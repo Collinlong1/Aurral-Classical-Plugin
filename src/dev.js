@@ -97,6 +97,13 @@ export default {
       return text ? JSON.parse(text) : { pending: true };
     },
 
+    // What the plugin recorded for each file it processed.
+    async processed(input) {
+      const records = JSON.parse(await fs.readFile(path.join(input.dataFolder, "processed.json"), "utf8").catch(() => "{}"));
+      const rows = Object.entries(records).filter(([, r]) => !input.status || r.status === input.status);
+      return rows.slice(input.offset || 0, (input.offset || 0) + (input.limit || 500)).map(([file, r]) => ({ file, ...r }));
+    },
+
     // Library files from the index (paths and tags only).
     async libraryFiles(input) {
       const ctx = makeContext(input);

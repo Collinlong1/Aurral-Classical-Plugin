@@ -229,17 +229,24 @@ export async function classicalInfo(ctx, recordingId, { albumArtistIds = [], rel
 
 // Search texts, most specific first: composer + work + catalogue number +
 // performer, then shorter ones Soulseek is likelier to match.
-export function searchQueries(info, extra = []) {
+// For an album, its title comes first: an album of several works is
+// shared as one folder named after the album, not after its first work.
+export function searchQueries(info, { albumTitle = "", album = false } = {}) {
   const composer = surname(info.composer);
   const performer = surname(info.performer);
   const work = shortWorkTitle(info.workTitle);
   const catalogue = catalogueNumber(info.workTitle) || catalogueNumber(info.movementTitle);
-  const candidates = [
+  const title = searchWords(albumTitle);
+  const byWork = [
     [composer, work, catalogue, performer],
     [composer, catalogue, performer],
     [composer, work, performer],
-    ...extra.map((words) => [composer, ...words]),
   ];
+  const byAlbum = [
+    [composer, title, performer],
+    [composer, title],
+  ];
+  const candidates = album ? [...byAlbum, ...byWork] : [...byWork, ...byAlbum.slice(1)];
   const seen = new Set();
   const queries = [];
   for (const parts of candidates) {
@@ -297,7 +304,7 @@ export async function searchTrack(ctx, track) {
   const info = await classicalInfo(ctx, recordingId, { releaseGroupId: release.releaseGroupId });
   if (!info) return [];
   const slskd = slskdFor(ctx);
-  const queries = searchQueries(info, [[searchWords(release.title)]]);
+  const queries = searchQueries(info, { albumTitle: release.title });
   const folders = await searchFolders(ctx, slskd, queries, (found) => trackCandidates(found, release, discPosition, index).length >= 3, started);
   const target = release.discs.find((d) => d.position === discPosition).tracks[index];
   ctx.log(`Release ${release.id}: ${describeMisses(folders, release)}`);
@@ -334,7 +341,7 @@ export async function searchAlbum(ctx, album) {
   }
   if (!info) return [];
   const slskd = slskdFor(ctx);
-  const queries = searchQueries(info, [[searchWords(release.title)]]);
+  const queries = searchQueries(info, { albumTitle: release.title, album: true });
   const folders = await searchFolders(ctx, slskd, queries, (found) => albumCandidates(found, release).length >= 3, started);
   ctx.log(`Release ${release.id}: ${describeMisses(folders, release)}`);
   return albumCandidates(folders, release)
