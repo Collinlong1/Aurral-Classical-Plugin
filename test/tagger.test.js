@@ -341,3 +341,28 @@ test("files tagged by an older version get the album artist on the next schedule
   await plugin.scheduled(input());
   assert.equal(fetchHere.calls.length, calls, "and only once");
 });
+
+test("an admin action pauses background tagging instead of waiting for it", async () => {
+  const file = await copyFixture("sine.flac", path.join(folders.libraryFolder, "busy", "01.flac"));
+  const ctx = makeContext(input());
+  let yielded = false;
+  // A long background run: it only stops when asked to.
+  const background = withTagging(ctx, async (session) => {
+    while (!(await session.shouldYield())) await new Promise((r) => setTimeout(r, 20));
+    yielded = true;
+  });
+  await new Promise((r) => setTimeout(r, 100));
+  const started = Date.now();
+  const result = await plugin.actions["tag-album"](input({ user: { id: 1, role: "admin" }, album: { title: "Busy", tracks: [{ path: file }] } }));
+  await background;
+  assert.ok(yielded);
+  assert.ok(Date.now() - started < 10_000, "the action didn't wait for the background run to finish");
+  assert.match(result.message, /1 tagged/);
+  assert.equal(readTags(file).artist, EXPECTED_ARTIST);
+});
+
+test("Tag as classical on an artist works on a fresh install, before any scan", async () => {
+  await copyFixture("sine.flac", path.join(folders.libraryFolder, "Ludwig van Beethoven", "Album", "01.flac"));
+  const result = await plugin.actions["tag-artist"](input({ user: { id: 1, role: "admin" }, artist: { id: 1, name: "Ludwig van Beethoven", mbid: null, albums: [] } }));
+  assert.match(result.message, /1 tagged/);
+});

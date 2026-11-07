@@ -36356,6 +36356,9 @@ var TAG_FIELDS = ["artist", "albumArtist", "composer", "work", "workId"];
 var TAGGING_VERSION = 2;
 var outdated = (record) => record && (record.status === "tagged" || record.status === "unchanged") && (record.v ?? 1) < TAGGING_VERSION;
 var lockDir = (ctx) => path3.join(ctx.dataFolder, "tagging.lock");
+var yieldFile = (ctx) => path3.join(ctx.dataFolder, "tagging.yield");
+var YIELD_FRESH_MS = 10 * 6e4;
+var PRIORITY_WAIT_MS = 5 * 6e4;
 async function enqueue(ctx, filePaths, { force = false, source = null } = {}) {
   await fs3.mkdir(queueDir(ctx), { recursive: true });
   const ids = [];
@@ -36411,6 +36414,19 @@ var Session = class {
     this.changedFiles = 0;
     this.savedAt = Date.now();
     this.stats = { tagged: 0, unchanged: 0, skipped: {}, failed: 0, left: 0 };
+  }
+  // True when an admin action is waiting and this is background work.
+  async shouldYield() {
+    if (this.priority) return false;
+    if (this.yieldCheckedAt && Date.now() - this.yieldCheckedAt < 500) return this.yielding;
+    this.yieldCheckedAt = Date.now();
+    const stat = await fs3.stat(yieldFile(this.ctx)).catch(() => null);
+    this.yielding = Boolean(stat && Date.now() - stat.mtimeMs < YIELD_FRESH_MS);
+    if (this.yielding && !this.yieldLogged) {
+      this.yieldLogged = true;
+      this.ctx.log("Pausing background tagging for an admin action");
+    }
+    return this.yielding;
   }
   async load() {
     this.processed = await readJson(processedFile(this.ctx), {});
@@ -36577,7 +36593,7 @@ var Session = class {
   }
   async drainQueue(until, onlyIds = null) {
     for (const entry of await queuedEntries(this.ctx)) {
-      if (Date.now() > until) return false;
+      if (Date.now() > until || await this.shouldYield()) return false;
       if (onlyIds && !onlyIds.has(entry.name.replace(/\.json$/, ""))) continue;
       const job = await readJson(entry.file, null);
       if (job?.path) {
@@ -36598,13 +36614,13 @@ var Session = class {
     const seen = /* @__PURE__ */ new Set();
     let complete = true;
     const walk = async (dir) => {
-      if (Date.now() > until) {
+      if (Date.now() > until || await this.shouldYield()) {
         complete = false;
         return;
       }
       const entries = await fs3.readdir(dir, { withFileTypes: true }).catch(() => []);
       for (const entry of entries) {
-        if (Date.now() > until) {
+        if (Date.now() > until || await this.shouldYield()) {
           complete = false;
           return;
         }
@@ -36637,11 +36653,21 @@ var Session = class {
     return pending;
   }
 };
-async function withTagging(ctx, work) {
-  const lock = await tryLock(lockDir(ctx), LOCK_STALE_MS);
+async function withTagging(ctx, work, { priority = false } = {}) {
+  let lock = await tryLock(lockDir(ctx), LOCK_STALE_MS);
+  if (!lock && priority) {
+    const until = Date.now() + PRIORITY_WAIT_MS;
+    while (!lock && Date.now() < until) {
+      await writeJson(yieldFile(ctx), { at: Date.now() });
+      await sleep(500);
+      lock = await tryLock(lockDir(ctx), LOCK_STALE_MS);
+    }
+  }
+  if (priority) await fs3.rm(yieldFile(ctx), { force: true });
   if (!lock) return null;
   const heartbeat = setInterval(() => lock.touch(), 3e4);
   const session = new Session(ctx, lock);
+  session.priority = priority;
   try {
     await session.load();
     await work(session);
@@ -36661,12 +36687,16 @@ async function refreshLibrary(ctx) {
     ctx.log(`Couldn't ask Aurral to rescan the Library: ${error.message}`);
   }
 }
-async function runQueue(ctx, budgetMs, onlyIds = null) {
+async function runQueue(ctx, budgetMs, onlyIds = null, { priority = false } = {}) {
   const until = Date.now() + budgetMs;
-  return withTagging(ctx, async (session) => {
-    await session.drainQueue(until, onlyIds);
-    session.stats.left = await queueLength(ctx);
-  });
+  return withTagging(
+    ctx,
+    async (session) => {
+      await session.drainQueue(until, onlyIds);
+      session.stats.left = onlyIds ? (await queuedEntries(ctx)).filter((e) => onlyIds.has(e.name.replace(/\.json$/, ""))).length : await queueLength(ctx);
+    },
+    { priority }
+  );
 }
 async function runScheduled(ctx, budgetMs) {
   const until = Date.now() + budgetMs;
@@ -36675,22 +36705,26 @@ async function runScheduled(ctx, budgetMs) {
     const pending = await session.scan(until);
     session.stats.found = pending.length;
     for (const file of pending) {
-      if (Date.now() > until) break;
+      if (Date.now() > until || await session.shouldYield()) break;
       if (!await session.processFile(file, { prefilter: true, upgrade: true })) break;
       await session.save();
     }
     session.stats.left = await queueLength(ctx) + pending.filter((f) => !session.processed[f]).length;
   });
 }
-async function libraryIndex(ctx, budgetMs) {
+async function libraryIndex(ctx, budgetMs, { priority = false } = {}) {
   let index = null;
-  await withTagging(ctx, async (session) => {
-    await session.scan(Date.now() + budgetMs);
-    index = session.index;
-  });
+  await withTagging(
+    ctx,
+    async (session) => {
+      await session.scan(Date.now() + budgetMs);
+      index = session.index;
+    },
+    { priority }
+  );
   return index ?? await readJson(indexFile(ctx), {});
 }
-async function untagFiles(ctx, paths, budgetMs) {
+async function untagFiles(ctx, paths, budgetMs, { priority = false } = {}) {
   const until = Date.now() + budgetMs;
   const counts = { restored: 0, unchanged: 0, "no backup": 0, skipped: 0, left: 0 };
   const stats = await withTagging(ctx, async (session) => {
@@ -36706,7 +36740,7 @@ async function untagFiles(ctx, paths, budgetMs) {
         counts.skipped++;
       }
     }
-  });
+  }, { priority });
   return stats ? counts : null;
 }
 function describeStats(stats) {
@@ -36864,7 +36898,7 @@ function summarize(lines) {
 import path4 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.0" : "dev";
+var VERSION = true ? "1.0.1" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js
@@ -37530,20 +37564,14 @@ function tagInBackground(ctx) {
 async function tagNow(ctx, paths, what) {
   if (!paths.length) return `No files to tag in ${what}`;
   const ids = new Set(await enqueue(ctx, paths, { force: true, source: "action" }));
-  const until = Date.now() + ACTION_BUDGET_MS;
-  for (; ; ) {
-    const stats = await runQueue(ctx, until - Date.now(), ids);
-    if (stats) return `${what}: ${describeStats(stats)}`.slice(0, 500);
-    if (Date.now() > until - 6e4) break;
-    await sleep(5e3);
-  }
+  const stats = await runQueue(ctx, ACTION_BUDGET_MS, ids, { priority: true });
+  if (stats) return `${what}: ${describeStats(stats)}`.slice(0, 500);
   return `Queued ${paths.length} files from ${what}. Tagging is busy and will get to them.`;
 }
 async function untagNow(ctx, paths, what) {
   if (!paths.length) return `No files in ${what}`;
-  const until = Date.now() + ACTION_BUDGET_MS;
-  for (; ; ) {
-    const counts = await untagFiles(ctx, paths, until - Date.now());
+  {
+    const counts = await untagFiles(ctx, paths, ACTION_BUDGET_MS, { priority: true });
     if (counts) {
       const parts = [`${counts.restored} restored`];
       if (counts.unchanged) parts.push(`${counts.unchanged} already had no classical tags`);
@@ -37552,8 +37580,7 @@ async function untagNow(ctx, paths, what) {
       if (counts.left) parts.push(`${counts.left} left: run it again`);
       return `${what}: ${parts.join(", ")}. The plugin won't tag these recordings again unless you tag them as classical.`.slice(0, 500);
     }
-    if (Date.now() > until - 6e4) return `Tagging is busy. Try again in a few minutes.`;
-    await sleep(5e3);
+    return `Tagging is busy. Try again in a few minutes.`;
   }
 }
 function artistFiles(index, artist) {
@@ -37594,7 +37621,7 @@ var index_default = {
     },
     async "tag-artist"(input) {
       const ctx = makeContext(input);
-      const index = await libraryIndex(ctx, 10 * 6e4);
+      const index = await libraryIndex(ctx, 10 * 6e4, { priority: true });
       return { message: await tagNow(ctx, artistFiles(index, input.artist), input.artist.name) };
     },
     async "compare-track"(input) {

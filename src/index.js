@@ -6,7 +6,7 @@ import { parseOrder, parseSeparator, slskdSettings } from "./settings.js";
 import { Slskd } from "./slskd.js";
 import { downloadStatus, searchAlbum, searchTrack, startDownload } from "./source.js";
 import { describeStats, enqueue, libraryIndex, runQueue, runScheduled, untagFiles } from "./tagger.js";
-import { pruneCache, sleep } from "./store.js";
+import { pruneCache } from "./store.js";
 
 const BACKGROUND_BUDGET_MS = 4 * 60_000; // the process stops 5 idle minutes after a call
 const SCHEDULE_BUDGET_MS = 8.5 * 60_000; // a scheduled run has 10 minutes
@@ -59,21 +59,15 @@ function tagInBackground(ctx) {
 async function tagNow(ctx, paths, what) {
   if (!paths.length) return `No files to tag in ${what}`;
   const ids = new Set(await enqueue(ctx, paths, { force: true, source: "action" }));
-  const until = Date.now() + ACTION_BUDGET_MS;
-  for (;;) {
-    const stats = await runQueue(ctx, until - Date.now(), ids);
-    if (stats) return `${what}: ${describeStats(stats)}`.slice(0, 500);
-    if (Date.now() > until - 60_000) break;
-    await sleep(5000);
-  }
+  const stats = await runQueue(ctx, ACTION_BUDGET_MS, ids, { priority: true });
+  if (stats) return `${what}: ${describeStats(stats)}`.slice(0, 500);
   return `Queued ${paths.length} files from ${what}. Tagging is busy and will get to them.`;
 }
 
 async function untagNow(ctx, paths, what) {
   if (!paths.length) return `No files in ${what}`;
-  const until = Date.now() + ACTION_BUDGET_MS;
-  for (;;) {
-    const counts = await untagFiles(ctx, paths, until - Date.now());
+  {
+    const counts = await untagFiles(ctx, paths, ACTION_BUDGET_MS, { priority: true });
     if (counts) {
       const parts = [`${counts.restored} restored`];
       if (counts.unchanged) parts.push(`${counts.unchanged} already had no classical tags`);
@@ -82,8 +76,7 @@ async function untagNow(ctx, paths, what) {
       if (counts.left) parts.push(`${counts.left} left: run it again`);
       return `${what}: ${parts.join(", ")}. The plugin won't tag these recordings again unless you tag them as classical.`.slice(0, 500);
     }
-    if (Date.now() > until - 60_000) return `Tagging is busy. Try again in a few minutes.`;
-    await sleep(5000);
+    return `Tagging is busy. Try again in a few minutes.`;
   }
 }
 
@@ -135,7 +128,8 @@ export default {
 
     async "tag-artist"(input) {
       const ctx = makeContext(input);
-      const index = await libraryIndex(ctx, 10 * 60_000);
+      // Reads the Library first, so a fresh install finds the artist's files.
+      const index = await libraryIndex(ctx, 10 * 60_000, { priority: true });
       return { message: await tagNow(ctx, artistFiles(index, input.artist), input.artist.name) };
     },
 

@@ -7,7 +7,7 @@ import path from "node:path";
 import { isAudioPath, readTags, readValues, UnsupportedFormat, writeTags } from "./tags.js";
 import { creditString, RELEASE_INC } from "./works.js";
 import { Aurral } from "./aurral.js";
-import { readJson, tryLock, writeJson } from "./store.js";
+import { readJson, sleep, tryLock, writeJson } from "./store.js";
 
 const LOCK_STALE_MS = 2 * 60_000;
 const SAVE_EVERY_MS = 30_000;
@@ -26,6 +26,11 @@ export const TAG_FIELDS = ["artist", "albumArtist", "composer", "work", "workId"
 const TAGGING_VERSION = 2;
 const outdated = (record) => record && (record.status === "tagged" || record.status === "unchanged") && (record.v ?? 1) < TAGGING_VERSION;
 const lockDir = (ctx) => path.join(ctx.dataFolder, "tagging.lock");
+// Left by an admin action waiting for the lock: background work stops at the
+// next file and picks up later.
+const yieldFile = (ctx) => path.join(ctx.dataFolder, "tagging.yield");
+const YIELD_FRESH_MS = 10 * 60_000;
+const PRIORITY_WAIT_MS = 5 * 60_000;
 
 export async function enqueue(ctx, filePaths, { force = false, source = null } = {}) {
   await fs.mkdir(queueDir(ctx), { recursive: true });
@@ -90,6 +95,20 @@ class Session {
     this.changedFiles = 0;
     this.savedAt = Date.now();
     this.stats = { tagged: 0, unchanged: 0, skipped: {}, failed: 0, left: 0 };
+  }
+
+  // True when an admin action is waiting and this is background work.
+  async shouldYield() {
+    if (this.priority) return false;
+    if (this.yieldCheckedAt && Date.now() - this.yieldCheckedAt < 500) return this.yielding;
+    this.yieldCheckedAt = Date.now();
+    const stat = await fs.stat(yieldFile(this.ctx)).catch(() => null);
+    this.yielding = Boolean(stat && Date.now() - stat.mtimeMs < YIELD_FRESH_MS);
+    if (this.yielding && !this.yieldLogged) {
+      this.yieldLogged = true;
+      this.ctx.log("Pausing background tagging for an admin action");
+    }
+    return this.yielding;
   }
 
   async load() {
@@ -269,7 +288,7 @@ class Session {
 
   async drainQueue(until, onlyIds = null) {
     for (const entry of await queuedEntries(this.ctx)) {
-      if (Date.now() > until) return false;
+      if (Date.now() > until || (await this.shouldYield())) return false;
       if (onlyIds && !onlyIds.has(entry.name.replace(/\.json$/, ""))) continue;
       const job = await readJson(entry.file, null);
       if (job?.path) {
@@ -291,13 +310,13 @@ class Session {
     const seen = new Set();
     let complete = true;
     const walk = async (dir) => {
-      if (Date.now() > until) {
+      if (Date.now() > until || (await this.shouldYield())) {
         complete = false;
         return;
       }
       const entries = await fs.readdir(dir, { withFileTypes: true }).catch(() => []);
       for (const entry of entries) {
-        if (Date.now() > until) {
+        if (Date.now() > until || (await this.shouldYield())) {
           complete = false;
           return;
         }
@@ -333,11 +352,23 @@ class Session {
 
 // Runs `work` while holding the tagging lock, or returns null if another
 // process has it.
-export async function withTagging(ctx, work) {
-  const lock = await tryLock(lockDir(ctx), LOCK_STALE_MS);
+// With `priority` (admin actions), waits up to five minutes for background
+// work to stop at its next file instead of giving up.
+export async function withTagging(ctx, work, { priority = false } = {}) {
+  let lock = await tryLock(lockDir(ctx), LOCK_STALE_MS);
+  if (!lock && priority) {
+    const until = Date.now() + PRIORITY_WAIT_MS;
+    while (!lock && Date.now() < until) {
+      await writeJson(yieldFile(ctx), { at: Date.now() });
+      await sleep(500);
+      lock = await tryLock(lockDir(ctx), LOCK_STALE_MS);
+    }
+  }
+  if (priority) await fs.rm(yieldFile(ctx), { force: true });
   if (!lock) return null;
   const heartbeat = setInterval(() => lock.touch(), 30_000);
   const session = new Session(ctx, lock);
+  session.priority = priority;
   try {
     await session.load();
     await work(session);
@@ -362,12 +393,18 @@ async function refreshLibrary(ctx) {
   }
 }
 
-export async function runQueue(ctx, budgetMs, onlyIds = null) {
+export async function runQueue(ctx, budgetMs, onlyIds = null, { priority = false } = {}) {
   const until = Date.now() + budgetMs;
-  return withTagging(ctx, async (session) => {
-    await session.drainQueue(until, onlyIds);
-    session.stats.left = await queueLength(ctx);
-  });
+  return withTagging(
+    ctx,
+    async (session) => {
+      await session.drainQueue(until, onlyIds);
+      session.stats.left = onlyIds
+        ? (await queuedEntries(ctx)).filter((e) => onlyIds.has(e.name.replace(/\.json$/, ""))).length
+        : await queueLength(ctx);
+    },
+    { priority },
+  );
 }
 
 // The schedule: the queue first, then the Library scan.
@@ -378,7 +415,7 @@ export async function runScheduled(ctx, budgetMs) {
     const pending = await session.scan(until);
     session.stats.found = pending.length;
     for (const file of pending) {
-      if (Date.now() > until) break;
+      if (Date.now() > until || (await session.shouldYield())) break;
       if (!(await session.processFile(file, { prefilter: true, upgrade: true }))) break;
       await session.save();
     }
@@ -387,16 +424,20 @@ export async function runScheduled(ctx, budgetMs) {
 }
 
 // Library files from the index, refreshed first.
-export async function libraryIndex(ctx, budgetMs) {
+export async function libraryIndex(ctx, budgetMs, { priority = false } = {}) {
   let index = null;
-  await withTagging(ctx, async (session) => {
-    await session.scan(Date.now() + budgetMs);
-    index = session.index;
-  });
+  await withTagging(
+    ctx,
+    async (session) => {
+      await session.scan(Date.now() + budgetMs);
+      index = session.index;
+    },
+    { priority },
+  );
   return index ?? (await readJson(indexFile(ctx), {}));
 }
 
-export async function untagFiles(ctx, paths, budgetMs) {
+export async function untagFiles(ctx, paths, budgetMs, { priority = false } = {}) {
   const until = Date.now() + budgetMs;
   const counts = { restored: 0, unchanged: 0, "no backup": 0, skipped: 0, left: 0 };
   const stats = await withTagging(ctx, async (session) => {
@@ -412,7 +453,7 @@ export async function untagFiles(ctx, paths, budgetMs) {
         counts.skipped++;
       }
     }
-  });
+  }, { priority });
   return stats ? counts : null;
 }
 
