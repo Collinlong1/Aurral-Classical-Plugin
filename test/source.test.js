@@ -130,15 +130,43 @@ test("a request without a recording ID uses the release's track at its position"
   assert.equal(results[0].data.files[0].recordingId, RECORDING);
 });
 
-test("a folder that matches another edition's lengths qualifies, as in Aurral", async () => {
+function withEditions(releases) {
   const e = entities();
-  // A digital edition of the same recordings, a few seconds off the CD.
-  e["editions:rg1"] = { releases: [{ id: "digital", media: [{ tracks: [
-    { length: 2000, recording: { id: RECORDING } }, { length: 305_000, recording: { id: "r2" } },
-  ] }] }] };
-  globalThis.fetch = fakeFetch({ entities: e, slskd: fakeSlskd(state) });
+  e["release:rel1"].status = "Official";
+  e["editions:rg1"] = { releases };
+  return e;
+}
+// Another pressing of rel1: the same tracks, the second one 5 seconds longer.
+const pressing = (extra = {}) => ({
+  id: "other",
+  status: "Official",
+  media: [{ tracks: [
+    { title: "Symphony No. 5: I. Allegro con brio", length: 2000, recording: { id: RECORDING } },
+    { title: "Symphony No. 5: II. Andante", length: 305_000, recording: { id: "r2" } },
+  ] }, { tracks: [
+    { title: "Symphony No. 7: I.", length: 400_000, recording: { id: "r3" } },
+    { title: "Symphony No. 7: II.", length: 500_000, recording: { id: "r4" } },
+  ] }],
+  ...extra,
+});
+
+test("a folder that matches another official pressing's lengths qualifies, as in Aurral", async () => {
+  globalThis.fetch = fakeFetch({ entities: withEditions([pressing()]), slskd: fakeSlskd(state) });
   const results = await plugin.downloadSource.search(input({ track: request }));
-  assert.deepEqual(results.map((r) => r.data.username).sort(), ["alice", "bob", "carol"]);
+  assert.ok(results.map((r) => r.data.username).includes("carol"));
+});
+
+test("lengths of pressings Aurral wouldn't count don't qualify a folder", async () => {
+  // Aurral counts only official pressings when the album has one, and only
+  // ones with the same titles in the same order.
+  const unofficial = pressing({ status: null });
+  const retitled = pressing();
+  retitled.media[0].tracks[1].title = "Andante con moto";
+  for (const releases of [[unofficial], [retitled]]) {
+    globalThis.fetch = fakeFetch({ entities: withEditions(releases), slskd: fakeSlskd(state) });
+    const results = await plugin.downloadSource.search(input({ track: request }));
+    assert.ok(!results.map((r) => r.data.username).includes("carol"));
+  }
 });
 
 test("searches return nothing for requests that aren't classical", async () => {

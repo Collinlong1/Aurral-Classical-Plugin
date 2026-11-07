@@ -37044,20 +37044,20 @@ async function loadRelease(mb, releaseMbid) {
   })).filter((disc) => disc.tracks.length > 0);
   const groupId = release["release-group"]?.id;
   const editions = groupId ? await mb.query("release", { "release-group": groupId, inc: "recordings", limit: "100" }) : null;
-  const pressings = /* @__PURE__ */ new Map();
-  for (const edition of editions?.releases || []) {
-    for (const medium of edition.media || []) {
-      for (const track of medium.tracks || []) {
-        const id = track.recording?.id;
-        if (!id || track.length == null) continue;
-        if (!pressings.has(id)) pressings.set(id, /* @__PURE__ */ new Set());
-        pressings.get(id).add(track.length);
-      }
-    }
-  }
+  const flat = (r) => (r.media || []).flatMap((m) => (m.tracks || []).map((t) => ({ title: t.title || t.recording?.title || "", length: t.length, recordingId: t.recording?.id })));
+  const order = (tracks) => tracks.map((t) => normalizeTitle(t.title)).join("\n");
+  const own = flat(release);
+  const others = (editions?.releases || []).filter((r) => r.id !== release.id);
+  const officialOnly = others.some((r) => r.status === "Official") || release.status === "Official";
+  const pressings = others.filter((r) => !officialOnly || r.status === "Official").map(flat).filter((tracks) => tracks.length === own.length && order(tracks) === order(own));
+  let index = 0;
   for (const disc of discs)
-    for (const track of disc.tracks)
-      track.lengthsMs = [...new Set([track.lengthMs, ...pressings.get(track.recordingId) ?? []].filter((l) => l != null))];
+    for (const track of disc.tracks) {
+      const i = index++;
+      const lengths = pressings.map((tracks) => tracks[i]).filter((t) => t?.recordingId === track.recordingId && t.length > 0).map((t) => t.length);
+      if (track.lengthMs == null && lengths.length) track.lengthMs = [...lengths].sort((a, b) => a - b)[Math.floor(lengths.length / 2)];
+      track.lengthsMs = [...new Set([track.lengthMs, ...lengths].filter((l) => l != null))];
+    }
   return {
     id: release.id,
     title: release.title,
@@ -37067,6 +37067,9 @@ async function loadRelease(mb, releaseMbid) {
     releaseGroupId: release["release-group"]?.id ?? null,
     discs
   };
+}
+function normalizeTitle(value) {
+  return String(value || "").normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").replace(/\s+/g, " ").trim();
 }
 var extensionOf = (filename) => (filename.match(/\.([a-z0-9]+)$/i)?.[1] || "").toLowerCase();
 var remoteDir = (filename) => filename.replace(/[\\/][^\\/]*$/, "");
