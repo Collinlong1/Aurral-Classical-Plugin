@@ -275,3 +275,23 @@ test("searches started while slskd is busy wait and try again", async () => {
   assert.ok(state.searches.length >= 1);
   assert.deepEqual(results.map((r) => r.data.username).sort(), ["alice", "bob"]);
 });
+
+test("an older cancelled request for a file doesn't fail a download slskd is still doing", async () => {
+  const [result] = await plugin.downloadSource.search(input({ track: request }));
+  const directory = path.join(folders.root, "stage");
+  const started = await plugin.downloadSource.download(input({ result, directory }));
+  const filename = result.data.files[0].filename;
+  state.transfers = () => [
+    { filename, state: "Completed, Cancelled", requestedAt: "2026-01-01T00:00:00" },
+    { filename, state: "InProgress", requestedAt: "2026-01-01T00:30:00" },
+  ];
+  assert.deepEqual(await plugin.downloadSource.status(input({ id: started.pending, directory })), { done: false });
+  // ...and a finished earlier request is used, whatever came after it.
+  state.transfers = () => [
+    { filename, state: "Completed, Succeeded", requestedAt: "2026-01-01T00:00:00" },
+    { filename, state: "Completed, Cancelled", requestedAt: "2026-01-01T00:30:00" },
+  ];
+  const parts = filename.split("\\");
+  await copyFixture("sine.flac", path.join(folders.downloads, parts.at(-2), parts.at(-1)));
+  assert.equal((await plugin.downloadSource.status(input({ id: started.pending, directory }))).done, true);
+});

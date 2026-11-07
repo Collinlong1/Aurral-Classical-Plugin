@@ -457,10 +457,13 @@ export async function downloadStatus(ctx, id, directory) {
   if (!record) throw new Error("This download is unknown to the plugin");
   const slskd = slskdFor(ctx);
   const transfers = await slskd.downloads(record.username);
+  // slskd can hold several requests for one file, as when Aurral asks again
+  // after the plugin was turned off mid-download. The best one counts: done,
+  // else still going, and the file only fails when every request did.
+  const rank = (state) => (isSucceeded(state) ? 0 : FAILED_STATES.test(state) ? 2 : 1);
   const states = record.files.map((file) => {
     const matches = transfers.filter((t) => t.filename === file.filename);
-    const latest = matches.sort((a, b) => String(b.requestedAt || "").localeCompare(String(a.requestedAt || "")))[0];
-    return latest?.state || "";
+    return matches.map((t) => t.state || "").sort((a, b) => rank(a) - rank(b))[0] ?? "";
   });
   const failed = states.find((state) => FAILED_STATES.test(state));
   if (failed) throw new Error(`slskd: ${remoteBase(record.files[states.indexOf(failed)].filename)} ${failed.replace(/^Completed,\s*/, "").toLowerCase()}`);
