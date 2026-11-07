@@ -2,9 +2,9 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { afterEach, beforeEach, test } from "node:test";
-import plugin from "../src/index.js";
+import plugin, { makeContext } from "../src/index.js";
 import { readTags } from "../src/tags.js";
-import { groupFolders, linesUp } from "../src/source.js";
+import { downloadStatus, groupFolders, KEEP_FREE_BYTES, linesUp } from "../src/source.js";
 import { catalogueNumber, shortWorkTitle } from "../src/works.js";
 import { baseSettings, copyFixture, fakeFetch, json, RECORDING, SLSKD, symphonyEntities, tempFolders } from "./helpers.js";
 
@@ -247,6 +247,58 @@ test("an album download tags the files it can vouch for and leaves the rest", as
   assert.equal(tagged[0].recordingMbid, RECORDING);
   assert.equal(tagged[0].title, "Symphony No. 5: I. Allegro con brio");
   for (const t of tagged.slice(1)) assert.equal(t.title, "Symphony No. 5: I.");
+});
+
+async function finishedAlbum() {
+  const album = { artist: "Ludwig van Beethoven", title: "Symphonies 5 & 7", releaseMbid: "rel1", releaseGroupMbid: "rg1", tracks: [] };
+  const [result] = await plugin.downloadSource.searchAlbum(input({ album }));
+  const directory = path.join(folders.root, "stage");
+  await fs.mkdir(directory, { recursive: true });
+  const started = await plugin.downloadSource.downloadAlbum(input({ result, album, directory }));
+  state.transfers = () => result.data.files.map((f) => ({ filename: f.filename, state: "Completed, Succeeded" }));
+  for (const f of result.data.files) {
+    const parts = f.filename.split("\\");
+    await copyFixture("sine.flac", path.join(folders.downloads, parts.at(-2), parts.at(-1)));
+  }
+  return { directory, id: started.pending };
+}
+
+const noLinks = async () => {
+  throw Object.assign(new Error("cross-device link"), { code: "EXDEV" });
+};
+
+test("a download that won't fit in Aurral's data folder is refused before copying", async () => {
+  const { directory, id } = await finishedAlbum();
+  const ctx = { ...makeContext(input()), linkFile: noLinks, freeBytes: async () => KEEP_FREE_BYTES + 1000 };
+  await assert.rejects(downloadStatus(ctx, id, directory), /Not enough room for this download in Aurral's data folder/);
+  assert.deepEqual(await fs.readdir(directory), [], "nothing was copied");
+});
+
+test("files are hard-linked when slskd's folder is on the same disk, and need no space", async () => {
+  const { directory, id } = await finishedAlbum();
+  const ctx = { ...makeContext(input()), freeBytes: async () => 0 };
+  assert.deepEqual(await downloadStatus(ctx, id, directory), { done: true });
+  assert.equal((await fs.readdir(directory)).length, 4);
+});
+
+test("a slow copy carries on across status calls instead of running past one", async () => {
+  const { directory, id } = await finishedAlbum();
+  let release;
+  const gate = new Promise((r) => (release = r));
+  const ctx = {
+    ...makeContext(input()),
+    finishWaitMs: 50,
+    linkFile: async (...args) => {
+      await gate;
+      return noLinks(...args);
+    },
+  };
+  assert.deepEqual(await downloadStatus(ctx, id, directory), { done: false });
+  assert.deepEqual(await downloadStatus(ctx, id, directory), { done: false });
+  release();
+  assert.deepEqual(await downloadStatus({ ...ctx, finishWaitMs: 10_000 }, id, directory), { done: true });
+  assert.equal((await fs.readdir(directory)).filter((n) => n.endsWith(".flac")).length, 4);
+  assert.deepEqual((await fs.readdir(directory)).filter((n) => !n.endsWith(".flac")), [], "no partial copies left");
 });
 
 test("a failed slskd transfer fails the download", async () => {

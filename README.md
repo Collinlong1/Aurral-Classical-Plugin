@@ -108,6 +108,10 @@ Here the admin has said the music is classical, so missing evidence doesn't
 stop it; signs that it isn't classical (a soundtrack, Christmas or crossover
 genre, a musical) still do.
 
+Admin actions never wait their turn behind other tagging. Several can run at
+once, and background tagging (the schedule, new downloads) pauses at its next
+file while one runs, even when Aurral runs it in another process.
+
 ## Remove classical tags
 
 Admins see **Remove classical tags** in the album menu. Before it first changes
@@ -151,10 +155,18 @@ hold one disc or the whole release; for an album, one user's folders must
 cover every disc.
 
 Downloads run in slskd. Aurral checks on them every 15 seconds. When they
-finish, the plugin copies the files from slskd's download folder into Aurral's
+finish, the plugin puts the files from slskd's download folder into Aurral's
 and tags each file whose length still matches its track with MusicBrainz's
 title, artist and recording ID. Files it can't vouch for go back untagged,
 so Aurral sends them to review.
+
+Aurral keeps a plugin's downloads in its own data folder (`/config` in
+Docker) until it imports them. When slskd's folder is on the same disk, the
+plugin hard-links the files, which is instant and takes no space. Otherwise it
+copies them, in the background across Aurral's checks, and first makes sure
+the copy leaves at least 1 GB free there, since Aurral's database is on that
+disk too. A download that doesn't fit fails with a message saying how much
+room it needs.
 
 ## Data folder
 

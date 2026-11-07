@@ -342,23 +342,83 @@ test("files tagged by an older version get the album artist on the next schedule
   assert.equal(fetchHere.calls.length, calls, "and only once");
 });
 
-test("an admin action pauses background tagging instead of waiting for it", async () => {
+test("an admin action runs while another is still going, instead of waiting for it", async () => {
+  const file = await copyFixture("sine.flac", path.join(folders.libraryFolder, "busy", "01.flac"));
+  const ctx = makeContext(input());
+  let release;
+  const gate = new Promise((r) => (release = r));
+  // A long admin action, like Tag as classical on a big artist.
+  const long = withTagging(ctx, () => gate, { priority: true });
+  await new Promise((r) => setTimeout(r, 50));
+  const started = Date.now();
+  const tagged = await plugin.actions["tag-album"](input({ user: { id: 1, role: "admin" }, album: { title: "Busy", tracks: [{ path: file }] } }));
+  assert.match(tagged.message, /1 tagged/);
+  const untagged = await plugin.actions["untag-album"](input({ user: { id: 1, role: "admin" }, album: { title: "Busy", tracks: [{ path: file }] } }));
+  assert.match(untagged.message, /1 restored/);
+  assert.ok(Date.now() - started < 10_000);
+  release();
+  await long;
+  assert.notEqual(readTags(file).artist, EXPECTED_ARTIST);
+});
+
+test("background tagging in this process stops for an admin action", async () => {
   const file = await copyFixture("sine.flac", path.join(folders.libraryFolder, "busy", "01.flac"));
   const ctx = makeContext(input());
   let yielded = false;
-  // A long background run: it only stops when asked to.
   const background = withTagging(ctx, async (session) => {
-    while (!(await session.shouldYield())) await new Promise((r) => setTimeout(r, 20));
+    while (!(await session.shouldYield())) await new Promise((r) => setTimeout(r, 5));
     yielded = true;
   });
-  await new Promise((r) => setTimeout(r, 100));
-  const started = Date.now();
-  const result = await plugin.actions["tag-album"](input({ user: { id: 1, role: "admin" }, album: { title: "Busy", tracks: [{ path: file }] } }));
+  await new Promise((r) => setTimeout(r, 20));
+  let release;
+  const gate = new Promise((r) => (release = r));
+  const action = withTagging(ctx, () => gate, { priority: true });
   await background;
   assert.ok(yielded);
-  assert.ok(Date.now() - started < 10_000, "the action didn't wait for the background run to finish");
+  release();
+  await action;
+  assert.ok(file);
+});
+
+test("background tagging in another process pauses for an admin action", async () => {
+  const file = await copyFixture("sine.flac", path.join(folders.libraryFolder, "busy", "01.flac"));
+  // Another Aurral process holding the lock, which stops when it sees the
+  // admin's request to pause.
+  const { tryLock } = await import("../src/store.js");
+  const lock = await tryLock(path.join(folders.dataFolder, "tagging.lock"), 120_000);
+  assert.ok(lock);
+  const other = (async () => {
+    for (;;) {
+      const stat = await fs.stat(path.join(folders.dataFolder, "tagging.yield")).catch(() => null);
+      if (stat) break;
+      await new Promise((r) => setTimeout(r, 50));
+    }
+    await lock.release();
+  })();
+  const started = Date.now();
+  const result = await plugin.actions["tag-album"](input({ user: { id: 1, role: "admin" }, album: { title: "Busy", tracks: [{ path: file }] } }));
+  await other;
+  assert.ok(Date.now() - started < 10_000);
   assert.match(result.message, /1 tagged/);
   assert.equal(readTags(file).artist, EXPECTED_ARTIST);
+});
+
+test("a Tag as classical left in the queue doesn't undo a later Remove classical tags", async () => {
+  const file = await copyFixture("sine.flac", path.join(folders.libraryFolder, "later", "01.flac"));
+  const album = { title: "Later", tracks: [{ path: file }] };
+  await plugin.actions["tag-album"](input({ user: { id: 1, role: "admin" }, album }));
+  const ctx = makeContext(input());
+  // A Tag as classical that was cut off (the plugin restarted) leaves its
+  // request queued; then the admin removes the tags.
+  await enqueue(ctx, [file], { force: true, source: "action" });
+  const queued = (await fs.readdir(path.join(folders.dataFolder, "queue")))[0];
+  const job = JSON.parse(await fs.readFile(path.join(folders.dataFolder, "queue", queued), "utf8"));
+  job.at -= 10 * 60_000;
+  await fs.writeFile(path.join(folders.dataFolder, "queue", queued), JSON.stringify(job));
+  await plugin.actions["untag-album"](input({ user: { id: 1, role: "admin" }, album }));
+  await plugin.scheduled(input());
+  assert.notEqual(readTags(file).artist, EXPECTED_ARTIST);
+  assert.deepEqual(await fs.readdir(path.join(folders.dataFolder, "queue")), []);
 });
 
 test("Tag as classical on an artist works on a fresh install, before any scan", async () => {
