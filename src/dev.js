@@ -5,6 +5,8 @@ import path from "node:path";
 import plugin, { makeContext } from "./index.js";
 import { readTags } from "./tags.js";
 import { withTagging } from "./tagger.js";
+import { Slskd } from "./slskd.js";
+import { slskdSettings } from "./settings.js";
 
 const samples = (ctx) => path.join(ctx.dataFolder, "samples");
 
@@ -28,6 +30,13 @@ export default {
         copied.push(target);
       }
       return { copied };
+    },
+
+    // Deletes the copies in dataFolder/samples (the dev plugin's own files).
+    async clearSamples(input) {
+      const ctx = makeContext(input);
+      await fs.rm(samples(ctx), { recursive: true, force: true });
+      return { cleared: samples(ctx) };
     },
 
     async listSamples(input) {
@@ -114,6 +123,51 @@ export default {
       const response = await fetch(`${input.api.url}${route}`, { headers: { "X-Api-Key": input.api.key } });
       const text = await response.text();
       return { status: response.status, body: text.slice(0, input.maxChars || 200_000) };
+    },
+
+    // Sizes of the plugin data folders (read only): every plugin's folder
+    // beside this one, and the biggest entries inside each.
+    async du(input) {
+      const root = path.dirname(input.dataFolder);
+      const size = async (p) => {
+        const st = await fs.lstat(p).catch(() => null);
+        if (!st) return { bytes: 0, files: 0 };
+        if (!st.isDirectory()) return { bytes: st.size, files: 1 };
+        let bytes = 0, files = 0;
+        for (const name of await fs.readdir(p).catch(() => [])) {
+          const r = await size(path.join(p, name));
+          bytes += r.bytes; files += r.files;
+        }
+        return { bytes, files };
+      };
+      const out = {};
+      for (const name of await fs.readdir(root)) {
+        const dir = path.join(root, name);
+        const inner = {};
+        for (const child of await fs.readdir(dir).catch(() => [])) inner[child] = await size(path.join(dir, child));
+        out[name] = inner;
+      }
+      return { root, out };
+    },
+
+    // Reads a file under the plugin data folders (read only).
+    async peek(input) {
+      const root = path.dirname(input.dataFolder);
+      const file = path.resolve(root, String(input.file || ""));
+      if (!inside(root, file)) throw new Error("only files under the plugin data folders");
+      const st = await fs.stat(file);
+      if (st.isDirectory()) return { dir: await fs.readdir(file) };
+      return { text: (await fs.readFile(file, "utf8")).slice(0, input.maxChars || 100_000) };
+    },
+
+    // A user's transfers in slskd, summarized by state (read only).
+    async slskdTransfers(input) {
+      const transfers = await new Slskd(slskdSettings(input.settings)).downloads(input.username);
+      const states = {};
+      for (const t of transfers) states[t.state] = (states[t.state] || 0) + 1;
+      const bytes = transfers.reduce((a, t) => a + (t.bytesTransferred || 0), 0);
+      const size = transfers.reduce((a, t) => a + (t.size || 0), 0);
+      return { count: transfers.length, states, bytes, size, sample: transfers.slice(0, 2).map((t) => ({ state: t.state, requestedAt: t.requestedAt, endedAt: t.endedAt, percent: t.percentComplete })) };
     },
 
     // Library files from the index (paths and tags only).

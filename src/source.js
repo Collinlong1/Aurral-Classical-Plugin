@@ -498,20 +498,112 @@ export async function downloadStatus(ctx, id, directory) {
   if (failed) throw new Error(`slskd: ${remoteBase(record.files[states.indexOf(failed)].filename)} ${failed.replace(/^Completed,\s*/, "").toLowerCase()}`);
   if (!states.every(isSucceeded)) return { done: false };
 
+  return finishDownload(ctx, id, record, directory);
+}
+
+// Moving a finished download into Aurral's folder can take longer than a
+// status call may (a minute): a FLAC album is gigabytes. It runs in the
+// background, and each status call waits for it a while, then reports it
+// still going. A restarted process starts it again and skips what's there.
+const finishing = new Map();
+const FINISH_WAIT_MS = 40_000;
+// Aurral keeps plugin downloads in its own data folder, beside its
+// database, until it imports them. A copy never leaves it less than this.
+export const KEEP_FREE_BYTES = 1024 ** 3;
+
+async function finishDownload(ctx, id, record, directory) {
+  const key = `${id}\u0000${directory}`;
+  let job = finishing.get(key);
+  if (!job) {
+    job = { promise: moveIntoPlace(ctx, id, record, directory) };
+    job.promise.then(
+      (value) => (job.value = value),
+      (error) => (job.error = error),
+    );
+    finishing.set(key, job);
+  }
+  const waitMs = ctx.finishWaitMs ?? FINISH_WAIT_MS;
+  let timer;
+  await Promise.race([job.promise.catch(() => {}), new Promise((r) => (timer = setTimeout(r, waitMs)))]);
+  clearTimeout(timer);
+  if (!job.value && !job.error) return { done: false };
+  finishing.delete(key);
+  if (job.error) throw job.error;
+  return job.value;
+}
+
+const formatBytes = (bytes) => (bytes >= 1024 ** 3 ? `${(bytes / 1024 ** 3).toFixed(1)} GB` : `${Math.max(1, Math.round(bytes / 1024 ** 2))} MB`);
+
+async function freeBytes(ctx, dir) {
+  if (ctx.freeBytes) return ctx.freeBytes(dir);
+  for (let at = dir; ; at = path.dirname(at)) {
+    const stats = await fs.statfs(at).catch(() => null);
+    if (stats) return stats.bavail * stats.bsize;
+    if (path.dirname(at) === at) return Infinity;
+  }
+}
+
+const link = (ctx, local, target) => (ctx.linkFile ?? fs.link)(local, target);
+
+// Written beside the target and renamed into place, so a partial copy is
+// never taken for the file.
+async function copyInto(local, target) {
+  const temp = `${target}.${randomUUID()}.part`;
+  try {
+    await fs.copyFile(local, temp);
+    await fs.rename(temp, target);
+  } catch (error) {
+    await fs.rm(temp, { force: true }).catch(() => {});
+    throw error;
+  }
+}
+
+async function moveIntoPlace(ctx, id, record, directory) {
   const { downloadFolder } = slskdSettings(ctx.settings);
-  const copied = [];
+  const files = [];
   for (const [i, file] of record.files.entries()) {
     const local = await locate(downloadFolder, file);
     if (!local) throw new Error(`Couldn't find ${remoteBase(file.filename)} in slskd's download folder`);
     const name = `${String(file.disc || 1).padStart(2, "0")}-${String(i + 1).padStart(3, "0")} ${remoteBase(file.filename)}`.replace(/[\\/]/g, "_");
     const target = path.join(directory, record.kind === "album" ? name : remoteBase(file.filename));
-    await fs.mkdir(path.dirname(target), { recursive: true });
-    await fs.copyFile(local, target);
-    copied.push({ target, file });
+    files.push({ local, target, file, size: (await fs.stat(local)).size });
   }
+  await fs.mkdir(directory, { recursive: true });
+  // Files that are already there, from an earlier try, stay.
+  const todo = [];
+  for (const entry of files) {
+    const there = await fs.stat(entry.target).catch(() => null);
+    if (!there || there.size !== entry.size) {
+      await fs.rm(entry.target, { force: true });
+      todo.push(entry);
+    }
+  }
+  // A hard link when slskd's folder is on the same disk: instant, and it
+  // takes no space. Linking the first file shows whether the rest link too.
+  let linked = false;
+  if (todo.length) {
+    linked = await link(ctx, todo[0].local, todo[0].target).then(
+      () => true,
+      () => false,
+    );
+  }
+  if (!linked && todo.length) {
+    const needed = todo.reduce((sum, entry) => sum + entry.size, 0);
+    const free = await freeBytes(ctx, directory);
+    if (needed + KEEP_FREE_BYTES > free) {
+      throw new Error(
+        `Not enough room for this download in Aurral's data folder, where Aurral keeps it until import: it needs ${formatBytes(needed)} and ${formatBytes(free)} is free, and at least ${formatBytes(KEEP_FREE_BYTES)} must stay free. Free some space and search again.`,
+      );
+    }
+  }
+  for (const entry of linked ? todo.slice(1) : todo) {
+    if (linked) await link(ctx, entry.local, entry.target).catch(() => copyInto(entry.local, entry.target));
+    else await copyInto(entry.local, entry.target);
+  }
+
   // Tag the files we can vouch for: their length still matches the release.
   let tagged = 0;
-  for (const { target, file } of copied) {
+  for (const { target, file } of files) {
     let identified = false;
     try {
       const { durationMs } = readTags(target);
@@ -527,8 +619,8 @@ export async function downloadStatus(ctx, id, directory) {
       ctx.log(`Couldn't tag ${path.basename(target)}: ${error.message}`);
     }
   }
-  ctx.log(`Download ${id}: ${copied.length} file(s) copied, ${tagged} identified and tagged`);
+  ctx.log(`Download ${id}: ${files.length} file(s) ${linked ? "linked" : "copied"}, ${tagged} identified and tagged`);
   // The record stays (cleared after two days): another Aurral job may be
   // waiting on the same download and copies the files into its own folder.
-  return record.kind === "album" ? { done: true } : { done: true, path: path.basename(copied[0].target) };
+  return record.kind === "album" ? { done: true } : { done: true, path: path.basename(files[0].target) };
 }

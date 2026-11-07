@@ -36359,6 +36359,7 @@ var lockDir = (ctx) => path3.join(ctx.dataFolder, "tagging.lock");
 var yieldFile = (ctx) => path3.join(ctx.dataFolder, "tagging.yield");
 var YIELD_FRESH_MS = 10 * 6e4;
 var PRIORITY_WAIT_MS = 5 * 6e4;
+var ACTION_CLAIM_MS = 2 * 6e4;
 async function enqueue(ctx, filePaths, { force = false, source = null } = {}) {
   await fs3.mkdir(queueDir(ctx), { recursive: true });
   const ids = [];
@@ -36406,27 +36407,17 @@ function indexEntry(tags, stat) {
     workId: tags.workId
   };
 }
-var Session = class {
+var State = class {
   constructor(ctx, lock) {
     this.ctx = ctx;
     this.lock = lock;
     this.dirty = 0;
-    this.changedFiles = 0;
     this.savedAt = Date.now();
-    this.stats = { tagged: 0, unchanged: 0, skipped: {}, failed: 0, left: 0 };
-  }
-  // True when an admin action is waiting and this is background work.
-  async shouldYield() {
-    if (this.priority) return false;
-    if (this.yieldCheckedAt && Date.now() - this.yieldCheckedAt < 500) return this.yielding;
-    this.yieldCheckedAt = Date.now();
-    const stat = await fs3.stat(yieldFile(this.ctx)).catch(() => null);
-    this.yielding = Boolean(stat && Date.now() - stat.mtimeMs < YIELD_FRESH_MS);
-    if (this.yielding && !this.yieldLogged) {
-      this.yieldLogged = true;
-      this.ctx.log("Pausing background tagging for an admin action");
-    }
-    return this.yielding;
+    this.refs = 0;
+    this.admins = 0;
+    this.background = 0;
+    this.claimed = /* @__PURE__ */ new Set();
+    this.busyPaths = /* @__PURE__ */ new Map();
   }
   async load() {
     this.processed = await readJson(processedFile(this.ctx), {});
@@ -36439,12 +36430,70 @@ var Session = class {
   async save(force = false) {
     if (!this.dirty || !force && Date.now() - this.savedAt < SAVE_EVERY_MS) return;
     this.savedAt = Date.now();
+    this.dirty = 0;
     await writeJson(processedFile(this.ctx), this.processed);
     await writeJson(indexFile(this.ctx), this.index);
     await writeJson(originalsFile(this.ctx), this.originals);
     await writeJson(excludedFile(this.ctx), this.excluded);
-    this.dirty = 0;
     await this.lock.touch();
+  }
+  // One call at a time works on a file.
+  async exclusive(file, work) {
+    while (this.busyPaths.has(file)) await this.busyPaths.get(file).catch(() => {
+    });
+    const running = work();
+    this.busyPaths.set(file, running);
+    try {
+      return await running;
+    } finally {
+      this.busyPaths.delete(file);
+    }
+  }
+};
+var Session = class {
+  constructor(ctx, state, priority) {
+    this.ctx = ctx;
+    this.state = state;
+    this.priority = priority;
+    this.changedFiles = 0;
+    this.stats = { tagged: 0, unchanged: 0, skipped: {}, failed: 0, left: 0 };
+  }
+  get processed() {
+    return this.state.processed;
+  }
+  get index() {
+    return this.state.index;
+  }
+  get originals() {
+    return this.state.originals;
+  }
+  get excluded() {
+    return this.state.excluded;
+  }
+  get dirty() {
+    return this.state.dirty;
+  }
+  set dirty(value) {
+    this.state.dirty = value;
+  }
+  save(force = false) {
+    return this.state.save(force);
+  }
+  // True when an admin action wants the lock and this is background work:
+  // one in this process, or one waiting in another.
+  async shouldYield() {
+    if (this.priority) return false;
+    if (this.state.admins > 0) this.yielding = true;
+    else if (!this.yieldCheckedAt || Date.now() - this.yieldCheckedAt >= 500) {
+      this.yieldCheckedAt = Date.now();
+      const stat = await fs3.stat(yieldFile(this.ctx)).catch(() => null);
+      this.yielding = Boolean(stat && Date.now() - stat.mtimeMs < YIELD_FRESH_MS);
+    }
+    if (this.yielding && !this.yieldLogged) {
+      this.yieldLogged = true;
+      this.ctx.log("Pausing background tagging for an admin action");
+    }
+    return this.yielding;
   }
   record(filePath, stat, result) {
     this.processed[filePath] = { ...statKey(stat), ...result, at: Date.now() };
@@ -36453,15 +36502,20 @@ var Session = class {
     else this.stats[result.status]++;
   }
   // Returns false when MusicBrainz can't be reached, so the caller stops.
-  async processFile(filePath, { force = false, prefilter = false, upgrade = false } = {}) {
-    const { ctx } = this;
-    const real = await allowedPath(ctx, filePath);
+  async processFile(filePath, options = {}) {
+    const real = await allowedPath(this.ctx, filePath);
     if (!real) {
-      ctx.log(`Not tagging ${filePath}: it isn't in the Library folder`);
+      this.ctx.log(`Not tagging ${filePath}: it isn't in the Library folder`);
       this.stats.skipped["outside the Library"] = (this.stats.skipped["outside the Library"] || 0) + 1;
       return true;
     }
     if (!isAudioPath(real)) return true;
+    return this.state.exclusive(real, () => this.processReal(real, options));
+  }
+  // `queuedAt`: when the request to tag was made. Classical tags an admin
+  // removed after that stay removed.
+  async processReal(real, { force = false, prefilter = false, upgrade = false, queuedAt = null } = {}) {
+    const { ctx } = this;
     const stat = await fs3.stat(real);
     if (!force && sameStat(this.processed[real], stat) && !(upgrade && outdated(this.processed[real]))) return true;
     let tags;
@@ -36477,7 +36531,7 @@ var Session = class {
       return true;
     }
     if (this.excluded[tags.recordingMbid]) {
-      if (!force) {
+      if (!force || queuedAt && (this.excluded[tags.recordingMbid].at ?? 0) > queuedAt) {
         this.record(real, stat, { status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
         return true;
       }
@@ -36534,9 +36588,12 @@ var Session = class {
   // tagged before the plugin kept backups get the artist MusicBrainz credits
   // for that track on its release, which is what Aurral writes.
   async untagFile(filePath) {
-    const { ctx } = this;
-    const real = await allowedPath(ctx, filePath);
+    const real = await allowedPath(this.ctx, filePath);
     if (!real || !isAudioPath(real)) return "skipped";
+    return this.state.exclusive(real, () => this.untagReal(real));
+  }
+  async untagReal(real) {
+    const { ctx } = this;
     let tags;
     try {
       tags = readTags(real);
@@ -36595,12 +36652,19 @@ var Session = class {
     for (const entry of await queuedEntries(this.ctx)) {
       if (Date.now() > until || await this.shouldYield()) return false;
       if (onlyIds && !onlyIds.has(entry.name.replace(/\.json$/, ""))) continue;
-      const job = await readJson(entry.file, null);
-      if (job?.path) {
-        const reachable = await this.processFile(job.path, { force: job.force });
-        if (!reachable) return false;
+      if (this.state.claimed.has(entry.name)) continue;
+      this.state.claimed.add(entry.name);
+      try {
+        const job = await readJson(entry.file, null);
+        if (!this.priority && job?.source === "action" && Date.now() - (job.at || 0) < ACTION_CLAIM_MS) continue;
+        if (job?.path) {
+          const reachable = await this.processFile(job.path, { force: job.force, queuedAt: job.at });
+          if (!reachable) return false;
+        }
+        await fs3.rm(entry.file, { force: true });
+      } finally {
+        this.state.claimed.delete(entry.name);
       }
-      await fs3.rm(entry.file, { force: true });
       await this.save();
     }
     return true;
@@ -36653,29 +36717,81 @@ var Session = class {
     return pending;
   }
 };
-async function withTagging(ctx, work, { priority = false } = {}) {
+var held = /* @__PURE__ */ new Map();
+async function openState(ctx, priority) {
   let lock = await tryLock(lockDir(ctx), LOCK_STALE_MS);
   if (!lock && priority) {
+    ctx.log("Waiting for background tagging in another process to pause");
     const until = Date.now() + PRIORITY_WAIT_MS;
     while (!lock && Date.now() < until) {
       await writeJson(yieldFile(ctx), { at: Date.now() });
       await sleep(500);
       lock = await tryLock(lockDir(ctx), LOCK_STALE_MS);
     }
+    await fs3.rm(yieldFile(ctx), { force: true });
+    if (!lock) ctx.log("Tagging in another process didn't pause within 5 minutes");
   }
-  if (priority) await fs3.rm(yieldFile(ctx), { force: true });
   if (!lock) return null;
-  const heartbeat = setInterval(() => lock.touch(), 3e4);
-  const session = new Session(ctx, lock);
-  session.priority = priority;
+  const state = new State(ctx, lock);
   try {
-    await session.load();
+    await state.load();
+  } catch (error) {
+    await lock.release();
+    throw error;
+  }
+  state.heartbeat = setInterval(() => lock.touch(), 3e4);
+  return state;
+}
+async function withTagging(ctx, work, { priority = false } = {}) {
+  const key = path3.resolve(ctx.dataFolder);
+  let entry;
+  for (; ; ) {
+    entry = held.get(key);
+    if (!entry) {
+      entry = { opening: openState(ctx, priority), state: null };
+      held.set(key, entry);
+      try {
+        entry.state = await entry.opening;
+      } catch (error) {
+        held.delete(key);
+        throw error;
+      }
+      if (!entry.state) {
+        held.delete(key);
+        return null;
+      }
+      break;
+    }
+    if (!entry.state) {
+      if (!priority) return null;
+      await entry.opening.catch(() => {
+      });
+      if (held.get(key) === entry && entry.state) break;
+      continue;
+    }
+    if (!priority && entry.state.background > 0) return null;
+    break;
+  }
+  const { state } = entry;
+  const session = new Session(ctx, state, priority);
+  state.refs++;
+  if (priority) state.admins++;
+  else state.background++;
+  try {
     await work(session);
     return session.stats;
   } finally {
-    clearInterval(heartbeat);
-    await session.save(true).catch((error) => ctx.log(`Couldn't save progress: ${error.message}`));
-    await lock.release();
+    if (priority) state.admins--;
+    else state.background--;
+    if (--state.refs === 0) {
+      held.delete(key);
+      clearInterval(state.heartbeat);
+      await state.save(true).catch((error) => ctx.log(`Couldn't save progress: ${error.message}`));
+      await state.lock.release();
+    } else {
+      await state.save().catch(() => {
+      });
+    }
     if (session.changedFiles) await refreshLibrary(ctx);
   }
 }
@@ -36898,7 +37014,7 @@ function summarize(lines) {
 import path4 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.1" : "dev";
+var VERSION = true ? "1.0.2" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js
@@ -37488,19 +37604,94 @@ async function downloadStatus(ctx, id, directory) {
   if (failed) await writeJson(path5.join(downloadsDir(ctx), `${id}.json`), { ...record, failed: true });
   if (failed) throw new Error(`slskd: ${remoteBase(record.files[states.indexOf(failed)].filename)} ${failed.replace(/^Completed,\s*/, "").toLowerCase()}`);
   if (!states.every(isSucceeded)) return { done: false };
+  return finishDownload(ctx, id, record, directory);
+}
+var finishing = /* @__PURE__ */ new Map();
+var FINISH_WAIT_MS = 4e4;
+var KEEP_FREE_BYTES = 1024 ** 3;
+async function finishDownload(ctx, id, record, directory) {
+  const key = `${id}\0${directory}`;
+  let job = finishing.get(key);
+  if (!job) {
+    job = { promise: moveIntoPlace(ctx, id, record, directory) };
+    job.promise.then(
+      (value) => job.value = value,
+      (error) => job.error = error
+    );
+    finishing.set(key, job);
+  }
+  const waitMs = ctx.finishWaitMs ?? FINISH_WAIT_MS;
+  let timer;
+  await Promise.race([job.promise.catch(() => {
+  }), new Promise((r) => timer = setTimeout(r, waitMs))]);
+  clearTimeout(timer);
+  if (!job.value && !job.error) return { done: false };
+  finishing.delete(key);
+  if (job.error) throw job.error;
+  return job.value;
+}
+var formatBytes = (bytes) => bytes >= 1024 ** 3 ? `${(bytes / 1024 ** 3).toFixed(1)} GB` : `${Math.max(1, Math.round(bytes / 1024 ** 2))} MB`;
+async function freeBytes(ctx, dir) {
+  if (ctx.freeBytes) return ctx.freeBytes(dir);
+  for (let at = dir; ; at = path5.dirname(at)) {
+    const stats = await fs4.statfs(at).catch(() => null);
+    if (stats) return stats.bavail * stats.bsize;
+    if (path5.dirname(at) === at) return Infinity;
+  }
+}
+var link = (ctx, local, target) => (ctx.linkFile ?? fs4.link)(local, target);
+async function copyInto(local, target) {
+  const temp = `${target}.${randomUUID5()}.part`;
+  try {
+    await fs4.copyFile(local, temp);
+    await fs4.rename(temp, target);
+  } catch (error) {
+    await fs4.rm(temp, { force: true }).catch(() => {
+    });
+    throw error;
+  }
+}
+async function moveIntoPlace(ctx, id, record, directory) {
   const { downloadFolder } = slskdSettings(ctx.settings);
-  const copied = [];
+  const files = [];
   for (const [i, file] of record.files.entries()) {
     const local = await locate(downloadFolder, file);
     if (!local) throw new Error(`Couldn't find ${remoteBase(file.filename)} in slskd's download folder`);
     const name = `${String(file.disc || 1).padStart(2, "0")}-${String(i + 1).padStart(3, "0")} ${remoteBase(file.filename)}`.replace(/[\\/]/g, "_");
     const target = path5.join(directory, record.kind === "album" ? name : remoteBase(file.filename));
-    await fs4.mkdir(path5.dirname(target), { recursive: true });
-    await fs4.copyFile(local, target);
-    copied.push({ target, file });
+    files.push({ local, target, file, size: (await fs4.stat(local)).size });
+  }
+  await fs4.mkdir(directory, { recursive: true });
+  const todo = [];
+  for (const entry of files) {
+    const there = await fs4.stat(entry.target).catch(() => null);
+    if (!there || there.size !== entry.size) {
+      await fs4.rm(entry.target, { force: true });
+      todo.push(entry);
+    }
+  }
+  let linked = false;
+  if (todo.length) {
+    linked = await link(ctx, todo[0].local, todo[0].target).then(
+      () => true,
+      () => false
+    );
+  }
+  if (!linked && todo.length) {
+    const needed = todo.reduce((sum, entry) => sum + entry.size, 0);
+    const free = await freeBytes(ctx, directory);
+    if (needed + KEEP_FREE_BYTES > free) {
+      throw new Error(
+        `Not enough room for this download in Aurral's data folder, where Aurral keeps it until import: it needs ${formatBytes(needed)} and ${formatBytes(free)} is free, and at least ${formatBytes(KEEP_FREE_BYTES)} must stay free. Free some space and search again.`
+      );
+    }
+  }
+  for (const entry of linked ? todo.slice(1) : todo) {
+    if (linked) await link(ctx, entry.local, entry.target).catch(() => copyInto(entry.local, entry.target));
+    else await copyInto(entry.local, entry.target);
   }
   let tagged = 0;
-  for (const { target, file } of copied) {
+  for (const { target, file } of files) {
     let identified = false;
     try {
       const { durationMs } = readTags(target);
@@ -37516,8 +37707,8 @@ async function downloadStatus(ctx, id, directory) {
       ctx.log(`Couldn't tag ${path5.basename(target)}: ${error.message}`);
     }
   }
-  ctx.log(`Download ${id}: ${copied.length} file(s) copied, ${tagged} identified and tagged`);
-  return record.kind === "album" ? { done: true } : { done: true, path: path5.basename(copied[0].target) };
+  ctx.log(`Download ${id}: ${files.length} file(s) ${linked ? "linked" : "copied"}, ${tagged} identified and tagged`);
+  return record.kind === "album" ? { done: true } : { done: true, path: path5.basename(files[0].target) };
 }
 
 // src/index.js

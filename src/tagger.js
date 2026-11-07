@@ -31,6 +31,7 @@ const lockDir = (ctx) => path.join(ctx.dataFolder, "tagging.lock");
 const yieldFile = (ctx) => path.join(ctx.dataFolder, "tagging.yield");
 const YIELD_FRESH_MS = 10 * 60_000;
 const PRIORITY_WAIT_MS = 5 * 60_000;
+const ACTION_CLAIM_MS = 2 * 60_000;
 
 export async function enqueue(ctx, filePaths, { force = false, source = null } = {}) {
   await fs.mkdir(queueDir(ctx), { recursive: true });
@@ -86,29 +87,20 @@ function indexEntry(tags, stat) {
   };
 }
 
-// The shared state a worker holds while it has the lock.
-class Session {
+// What a process holds while it has the tagging lock. Every tagging call in
+// the process shares it: an admin action that comes while another runs
+// works alongside it instead of waiting.
+class State {
   constructor(ctx, lock) {
     this.ctx = ctx;
     this.lock = lock;
     this.dirty = 0;
-    this.changedFiles = 0;
     this.savedAt = Date.now();
-    this.stats = { tagged: 0, unchanged: 0, skipped: {}, failed: 0, left: 0 };
-  }
-
-  // True when an admin action is waiting and this is background work.
-  async shouldYield() {
-    if (this.priority) return false;
-    if (this.yieldCheckedAt && Date.now() - this.yieldCheckedAt < 500) return this.yielding;
-    this.yieldCheckedAt = Date.now();
-    const stat = await fs.stat(yieldFile(this.ctx)).catch(() => null);
-    this.yielding = Boolean(stat && Date.now() - stat.mtimeMs < YIELD_FRESH_MS);
-    if (this.yielding && !this.yieldLogged) {
-      this.yieldLogged = true;
-      this.ctx.log("Pausing background tagging for an admin action");
-    }
-    return this.yielding;
+    this.refs = 0;
+    this.admins = 0;
+    this.background = 0;
+    this.claimed = new Set();
+    this.busyPaths = new Map();
   }
 
   async load() {
@@ -123,12 +115,74 @@ class Session {
   async save(force = false) {
     if (!this.dirty || (!force && Date.now() - this.savedAt < SAVE_EVERY_MS)) return;
     this.savedAt = Date.now();
+    this.dirty = 0;
     await writeJson(processedFile(this.ctx), this.processed);
     await writeJson(indexFile(this.ctx), this.index);
     await writeJson(originalsFile(this.ctx), this.originals);
     await writeJson(excludedFile(this.ctx), this.excluded);
-    this.dirty = 0;
     await this.lock.touch();
+  }
+
+  // One call at a time works on a file.
+  async exclusive(file, work) {
+    while (this.busyPaths.has(file)) await this.busyPaths.get(file).catch(() => {});
+    const running = work();
+    this.busyPaths.set(file, running);
+    try {
+      return await running;
+    } finally {
+      this.busyPaths.delete(file);
+    }
+  }
+}
+
+// One tagging call: its own counts, on the shared state.
+class Session {
+  constructor(ctx, state, priority) {
+    this.ctx = ctx;
+    this.state = state;
+    this.priority = priority;
+    this.changedFiles = 0;
+    this.stats = { tagged: 0, unchanged: 0, skipped: {}, failed: 0, left: 0 };
+  }
+
+  get processed() {
+    return this.state.processed;
+  }
+  get index() {
+    return this.state.index;
+  }
+  get originals() {
+    return this.state.originals;
+  }
+  get excluded() {
+    return this.state.excluded;
+  }
+  get dirty() {
+    return this.state.dirty;
+  }
+  set dirty(value) {
+    this.state.dirty = value;
+  }
+  save(force = false) {
+    return this.state.save(force);
+  }
+
+  // True when an admin action wants the lock and this is background work:
+  // one in this process, or one waiting in another.
+  async shouldYield() {
+    if (this.priority) return false;
+    if (this.state.admins > 0) this.yielding = true;
+    else if (!this.yieldCheckedAt || Date.now() - this.yieldCheckedAt >= 500) {
+      this.yieldCheckedAt = Date.now();
+      const stat = await fs.stat(yieldFile(this.ctx)).catch(() => null);
+      this.yielding = Boolean(stat && Date.now() - stat.mtimeMs < YIELD_FRESH_MS);
+    }
+    if (this.yielding && !this.yieldLogged) {
+      this.yieldLogged = true;
+      this.ctx.log("Pausing background tagging for an admin action");
+    }
+    return this.yielding;
   }
 
   record(filePath, stat, result) {
@@ -139,15 +193,21 @@ class Session {
   }
 
   // Returns false when MusicBrainz can't be reached, so the caller stops.
-  async processFile(filePath, { force = false, prefilter = false, upgrade = false } = {}) {
-    const { ctx } = this;
-    const real = await allowedPath(ctx, filePath);
+  async processFile(filePath, options = {}) {
+    const real = await allowedPath(this.ctx, filePath);
     if (!real) {
-      ctx.log(`Not tagging ${filePath}: it isn't in the Library folder`);
+      this.ctx.log(`Not tagging ${filePath}: it isn't in the Library folder`);
       this.stats.skipped["outside the Library"] = (this.stats.skipped["outside the Library"] || 0) + 1;
       return true;
     }
     if (!isAudioPath(real)) return true;
+    return this.state.exclusive(real, () => this.processReal(real, options));
+  }
+
+  // `queuedAt`: when the request to tag was made. Classical tags an admin
+  // removed after that stay removed.
+  async processReal(real, { force = false, prefilter = false, upgrade = false, queuedAt = null } = {}) {
+    const { ctx } = this;
     const stat = await fs.stat(real);
     if (!force && sameStat(this.processed[real], stat) && !(upgrade && outdated(this.processed[real]))) return true;
     let tags;
@@ -163,7 +223,7 @@ class Session {
       return true;
     }
     if (this.excluded[tags.recordingMbid]) {
-      if (!force) {
+      if (!force || (queuedAt && (this.excluded[tags.recordingMbid].at ?? 0) > queuedAt)) {
         this.record(real, stat, { status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
         return true;
       }
@@ -226,9 +286,13 @@ class Session {
   // tagged before the plugin kept backups get the artist MusicBrainz credits
   // for that track on its release, which is what Aurral writes.
   async untagFile(filePath) {
-    const { ctx } = this;
-    const real = await allowedPath(ctx, filePath);
+    const real = await allowedPath(this.ctx, filePath);
     if (!real || !isAudioPath(real)) return "skipped";
+    return this.state.exclusive(real, () => this.untagReal(real));
+  }
+
+  async untagReal(real) {
+    const { ctx } = this;
     let tags;
     try {
       tags = readTags(real);
@@ -269,6 +333,7 @@ class Session {
     return name || null;
   }
 
+
   // MusicBrainz's artist credit for this recording on the file's release,
   // else on the recording itself.
   async trackCredit(tags) {
@@ -290,12 +355,21 @@ class Session {
     for (const entry of await queuedEntries(this.ctx)) {
       if (Date.now() > until || (await this.shouldYield())) return false;
       if (onlyIds && !onlyIds.has(entry.name.replace(/\.json$/, ""))) continue;
-      const job = await readJson(entry.file, null);
-      if (job?.path) {
-        const reachable = await this.processFile(job.path, { force: job.force });
-        if (!reachable) return false;
+      // Another call in this process has it.
+      if (this.state.claimed.has(entry.name)) continue;
+      this.state.claimed.add(entry.name);
+      try {
+        const job = await readJson(entry.file, null);
+        // An admin action tags the files it queued itself.
+        if (!this.priority && job?.source === "action" && Date.now() - (job.at || 0) < ACTION_CLAIM_MS) continue;
+        if (job?.path) {
+          const reachable = await this.processFile(job.path, { force: job.force, queuedAt: job.at });
+          if (!reachable) return false;
+        }
+        await fs.rm(entry.file, { force: true });
+      } finally {
+        this.state.claimed.delete(entry.name);
       }
-      await fs.rm(entry.file, { force: true });
       await this.save();
     }
     return true;
@@ -350,33 +424,91 @@ class Session {
   }
 }
 
-// Runs `work` while holding the tagging lock, or returns null if another
-// process has it.
-// With `priority` (admin actions), waits up to five minutes for background
-// work to stop at its next file instead of giving up.
-export async function withTagging(ctx, work, { priority = false } = {}) {
+// The state this process holds the lock for, by data folder.
+const held = new Map();
+
+async function openState(ctx, priority) {
   let lock = await tryLock(lockDir(ctx), LOCK_STALE_MS);
   if (!lock && priority) {
+    // Another Aurral process has it (Aurral runs schedules, downloads and
+    // actions in separate processes). Its background work stops at the
+    // next file when it sees this file.
+    ctx.log("Waiting for background tagging in another process to pause");
     const until = Date.now() + PRIORITY_WAIT_MS;
     while (!lock && Date.now() < until) {
       await writeJson(yieldFile(ctx), { at: Date.now() });
       await sleep(500);
       lock = await tryLock(lockDir(ctx), LOCK_STALE_MS);
     }
+    await fs.rm(yieldFile(ctx), { force: true });
+    if (!lock) ctx.log("Tagging in another process didn't pause within 5 minutes");
   }
-  if (priority) await fs.rm(yieldFile(ctx), { force: true });
   if (!lock) return null;
-  const heartbeat = setInterval(() => lock.touch(), 30_000);
-  const session = new Session(ctx, lock);
-  session.priority = priority;
+  const state = new State(ctx, lock);
   try {
-    await session.load();
+    await state.load();
+  } catch (error) {
+    await lock.release();
+    throw error;
+  }
+  state.heartbeat = setInterval(() => lock.touch(), 30_000);
+  return state;
+}
+
+// Runs `work` with the tagging state, or returns null when it's busy:
+// another process holds the lock, or (for background work) other
+// background work in this process is running. Admin actions (`priority`)
+// join whatever runs in this process, and wait for another process's
+// background work to pause.
+export async function withTagging(ctx, work, { priority = false } = {}) {
+  const key = path.resolve(ctx.dataFolder);
+  let entry;
+  for (;;) {
+    entry = held.get(key);
+    if (!entry) {
+      entry = { opening: openState(ctx, priority), state: null };
+      held.set(key, entry);
+      try {
+        entry.state = await entry.opening;
+      } catch (error) {
+        held.delete(key);
+        throw error;
+      }
+      if (!entry.state) {
+        held.delete(key);
+        return null;
+      }
+      break;
+    }
+    if (!entry.state) {
+      // Being opened by another call.
+      if (!priority) return null;
+      await entry.opening.catch(() => {});
+      if (held.get(key) === entry && entry.state) break;
+      continue;
+    }
+    if (!priority && entry.state.background > 0) return null;
+    break;
+  }
+  const { state } = entry;
+  const session = new Session(ctx, state, priority);
+  state.refs++;
+  if (priority) state.admins++;
+  else state.background++;
+  try {
     await work(session);
     return session.stats;
   } finally {
-    clearInterval(heartbeat);
-    await session.save(true).catch((error) => ctx.log(`Couldn't save progress: ${error.message}`));
-    await lock.release();
+    if (priority) state.admins--;
+    else state.background--;
+    if (--state.refs === 0) {
+      held.delete(key);
+      clearInterval(state.heartbeat);
+      await state.save(true).catch((error) => ctx.log(`Couldn't save progress: ${error.message}`));
+      await state.lock.release();
+    } else {
+      await state.save().catch(() => {});
+    }
     if (session.changedFiles) await refreshLibrary(ctx);
   }
 }
