@@ -36920,6 +36920,28 @@ function trackCandidates(folders, release, discPosition, trackIndexInDisc) {
   }
   return out.sort((a, b) => a.score - b.score);
 }
+function describeMisses(folders, release) {
+  const counts = new Set(release.discs.map((d) => d.tracks.length));
+  counts.add(release.discs.reduce((n, d) => n + d.tracks.length, 0));
+  let noLengths = 0;
+  let wrongCount = 0;
+  let wrongLengths = 0;
+  let closest = null;
+  for (const folder of folders) {
+    if (folderDiscs(folder, release)) continue;
+    if (!counts.has(folder.files.length)) wrongCount++;
+    else if (folder.files.some((f) => f.lengthMs == null)) noLengths++;
+    else {
+      wrongLengths++;
+      const tracks = release.discs.find((d) => d.tracks.length === folder.files.length)?.tracks ?? release.discs.flatMap((d) => d.tracks);
+      const offs = folder.files.map((f, i) => Math.abs(f.lengthMs - (tracks[i]?.lengthMs ?? 0)));
+      const worst = Math.max(...offs);
+      if (!closest || worst < closest.worst) closest = { worst, at: offs.indexOf(worst) + 1, over: offs.filter((o) => o > LENGTH_TOLERANCE_MS).length };
+    }
+  }
+  const near = closest ? ` (closest: ${closest.over} track(s) off, worst ${(closest.worst / 1e3).toFixed(1)}s at track ${closest.at})` : "";
+  return `${folders.length} folders: ${wrongCount} with another track count, ${noLengths} without lengths, ${wrongLengths} with lengths off by more than 2s${near}`;
+}
 async function classicalInfo(ctx, recordingId, { albumArtistIds = [], releaseGroupId = null } = {}) {
   if (!recordingId) return null;
   const fields = await ctx.resolver.resolve(recordingId, { albumArtistIds, releaseGroupId });
@@ -36997,6 +37019,7 @@ async function searchTrack(ctx, track) {
   const queries = searchQueries(info, [[searchWords(release.title)]]);
   const folders = await searchFolders(ctx, slskd, queries, (found) => trackCandidates(found, release, discPosition, index).length >= 3, started);
   const target = release.discs.find((d) => d.position === discPosition).tracks[index];
+  ctx.log(`Release ${release.id}: ${describeMisses(folders, release)}`);
   const seen = /* @__PURE__ */ new Set();
   return trackCandidates(folders, release, discPosition, index).filter((c) => !seen.has(`${c.folder.username}\0${c.file.filename}`) && seen.add(`${c.folder.username}\0${c.file.filename}`)).slice(0, MAX_RESULTS).map((c) => ({
     id: `${c.folder.username}:${c.file.filename}`.slice(0, 500),
@@ -37028,6 +37051,7 @@ async function searchAlbum(ctx, album) {
   const slskd = slskdFor(ctx);
   const queries = searchQueries(info, [[searchWords(release.title)]]);
   const folders = await searchFolders(ctx, slskd, queries, (found) => albumCandidates(found, release).length >= 3, started);
+  ctx.log(`Release ${release.id}: ${describeMisses(folders, release)}`);
   return albumCandidates(folders, release).slice(0, MAX_RESULTS).map((c) => ({
     id: `${c.username}:${c.folders.map((f) => f.directory).join("|")}`.slice(0, 500),
     title: album.title || release.title,

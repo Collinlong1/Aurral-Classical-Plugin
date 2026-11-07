@@ -74,6 +74,29 @@ export default {
       return { indexed: count, busy: !stats };
     },
 
+    // Starts a slow call (a search) in the background and saves its answer,
+    // for clients whose connection drops before the call ends. Only calls
+    // that read: searches and resolving.
+    async start(input) {
+      const allowed = new Set(["downloadSource.search", "downloadSource.searchAlbum"]);
+      if (!allowed.has(input.call)) throw new Error(`dev.start runs only ${[...allowed].join(", ")}`);
+      const id = `${Date.now()}`;
+      const file = path.join(input.dataFolder, "dev-results", `${id}.json`);
+      await fs.mkdir(path.dirname(file), { recursive: true });
+      const [group, name] = input.call.split(".");
+      const started = Date.now();
+      plugin[group][name]({ ...input, ...input.args })
+        .then((answer) => ({ ok: true, answer }), (error) => ({ ok: false, error: error.message }))
+        .then((result) => fs.writeFile(file, JSON.stringify({ ...result, ms: Date.now() - started })));
+      return { id };
+    },
+
+    async result(input) {
+      const file = path.join(input.dataFolder, "dev-results", `${input.id}.json`);
+      const text = await fs.readFile(file, "utf8").catch(() => null);
+      return text ? JSON.parse(text) : { pending: true };
+    },
+
     // Library files from the index (paths and tags only).
     async libraryFiles(input) {
       const ctx = makeContext(input);
