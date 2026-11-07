@@ -8,7 +8,7 @@ import { isAudioPath, readTags, UnsupportedFormat, writeTags } from "./tags.js";
 import { readJson, tryLock, writeJson } from "./store.js";
 
 const LOCK_STALE_MS = 2 * 60_000;
-const SAVE_EVERY = 25;
+const SAVE_EVERY_MS = 30_000;
 
 export const queueDir = (ctx) => path.join(ctx.dataFolder, "queue");
 const processedFile = (ctx) => path.join(ctx.dataFolder, "processed.json");
@@ -75,6 +75,7 @@ class Session {
     this.ctx = ctx;
     this.lock = lock;
     this.dirty = 0;
+    this.savedAt = Date.now();
     this.stats = { tagged: 0, unchanged: 0, skipped: {}, failed: 0, left: 0 };
   }
 
@@ -83,8 +84,11 @@ class Session {
     this.index = await readJson(indexFile(this.ctx), {});
   }
 
+  // Saved every 30 seconds while working, and at the end: the index of a
+  // large Library is several megabytes.
   async save(force = false) {
-    if (!force && this.dirty < SAVE_EVERY) return;
+    if (!this.dirty || (!force && Date.now() - this.savedAt < SAVE_EVERY_MS)) return;
+    this.savedAt = Date.now();
     await writeJson(processedFile(this.ctx), this.processed);
     await writeJson(indexFile(this.ctx), this.index);
     this.dirty = 0;
@@ -177,20 +181,29 @@ class Session {
   }
 
   // Walks the Library, refreshing the index, and returns files that have a
-  // recording ID and were never processed (or changed since).
+  // recording ID and were never processed (or changed since). Stops at
+  // `until`; unchanged files cost only a stat, so the next run gets further.
   async scan(until) {
     const root = this.ctx.libraryFolder;
     const pending = [];
     const seen = new Set();
+    let complete = true;
     const walk = async (dir) => {
+      if (Date.now() > until) {
+        complete = false;
+        return;
+      }
       const entries = await fs.readdir(dir, { withFileTypes: true }).catch(() => []);
       for (const entry of entries) {
+        if (Date.now() > until) {
+          complete = false;
+          return;
+        }
         if (entry.name.startsWith(".")) continue;
         const full = path.join(dir, entry.name);
         if (entry.isDirectory()) await walk(full);
         else if (entry.isFile() && isAudioPath(full)) {
           seen.add(full);
-          if (Date.now() > until) continue;
           const stat = await fs.stat(full).catch(() => null);
           if (!stat) continue;
           if (!sameStat(this.index[full], stat)) {
@@ -208,9 +221,10 @@ class Session {
       }
     };
     if (root) await walk(root);
-    // Files that left the Library leave the index.
-    if (Date.now() <= until)
+    // Files that left the Library leave the index, once a walk finishes.
+    if (complete)
       for (const file of Object.keys(this.index)) if (file.startsWith(root) && !seen.has(file)) delete this.index[file];
+    this.scanComplete = complete;
     return pending;
   }
 }

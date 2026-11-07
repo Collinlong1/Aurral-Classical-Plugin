@@ -36147,7 +36147,7 @@ async function pruneCache(folder, maxAgeMs) {
 
 // src/tagger.js
 var LOCK_STALE_MS = 2 * 6e4;
-var SAVE_EVERY = 25;
+var SAVE_EVERY_MS = 3e4;
 var queueDir = (ctx) => path3.join(ctx.dataFolder, "queue");
 var processedFile = (ctx) => path3.join(ctx.dataFolder, "processed.json");
 var indexFile = (ctx) => path3.join(ctx.dataFolder, "library-index.json");
@@ -36204,14 +36204,18 @@ var Session = class {
     this.ctx = ctx;
     this.lock = lock;
     this.dirty = 0;
+    this.savedAt = Date.now();
     this.stats = { tagged: 0, unchanged: 0, skipped: {}, failed: 0, left: 0 };
   }
   async load() {
     this.processed = await readJson(processedFile(this.ctx), {});
     this.index = await readJson(indexFile(this.ctx), {});
   }
+  // Saved every 30 seconds while working, and at the end: the index of a
+  // large Library is several megabytes.
   async save(force = false) {
-    if (!force && this.dirty < SAVE_EVERY) return;
+    if (!this.dirty || !force && Date.now() - this.savedAt < SAVE_EVERY_MS) return;
+    this.savedAt = Date.now();
     await writeJson(processedFile(this.ctx), this.processed);
     await writeJson(indexFile(this.ctx), this.index);
     this.dirty = 0;
@@ -36298,20 +36302,29 @@ var Session = class {
     return true;
   }
   // Walks the Library, refreshing the index, and returns files that have a
-  // recording ID and were never processed (or changed since).
+  // recording ID and were never processed (or changed since). Stops at
+  // `until`; unchanged files cost only a stat, so the next run gets further.
   async scan(until) {
     const root = this.ctx.libraryFolder;
     const pending = [];
     const seen = /* @__PURE__ */ new Set();
+    let complete = true;
     const walk = async (dir) => {
+      if (Date.now() > until) {
+        complete = false;
+        return;
+      }
       const entries = await fs3.readdir(dir, { withFileTypes: true }).catch(() => []);
       for (const entry of entries) {
+        if (Date.now() > until) {
+          complete = false;
+          return;
+        }
         if (entry.name.startsWith(".")) continue;
         const full = path3.join(dir, entry.name);
         if (entry.isDirectory()) await walk(full);
         else if (entry.isFile() && isAudioPath(full)) {
           seen.add(full);
-          if (Date.now() > until) continue;
           const stat = await fs3.stat(full).catch(() => null);
           if (!stat) continue;
           if (!sameStat(this.index[full], stat)) {
@@ -36329,9 +36342,10 @@ var Session = class {
       }
     };
     if (root) await walk(root);
-    if (Date.now() <= until) {
+    if (complete) {
       for (const file of Object.keys(this.index)) if (file.startsWith(root) && !seen.has(file)) delete this.index[file];
     }
+    this.scanComplete = complete;
     return pending;
   }
 };
