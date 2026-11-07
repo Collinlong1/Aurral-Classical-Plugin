@@ -217,3 +217,15 @@ test("the settings test reports MusicBrainz and slskd", async () => {
   assert.match(answer.message, /slskd 0\.22\.0 answers/);
   assert.ok(answer.message.length < 500);
 });
+
+test("searches started while slskd is busy wait and try again", async () => {
+  let busy = 0;
+  const inner = fakeSlskd(state);
+  globalThis.fetch = fakeFetch({
+    entities: entities(),
+    slskd: (method, route, body) => (method === "POST" && route === "/searches" && busy++ % 2 === 0 ? json({ error: "Only one concurrent operation is permitted" }, 429) : inner(method, route, body)),
+  });
+  const results = await plugin.downloadSource.search(input({ track: request }));
+  assert.ok(state.searches.length >= 1);
+  assert.deepEqual(results.map((r) => r.data.username).sort(), ["alice", "bob"]);
+});

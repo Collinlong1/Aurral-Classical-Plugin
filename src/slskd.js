@@ -10,7 +10,20 @@ export class Slskd {
     this.fetch = fetchImpl;
   }
 
-  async request(method, route, body, { timeoutMs = 15_000 } = {}) {
+  // slskd answers 429 while it's busy with another request; those wait and
+  // try again.
+  async request(method, route, body, options = {}) {
+    for (let attempt = 0; ; attempt++) {
+      try {
+        return await this.requestOnce(method, route, body, options);
+      } catch (error) {
+        if (!/answered 429/.test(error.message) || attempt >= 10) throw error;
+        await sleep(250 + attempt * 150);
+      }
+    }
+  }
+
+  async requestOnce(method, route, body, { timeoutMs = 15_000 } = {}) {
     let response;
     try {
       response = await this.fetch(`${this.url}/api/v0${route}`, {
@@ -35,18 +48,18 @@ export class Slskd {
     return this.request("GET", "/application");
   }
 
-  // Runs one search and returns its responses. Never waits past `deadline`.
-  async search(searchText, { searchTimeoutMs = 10_000, deadline = Date.now() + 20_000 } = {}) {
+  // Starts a search and returns its id.
+  async startSearch(searchText, searchTimeoutMs) {
     const id = randomUUID();
-    await this.request("POST", "/searches", {
-      id,
-      searchText,
-      searchTimeout: searchTimeoutMs,
-      filterResponses: true,
-      minimumResponseFileCount: 1,
-      responseLimit: 200,
-      fileLimit: 20_000,
-    });
+    const body = { id, searchText, searchTimeout: searchTimeoutMs, filterResponses: true, minimumResponseFileCount: 1, responseLimit: 200, fileLimit: 20_000 };
+    // Some slskd versions answer only once the search is under way.
+    await this.request("POST", "/searches", body, { timeoutMs: searchTimeoutMs + 15_000 });
+    return id;
+  }
+
+  // Waits for a search to finish, never past `deadline`, and returns its
+  // responses.
+  async searchResults(id, deadline) {
     try {
       while (Date.now() < deadline) {
         await sleep(1000);
@@ -57,6 +70,10 @@ export class Slskd {
     } finally {
       this.request("DELETE", `/searches/${id}`).catch(() => {});
     }
+  }
+
+  async search(searchText, { searchTimeoutMs = 10_000, deadline = Date.now() + 20_000 } = {}) {
+    return this.searchResults(await this.startSearch(searchText, searchTimeoutMs), deadline);
   }
 
   enqueue(username, files) {

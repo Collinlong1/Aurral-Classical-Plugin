@@ -36939,7 +36939,19 @@ var Slskd = class {
     this.apiKey = apiKey;
     this.fetch = fetchImpl;
   }
-  async request(method, route, body, { timeoutMs = 15e3 } = {}) {
+  // slskd answers 429 while it's busy with another request; those wait and
+  // try again.
+  async request(method, route, body, options = {}) {
+    for (let attempt = 0; ; attempt++) {
+      try {
+        return await this.requestOnce(method, route, body, options);
+      } catch (error) {
+        if (!/answered 429/.test(error.message) || attempt >= 10) throw error;
+        await sleep(250 + attempt * 150);
+      }
+    }
+  }
+  async requestOnce(method, route, body, { timeoutMs = 15e3 } = {}) {
     let response;
     try {
       response = await this.fetch(`${this.url}/api/v0${route}`, {
@@ -36962,18 +36974,16 @@ var Slskd = class {
   application() {
     return this.request("GET", "/application");
   }
-  // Runs one search and returns its responses. Never waits past `deadline`.
-  async search(searchText, { searchTimeoutMs = 1e4, deadline = Date.now() + 2e4 } = {}) {
+  // Starts a search and returns its id.
+  async startSearch(searchText, searchTimeoutMs) {
     const id = randomUUID4();
-    await this.request("POST", "/searches", {
-      id,
-      searchText,
-      searchTimeout: searchTimeoutMs,
-      filterResponses: true,
-      minimumResponseFileCount: 1,
-      responseLimit: 200,
-      fileLimit: 2e4
-    });
+    const body = { id, searchText, searchTimeout: searchTimeoutMs, filterResponses: true, minimumResponseFileCount: 1, responseLimit: 200, fileLimit: 2e4 };
+    await this.request("POST", "/searches", body, { timeoutMs: searchTimeoutMs + 15e3 });
+    return id;
+  }
+  // Waits for a search to finish, never past `deadline`, and returns its
+  // responses.
+  async searchResults(id, deadline) {
     try {
       while (Date.now() < deadline) {
         await sleep(1e3);
@@ -36985,6 +36995,9 @@ var Slskd = class {
       this.request("DELETE", `/searches/${id}`).catch(() => {
       });
     }
+  }
+  async search(searchText, { searchTimeoutMs = 1e4, deadline = Date.now() + 2e4 } = {}) {
+    return this.searchResults(await this.startSearch(searchText, searchTimeoutMs), deadline);
   }
   enqueue(username, files) {
     return this.request("POST", `/transfers/downloads/${encodeURIComponent(username)}`, files);
@@ -37009,8 +37022,8 @@ import { randomUUID as randomUUID5 } from "node:crypto";
 import fs4 from "node:fs/promises";
 import path5 from "node:path";
 var LENGTH_TOLERANCE_MS = 2e3;
-var SEARCH_BUDGET_MS = 48e3;
-var SEARCH_TIMEOUT_MS = 1e4;
+var SEARCH_BUDGET_MS = 5e4;
+var SEARCH_TIMEOUT_MS = 12e3;
 var MAX_RESULTS = 50;
 var SOURCE_EXTENSIONS = /* @__PURE__ */ new Set(["flac", "mp3", "m4a", "ogg", "oga", "opus"]);
 var LOSSLESS = /* @__PURE__ */ new Set(["flac"]);
@@ -37220,10 +37233,19 @@ async function searchFolders(ctx, slskd, queries, accept, started) {
   const deadline = started + SEARCH_BUDGET_MS;
   let folders = [];
   for (const query of queries) {
-    if (Date.now() + SEARCH_TIMEOUT_MS + 2e3 > deadline) break;
-    ctx.log(`Searching Soulseek for "${query}"`);
-    const responses = await slskd.search(query, { searchTimeoutMs: SEARCH_TIMEOUT_MS, deadline: Math.min(deadline, Date.now() + SEARCH_TIMEOUT_MS + 6e3) });
-    folders = folders.concat(groupFolders(responses));
+    const listenMs = Math.min(SEARCH_TIMEOUT_MS, deadline - Date.now() - 3e3);
+    if (listenMs < 5e3) {
+      ctx.log(`Out of time before searching for "${query}"`);
+      break;
+    }
+    ctx.log(`Searching Soulseek for "${query}" (${Math.round(listenMs / 1e3)}s)`);
+    try {
+      const responses = await slskd.search(query, { searchTimeoutMs: listenMs, deadline: Math.min(deadline, Date.now() + listenMs + 4e3) });
+      folders = folders.concat(groupFolders(responses));
+    } catch (error) {
+      if (!folders.length && query === queries.at(-1)) throw error;
+      ctx.log(`A Soulseek search failed: ${error.message}`);
+    }
     if (accept(folders)) break;
   }
   return folders;
@@ -37254,7 +37276,7 @@ async function searchTrack(ctx, track) {
   if (!info) return [];
   const slskd = slskdFor(ctx);
   const queries = searchQueries(info, { albumTitle: release.title });
-  const folders = await searchFolders(ctx, slskd, queries, (found) => trackCandidates(found, release, discPosition, index).length >= 3, started);
+  const folders = await searchFolders(ctx, slskd, queries, (found) => trackCandidates(found, release, discPosition, index).length > 0, started);
   const target = release.discs.find((d) => d.position === discPosition).tracks[index];
   ctx.log(`Release ${release.id}: ${describeMisses(folders, release)}`);
   const seen = /* @__PURE__ */ new Set();
@@ -37287,7 +37309,7 @@ async function searchAlbum(ctx, album) {
   if (!info) return [];
   const slskd = slskdFor(ctx);
   const queries = searchQueries(info, { albumTitle: release.title, album: true });
-  const folders = await searchFolders(ctx, slskd, queries, (found) => albumCandidates(found, release).length >= 3, started);
+  const folders = await searchFolders(ctx, slskd, queries, (found) => albumCandidates(found, release).length > 0, started);
   ctx.log(`Release ${release.id}: ${describeMisses(folders, release)}`);
   return albumCandidates(folders, release).slice(0, MAX_RESULTS).map((c) => ({
     id: `${c.username}:${c.folders.map((f) => f.directory).join("|")}`.slice(0, 500),

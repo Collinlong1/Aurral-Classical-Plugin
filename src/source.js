@@ -11,8 +11,8 @@ import { catalogueNumber, creditString, RELEASE_INC, releaseYear, searchWords, s
 import { slskdSettings } from "./settings.js";
 
 export const LENGTH_TOLERANCE_MS = 2000;
-const SEARCH_BUDGET_MS = 48_000;
-const SEARCH_TIMEOUT_MS = 10_000;
+const SEARCH_BUDGET_MS = 50_000;
+const SEARCH_TIMEOUT_MS = 12_000;
 const MAX_RESULTS = 50;
 const SOURCE_EXTENSIONS = new Set(["flac", "mp3", "m4a", "ogg", "oga", "opus"]);
 const LOSSLESS = new Set(["flac"]);
@@ -258,14 +258,27 @@ export function searchQueries(info, { albumTitle = "", album = false } = {}) {
   return queries;
 }
 
+// Runs the searches one at a time (slskd runs one search at a time), most
+// specific first, and stops as soon as a folder lines up. Aurral gives a
+// search call one minute, which also covers the MusicBrainz lookups before
+// and the matching after.
 async function searchFolders(ctx, slskd, queries, accept, started) {
   const deadline = started + SEARCH_BUDGET_MS;
   let folders = [];
   for (const query of queries) {
-    if (Date.now() + SEARCH_TIMEOUT_MS + 2000 > deadline) break;
-    ctx.log(`Searching Soulseek for "${query}"`);
-    const responses = await slskd.search(query, { searchTimeoutMs: SEARCH_TIMEOUT_MS, deadline: Math.min(deadline, Date.now() + SEARCH_TIMEOUT_MS + 6000) });
-    folders = folders.concat(groupFolders(responses));
+    const listenMs = Math.min(SEARCH_TIMEOUT_MS, deadline - Date.now() - 3000);
+    if (listenMs < 5000) {
+      ctx.log(`Out of time before searching for "${query}"`);
+      break;
+    }
+    ctx.log(`Searching Soulseek for "${query}" (${Math.round(listenMs / 1000)}s)`);
+    try {
+      const responses = await slskd.search(query, { searchTimeoutMs: listenMs, deadline: Math.min(deadline, Date.now() + listenMs + 4000) });
+      folders = folders.concat(groupFolders(responses));
+    } catch (error) {
+      if (!folders.length && query === queries.at(-1)) throw error;
+      ctx.log(`A Soulseek search failed: ${error.message}`);
+    }
     if (accept(folders)) break;
   }
   return folders;
@@ -305,7 +318,7 @@ export async function searchTrack(ctx, track) {
   if (!info) return [];
   const slskd = slskdFor(ctx);
   const queries = searchQueries(info, { albumTitle: release.title });
-  const folders = await searchFolders(ctx, slskd, queries, (found) => trackCandidates(found, release, discPosition, index).length >= 3, started);
+  const folders = await searchFolders(ctx, slskd, queries, (found) => trackCandidates(found, release, discPosition, index).length > 0, started);
   const target = release.discs.find((d) => d.position === discPosition).tracks[index];
   ctx.log(`Release ${release.id}: ${describeMisses(folders, release)}`);
   const seen = new Set();
@@ -342,7 +355,7 @@ export async function searchAlbum(ctx, album) {
   if (!info) return [];
   const slskd = slskdFor(ctx);
   const queries = searchQueries(info, { albumTitle: release.title, album: true });
-  const folders = await searchFolders(ctx, slskd, queries, (found) => albumCandidates(found, release).length >= 3, started);
+  const folders = await searchFolders(ctx, slskd, queries, (found) => albumCandidates(found, release).length > 0, started);
   ctx.log(`Release ${release.id}: ${describeMisses(folders, release)}`);
   return albumCandidates(folders, release)
     .slice(0, MAX_RESULTS)
