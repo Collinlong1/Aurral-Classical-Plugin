@@ -89,6 +89,7 @@ function textField(xiphName, id3Description, apple) {
 const workField = textField("WORK", "WORK", { box: "©wrk" });
 const workIdField = textField("MUSICBRAINZ_WORKID", "MusicBrainz Work Id", { name: "MusicBrainz Work Id" });
 const artistIdsField = textField("MUSICBRAINZ_ARTISTID", "MusicBrainz Artist Id", { name: "MusicBrainz Artist Id" });
+const albumArtistIdsField = textField("MUSICBRAINZ_ALBUMARTISTID", "MusicBrainz Album Artist Id", { name: "MusicBrainz Album Artist Id" });
 
 // Fields the plugin writes. Each value is a list of strings.
 const WRITERS = {
@@ -99,6 +100,10 @@ const WRITERS = {
   artist: {
     read: (file) => texts(file.tag.performers),
     write: (file, values) => (file.tag.performers = values),
+  },
+  albumArtist: {
+    read: (file) => texts(file.tag.albumArtists),
+    write: (file, values) => (file.tag.albumArtists = values),
   },
   composer: {
     read: (file) => texts(file.tag.composers),
@@ -178,7 +183,8 @@ export function readTags(filePath) {
       recordingMbid: text(tag.musicBrainzTrackId),
       releaseMbid: text(tag.musicBrainzReleaseId),
       releaseGroupMbid: text(tag.musicBrainzReleaseGroupId),
-      albumArtistMbids: texts(text(tag.musicBrainzReleaseArtistId).split(/[;/]/)),
+      // Every album artist ID: taglib's own property has only the first.
+      albumArtistMbids: [...new Set([...albumArtistIdsField.read(file), text(tag.musicBrainzReleaseArtistId)].flatMap((v) => texts(v.split(/[;/]/))))],
       artistMbids: artistIdsField.read(file).flatMap((value) => texts(value.split(/[;/]/))),
       genres: texts(tag.genres ?? []).flatMap((genre) => texts(genre.split(";"))),
       composer: texts(tag.composers ?? []),

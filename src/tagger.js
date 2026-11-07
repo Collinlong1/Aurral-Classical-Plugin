@@ -20,7 +20,11 @@ const originalsFile = (ctx) => path.join(ctx.dataFolder, "originals.json");
 // Recordings whose classical tags an admin removed: never tagged again
 // unless an admin tags them as classical.
 const excludedFile = (ctx) => path.join(ctx.dataFolder, "excluded.json");
-export const TAG_FIELDS = ["artist", "composer", "work", "workId"];
+export const TAG_FIELDS = ["artist", "albumArtist", "composer", "work", "workId"];
+// Raised when the plugin writes more than before, so files it already
+// tagged are tagged once more by the schedule (2: the album artist).
+const TAGGING_VERSION = 2;
+const outdated = (record) => record && (record.status === "tagged" || record.status === "unchanged") && (record.v ?? 1) < TAGGING_VERSION;
 const lockDir = (ctx) => path.join(ctx.dataFolder, "tagging.lock");
 
 export async function enqueue(ctx, filePaths, { force = false, source = null } = {}) {
@@ -116,7 +120,7 @@ class Session {
   }
 
   // Returns false when MusicBrainz can't be reached, so the caller stops.
-  async processFile(filePath, { force = false, prefilter = false } = {}) {
+  async processFile(filePath, { force = false, prefilter = false, upgrade = false } = {}) {
     const { ctx } = this;
     const real = await allowedPath(ctx, filePath);
     if (!real) {
@@ -126,7 +130,7 @@ class Session {
     }
     if (!isAudioPath(real)) return true;
     const stat = await fs.stat(real);
-    if (!force && sameStat(this.processed[real], stat)) return true;
+    if (!force && sameStat(this.processed[real], stat) && !(upgrade && outdated(this.processed[real]))) return true;
     let tags;
     try {
       tags = readTags(real);
@@ -166,6 +170,11 @@ class Session {
     }
     const values = { artist: [fields.artist], composer: fields.composers };
     if (fields.workId) Object.assign(values, { work: [fields.work], workId: [fields.workId] });
+    // Aurral files an album under one album artist and names it after the
+    // album artist tag. That name in English, as in the artist tag; albums
+    // credited to several artists (as beets tags them) are left as they are.
+    const albumArtist = await this.englishAlbumArtist(tags);
+    if (albumArtist) values.albumArtist = [albumArtist];
     let changed;
     try {
       if (!this.originals[real]) {
@@ -181,6 +190,7 @@ class Session {
     const after = await fs.stat(real);
     this.index[real] = { ...this.index[real], ...statKey(after), artist: fields.artist, workId: fields.workId || "" };
     this.record(real, after, {
+      v: TAGGING_VERSION,
       status: changed.length ? "tagged" : "unchanged",
       recording: tags.recordingMbid,
       artist: fields.artist,
@@ -214,6 +224,10 @@ class Session {
       const credit = await this.trackCredit(tags);
       if (!credit) return "no backup";
       values = { artist: [credit] };
+      if (tags.albumArtistMbids.length === 1) {
+        const name = (await ctx.mb.get("artist", tags.albumArtistMbids[0], "aliases+genres"))?.name;
+        if (name) values.albumArtist = [name];
+      }
     }
     const changed = await writeTags(real, values);
     delete this.originals[real];
@@ -226,6 +240,14 @@ class Session {
       ctx.log(`Removed classical tags from ${path.basename(real)}`);
     }
     return changed.length ? "restored" : "unchanged";
+  }
+
+  async englishAlbumArtist(tags) {
+    if (tags.albumArtistMbids.length !== 1) return null;
+    const artist = await this.ctx.resolver.getArtist(tags.albumArtistMbids[0]);
+    if (!artist?.name) return null;
+    const [name] = await this.ctx.resolver.englishNames(artist);
+    return name || null;
   }
 
   // MusicBrainz's artist credit for this recording on the file's release,
@@ -296,7 +318,7 @@ class Session {
             this.dirty++;
             await this.save();
           }
-          if (this.index[full].recordingMbid && !sameStat(this.processed[full], stat)) pending.push(full);
+          if (this.index[full].recordingMbid && (!sameStat(this.processed[full], stat) || outdated(this.processed[full]))) pending.push(full);
         }
       }
     };
@@ -357,7 +379,7 @@ export async function runScheduled(ctx, budgetMs) {
     session.stats.found = pending.length;
     for (const file of pending) {
       if (Date.now() > until) break;
-      if (!(await session.processFile(file, { prefilter: true }))) break;
+      if (!(await session.processFile(file, { prefilter: true, upgrade: true }))) break;
       await session.save();
     }
     session.stats.left = (await queueLength(ctx)) + pending.filter((f) => !session.processed[f]).length;

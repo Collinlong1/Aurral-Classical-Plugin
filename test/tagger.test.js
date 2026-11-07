@@ -281,3 +281,63 @@ test("the copy being tagged has no audio extension, so a Library scan never pick
     fsp.copyFile = realCopy;
   }
 });
+
+async function withAlbumArtist(file, names, ids) {
+  const f = File.createFromPath(file);
+  f.tag.albumArtists = names;
+  const xiph = f.getTag(TagTypes.Xiph, false);
+  xiph.setFieldAsStrings("MUSICBRAINZ_ALBUMARTISTID", ...ids);
+  f.save();
+  f.dispose();
+}
+const tchaikovskyEntities = () => {
+  const e = symphonyEntities();
+  e["artist:pti"] = { id: "pti", name: "Пётр Ильич Чайковский", "sort-name": "Tchaikovsky, Pyotr Ilyich", aliases: [{ name: "Pyotr Ilyich Tchaikovsky", locale: "en", primary: true }] };
+  return e;
+};
+
+test("an album Aurral files under one artist gets that artist's English name", async () => {
+  globalThis.fetch = fakeFetch({ entities: tchaikovskyEntities() });
+  const file = await copyFixture("sine.flac", path.join(folders.libraryFolder, "pti", "01.flac"));
+  await withAlbumArtist(file, ["Пётр Ильич Чайковский"], ["pti"]);
+  await plugin.scheduled(input());
+  assert.equal(readTags(file).albumArtist, "Pyotr Tchaikovsky");
+  // Remove classical tags puts it back.
+  await plugin.actions["untag-album"](input({ user: { id: 1, role: "admin" }, album: { title: "X", tracks: [{ path: file }] } }));
+  assert.equal(readTags(file).albumArtist, "Пётр Ильич Чайковский");
+});
+
+test("an album credited to several artists, as beets tags them, keeps its album artist", async () => {
+  globalThis.fetch = fakeFetch({ entities: tchaikovskyEntities() });
+  const file = await copyFixture("sine.flac", path.join(folders.libraryFolder, "credit", "01.flac"));
+  await withAlbumArtist(file, ["Pyotr Ilyich Tchaikovsky; Berlin Philharmonic Orchestra, Claudio Abbado"], ["pti", "bpo", "abbado"]);
+  await plugin.scheduled(input());
+  const tags = readTags(file);
+  assert.equal(tags.artist, EXPECTED_ARTIST);
+  assert.equal(tags.albumArtist, "Pyotr Ilyich Tchaikovsky; Berlin Philharmonic Orchestra, Claudio Abbado");
+  assert.deepEqual(tags.albumArtistMbids, ["pti", "bpo", "abbado"]);
+});
+
+test("files tagged by an older version get the album artist on the next schedule", async () => {
+  const fetchHere = fakeFetch({ entities: tchaikovskyEntities() });
+  globalThis.fetch = fetchHere;
+  const file = await copyFixture("sine.flac", path.join(folders.libraryFolder, "old", "01.flac"));
+  await withAlbumArtist(file, ["Пётр Ильич Чайковский"], ["pti"]);
+  await plugin.scheduled(input());
+  // Pretend an older version tagged it: no album artist and no version.
+  const { writeTags } = await import("../src/tags.js");
+  await writeTags(file, { albumArtist: ["Пётр Ильич Чайковский"] });
+  const ctx = makeContext(input());
+  const processed = await readProcessed(ctx);
+  const real = await fs.realpath(file);
+  const stat = await fs.stat(real);
+  processed[real] = { ...processed[real], v: undefined, mtimeMs: Math.round(stat.mtimeMs), size: stat.size };
+  await fs.writeFile(path.join(folders.dataFolder, "processed.json"), JSON.stringify(processed));
+  await plugin.scheduled(input());
+  assert.equal(readTags(file).albumArtist, "Pyotr Tchaikovsky");
+  const processedNow = await readProcessed(makeContext(input()));
+  assert.equal(processedNow[real].v, 2);
+  const calls = fetchHere.calls.length;
+  await plugin.scheduled(input());
+  assert.equal(fetchHere.calls.length, calls, "and only once");
+});

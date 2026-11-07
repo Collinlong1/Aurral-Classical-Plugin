@@ -53,6 +53,12 @@ and their composers, and writes:
 | `COMPOSER` | The composers |
 | `WORK` | The Work the recording performs (usually a movement) |
 | `MUSICBRAINZ_WORKID` | Its MusicBrainz ID |
+| `ALBUMARTIST` | The album artist's English name, e.g. Pyotr Tchaikovsky for Пётр Ильич Чайковский |
+
+Aurral files an album under one album artist, by its MusicBrainz ID, and
+names that artist after the album artist tag, so the artist shows in English
+and nothing moves. Albums credited to several artists, as beets tags them
+("Claude Debussy; Daniel Barenboim"), keep their album artist.
 
 Tracks whose Works have no composer (or `writer`) are left alone. The rules
 for building the artist are the beets plugin's, unchanged; see its README for
@@ -105,7 +111,7 @@ genre, a musical) still do.
 ## Remove classical tags
 
 Admins see **Remove classical tags** in the album menu. Before it first changes
-a file, the plugin keeps its `ARTIST`, `COMPOSER`, `WORK` and
+a file, the plugin keeps its `ARTIST`, `ALBUMARTIST`, `COMPOSER`, `WORK` and
 `MUSICBRAINZ_WORKID` in its data folder; this puts them back. Files tagged
 before the plugin kept these (or by the beets plugin) get the artist
 MusicBrainz credits for that track on its release, which is what Aurral

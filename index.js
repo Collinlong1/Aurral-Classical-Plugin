@@ -36034,6 +36034,7 @@ function textField(xiphName, id3Description, apple) {
 var workField = textField("WORK", "WORK", { box: "\xA9wrk" });
 var workIdField = textField("MUSICBRAINZ_WORKID", "MusicBrainz Work Id", { name: "MusicBrainz Work Id" });
 var artistIdsField = textField("MUSICBRAINZ_ARTISTID", "MusicBrainz Artist Id", { name: "MusicBrainz Artist Id" });
+var albumArtistIdsField = textField("MUSICBRAINZ_ALBUMARTISTID", "MusicBrainz Album Artist Id", { name: "MusicBrainz Album Artist Id" });
 var WRITERS = {
   title: {
     read: (file) => texts(file.tag.title),
@@ -36042,6 +36043,10 @@ var WRITERS = {
   artist: {
     read: (file) => texts(file.tag.performers),
     write: (file, values) => file.tag.performers = values
+  },
+  albumArtist: {
+    read: (file) => texts(file.tag.albumArtists),
+    write: (file, values) => file.tag.albumArtists = values
   },
   composer: {
     read: (file) => texts(file.tag.composers),
@@ -36112,7 +36117,8 @@ function readTags(filePath) {
       recordingMbid: text(tag.musicBrainzTrackId),
       releaseMbid: text(tag.musicBrainzReleaseId),
       releaseGroupMbid: text(tag.musicBrainzReleaseGroupId),
-      albumArtistMbids: texts(text(tag.musicBrainzReleaseArtistId).split(/[;/]/)),
+      // Every album artist ID: taglib's own property has only the first.
+      albumArtistMbids: [...new Set([...albumArtistIdsField.read(file), text(tag.musicBrainzReleaseArtistId)].flatMap((v) => texts(v.split(/[;/]/))))],
       artistMbids: artistIdsField.read(file).flatMap((value) => texts(value.split(/[;/]/))),
       genres: texts(tag.genres ?? []).flatMap((genre) => texts(genre.split(";"))),
       composer: texts(tag.composers ?? []),
@@ -36346,7 +36352,9 @@ var processedFile = (ctx) => path3.join(ctx.dataFolder, "processed.json");
 var indexFile = (ctx) => path3.join(ctx.dataFolder, "library-index.json");
 var originalsFile = (ctx) => path3.join(ctx.dataFolder, "originals.json");
 var excludedFile = (ctx) => path3.join(ctx.dataFolder, "excluded.json");
-var TAG_FIELDS = ["artist", "composer", "work", "workId"];
+var TAG_FIELDS = ["artist", "albumArtist", "composer", "work", "workId"];
+var TAGGING_VERSION = 2;
+var outdated = (record) => record && (record.status === "tagged" || record.status === "unchanged") && (record.v ?? 1) < TAGGING_VERSION;
 var lockDir = (ctx) => path3.join(ctx.dataFolder, "tagging.lock");
 async function enqueue(ctx, filePaths, { force = false, source = null } = {}) {
   await fs3.mkdir(queueDir(ctx), { recursive: true });
@@ -36429,7 +36437,7 @@ var Session = class {
     else this.stats[result.status]++;
   }
   // Returns false when MusicBrainz can't be reached, so the caller stops.
-  async processFile(filePath, { force = false, prefilter = false } = {}) {
+  async processFile(filePath, { force = false, prefilter = false, upgrade = false } = {}) {
     const { ctx } = this;
     const real = await allowedPath(ctx, filePath);
     if (!real) {
@@ -36439,7 +36447,7 @@ var Session = class {
     }
     if (!isAudioPath(real)) return true;
     const stat = await fs3.stat(real);
-    if (!force && sameStat(this.processed[real], stat)) return true;
+    if (!force && sameStat(this.processed[real], stat) && !(upgrade && outdated(this.processed[real]))) return true;
     let tags;
     try {
       tags = readTags(real);
@@ -36477,6 +36485,8 @@ var Session = class {
     }
     const values = { artist: [fields.artist], composer: fields.composers };
     if (fields.workId) Object.assign(values, { work: [fields.work], workId: [fields.workId] });
+    const albumArtist = await this.englishAlbumArtist(tags);
+    if (albumArtist) values.albumArtist = [albumArtist];
     let changed;
     try {
       if (!this.originals[real]) {
@@ -36492,6 +36502,7 @@ var Session = class {
     const after = await fs3.stat(real);
     this.index[real] = { ...this.index[real], ...statKey(after), artist: fields.artist, workId: fields.workId || "" };
     this.record(real, after, {
+      v: TAGGING_VERSION,
       status: changed.length ? "tagged" : "unchanged",
       recording: tags.recordingMbid,
       artist: fields.artist,
@@ -36524,6 +36535,10 @@ var Session = class {
       const credit = await this.trackCredit(tags);
       if (!credit) return "no backup";
       values = { artist: [credit] };
+      if (tags.albumArtistMbids.length === 1) {
+        const name = (await ctx.mb.get("artist", tags.albumArtistMbids[0], "aliases+genres"))?.name;
+        if (name) values.albumArtist = [name];
+      }
     }
     const changed = await writeTags(real, values);
     delete this.originals[real];
@@ -36536,6 +36551,13 @@ var Session = class {
       ctx.log(`Removed classical tags from ${path3.basename(real)}`);
     }
     return changed.length ? "restored" : "unchanged";
+  }
+  async englishAlbumArtist(tags) {
+    if (tags.albumArtistMbids.length !== 1) return null;
+    const artist = await this.ctx.resolver.getArtist(tags.albumArtistMbids[0]);
+    if (!artist?.name) return null;
+    const [name] = await this.ctx.resolver.englishNames(artist);
+    return name || null;
   }
   // MusicBrainz's artist credit for this recording on the file's release,
   // else on the recording itself.
@@ -36603,7 +36625,7 @@ var Session = class {
             this.dirty++;
             await this.save();
           }
-          if (this.index[full].recordingMbid && !sameStat(this.processed[full], stat)) pending.push(full);
+          if (this.index[full].recordingMbid && (!sameStat(this.processed[full], stat) || outdated(this.processed[full]))) pending.push(full);
         }
       }
     };
@@ -36654,7 +36676,7 @@ async function runScheduled(ctx, budgetMs) {
     session.stats.found = pending.length;
     for (const file of pending) {
       if (Date.now() > until) break;
-      if (!await session.processFile(file, { prefilter: true })) break;
+      if (!await session.processFile(file, { prefilter: true, upgrade: true })) break;
       await session.save();
     }
     session.stats.left = await queueLength(ctx) + pending.filter((f) => !session.processed[f]).length;
