@@ -37050,6 +37050,10 @@ async function loadRelease(mb, releaseMbid) {
   const others = (editions?.releases || []).filter((r) => r.id !== release.id);
   const officialOnly = others.some((r) => r.status === "Official") || release.status === "Official";
   const pressings = others.filter((r) => !officialOnly || r.status === "Official").map(flat).filter((tracks) => tracks.length === own.length && order(tracks) === order(own));
+  const byRecording = /* @__PURE__ */ new Map();
+  for (const tracks of (editions?.releases || []).map(flat))
+    for (const t of tracks)
+      if (t.recordingId && t.length > 0) byRecording.set(t.recordingId, [...byRecording.get(t.recordingId) ?? [], t.length]);
   let index = 0;
   for (const disc of discs)
     for (const track of disc.tracks) {
@@ -37057,6 +37061,7 @@ async function loadRelease(mb, releaseMbid) {
       const lengths = pressings.map((tracks) => tracks[i]).filter((t) => t?.recordingId === track.recordingId && t.length > 0).map((t) => t.length);
       if (track.lengthMs == null && lengths.length) track.lengthMs = [...lengths].sort((a, b) => a - b)[Math.floor(lengths.length / 2)];
       track.lengthsMs = [...new Set([track.lengthMs, ...lengths].filter((l) => l != null))];
+      track.anyLengthsMs = [.../* @__PURE__ */ new Set([...track.lengthsMs, ...byRecording.get(track.recordingId) ?? []])];
     }
   return {
     id: release.id,
@@ -37108,19 +37113,19 @@ function groupFolders(responses) {
   }
   return [...folders.values()];
 }
-function lengthGap(lengthMs, track) {
-  const lengths = track.lengthsMs?.length ? track.lengthsMs : [track.lengthMs];
+function lengthGap(lengthMs, track, { anyEdition = false } = {}) {
+  const lengths = anyEdition && track.anyLengthsMs?.length ? track.anyLengthsMs : track.lengthsMs?.length ? track.lengthsMs : [track.lengthMs];
   const gaps = lengths.filter((l) => l != null).map((l) => Math.abs(lengthMs - l));
   return gaps.length ? Math.min(...gaps) : Infinity;
 }
-function linesUp(files, tracks) {
+function linesUp(files, tracks, options = {}) {
   if (files.length !== tracks.length) return false;
-  return files.every((file, i) => file.lengthMs != null && lengthGap(file.lengthMs, tracks[i]) <= LENGTH_TOLERANCE_MS);
+  return files.every((file, i) => file.lengthMs != null && lengthGap(file.lengthMs, tracks[i], options) <= LENGTH_TOLERANCE_MS);
 }
-function folderDiscs(folder, release) {
+function folderDiscs(folder, release, options = {}) {
   const all = release.discs.flatMap((disc2) => disc2.tracks);
-  if (release.discs.length > 1 && linesUp(folder.files, all)) return release.discs.map((d) => d.position);
-  const disc = release.discs.find((d) => linesUp(folder.files, d.tracks));
+  if (release.discs.length > 1 && linesUp(folder.files, all, options)) return release.discs.map((d) => d.position);
+  const disc = release.discs.find((d) => linesUp(folder.files, d.tracks, options));
   return disc ? [disc.position] : null;
 }
 var folderScore = (folder) => (folder.freeSlot ? 0 : 1e9) + folder.queueLength * 1e6 + (LOSSLESS.has(folder.format) ? 0 : 1e5) - Math.min(folder.speed, 99999);
@@ -37160,7 +37165,7 @@ function albumCandidates(folders, release) {
 function trackCandidates(folders, release, discPosition, trackIndexInDisc) {
   const out = [];
   for (const folder of folders) {
-    const discs = folderDiscs(folder, release);
+    const discs = folderDiscs(folder, release, { anyEdition: true });
     if (!discs?.includes(discPosition)) continue;
     const mapped = mapFiles(folder, release, discs);
     const hit = mapped.find((m) => m.disc === discPosition && m.track === release.discs.find((d) => d.position === discPosition).tracks[trackIndexInDisc]);
@@ -37168,7 +37173,7 @@ function trackCandidates(folders, release, discPosition, trackIndexInDisc) {
   }
   return out.sort((a, b) => a.score - b.score);
 }
-function describeMisses(folders, release) {
+function describeMisses(folders, release, options = {}) {
   const counts = new Set(release.discs.map((d) => d.tracks.length));
   counts.add(release.discs.reduce((n, d) => n + d.tracks.length, 0));
   let noLengths = 0;
@@ -37176,13 +37181,13 @@ function describeMisses(folders, release) {
   let wrongLengths = 0;
   let closest = null;
   for (const folder of folders) {
-    if (folderDiscs(folder, release)) continue;
+    if (folderDiscs(folder, release, options)) continue;
     if (!counts.has(folder.files.length)) wrongCount++;
     else if (folder.files.some((f) => f.lengthMs == null)) noLengths++;
     else {
       wrongLengths++;
       const tracks = release.discs.find((d) => d.tracks.length === folder.files.length)?.tracks ?? release.discs.flatMap((d) => d.tracks);
-      const offs = folder.files.map((f, i) => tracks[i] ? lengthGap(f.lengthMs, tracks[i]) : Infinity);
+      const offs = folder.files.map((f, i) => tracks[i] ? lengthGap(f.lengthMs, tracks[i], options) : Infinity);
       const worst = Math.max(...offs);
       if (!closest || worst < closest.worst) closest = { worst, at: offs.indexOf(worst) + 1, over: offs.filter((o) => o > LENGTH_TOLERANCE_MS).length };
     }
@@ -37281,7 +37286,7 @@ async function searchTrack(ctx, track) {
   const queries = searchQueries(info, { albumTitle: release.title });
   const folders = await searchFolders(ctx, slskd, queries, (found) => trackCandidates(found, release, discPosition, index).length > 0, started);
   const target = release.discs.find((d) => d.position === discPosition).tracks[index];
-  ctx.log(`Release ${release.id}: ${describeMisses(folders, release)}`);
+  ctx.log(`Release ${release.id}: ${describeMisses(folders, release, { anyEdition: true })}`);
   const seen = /* @__PURE__ */ new Set();
   return trackCandidates(folders, release, discPosition, index).filter((c) => !seen.has(`${c.folder.username}\0${c.file.filename}`) && seen.add(`${c.folder.username}\0${c.file.filename}`)).slice(0, MAX_RESULTS).map((c) => ({
     id: `${c.folder.username}:${c.file.filename}`.slice(0, 500),
@@ -37293,7 +37298,7 @@ async function searchTrack(ctx, track) {
     bitrate: c.file.bitRate,
     data: {
       username: c.folder.username,
-      files: [{ filename: c.file.filename, size: c.file.size, title: target.title, artist: target.artist, recordingId: target.recordingId, lengthMs: target.lengthMs, lengthsMs: target.lengthsMs }]
+      files: [{ filename: c.file.filename, size: c.file.size, title: target.title, artist: target.artist, recordingId: target.recordingId, lengthMs: target.lengthMs, lengthsMs: target.anyLengthsMs }]
     }
   }));
 }

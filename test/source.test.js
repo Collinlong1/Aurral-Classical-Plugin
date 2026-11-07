@@ -150,23 +150,41 @@ const pressing = (extra = {}) => ({
   ...extra,
 });
 
-test("a folder that matches another official pressing's lengths qualifies, as in Aurral", async () => {
+const album = { artist: "Ludwig van Beethoven", title: "Symphonies 5 & 7", releaseMbid: "rel1", releaseGroupMbid: "rg1", tracks: [] };
+// carol shares one disc; this one has both discs, the second track 5s long.
+const fullRip = { username: "frank", files: [
+  file("@@f\\B57", "01.flac", 2), file("@@f\\B57", "02.flac", 305), file("@@f\\B57", "03.flac", 400), file("@@f\\B57", "04.flac", 500),
+] };
+
+test("an album folder may match another official pressing's lengths, as in Aurral", async () => {
+  state.responses.push(fullRip);
   globalThis.fetch = fakeFetch({ entities: withEditions([pressing()]), slskd: fakeSlskd(state) });
-  const results = await plugin.downloadSource.search(input({ track: request }));
-  assert.ok(results.map((r) => r.data.username).includes("carol"));
+  const results = await plugin.downloadSource.searchAlbum(input({ album }));
+  assert.ok(results.map((r) => r.data.username).includes("frank"));
 });
 
-test("lengths of pressings Aurral wouldn't count don't qualify a folder", async () => {
-  // Aurral counts only official pressings when the album has one, and only
-  // ones with the same titles in the same order.
+test("an album folder matching only a pressing Aurral wouldn't count is left out", async () => {
+  // Aurral judges a whole album against the pinned release and only official
+  // pressings with the same titles in the same order, and would reject it.
   const unofficial = pressing({ status: null });
   const retitled = pressing();
   retitled.media[0].tracks[1].title = "Andante con moto";
   for (const releases of [[unofficial], [retitled]]) {
+    state.responses = [...responses(), fullRip];
     globalThis.fetch = fakeFetch({ entities: withEditions(releases), slskd: fakeSlskd(state) });
-    const results = await plugin.downloadSource.search(input({ track: request }));
-    assert.ok(!results.map((r) => r.data.username).includes("carol"));
+    const results = await plugin.downloadSource.searchAlbum(input({ album }));
+    assert.ok(!results.map((r) => r.data.username).includes("frank"));
   }
+});
+
+test("a single track may come from any edition of the album", async () => {
+  // Aurral checks single tracks by the recording ID the plugin tags them
+  // with, and sends doubtful ones to review rather than dropping them.
+  globalThis.fetch = fakeFetch({ entities: withEditions([pressing({ status: null, media: [{ tracks: [
+    { title: "Allegro", length: 2000, recording: { id: RECORDING } }, { title: "Andante", length: 305_000, recording: { id: "r2" } },
+  ] }] })]), slskd: fakeSlskd(state) });
+  const results = await plugin.downloadSource.search(input({ track: request }));
+  assert.ok(results.map((r) => r.data.username).includes("carol"));
 });
 
 test("searches return nothing for requests that aren't classical", async () => {

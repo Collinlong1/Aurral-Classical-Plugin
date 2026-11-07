@@ -53,6 +53,10 @@ export async function loadRelease(mb, releaseMbid) {
     .filter((r) => (!officialOnly || r.status === "Official"))
     .map(flat)
     .filter((tracks) => tracks.length === own.length && order(tracks) === order(own));
+  const byRecording = new Map();
+  for (const tracks of (editions?.releases || []).map(flat))
+    for (const t of tracks)
+      if (t.recordingId && t.length > 0) byRecording.set(t.recordingId, [...(byRecording.get(t.recordingId) ?? []), t.length]);
   let index = 0;
   for (const disc of discs)
     for (const track of disc.tracks) {
@@ -61,6 +65,10 @@ export async function loadRelease(mb, releaseMbid) {
       // A track without a length takes the median of its pressings'.
       if (track.lengthMs == null && lengths.length) track.lengthMs = [...lengths].sort((a, b) => a - b)[Math.floor(lengths.length / 2)];
       track.lengthsMs = [...new Set([track.lengthMs, ...lengths].filter((l) => l != null))];
+      // Its length on every edition of the album, for single tracks: Aurral
+      // checks those one at a time, by the recording ID the plugin tags them
+      // with, and sends doubtful ones to review instead of dropping them.
+      track.anyLengthsMs = [...new Set([...track.lengthsMs, ...(byRecording.get(track.recordingId) ?? [])])];
     }
   return {
     id: release.id,
@@ -127,24 +135,24 @@ export function groupFolders(responses) {
 }
 
 // How far a length is from a track's, on its nearest edition.
-export function lengthGap(lengthMs, track) {
-  const lengths = track.lengthsMs?.length ? track.lengthsMs : [track.lengthMs];
+export function lengthGap(lengthMs, track, { anyEdition = false } = {}) {
+  const lengths = anyEdition && track.anyLengthsMs?.length ? track.anyLengthsMs : track.lengthsMs?.length ? track.lengthsMs : [track.lengthMs];
   const gaps = lengths.filter((l) => l != null).map((l) => Math.abs(lengthMs - l));
   return gaps.length ? Math.min(...gaps) : Infinity;
 }
 
 // Does this folder's file list line up with these tracks, in order?
-export function linesUp(files, tracks) {
+export function linesUp(files, tracks, options = {}) {
   if (files.length !== tracks.length) return false;
-  return files.every((file, i) => file.lengthMs != null && lengthGap(file.lengthMs, tracks[i]) <= LENGTH_TOLERANCE_MS);
+  return files.every((file, i) => file.lengthMs != null && lengthGap(file.lengthMs, tracks[i], options) <= LENGTH_TOLERANCE_MS);
 }
 
 // A folder can hold one disc, or the whole release with the discs in order.
 // Returns the disc positions it covers, or null.
-export function folderDiscs(folder, release) {
+export function folderDiscs(folder, release, options = {}) {
   const all = release.discs.flatMap((disc) => disc.tracks);
-  if (release.discs.length > 1 && linesUp(folder.files, all)) return release.discs.map((d) => d.position);
-  const disc = release.discs.find((d) => linesUp(folder.files, d.tracks));
+  if (release.discs.length > 1 && linesUp(folder.files, all, options)) return release.discs.map((d) => d.position);
+  const disc = release.discs.find((d) => linesUp(folder.files, d.tracks, options));
   return disc ? [disc.position] : null;
 }
 
@@ -189,10 +197,11 @@ export function albumCandidates(folders, release) {
 }
 
 // For a track: each folder holding its disc, and the file at its position.
+// Single tracks may line up with any edition of the album (see anyLengthsMs).
 export function trackCandidates(folders, release, discPosition, trackIndexInDisc) {
   const out = [];
   for (const folder of folders) {
-    const discs = folderDiscs(folder, release);
+    const discs = folderDiscs(folder, release, { anyEdition: true });
     if (!discs?.includes(discPosition)) continue;
     const mapped = mapFiles(folder, release, discs);
     const hit = mapped.find((m) => m.disc === discPosition && m.track === release.discs.find((d) => d.position === discPosition).tracks[trackIndexInDisc]);
@@ -202,7 +211,7 @@ export function trackCandidates(folders, release, discPosition, trackIndexInDisc
 }
 
 // Why folders didn't qualify, for the log.
-export function describeMisses(folders, release) {
+export function describeMisses(folders, release, options = {}) {
   const counts = new Set(release.discs.map((d) => d.tracks.length));
   counts.add(release.discs.reduce((n, d) => n + d.tracks.length, 0));
   let noLengths = 0;
@@ -210,13 +219,13 @@ export function describeMisses(folders, release) {
   let wrongLengths = 0;
   let closest = null;
   for (const folder of folders) {
-    if (folderDiscs(folder, release)) continue;
+    if (folderDiscs(folder, release, options)) continue;
     if (!counts.has(folder.files.length)) wrongCount++;
     else if (folder.files.some((f) => f.lengthMs == null)) noLengths++;
     else {
       wrongLengths++;
       const tracks = release.discs.find((d) => d.tracks.length === folder.files.length)?.tracks ?? release.discs.flatMap((d) => d.tracks);
-      const offs = folder.files.map((f, i) => (tracks[i] ? lengthGap(f.lengthMs, tracks[i]) : Infinity));
+      const offs = folder.files.map((f, i) => (tracks[i] ? lengthGap(f.lengthMs, tracks[i], options) : Infinity));
       const worst = Math.max(...offs);
       if (!closest || worst < closest.worst) closest = { worst, at: offs.indexOf(worst) + 1, over: offs.filter((o) => o > LENGTH_TOLERANCE_MS).length };
     }
@@ -338,7 +347,7 @@ export async function searchTrack(ctx, track) {
   const queries = searchQueries(info, { albumTitle: release.title });
   const folders = await searchFolders(ctx, slskd, queries, (found) => trackCandidates(found, release, discPosition, index).length > 0, started);
   const target = release.discs.find((d) => d.position === discPosition).tracks[index];
-  ctx.log(`Release ${release.id}: ${describeMisses(folders, release)}`);
+  ctx.log(`Release ${release.id}: ${describeMisses(folders, release, { anyEdition: true })}`);
   const seen = new Set();
   return trackCandidates(folders, release, discPosition, index)
     .filter((c) => !seen.has(`${c.folder.username}\u0000${c.file.filename}`) && seen.add(`${c.folder.username}\u0000${c.file.filename}`))
@@ -353,7 +362,7 @@ export async function searchTrack(ctx, track) {
       bitrate: c.file.bitRate,
       data: {
         username: c.folder.username,
-        files: [{ filename: c.file.filename, size: c.file.size, title: target.title, artist: target.artist, recordingId: target.recordingId, lengthMs: target.lengthMs, lengthsMs: target.lengthsMs }],
+        files: [{ filename: c.file.filename, size: c.file.size, title: target.title, artist: target.artist, recordingId: target.recordingId, lengthMs: target.lengthMs, lengthsMs: target.anyLengthsMs }],
       },
     }));
 }
