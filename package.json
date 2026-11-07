@@ -1,0 +1,30 @@
+{
+  "name": "aurral-classical-plugin",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "node build.mjs",
+    "build:dev": "node build.mjs --dev",
+    "test": "node --test test/*.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Collinlong1/Aurral-Classical-Plugin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Collinlong1/Aurral-Classical-Plugin/issues"
+  },
+  "homepage": "https://github.com/Collinlong1/Aurral-Classical-Plugin#readme",
+  "devDependencies": {
+    "esbuild": "^0.25.12"
+  },
+  "dependencies": {
+    "node-taglib-sharp": "^6.0.3"
+  },
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "description": "Aurral plugin: classical tagging, recording comparisons and an slskd source",
+  "license": "MIT"
+}
