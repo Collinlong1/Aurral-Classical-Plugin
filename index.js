@@ -35363,6 +35363,59 @@ var DEFAULT_NON_CLASSICAL_GENRES = [
   "shoegaze",
   "lo fi"
 ];
+var HARD_NON_CLASSICAL_GENRES = [
+  "christmas",
+  "holiday",
+  "soundtrack",
+  "film score",
+  "film soundtrack",
+  "cinematic",
+  "video game",
+  "game music",
+  "musical",
+  "musicals",
+  "show tunes",
+  "broadway",
+  "crossover",
+  "easy listening",
+  "children's music",
+  "lullaby",
+  "new age",
+  "lounge",
+  "bossa nova",
+  "trailer music"
+];
+var NON_CLASSICAL_RELEASE_TYPES = ["soundtrack", "spokenword", "audiobook", "audio drama", "interview", "dj-mix", "mixtape/street"];
+var CLASSICAL_WORK_TYPES = [
+  "aria",
+  "ballet",
+  "cantata",
+  "concerto",
+  "\xE9tude",
+  "etude",
+  "incidental music",
+  "madrigal",
+  "mass",
+  "motet",
+  "opera",
+  "operetta",
+  "oratorio",
+  "overture",
+  "partita",
+  "quartet",
+  "sonata",
+  "song-cycle",
+  "suite",
+  "symphonic poem",
+  "symphony",
+  "zarzuela",
+  "variations",
+  "prelude",
+  "chorale",
+  "chanson"
+];
+var NON_CLASSICAL_WORK_TYPES = ["soundtrack", "musical", "play", "audio drama", "beijing opera"];
+var EARLY_COMPOSER_YEAR = 1900;
 var DEFAULT_COMPOSER_RELATIONS = ["composer", "writer"];
 var DEFAULT_ORDER = [
   "composers",
@@ -35454,6 +35507,7 @@ var ClassicalResolver = class _ClassicalResolver {
     maxSoloists = 4,
     maxArtistSoloists = 4,
     trackArtistFallback = false,
+    requireEvidence = true,
     recordingTtlMs
   } = {}) {
     this.mb = mb;
@@ -35471,6 +35525,9 @@ var ClassicalResolver = class _ClassicalResolver {
     this.maxSoloists = maxSoloists;
     this.maxArtistSoloists = maxArtistSoloists;
     this.trackArtistFallback = trackArtistFallback;
+    this.requireEvidence = requireEvidence;
+    const hard = HARD_NON_CLASSICAL_GENRES.map(normGenre).sort((a, b) => b.length - a.length);
+    this.hardNonClassicalRe = new RegExp(`(?<![\\p{L}\\p{N}_])(?:${hard.map(escapeRegex).join("|")})(?![\\p{L}\\p{N}_])`, "u");
     this.recordingTtlMs = recordingTtlMs;
     this.skipReason = null;
   }
@@ -35488,15 +35545,22 @@ var ClassicalResolver = class _ClassicalResolver {
     return id ? this.mb.get("release-group", id, _ClassicalResolver.RELEASE_GROUP_INC) : null;
   }
   // -- genres -------------------------------------------------------------
+  isHardNonClassicalGenre(name) {
+    return this.hardNonClassicalRe.test(name);
+  }
   isClassicalGenre(name) {
+    if (this.isHardNonClassicalGenre(name)) return false;
     return this.classicalGenres.has(name) || CLASSICAL_WORD.test(name);
   }
   isNonClassicalGenre(name) {
-    return Boolean(this.nonClassicalRe && this.nonClassicalRe.test(name));
+    return this.isHardNonClassicalGenre(name) || Boolean(this.nonClassicalRe && this.nonClassicalRe.test(name));
   }
-  // true (classical), false (not classical) or null (no signal).
+  // true (classical), false (not classical) or null (no signal). A
+  // classical genre wins over "pop" or "rock" on the same entity, but not
+  // over Christmas, soundtrack or crossover genres.
   classifyGenres(genres) {
     const list = [...genres];
+    if (list.some((g) => this.isHardNonClassicalGenre(g))) return false;
     if (list.some((g) => this.isClassicalGenre(g))) return true;
     if (list.some((g) => this.isNonClassicalGenre(g))) return false;
     return null;
@@ -35684,11 +35748,49 @@ var ClassicalResolver = class _ClassicalResolver {
       credits[role] = sorted;
     }
   }
+  // -- evidence -----------------------------------------------------------
+  // An artist known only for classical music: their most-voted genres are
+  // classical, and none of them isn't.
+  async isClassicalArtist(id) {
+    const data = await this.getArtist(id) || {};
+    const genres = data.genres || [];
+    if (!genres.length) return false;
+    const top = Math.max(...genres.map((g) => g.count || 0));
+    const names = [...genreNames({ genres: genres.filter((g) => (g.count || 0) === top) })];
+    return names.some((g) => this.isClassicalGenre(g)) && !names.some((g) => this.isNonClassicalGenre(g));
+  }
+  async isEarlyComposer(id) {
+    const year = Number(String((await this.getArtist(id) || {})["life-span"]?.begin || "").slice(0, 4));
+    return year > 0 && year < EARLY_COMPOSER_YEAR;
+  }
+  // The types of the recorded Work and the Work it belongs to.
+  async workTypes(credits) {
+    const work = credits.work;
+    if (!work) return [];
+    const types = [work.type];
+    const parent = (work.relations || []).find((rel) => rel.type === "parts" && rel.direction === "backward" && rel.work?.id);
+    if (parent) types.push((await this.getWork(parent.work.id) || {}).type);
+    return types.filter(Boolean).map((t) => String(t).toLowerCase());
+  }
+  // Why this recording is classical, or null when nothing says so.
+  async classicalEvidence(recording, credits, workTypes) {
+    if (workTypes.some((t) => CLASSICAL_WORK_TYPES.includes(t))) return "work type";
+    for (const p of credits.composers) {
+      if (p.id === p.name) continue;
+      if (await this.isEarlyComposer(p.id)) return "composer's dates";
+      if (await this.isClassicalArtist(p.id)) return "composer's genres";
+    }
+    for (const credit of recording["artist-credit"] || [])
+      if (credit.artist?.id && await this.isClassicalArtist(credit.artist.id)) return "performer's genres";
+    return null;
+  }
   // -- entry point --------------------------------------------------------
   // Returns the classical fields for a recording, or null to leave it alone.
   // `skipReason` says why: "no composer", "non-classical", or null when
   // MusicBrainz couldn't be reached.
-  async resolve(recordingId, { trackArtistIds = [], albumArtistIds = [], releaseGroupId = null } = {}) {
+  // `confirmed`: an admin said it's classical, so missing evidence doesn't
+  // keep it from being tagged (signs that it isn't classical still do).
+  async resolve(recordingId, { trackArtistIds = [], albumArtistIds = [], releaseGroupId = null, confirmed = false } = {}) {
     this.skipReason = null;
     if (!recordingId) return null;
     const recording = await this.getRecording(recordingId);
@@ -35702,9 +35804,18 @@ var ClassicalResolver = class _ClassicalResolver {
         return null;
       }
     }
+    const needAlbum = this.requireEvidence || this.classifyGenres(genreNames(recording)) == null;
+    const releaseGroup = releaseGroupId && needAlbum ? await this.getReleaseGroup(releaseGroupId) || {} : {};
+    const albumTypes = (releaseGroup["secondary-types"] || []).map((t) => String(t).toLowerCase());
+    if (this.requireEvidence && albumTypes.some((t) => NON_CLASSICAL_RELEASE_TYPES.includes(t))) {
+      this.skipReason = "non-classical";
+      return null;
+    }
     let verdict = this.classifyGenres(genreNames(recording));
-    if (verdict == null && releaseGroupId)
-      verdict = this.classifyGenres(genreNames(await this.getReleaseGroup(releaseGroupId) || {}));
+    const albumVerdict = this.classifyGenres(genreNames(releaseGroup));
+    if (this.requireEvidence && albumVerdict === false && [...genreNames(releaseGroup)].some((g) => this.isHardNonClassicalGenre(g)))
+      verdict = false;
+    if (verdict == null) verdict = albumVerdict;
     if (verdict === false) {
       this.skipReason = "non-classical";
       return null;
@@ -35724,6 +35835,17 @@ var ClassicalResolver = class _ClassicalResolver {
           this.skipReason = "non-classical";
           return null;
         }
+      }
+    }
+    if (this.requireEvidence) {
+      const types = await this.workTypes(credits);
+      if (types.some((t) => NON_CLASSICAL_WORK_TYPES.includes(t))) {
+        this.skipReason = "non-classical";
+        return null;
+      }
+      if (!confirmed && verdict !== true && !await this.classicalEvidence(recording, credits, types)) {
+        this.skipReason = "not clearly classical";
+        return null;
       }
     }
     await this.addPerformers(recording, credits);
@@ -36339,7 +36461,8 @@ var Session = class {
     const fields = await ctx.resolver.resolve(tags.recordingMbid, {
       trackArtistIds: tags.artistMbids,
       albumArtistIds: tags.albumArtistMbids,
-      releaseGroupId: tags.releaseGroupMbid || null
+      releaseGroupId: tags.releaseGroupMbid || null,
+      confirmed: force
     });
     if (!fields) {
       const reason = ctx.resolver.skipReason;

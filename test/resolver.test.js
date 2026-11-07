@@ -23,7 +23,8 @@ class FakeMb {
 
 function resolver(entities, options = {}) {
   const mb = new FakeMb(entities);
-  return [new ClassicalResolver(mb, { knownNames: {}, ...options }), mb];
+  // The beets plugin's rules, without the classical evidence this plugin adds.
+  return [new ClassicalResolver(mb, { knownNames: {}, requireEvidence: false, ...options }), mb];
 }
 
 const BEETHOVEN = artist("beet", "Ludwig van Beethoven", "Beethoven, Ludwig van");

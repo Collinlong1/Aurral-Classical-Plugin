@@ -54,11 +54,31 @@ and their composers, and writes:
 | `WORK` | The Work the recording performs (usually a movement) |
 | `MUSICBRAINZ_WORKID` | Its MusicBrainz ID |
 
-Tracks whose Works have no composer (or `writer`) are left alone, as are
-recordings that the genre and artist checks find aren't classical. The rules
-are the beets plugin's, unchanged; see its README for how performers are
-sorted into soloists and ensembles. On real MusicBrainz data the two give the
-same artist for every recording tested.
+Tracks whose Works have no composer (or `writer`) are left alone. The rules
+for building the artist are the beets plugin's, unchanged; see its README for
+how performers are sorted into soloists and ensembles. On real MusicBrainz
+data the two give the same artist for every recording tested.
+
+Deciding what is classical is stricter than the beets plugin, because film
+scores, Christmas songs and crossover records also have Works with composers.
+When the plugin can't tell, it changes nothing. A track is tagged only when:
+
+1. Nothing says it isn't classical: no artist on the built-in non-classical
+   list, an album that isn't a soundtrack or spoken word, a Work that isn't a
+   soundtrack or musical, and no genre on the recording or album such as rock,
+   pop, jazz, Christmas, soundtrack, film score, crossover or easy listening.
+   Genres like "cinematic classical" or "classical crossover" don't count as
+   classical. When the recording and album have no genres, the performers' and
+   composers' main genres are checked the same way.
+2. Something says it is: a classical genre on the recording or album, a
+   classical Work type (symphony, concerto, sonata, suite, mass, opera...), a
+   composer born before 1900 or known for classical music, or a performer known
+   only for classical music.
+
+On the files the plugin had tagged on a real Library, this left out every film
+score, Christmas song and crossover record and kept the classical albums (see
+the commit for the numbers). Files it skips are recorded as "non-classical" or
+"not clearly classical".
 
 Tags are written the way Aurral writes its own, with
 [node-taglib-sharp](https://github.com/benrr101/node-taglib-sharp) and
@@ -77,6 +97,20 @@ MusicBrainz album artist ID, release, or album artist name), straight away,
 even ones the plugin has seen before. It runs in the background and reports
 how many it tagged and why it skipped the rest. Use it for music that was in
 the Library before the plugin, or after fixing a Work on MusicBrainz.
+
+Here the admin has said the music is classical, so missing evidence doesn't
+stop it; signs that it isn't classical (a soundtrack, Christmas or crossover
+genre, a musical) still do.
+
+## Remove classical tags
+
+Admins see **Remove classical tags** in the album menu. Before it first changes
+a file, the plugin keeps its `ARTIST`, `COMPOSER`, `WORK` and
+`MUSICBRAINZ_WORKID` in its data folder; this puts them back. Files tagged
+before the plugin kept these (or by the beets plugin) get the artist
+MusicBrainz credits for that track on its release, which is what Aurral
+writes. The plugin then leaves those recordings alone until an admin tags them
+as classical again.
 
 Menu items appear only while the plugin is on. Aurral's web app remembers the
 list for a few minutes, so reload the page after turning the plugin on.

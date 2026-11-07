@@ -59,7 +59,7 @@ export { json };
 export function symphonyEntities(recordingId = RECORDING) {
   const karajan = { id: "kara", name: "Herbert von Karajan", "sort-name": "Karajan, Herbert von", type: "Person" };
   const bpo = { id: "bpo", name: "Berliner Philharmoniker", "sort-name": "Berliner Philharmoniker", type: "Orchestra" };
-  const beethoven = { id: "beet", name: "Ludwig van Beethoven", "sort-name": "Beethoven, Ludwig van", type: "Person" };
+  const beethoven = { id: "beet", name: "Ludwig van Beethoven", "sort-name": "Beethoven, Ludwig van", type: "Person", "life-span": { begin: "1770-12-17" } };
   return {
     [`recording:${recordingId}`]: {
       id: recordingId,
@@ -79,7 +79,7 @@ export function symphonyEntities(recordingId = RECORDING) {
         { type: "parts", "target-type": "work", direction: "backward", work: { id: "sym5", title: "Symphony No. 5 in C minor, op. 67" } },
       ],
     },
-    "work:sym5": { id: "sym5", title: "Symphony No. 5 in C minor, op. 67", relations: [{ type: "composer", "target-type": "artist", direction: "backward", artist: beethoven }] },
+    "work:sym5": { id: "sym5", title: "Symphony No. 5 in C minor, op. 67", type: "Symphony", relations: [{ type: "composer", "target-type": "artist", direction: "backward", artist: beethoven }] },
     "artist:bpo": { ...bpo, aliases: [{ name: "Berlin Philharmonic", locale: "en", primary: true }] },
     "artist:beet": { ...beethoven, aliases: [] },
     "artist:kara": { ...karajan, aliases: [] },

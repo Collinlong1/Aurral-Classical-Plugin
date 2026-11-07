@@ -212,3 +212,38 @@ test("files tagged before backups get MusicBrainz's credit for the track back", 
   assert.match(result.message, /1 restored/);
   assert.equal(readTags(file).artist, "Berliner Philharmoniker, Herbert von Karajan");
 });
+
+test("files with no evidence of being classical are left alone, unless an admin says so", async () => {
+  const entities = symphonyEntities();
+  delete entities["artist:beet"]["life-span"];
+  delete entities["work:sym5"].type;
+  globalThis.fetch = fakeFetch({ entities });
+  const file = await copyFixture("sine.flac", path.join(folders.libraryFolder, "unsure", "01.flac"));
+  // Its genre tags don't count as evidence either.
+  const f = File.createFromPath(file);
+  f.tag.genres = [];
+  f.save();
+  f.dispose();
+  await plugin.scheduled(input());
+  const processed = await readProcessed(makeContext(input()));
+  assert.equal(processed[await fs.realpath(file)].reason, "not clearly classical");
+  assert.equal(readTags(file).artist, "Berliner Philharmoniker, Herbert von Karajan");
+  await plugin.actions["tag-album"](input({ user: { id: 1, role: "admin" }, album: { title: "Unsure", tracks: [{ path: file }] } }));
+  assert.equal(readTags(file).artist, EXPECTED_ARTIST);
+});
+
+test("soundtracks and Christmas albums are never tagged, even by Tag as classical", async () => {
+  for (const album of [{ "secondary-types": ["Soundtrack"] }, { genres: [{ name: "christmas music", count: 2 }, { name: "classical", count: 3 }] }]) {
+    const entities = symphonyEntities();
+    entities["release-group:rg-x"] = { id: "rg-x", ...album };
+    globalThis.fetch = fakeFetch({ entities });
+    const file = await copyFixture("sine.flac", path.join(folders.libraryFolder, `x-${Math.random()}`, "01.flac"));
+    const f = File.createFromPath(file);
+    f.tag.musicBrainzReleaseGroupId = "rg-x";
+    f.save();
+    f.dispose();
+    const result = await plugin.actions["tag-album"](input({ user: { id: 1, role: "admin" }, album: { title: "X", tracks: [{ path: file }] } }));
+    assert.match(result.message, /skipped \(non-classical\)/);
+    assert.equal(readTags(file).artist, "Berliner Philharmoniker, Herbert von Karajan");
+  }
+});

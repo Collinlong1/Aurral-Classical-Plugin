@@ -154,6 +154,7 @@ class Session {
       trackArtistIds: tags.artistMbids,
       albumArtistIds: tags.albumArtistMbids,
       releaseGroupId: tags.releaseGroupMbid || null,
+      confirmed: force,
     });
     if (!fields) {
       const reason = ctx.resolver.skipReason;
