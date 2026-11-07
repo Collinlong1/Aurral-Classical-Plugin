@@ -5,7 +5,7 @@ import { ClassicalResolver } from "./resolver.js";
 import { parseOrder, parseSeparator, slskdSettings } from "./settings.js";
 import { Slskd } from "./slskd.js";
 import { downloadStatus, searchAlbum, searchTrack, startDownload } from "./source.js";
-import { describeStats, enqueue, libraryIndex, runQueue, runScheduled } from "./tagger.js";
+import { describeStats, enqueue, libraryIndex, runQueue, runScheduled, untagFiles } from "./tagger.js";
 import { pruneCache, sleep } from "./store.js";
 
 const BACKGROUND_BUDGET_MS = 4 * 60_000; // the process stops 5 idle minutes after a call
@@ -69,6 +69,24 @@ async function tagNow(ctx, paths, what) {
   return `Queued ${paths.length} files from ${what}. Tagging is busy and will get to them.`;
 }
 
+async function untagNow(ctx, paths, what) {
+  if (!paths.length) return `No files in ${what}`;
+  const until = Date.now() + ACTION_BUDGET_MS;
+  for (;;) {
+    const counts = await untagFiles(ctx, paths, until - Date.now());
+    if (counts) {
+      const parts = [`${counts.restored} restored`];
+      if (counts.unchanged) parts.push(`${counts.unchanged} already had no classical tags`);
+      if (counts["no backup"]) parts.push(`${counts["no backup"]} couldn't be restored (no backup, and MusicBrainz has no credit)`);
+      if (counts.skipped) parts.push(`${counts.skipped} skipped`);
+      if (counts.left) parts.push(`${counts.left} left: run it again`);
+      return `${what}: ${parts.join(", ")}. The plugin won't tag these recordings again unless you tag them as classical.`.slice(0, 500);
+    }
+    if (Date.now() > until - 60_000) return `Tagging is busy. Try again in a few minutes.`;
+    await sleep(5000);
+  }
+}
+
 function artistFiles(index, artist) {
   const albumIds = new Set(artist.albums.flatMap((a) => [a.mbid]).filter(Boolean));
   const name = String(artist.name || "").toLowerCase();
@@ -107,6 +125,12 @@ export default {
       const ctx = makeContext(input);
       const paths = input.album.tracks.map((t) => t.path).filter(Boolean);
       return { message: await tagNow(ctx, paths, `"${input.album.title}"`) };
+    },
+
+    async "untag-album"(input) {
+      const ctx = makeContext(input);
+      const paths = input.album.tracks.map((t) => t.path).filter(Boolean);
+      return { message: await untagNow(ctx, paths, `"${input.album.title}"`) };
     },
 
     async "tag-artist"(input) {

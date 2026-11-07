@@ -35966,6 +35966,14 @@ function openFile(filePath, readStyle = READ_STYLE) {
     throw error;
   }
 }
+function readValues(filePath, fields) {
+  const file = openFile(filePath);
+  try {
+    return Object.fromEntries(fields.map((field) => [field, WRITERS[field].read(file)]));
+  } finally {
+    file.dispose();
+  }
+}
 function readTags(filePath) {
   const file = openFile(filePath, READ_WITH_PROPERTIES);
   try {
@@ -36024,6 +36032,65 @@ async function writeTags(filePath, values) {
     throw error;
   }
   return changed;
+}
+
+// src/works.js
+var CATALOGUES = [
+  [/\bBWV\s*(\d+[a-z]?)/i, "BWV"],
+  [/\bHWV\s*(\d+[a-z]?)/i, "HWV"],
+  [/\bRV\s*(\d+[a-z]?)/i, "RV"],
+  [/\bK(?:V|\.)?\s*(\d+[a-z]?)\b/, "K"],
+  [/\bD\.?\s*(\d+[a-z]?)\b/, "D"],
+  [/\bHob\.?\s*([IVXL]+[a-z]?:\s*\d+[a-z]?)/i, "Hob"],
+  [/\bWoO\s*(\d+)/i, "WoO"],
+  [/\bS\.\s*(\d+)/, "S"],
+  [/\bSz\.?\s*(\d+)/i, "Sz"],
+  [/\bBB\s*(\d+)/, "BB"],
+  [/\bTrV\s*(\d+)/i, "TrV"],
+  [/\bL\.\s*(\d+)/, "L"],
+  [/\bFP\s*(\d+)/, "FP"]
+];
+var OPUS = /\bop(?:us|\.)?\s*(\d+[a-z]?)(?:\s*,?\s*(?:no\.?|nr\.?|n°)\s*(\d+))?/i;
+function catalogueNumber(title) {
+  const text2 = String(title || "");
+  for (const [pattern, prefix] of CATALOGUES) {
+    const match = text2.match(pattern);
+    if (match) return `${prefix} ${match[1].replace(/\s+/g, "")}`;
+  }
+  const opus = text2.match(OPUS);
+  if (opus) return `op ${opus[1]}${opus[2] ? ` no ${opus[2]}` : ""}`;
+  return "";
+}
+function shortWorkTitle(title) {
+  let text2 = String(title || "").split(":")[0];
+  text2 = text2.replace(OPUS, " ");
+  for (const [pattern] of CATALOGUES) text2 = text2.replace(pattern, " ");
+  text2 = text2.replace(/\bin\s+[A-G](?:[- ]?(?:flat|sharp|♭|♯|b|#))?\s*(?:major|minor|maj|min|dur|moll)\b/gi, " ").replace(/\b(?:no|nr|n°)\.?\s*(?=\d)/gi, " ").replace(/[“”"'’,;()[\]]/g, " ");
+  return searchWords(text2);
+}
+function searchWords(text2) {
+  return String(text2 || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim().split(/\s+/).filter(Boolean).join(" ");
+}
+function surname(person) {
+  if (!person) return "";
+  const sort = String(person.sortName || "");
+  if (sort.includes(",")) return searchWords(sort.split(",")[0]);
+  return searchWords(person.name);
+}
+function creditString(credit) {
+  return (credit || []).map((entry) => `${entry.name ?? entry.artist?.name ?? ""}${entry.joinphrase ?? ""}`).join("").trim();
+}
+async function topWork(mb, work, depth = 0) {
+  if (!work || depth >= 3) return work;
+  const parent = (work.relations || []).find((rel) => rel.type === "parts" && rel.direction === "backward" && rel.work?.id);
+  if (!parent) return work;
+  const data = await mb.get("work", parent.work.id, "artist-rels+work-rels");
+  return data ? topWork(mb, data, depth + 1) : work;
+}
+var RELEASE_INC = "recordings+artist-credits+release-groups+media";
+function releaseYear(date) {
+  const year = Number(String(date || "").slice(0, 4));
+  return Number.isInteger(year) && year > 0 ? year : null;
 }
 
 // src/store.js
@@ -36151,6 +36218,9 @@ var SAVE_EVERY_MS = 3e4;
 var queueDir = (ctx) => path3.join(ctx.dataFolder, "queue");
 var processedFile = (ctx) => path3.join(ctx.dataFolder, "processed.json");
 var indexFile = (ctx) => path3.join(ctx.dataFolder, "library-index.json");
+var originalsFile = (ctx) => path3.join(ctx.dataFolder, "originals.json");
+var excludedFile = (ctx) => path3.join(ctx.dataFolder, "excluded.json");
+var TAG_FIELDS = ["artist", "composer", "work", "workId"];
 var lockDir = (ctx) => path3.join(ctx.dataFolder, "tagging.lock");
 async function enqueue(ctx, filePaths, { force = false, source = null } = {}) {
   await fs3.mkdir(queueDir(ctx), { recursive: true });
@@ -36210,6 +36280,8 @@ var Session = class {
   async load() {
     this.processed = await readJson(processedFile(this.ctx), {});
     this.index = await readJson(indexFile(this.ctx), {});
+    this.originals = await readJson(originalsFile(this.ctx), {});
+    this.excluded = await readJson(excludedFile(this.ctx), {});
   }
   // Saved every 30 seconds while working, and at the end: the index of a
   // large Library is several megabytes.
@@ -36218,6 +36290,8 @@ var Session = class {
     this.savedAt = Date.now();
     await writeJson(processedFile(this.ctx), this.processed);
     await writeJson(indexFile(this.ctx), this.index);
+    await writeJson(originalsFile(this.ctx), this.originals);
+    await writeJson(excludedFile(this.ctx), this.excluded);
     this.dirty = 0;
     await this.lock.touch();
   }
@@ -36251,6 +36325,13 @@ var Session = class {
       this.record(real, stat, { status: "skipped", reason: "no recording ID" });
       return true;
     }
+    if (this.excluded[tags.recordingMbid]) {
+      if (!force) {
+        this.record(real, stat, { status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
+        return true;
+      }
+      delete this.excluded[tags.recordingMbid];
+    }
     if (prefilter && ctx.resolver.classifyGenres(new Set(tags.genres.map((g) => g.toLowerCase()))) === false) {
       this.record(real, stat, { status: "skipped", reason: "non-classical", recording: tags.recordingMbid });
       return true;
@@ -36270,6 +36351,10 @@ var Session = class {
     if (fields.workId) Object.assign(values, { work: [fields.work], workId: [fields.workId] });
     let changed;
     try {
+      if (!this.originals[real]) {
+        this.originals[real] = { ...readValues(real, TAG_FIELDS), recording: tags.recordingMbid };
+        this.dirty++;
+      }
       changed = await writeTags(real, values);
     } catch (error) {
       ctx.log(`Couldn't tag ${real}: ${error.message}`);
@@ -36286,6 +36371,53 @@ var Session = class {
     });
     if (changed.length) ctx.log(`Tagged ${path3.basename(real)}: ${fields.artist}`);
     return true;
+  }
+  // Puts back the tags a file had before the plugin changed them. Files
+  // tagged before the plugin kept backups get the artist MusicBrainz credits
+  // for that track on its release, which is what Aurral writes.
+  async untagFile(filePath) {
+    const { ctx } = this;
+    const real = await allowedPath(ctx, filePath);
+    if (!real || !isAudioPath(real)) return "skipped";
+    let tags;
+    try {
+      tags = readTags(real);
+    } catch {
+      return "skipped";
+    }
+    if (tags.recordingMbid) this.excluded[tags.recordingMbid] = { at: Date.now() };
+    const original = this.originals[real];
+    let values;
+    if (original) values = Object.fromEntries(TAG_FIELDS.map((field) => [field, original[field] ?? []]));
+    else {
+      const credit = await this.trackCredit(tags);
+      if (!credit) return "no backup";
+      values = { artist: [credit] };
+    }
+    const changed = await writeTags(real, values);
+    delete this.originals[real];
+    const after = await fs3.stat(real);
+    this.index[real] = { ...this.index[real] ?? {}, ...indexEntry(readTags(real), after) };
+    this.record(real, after, { status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
+    this.stats.skipped["classical tags removed"]--;
+    if (changed.length) ctx.log(`Removed classical tags from ${path3.basename(real)}`);
+    return changed.length ? "restored" : "unchanged";
+  }
+  // MusicBrainz's artist credit for this recording on the file's release,
+  // else on the recording itself.
+  async trackCredit(tags) {
+    const { mb } = this.ctx;
+    if (tags.releaseMbid) {
+      const release = await mb.get("release", tags.releaseMbid, RELEASE_INC);
+      for (const medium of release?.media || [])
+        for (const track of medium.tracks || [])
+          if (track.recording?.id === tags.recordingMbid) {
+            const credit = creditString(track["artist-credit"] || track.recording["artist-credit"]);
+            if (credit) return credit;
+          }
+    }
+    const recording = await mb.get("recording", tags.recordingMbid, "artist-credits");
+    return creditString(recording?.["artist-credit"]) || null;
   }
   async drainQueue(until, onlyIds = null) {
     for (const entry of await queuedEntries(this.ctx)) {
@@ -36393,6 +36525,25 @@ async function libraryIndex(ctx, budgetMs) {
   });
   return index ?? await readJson(indexFile(ctx), {});
 }
+async function untagFiles(ctx, paths, budgetMs) {
+  const until = Date.now() + budgetMs;
+  const counts = { restored: 0, unchanged: 0, "no backup": 0, skipped: 0, left: 0 };
+  const stats = await withTagging(ctx, async (session) => {
+    for (const file of paths) {
+      if (Date.now() > until) {
+        counts.left++;
+        continue;
+      }
+      try {
+        counts[await session.untagFile(file)]++;
+      } catch (error) {
+        ctx.log(`Couldn't remove classical tags from ${file}: ${error.message}`);
+        counts.skipped++;
+      }
+    }
+  });
+  return stats ? counts : null;
+}
 function describeStats(stats) {
   if (!stats) return "Another tagging run is in progress";
   const parts = [`${stats.tagged} tagged`];
@@ -36401,65 +36552,6 @@ function describeStats(stats) {
   if (stats.failed) parts.push(`${stats.failed} failed`);
   if (stats.left) parts.push(`${stats.left} left for the next run`);
   return parts.join(", ");
-}
-
-// src/works.js
-var CATALOGUES = [
-  [/\bBWV\s*(\d+[a-z]?)/i, "BWV"],
-  [/\bHWV\s*(\d+[a-z]?)/i, "HWV"],
-  [/\bRV\s*(\d+[a-z]?)/i, "RV"],
-  [/\bK(?:V|\.)?\s*(\d+[a-z]?)\b/, "K"],
-  [/\bD\.?\s*(\d+[a-z]?)\b/, "D"],
-  [/\bHob\.?\s*([IVXL]+[a-z]?:\s*\d+[a-z]?)/i, "Hob"],
-  [/\bWoO\s*(\d+)/i, "WoO"],
-  [/\bS\.\s*(\d+)/, "S"],
-  [/\bSz\.?\s*(\d+)/i, "Sz"],
-  [/\bBB\s*(\d+)/, "BB"],
-  [/\bTrV\s*(\d+)/i, "TrV"],
-  [/\bL\.\s*(\d+)/, "L"],
-  [/\bFP\s*(\d+)/, "FP"]
-];
-var OPUS = /\bop(?:us|\.)?\s*(\d+[a-z]?)(?:\s*,?\s*(?:no\.?|nr\.?|n°)\s*(\d+))?/i;
-function catalogueNumber(title) {
-  const text2 = String(title || "");
-  for (const [pattern, prefix] of CATALOGUES) {
-    const match = text2.match(pattern);
-    if (match) return `${prefix} ${match[1].replace(/\s+/g, "")}`;
-  }
-  const opus = text2.match(OPUS);
-  if (opus) return `op ${opus[1]}${opus[2] ? ` no ${opus[2]}` : ""}`;
-  return "";
-}
-function shortWorkTitle(title) {
-  let text2 = String(title || "").split(":")[0];
-  text2 = text2.replace(OPUS, " ");
-  for (const [pattern] of CATALOGUES) text2 = text2.replace(pattern, " ");
-  text2 = text2.replace(/\bin\s+[A-G](?:[- ]?(?:flat|sharp|♭|♯|b|#))?\s*(?:major|minor|maj|min|dur|moll)\b/gi, " ").replace(/\b(?:no|nr|n°)\.?\s*(?=\d)/gi, " ").replace(/[“”"'’,;()[\]]/g, " ");
-  return searchWords(text2);
-}
-function searchWords(text2) {
-  return String(text2 || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim().split(/\s+/).filter(Boolean).join(" ");
-}
-function surname(person) {
-  if (!person) return "";
-  const sort = String(person.sortName || "");
-  if (sort.includes(",")) return searchWords(sort.split(",")[0]);
-  return searchWords(person.name);
-}
-function creditString(credit) {
-  return (credit || []).map((entry) => `${entry.name ?? entry.artist?.name ?? ""}${entry.joinphrase ?? ""}`).join("").trim();
-}
-async function topWork(mb, work, depth = 0) {
-  if (!work || depth >= 3) return work;
-  const parent = (work.relations || []).find((rel) => rel.type === "parts" && rel.direction === "backward" && rel.work?.id);
-  if (!parent) return work;
-  const data = await mb.get("work", parent.work.id, "artist-rels+work-rels");
-  return data ? topWork(mb, data, depth + 1) : work;
-}
-var RELEASE_INC = "recordings+artist-credits+release-groups+media";
-function releaseYear(date) {
-  const year = Number(String(date || "").slice(0, 4));
-  return Number.isInteger(year) && year > 0 ? year : null;
 }
 
 // src/compare.js
@@ -36975,17 +37067,22 @@ async function classicalInfo(ctx, recordingId, { albumArtistIds = [], releaseGro
     movementTitle: fields.work || ""
   };
 }
-function searchQueries(info, extra = []) {
+function searchQueries(info, { albumTitle = "", album = false } = {}) {
   const composer = surname(info.composer);
   const performer = surname(info.performer);
   const work = shortWorkTitle(info.workTitle);
   const catalogue = catalogueNumber(info.workTitle) || catalogueNumber(info.movementTitle);
-  const candidates = [
+  const title = searchWords(albumTitle);
+  const byWork = [
     [composer, work, catalogue, performer],
     [composer, catalogue, performer],
-    [composer, work, performer],
-    ...extra.map((words) => [composer, ...words])
+    [composer, work, performer]
   ];
+  const byAlbum = [
+    [composer, title, performer],
+    [composer, title]
+  ];
+  const candidates = album ? [...byAlbum, ...byWork] : [...byWork, ...byAlbum.slice(1)];
   const seen = /* @__PURE__ */ new Set();
   const queries = [];
   for (const parts of candidates) {
@@ -37033,7 +37130,7 @@ async function searchTrack(ctx, track) {
   const info = await classicalInfo(ctx, recordingId, { releaseGroupId: release.releaseGroupId });
   if (!info) return [];
   const slskd = slskdFor(ctx);
-  const queries = searchQueries(info, [[searchWords(release.title)]]);
+  const queries = searchQueries(info, { albumTitle: release.title });
   const folders = await searchFolders(ctx, slskd, queries, (found) => trackCandidates(found, release, discPosition, index).length >= 3, started);
   const target = release.discs.find((d) => d.position === discPosition).tracks[index];
   ctx.log(`Release ${release.id}: ${describeMisses(folders, release)}`);
@@ -37066,7 +37163,7 @@ async function searchAlbum(ctx, album) {
   }
   if (!info) return [];
   const slskd = slskdFor(ctx);
-  const queries = searchQueries(info, [[searchWords(release.title)]]);
+  const queries = searchQueries(info, { albumTitle: release.title, album: true });
   const folders = await searchFolders(ctx, slskd, queries, (found) => albumCandidates(found, release).length >= 3, started);
   ctx.log(`Release ${release.id}: ${describeMisses(folders, release)}`);
   return albumCandidates(folders, release).slice(0, MAX_RESULTS).map((c) => ({
@@ -37226,6 +37323,23 @@ async function tagNow(ctx, paths, what) {
   }
   return `Queued ${paths.length} files from ${what}. Tagging is busy and will get to them.`;
 }
+async function untagNow(ctx, paths, what) {
+  if (!paths.length) return `No files in ${what}`;
+  const until = Date.now() + ACTION_BUDGET_MS;
+  for (; ; ) {
+    const counts = await untagFiles(ctx, paths, until - Date.now());
+    if (counts) {
+      const parts = [`${counts.restored} restored`];
+      if (counts.unchanged) parts.push(`${counts.unchanged} already had no classical tags`);
+      if (counts["no backup"]) parts.push(`${counts["no backup"]} couldn't be restored (no backup, and MusicBrainz has no credit)`);
+      if (counts.skipped) parts.push(`${counts.skipped} skipped`);
+      if (counts.left) parts.push(`${counts.left} left: run it again`);
+      return `${what}: ${parts.join(", ")}. The plugin won't tag these recordings again unless you tag them as classical.`.slice(0, 500);
+    }
+    if (Date.now() > until - 6e4) return `Tagging is busy. Try again in a few minutes.`;
+    await sleep(5e3);
+  }
+}
 function artistFiles(index, artist) {
   const albumIds = new Set(artist.albums.flatMap((a) => [a.mbid]).filter(Boolean));
   const name = String(artist.name || "").toLowerCase();
@@ -37256,6 +37370,11 @@ var index_default = {
       const ctx = makeContext(input);
       const paths = input.album.tracks.map((t) => t.path).filter(Boolean);
       return { message: await tagNow(ctx, paths, `"${input.album.title}"`) };
+    },
+    async "untag-album"(input) {
+      const ctx = makeContext(input);
+      const paths = input.album.tracks.map((t) => t.path).filter(Boolean);
+      return { message: await untagNow(ctx, paths, `"${input.album.title}"`) };
     },
     async "tag-artist"(input) {
       const ctx = makeContext(input);

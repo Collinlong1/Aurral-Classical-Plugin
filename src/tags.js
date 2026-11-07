@@ -154,6 +154,16 @@ function openFile(filePath, readStyle = READ_STYLE) {
   }
 }
 
+// The current values of fields the plugin writes: { field: string[] }.
+export function readValues(filePath, fields) {
+  const file = openFile(filePath);
+  try {
+    return Object.fromEntries(fields.map((field) => [field, WRITERS[field].read(file)]));
+  } finally {
+    file.dispose();
+  }
+}
+
 // What the plugin needs to know about a file.
 export function readTags(filePath) {
   const file = openFile(filePath, READ_WITH_PROPERTIES);

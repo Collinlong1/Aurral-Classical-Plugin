@@ -100,8 +100,11 @@ export default {
     // What the plugin recorded for each file it processed.
     async processed(input) {
       const records = JSON.parse(await fs.readFile(path.join(input.dataFolder, "processed.json"), "utf8").catch(() => "{}"));
+      const index = JSON.parse(await fs.readFile(path.join(input.dataFolder, "library-index.json"), "utf8").catch(() => "{}"));
       const rows = Object.entries(records).filter(([, r]) => !input.status || r.status === input.status);
-      return rows.slice(input.offset || 0, (input.offset || 0) + (input.limit || 500)).map(([file, r]) => ({ file, ...r }));
+      return rows
+        .slice(input.offset || 0, (input.offset || 0) + (input.limit || 500))
+        .map(([file, r]) => ({ file, ...r, releaseGroupMbid: index[file]?.releaseGroupMbid, albumArtistMbids: index[file]?.albumArtistMbids, album: index[file]?.album, title: index[file]?.title }));
     },
 
     // Library files from the index (paths and tags only).

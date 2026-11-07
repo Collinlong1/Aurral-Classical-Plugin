@@ -71,6 +71,13 @@
       "background": true
     },
     {
+      "id": "untag-album",
+      "label": "Remove classical tags",
+      "target": "album",
+      "admin": true,
+      "background": true
+    },
+    {
       "id": "compare-track",
       "label": "Compare recordings",
       "target": "track",

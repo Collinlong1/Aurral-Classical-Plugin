@@ -166,3 +166,49 @@ test("a recording MusicBrainz doesn't have is recorded, not retried", async () =
   assert.equal(stats.skipped["not on MusicBrainz"], 1);
   assert.equal(stats.left, 0);
 });
+
+const tagsOf = (file) => {
+  const t = readTags(file);
+  return { artist: t.artist, composer: t.composer, work: t.work, workId: t.workId, recording: t.recordingMbid, title: t.title };
+};
+
+for (const ext of ["flac", "mp3", "m4a"]) {
+  test(`Remove classical tags restores a ${ext} exactly, and it stays untagged`, async () => {
+    const file = await copyFixture(`sine.${ext}`, path.join(folders.libraryFolder, "album", `01.${ext}`));
+    const before = tagsOf(file);
+    const others = otherTags(file);
+    await plugin.scheduled(input());
+    assert.equal(readTags(file).artist, EXPECTED_ARTIST);
+    const album = { title: "Symphony No. 5", tracks: [{ path: file }] };
+    const result = await plugin.actions["untag-album"](input({ user: { id: 1, role: "admin" }, album }));
+    assert.match(result.message, /^"Symphony No. 5": 1 restored/);
+    assert.deepEqual(tagsOf(file), before);
+    assert.deepEqual(otherTags(file), others);
+    // The schedule leaves it alone from now on...
+    await plugin.scheduled(input());
+    assert.deepEqual(tagsOf(file), before);
+    // ...until an admin tags it as classical again.
+    await plugin.actions["tag-album"](input({ user: { id: 1, role: "admin" }, album }));
+    assert.equal(readTags(file).artist, EXPECTED_ARTIST);
+  });
+}
+
+test("files tagged before backups get MusicBrainz's credit for the track back", async () => {
+  const entities = symphonyEntities();
+  entities["release:rel1"] = {
+    id: "rel1",
+    media: [{ position: 1, tracks: [{ position: 1, recording: { id: RECORDING }, "artist-credit": [
+      { name: "Berliner Philharmoniker", joinphrase: ", ", artist: { id: "bpo" } }, { name: "Herbert von Karajan", artist: { id: "kara" } },
+    ] }] }],
+  };
+  globalThis.fetch = fakeFetch({ entities });
+  const file = await copyFixture("sine.flac", path.join(folders.libraryFolder, "old", "01.flac"));
+  const f = File.createFromPath(file);
+  f.tag.performers = ["Ludwig van Beethoven — Berlin Philharmonic — Herbert von Karajan"];
+  f.tag.musicBrainzReleaseId = "rel1";
+  f.save();
+  f.dispose();
+  const result = await plugin.actions["untag-album"](input({ user: { id: 1, role: "admin" }, album: { title: "Old", tracks: [{ path: file }] } }));
+  assert.match(result.message, /1 restored/);
+  assert.equal(readTags(file).artist, "Berliner Philharmoniker, Herbert von Karajan");
+});

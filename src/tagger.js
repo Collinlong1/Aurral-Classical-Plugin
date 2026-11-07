@@ -4,7 +4,8 @@
 import { randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { isAudioPath, readTags, UnsupportedFormat, writeTags } from "./tags.js";
+import { isAudioPath, readTags, readValues, UnsupportedFormat, writeTags } from "./tags.js";
+import { creditString, RELEASE_INC } from "./works.js";
 import { readJson, tryLock, writeJson } from "./store.js";
 
 const LOCK_STALE_MS = 2 * 60_000;
@@ -13,6 +14,12 @@ const SAVE_EVERY_MS = 30_000;
 export const queueDir = (ctx) => path.join(ctx.dataFolder, "queue");
 const processedFile = (ctx) => path.join(ctx.dataFolder, "processed.json");
 const indexFile = (ctx) => path.join(ctx.dataFolder, "library-index.json");
+// Each file's tags before the plugin first changed them.
+const originalsFile = (ctx) => path.join(ctx.dataFolder, "originals.json");
+// Recordings whose classical tags an admin removed: never tagged again
+// unless an admin tags them as classical.
+const excludedFile = (ctx) => path.join(ctx.dataFolder, "excluded.json");
+export const TAG_FIELDS = ["artist", "composer", "work", "workId"];
 const lockDir = (ctx) => path.join(ctx.dataFolder, "tagging.lock");
 
 export async function enqueue(ctx, filePaths, { force = false, source = null } = {}) {
@@ -82,6 +89,8 @@ class Session {
   async load() {
     this.processed = await readJson(processedFile(this.ctx), {});
     this.index = await readJson(indexFile(this.ctx), {});
+    this.originals = await readJson(originalsFile(this.ctx), {});
+    this.excluded = await readJson(excludedFile(this.ctx), {});
   }
 
   // Saved every 30 seconds while working, and at the end: the index of a
@@ -91,6 +100,8 @@ class Session {
     this.savedAt = Date.now();
     await writeJson(processedFile(this.ctx), this.processed);
     await writeJson(indexFile(this.ctx), this.index);
+    await writeJson(originalsFile(this.ctx), this.originals);
+    await writeJson(excludedFile(this.ctx), this.excluded);
     this.dirty = 0;
     await this.lock.touch();
   }
@@ -126,6 +137,13 @@ class Session {
       this.record(real, stat, { status: "skipped", reason: "no recording ID" });
       return true;
     }
+    if (this.excluded[tags.recordingMbid]) {
+      if (!force) {
+        this.record(real, stat, { status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
+        return true;
+      }
+      delete this.excluded[tags.recordingMbid];
+    }
     // Scanned files whose own genre tags say "not classical" skip the
     // lookups. Aurral writes the album's MusicBrainz genres to its files.
     if (prefilter && ctx.resolver.classifyGenres(new Set(tags.genres.map((g) => g.toLowerCase()))) === false) {
@@ -147,6 +165,10 @@ class Session {
     if (fields.workId) Object.assign(values, { work: [fields.work], workId: [fields.workId] });
     let changed;
     try {
+      if (!this.originals[real]) {
+        this.originals[real] = { ...readValues(real, TAG_FIELDS), recording: tags.recordingMbid };
+        this.dirty++;
+      }
       changed = await writeTags(real, values);
     } catch (error) {
       ctx.log(`Couldn't tag ${real}: ${error.message}`);
@@ -163,6 +185,55 @@ class Session {
     });
     if (changed.length) ctx.log(`Tagged ${path.basename(real)}: ${fields.artist}`);
     return true;
+  }
+
+  // Puts back the tags a file had before the plugin changed them. Files
+  // tagged before the plugin kept backups get the artist MusicBrainz credits
+  // for that track on its release, which is what Aurral writes.
+  async untagFile(filePath) {
+    const { ctx } = this;
+    const real = await allowedPath(ctx, filePath);
+    if (!real || !isAudioPath(real)) return "skipped";
+    let tags;
+    try {
+      tags = readTags(real);
+    } catch {
+      return "skipped";
+    }
+    if (tags.recordingMbid) this.excluded[tags.recordingMbid] = { at: Date.now() };
+    const original = this.originals[real];
+    let values;
+    if (original) values = Object.fromEntries(TAG_FIELDS.map((field) => [field, original[field] ?? []]));
+    else {
+      const credit = await this.trackCredit(tags);
+      if (!credit) return "no backup";
+      values = { artist: [credit] };
+    }
+    const changed = await writeTags(real, values);
+    delete this.originals[real];
+    const after = await fs.stat(real);
+    this.index[real] = { ...(this.index[real] ?? {}), ...indexEntry(readTags(real), after) };
+    this.record(real, after, { status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
+    this.stats.skipped["classical tags removed"]--;
+    if (changed.length) ctx.log(`Removed classical tags from ${path.basename(real)}`);
+    return changed.length ? "restored" : "unchanged";
+  }
+
+  // MusicBrainz's artist credit for this recording on the file's release,
+  // else on the recording itself.
+  async trackCredit(tags) {
+    const { mb } = this.ctx;
+    if (tags.releaseMbid) {
+      const release = await mb.get("release", tags.releaseMbid, RELEASE_INC);
+      for (const medium of release?.media || [])
+        for (const track of medium.tracks || [])
+          if (track.recording?.id === tags.recordingMbid) {
+            const credit = creditString(track["artist-credit"] || track.recording["artist-credit"]);
+            if (credit) return credit;
+          }
+    }
+    const recording = await mb.get("recording", tags.recordingMbid, "artist-credits");
+    return creditString(recording?.["artist-credit"]) || null;
   }
 
   async drainQueue(until, onlyIds = null) {
@@ -279,6 +350,26 @@ export async function libraryIndex(ctx, budgetMs) {
     index = session.index;
   });
   return index ?? (await readJson(indexFile(ctx), {}));
+}
+
+export async function untagFiles(ctx, paths, budgetMs) {
+  const until = Date.now() + budgetMs;
+  const counts = { restored: 0, unchanged: 0, "no backup": 0, skipped: 0, left: 0 };
+  const stats = await withTagging(ctx, async (session) => {
+    for (const file of paths) {
+      if (Date.now() > until) {
+        counts.left++;
+        continue;
+      }
+      try {
+        counts[await session.untagFile(file)]++;
+      } catch (error) {
+        ctx.log(`Couldn't remove classical tags from ${file}: ${error.message}`);
+        counts.skipped++;
+      }
+    }
+  });
+  return stats ? counts : null;
 }
 
 export const readProcessed = (ctx) => readJson(processedFile(ctx), {});
