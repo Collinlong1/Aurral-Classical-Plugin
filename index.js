@@ -36624,8 +36624,7 @@ var MusicBrainz = class {
   constructor({ settings, dataFolder, fetchImpl = fetch, log: log2 = () => {
   }, intervalMs, maxRetries = 4, retryWaitMs = 3e3 }) {
     this.base = mbBaseUrl(settings);
-    const contact = String(settings.mbContact || "").trim() || REPOSITORY;
-    this.userAgent = `AurralClassical/${VERSION} ( ${contact} )`;
+    this.userAgent = `AurralClassical/${VERSION} ( ${REPOSITORY} )`;
     this.fetch = fetchImpl;
     this.log = log2;
     this.cache = new FileCache(path4.join(dataFolder, "mb-cache"));
@@ -36815,6 +36814,22 @@ async function loadRelease(mb, releaseMbid) {
       artist: creditString(track["artist-credit"] || track.recording?.["artist-credit"])
     }))
   })).filter((disc) => disc.tracks.length > 0);
+  const groupId = release["release-group"]?.id;
+  const editions = groupId ? await mb.query("release", { "release-group": groupId, inc: "recordings", limit: "100" }) : null;
+  const pressings = /* @__PURE__ */ new Map();
+  for (const edition of editions?.releases || []) {
+    for (const medium of edition.media || []) {
+      for (const track of medium.tracks || []) {
+        const id = track.recording?.id;
+        if (!id || track.length == null) continue;
+        if (!pressings.has(id)) pressings.set(id, /* @__PURE__ */ new Set());
+        pressings.get(id).add(track.length);
+      }
+    }
+  }
+  for (const disc of discs)
+    for (const track of disc.tracks)
+      track.lengthsMs = [...new Set([track.lengthMs, ...pressings.get(track.recordingId) ?? []].filter((l) => l != null))];
   return {
     id: release.id,
     title: release.title,
@@ -36862,12 +36877,14 @@ function groupFolders(responses) {
   }
   return [...folders.values()];
 }
+function lengthGap(lengthMs, track) {
+  const lengths = track.lengthsMs?.length ? track.lengthsMs : [track.lengthMs];
+  const gaps = lengths.filter((l) => l != null).map((l) => Math.abs(lengthMs - l));
+  return gaps.length ? Math.min(...gaps) : Infinity;
+}
 function linesUp(files, tracks) {
   if (files.length !== tracks.length) return false;
-  return files.every((file, i) => {
-    const expected = tracks[i].lengthMs;
-    return file.lengthMs != null && expected != null && Math.abs(file.lengthMs - expected) <= LENGTH_TOLERANCE_MS;
-  });
+  return files.every((file, i) => file.lengthMs != null && lengthGap(file.lengthMs, tracks[i]) <= LENGTH_TOLERANCE_MS);
 }
 function folderDiscs(folder, release) {
   const all = release.discs.flatMap((disc2) => disc2.tracks);
@@ -36934,7 +36951,7 @@ function describeMisses(folders, release) {
     else {
       wrongLengths++;
       const tracks = release.discs.find((d) => d.tracks.length === folder.files.length)?.tracks ?? release.discs.flatMap((d) => d.tracks);
-      const offs = folder.files.map((f, i) => Math.abs(f.lengthMs - (tracks[i]?.lengthMs ?? 0)));
+      const offs = folder.files.map((f, i) => tracks[i] ? lengthGap(f.lengthMs, tracks[i]) : Infinity);
       const worst = Math.max(...offs);
       if (!closest || worst < closest.worst) closest = { worst, at: offs.indexOf(worst) + 1, over: offs.filter((o) => o > LENGTH_TOLERANCE_MS).length };
     }
@@ -37031,7 +37048,7 @@ async function searchTrack(ctx, track) {
     bitrate: c.file.bitRate,
     data: {
       username: c.folder.username,
-      files: [{ filename: c.file.filename, size: c.file.size, title: target.title, artist: target.artist, recordingId: target.recordingId, lengthMs: target.lengthMs }]
+      files: [{ filename: c.file.filename, size: c.file.size, title: target.title, artist: target.artist, recordingId: target.recordingId, lengthMs: target.lengthMs, lengthsMs: target.lengthsMs }]
     }
   }));
 }
@@ -37069,7 +37086,8 @@ async function searchAlbum(ctx, album) {
         title: m.track.title,
         artist: m.track.artist,
         recordingId: m.track.recordingId,
-        lengthMs: m.track.lengthMs
+        lengthMs: m.track.lengthMs,
+        lengthsMs: m.track.lengthsMs
       }))
     }
   }));
@@ -37138,7 +37156,7 @@ async function downloadStatus(ctx, id, directory) {
     let identified = false;
     try {
       const { durationMs } = readTags(target);
-      identified = Boolean(file.recordingId) && file.lengthMs != null && durationMs > 0 && Math.abs(durationMs - file.lengthMs) <= LENGTH_TOLERANCE_MS;
+      identified = Boolean(file.recordingId) && durationMs > 0 && lengthGap(durationMs, file) <= LENGTH_TOLERANCE_MS;
     } catch {
       identified = false;
     }
@@ -37223,7 +37241,6 @@ var index_default = {
     const reached = await ctx.mb.ping();
     if (reached !== true) throw new Error(`Couldn't reach MusicBrainz at ${host}: ${reached}`);
     parts.push(`MusicBrainz answers at ${host}`);
-    if (!String(ctx.settings.mbContact || "").trim()) parts.push("Add a MusicBrainz contact so MusicBrainz can reach you");
     const slskd = slskdSettings(ctx.settings);
     if (slskd.configured) {
       const app = await new Slskd(slskd).application();

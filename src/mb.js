@@ -18,8 +18,8 @@ export function mbBaseUrl(settings) {
 export class MusicBrainz {
   constructor({ settings, dataFolder, fetchImpl = fetch, log = () => {}, intervalMs, maxRetries = 4, retryWaitMs = 3000 }) {
     this.base = mbBaseUrl(settings);
-    const contact = String(settings.mbContact || "").trim() || REPOSITORY;
-    this.userAgent = `AurralClassical/${VERSION} ( ${contact} )`;
+    // MusicBrainz asks for a way to reach the app's developer.
+    this.userAgent = `AurralClassical/${VERSION} ( ${REPOSITORY} )`;
     this.fetch = fetchImpl;
     this.log = log;
     this.cache = new FileCache(path.join(dataFolder, "mb-cache"));

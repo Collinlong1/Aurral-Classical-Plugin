@@ -15,10 +15,10 @@ test("the public server is used without a mirror, with a contact in the User-Age
   assert.equal(mbBaseUrl({ mbMirror: "musicbrainz.lan:5000/" }), "http://musicbrainz.lan:5000");
   assert.equal(mbBaseUrl({ mbMirror: "https://mb.example/ws/2" }), "https://mb.example");
   const seen = [];
-  const mb = new MusicBrainz({ settings: { mbContact: "me@example.invalid" }, dataFolder: folders.dataFolder, intervalMs: 0, fetchImpl: async (url, init) => (seen.push([url, init.headers["User-Agent"]]), ok({ id: "x" })) });
+  const mb = new MusicBrainz({ settings: {}, dataFolder: folders.dataFolder, intervalMs: 0, fetchImpl: async (url, init) => (seen.push([url, init.headers["User-Agent"]]), ok({ id: "x" })) });
   await mb.get("work", "x", "artist-rels");
   assert.match(seen[0][0], /^https:\/\/musicbrainz\.org\/ws\/2\/work\/x\?fmt=json&inc=artist-rels$/);
-  assert.match(seen[0][1], /^AurralClassical\/\S+ \( me@example\.invalid \)$/);
+  assert.match(seen[0][1], /^AurralClassical\/\S+ \( https:\/\/github\.com\/Collinlong1\/Aurral-Classical-Plugin \)$/);
 });
 
 test("retries 503s, caches answers and 404s", async () => {

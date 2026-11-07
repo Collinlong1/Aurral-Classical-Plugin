@@ -28,7 +28,6 @@ playlists and to check who may use that item.
 
 | Setting | |
 | --- | --- |
-| MusicBrainz contact | Your email or website. MusicBrainz asks every app for one; it goes in the User-Agent. Without one, the plugin's GitHub page is sent. |
 | MusicBrainz mirror | Optional, like `http://musicbrainz.lan:5000`. musicbrainz.org is used at 1 request a second; a mirror has no limit. |
 | slskd URL, API key | Your slskd, like `http://slskd:5030`. Only the download source needs them. |
 | slskd download folder | slskd's downloads folder, as Aurral's container sees it. Finished files are copied from here. |
@@ -104,7 +103,10 @@ next source.
 It searches Soulseek for the composer, work, catalogue number and performer
 (`Beethoven Symphony 5 op 67 Karajan`), then shorter variants. A Soulseek
 folder qualifies only if its files line up with the release Aurral pinned: the
-same number of tracks per disc and every length within 2 seconds. A folder can
+same number of tracks per disc and every length within 2 seconds. As in
+Aurral's own matching, a length counts if it's within 2 seconds of the pinned
+edition or of the same recording on another edition of the album, since
+lengths typed in from a CD booklet are often a few seconds off a rip. A folder can
 hold one disc or the whole release; for an album, one user's folders must
 cover every disc.
 

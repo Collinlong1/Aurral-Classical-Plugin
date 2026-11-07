@@ -35,6 +35,10 @@ export function fakeFetch({ entities = {}, aurral = () => json({}), slskd = () =
     calls.push({ method, url: String(url), body });
     if (u.origin === MB) {
       const [, , , entity, id] = u.pathname.split("/");
+      if (entity === "release" && !id) {
+        const data = entities[`editions:${u.searchParams.get("release-group")}`];
+        return data ? json(data) : json({ releases: [] });
+      }
       const inc = u.searchParams.get("inc");
       const key = entity === "artist" && inc === "artist-rels" ? `artist-rels:${id}` : `${entity}:${id}`;
       const data = entities[key];
@@ -84,7 +88,7 @@ export function symphonyEntities(recordingId = RECORDING) {
 
 export const EXPECTED_ARTIST = "Ludwig van Beethoven — Berlin Philharmonic — Herbert von Karajan";
 
-export const baseSettings = { mbContact: "test@example.invalid", mbMirror: MB };
+export const baseSettings = { mbMirror: MB };
 
 export async function waitFor(check, timeoutMs = 10_000) {
   const until = Date.now() + timeoutMs;

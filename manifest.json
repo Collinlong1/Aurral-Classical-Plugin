@@ -13,12 +13,6 @@
   ],
   "settings": [
     {
-      "key": "mbContact",
-      "label": "MusicBrainz contact",
-      "type": "text",
-      "help": "Your email or website, sent to MusicBrainz as it asks. Without one, the plugin's GitHub page is sent."
-    },
-    {
       "key": "mbMirror",
       "label": "MusicBrainz mirror",
       "type": "text",

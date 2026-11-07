@@ -130,6 +130,17 @@ test("a request without a recording ID uses the release's track at its position"
   assert.equal(results[0].data.files[0].recordingId, RECORDING);
 });
 
+test("a folder that matches another edition's lengths qualifies, as in Aurral", async () => {
+  const e = entities();
+  // A digital edition of the same recordings, a few seconds off the CD.
+  e["editions:rg1"] = { releases: [{ id: "digital", media: [{ tracks: [
+    { length: 2000, recording: { id: RECORDING } }, { length: 305_000, recording: { id: "r2" } },
+  ] }] }] };
+  globalThis.fetch = fakeFetch({ entities: e, slskd: fakeSlskd(state) });
+  const results = await plugin.downloadSource.search(input({ track: request }));
+  assert.deepEqual(results.map((r) => r.data.username).sort(), ["alice", "bob", "carol"]);
+});
+
 test("searches return nothing for requests that aren't classical", async () => {
   const e = entities();
   e["work:mvt1"].relations = [];
