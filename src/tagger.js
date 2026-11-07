@@ -6,6 +6,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { isAudioPath, readTags, readValues, UnsupportedFormat, writeTags } from "./tags.js";
 import { creditString, RELEASE_INC } from "./works.js";
+import { Aurral } from "./aurral.js";
 import { readJson, tryLock, writeJson } from "./store.js";
 
 const LOCK_STALE_MS = 2 * 60_000;
@@ -82,6 +83,7 @@ class Session {
     this.ctx = ctx;
     this.lock = lock;
     this.dirty = 0;
+    this.changedFiles = 0;
     this.savedAt = Date.now();
     this.stats = { tagged: 0, unchanged: 0, skipped: {}, failed: 0, left: 0 };
   }
@@ -184,7 +186,10 @@ class Session {
       artist: fields.artist,
       workId: fields.workId,
     });
-    if (changed.length) ctx.log(`Tagged ${path.basename(real)}: ${fields.artist}`);
+    if (changed.length) {
+      this.changedFiles++;
+      ctx.log(`Tagged ${path.basename(real)}: ${fields.artist}`);
+    }
     return true;
   }
 
@@ -216,7 +221,10 @@ class Session {
     this.index[real] = { ...(this.index[real] ?? {}), ...indexEntry(readTags(real), after) };
     this.record(real, after, { status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
     this.stats.skipped["classical tags removed"]--;
-    if (changed.length) ctx.log(`Removed classical tags from ${path.basename(real)}`);
+    if (changed.length) {
+      this.changedFiles++;
+      ctx.log(`Removed classical tags from ${path.basename(real)}`);
+    }
     return changed.length ? "restored" : "unchanged";
   }
 
@@ -316,6 +324,19 @@ export async function withTagging(ctx, work) {
     clearInterval(heartbeat);
     await session.save(true).catch((error) => ctx.log(`Couldn't save progress: ${error.message}`));
     await lock.release();
+    if (session.changedFiles) await refreshLibrary(ctx);
+  }
+}
+
+// Aurral read the files before the plugin changed their tags. A quick
+// Library scan reads the changed ones again, so the Library shows the new
+// artist. Needs the plugin's Aurral API access.
+async function refreshLibrary(ctx) {
+  if (!ctx.api?.url || !ctx.api?.key) return;
+  try {
+    await new Aurral(ctx.api, ctx.fetch).refreshLibrary();
+  } catch (error) {
+    ctx.log(`Couldn't ask Aurral to rescan the Library: ${error.message}`);
   }
 }
 

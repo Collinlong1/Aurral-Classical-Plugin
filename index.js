@@ -35230,6 +35230,10 @@ var Aurral = class {
     }
     return data;
   }
+  // Re-reads files whose tags changed, so the Library shows the new ones.
+  refreshLibrary() {
+    return this.request("POST", "/library/refresh", { mode: "quick" });
+  }
   users() {
     return this.request("GET", "/users");
   }
@@ -36396,6 +36400,7 @@ var Session = class {
     this.ctx = ctx;
     this.lock = lock;
     this.dirty = 0;
+    this.changedFiles = 0;
     this.savedAt = Date.now();
     this.stats = { tagged: 0, unchanged: 0, skipped: {}, failed: 0, left: 0 };
   }
@@ -36492,7 +36497,10 @@ var Session = class {
       artist: fields.artist,
       workId: fields.workId
     });
-    if (changed.length) ctx.log(`Tagged ${path3.basename(real)}: ${fields.artist}`);
+    if (changed.length) {
+      this.changedFiles++;
+      ctx.log(`Tagged ${path3.basename(real)}: ${fields.artist}`);
+    }
     return true;
   }
   // Puts back the tags a file had before the plugin changed them. Files
@@ -36523,7 +36531,10 @@ var Session = class {
     this.index[real] = { ...this.index[real] ?? {}, ...indexEntry(readTags(real), after) };
     this.record(real, after, { status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
     this.stats.skipped["classical tags removed"]--;
-    if (changed.length) ctx.log(`Removed classical tags from ${path3.basename(real)}`);
+    if (changed.length) {
+      this.changedFiles++;
+      ctx.log(`Removed classical tags from ${path3.basename(real)}`);
+    }
     return changed.length ? "restored" : "unchanged";
   }
   // MusicBrainz's artist credit for this recording on the file's release,
@@ -36617,6 +36628,15 @@ async function withTagging(ctx, work) {
     clearInterval(heartbeat);
     await session.save(true).catch((error) => ctx.log(`Couldn't save progress: ${error.message}`));
     await lock.release();
+    if (session.changedFiles) await refreshLibrary(ctx);
+  }
+}
+async function refreshLibrary(ctx) {
+  if (!ctx.api?.url || !ctx.api?.key) return;
+  try {
+    await new Aurral(ctx.api, ctx.fetch).refreshLibrary();
+  } catch (error) {
+    ctx.log(`Couldn't ask Aurral to rescan the Library: ${error.message}`);
   }
 }
 async function runQueue(ctx, budgetMs, onlyIds = null) {

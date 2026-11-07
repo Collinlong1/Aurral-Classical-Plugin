@@ -247,3 +247,17 @@ test("soundtracks and Christmas albums are never tagged, even by Tag as classica
     assert.equal(readTags(file).artist, "Berliner Philharmoniker, Herbert von Karajan");
   }
 });
+
+test("Aurral is asked to rescan the Library after tags change, and only then", async () => {
+  const refreshes = [];
+  globalThis.fetch = fakeFetch({
+    entities: symphonyEntities(),
+    aurral: (method, route, body) => (refreshes.push([method, route, body]), new Response("{}", { status: 202 })),
+  });
+  const api = { url: "http://aurral.test/api", key: "plugin-key" };
+  await copyFixture("sine.flac", path.join(folders.libraryFolder, "a", "01.flac"));
+  await plugin.scheduled(input({ api }));
+  assert.deepEqual(refreshes, [["POST", "/library/refresh", { mode: "quick" }]]);
+  await plugin.scheduled(input({ api }));
+  assert.equal(refreshes.length, 1, "nothing changed the second time");
+});

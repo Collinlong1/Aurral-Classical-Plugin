@@ -22,6 +22,11 @@ export class Aurral {
     return data;
   }
 
+  // Re-reads files whose tags changed, so the Library shows the new ones.
+  refreshLibrary() {
+    return this.request("POST", "/library/refresh", { mode: "quick" });
+  }
+
   users() {
     return this.request("GET", "/users");
   }
