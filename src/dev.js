@@ -107,6 +107,15 @@ export default {
         .map(([file, r]) => ({ file, ...r, releaseGroupMbid: index[file]?.releaseGroupMbid, albumArtistMbids: index[file]?.albumArtistMbids, album: index[file]?.album, title: index[file]?.title }));
     },
 
+    // Reads from Aurral's API with the plugin's key. GET only.
+    async aurralGet(input) {
+      const route = String(input.route || "");
+      if (!route.startsWith("/")) throw new Error("route must start with /");
+      const response = await fetch(`${input.api.url}${route}`, { headers: { "X-Api-Key": input.api.key } });
+      const text = await response.text();
+      return { status: response.status, body: text.slice(0, input.maxChars || 200_000) };
+    },
+
     // Library files from the index (paths and tags only).
     async libraryFiles(input) {
       const ctx = makeContext(input);

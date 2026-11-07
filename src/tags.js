@@ -143,11 +143,12 @@ function isFragmentedMp4(filePath) {
 
 export class UnsupportedFormat extends Error {}
 
-function openFile(filePath, readStyle = READ_STYLE) {
-  if (!isAudioPath(filePath)) throw new UnsupportedFormat(`can't tag ${path.extname(filePath) || "this kind of"} files`);
+// `asPath` names the format when the file itself is a temp copy.
+function openFile(filePath, readStyle = READ_STYLE, asPath = filePath) {
+  if (!isAudioPath(asPath)) throw new UnsupportedFormat(`can't tag ${path.extname(asPath) || "this kind of"} files`);
   if (isFragmentedMp4(filePath)) throw new UnsupportedFormat("can't tag fragmented MP4 files");
   try {
-    return File.createFromPath(filePath, undefined, readStyle);
+    return File.createFromPath(filePath, `taglib/${path.extname(asPath).slice(1).toLowerCase()}`, readStyle);
   } catch (error) {
     if (/unsupported format/i.test(String(error?.message))) throw new UnsupportedFormat("can't tag this kind of file");
     throw error;
@@ -209,11 +210,14 @@ export async function writeTags(filePath, values) {
     preview.dispose();
   }
   if (!changed.length) return [];
+  // The copy has no audio extension, so a Library scan running meanwhile
+  // never indexes it: a scan that did kept the old artist on the track,
+  // since the copy's path sorts first, until a full rescan.
   const extension = path.extname(source);
-  const working = path.join(path.dirname(source), `.${path.basename(source, extension)}.${randomUUID()}.tagging${extension}`);
+  const working = path.join(path.dirname(source), `.${path.basename(source, extension)}.${randomUUID()}.tagging`);
   await fs.copyFile(source, working, fs.constants.COPYFILE_FICLONE);
   try {
-    const file = openFile(working);
+    const file = openFile(working, READ_STYLE, source);
     try {
       file.removeTags(ADDED_TAG_TYPES & ~file.tagTypesOnDisk);
       const id3 = id3Of(file);

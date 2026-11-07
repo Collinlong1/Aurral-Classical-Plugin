@@ -261,3 +261,23 @@ test("Aurral is asked to rescan the Library after tags change, and only then", a
   await plugin.scheduled(input({ api }));
   assert.equal(refreshes.length, 1, "nothing changed the second time");
 });
+
+test("the copy being tagged has no audio extension, so a Library scan never picks it up", async () => {
+  const fsp = (await import("node:fs/promises")).default;
+  const copies = [];
+  const realCopy = fsp.copyFile;
+  fsp.copyFile = (from, to, mode) => (copies.push(to), realCopy(from, to, mode));
+  try {
+    for (const ext of ["flac", "mp3", "m4a", "opus"]) {
+      const file = await copyFixture(`sine.${ext}`, path.join(folders.libraryFolder, "t", `01.${ext}`));
+      copies.length = 0;
+      const { writeTags } = await import("../src/tags.js");
+      assert.deepEqual(await writeTags(file, { artist: ["Someone — Else"] }), ["artist"]);
+      assert.equal(readTags(file).artist, "Someone — Else");
+      assert.equal(copies.length, 1);
+      assert.match(path.basename(copies[0]), /^\.01\.[0-9a-f-]+\.tagging$/);
+    }
+  } finally {
+    fsp.copyFile = realCopy;
+  }
+});
