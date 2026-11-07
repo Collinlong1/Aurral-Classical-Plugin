@@ -1,0 +1,67 @@
+# Publishes a GitHub release for the version in manifest.json, tagged
+# v<version>, whenever that version has none yet. Aurral installs and updates
+# plugins from a repo's latest release, using its first .zip asset.
+#
+# To release: bump "version" in manifest.json (and run `npm run build`) and
+# push to main. It can also be run by hand from the Actions tab.
+name: Release
+
+on:
+  push:
+    branches: [main]
+    paths: [manifest.json]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read the version
+        id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="v$(jq -r .version manifest.json)"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Release $tag already exists, nothing to do"
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.version.outputs.exists != 'true'
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Test and build
+        if: steps.version.outputs.exists != 'true'
+        run: |
+          npm ci
+          npm test
+          npm run build
+          node --check index.js
+          git diff --exit-code index.js || (echo "index.js is out of date: run npm run build and commit it" && exit 1)
+
+      - name: Build the plugin zip
+        if: steps.version.outputs.exists != 'true'
+        run: |
+          mkdir -p zip/aurral-classical
+          cp manifest.json index.js README.md LICENSE zip/aurral-classical/
+          (cd zip && zip -r ../aurral-classical.zip aurral-classical)
+
+      - name: Publish the release
+        if: steps.version.outputs.exists != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          gh release create "$TAG" aurral-classical.zip \
+            --target "$GITHUB_SHA" \
+            --title "Aurral Classical $TAG" \
+            --generate-notes
