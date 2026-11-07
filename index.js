@@ -37226,7 +37226,7 @@ function searchQueries(info, { albumTitle = "", album = false } = {}) {
     [composer, title, performer],
     [composer, title]
   ];
-  const candidates = album ? [...byAlbum, ...byWork] : [...byWork, ...byAlbum.slice(1)];
+  const candidates = album ? [...byAlbum, ...byWork] : [byWork[0], byAlbum[0], byWork[1], byWork[2], byAlbum[1]];
   const seen = /* @__PURE__ */ new Set();
   const queries = [];
   for (const parts of candidates) {

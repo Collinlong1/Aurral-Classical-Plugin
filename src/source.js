@@ -273,7 +273,9 @@ export function searchQueries(info, { albumTitle = "", album = false } = {}) {
     [composer, title, performer],
     [composer, title],
   ];
-  const candidates = album ? [...byAlbum, ...byWork] : [...byWork, ...byAlbum.slice(1)];
+  // A track is often shared inside a folder named after its album, so the
+  // album search comes second, inside the time a search call has.
+  const candidates = album ? [...byAlbum, ...byWork] : [byWork[0], byAlbum[0], byWork[1], byWork[2], byAlbum[1]];
   const seen = new Set();
   const queries = [];
   for (const parts of candidates) {
