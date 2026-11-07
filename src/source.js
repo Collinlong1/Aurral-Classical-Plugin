@@ -419,11 +419,39 @@ export async function startDownload(ctx, result, kind) {
   if (!data?.username || !Array.isArray(data.files) || !data.files.length) throw new Error("The result has no files to download");
   const { downloadFolder } = slskdSettings(ctx.settings);
   if (!downloadFolder) throw new Error("Set slskd's download folder on the plugin's page");
+  // Aurral can start two downloads of one album at once (two of its tracks
+  // each leading an album download). The second joins the first instead of
+  // asking slskd for the same files again.
+  const key = downloadKey(data.username, data.files);
+  const existing = await findDownload(ctx, key);
+  if (existing) {
+    ctx.log(`Joining the download already running for ${remoteBase(remoteDir(data.files[0].filename))}`);
+    return { pending: existing };
+  }
   const slskd = slskdFor(ctx);
   await slskd.enqueue(data.username, data.files.map((f) => ({ filename: f.filename, size: f.size })));
   const id = randomUUID();
-  await writeJson(path.join(downloadsDir(ctx), `${id}.json`), { kind, username: data.username, files: data.files, startedAt: Date.now() });
+  await writeJson(path.join(downloadsDir(ctx), `${id}.json`), { kind, key, username: data.username, files: data.files, startedAt: Date.now() });
   return { pending: id };
+}
+
+const downloadKey = (username, files) => `${username}\u0000${files.map((f) => f.filename).sort().join("\u0000")}`;
+const KEEP_DOWNLOADS_MS = 2 * 24 * 60 * 60_000;
+
+// An unfinished download of exactly these files, if there is one. Records
+// older than two days are cleared out on the way.
+async function findDownload(ctx, key) {
+  const dir = downloadsDir(ctx);
+  for (const name of await fs.readdir(dir).catch(() => [])) {
+    if (!name.endsWith(".json")) continue;
+    const record = await readJson(path.join(dir, name), null);
+    if (!record || Date.now() - (record.startedAt || 0) > KEEP_DOWNLOADS_MS) {
+      await fs.rm(path.join(dir, name), { force: true });
+      continue;
+    }
+    if (record.key === key && !record.failed) return name.replace(/\.json$/, "");
+  }
+  return null;
 }
 
 // Finds a finished download in slskd's folder: <folder>/<remote folder>/<file>,
@@ -466,6 +494,7 @@ export async function downloadStatus(ctx, id, directory) {
     return matches.map((t) => t.state || "").sort((a, b) => rank(a) - rank(b))[0] ?? "";
   });
   const failed = states.find((state) => FAILED_STATES.test(state));
+  if (failed) await writeJson(path.join(downloadsDir(ctx), `${id}.json`), { ...record, failed: true });
   if (failed) throw new Error(`slskd: ${remoteBase(record.files[states.indexOf(failed)].filename)} ${failed.replace(/^Completed,\s*/, "").toLowerCase()}`);
   if (!states.every(isSucceeded)) return { done: false };
 
@@ -499,6 +528,7 @@ export async function downloadStatus(ctx, id, directory) {
     }
   }
   ctx.log(`Download ${id}: ${copied.length} file(s) copied, ${tagged} identified and tagged`);
-  await fs.rm(path.join(downloadsDir(ctx), `${id}.json`), { force: true });
+  // The record stays (cleared after two days): another Aurral job may be
+  // waiting on the same download and copies the files into its own folder.
   return record.kind === "album" ? { done: true } : { done: true, path: path.basename(copied[0].target) };
 }

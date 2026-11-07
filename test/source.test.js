@@ -295,3 +295,25 @@ test("an older cancelled request for a file doesn't fail a download slskd is sti
   await copyFixture("sine.flac", path.join(folders.downloads, parts.at(-2), parts.at(-1)));
   assert.equal((await plugin.downloadSource.status(input({ id: started.pending, directory }))).done, true);
 });
+
+test("a second download of the same folder joins the first, and each job gets the files", async () => {
+  const album = { artist: "Ludwig van Beethoven", title: "Symphonies 5 & 7", releaseMbid: "rel1", releaseGroupMbid: "rg1", tracks: [] };
+  const [result] = await plugin.downloadSource.searchAlbum(input({ album }));
+  const dirs = [path.join(folders.root, "job-a"), path.join(folders.root, "job-b")];
+  for (const d of dirs) await fs.mkdir(d, { recursive: true });
+  const first = await plugin.downloadSource.downloadAlbum(input({ result, album, directory: dirs[0] }));
+  const enqueues = () => state.requests.filter((r) => r.method === "POST" && r.route.startsWith("/transfers/downloads/")).length;
+  assert.equal(enqueues(), 1);
+  const second = await plugin.downloadSource.downloadAlbum(input({ result, album, directory: dirs[1] }));
+  assert.equal(second.pending, first.pending);
+  assert.equal(enqueues(), 1, "slskd is asked once");
+  state.transfers = () => result.data.files.map((f) => ({ filename: f.filename, state: "Completed, Succeeded" }));
+  for (const f of result.data.files) {
+    const parts = f.filename.split("\\");
+    await copyFixture("sine.flac", path.join(folders.downloads, parts.at(-2), parts.at(-1)));
+  }
+  for (const d of dirs) {
+    assert.deepEqual(await plugin.downloadSource.status(input({ id: first.pending, directory: d })), { done: true });
+    assert.equal((await fs.readdir(d)).length, 4);
+  }
+});

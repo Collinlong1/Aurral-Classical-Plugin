@@ -37368,11 +37368,32 @@ async function startDownload(ctx, result, kind) {
   if (!data?.username || !Array.isArray(data.files) || !data.files.length) throw new Error("The result has no files to download");
   const { downloadFolder } = slskdSettings(ctx.settings);
   if (!downloadFolder) throw new Error("Set slskd's download folder on the plugin's page");
+  const key = downloadKey(data.username, data.files);
+  const existing = await findDownload(ctx, key);
+  if (existing) {
+    ctx.log(`Joining the download already running for ${remoteBase(remoteDir(data.files[0].filename))}`);
+    return { pending: existing };
+  }
   const slskd = slskdFor(ctx);
   await slskd.enqueue(data.username, data.files.map((f) => ({ filename: f.filename, size: f.size })));
   const id = randomUUID5();
-  await writeJson(path5.join(downloadsDir(ctx), `${id}.json`), { kind, username: data.username, files: data.files, startedAt: Date.now() });
+  await writeJson(path5.join(downloadsDir(ctx), `${id}.json`), { kind, key, username: data.username, files: data.files, startedAt: Date.now() });
   return { pending: id };
+}
+var downloadKey = (username, files) => `${username}\0${files.map((f) => f.filename).sort().join("\0")}`;
+var KEEP_DOWNLOADS_MS = 2 * 24 * 60 * 6e4;
+async function findDownload(ctx, key) {
+  const dir = downloadsDir(ctx);
+  for (const name of await fs4.readdir(dir).catch(() => [])) {
+    if (!name.endsWith(".json")) continue;
+    const record = await readJson(path5.join(dir, name), null);
+    if (!record || Date.now() - (record.startedAt || 0) > KEEP_DOWNLOADS_MS) {
+      await fs4.rm(path5.join(dir, name), { force: true });
+      continue;
+    }
+    if (record.key === key && !record.failed) return name.replace(/\.json$/, "");
+  }
+  return null;
 }
 async function locate(downloadFolder, file) {
   const base = remoteBase(file.filename);
@@ -37408,6 +37429,7 @@ async function downloadStatus(ctx, id, directory) {
     return matches.map((t) => t.state || "").sort((a, b) => rank(a) - rank(b))[0] ?? "";
   });
   const failed = states.find((state) => FAILED_STATES.test(state));
+  if (failed) await writeJson(path5.join(downloadsDir(ctx), `${id}.json`), { ...record, failed: true });
   if (failed) throw new Error(`slskd: ${remoteBase(record.files[states.indexOf(failed)].filename)} ${failed.replace(/^Completed,\s*/, "").toLowerCase()}`);
   if (!states.every(isSucceeded)) return { done: false };
   const { downloadFolder } = slskdSettings(ctx.settings);
@@ -37439,7 +37461,6 @@ async function downloadStatus(ctx, id, directory) {
     }
   }
   ctx.log(`Download ${id}: ${copied.length} file(s) copied, ${tagged} identified and tagged`);
-  await fs4.rm(path5.join(downloadsDir(ctx), `${id}.json`), { force: true });
   return record.kind === "album" ? { done: true } : { done: true, path: path5.basename(copied[0].target) };
 }
 
