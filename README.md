@@ -28,7 +28,7 @@ playlists and to check who may use that item.
 
 | Setting | |
 | --- | --- |
-| MusicBrainz contact | Your email or website. MusicBrainz asks every app for one; it goes in the User-Agent. Required. |
+| MusicBrainz contact | Your email or website. MusicBrainz asks every app for one; it goes in the User-Agent. Without one, the plugin's GitHub page is sent. |
 | MusicBrainz mirror | Optional, like `http://musicbrainz.lan:5000`. musicbrainz.org is used at 1 request a second; a mirror has no limit. |
 | slskd URL, API key | Your slskd, like `http://slskd:5030`. Only the download source needs them. |
 | slskd download folder | slskd's downloads folder, as Aurral's container sees it. Finished files are copied from here. |
@@ -69,6 +69,18 @@ in M4A files and cover art. The plugin edits a copy beside the file and
 renames it into place, so a crash never leaves half a file. FLAC, MP3, M4A,
 Ogg and Opus files are supported. Fragmented MP4 files are skipped, as Aurral
 skips them too. The audio is never re-encoded.
+
+## Tag as classical
+
+Admins see **Tag as classical** in the menu of an artist or an album in the
+Library. It retags that album's files, or every file of that artist (by
+MusicBrainz album artist ID, release, or album artist name), straight away,
+even ones the plugin has seen before. It runs in the background and reports
+how many it tagged and why it skipped the rest. Use it for music that was in
+the Library before the plugin, or after fixing a Work on MusicBrainz.
+
+Menu items appear only while the plugin is on. Aurral's web app remembers the
+list for a few minutes, so reload the page after turning the plugin on.
 
 ## Compare recordings
 

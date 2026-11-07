@@ -91,6 +91,7 @@ export default {
     const reached = await ctx.mb.ping();
     if (reached !== true) throw new Error(`Couldn't reach MusicBrainz at ${host}: ${reached}`);
     parts.push(`MusicBrainz answers at ${host}`);
+    if (!String(ctx.settings.mbContact || "").trim()) parts.push("Add a MusicBrainz contact so MusicBrainz can reach you");
     const slskd = slskdSettings(ctx.settings);
     if (slskd.configured) {
       const app = await new Slskd(slskd).application();

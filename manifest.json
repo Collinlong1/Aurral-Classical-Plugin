@@ -12,24 +12,89 @@
     "Aurral's API, to make playlists"
   ],
   "settings": [
-    { "key": "mbContact", "label": "MusicBrainz contact", "type": "text", "required": true, "help": "Your email or website. MusicBrainz asks every app to send one." },
-    { "key": "mbMirror", "label": "MusicBrainz mirror", "type": "text", "help": "Optional, like http://musicbrainz.lan:5000. A mirror isn't limited to 1 request a second." },
-    { "key": "slskdUrl", "label": "slskd URL", "type": "text", "help": "Like http://slskd:5030. Needed for the download source." },
-    { "key": "slskdApiKey", "label": "slskd API key", "type": "password" },
-    { "key": "slskdDownloadFolder", "label": "slskd download folder", "type": "text", "help": "slskd's downloads folder, as Aurral sees it. Finished files are copied from here." },
-    { "key": "nameOrder", "label": "Name order", "type": "text", "help": "Roles in the artist tag, in order. Default: composers, arrangers, soloists, ensembles, conductors" },
-    { "key": "separator", "label": "Separator", "type": "text", "help": "Goes between the names in the artist tag. Default: —" },
-    { "key": "compareCount", "label": "Recordings to compare", "type": "number", "help": "How many recordings Compare recordings puts in a playlist. Default 10, at most 25." }
+    {
+      "key": "mbContact",
+      "label": "MusicBrainz contact",
+      "type": "text",
+      "help": "Your email or website, sent to MusicBrainz as it asks. Without one, the plugin's GitHub page is sent."
+    },
+    {
+      "key": "mbMirror",
+      "label": "MusicBrainz mirror",
+      "type": "text",
+      "help": "Optional, like http://musicbrainz.lan:5000. A mirror isn't limited to 1 request a second."
+    },
+    {
+      "key": "slskdUrl",
+      "label": "slskd URL",
+      "type": "text",
+      "help": "Like http://slskd:5030. Needed for the download source."
+    },
+    {
+      "key": "slskdApiKey",
+      "label": "slskd API key",
+      "type": "password"
+    },
+    {
+      "key": "slskdDownloadFolder",
+      "label": "slskd download folder",
+      "type": "text",
+      "help": "slskd's downloads folder, as Aurral sees it. Finished files are copied from here."
+    },
+    {
+      "key": "nameOrder",
+      "label": "Name order",
+      "type": "text",
+      "help": "Roles in the artist tag, in order. Default: composers, arrangers, soloists, ensembles, conductors"
+    },
+    {
+      "key": "separator",
+      "label": "Separator",
+      "type": "text",
+      "help": "Goes between the names in the artist tag. Default: —"
+    },
+    {
+      "key": "compareCount",
+      "label": "Recordings to compare",
+      "type": "number",
+      "help": "How many recordings Compare recordings puts in a playlist. Default 10, at most 25."
+    }
   ],
   "test": true,
   "actions": [
-    { "id": "tag-artist", "label": "Tag as classical", "target": "artist", "admin": true, "background": true },
-    { "id": "tag-album", "label": "Tag as classical", "target": "album", "admin": true, "background": true },
-    { "id": "compare-track", "label": "Compare recordings", "target": "track", "background": true },
-    { "id": "compare-album", "label": "Compare recordings", "target": "album", "background": true }
+    {
+      "id": "tag-artist",
+      "label": "Tag as classical",
+      "target": "artist",
+      "admin": true,
+      "background": true
+    },
+    {
+      "id": "tag-album",
+      "label": "Tag as classical",
+      "target": "album",
+      "admin": true,
+      "background": true
+    },
+    {
+      "id": "compare-track",
+      "label": "Compare recordings",
+      "target": "track",
+      "background": true
+    },
+    {
+      "id": "compare-album",
+      "label": "Compare recordings",
+      "target": "album",
+      "background": true
+    }
   ],
-  "events": ["download.finished"],
-  "downloadSource": { "albums": true },
+  "events": [
+    "download.finished"
+  ],
+  "downloadSource": {
+    "albums": true
+  },
   "importList": null,
   "schedule": "15m",
   "apiAccess": true
