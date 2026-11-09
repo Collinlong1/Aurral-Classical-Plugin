@@ -14,7 +14,10 @@ export const LENGTH_TOLERANCE_MS = 2000;
 const SEARCH_BUDGET_MS = 50_000;
 const SEARCH_TIMEOUT_MS = 12_000;
 const MAX_RESULTS = 50;
-const SOURCE_EXTENSIONS = new Set(["flac", "mp3", "m4a", "ogg", "oga", "opus"]);
+// Only formats Aurral can import: its quality profiles have tiers for FLAC,
+// MP3 and M4A, and never for Ogg or Opus, so a folder of those would be
+// downloaded and then rejected whole.
+const SOURCE_EXTENSIONS = new Set(["flac", "mp3", "m4a"]);
 const LOSSLESS = new Set(["flac"]);
 
 // -- the pinned release ------------------------------------------------------

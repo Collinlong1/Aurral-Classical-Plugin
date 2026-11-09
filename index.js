@@ -37014,7 +37014,7 @@ function summarize(lines) {
 import path4 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.3" : "dev";
+var VERSION = true ? "1.0.4" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js
@@ -37217,7 +37217,7 @@ var LENGTH_TOLERANCE_MS = 2e3;
 var SEARCH_BUDGET_MS = 5e4;
 var SEARCH_TIMEOUT_MS = 12e3;
 var MAX_RESULTS = 50;
-var SOURCE_EXTENSIONS = /* @__PURE__ */ new Set(["flac", "mp3", "m4a", "ogg", "oga", "opus"]);
+var SOURCE_EXTENSIONS = /* @__PURE__ */ new Set(["flac", "mp3", "m4a"]);
 var LOSSLESS = /* @__PURE__ */ new Set(["flac"]);
 async function loadRelease(mb, releaseMbid) {
   if (!releaseMbid) return null;
