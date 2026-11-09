@@ -408,3 +408,12 @@ test("a finished download whose transfers slskd cleared is still picked up", asy
   assert.deepEqual(await downloadStatus(ctx, id, directory), { done: true });
   assert.equal((await fs.readdir(directory)).filter((n) => n.endsWith(".flac")).length, 4);
 });
+
+test("Ogg and Opus folders are never offered, since Aurral can't import them", () => {
+  const folders = groupFolders([
+    { username: "olga", files: [file("@@o\\B5", "01.ogg", 2), file("@@o\\B5", "02.ogg", 300)] },
+    { username: "oscar", files: [file("@@p\\B5", "01.opus", 2), file("@@p\\B5", "02.opus", 300), file("@@p\\B5", "03.oga", 1)] },
+    { username: "mia", files: [file("@@m\\B5", "01.mp3", 2), file("@@m\\B5", "02.mp3", 300)] },
+  ]);
+  assert.deepEqual(folders.map((f) => f.username), ["mia"]);
+});
