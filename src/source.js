@@ -437,6 +437,8 @@ export async function startDownload(ctx, result, kind) {
 
 const downloadKey = (username, files) => `${username}\u0000${files.map((f) => f.filename).sort().join("\u0000")}`;
 const KEEP_DOWNLOADS_MS = 2 * 24 * 60 * 60_000;
+// How long a just-queued file may be missing from slskd's transfers.
+export const MISSING_GRACE_MS = 2 * 60_000;
 
 // An unfinished download of exactly these files, if there is one. Records
 // older than two days are cleared out on the way.
@@ -491,8 +493,21 @@ export async function downloadStatus(ctx, id, directory) {
   const rank = (state) => (isSucceeded(state) ? 0 : FAILED_STATES.test(state) ? 2 : 1);
   const states = record.files.map((file) => {
     const matches = transfers.filter((t) => t.filename === file.filename);
-    return matches.map((t) => t.state || "").sort((a, b) => rank(a) - rank(b))[0] ?? "";
+    return matches.map((t) => t.state || "").sort((a, b) => rank(a) - rank(b))[0] ?? null;
   });
+  // A file slskd no longer lists was cleared from its transfers, or never
+  // queued. If it's in the download folder it finished (slskd can clear
+  // completed transfers on its own); otherwise nothing is downloading it and
+  // waiting would last until Aurral gives up a day later.
+  if (states.includes(null)) {
+    const { downloadFolder } = slskdSettings(ctx.settings);
+    for (const [i, file] of record.files.entries()) {
+      if (states[i] !== null) continue;
+      if (await locate(downloadFolder, file)) states[i] = "Completed, Succeeded";
+      else if (Date.now() - (record.startedAt || 0) < (ctx.missingGraceMs ?? MISSING_GRACE_MS)) states[i] = "";
+      else states[i] = "Completed, Failed (slskd no longer has this transfer)";
+    }
+  }
   const failed = states.find((state) => FAILED_STATES.test(state));
   if (failed) await writeJson(path.join(downloadsDir(ctx), `${id}.json`), { ...record, failed: true });
   if (failed) throw new Error(`slskd: ${remoteBase(record.files[states.indexOf(failed)].filename)} ${failed.replace(/^Completed,\s*/, "").toLowerCase()}`);
