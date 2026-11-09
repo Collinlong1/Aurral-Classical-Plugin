@@ -369,3 +369,42 @@ test("a second download of the same folder joins the first, and each job gets th
     assert.equal((await fs.readdir(d)).length, 4);
   }
 });
+
+// slskd cleared its transfers (or never queued them): the download fails
+// instead of waiting a day, and the next try starts afresh instead of joining it.
+async function clearedAlbum() {
+  const album = { artist: "Ludwig van Beethoven", title: "Symphonies 5 & 7", releaseMbid: "rel1", releaseGroupMbid: "rg1", tracks: [] };
+  const [result] = await plugin.downloadSource.searchAlbum(input({ album }));
+  const directory = path.join(folders.root, "stage");
+  await fs.mkdir(directory, { recursive: true });
+  const started = await plugin.downloadSource.downloadAlbum(input({ result, album, directory }));
+  state.transfers = () => [];
+  return { album, result, directory, id: started.pending };
+}
+
+test("a download slskd no longer lists fails, and the next try doesn't join it", async () => {
+  const { album, result, directory, id } = await clearedAlbum();
+  const ctx = { ...makeContext(input()), missingGraceMs: 0 };
+  await assert.rejects(downloadStatus(ctx, id, directory), /no longer has this transfer/);
+  const enqueues = () => state.requests.filter((r) => r.method === "POST" && r.route.startsWith("/transfers/downloads/")).length;
+  const before = enqueues();
+  const again = await plugin.downloadSource.downloadAlbum(input({ result, album, directory }));
+  assert.notEqual(again.pending, id, "a new download, not the failed one");
+  assert.equal(enqueues(), before + 1, "the files were asked for again");
+});
+
+test("a just-queued download slskd doesn't list yet keeps waiting", async () => {
+  const { directory, id } = await clearedAlbum();
+  assert.deepEqual(await downloadStatus(makeContext(input()), id, directory), { done: false });
+});
+
+test("a finished download whose transfers slskd cleared is still picked up", async () => {
+  const { result, directory, id } = await clearedAlbum();
+  for (const f of result.data.files) {
+    const parts = f.filename.split("\\");
+    await copyFixture("sine.flac", path.join(folders.downloads, parts.at(-2), parts.at(-1)));
+  }
+  const ctx = { ...makeContext(input()), missingGraceMs: 0 };
+  assert.deepEqual(await downloadStatus(ctx, id, directory), { done: true });
+  assert.equal((await fs.readdir(directory)).filter((n) => n.endsWith(".flac")).length, 4);
+});

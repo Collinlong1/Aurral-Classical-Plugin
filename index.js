@@ -37014,7 +37014,7 @@ function summarize(lines) {
 import path4 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.2" : "dev";
+var VERSION = true ? "1.0.3" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js
@@ -37554,6 +37554,7 @@ async function startDownload(ctx, result, kind) {
 }
 var downloadKey = (username, files) => `${username}\0${files.map((f) => f.filename).sort().join("\0")}`;
 var KEEP_DOWNLOADS_MS = 2 * 24 * 60 * 6e4;
+var MISSING_GRACE_MS = 2 * 6e4;
 async function findDownload(ctx, key) {
   const dir = downloadsDir(ctx);
   for (const name of await fs4.readdir(dir).catch(() => [])) {
@@ -37598,8 +37599,17 @@ async function downloadStatus(ctx, id, directory) {
   const rank = (state) => isSucceeded(state) ? 0 : FAILED_STATES.test(state) ? 2 : 1;
   const states = record.files.map((file) => {
     const matches = transfers.filter((t) => t.filename === file.filename);
-    return matches.map((t) => t.state || "").sort((a, b) => rank(a) - rank(b))[0] ?? "";
+    return matches.map((t) => t.state || "").sort((a, b) => rank(a) - rank(b))[0] ?? null;
   });
+  if (states.includes(null)) {
+    const { downloadFolder } = slskdSettings(ctx.settings);
+    for (const [i, file] of record.files.entries()) {
+      if (states[i] !== null) continue;
+      if (await locate(downloadFolder, file)) states[i] = "Completed, Succeeded";
+      else if (Date.now() - (record.startedAt || 0) < (ctx.missingGraceMs ?? MISSING_GRACE_MS)) states[i] = "";
+      else states[i] = "Completed, Failed (slskd no longer has this transfer)";
+    }
+  }
   const failed = states.find((state) => FAILED_STATES.test(state));
   if (failed) await writeJson(path5.join(downloadsDir(ctx), `${id}.json`), { ...record, failed: true });
   if (failed) throw new Error(`slskd: ${remoteBase(record.files[states.indexOf(failed)].filename)} ${failed.replace(/^Completed,\s*/, "").toLowerCase()}`);
