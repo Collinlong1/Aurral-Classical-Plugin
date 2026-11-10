@@ -1,5 +1,9 @@
 # Phase 2 — data model review
 
+## Final implementation CI
+
+GitHub Actions run [42887705310](https://github.com/Collinlong1/Aurral-Classical-Plugin/actions/runs/42887705310) passed all five jobs on implementation commit `eb997d521ccf1aad2d1f611b0fd5b62bcba6e8eb`: full 159-test suites on Node22.16/22/24/26.12, bundle/source consistency in every matrix job, and the isolated no-network model tests. Both repositories have a separate `phase2-review` source branch. Core snapshot `bae8d4bace3ea4541d0c76da533f3de25e78eb78` contains checkpoint documentation only. Follow-up commits record this observed result without changing runtime source. No PR was opened or merged.
+
 November 10, 2026. The user's request explicitly authorized verifying Phase 1 and building Phase 2. Phase 2 backend implementation is complete for review. Stop before Phase 3.
 
 ## Phase 1 verification and source prerequisites
@@ -54,7 +58,7 @@ The model suite tests actual SQLite, three independent writers, killed processes
 
 A standalone synthetic 10,000-link run on Node24 measured initial reconciliation 4,031ms and rescan 1,667ms, with 263MiB process RSS and a 1,275,561-byte evidence snapshot. This measures model reconciliation with synthetic evidence, not host query cost, media hashing throughput, page latency or a production-library guarantee. Source baseline for this measurement preceded the later provider/test cleanup fixes; the reconciliation algorithm was unchanged afterward.
 
-Remote Phase 2 push CI is separate from these local/container results; consult the review branch's actual checks. Do not infer remote success from the local matrix. No new real-HTTP model integration or browser UI is claimed; this phase adds a backend, and the Phase 1 disposable HTTP integration result is separately recorded above.
+Remote Phase 2 implementation CI was separately observed passing in run 42887705310; the final addendum above identifies the exact source commit. A later documentation-only update may trigger another run. No new real-HTTP model integration or browser UI is claimed; this phase adds a backend, and the Phase 1 disposable HTTP integration result is separately recorded above.
 
 ## Migrations, rollback and limits
 

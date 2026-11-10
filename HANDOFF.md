@@ -1,5 +1,7 @@
 # Current shared checkpoint — Phase 2
 
+Final observed Phase 2 implementation CI: plugin run 42887705310 passed all five jobs on `eb997d521ccf1aad2d1f611b0fd5b62bcba6e8eb` (159 full-suite tests on each Node22.16/22/24/26 plus isolated model tests and bundle consistency). Source snapshots are in both user repositories on phase2-review; core snapshot bae8d4ba is documentation only. Later handoff/result commits do not change runtime source. No new PR or merge.
+
 November 10, 2026. User request: “Phase one should be done. Verify then continue and build phase 2.” This authorizes Phase 2 and supersedes old pending-approval language below. Phase 3 is not authorized.
 
 Phase 1 review source is in open, unmerged plugin PR6 and core PR36. Fresh clones initially had only Phase 0.5 on remote classical. Local existing `aurral-classical` branches were fast-forwarded to plugin `e1a980ad768af6c8d3e5122e85f05a6e68b3629b` and core `581e8b6ca32908652eecb673620ee6f1389a96b5` as the Phase 2 baseline. No remote refs or PRs were merged. Preserve those prerequisites when applying the Phase 2 patch.
