@@ -1,5 +1,14 @@
 # Aurral Classical — Phase 0.5 report
 
+## Final-verification drift correction
+
+Fork main advanced **externally to this task** from `aa643d316e9e00fb8622ab60b2fb2cb8b76661ee` to `c0deb211eba929424b608ca1c2449c7242892d9c` via merge PR #31, bringing upstream `656475b92be36b6834002da2407e7d9d50c2e0c2` (the owned-albums artist-page fix). No agent write or merge targeted main. The live fork now matches upstream `656475b92be36b6834002da2407e7d9d50c2e0c2` with **110 historical fork-only commits and the same 52 net changed paths**.
+
+Preservation branches remain independently tested one-commit branches on the matching upstream base selected at Phase 0.5 entry, `7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef`. Classical runtime source remains the frozen entry fork main `aa643d316e9e00fb8622ab60b2fb2cb8b76661ee` plus documentation; it does not silently absorb the later update. The user-created classical branches are reused. Reconcile this newly observed nightly drift on classical only after the next phase is approved. Do not reset, overwrite or try to restore live main to the older audited SHA.
+
+All references below to an unchanged main mean **no main edits by this task**, with source/test baseline SHAs explicitly pinned. They do not claim the live fork main stayed stationary while another upstream merge occurred.
+
+
 **Preservation work complete for review. Phase 1 has not started.**
 
 The user approved the next phase, confirmed the existing classical branches were created for this project, and clarified that upstream must remain read-only. All edits and issue branches are confined to the user’s repositories. No PR was opened or updated.
@@ -9,7 +18,7 @@ The user approved the next phase, confirmed the existing classical branches were
 - Published 16 independent, single-issue preservation branches in Collinlong1/aurral. Each commit has the frozen matching upstream commit as its sole parent.
 - Split mixed code, helper dependencies and tests; no issue branch inherits other fork features.
 - Independently passed required check stages and application builds on every branch; docs builds passed where changed.
-- Reused both existing aurral-classical branches. Core runtime source is the unchanged current fork-main source; plugin runtime source is unchanged. Handoff/analysis documentation is added on these existing branches.
+- Reused both existing aurral-classical branches. Core runtime source is the frozen entry fork-main source; plugin runtime source is unchanged. Handoff/analysis documentation is added on these existing branches.
 - No main, upstream, production server, credentials, deployment, classical runtime implementation or schema changes.
 
 ## Frozen references
@@ -17,7 +26,7 @@ The user approved the next phase, confirmed the existing classical branches were
 | Reference | SHA |
 | --- | --- |
 | Matching upstream base / every issue parent | `7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef` |
-| Fork main, unchanged throughout Phase 0.5 | `aa643d316e9e00fb8622ab60b2fb2cb8b76661ee` |
+| Fork main at Phase 0.5 entry/test baseline (later external advance above) | `aa643d316e9e00fb8622ab60b2fb2cb8b76661ee` |
 | Plugin main/source, unchanged | `506e5259e1442b8cfe072a75b129abb428c6bcf7` |
 | Existing core classical before adoption | `287ab4b76ca8a9d231b684089d02ddc9d9ea70a2` |
 | Later observed upstream main (read only) | `656475b92be36b6834002da2407e7d9d50c2e0c2` |

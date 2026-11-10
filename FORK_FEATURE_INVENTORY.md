@@ -1,8 +1,17 @@
 # Fork feature inventory — Phase 0.5 execution record
 
+## Final-verification drift correction
+
+Fork main advanced **externally to this task** from `aa643d316e9e00fb8622ab60b2fb2cb8b76661ee` to `c0deb211eba929424b608ca1c2449c7242892d9c` via merge PR #31, bringing upstream `656475b92be36b6834002da2407e7d9d50c2e0c2` (the owned-albums artist-page fix). No agent write or merge targeted main. The live fork now matches upstream `656475b92be36b6834002da2407e7d9d50c2e0c2` with **110 historical fork-only commits and the same 52 net changed paths**.
+
+Preservation branches remain independently tested one-commit branches on the matching upstream base selected at Phase 0.5 entry, `7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef`. Classical runtime source remains the frozen entry fork main `aa643d316e9e00fb8622ab60b2fb2cb8b76661ee` plus documentation; it does not silently absorb the later update. The user-created classical branches are reused. Reconcile this newly observed nightly drift on classical only after the next phase is approved. Do not reset, overwrite or try to restore live main to the older audited SHA.
+
+All references below to an unchanged main mean **no main edits by this task**, with source/test baseline SHAs explicitly pinned. They do not claim the live fork main stayed stationary while another upstream merge occurred.
+
+
 **Status: all 16 preservation branches published and independently validated. No PRs opened. Phase 1 not started.**
 
-Matching upstream base: `7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef`. Unchanged fork main: `aa643d316e9e00fb8622ab60b2fb2cb8b76661ee`. Unchanged plugin main: `506e5259e1442b8cfe072a75b129abb428c6bcf7`. The refresh added an upstream-only merge to fork history: **109 fork-only historical commits; 52 net changed paths, +3,130/−181 lines**. All issue branches have exactly one new commit with the matching upstream SHA as their sole parent.
+Matching upstream base: `7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef`. Frozen entry fork-main baseline: `aa643d316e9e00fb8622ab60b2fb2cb8b76661ee`. Unchanged plugin main: `506e5259e1442b8cfe072a75b129abb428c6bcf7`. The refresh added an upstream-only merge to fork history: **109 fork-only historical commits; 52 net changed paths, +3,130/−181 lines**. All issue branches have exactly one new commit with the matching upstream SHA as their sole parent.
 
 [Current matching-base comparison](https://github.com/lklynet/aurral/compare/7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef...Collinlong1:aa643d316e9e00fb8622ab60b2fb2cb8b76661ee). Later observed upstream main `656475b92be36b6834002da2407e7d9d50c2e0c2` is one commit beyond the matching base; no automatic rebase or main sync was performed.
 
@@ -373,9 +382,9 @@ Every path is assigned below, including configuration, CSS, docs and tests. Shar
 | Playlist local cover removed then restored | `aa7f72a`; removal `5866778`; restored `37b670e` | F10 is active, not retired |
 | Pure style/module refactors | `cfa5fe2`, `d74343c`, `7bd66e3`, `afffe95`, `f12f7bb`, `e480efc`, `3bdb4e7`, `538f94f` | Active portions assigned to their owning issue; no unrelated refactor branch |
 
-## Complete 109-commit ledger
+## Complete 110-commit ledger
 
-All original Phase 0 commits plus the upstream-only merge added during refresh are listed, including merges, removals and transient states. This prevents an omission in the net inventory from being confused with lost history. Merge parents are preserved in evidence; merges are not extraction units.
+All original Phase 0 commits plus the two upstream-only refresh merges are listed, including merges, removals and transient states. This prevents an omission in the net inventory from being confused with lost history. Merge parents are preserved in evidence; merges are not extraction units.
 
 | Commit | Parents | Subject | Extraction treatment |
 | --- | --- | --- | --- |
@@ -488,6 +497,7 @@ All original Phase 0 commits plus the upstream-only merge added during refresh a
 | [`e97d3380880e8194fb36e58a9f81d25eefad9cd0`](https://github.com/Collinlong1/aurral/commit/e97d3380880e8194fb36e58a9f81d25eefad9cd0) | 2 | Merge pull request #28 from lklynet/main | Integration history; current conflict adaptations allocated by net paths |
 | [`287ab4b76ca8a9d231b684089d02ddc9d9ea70a2`](https://github.com/Collinlong1/aurral/commit/287ab4b76ca8a9d231b684089d02ddc9d9ea70a2) | 2 | Merge pull request #29 from lklynet/main | Integration history; current conflict adaptations allocated by net paths |
 | [`aa643d316e9e00fb8622ab60b2fb2cb8b76661ee`](https://github.com/Collinlong1/aurral/commit/aa643d316e9e00fb8622ab60b2fb2cb8b76661ee) | 2 | Merge pull request #30 from lklynet/main | Upstream refresh only; no new fork feature |
+| [`c0deb211eba929424b608ca1c2449c7242892d9c`](https://github.com/Collinlong1/aurral/commit/c0deb211eba929424b608ca1c2449c7242892d9c) | 2 | Merge pull request #31 from lklynet/main | External upstream refresh observed at final verification; no new fork feature |
 
 
 ## Unchanged baseline findings
@@ -498,4 +508,4 @@ Its application build, generated DB types, UI CSS and typecheck pass. Its existi
 
 ## Existing classical branches
 
-Reuse was expressly confirmed by the user. Fork classical began at 287ab4b76ca8a9d231b684089d02ddc9d9ea70a2 and is fast-forwarded through the unchanged current-main ancestry, then receives handoff docs. Plugin classical began at 506e5259e1442b8cfe072a75b129abb428c6bcf7 and receives docs only. No branch deletion/reset/force push, main merge, upstream write or PR. Stop for review before Phase 1.
+Reuse was expressly confirmed by the user. Fork classical began at 287ab4b76ca8a9d231b684089d02ddc9d9ea70a2 and is fast-forwarded through the frozen entry-main ancestry, then receives handoff docs. Plugin classical began at 506e5259e1442b8cfe072a75b129abb428c6bcf7 and receives docs only. No branch deletion/reset/force push, main merge, upstream write or PR. Stop for review before Phase 1.

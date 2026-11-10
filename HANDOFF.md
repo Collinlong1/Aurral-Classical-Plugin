@@ -1,5 +1,14 @@
 # Current handoff — Codex / Claude Code
 
+## Final-verification drift correction
+
+Fork main advanced **externally to this task** from `aa643d316e9e00fb8622ab60b2fb2cb8b76661ee` to `c0deb211eba929424b608ca1c2449c7242892d9c` via merge PR #31, bringing upstream `656475b92be36b6834002da2407e7d9d50c2e0c2` (the owned-albums artist-page fix). No agent write or merge targeted main. The live fork now matches upstream `656475b92be36b6834002da2407e7d9d50c2e0c2` with **110 historical fork-only commits and the same 52 net changed paths**.
+
+Preservation branches remain independently tested one-commit branches on the matching upstream base selected at Phase 0.5 entry, `7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef`. Classical runtime source remains the frozen entry fork main `aa643d316e9e00fb8622ab60b2fb2cb8b76661ee` plus documentation; it does not silently absorb the later update. The user-created classical branches are reused. Reconcile this newly observed nightly drift on classical only after the next phase is approved. Do not reset, overwrite or try to restore live main to the older audited SHA.
+
+All references below to an unchanged main mean **no main edits by this task**, with source/test baseline SHAs explicitly pinned. They do not claim the live fork main stayed stationary while another upstream merge occurred.
+
+
 Checkpoint: **Phase 0.5 preservation complete for review; Phase 1 NOT approved or started.** Updated 2026-11-10.
 
 The user approved Phase 0.5, confirmed ownership of the existing aurral-classical branches, and expressly prohibited upstream edits/PR changes. This handoff records that authorization; it does not authorize Phase 1.
@@ -11,8 +20,8 @@ Read PHASE_05_REPORT.md, FORK_FEATURE_INVENTORY.md, PRESERVATION_BRANCHES.json a
 ## Repository/source state
 
 - Upstream matching base: `7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef`. Read-only. Later observed upstream main: `656475b92be36b6834002da2407e7d9d50c2e0c2`, one commit ahead; do not silently update any main or claim latest-nightly testing.
-- User fork main: `aa643d316e9e00fb8622ab60b2fb2cb8b76661ee` — unchanged.
-- Existing user fork classical began at `287ab4b76ca8a9d231b684089d02ddc9d9ea70a2`. Reused, fast-forwarded through the unchanged fork-main ancestry, then handoff docs added. Runtime source equals frozen fork main.
+- User fork main at entry/test baseline: `aa643d316e9e00fb8622ab60b2fb2cb8b76661ee`. Live main later advanced externally to `c0deb211eba929424b608ca1c2449c7242892d9c`; no agent main writes. Do not restore the older ref.
+- Existing user fork classical began at `287ab4b76ca8a9d231b684089d02ddc9d9ea70a2`. Reused, fast-forwarded through the unchanged fork-main ancestry, then handoff docs added. Runtime source equals the frozen entry fork main, not the later externally advanced main.
 - Plugin main/source: `506e5259e1442b8cfe072a75b129abb428c6bcf7` — unchanged. Existing plugin classical reused; documentation only.
 - Sixteen isolated branches exist in Collinlong1/aurral, each one commit directly on the matching upstream base. Exact names/SHAs/files are in PRESERVATION_BRANCHES.json.
 - No PR, upstream write, main merge, deployment, classical implementation or schema change. No branch deletion/reset/force push. No production credentials or server connection.

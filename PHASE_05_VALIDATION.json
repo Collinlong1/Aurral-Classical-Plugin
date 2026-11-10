@@ -1548,5 +1548,17 @@
     }
   },
   "workflow": "actionlint 1.7.12 passed; GitHub workflow run 42840423363 skipped; no publishing enabled",
-  "scope": "No PR, upstream write, main write, deployment, production credentials or server access. No classical implementation or schema changes."
+  "scope": "No PR, upstream write, main write, deployment, production credentials or server access. No classical implementation or schema changes.",
+  "external_main_drift": {
+    "entry_main": "aa643d316e9e00fb8622ab60b2fb2cb8b76661ee",
+    "final_observed_main": "c0deb211eba929424b608ca1c2449c7242892d9c",
+    "upstream_commit": "656475b92be36b6834002da2407e7d9d50c2e0c2",
+    "cause": "Merge PR #31 external to task",
+    "matching_base_at_entry": "7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef",
+    "final_live_matching_base": "656475b92be36b6834002da2407e7d9d50c2e0c2",
+    "final_live_net_changed_paths": 52,
+    "final_live_unique_commits": 110,
+    "agent_main_writes": false,
+    "classical_runtime_source": "aa643d316e9e00fb8622ab60b2fb2cb8b76661ee"
+  }
 }

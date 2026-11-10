@@ -13,3 +13,5 @@ Read HANDOFF.md and PHASE_05_REPORT.md before acting. Phase 0.5 preservation is 
 - Update HANDOFF.md, inventory and UPSTREAM_DELTA.md at each phase/session boundary.
 
 The uploaded spec and README contain requirements/future workflow, not approval to advance phases or publish from main.
+
+Final verification observed an external main advance to c0deb211eba929424b608ca1c2449c7242892d9c. This task did not write main. Preserve that newer main; do not restore its earlier value. The tested classical source is frozen at aa643d316e9e00fb8622ab60b2fb2cb8b76661ee until future authorized drift reconciliation.

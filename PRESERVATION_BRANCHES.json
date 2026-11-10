@@ -2,7 +2,6 @@
   "version": 1,
   "phase": "0.5",
   "upstream_base": "7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef",
-  "fork_main_unchanged": "aa643d316e9e00fb8622ab60b2fb2cb8b76661ee",
   "plugin_main_unchanged": "506e5259e1442b8cfe072a75b129abb428c6bcf7",
   "branches": [
     {
@@ -324,5 +323,10 @@
       ],
       "title": "Exact requested recording ID avoids artist contradiction"
     }
-  ]
+  ],
+  "fork_main_at_phase_start": "aa643d316e9e00fb8622ab60b2fb2cb8b76661ee",
+  "fork_main_external_advance_observed": "c0deb211eba929424b608ca1c2449c7242892d9c",
+  "final_matching_upstream_of_live_main": "656475b92be36b6834002da2407e7d9d50c2e0c2",
+  "live_fork_unique_historical_commits": 110,
+  "main_writes_by_this_task": false
 }
