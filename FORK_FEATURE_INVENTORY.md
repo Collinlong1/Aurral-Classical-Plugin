@@ -509,3 +509,9 @@ Its application build, generated DB types, UI CSS and typecheck pass. Its existi
 ## Existing classical branches
 
 Reuse was expressly confirmed by the user. Fork classical began at 287ab4b76ca8a9d231b684089d02ddc9d9ea70a2 and is fast-forwarded through the frozen entry-main ancestry, then receives handoff docs. Plugin classical began at 506e5259e1442b8cfe072a75b129abb428c6bcf7 and receives docs only. No branch deletion/reset/force push, main merge, upstream write or PR. Stop for review before Phase 1.
+# Phase 1 inventory addendum — November 10, 2026
+
+User authorized Phase 1 and fork-only PRs targeting aurral-classical. Read PHASE_1_REPORT.md and HANDOFF.md for current implementation, files, tests and source state. The Phase 0/0.5 inventory below is historical preservation evidence.
+
+External merges advanced core main to 3739443a and classical to 1b3c1c00; the agent preserved these changes on the review branch and did not write main. Matching upstream is now 021b1f03. Live main still has the same 52 net changed paths (+3130/-181), now 111 historical fork-only commits. All 16 preservation branches remain unchanged on 7afcb7cb. New Phase 1 hooks/fixes are separate from F01–F16 and are documented as D02/D03/D06/D07 in central UPSTREAM_DELTA.md. No upstream PR was opened.
+

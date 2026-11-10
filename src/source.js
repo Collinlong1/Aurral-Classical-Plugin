@@ -247,11 +247,12 @@ export async function classicalInfo(ctx, recordingId, { albumArtistIds = [], rel
   const movement = fields.workId ? await ctx.mb.get("work", fields.workId, "artist-rels+work-rels") : null;
   const work = movement ? await topWork(ctx.mb, movement) : null;
   const people = fields.people;
-  const performer = people.conductors[0] || people.soloists[0] || people.ensembles[0] || null;
+  const performer = people.soloists[0] || people.conductors[0] || people.ensembles[0] || null;
   return {
     fields,
     composer: people.composers[0] || null,
     performer,
+    ensemble: people.ensembles[0] || null,
     workTitle: work?.title || fields.work || "",
     movementTitle: fields.work || "",
   };
@@ -262,19 +263,21 @@ export async function classicalInfo(ctx, recordingId, { albumArtistIds = [], rel
 // For an album, its title comes first: an album of several works is
 // shared as one folder named after the album, not after its first work.
 export function searchQueries(info, { albumTitle = "", album = false } = {}) {
+  if (!info.performer) return [];
   const composer = surname(info.composer);
   const performer = surname(info.performer);
+  const ensemble = info.performer === info.ensemble ? "" : surname(info.ensemble);
   const work = shortWorkTitle(info.workTitle);
   const catalogue = catalogueNumber(info.workTitle) || catalogueNumber(info.movementTitle);
   const title = searchWords(albumTitle);
   const byWork = [
-    [composer, work, catalogue, performer],
-    [composer, catalogue, performer],
-    [composer, work, performer],
+    [performer, ensemble, composer, work, catalogue],
+    [performer, ensemble, composer, catalogue],
+    [performer, ensemble, composer, work],
   ];
   const byAlbum = [
-    [composer, title, performer],
-    [composer, title],
+    [performer, ensemble, composer, title],
+    [performer, ensemble, title],
   ];
   // A track is often shared inside a folder named after its album, so the
   // album search comes second, inside the time a search call has.
@@ -288,6 +291,20 @@ export function searchQueries(info, { albumTitle = "", album = false } = {}) {
     queries.push(query);
   }
   return queries;
+}
+
+export function performerMatches(folder, info) {
+  const wanted = searchWords(surname(info.performer)).toLowerCase().split(/\s+/).filter(Boolean);
+  if (!wanted.length) return false;
+  const haystack = ` ${searchWords([folder.directory, ...folder.files.map((file) => file.filename)].join(" ")).toLowerCase()} `;
+  return wanted.every((word) => haystack.includes(` ${word} `));
+}
+
+export async function acquisitionIdentity(ctx, track) {
+  const info = await classicalInfo(ctx, track.trackMbid);
+  if (!info) return null;
+  if (!info.performer) return { blocked: true };
+  return { artist: [info.performer.name, info.performer !== info.ensemble && info.ensemble?.name].filter(Boolean).join(" "), aliases: [], requiredTerms: [surname(info.performer)] };
 }
 
 // Runs the searches one at a time (slskd runs one search at a time), most
@@ -350,7 +367,7 @@ export async function searchTrack(ctx, track) {
   if (!info) return [];
   const slskd = slskdFor(ctx);
   const queries = searchQueries(info, { albumTitle: release.title });
-  const folders = await searchFolders(ctx, slskd, queries, (found) => trackCandidates(found, release, discPosition, index).length > 0, started);
+  const folders = (await searchFolders(ctx, slskd, queries, (found) => trackCandidates(found.filter((f) => performerMatches(f, info)), release, discPosition, index).length > 0, started)).filter((f) => performerMatches(f, info));
   const target = release.discs.find((d) => d.position === discPosition).tracks[index];
   ctx.log(`Release ${release.id}: ${describeMisses(folders, release, { anyEdition: true })}`);
   const seen = new Set();
@@ -387,7 +404,7 @@ export async function searchAlbum(ctx, album) {
   if (!info) return [];
   const slskd = slskdFor(ctx);
   const queries = searchQueries(info, { albumTitle: release.title, album: true });
-  const folders = await searchFolders(ctx, slskd, queries, (found) => albumCandidates(found, release).length > 0, started);
+  const folders = (await searchFolders(ctx, slskd, queries, (found) => albumCandidates(found.filter((f) => performerMatches(f, info)), release).length > 0, started)).filter((f) => performerMatches(f, info));
   ctx.log(`Release ${release.id}: ${describeMisses(folders, release)}`);
   return albumCandidates(folders, release)
     .slice(0, MAX_RESULTS)

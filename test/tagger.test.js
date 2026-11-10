@@ -2,9 +2,9 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { afterEach, beforeEach, test } from "node:test";
-import { File, TagTypes } from "node-taglib-sharp";
+import { File, TagTypes, Id3v2UserTextInformationFrame } from "node-taglib-sharp";
 import plugin, { makeContext } from "../src/index.js";
-import { readTags } from "../src/tags.js";
+import { readTags, readValues, writeTags } from "../src/tags.js";
 import { enqueue, readProcessed, runQueue, withTagging } from "../src/tagger.js";
 import { baseSettings, copyFixture, EXPECTED_ARTIST, fakeFetch, RECORDING, symphonyEntities, tempFolders, waitFor } from "./helpers.js";
 
@@ -23,6 +23,46 @@ afterEach(async () => {
 });
 
 const input = (extra = {}) => ({ settings: baseSettings, libraryFolder: folders.libraryFolder, dataFolder: folders.dataFolder, ...extra });
+
+test("enabling the plugin without file-write opt-in never tags existing media", async () => {
+  const file = await copyFixture("sine.flac", path.join(folders.libraryFolder, "readonly-default.flac"));
+  const before = await fs.readFile(file);
+  const settings = { mbMirror: baseSettings.mbMirror };
+  await plugin.events["download.finished"](input({ settings, track: { path: file } }));
+  await plugin.scheduled(input({ settings }));
+  assert.deepEqual(await fs.readFile(file), before);
+});
+
+test("clear removes duplicate native ID3 work frames, including an empty leading frame", async () => {
+  const file = await copyFixture("sine.mp3", path.join(folders.libraryFolder, "duplicates.mp3"));
+  const audio = File.createFromPath(file);
+  const id3 = audio.getTag(TagTypes.Id3v2, true);
+  for (const value of ["", ...Array.from({length:7},(_,i) => `Work ${i}`)]) {
+    const frame = Id3v2UserTextInformationFrame.fromDescription("WORK"); frame.text = [value]; id3.addFrame(frame);
+  }
+  audio.save(); audio.dispose();
+  await plugin.actions["clear-classical"](input({ user:{id:1,role:"admin"}, album:{title:"Duplicate",tracks:[{path:file}]} }));
+  assert.deepEqual(readValues(file,["work"]).work,[]);
+});
+
+test("a failed atomic replacement preserves original audio and the persisted backup", async () => {
+  const file = await copyFixture("sine.flac", path.join(folders.libraryFolder,"failure.flac"));
+  const album = {title:"Failure",tracks:[{path:file}]};
+  await plugin.actions["tag-album"](input({user:{id:1,role:"admin"},album}));
+  const before = await fs.readFile(file);
+  const backup = await fs.readFile(path.join(folders.dataFolder,"originals.json"));
+  const rename = fs.rename;
+  fs.rename = async (source, target) => {
+    if (String(source).endsWith(".tagging")) throw Object.assign(new Error("Read-only fixture"),{code:"EROFS"});
+    return rename(source,target);
+  };
+  try {
+    const result = await plugin.actions["untag-album"](input({user:{id:1,role:"admin"},album}));
+    assert.match(result.message,/1 skipped/);
+  } finally { fs.rename = rename; }
+  assert.deepEqual(await fs.readFile(file),before);
+  assert.deepEqual(await fs.readFile(path.join(folders.dataFolder,"originals.json")),backup);
+});
 
 function otherTags(file) {
   const f = File.createFromPath(file);
@@ -172,6 +212,35 @@ const tagsOf = (file) => {
   return { artist: t.artist, composer: t.composer, work: t.work, workId: t.workId, recording: t.recordingMbid, title: t.title };
 };
 
+for (const ext of ["flac", "mp3", "m4a", "opus"]) {
+  test(`restore preserves seven original classical values in ${ext}`, async () => {
+    const file = await copyFixture(`sine.${ext}`, path.join(folders.libraryFolder, `restore.${ext}`));
+    const values = Array.from({ length: 7 }, (_, i) => `Original ${i + 1}`);
+    const original = { composer: values, work: values, workId: values };
+    await writeTags(file, original);
+    const album = { title: "Restore", tracks: [{ path: file }] };
+    await plugin.actions["tag-album"](input({ user: { id: 1, role: "admin" }, album }));
+    const result = await plugin.actions["untag-album"](input({ user: { id: 1, role: "admin" }, album }));
+    assert.match(result.message, /1 restored/);
+    assert.deepEqual(readValues(file, Object.keys(original)), original);
+  });
+
+  test(`no-backup removal clears every one of seven classical values in ${ext}`, async () => {
+    const file = await copyFixture(`sine.${ext}`, path.join(folders.libraryFolder, `seven.${ext}`));
+    const values = Array.from({ length: 7 }, (_, i) => `Value ${i + 1}`);
+    await writeTags(file, { composer: values, work: values, workId: values });
+    const unrelated = otherTags(file);
+    const recording = readTags(file).recordingMbid;
+    const result = await plugin.actions["untag-album"](input({ user: { id: 1, role: "admin" }, album: { title: "Seven", tracks: [{ path: file }] } }));
+    assert.match(result.message, /1 cleared/);
+    assert.deepEqual(readValues(file, ["composer", "work", "workId"]), { composer: [], work: [], workId: [] });
+    assert.deepEqual(otherTags(file), unrelated);
+    assert.equal(readTags(file).recordingMbid, recording);
+    await plugin.scheduled(input());
+    assert.deepEqual(readValues(file, ["composer", "work", "workId"]), { composer: [], work: [], workId: [] });
+  });
+}
+
 for (const ext of ["flac", "mp3", "m4a"]) {
   test(`Remove classical tags restores a ${ext} exactly, and it stays untagged`, async () => {
     const file = await copyFixture(`sine.${ext}`, path.join(folders.libraryFolder, "album", `01.${ext}`));
@@ -209,7 +278,7 @@ test("files tagged before backups get MusicBrainz's credit for the track back", 
   f.save();
   f.dispose();
   const result = await plugin.actions["untag-album"](input({ user: { id: 1, role: "admin" }, album: { title: "Old", tracks: [{ path: file }] } }));
-  assert.match(result.message, /1 restored/);
+  assert.match(result.message, /1 cleared/);
   assert.equal(readTags(file).artist, "Berliner Philharmoniker, Herbert von Karajan");
 });
 

@@ -1,6 +1,6 @@
 # Schema draft — classical data version 1 (proposal only)
 
-Status update: Phase 0.5 preservation completed; this remains a proposal, with no classical implementation or migration. Phase 1 approval is pending. Existing-plugin test runtime validation now includes Node 26.12.0; standalone plugin SQLite volume/concurrency/migration validation remains pending; see PHASE_05_REPORT.md for exact results and remaining baseline issues.
+Status update: Phase 1 fixes and generic integration are implemented; see PHASE_1_REPORT.md. This Phase 2 schema remains a proposal with no migrations or classical tables. Plugin SQLite volume/concurrency/migration validation belongs to the next approved phase. Phase 2 is not authorized yet.
 
 No SQL or migrations executed. All tables below belong in the plugin's independent SQLite database. UUIDs are plugin-generated and never derived from provider IDs, titles, filenames or Aurral IDs. Every mutable row has `revision`, `created_at`, `updated_at`; deletions use tombstones where history/links matter. Time is UTC milliseconds. Date metadata uses partial ISO text plus precision, not invented January 1 dates.
 

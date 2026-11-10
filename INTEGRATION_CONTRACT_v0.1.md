@@ -60,3 +60,24 @@ Identification begins only after admin action; enabling reads and advertises cap
 ## Compatibility acceptance
 
 Test current stock with no hooks (honest missing UI), fork with each capability separately off, fork with complete hooks, old API-1 plugin under new host, plugin absent/disabled/crashed, and weekly latest-upstream drift. Use two users plus admin, synthetic mixed library and provider fixtures. Negative tests include forged user IDs/tokens, wrong playlist owner, revoked permissions, unsafe local ref, invalid segment and stale revision. Native playback/non-classical ranking must remain unchanged when plugin returns no opinion.
+# Implemented Phase 1 contract — user-operations v1 / acquisition-identity v1
+
+This section supersedes draft status only for the following interfaces. API manifest version remains 1; later sections describe future v0.1 design.
+
+Action manifest localPlaylists:true opts into action input userOperations:{version:1,url,token}. Missing input means unsupported; never guess URLs or fall back to the broad admin key. Disabled action capabilities disappear from the host action menu. Grant errors return 401/403 and create no playlist. Tokens bind plugin/action/user/30-minute expiry, are never browser session cookies, and can only access the plugin's three local-operation routes. Requests require X-Action-Grant. Existing API-1 plugins without the opt-in are unchanged.
+
+- GET URL/library returns {version:1,complete:true,library:{artists,albums,tracks}} with all available indexed files and optional mapped readPath. Incomplete or unreadable evidence cancels comparison; no deletions/reconciliation are inferred.
+- POST URL/playlists accepts {key,name,tracks:[{path,artistName?,trackName?}]}. Owner and playlist ID are host-derived; paths must resolve to permitted available indexed files. It enqueues a local-only upsert and returns {queued:true,operationId,playlistId}. Stable ID is scoped by plugin/user/key. Existing DB queue records persist the grant, and execution rechecks current user/action/capability/expiry/ownership. Expired/revoked grants fail terminally.
+- GET URL/jobs/ID returns own operation {state,error}. The plugin waits for done or reports failed/cancelled/pending explicitly. HTTP enqueue alone is never reported as completion.
+
+Acquisition manifest downloadSource.acquisitionIdentity:true adds an independently switchable acquisitionIdentity capability under the existing enabled download source. Host calls downloadSource.acquisitionIdentity with track input before native Soulseek queries regardless of source priority. Return null for no opinion, {blocked:true} for known unresolved identity, or {artist,aliases,requiredTerms?}. Required terms are bounded strings, matched as normalized words in native result paths. Identity persists with search attempts, does not rewrite display artist, and does not bypass existing duration/quality/integrity checks. Provider errors hold acquisition; playback is independent. Disabled/absent hooks use stock behavior.
+
+| Host | Phase 1 tag/source | User-owned local compare | Later editor/work/grouping/segments |
+| --- | --- | --- | --- |
+| Frozen stock API-1 | Existing actions/source; background media writes opt-in | Unsupported; explanatory error, no admin-owned fallback | Unavailable |
+| Fork before Phase 1 | Same | Unsupported | Unavailable |
+| Fork with Phase 1 review | Clear/restore/preview and performer queries | Supported for real admin/regular accounts; accessPlaylists required, acquisition permission unnecessary | Unavailable; future phases |
+| Phase 1 fork, plugin disabled/no opinion | Stock playback/queries | Hidden/denied | Unavailable |
+
+No SQL schema migration. No service/iframe/player replacement. No claim of the later full native-ref, view, cursor, optimistic revision or classical model interfaces yet.
+

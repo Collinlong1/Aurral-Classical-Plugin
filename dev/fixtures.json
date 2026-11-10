@@ -1,0 +1,14 @@
+[
+  {"id":"etude-set","tracks":3,"work":"etude","collection":true},
+  {"id":"sonata","tracks":3,"work":"sonata"},
+  {"id":"symphony-cycle","tracks":4,"work":"symphony"},
+  {"id":"concerto","tracks":3,"work":"concerto","performer":"Daniil Trifonov","composer":"Franz Liszt"},
+  {"id":"multiple-recordings","tracks":5,"work":"sonata","sameMovement":true},
+  {"id":"same-recording-other-release","tracks":1,"work":"sonata","recording":"recording-multiple-recordings-1","sameMovement":true},
+  {"id":"broadcast","tracks":1,"work":"broadcast","noRecordingId":true},
+  {"id":"incomplete-work","tracks":2,"work":"incomplete","missingMovement":2},
+  {"id":"attacca","tracks":1,"work":"attacca","segments":[[0,0.1],[0.1,0.2]]},
+  {"id":"multivalue-performers","tracks":1,"work":"multivalue","sevenValues":true},
+  {"id":"non-classical","tracks":2,"classical":false},
+  {"id":"crossover","tracks":2,"mixed":true}
+]

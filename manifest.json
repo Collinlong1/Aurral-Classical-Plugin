@@ -13,6 +13,12 @@
   ],
   "settings": [
     {
+      "key": "enableFileWrites",
+      "label": "Enable background file tagging",
+      "type": "boolean",
+      "help": "Off by default. Enable only after reviewing a synthetic or local dry run. Explicit admin tag/remove actions still write selected files."
+    },
+    {
       "key": "mbMirror",
       "label": "MusicBrainz mirror",
       "type": "text",
@@ -48,14 +54,16 @@
       "help": "Goes between the names in the artist tag. Default: —"
     },
     {
-      "key": "compareCount",
-      "label": "Recordings to compare",
-      "type": "number",
-      "help": "How many recordings Compare recordings puts in a playlist. Default 10, at most 25."
+      "key": "comparisonScope",
+      "label": "Comparison scope",
+      "type": "text",
+      "help": "Compare includes every owned recording with explicit work identity. Remote acquisition is separate."
     }
   ],
   "test": true,
   "actions": [
+    {"id":"preview-remove","label":"Preview classical tag removal","target":"album","admin":true},
+    {"id":"clear-classical","label":"Clear classical fields (keep backup)","target":"album","admin":true,"background":true},
     {
       "id": "tag-artist",
       "label": "Tag as classical",
@@ -72,19 +80,21 @@
     },
     {
       "id": "untag-album",
-      "label": "Remove classical tags",
+      "label": "Restore original classical tags",
       "target": "album",
       "admin": true,
       "background": true
     },
     {
       "id": "compare-track",
+      "localPlaylists": true,
       "label": "Compare recordings",
       "target": "track",
       "background": true
     },
     {
       "id": "compare-album",
+      "localPlaylists": true,
       "label": "Compare recordings",
       "target": "album",
       "background": true
@@ -94,6 +104,7 @@
     "download.finished"
   ],
   "downloadSource": {
+    "acquisitionIdentity": true,
     "albums": true
   },
   "importList": null,

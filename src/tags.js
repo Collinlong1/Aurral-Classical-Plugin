@@ -57,7 +57,7 @@ function textField(xiphName, id3Description, apple) {
       const appleTag = appleOf(file);
       for (const values of [
         xiph?.getField(xiphName),
-        id3 && userTextFrames(id3, id3Description)[0]?.text,
+        id3 && userTextFrames(id3, id3Description).flatMap((frame) => frame.text || []),
         appleTag && (box ? appleTag.getQuickTimeStrings(box) : appleTag.getItunesStrings(ITUNES_MEAN, apple.name)),
       ]) {
         const found = texts(values ?? []);
@@ -232,6 +232,15 @@ export async function writeTags(filePath, values) {
       file.save();
     } finally {
       file.dispose();
+    }
+    const verified = openFile(working, READ_STYLE, source);
+    try {
+      for (const field of changed) {
+        if (!same(WRITERS[field].read(verified), texts(values[field])))
+          throw new Error(`Tag verification failed for ${field}`);
+      }
+    } finally {
+      verified.dispose();
     }
     await fs.rename(working, source);
   } catch (error) {
