@@ -2,6 +2,10 @@
 
 ## Final local validation
 
+Final observed implementation CI is **green**: core run 42881762781 passed checks/docs, both unit shards, full integration tests, production-container build/smoke and validate; Perf passed. Plugin CI passed on Node22/24/26; disposable Compose integration run 42881393448 passed. Follow-up handoff commits only change documentation and can trigger repeat CI; they do not alter the verified runtime.
+
+GitHub disposable Compose CI run 42881393448 passed, including synthetic library setup and admin/two-user playback before and after restart. Plugin Node22/24/26 CI passed. Core workflow fixes are validated by rerun 42881762781; its live status is separate from the successful local checks.
+
 Published reviews: core PR36 https://github.com/Collinlong1/aurral/pull/36 and plugin PR6 https://github.com/Collinlong1/Aurral-Classical-Plugin/pull/6. Both target the user's aurral-classical branch and remain unmerged.
 
 Remote CI initially passed core unit/integration/Perf and plugin Node22/24/26 tests/bundle checks. Core CI encountered inherited workflow failures: Dependency Review unsupported without this fork's Dependency Graph, and uppercase ghcr.io/Collinlong1 image tag. The core PR includes a dependency-change gate and lowercase image normalization; no test failures are hidden and no continue-on-error added. The disposable Compose CI run started; consult live PR checks for its conclusion. These workflow fixes do not change runtime source pinned by the plugin CI.

@@ -1,4 +1,6 @@
-# Upstream Delta — draft for v0.1 Foundation
+# Upstream Delta — Phase 1 implementation and later proposals
+
+Current implementation: D02/D03 and the Phase 1 portions of D06/D07 are implemented in core PR36; plugin PR6 consumes them. See the Phase 1 implementation addendum at the end and PHASE_1_REPORT.md for files/tests/contract. The audit baseline and draft table below are historical planning; their no-implementation wording is superseded by that addendum. D01/D04/D05 remain proposals. No upstream PR exists.
 
 Audit baseline: upstream `7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef`; fork `aa643d316e9e00fb8622ab60b2fb2cb8b76661ee`; plugin `506e5259e1442b8cfe072a75b129abb428c6bcf7`.
 

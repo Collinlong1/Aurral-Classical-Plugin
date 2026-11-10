@@ -1,4 +1,6 @@
-# Proposed integration contract — `aurral.plugin-integration/0.1.0`
+# Integration contract — implemented Phase 1 and future v0.1 design
+
+Current APIs and compatibility are defined in the Implemented Phase 1 contract section at the end: user-operations v1 and acquisition-identity v1. Core PR36 and plugin PR6 implement only those portions. Earlier sections below are historical proposals; views, model, grouping and segment APIs are not implemented.
 
 Status update: Phase 0.5 preservation completed; this remains a proposal, with no classical implementation or migration. Phase 1 approval is pending. Runtime validation now includes Node 26.12.0; see PHASE_05_REPORT.md for exact results and remaining baseline issues.
 

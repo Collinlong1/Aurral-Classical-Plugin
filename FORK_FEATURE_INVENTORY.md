@@ -1,5 +1,7 @@
 # Fork feature inventory — Phase 0.5 execution record
 
+Current status: Phase 1 is implemented in fork-only core PR36 and plugin PR6, targeting aurral-classical. Read PHASE_1_REPORT.md and the Phase 1 inventory addendum at the end for current source/test state. The Phase 0.5 records below are preserved historical evidence; the 16 preservation branches are unchanged. Live main's matching upstream advanced externally to 021b1f03, with the same 52 net paths and 111 historical fork-only commits.
+
 ## Final-verification drift correction
 
 Fork main advanced **externally to this task** from `aa643d316e9e00fb8622ab60b2fb2cb8b76661ee` to `c0deb211eba929424b608ca1c2449c7242892d9c` via merge PR #31, bringing upstream `656475b92be36b6834002da2407e7d9d50c2e0c2` (the owned-albums artist-page fix). No agent write or merge targeted main. The live fork now matches upstream `656475b92be36b6834002da2407e7d9d50c2e0c2` with **110 historical fork-only commits and the same 52 net changed paths**.
