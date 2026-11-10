@@ -1,0 +1,1552 @@
+{
+  "version": 1,
+  "runtime": {
+    "node": "26.12.0",
+    "pnpm": "12.15.0"
+  },
+  "upstream_unit": {
+    "files_passed": 402,
+    "tests_passed": 2717
+  },
+  "fork_unit_full_run": {
+    "files_passed": 404,
+    "files_failed": 1,
+    "tests_passed": 2743,
+    "tests_failed": 1,
+    "reason": "deadline-sensitive unchanged slskd-client test timed out under concurrent build load"
+  },
+  "fork_failed_file_rerun": {
+    "file": ".tests/download/slskd-client.test.ts",
+    "tests_passed": 28,
+    "tests_failed": 0
+  },
+  "plugin_node26": {
+    "tests_passed": 124,
+    "tests_failed": 0
+  },
+  "fork_baseline_checks": {
+    "lint": {
+      "exit": 1,
+      "seconds": 10.33
+    },
+    "ui-css": {
+      "exit": 0,
+      "seconds": 0.25
+    },
+    "db-types": {
+      "exit": 0,
+      "seconds": 0.14
+    },
+    "typecheck": {
+      "exit": 0,
+      "seconds": 17.37
+    },
+    "lint-any": {
+      "exit": 1,
+      "seconds": 16.2
+    },
+    "build": {
+      "exit": 0,
+      "seconds": 4.52
+    }
+  },
+  "isolated_focused_tests_passed": 149,
+  "branches": {
+    "F01": {
+      "checks": {
+        "format": {
+          "exit": 0,
+          "seconds": 0.5,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "fmt",
+            ".github/workflows/fork-image.yml"
+          ]
+        },
+        "lint": {
+          "exit": 0,
+          "seconds": 22.78,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "check"
+          ]
+        },
+        "ui-css": {
+          "exit": 0,
+          "seconds": 0.5,
+          "command": [
+            "node",
+            "frontend/scripts/lint-ui-css.mts"
+          ]
+        },
+        "db-types": {
+          "exit": 0,
+          "seconds": 0.26,
+          "command": [
+            "node",
+            "scripts/db-types.mts",
+            "--check"
+          ]
+        },
+        "typecheck": {
+          "exit": 0,
+          "seconds": 40.26,
+          "command": [
+            "node",
+            "scripts/typecheck.mts"
+          ]
+        },
+        "lint-any": {
+          "exit": 0,
+          "seconds": 31.41,
+          "command": [
+            "node",
+            "scripts/lint-any.mts"
+          ]
+        }
+      },
+      "extra": {
+        "build": {
+          "exit": 0,
+          "seconds": 12.79,
+          "command": [
+            "pnpm",
+            "run",
+            "build"
+          ]
+        },
+        "docs-build": {
+          "exit": 0,
+          "seconds": 38.99,
+          "command": [
+            "pnpm",
+            "run",
+            "docs:build"
+          ]
+        }
+      }
+    },
+    "F02": {
+      "checks": {
+        "format": {
+          "exit": 0,
+          "seconds": 0.52,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "fmt",
+            ".tests/frontend/active-downloads.test.ts",
+            "frontend/src/hooks/useActiveDownloads.ts",
+            "frontend/src/pages/library/useLibraryActions.tsx",
+            "frontend/src/utils/activeDownloads.ts"
+          ]
+        },
+        "lint": {
+          "exit": 0,
+          "seconds": 21.26,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "check"
+          ]
+        },
+        "ui-css": {
+          "exit": 0,
+          "seconds": 0.52,
+          "command": [
+            "node",
+            "frontend/scripts/lint-ui-css.mts"
+          ]
+        },
+        "db-types": {
+          "exit": 0,
+          "seconds": 0.3,
+          "command": [
+            "node",
+            "scripts/db-types.mts",
+            "--check"
+          ]
+        },
+        "typecheck": {
+          "exit": 0,
+          "seconds": 29.88,
+          "command": [
+            "node",
+            "scripts/typecheck.mts"
+          ]
+        },
+        "lint-any": {
+          "exit": 0,
+          "seconds": 35.52,
+          "command": [
+            "node",
+            "scripts/lint-any.mts"
+          ]
+        },
+        "tests": {
+          "exit": 0,
+          "seconds": 2.21,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "test",
+            "run",
+            "--project",
+            "unit",
+            ".tests/frontend/active-downloads.test.ts"
+          ]
+        },
+        "build": {
+          "exit": 0,
+          "seconds": 10.83,
+          "command": [
+            "pnpm",
+            "run",
+            "build"
+          ]
+        }
+      },
+      "extra": {
+        "docs-build": {
+          "exit": 0,
+          "seconds": 40.19,
+          "command": [
+            "pnpm",
+            "run",
+            "docs:build"
+          ]
+        }
+      }
+    },
+    "F03": {
+      "checks": {
+        "format": {
+          "exit": 0,
+          "seconds": 0.82,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "fmt",
+            "frontend/src/index.css",
+            "frontend/src/utils/pagination.ts",
+            ".tests/frontend/pagination.test.ts",
+            "frontend/src/components/Pagination.tsx",
+            "frontend/src/components/Pagination.css",
+            "frontend/src/pages/LibraryPage.tsx"
+          ]
+        },
+        "lint": {
+          "exit": 0,
+          "seconds": 27.18,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "check"
+          ]
+        },
+        "ui-css": {
+          "exit": 0,
+          "seconds": 0.7,
+          "command": [
+            "node",
+            "frontend/scripts/lint-ui-css.mts"
+          ]
+        },
+        "db-types": {
+          "exit": 0,
+          "seconds": 0.29,
+          "command": [
+            "node",
+            "scripts/db-types.mts",
+            "--check"
+          ]
+        },
+        "typecheck": {
+          "exit": 0,
+          "seconds": 26.5,
+          "command": [
+            "node",
+            "scripts/typecheck.mts"
+          ]
+        },
+        "lint-any": {
+          "exit": 0,
+          "seconds": 23.02,
+          "command": [
+            "node",
+            "scripts/lint-any.mts"
+          ]
+        },
+        "tests": {
+          "exit": 0,
+          "seconds": 2.27,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "test",
+            "run",
+            "--project",
+            "unit",
+            ".tests/frontend/pagination.test.ts"
+          ]
+        },
+        "build": {
+          "exit": 0,
+          "seconds": 10.92,
+          "command": [
+            "pnpm",
+            "run",
+            "build"
+          ]
+        }
+      },
+      "extra": {
+        "docs-build": {
+          "exit": 0,
+          "seconds": 13.99,
+          "command": [
+            "pnpm",
+            "run",
+            "docs:build"
+          ]
+        }
+      }
+    },
+    "F04": {
+      "checks": {
+        "format": {
+          "exit": 0,
+          "seconds": 0.74,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "fmt",
+            "frontend/src/navigation/routePrefetch.ts",
+            "frontend/src/pages/libraryViewQuery.ts",
+            ".tests/frontend/pagination.test.ts",
+            "frontend/src/pages/LibraryPage.tsx"
+          ]
+        },
+        "lint": {
+          "exit": 0,
+          "seconds": 27.13,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "check"
+          ]
+        },
+        "ui-css": {
+          "exit": 0,
+          "seconds": 0.68,
+          "command": [
+            "node",
+            "frontend/scripts/lint-ui-css.mts"
+          ]
+        },
+        "db-types": {
+          "exit": 0,
+          "seconds": 0.39,
+          "command": [
+            "node",
+            "scripts/db-types.mts",
+            "--check"
+          ]
+        },
+        "typecheck": {
+          "exit": 0,
+          "seconds": 30.98,
+          "command": [
+            "node",
+            "scripts/typecheck.mts"
+          ]
+        },
+        "lint-any": {
+          "exit": 0,
+          "seconds": 28.85,
+          "command": [
+            "node",
+            "scripts/lint-any.mts"
+          ]
+        },
+        "tests": {
+          "exit": 0,
+          "seconds": 1.85,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "test",
+            "run",
+            "--project",
+            "unit",
+            ".tests/frontend/pagination.test.ts"
+          ]
+        },
+        "build": {
+          "exit": 0,
+          "seconds": 7.83,
+          "command": [
+            "pnpm",
+            "run",
+            "build"
+          ]
+        }
+      },
+      "extra": {
+        "docs-build": {
+          "exit": 0,
+          "seconds": 13.61,
+          "command": [
+            "pnpm",
+            "run",
+            "docs:build"
+          ]
+        }
+      }
+    },
+    "F05": {
+      "checks": {
+        "format": {
+          "exit": 0,
+          "seconds": 0.87,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "fmt",
+            ".tests/library/media-query.test.ts",
+            ".tests/library/track-album-context.test.ts",
+            "backend/services/libraryQueryService.ts",
+            "backend/services/libraryTrackRequests.ts"
+          ]
+        },
+        "lint": {
+          "exit": 0,
+          "seconds": 22.3,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "check"
+          ]
+        },
+        "ui-css": {
+          "exit": 0,
+          "seconds": 0.44,
+          "command": [
+            "node",
+            "frontend/scripts/lint-ui-css.mts"
+          ]
+        },
+        "db-types": {
+          "exit": 0,
+          "seconds": 0.28,
+          "command": [
+            "node",
+            "scripts/db-types.mts",
+            "--check"
+          ]
+        },
+        "typecheck": {
+          "exit": 0,
+          "seconds": 36.17,
+          "command": [
+            "node",
+            "scripts/typecheck.mts"
+          ]
+        },
+        "lint-any": {
+          "exit": 0,
+          "seconds": 27.58,
+          "command": [
+            "node",
+            "scripts/lint-any.mts"
+          ]
+        },
+        "tests": {
+          "exit": 0,
+          "seconds": 8.74,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "test",
+            "run",
+            "--project",
+            "unit",
+            ".tests/library/media-query.test.ts",
+            ".tests/library/track-album-context.test.ts"
+          ]
+        }
+      },
+      "extra": {
+        "build": {
+          "exit": 0,
+          "seconds": 10.11,
+          "command": [
+            "pnpm",
+            "run",
+            "build"
+          ]
+        },
+        "docs-build": {
+          "exit": 0,
+          "seconds": 18.63,
+          "command": [
+            "pnpm",
+            "run",
+            "docs:build"
+          ]
+        }
+      }
+    },
+    "F06": {
+      "checks": {
+        "format": {
+          "exit": 0,
+          "seconds": 0.69,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "fmt",
+            ".tests/frontend/activity-missing.test.ts",
+            ".tests/library/aurral-wanted-monitoring.test.ts",
+            "backend/services/downloadJobs/downloadTracker.ts",
+            "frontend/src/pages/activity/activityMissingUtils.ts",
+            "backend/services/downloadJobs/downloadWorker.ts",
+            "frontend/src/pages/activity/ActivityMissingPage.tsx",
+            "backend/routes/playlists/handlers/jobs.ts"
+          ]
+        },
+        "lint": {
+          "exit": 0,
+          "seconds": 21.47,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "check"
+          ]
+        },
+        "ui-css": {
+          "exit": 0,
+          "seconds": 0.61,
+          "command": [
+            "node",
+            "frontend/scripts/lint-ui-css.mts"
+          ]
+        },
+        "db-types": {
+          "exit": 0,
+          "seconds": 0.48,
+          "command": [
+            "node",
+            "scripts/db-types.mts",
+            "--check"
+          ]
+        },
+        "typecheck": {
+          "exit": 0,
+          "seconds": 31.72,
+          "command": [
+            "node",
+            "scripts/typecheck.mts"
+          ]
+        },
+        "lint-any": {
+          "exit": 0,
+          "seconds": 32.6,
+          "command": [
+            "node",
+            "scripts/lint-any.mts"
+          ]
+        },
+        "tests": {
+          "exit": 0,
+          "seconds": 6.51,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "test",
+            "run",
+            "--project",
+            "unit",
+            ".tests/frontend/activity-missing.test.ts",
+            ".tests/library/aurral-wanted-monitoring.test.ts"
+          ]
+        },
+        "build": {
+          "exit": 0,
+          "seconds": 7.58,
+          "command": [
+            "pnpm",
+            "run",
+            "build"
+          ]
+        }
+      },
+      "extra": {
+        "docs-build": {
+          "exit": 0,
+          "seconds": 21.77,
+          "command": [
+            "pnpm",
+            "run",
+            "docs:build"
+          ]
+        }
+      }
+    },
+    "F07": {
+      "checks": {
+        "format": {
+          "exit": 0,
+          "seconds": 0.59,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "fmt",
+            ".tests/playlists/playlist-track-order.test.ts",
+            "backend/routes/playlists/handlers/staticPlaylists.ts",
+            "backend/services/playlists/playlistTrackOrder.ts",
+            "frontend/src/components/icons.tsx",
+            "frontend/src/pages/playlists/components/PlaylistReorderList.css",
+            "frontend/src/pages/playlists/components/PlaylistReorderList.tsx",
+            "frontend/src/pages/playlists/PlaylistTracks.tsx",
+            "frontend/src/pages/playlists/components/playlistTrackComponents.tsx"
+          ]
+        },
+        "lint": {
+          "exit": 0,
+          "seconds": 20.47,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "check"
+          ]
+        },
+        "ui-css": {
+          "exit": 0,
+          "seconds": 0.57,
+          "command": [
+            "node",
+            "frontend/scripts/lint-ui-css.mts"
+          ]
+        },
+        "db-types": {
+          "exit": 0,
+          "seconds": 0.25,
+          "command": [
+            "node",
+            "scripts/db-types.mts",
+            "--check"
+          ]
+        },
+        "typecheck": {
+          "exit": 0,
+          "seconds": 28.38,
+          "command": [
+            "node",
+            "scripts/typecheck.mts"
+          ]
+        },
+        "lint-any": {
+          "exit": 0,
+          "seconds": 33.76,
+          "command": [
+            "node",
+            "scripts/lint-any.mts"
+          ]
+        },
+        "tests": {
+          "exit": 0,
+          "seconds": 6.65,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "test",
+            "run",
+            "--project",
+            "unit",
+            ".tests/playlists/playlist-track-order.test.ts"
+          ]
+        },
+        "build": {
+          "exit": 0,
+          "seconds": 11.5,
+          "command": [
+            "pnpm",
+            "run",
+            "build"
+          ]
+        }
+      },
+      "extra": {
+        "docs-build": {
+          "exit": 0,
+          "seconds": 23.02,
+          "command": [
+            "pnpm",
+            "run",
+            "docs:build"
+          ]
+        }
+      }
+    },
+    "F08": {
+      "checks": {
+        "format": {
+          "exit": 0,
+          "seconds": 1.62,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "fmt",
+            "frontend/src/pages/activity/ActivityMissingPage.tsx"
+          ]
+        },
+        "lint": {
+          "exit": 0,
+          "seconds": 50.08,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "check"
+          ]
+        },
+        "ui-css": {
+          "exit": 0,
+          "seconds": 0.59,
+          "command": [
+            "node",
+            "frontend/scripts/lint-ui-css.mts"
+          ]
+        },
+        "db-types": {
+          "exit": 0,
+          "seconds": 0.33,
+          "command": [
+            "node",
+            "scripts/db-types.mts",
+            "--check"
+          ]
+        },
+        "typecheck": {
+          "exit": 0,
+          "seconds": 23.73,
+          "command": [
+            "node",
+            "scripts/typecheck.mts"
+          ]
+        },
+        "lint-any": {
+          "exit": 0,
+          "seconds": 76.51,
+          "command": [
+            "node",
+            "scripts/lint-any.mts"
+          ]
+        },
+        "tests": {
+          "exit": 0,
+          "seconds": 12.1,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "test",
+            "run",
+            "--project",
+            "unit",
+            ".tests/download/link-library-file.test.ts"
+          ]
+        },
+        "build": {
+          "exit": 0,
+          "seconds": 19.53,
+          "command": [
+            "pnpm",
+            "run",
+            "build"
+          ]
+        }
+      },
+      "extra": {
+        "docs-build": {
+          "exit": 0,
+          "seconds": 20.58,
+          "command": [
+            "pnpm",
+            "run",
+            "docs:build"
+          ]
+        }
+      }
+    },
+    "F09": {
+      "checks": {
+        "format": {
+          "exit": 0,
+          "seconds": 1.11,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "fmt",
+            "backend/services/downloadJobs/importDiskFile.ts",
+            "frontend/src/pages/activity/DiskFilePanel.css",
+            "frontend/src/pages/activity/DiskFilePanel.tsx",
+            "backend/services/downloadJobs/downloadOwnerCommands.ts",
+            "backend/routes/playlists/handlers/jobs.ts",
+            ".tests/download/import-disk-file.test.ts",
+            "frontend/src/pages/activity/ImportDiskFileModal.tsx",
+            "frontend/src/pages/activity/ActivityMissingPage.tsx",
+            "frontend/src/pages/playlists/PlaylistTracks.tsx",
+            "frontend/src/pages/playlists/components/playlistTrackComponents.tsx"
+          ]
+        },
+        "lint": {
+          "exit": 0,
+          "seconds": 28.2,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "check"
+          ]
+        },
+        "ui-css": {
+          "exit": 0,
+          "seconds": 0.61,
+          "command": [
+            "node",
+            "frontend/scripts/lint-ui-css.mts"
+          ]
+        },
+        "db-types": {
+          "exit": 0,
+          "seconds": 0.47,
+          "command": [
+            "node",
+            "scripts/db-types.mts",
+            "--check"
+          ]
+        },
+        "typecheck": {
+          "exit": 0,
+          "seconds": 66.99,
+          "command": [
+            "node",
+            "scripts/typecheck.mts"
+          ]
+        },
+        "lint-any": {
+          "exit": 0,
+          "seconds": 59.35,
+          "command": [
+            "node",
+            "scripts/lint-any.mts"
+          ]
+        },
+        "tests": {
+          "exit": 0,
+          "seconds": 12.65,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "test",
+            "run",
+            "--project",
+            "unit",
+            ".tests/download/import-disk-file.test.ts"
+          ]
+        },
+        "build": {
+          "exit": 0,
+          "seconds": 17.05,
+          "command": [
+            "pnpm",
+            "run",
+            "build"
+          ]
+        }
+      },
+      "extra": {
+        "docs-build": {
+          "exit": 0,
+          "seconds": 18.63,
+          "command": [
+            "pnpm",
+            "run",
+            "docs:build"
+          ]
+        }
+      }
+    },
+    "F10": {
+      "checks": {
+        "format": {
+          "exit": 0,
+          "seconds": 1.38,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "fmt",
+            "backend/services/playlists/playlistTrackCovers.ts",
+            "backend/routes/playlists/handlers/jobs.ts",
+            ".tests/playlists/playlist-local-artwork.test.ts"
+          ]
+        },
+        "lint": {
+          "exit": 0,
+          "seconds": 46.01,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "check"
+          ]
+        },
+        "ui-css": {
+          "exit": 0,
+          "seconds": 1.17,
+          "command": [
+            "node",
+            "frontend/scripts/lint-ui-css.mts"
+          ]
+        },
+        "db-types": {
+          "exit": 0,
+          "seconds": 0.43,
+          "command": [
+            "node",
+            "scripts/db-types.mts",
+            "--check"
+          ]
+        },
+        "typecheck": {
+          "exit": 0,
+          "seconds": 61.59,
+          "command": [
+            "node",
+            "scripts/typecheck.mts"
+          ]
+        },
+        "lint-any": {
+          "exit": 0,
+          "seconds": 44.0,
+          "command": [
+            "node",
+            "scripts/lint-any.mts"
+          ]
+        },
+        "tests": {
+          "exit": 0,
+          "seconds": 8.77,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "test",
+            "run",
+            "--project",
+            "unit",
+            ".tests/playlists/playlist-local-artwork.test.ts"
+          ]
+        }
+      },
+      "extra": {
+        "build": {
+          "exit": 0,
+          "seconds": 12.47,
+          "command": [
+            "pnpm",
+            "run",
+            "build"
+          ]
+        },
+        "docs-build": {
+          "exit": 0,
+          "seconds": 196.52,
+          "command": [
+            "pnpm",
+            "run",
+            "docs:build"
+          ]
+        }
+      }
+    },
+    "F11": {
+      "checks": {
+        "format": {
+          "exit": 0,
+          "seconds": 0.5,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "fmt",
+            "backend/services/playlists/playlistTrackCovers.ts"
+          ]
+        },
+        "lint": {
+          "exit": 0,
+          "seconds": 17.85,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "check"
+          ]
+        },
+        "ui-css": {
+          "exit": 0,
+          "seconds": 1.06,
+          "command": [
+            "node",
+            "frontend/scripts/lint-ui-css.mts"
+          ]
+        },
+        "db-types": {
+          "exit": 0,
+          "seconds": 0.69,
+          "command": [
+            "node",
+            "scripts/db-types.mts",
+            "--check"
+          ]
+        },
+        "typecheck": {
+          "exit": 0,
+          "seconds": 24.29,
+          "command": [
+            "node",
+            "scripts/typecheck.mts"
+          ]
+        },
+        "lint-any": {
+          "exit": 0,
+          "seconds": 22.15,
+          "command": [
+            "node",
+            "scripts/lint-any.mts"
+          ]
+        },
+        "tests": {
+          "exit": 0,
+          "seconds": 1.86,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "test",
+            "run",
+            "--project",
+            "unit",
+            ".tests/playlists/playlist-current-names.test.ts"
+          ]
+        }
+      },
+      "extra": {
+        "build": {
+          "exit": 0,
+          "seconds": 15.45,
+          "command": [
+            "pnpm",
+            "run",
+            "build"
+          ]
+        },
+        "docs-build": {
+          "exit": 0,
+          "seconds": 31.39,
+          "command": [
+            "pnpm",
+            "run",
+            "docs:build"
+          ]
+        }
+      }
+    },
+    "F12": {
+      "checks": {
+        "format": {
+          "exit": 0,
+          "seconds": 2.51,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "fmt",
+            ".tests/subsonic/subsonic-api.int.test.ts",
+            "backend/services/subsonicLibraryService.ts"
+          ]
+        },
+        "lint": {
+          "exit": 0,
+          "seconds": 51.42,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "check"
+          ]
+        },
+        "ui-css": {
+          "exit": 0,
+          "seconds": 1.37,
+          "command": [
+            "node",
+            "frontend/scripts/lint-ui-css.mts"
+          ]
+        },
+        "db-types": {
+          "exit": 0,
+          "seconds": 0.89,
+          "command": [
+            "node",
+            "scripts/db-types.mts",
+            "--check"
+          ]
+        },
+        "typecheck": {
+          "exit": 0,
+          "seconds": 252.95,
+          "command": [
+            "node",
+            "scripts/typecheck.mts"
+          ]
+        },
+        "lint-any": {
+          "exit": 0,
+          "seconds": 63.03,
+          "command": [
+            "node",
+            "scripts/lint-any.mts"
+          ]
+        },
+        "tests": {
+          "exit": 0,
+          "seconds": 32.31,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "test",
+            "run",
+            "--project",
+            "integration",
+            ".tests/subsonic/subsonic-api.int.test.ts"
+          ]
+        }
+      },
+      "extra": {
+        "build": {
+          "exit": 0,
+          "seconds": 21.02,
+          "command": [
+            "pnpm",
+            "run",
+            "build"
+          ]
+        },
+        "docs-build": {
+          "exit": 0,
+          "seconds": 24.02,
+          "command": [
+            "pnpm",
+            "run",
+            "docs:build"
+          ]
+        }
+      }
+    },
+    "F13": {
+      "checks": {
+        "format": {
+          "exit": 0,
+          "seconds": 1.24,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "fmt",
+            "backend/services/subsonicLibraryService.ts",
+            ".tests/subsonic/playlist-rescan-timestamp.test.ts"
+          ]
+        },
+        "lint": {
+          "exit": 0,
+          "seconds": 39.19,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "check"
+          ]
+        },
+        "ui-css": {
+          "exit": 0,
+          "seconds": 0.91,
+          "command": [
+            "node",
+            "frontend/scripts/lint-ui-css.mts"
+          ]
+        },
+        "db-types": {
+          "exit": 0,
+          "seconds": 0.59,
+          "command": [
+            "node",
+            "scripts/db-types.mts",
+            "--check"
+          ]
+        },
+        "typecheck": {
+          "exit": 0,
+          "seconds": 41.89,
+          "command": [
+            "node",
+            "scripts/typecheck.mts"
+          ]
+        },
+        "lint-any": {
+          "exit": 0,
+          "seconds": 32.15,
+          "command": [
+            "node",
+            "scripts/lint-any.mts"
+          ]
+        },
+        "tests": {
+          "exit": 0,
+          "seconds": 4.32,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "test",
+            "run",
+            "--project",
+            "unit",
+            ".tests/subsonic/playlist-rescan-timestamp.test.ts"
+          ]
+        }
+      },
+      "extra": {
+        "build": {
+          "exit": 0,
+          "seconds": 16.8,
+          "command": [
+            "pnpm",
+            "run",
+            "build"
+          ]
+        },
+        "docs-build": {
+          "exit": 0,
+          "seconds": 13.17,
+          "command": [
+            "pnpm",
+            "run",
+            "docs:build"
+          ]
+        }
+      }
+    },
+    "F14": {
+      "checks": {
+        "format": {
+          "exit": 0,
+          "seconds": 1.19,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "fmt",
+            ".tests/download/download-tracker.test.ts",
+            "backend/services/downloadJobs/downloadWorker.ts"
+          ]
+        },
+        "lint": {
+          "exit": 0,
+          "seconds": 37.4,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "check"
+          ]
+        },
+        "ui-css": {
+          "exit": 0,
+          "seconds": 0.71,
+          "command": [
+            "node",
+            "frontend/scripts/lint-ui-css.mts"
+          ]
+        },
+        "db-types": {
+          "exit": 0,
+          "seconds": 0.36,
+          "command": [
+            "node",
+            "scripts/db-types.mts",
+            "--check"
+          ]
+        },
+        "typecheck": {
+          "exit": 0,
+          "seconds": 40.03,
+          "command": [
+            "node",
+            "scripts/typecheck.mts"
+          ]
+        },
+        "lint-any": {
+          "exit": 0,
+          "seconds": 34.9,
+          "command": [
+            "node",
+            "scripts/lint-any.mts"
+          ]
+        },
+        "tests": {
+          "exit": 0,
+          "seconds": 9.88,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "test",
+            "run",
+            "--project",
+            "unit",
+            ".tests/download/download-tracker.test.ts"
+          ]
+        }
+      },
+      "extra": {
+        "build": {
+          "exit": 0,
+          "seconds": 14.12,
+          "command": [
+            "pnpm",
+            "run",
+            "build"
+          ]
+        }
+      }
+    },
+    "F15": {
+      "checks": {
+        "format": {
+          "exit": 0,
+          "seconds": 1.47,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "fmt",
+            ".tests/plugins/plugin-install.test.ts",
+            "backend/services/plugins/pluginInstaller.ts"
+          ]
+        },
+        "lint": {
+          "exit": 0,
+          "seconds": 30.7,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "check"
+          ]
+        },
+        "ui-css": {
+          "exit": 0,
+          "seconds": 0.84,
+          "command": [
+            "node",
+            "frontend/scripts/lint-ui-css.mts"
+          ]
+        },
+        "db-types": {
+          "exit": 0,
+          "seconds": 0.4,
+          "command": [
+            "node",
+            "scripts/db-types.mts",
+            "--check"
+          ]
+        },
+        "typecheck": {
+          "exit": 0,
+          "seconds": 39.45,
+          "command": [
+            "node",
+            "scripts/typecheck.mts"
+          ]
+        },
+        "lint-any": {
+          "exit": 0,
+          "seconds": 34.9,
+          "command": [
+            "node",
+            "scripts/lint-any.mts"
+          ]
+        },
+        "tests": {
+          "exit": 0,
+          "seconds": 6.81,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "test",
+            "run",
+            "--project",
+            "unit",
+            ".tests/plugins/plugin-install.test.ts"
+          ]
+        }
+      },
+      "extra": {
+        "build": {
+          "exit": 0,
+          "seconds": 17.73,
+          "command": [
+            "pnpm",
+            "run",
+            "build"
+          ]
+        }
+      }
+    },
+    "F16": {
+      "checks": {
+        "format": {
+          "exit": 0,
+          "seconds": 1.29,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "fmt",
+            ".tests/track-matching/native-matcher.test.ts",
+            "backend/services/trackMatching/nativeMatcher.ts"
+          ]
+        },
+        "lint": {
+          "exit": 0,
+          "seconds": 32.11,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "check"
+          ]
+        },
+        "ui-css": {
+          "exit": 0,
+          "seconds": 0.79,
+          "command": [
+            "node",
+            "frontend/scripts/lint-ui-css.mts"
+          ]
+        },
+        "db-types": {
+          "exit": 0,
+          "seconds": 0.34,
+          "command": [
+            "node",
+            "scripts/db-types.mts",
+            "--check"
+          ]
+        },
+        "typecheck": {
+          "exit": 0,
+          "seconds": 41.16,
+          "command": [
+            "node",
+            "scripts/typecheck.mts"
+          ]
+        },
+        "lint-any": {
+          "exit": 0,
+          "seconds": 29.08,
+          "command": [
+            "node",
+            "scripts/lint-any.mts"
+          ]
+        },
+        "tests": {
+          "exit": 0,
+          "seconds": 1.35,
+          "command": [
+            "pnpm",
+            "exec",
+            "vp",
+            "test",
+            "run",
+            "--project",
+            "unit",
+            ".tests/track-matching/native-matcher.test.ts"
+          ]
+        }
+      },
+      "extra": {
+        "build": {
+          "exit": 0,
+          "seconds": 14.9,
+          "command": [
+            "pnpm",
+            "run",
+            "build"
+          ]
+        }
+      }
+    }
+  },
+  "performance": {
+    "F10": "unmodified budget test passed",
+    "F11": "unmodified budget test passed",
+    "F12": {
+      "cold": 130,
+      "warm": 50,
+      "previous_cold": 129,
+      "previous_warm": 49,
+      "test": "passed"
+    },
+    "F13": {
+      "cold": 138,
+      "warm": 58,
+      "previous_cold": 129,
+      "previous_warm": 49,
+      "test": "passed"
+    }
+  },
+  "workflow": "actionlint 1.7.12 passed; GitHub workflow run 42840423363 skipped; no publishing enabled",
+  "scope": "No PR, upstream write, main write, deployment, production credentials or server access. No classical implementation or schema changes."
+}

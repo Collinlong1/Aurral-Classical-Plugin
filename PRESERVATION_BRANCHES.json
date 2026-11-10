@@ -1,0 +1,328 @@
+{
+  "version": 1,
+  "phase": "0.5",
+  "upstream_base": "7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef",
+  "fork_main_unchanged": "aa643d316e9e00fb8622ab60b2fb2cb8b76661ee",
+  "plugin_main_unchanged": "506e5259e1442b8cfe072a75b129abb428c6bcf7",
+  "branches": [
+    {
+      "id": "F01",
+      "branch": "feature/optional-fork-container-image",
+      "base": "7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef",
+      "sha": "8991619c5eee68520af1ce3ec846a3dc6baf622f",
+      "tree": "cd14c5c15958e521de561e546dfea2702dca8c10",
+      "files": [
+        ".github/workflows/fork-image.yml",
+        "docs/src/content/docs/admin/optional-container-publishing.mdx"
+      ],
+      "focused_tests_passed": 0,
+      "source_commits": [
+        "11739f0945e388bfc40f88de30cb1c6538dcf7fa",
+        "34d17c9cd8eeacb5d63a17a949090d649f0f7698",
+        "34bbedba1f07307bf24d182acde91387454582c4"
+      ],
+      "title": "Optional container image publishing"
+    },
+    {
+      "id": "F02",
+      "branch": "fix/missing-track-download-status",
+      "base": "7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef",
+      "sha": "c31abe13cd60b5ffdcac587d216d454b89a16bfe",
+      "tree": "6fbf3a0c417931398ccb3b8cb323861a89d7c687",
+      "files": [
+        ".tests/frontend/active-downloads.test.ts",
+        "docs/src/content/docs/using/activity.mdx",
+        "frontend/src/hooks/useActiveDownloads.ts",
+        "frontend/src/pages/library/useLibraryActions.tsx",
+        "frontend/src/utils/activeDownloads.ts"
+      ],
+      "focused_tests_passed": 3,
+      "source_commits": [
+        "cd409bad9c0fa14a950c6e1cb0dbab3188a58e26"
+      ],
+      "title": "Missing-track download indicator scope"
+    },
+    {
+      "id": "F03",
+      "branch": "feature/numbered-library-pagination",
+      "base": "7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef",
+      "sha": "f16b4e057f034c99ed7fc2949c8a13402b116b25",
+      "tree": "69e85a7ee3bc7c2fe6515a558a97b6486c58cc76",
+      "files": [
+        ".tests/frontend/pagination.test.ts",
+        "docs/src/content/docs/using/library.mdx",
+        "frontend/src/components/Pagination.css",
+        "frontend/src/components/Pagination.tsx",
+        "frontend/src/index.css",
+        "frontend/src/pages/LibraryPage.tsx",
+        "frontend/src/utils/pagination.ts"
+      ],
+      "focused_tests_passed": 3,
+      "source_commits": [
+        "2d8e625fc99536f84be34a269e4244ab4b96a299",
+        "ff1d308b5bbd3d3ca3c12193f16a6f98d0209b3a",
+        "cfa5fe26c6a7e4c1ffb37d6190294b6c74bcb122",
+        "3bdb4e702d1e1befc4330b5f910e41b72f0d808f"
+      ],
+      "title": "Numbered Library pages and item range"
+    },
+    {
+      "id": "F04",
+      "branch": "feature/library-page-size",
+      "base": "7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef",
+      "sha": "100864c635cde498541c147a32ec89cac7d6ed21",
+      "tree": "9f0b6ff65359f38d6c095f3ff09b968a4e3547b2",
+      "files": [
+        ".tests/frontend/pagination.test.ts",
+        "docs/src/content/docs/using/library.mdx",
+        "frontend/src/navigation/routePrefetch.ts",
+        "frontend/src/pages/LibraryPage.tsx",
+        "frontend/src/pages/libraryViewQuery.ts"
+      ],
+      "focused_tests_passed": 1,
+      "source_commits": [
+        "ff1d308b5bbd3d3ca3c12193f16a6f98d0209b3a",
+        "3bdb4e702d1e1befc4330b5f910e41b72f0d808f"
+      ],
+      "title": "Selectable Library page size"
+    },
+    {
+      "id": "F05",
+      "branch": "fix/album-scoped-track-ownership",
+      "base": "7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef",
+      "sha": "183b22ca3388b9adff0568f135002591fcc59e04",
+      "tree": "cfb8557a19f5349621634c080301af0db8f106e2",
+      "files": [
+        ".tests/library/media-query.test.ts",
+        ".tests/library/track-album-context.test.ts",
+        "backend/services/libraryQueryService.ts",
+        "backend/services/libraryTrackRequests.ts",
+        "docs/src/content/docs/using/activity.mdx"
+      ],
+      "focused_tests_passed": 22,
+      "source_commits": [
+        "e2d4272770fd64b89ff917af6c31e945d03cfb09"
+      ],
+      "title": "Ownership check for a requested album placement"
+    },
+    {
+      "id": "F06",
+      "branch": "fix/wanted-cancelled-tracks",
+      "base": "7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef",
+      "sha": "a9c9a2abd64cd2dd290b66ccb43dcff832061372",
+      "tree": "29849288930ff91151e261fd9e368d145ddb25a4",
+      "files": [
+        ".tests/frontend/activity-missing.test.ts",
+        ".tests/library/aurral-wanted-monitoring.test.ts",
+        "backend/routes/playlists/handlers/jobs.ts",
+        "backend/services/downloadJobs/downloadTracker.ts",
+        "backend/services/downloadJobs/downloadWorker.ts",
+        "docs/src/content/docs/using/activity.mdx",
+        "frontend/src/pages/activity/ActivityMissingPage.tsx",
+        "frontend/src/pages/activity/activityMissingUtils.ts"
+      ],
+      "focused_tests_passed": 8,
+      "source_commits": [
+        "a790aaca2e8f03956be8708f9f1f9ea6d28a083a"
+      ],
+      "title": "Cancelled individual tracks remain Wanted/Missing"
+    },
+    {
+      "id": "F07",
+      "branch": "feature/playlist-track-reorder",
+      "base": "7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef",
+      "sha": "29b9baf0d36ac629bc3d1d01192211cae064eb17",
+      "tree": "9648dc1adb7b3f0bb86198072cf098dc5c5160fe",
+      "files": [
+        ".tests/playlists/playlist-track-order.test.ts",
+        "backend/routes/playlists/handlers/staticPlaylists.ts",
+        "backend/services/playlists/playlistTrackOrder.ts",
+        "docs/src/content/docs/using/playlists.mdx",
+        "frontend/src/components/icons.tsx",
+        "frontend/src/pages/playlists/PlaylistTracks.tsx",
+        "frontend/src/pages/playlists/components/PlaylistReorderList.css",
+        "frontend/src/pages/playlists/components/PlaylistReorderList.tsx",
+        "frontend/src/pages/playlists/components/playlistTrackComponents.tsx"
+      ],
+      "focused_tests_passed": 4,
+      "source_commits": [
+        "404cf3c10af9ed81b2914a6a48ec85617907cc50"
+      ],
+      "title": "Reorder static playlist tracks"
+    },
+    {
+      "id": "F08",
+      "branch": "feature/link-missing-track-library-file",
+      "base": "7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef",
+      "sha": "8886ca2c8a4b61dd3f9d9e2b4e3af3ac08a06d2e",
+      "tree": "b9aeb98c56726fe1a0a5b6fe0d073c6e405d5553",
+      "files": [
+        ".tests/download/link-library-file.test.ts",
+        "backend/routes/playlists/handlers/jobs.ts",
+        "backend/services/downloadJobs/downloadOwnerCommands.ts",
+        "backend/services/downloadJobs/fileReuse.ts",
+        "backend/services/downloadJobs/linkLibraryFile.ts",
+        "docs/src/content/docs/using/activity.mdx",
+        "frontend/src/pages/activity/ActivityMissingPage.tsx",
+        "frontend/src/pages/activity/LinkLibraryFileModal.tsx",
+        "frontend/src/pages/playlists/PlaylistTracks.tsx",
+        "frontend/src/pages/playlists/components/playlistTrackComponents.tsx"
+      ],
+      "focused_tests_passed": 5,
+      "source_commits": [
+        "79b9bef44762ff79152630f84c1592938de25f42",
+        "0ef5061d0c29750ccb5f1b88574e73e87047403a"
+      ],
+      "title": "Resolve a missing track using an existing Library file"
+    },
+    {
+      "id": "F09",
+      "branch": "feature/import-disk-file-for-missing-track",
+      "base": "7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef",
+      "sha": "e2e55bd09e2ee21898794956d42ca5a7a83f4d65",
+      "tree": "9aa1a8c62c3c961e68ec448f4d04b824521b0d0f",
+      "files": [
+        ".tests/download/import-disk-file.test.ts",
+        "backend/routes/playlists/handlers/jobs.ts",
+        "backend/services/downloadJobs/downloadOwnerCommands.ts",
+        "backend/services/downloadJobs/importDiskFile.ts",
+        "docs/src/content/docs/using/activity.mdx",
+        "frontend/src/pages/activity/ActivityMissingPage.tsx",
+        "frontend/src/pages/activity/DiskFilePanel.css",
+        "frontend/src/pages/activity/DiskFilePanel.tsx",
+        "frontend/src/pages/activity/ImportDiskFileModal.tsx",
+        "frontend/src/pages/playlists/PlaylistTracks.tsx",
+        "frontend/src/pages/playlists/components/playlistTrackComponents.tsx"
+      ],
+      "focused_tests_passed": 5,
+      "source_commits": [
+        "1c68fc63c9858ee9505013ca27ff9cf462755984",
+        "aa7f72a7f299afaced069431b4e4de4332064e8c"
+      ],
+      "title": "Resolve a missing track using a copied disk file"
+    },
+    {
+      "id": "F10",
+      "branch": "fix/playlist-local-album-artwork",
+      "base": "7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef",
+      "sha": "1b8358d53363b63aa4842a3d57902af9a80a8475",
+      "tree": "cf51c161dd93bb20a2fd7940c76989d23bb096a6",
+      "files": [
+        ".tests/playlists/playlist-local-artwork.test.ts",
+        "backend/routes/playlists/handlers/jobs.ts",
+        "backend/services/playlists/playlistTrackCovers.ts",
+        "docs/src/content/docs/using/playlists.mdx"
+      ],
+      "focused_tests_passed": 1,
+      "source_commits": [
+        "aa7f72a7f299afaced069431b4e4de4332064e8c",
+        "58667789c3d2d14e89c898355579e66a4a79d0a5",
+        "37b670eb6142301541cd4948e14b726af57ce991"
+      ],
+      "title": "Local album artwork fallback for playlist rows"
+    },
+    {
+      "id": "F11",
+      "branch": "fix/playlist-current-library-names",
+      "base": "7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef",
+      "sha": "ca666ca9c24d2a64e915c097716c46c3f7a455ea",
+      "tree": "e18a3be2a3e4f4c509b5ed3e423fcd5864031f66",
+      "files": [
+        ".tests/playlists/playlist-current-names.test.ts",
+        "backend/routes/playlists/handlers/jobs.ts",
+        "backend/services/playlists/playlistTrackCovers.ts",
+        "docs/src/content/docs/using/playlists.mdx"
+      ],
+      "focused_tests_passed": 1,
+      "source_commits": [
+        "eedfb2efd628c5a73ce5afc06e693aa02b80a0bc"
+      ],
+      "title": "Playlist rows follow current indexed track names"
+    },
+    {
+      "id": "F12",
+      "branch": "fix/subsonic-playlist-file-identity",
+      "base": "7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef",
+      "sha": "576ef4b266e1cb7758c1b26862fecba6cd9bdee3",
+      "tree": "7f8a7b265cb7d709c46bffd97b57898323c1bcd7",
+      "files": [
+        ".tests/perf/baseline.json",
+        ".tests/subsonic/subsonic-api.int.test.ts",
+        "backend/services/subsonicLibraryService.ts",
+        "docs/src/content/docs/using/playlists.mdx"
+      ],
+      "focused_tests_passed": 40,
+      "source_commits": [
+        "c4648674dc9af2059878b94105b7049a0d523281",
+        "d840e5b34965989df9bb5315cc22a8118db87d47"
+      ],
+      "title": "Resolve Subsonic playlist songs by linked file path"
+    },
+    {
+      "id": "F13",
+      "branch": "fix/subsonic-playlist-rescan-timestamp",
+      "base": "7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef",
+      "sha": "d2151224bf94511888fc24b4b62390e39ea8a533",
+      "tree": "0a485d6da8245d70310e2b6731e38cab9814325a",
+      "files": [
+        ".tests/perf/baseline.json",
+        ".tests/subsonic/playlist-rescan-timestamp.test.ts",
+        "backend/services/subsonicLibraryService.ts",
+        "docs/src/content/docs/using/playlists.mdx"
+      ],
+      "focused_tests_passed": 1,
+      "source_commits": [
+        "b2cd79967945512c41cbc7580c9a5f2f59978a45"
+      ],
+      "title": "Invalidate Subsonic playlist metadata after file rescan"
+    },
+    {
+      "id": "F14",
+      "branch": "fix/wake-running-download-worker",
+      "base": "7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef",
+      "sha": "2607fd60f5581d85d38caa116b4a2aa38ad9759e",
+      "tree": "12ee0fcdc77cd9e38bc0f2b1469b198060ffd010",
+      "files": [
+        ".tests/download/download-tracker.test.ts",
+        "backend/services/downloadJobs/downloadWorker.ts"
+      ],
+      "focused_tests_passed": 30,
+      "source_commits": [
+        "11e8cff64551fa2810fc9484aa99a1d6b5d8009a"
+      ],
+      "title": "Wake idle worker when start is called again"
+    },
+    {
+      "id": "F15",
+      "branch": "fix/plugin-install-cross-device-rollback",
+      "base": "7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef",
+      "sha": "963b3bc97c0875944f7f0f83513ec9377aa8d2e7",
+      "tree": "2a581e95c9713f1a09bf739ed6c1e7bd63bade6b",
+      "files": [
+        ".tests/plugins/plugin-install.test.ts",
+        "backend/services/plugins/pluginInstaller.ts"
+      ],
+      "focused_tests_passed": 8,
+      "source_commits": [
+        "a544a9b81ddd748bc26b72347703a4934f36ff4b"
+      ],
+      "title": "Make cross-device plugin replacement recoverable"
+    },
+    {
+      "id": "F16",
+      "branch": "fix/recording-id-artist-contradiction",
+      "base": "7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef",
+      "sha": "ab1f64f53f39d833bba3ece45d48292cf728d1b4",
+      "tree": "421e1158e2d11984c1cad03a2d3b435834e3d1bd",
+      "files": [
+        ".tests/track-matching/native-matcher.test.ts",
+        "backend/services/trackMatching/nativeMatcher.ts"
+      ],
+      "focused_tests_passed": 17,
+      "source_commits": [
+        "d4deed1011913bb2f43cd47752db28da08c0be1f"
+      ],
+      "title": "Exact requested recording ID avoids artist contradiction"
+    }
+  ]
+}
