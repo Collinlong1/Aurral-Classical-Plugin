@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { afterEach, beforeEach, test } from "node:test";
 import { File, TagTypes, Id3v2UserTextInformationFrame } from "node-taglib-sharp";
-import plugin, { makeContext } from "../src/index.js";
+import plugin, { makeContext, waitForBackgroundTagging } from "../src/index.js";
 import { readTags, readValues, writeTags } from "../src/tags.js";
 import { enqueue, readProcessed, runQueue, withTagging } from "../src/tagger.js";
 import { baseSettings, copyFixture, EXPECTED_ARTIST, fakeFetch, RECORDING, symphonyEntities, tempFolders, waitFor } from "./helpers.js";
@@ -18,6 +18,7 @@ beforeEach(async () => {
   globalThis.fetch = fetchImpl;
 });
 afterEach(async () => {
+  await waitForBackgroundTagging();
   globalThis.fetch = realFetch;
   await fs.rm(folders.root, { recursive: true, force: true });
 });

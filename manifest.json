@@ -3,7 +3,7 @@
   "name": "Aurral Classical",
   "version": "1.0.4",
   "api": 1,
-  "description": "Tags classical music as Composer — Soloist — Ensemble — Conductor from MusicBrainz, compares recordings of a movement, and downloads classical albums from slskd.",
+  "description": "Tags classical music as Composer \u2014 Soloist \u2014 Ensemble \u2014 Conductor from MusicBrainz, compares recordings of a movement, and downloads classical albums from slskd.",
   "repository": "https://github.com/Collinlong1/Aurral-Classical-Plugin",
   "uses": [
     "musicbrainz.org, or your mirror",
@@ -51,19 +51,36 @@
       "key": "separator",
       "label": "Separator",
       "type": "text",
-      "help": "Goes between the names in the artist tag. Default: —"
+      "help": "Goes between the names in the artist tag. Default: \u2014"
     },
     {
       "key": "comparisonScope",
       "label": "Comparison scope",
       "type": "text",
       "help": "Compare includes every owned recording with explicit work identity. Remote acquisition is separate."
+    },
+    {
+      "key": "libraryEpoch",
+      "label": "Library database epoch",
+      "type": "text",
+      "help": "Change this value after replacing or restoring the host library database. Existing catalogue links are held for review. Leave blank for the initial library."
     }
   ],
   "test": true,
   "actions": [
-    {"id":"preview-remove","label":"Preview classical tag removal","target":"album","admin":true},
-    {"id":"clear-classical","label":"Clear classical fields (keep backup)","target":"album","admin":true,"background":true},
+    {
+      "id": "preview-remove",
+      "label": "Preview classical tag removal",
+      "target": "album",
+      "admin": true
+    },
+    {
+      "id": "clear-classical",
+      "label": "Clear classical fields (keep backup)",
+      "target": "album",
+      "admin": true,
+      "background": true
+    },
     {
       "id": "tag-artist",
       "label": "Tag as classical",
@@ -98,6 +115,26 @@
       "label": "Compare recordings",
       "target": "album",
       "background": true
+    },
+    {
+      "id": "classical-model-status",
+      "label": "Classical model status",
+      "target": "album",
+      "admin": true
+    },
+    {
+      "id": "classical-model-scan",
+      "label": "Scan classical model (read only)",
+      "target": "album",
+      "admin": true,
+      "background": true,
+      "localPlaylists": true
+    },
+    {
+      "id": "classical-model-cancel",
+      "label": "Cancel classical model scan",
+      "target": "album",
+      "admin": true
     }
   ],
   "events": [

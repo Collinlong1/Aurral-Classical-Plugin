@@ -4014,7 +4014,7 @@ var require_byteVector = __commonJS({
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ByteVector = exports.Encoding = exports.StringType = void 0;
     var IConv = require_lib();
-    var fs5 = __require("fs");
+    var fs8 = __require("fs");
     var utils_1 = require_utils();
     var StringType2;
     (function(StringType3) {
@@ -4235,9 +4235,9 @@ var require_byteVector = __commonJS({
        * Creates a {@link ByteVector} using the contents of a file as the data
        * @param path Path to the file to store in the ByteVector
        */
-      static fromPath(path8) {
-        utils_1.Guards.truthy(path8, "path");
-        const fileBuffer = fs5.readFileSync(path8);
+      static fromPath(path11) {
+        utils_1.Guards.truthy(path11, "path");
+        const fileBuffer = fs8.readFileSync(path11);
         return _ByteVector.fromByteArray(fileBuffer);
       }
       /**
@@ -5252,7 +5252,7 @@ var require_stream = __commonJS({
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Stream = exports.SeekOrigin = void 0;
-    var fs5 = __require("fs");
+    var fs8 = __require("fs");
     var utils_1 = require_utils();
     var byteVector_1 = require_byteVector();
     var SeekOrigin;
@@ -5267,14 +5267,14 @@ var require_stream = __commonJS({
         this._canWrite = canWrite;
         this._fd = fd;
         this._position = 0;
-        this._length = fs5.fstatSync(fd).size;
+        this._length = fs8.fstatSync(fd).size;
       }
-      static createAsRead(path8) {
-        const fd = fs5.openSync(path8, "r");
+      static createAsRead(path11) {
+        const fd = fs8.openSync(path11, "r");
         return new _Stream(fd, false);
       }
-      static createAsReadWrite(path8) {
-        const fd = fs5.openSync(path8, "r+");
+      static createAsReadWrite(path11) {
+        const fd = fs8.openSync(path11, "r+");
         return new _Stream(fd, true);
       }
       // #endregion
@@ -5300,11 +5300,11 @@ var require_stream = __commonJS({
       // #region Public Methods
       /** @inheritDoc */
       close() {
-        fs5.closeSync(this._fd);
+        fs8.closeSync(this._fd);
       }
       /** @inheritDoc */
       read(buffer, bufferOffset, length) {
-        const bytes = fs5.readSync(this._fd, buffer, bufferOffset, length, this._position);
+        const bytes = fs8.readSync(this._fd, buffer, bufferOffset, length, this._position);
         this._position += bytes;
         return bytes;
       }
@@ -5332,7 +5332,7 @@ var require_stream = __commonJS({
         if (length === this._length) {
           return;
         }
-        fs5.ftruncateSync(this._fd, length);
+        fs8.ftruncateSync(this._fd, length);
         this._length = length;
         if (this._position > this._length) {
           this._position = this._length;
@@ -5347,7 +5347,7 @@ var require_stream = __commonJS({
           throw new Error("Invalid operation: this stream is a read-only stream");
         }
         const origLength = this._length;
-        const bytes = fs5.writeSync(this._fd, buffer, bufferOffset, length, this._position);
+        const bytes = fs8.writeSync(this._fd, buffer, bufferOffset, length, this._position);
         this._position += bytes;
         if (this._position > origLength) {
           this._length = this._position;
@@ -5373,9 +5373,9 @@ var require_fileAbstraction = __commonJS({
        * @param path Path of the file to use in the new instance
        * @throws Error Thrown if `path` is falsy
        */
-      constructor(path8) {
-        utils_1.Guards.truthy(path8, "path");
-        this._name = path8;
+      constructor(path11) {
+        utils_1.Guards.truthy(path11, "path");
+        this._name = path11;
       }
       /** @inheritDoc */
       get name() {
@@ -7416,7 +7416,7 @@ var init_v1 = __esm({
 });
 
 // node_modules/uuid/dist/esm-node/parse.js
-function parse(uuid) {
+function parse2(uuid) {
   if (!validate_default(uuid)) {
     throw TypeError("Invalid UUID");
   }
@@ -7444,7 +7444,7 @@ var parse_default;
 var init_parse = __esm({
   "node_modules/uuid/dist/esm-node/parse.js"() {
     init_validate();
-    parse_default = parse;
+    parse_default = parse2;
   }
 });
 
@@ -7649,14 +7649,14 @@ var require_uuidWrapper = __commonJS({
           source = Uuid.v4();
         }
         if (typeof source === "string") {
-          const match = _UuidWrapper.GUID_REGEX.exec(source);
-          if (!match) {
+          const match2 = _UuidWrapper.GUID_REGEX.exec(source);
+          if (!match2) {
             throw new Error(`Could not parse guid ${source}`);
           }
-          const int = Number.parseInt(match[1], 16);
-          const short1 = Number.parseInt(match[2], 16);
-          const short2 = Number.parseInt(match[3], 16);
-          const short3 = Number.parseInt(match[4], 16);
+          const int = Number.parseInt(match2[1], 16);
+          const short1 = Number.parseInt(match2[2], 16);
+          const short2 = Number.parseInt(match2[3], 16);
+          const short3 = Number.parseInt(match2[4], 16);
           const bytes = new Uint8Array(16);
           const dv = new DataView(bytes.buffer);
           dv.setUint32(0, int, true);
@@ -7664,7 +7664,7 @@ var require_uuidWrapper = __commonJS({
           dv.setUint16(6, short2, true);
           dv.setUint16(8, short3, false);
           for (let i = 0; i < 12; i += 2) {
-            bytes[10 + i / 2] = Number.parseInt(match[5].substring(i, i + 2), 16);
+            bytes[10 + i / 2] = Number.parseInt(match2[5].substring(i, i + 2), 16);
           }
           source = byteVector_1.ByteVector.fromByteArray(bytes);
         }
@@ -8655,7 +8655,7 @@ var require_picture = __commonJS({
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PictureLazy = exports.Picture = exports.PictureType = void 0;
-    var path8 = __require("path");
+    var path11 = __require("path");
     var byteVector_1 = require_byteVector();
     var fileAbstraction_1 = require_fileAbstraction();
     var utils_1 = require_utils();
@@ -8700,7 +8700,7 @@ var require_picture = __commonJS({
         utils_1.Guards.truthy(filePath, "filePath");
         const picture = new _Picture();
         picture.data = byteVector_1.ByteVector.fromPath(filePath);
-        picture.filename = path8.basename(filePath);
+        picture.filename = path11.basename(filePath);
         picture.description = picture.filename;
         picture.mimeType = _Picture.getMimeTypeFromFilename(picture.filename);
         picture.type = picture.mimeType.startsWith("image/") ? PictureType.FrontCover : PictureType.NotAPicture;
@@ -9049,7 +9049,7 @@ var require_picture = __commonJS({
         utils_1.Guards.truthy(filePath, "path");
         const picture = new _PictureLazy();
         picture._file = new fileAbstraction_1.LocalFileAbstraction(filePath);
-        picture._filename = path8.basename(filePath);
+        picture._filename = path11.basename(filePath);
         picture._description = picture._filename;
         picture._mimeType = Picture.getMimeTypeFromFilename(picture._filename);
         picture._type = picture._mimeType.startsWith("image/") ? PictureType.FrontCover : PictureType.NotAPicture;
@@ -16229,9 +16229,9 @@ var require_id3v2Tag = __commonJS({
           }
         }
         const performersRole = [];
-        for (const roles of map.values()) {
-          if (roles.length > 0) {
-            performersRole.push(roles.join("; "));
+        for (const roles2 of map.values()) {
+          if (roles2.length > 0) {
+            performersRole.push(roles2.join("; "));
           } else {
             performersRole.push(void 0);
           }
@@ -16931,15 +16931,15 @@ var require_id3v2Tag = __commonJS({
           super.copyTo(target, overwrite);
           return;
         }
-        const match = target;
+        const match2 = target;
         const frames = this._frameList.slice();
         while (frames.length > 0) {
           const ident = frames[0].frameId;
           let copy = true;
           if (overwrite) {
-            match.removeFrames(ident);
+            match2.removeFrames(ident);
           } else {
-            for (const f of match._frameList) {
+            for (const f of match2._frameList) {
               if (f.frameId === ident) {
                 copy = false;
                 break;
@@ -16950,7 +16950,7 @@ var require_id3v2Tag = __commonJS({
           while (i < frames.length) {
             if (frames[i].frameId === ident) {
               if (copy) {
-                match._frameList.push(frames[i].clone());
+                match2._frameList.push(frames[i].clone());
               }
               frames.splice(i, 1);
             } else {
@@ -35206,14 +35206,885 @@ var require_dist = __commonJS({
 });
 
 // src/index.js
-import path7 from "node:path";
+import path10 from "node:path";
+
+// src/model/runtime.js
+import { createHash, randomUUID as randomUUID6 } from "node:crypto";
+import { createReadStream } from "node:fs";
+import fs3 from "node:fs/promises";
+import path3 from "node:path";
+
+// src/model/catalogue.js
+import { randomUUID as randomUUID2 } from "node:crypto";
+
+// src/model/database.js
+import { randomUUID } from "node:crypto";
+import fs from "node:fs/promises";
+import path from "node:path";
+
+// src/model/schema.js
+var migrations = [
+  {
+    version: 1,
+    sql: `
+CREATE TABLE entity (
+ id TEXT PRIMARY KEY, kind TEXT NOT NULL CHECK(kind IN
+ ('person','ensemble','work','movement','collection','performance','recording','release')),
+ data TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(data)), revision INTEGER NOT NULL DEFAULT 1,
+ created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL, deleted_at INTEGER
+);
+CREATE TABLE relation (
+ id TEXT PRIMARY KEY, kind TEXT NOT NULL, source_id TEXT NOT NULL REFERENCES entity(id),
+ target_id TEXT NOT NULL REFERENCES entity(id), position INTEGER NOT NULL DEFAULT 1 CHECK(position>0),
+ occurrence INTEGER NOT NULL DEFAULT 1 CHECK(occurrence>0), data TEXT NOT NULL CHECK(json_valid(data)),
+ UNIQUE(kind,source_id,target_id,occurrence), UNIQUE(kind,source_id,position)
+);
+CREATE TABLE credit (
+ id TEXT PRIMARY KEY, target_id TEXT NOT NULL REFERENCES entity(id),
+ contributor_id TEXT NOT NULL REFERENCES entity(id), role TEXT NOT NULL,
+ instrument TEXT, position INTEGER NOT NULL CHECK(position>0), assertion_id TEXT REFERENCES assertion(id),
+ UNIQUE(target_id,contributor_id,role,instrument)
+);
+CREATE TABLE external_identity (
+ entity_id TEXT NOT NULL REFERENCES entity(id), provider TEXT NOT NULL, record_kind TEXT NOT NULL,
+ record_id TEXT NOT NULL, state TEXT NOT NULL CHECK(state IN ('active','stale','deleted','conflict')),
+ evidence TEXT NOT NULL CHECK(json_valid(evidence)), PRIMARY KEY(entity_id,provider,record_kind,record_id)
+);
+CREATE UNIQUE INDEX external_identity_active ON external_identity(provider,record_kind,record_id) WHERE state='active';
+CREATE TABLE alias (
+ id TEXT PRIMARY KEY, entity_id TEXT NOT NULL REFERENCES entity(id), text TEXT NOT NULL,
+ normalized TEXT NOT NULL, language TEXT, kind TEXT NOT NULL, assertion_id TEXT REFERENCES assertion(id)
+);
+CREATE TABLE catalogue_number (
+ id TEXT PRIMARY KEY, entity_id TEXT NOT NULL REFERENCES entity(id), system TEXT NOT NULL,
+ display TEXT NOT NULL, normalized TEXT NOT NULL, assertion_id TEXT REFERENCES assertion(id)
+);
+CREATE TABLE core_instance (id TEXT PRIMARY KEY, epoch TEXT NOT NULL, generation INTEGER NOT NULL DEFAULT 0);
+CREATE TABLE track_link (
+ id TEXT PRIMARY KEY, instance_id TEXT NOT NULL REFERENCES core_instance(id), core_id TEXT NOT NULL,
+ file_id TEXT NOT NULL, state TEXT NOT NULL CHECK(state IN ('active','missing','review')),
+ evidence TEXT NOT NULL CHECK(json_valid(evidence)), revision INTEGER NOT NULL DEFAULT 1,
+ created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL
+);
+CREATE INDEX track_instance ON track_link(instance_id);
+CREATE INDEX track_path ON track_link(json_extract(evidence,'$.path'));
+CREATE INDEX track_read_path ON track_link(json_extract(evidence,'$.readPath'));
+CREATE INDEX track_real_path ON track_link(json_extract(evidence,'$.observedRealPath'));
+CREATE UNIQUE INDEX track_active ON track_link(instance_id,core_id,file_id) WHERE state='active';
+CREATE TABLE track_evidence (
+ id INTEGER PRIMARY KEY, track_link_id TEXT NOT NULL REFERENCES track_link(id), generation INTEGER NOT NULL,
+ evidence TEXT NOT NULL CHECK(json_valid(evidence)), observed_at INTEGER NOT NULL
+);
+CREATE TABLE release_item (
+ id TEXT PRIMARY KEY, release_id TEXT NOT NULL REFERENCES entity(id), disc INTEGER NOT NULL CHECK(disc>0),
+ position INTEGER NOT NULL CHECK(position>0), UNIQUE(release_id,disc,position)
+);
+CREATE TABLE release_item_recording (
+ item_id TEXT NOT NULL REFERENCES release_item(id), recording_id TEXT NOT NULL REFERENCES entity(id),
+ occurrence INTEGER NOT NULL CHECK(occurrence>0), start_ms INTEGER NOT NULL CHECK(start_ms>=0),
+ end_ms INTEGER CHECK(end_ms>start_ms), PRIMARY KEY(item_id,recording_id,occurrence)
+);
+CREATE TABLE track_release_item (
+ track_link_id TEXT NOT NULL REFERENCES track_link(id), item_id TEXT NOT NULL REFERENCES release_item(id),
+ PRIMARY KEY(track_link_id,item_id)
+);
+CREATE TABLE recording_content (
+ id TEXT PRIMARY KEY, recording_id TEXT NOT NULL REFERENCES entity(id),
+ performance_work_id TEXT NOT NULL REFERENCES relation(id), movement_id TEXT REFERENCES entity(id),
+ position INTEGER NOT NULL CHECK(position>0), start_ms INTEGER NOT NULL CHECK(start_ms>=0),
+ end_ms INTEGER CHECK(end_ms>start_ms), UNIQUE(recording_id,position)
+);
+CREATE TABLE segment (
+ id TEXT PRIMARY KEY, track_link_id TEXT NOT NULL REFERENCES track_link(id), start_ms INTEGER NOT NULL CHECK(start_ms>=0),
+ end_ms INTEGER CHECK(end_ms>start_ms), kind TEXT NOT NULL CHECK(kind IN ('whole','range')),
+ CHECK(kind='whole' OR end_ms IS NOT NULL)
+);
+CREATE TABLE segment_content (
+ segment_id TEXT NOT NULL REFERENCES segment(id), content_id TEXT NOT NULL REFERENCES recording_content(id),
+ occurrence INTEGER NOT NULL CHECK(occurrence>0), PRIMARY KEY(segment_id,content_id,occurrence)
+);
+CREATE TABLE realization (
+ id TEXT PRIMARY KEY, work_id TEXT NOT NULL REFERENCES entity(id), performance_work_id TEXT NOT NULL REFERENCES relation(id),
+ label TEXT
+);
+CREATE TABLE realization_item (
+ id TEXT PRIMARY KEY, realization_id TEXT NOT NULL REFERENCES realization(id), movement_id TEXT REFERENCES entity(id),
+ segment_id TEXT NOT NULL REFERENCES segment(id), sequence INTEGER NOT NULL CHECK(sequence>0),
+ occurrence INTEGER NOT NULL CHECK(occurrence>0), UNIQUE(realization_id,sequence)
+);
+CREATE TABLE metadata_target (
+ id TEXT PRIMARY KEY, entity_id TEXT UNIQUE REFERENCES entity(id), track_link_id TEXT UNIQUE REFERENCES track_link(id),
+ album_ref TEXT UNIQUE, CHECK((entity_id IS NOT NULL)+(track_link_id IS NOT NULL)+(album_ref IS NOT NULL)=1)
+);
+CREATE TABLE field_definition (key TEXT PRIMARY KEY, type TEXT NOT NULL CHECK(type IN ('string','number','array','object','boolean')));
+INSERT INTO field_definition VALUES
+ ('title','string'),('name','string'),('nickname','string'),('description','string'),('date','string'),
+ ('period','string'),('form','string'),('key','string'),('catalogue','array'),('instrumentation','array'),
+ ('artistDisplay','string'),('movementNumber','string'),('tempo','string'),('aliases','array');
+CREATE TABLE assertion (
+ id TEXT PRIMARY KEY, target_id TEXT NOT NULL REFERENCES metadata_target(id), field TEXT NOT NULL REFERENCES field_definition(key),
+ value TEXT NOT NULL CHECK(json_valid(value)), source TEXT NOT NULL CHECK(source IN ('manual','provider','derived')),
+ provider TEXT, record_id TEXT, state TEXT NOT NULL CHECK(state IN ('active','stale','deleted','conflict','superseded')),
+ confidence REAL CHECK(confidence BETWEEN 0 AND 1), actor TEXT, updated_at INTEGER NOT NULL,
+ prior_id TEXT REFERENCES assertion(id), CHECK(source!='provider' OR (provider IS NOT NULL AND record_id IS NOT NULL))
+);
+CREATE INDEX assertion_field ON assertion(target_id,field,updated_at);
+CREATE TABLE pinned_override (
+ target_id TEXT NOT NULL REFERENCES metadata_target(id), field TEXT NOT NULL REFERENCES field_definition(key),
+ assertion_id TEXT NOT NULL REFERENCES assertion(id), actor TEXT NOT NULL, updated_at INTEGER NOT NULL,
+ PRIMARY KEY(target_id,field)
+);
+CREATE TABLE field_resolution (
+ target_id TEXT NOT NULL REFERENCES metadata_target(id), field TEXT NOT NULL REFERENCES field_definition(key),
+ assertion_id TEXT NOT NULL REFERENCES assertion(id), PRIMARY KEY(target_id,field)
+);
+CREATE TABLE provider_record (
+ provider TEXT NOT NULL, record_id TEXT NOT NULL, target_id TEXT NOT NULL REFERENCES metadata_target(id),
+ state TEXT NOT NULL, updated_at INTEGER NOT NULL, PRIMARY KEY(provider,record_id,target_id)
+);
+CREATE TABLE classification (
+ target_id TEXT PRIMARY KEY REFERENCES metadata_target(id), state TEXT NOT NULL CHECK(state IN ('classical','not_classical','unsure')),
+ pinned INTEGER NOT NULL CHECK(pinned IN (0,1)), score INTEGER NOT NULL, evidence TEXT NOT NULL CHECK(json_valid(evidence)),
+ rule_version INTEGER NOT NULL, updated_at INTEGER NOT NULL
+);
+CREATE TABLE review_item (
+ id TEXT PRIMARY KEY, kind TEXT NOT NULL, target_id TEXT NOT NULL, evidence TEXT NOT NULL CHECK(json_valid(evidence)),
+ status TEXT NOT NULL DEFAULT 'open' CHECK(status IN ('open','resolved')), created_at INTEGER NOT NULL
+);
+CREATE UNIQUE INDEX review_open ON review_item(kind,target_id) WHERE status='open';
+CREATE TABLE audit_event (
+ id INTEGER PRIMARY KEY, actor TEXT, action TEXT NOT NULL, target_id TEXT NOT NULL,
+ data TEXT NOT NULL CHECK(json_valid(data)), created_at INTEGER NOT NULL
+);
+CREATE TABLE model_job (
+ id TEXT PRIMARY KEY, type TEXT NOT NULL, key TEXT NOT NULL, input TEXT NOT NULL CHECK(json_valid(input)),
+ state TEXT NOT NULL CHECK(state IN ('queued','running','retry','done','failed','cancelled')),
+ progress TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(progress)), owner TEXT, lease_until INTEGER NOT NULL DEFAULT 0,
+ generation INTEGER NOT NULL DEFAULT 0, attempt INTEGER NOT NULL DEFAULT 0, max_attempts INTEGER NOT NULL,
+ next_run_at INTEGER NOT NULL DEFAULT 0, cancel_requested INTEGER NOT NULL DEFAULT 0, error TEXT, created_at INTEGER NOT NULL
+);
+CREATE UNIQUE INDEX job_active ON model_job(key) WHERE state IN ('queued','running','retry');
+`
+  }
+];
+
+// src/model/database.js
+var SCHEMA_VERSION = 1;
+function validateDatabase(db) {
+  if (db.prepare("PRAGMA integrity_check").get().integrity_check !== "ok" || db.prepare("PRAGMA foreign_key_check").all().length)
+    throw new Error("Classical database integrity check failed");
+}
+async function backupDatabase(db, destination) {
+  const { backup } = await import("node:sqlite");
+  await fs.mkdir(path.dirname(destination), { recursive: true });
+  const temporary = `${destination}.${randomUUID()}.tmp`;
+  try {
+    await backup(db, temporary);
+    const { DatabaseSync } = await import("node:sqlite");
+    const check = new DatabaseSync(temporary, { readOnly: true });
+    try {
+      validateDatabase(check);
+    } finally {
+      check.close();
+    }
+    await fs.rename(temporary, destination);
+  } finally {
+    await fs.rm(temporary, { force: true });
+  }
+  return destination;
+}
+async function openDatabase(folder, { migrations: migrations2 = migrations, maxVersion = SCHEMA_VERSION } = {}) {
+  const { DatabaseSync } = await import("node:sqlite");
+  await fs.mkdir(folder, { recursive: true });
+  const filename = path.join(folder, "classical.sqlite");
+  const db = new DatabaseSync(filename);
+  try {
+    db.exec("PRAGMA busy_timeout=5000; PRAGMA foreign_keys=ON");
+    let version2 = db.prepare("PRAGMA user_version").get().user_version;
+    if (version2 > maxVersion)
+      throw new Error(
+        `Classical schema ${version2} is newer than supported ${maxVersion}; restore a compatible backup`
+      );
+    db.exec("PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL");
+    for (const migration of migrations2) {
+      if (migration.version <= version2 || migration.version > maxVersion)
+        continue;
+      await backupDatabase(
+        db,
+        path.join(
+          folder,
+          "backups",
+          `before-v${migration.version}-${randomUUID()}.sqlite`
+        )
+      );
+      db.exec("BEGIN IMMEDIATE");
+      try {
+        version2 = db.prepare("PRAGMA user_version").get().user_version;
+        if (version2 < migration.version) {
+          if (migration.version !== version2 + 1)
+            throw new Error("Non-contiguous classical migration");
+          db.exec(migration.sql);
+          db.exec(
+            "CREATE TABLE IF NOT EXISTS migration_journal(version INTEGER PRIMARY KEY, applied_at INTEGER NOT NULL)"
+          );
+          db.prepare("INSERT INTO migration_journal VALUES (?,?)").run(
+            migration.version,
+            Date.now()
+          );
+          db.exec(`PRAGMA user_version=${migration.version}`);
+          validateDatabase(db);
+        }
+        db.exec("COMMIT");
+        version2 = db.prepare("PRAGMA user_version").get().user_version;
+      } catch (error) {
+        db.exec("ROLLBACK");
+        throw error;
+      }
+    }
+    if (version2 !== maxVersion)
+      throw new Error(`Missing migration to classical schema ${maxVersion}`);
+    validateDatabase(db);
+    return { db, filename };
+  } catch (error) {
+    db.close();
+    throw error;
+  }
+}
+var activeTransactions = /* @__PURE__ */ new WeakSet();
+function transaction(db, run) {
+  const nested = activeTransactions.has(db);
+  const savepoint = `nested_${randomUUID().replaceAll("-", "")}`;
+  db.exec(nested ? `SAVEPOINT ${savepoint}` : "BEGIN IMMEDIATE");
+  if (!nested) activeTransactions.add(db);
+  try {
+    const result = run();
+    if (result && typeof result.then === "function")
+      throw new Error("No asynchronous work inside classical transactions");
+    db.exec(nested ? `RELEASE ${savepoint}` : "COMMIT");
+    return result;
+  } catch (error) {
+    db.exec(
+      nested ? `ROLLBACK TO ${savepoint}; RELEASE ${savepoint}` : "ROLLBACK"
+    );
+    throw error;
+  } finally {
+    if (!nested) activeTransactions.delete(db);
+  }
+}
+
+// src/model/catalogue.js
+var kinds = /* @__PURE__ */ new Set([
+  "person",
+  "ensemble",
+  "work",
+  "movement",
+  "collection",
+  "performance",
+  "recording",
+  "release"
+]);
+var roles = /* @__PURE__ */ new Set([
+  "composer",
+  "soloist",
+  "performer",
+  "conductor",
+  "orchestra",
+  "ensemble",
+  "choir",
+  "arranger"
+]);
+var relations = {
+  movement: [["work"], ["movement"]],
+  collection_member: [["collection"], ["work", "collection"]],
+  performance_work: [["performance"], ["work"]],
+  recording_performance: [["recording"], ["performance"]],
+  work_relation: [["work"], ["work"]],
+  recording_relation: [["recording"], ["recording"]]
+};
+var json = (value) => JSON.stringify(value);
+var parse = (row) => row && { ...row, data: JSON.parse(row.data) };
+var positive = (value) => Number.isSafeInteger(value) && value > 0;
+var range = (start, end) => Number.isSafeInteger(start) && start >= 0 && (end === null || Number.isSafeInteger(end) && end > start);
+var Catalogue = class {
+  constructor(db, filename) {
+    this.db = db;
+    this.filename = filename;
+  }
+  close() {
+    this.db.close();
+  }
+  backup(destination) {
+    return backupDatabase(this.db, destination);
+  }
+  audit(action, target, data = {}, actor = null) {
+    this.db.prepare(
+      "INSERT INTO audit_event(actor,action,target_id,data,created_at) VALUES (?,?,?,?,?)"
+    ).run(actor, action, target, json(data), Date.now());
+  }
+  review(kind, target, evidence2) {
+    this.db.prepare(
+      `INSERT INTO review_item VALUES (?,?,?,?, 'open',?)
+      ON CONFLICT(kind,target_id) WHERE status='open' DO UPDATE SET evidence=excluded.evidence`
+    ).run(randomUUID2(), kind, target, json(evidence2), Date.now());
+  }
+  entity(id, expected) {
+    const row = parse(
+      this.db.prepare("SELECT * FROM entity WHERE id=? AND deleted_at IS NULL").get(id)
+    );
+    if (!row || expected && ![].concat(expected).includes(row.kind))
+      throw new Error("Missing entity or wrong entity kind");
+    return row;
+  }
+  createEntity(kind, data = {}) {
+    if (!kinds.has(kind) || !data || Array.isArray(data) || typeof data !== "object")
+      throw new Error("Invalid entity");
+    if (data.durationMs != null && !positive(data.durationMs))
+      throw new Error("Invalid entity duration");
+    if (data.date != null && (typeof data.date !== "string" || !/^\d{4}(-(?:0[1-9]|1[0-2])(-(?:0[1-9]|[12]\d|3[01]))?)?$/.test(
+      data.date
+    )))
+      throw new Error("Use a partial ISO date, without invented precision");
+    return transaction(this.db, () => {
+      const id = randomUUID2(), now = Date.now();
+      this.db.prepare(
+        "INSERT INTO entity(id,kind,data,created_at,updated_at) VALUES (?,?,?,?,?)"
+      ).run(id, kind, json(data), now, now);
+      this.db.prepare("INSERT INTO metadata_target(id,entity_id) VALUES (?,?)").run(id, id);
+      this.audit("entity.create", id, { kind });
+      return id;
+    });
+  }
+  relate(kind, source, target, { position = 1, occurrence = 1, ...data } = {}) {
+    return transaction(this.db, () => {
+      const rule = relations[kind];
+      if (!rule || !positive(position) || !positive(occurrence) || source === target)
+        throw new Error("Invalid relation");
+      this.entity(source, rule[0]);
+      this.entity(target, rule[1]);
+      if (kind === "movement" && this.db.prepare(
+        "SELECT 1 FROM relation WHERE kind='movement' AND target_id=?"
+      ).get(target))
+        throw new Error("Movement already belongs to a work");
+      if (kind === "collection_member" && this.db.prepare(
+        `WITH RECURSIVE descendants(id) AS
+        (SELECT ? UNION SELECT r.target_id FROM relation r JOIN descendants d ON r.source_id=d.id
+         WHERE r.kind='collection_member') SELECT 1 FROM descendants WHERE id=?`
+      ).get(target, source))
+        throw new Error("Collection cycle");
+      const id = randomUUID2();
+      this.db.prepare("INSERT INTO relation VALUES (?,?,?,?,?,?,?)").run(id, kind, source, target, position, occurrence, json(data));
+      this.audit("relation.create", id, { kind, source, target });
+      return id;
+    });
+  }
+  credit(target, contributor, role, { instrument = null, position = 1, assertionId = null } = {}) {
+    return transaction(this.db, () => {
+      this.entity(target);
+      const person = this.entity(contributor, ["person", "ensemble"]);
+      if (!roles.has(role) || !positive(position) || ["composer", "soloist", "conductor", "arranger"].includes(role) && person.kind !== "person" || ["orchestra", "ensemble", "choir"].includes(role) && person.kind !== "ensemble")
+        throw new Error("Invalid role/contributor");
+      if (assertionId) {
+        const assertion = this.db.prepare("SELECT target_id FROM assertion WHERE id=?").get(assertionId);
+        if (assertion?.target_id !== target)
+          throw new Error("Credit provenance target mismatch");
+      }
+      const id = randomUUID2();
+      this.db.prepare("INSERT INTO credit VALUES (?,?,?,?,?,?,?)").run(id, target, contributor, role, instrument, position, assertionId);
+      return id;
+    });
+  }
+  externalIdentity(entity, provider, recordKind, recordId, { confidence = 1, threshold = 0.95, evidence: evidence2 = {} } = {}) {
+    return transaction(this.db, () => {
+      this.entity(entity);
+      if (!provider || !recordKind || !recordId || !Number.isFinite(confidence) || confidence < 0 || confidence > 1 || !Number.isFinite(threshold) || threshold < 0.95 || threshold > 1)
+        throw new Error("Invalid provider identity");
+      const existing = this.db.prepare(
+        `SELECT entity_id FROM external_identity WHERE provider=? AND record_kind=? AND record_id=? AND state='active'`
+      ).get(provider, recordKind, recordId);
+      if (confidence < threshold || existing && existing.entity_id !== entity) {
+        this.review("identity", entity, {
+          provider,
+          recordKind,
+          recordId,
+          confidence,
+          evidence: evidence2
+        });
+        return false;
+      }
+      this.db.prepare(
+        `INSERT INTO external_identity VALUES (?,?,?,?,'active',?)
+        ON CONFLICT(entity_id,provider,record_kind,record_id) DO UPDATE SET state='active',evidence=excluded.evidence`
+      ).run(entity, provider, recordKind, recordId, json(evidence2));
+      return true;
+    });
+  }
+  releaseItem(release, { disc = 1, position }) {
+    this.entity(release, "release");
+    if (!positive(disc) || !positive(position))
+      throw new Error("Invalid release placement");
+    const id = randomUUID2();
+    this.db.prepare("INSERT INTO release_item VALUES (?,?,?,?)").run(id, release, disc, position);
+    return id;
+  }
+  attachRecording(item, recording, { occurrence = 1, startMs = 0, endMs = null } = {}) {
+    this.entity(recording, "recording");
+    if (!positive(occurrence) || !range(startMs, endMs))
+      throw new Error("Invalid recording range");
+    this.db.prepare("INSERT INTO release_item_recording VALUES (?,?,?,?,?)").run(item, recording, occurrence, startMs, endMs);
+  }
+  attachTrack(track, item) {
+    this.db.prepare("INSERT INTO track_release_item VALUES (?,?)").run(track, item);
+  }
+  performanceWork(id) {
+    const row = this.db.prepare("SELECT * FROM relation WHERE id=? AND kind='performance_work'").get(id);
+    if (!row) throw new Error("Missing performance/work");
+    return row;
+  }
+  checkMovement(work, movement) {
+    if (movement !== null && !this.db.prepare(
+      "SELECT 1 FROM relation WHERE kind='movement' AND source_id=? AND target_id=?"
+    ).get(work, movement))
+      throw new Error("Movement belongs to a different work");
+  }
+  recordingContent(recording, performanceWork, { movement = null, position = 1, startMs = 0, endMs = null } = {}) {
+    return transaction(this.db, () => {
+      this.entity(recording, "recording");
+      const pw = this.performanceWork(performanceWork);
+      this.checkMovement(pw.target_id, movement);
+      if (!this.db.prepare(
+        "SELECT 1 FROM relation WHERE kind='recording_performance' AND source_id=? AND target_id=?"
+      ).get(recording, pw.source_id))
+        throw new Error("Recording does not capture this performance");
+      const duration = this.entity(recording).data.durationMs;
+      if (!positive(position) || !range(startMs, endMs) || duration != null && (startMs >= duration || endMs > duration))
+        throw new Error("Invalid content range");
+      const id = randomUUID2();
+      this.db.prepare("INSERT INTO recording_content VALUES (?,?,?,?,?,?,?)").run(
+        id,
+        recording,
+        performanceWork,
+        movement,
+        position,
+        startMs,
+        endMs
+      );
+      return id;
+    });
+  }
+  segment(track, { startMs = 0, endMs = null, kind = "range" } = {}) {
+    return transaction(this.db, () => {
+      const row = this.db.prepare("SELECT evidence FROM track_link WHERE id=?").get(track);
+      if (!row) throw new Error("Missing track link");
+      const duration = JSON.parse(row.evidence).durationMs;
+      if (!range(startMs, endMs) || !["range", "whole"].includes(kind) || kind === "range" && endMs === null || kind === "whole" && startMs !== 0 || duration != null && (startMs >= duration || endMs > duration))
+        throw new Error("Invalid track range");
+      const id = randomUUID2();
+      this.db.prepare("INSERT INTO segment VALUES (?,?,?,?,?)").run(id, track, startMs, endMs, kind);
+      return id;
+    });
+  }
+  segmentContent(segment, content, occurrence = 1) {
+    if (!positive(occurrence)) throw new Error("Invalid occurrence");
+    this.db.prepare("INSERT INTO segment_content VALUES (?,?,?)").run(segment, content, occurrence);
+  }
+  realization(work, performanceWork, label = null) {
+    this.entity(work, "work");
+    if (this.performanceWork(performanceWork).target_id !== work)
+      throw new Error("Work/performance mismatch");
+    const id = randomUUID2();
+    this.db.prepare("INSERT INTO realization VALUES (?,?,?,?)").run(id, work, performanceWork, label);
+    return id;
+  }
+  realizationItem(realization, segment, {
+    movement = null,
+    sequence = 1,
+    occurrence = 1,
+    intentionalOverlap = false
+  } = {}) {
+    return transaction(this.db, () => {
+      const row = this.db.prepare("SELECT * FROM realization WHERE id=?").get(realization);
+      if (!row || !positive(sequence) || !positive(occurrence))
+        throw new Error("Invalid realization item");
+      this.checkMovement(row.work_id, movement);
+      const content = this.db.prepare(
+        `SELECT c.* FROM segment_content s JOIN recording_content c ON c.id=s.content_id
+      WHERE s.segment_id=? AND c.performance_work_id=? AND c.movement_id IS ?`
+      ).all(segment, row.performance_work_id, movement);
+      if (!content.length)
+        throw new Error("Segment belongs to another interpretation/movement");
+      const repeated = this.db.prepare(
+        "SELECT 1 FROM realization_item WHERE realization_id=? AND movement_id IS ? AND occurrence=?"
+      ).get(realization, movement, occurrence);
+      if (repeated)
+        throw new Error("Repeated movement requires explicit new occurrence");
+      const audio = this.db.prepare("SELECT * FROM segment WHERE id=?").get(segment);
+      const overlaps = this.db.prepare(
+        `SELECT s.* FROM realization_item i JOIN segment s ON s.id=i.segment_id
+      WHERE i.realization_id=? AND s.track_link_id=? AND s.start_ms<coalesce(?,9223372036854775807)
+      AND coalesce(s.end_ms,9223372036854775807)>?`
+      ).all(realization, audio.track_link_id, audio.end_ms, audio.start_ms);
+      if (overlaps.length && !intentionalOverlap)
+        throw new Error(
+          "Overlapping playback requires explicit artistic occurrence approval"
+        );
+      const id = randomUUID2();
+      this.db.prepare("INSERT INTO realization_item VALUES (?,?,?,?,?,?)").run(id, realization, movement, segment, sequence, occurrence);
+      return id;
+    });
+  }
+  alias(entity, text2, { language = null, kind = "alternate", assertionId = null } = {}) {
+    this.entity(entity);
+    if (typeof text2 !== "string" || !text2.trim())
+      throw new Error("Invalid alias");
+    const id = randomUUID2();
+    this.db.prepare("INSERT INTO alias VALUES (?,?,?,?,?,?,?)").run(
+      id,
+      entity,
+      text2,
+      text2.normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase(),
+      language,
+      kind,
+      assertionId
+    );
+    return id;
+  }
+  catalogueNumber(entity, system, display, normalized) {
+    this.entity(entity, ["work", "collection"]);
+    if (![system, display, normalized].every(
+      (v) => typeof v === "string" && v.length
+    ))
+      throw new Error("Invalid catalogue number");
+    const id = randomUUID2();
+    this.db.prepare("INSERT INTO catalogue_number VALUES (?,?,?,?,?,NULL)").run(id, entity, system, display, normalized);
+    return id;
+  }
+  albumTarget(instance, album) {
+    const ref = json([instance, String(album)]);
+    const existing = this.db.prepare("SELECT id FROM metadata_target WHERE album_ref=?").get(ref);
+    if (existing) return existing.id;
+    const id = randomUUID2();
+    this.db.prepare("INSERT INTO metadata_target(id,album_ref) VALUES (?,?)").run(id, ref);
+    return id;
+  }
+  diagnostics() {
+    return {
+      schema: this.db.prepare("PRAGMA user_version").get().user_version,
+      entities: this.db.prepare("SELECT kind,count(*) AS count FROM entity GROUP BY kind").all(),
+      tracks: this.db.prepare(
+        "SELECT state,count(*) AS count FROM track_link GROUP BY state"
+      ).all(),
+      reviews: this.db.prepare(
+        "SELECT kind,count(*) AS count FROM review_item WHERE status='open' GROUP BY kind"
+      ).all()
+    };
+  }
+};
+async function openCatalogue(folder, options) {
+  const { db, filename } = await openDatabase(folder, options);
+  return new Catalogue(db, filename);
+}
+
+// src/model/jobs.js
+import { randomUUID as randomUUID3 } from "node:crypto";
+var ModelJobs = class {
+  constructor(catalogue) {
+    this.db = catalogue.db;
+  }
+  enqueue(type, key, input, { maxAttempts = 3 } = {}) {
+    if (!type || !key || !Number.isSafeInteger(maxAttempts) || maxAttempts < 1)
+      throw new Error("Invalid job");
+    return transaction(this.db, () => {
+      const existing = this.db.prepare(
+        "SELECT id FROM model_job WHERE key=? AND state IN ('queued','running','retry')"
+      ).get(key);
+      if (existing) return existing.id;
+      const id = randomUUID3();
+      this.db.prepare(
+        `INSERT INTO model_job(id,type,key,input,state,max_attempts,created_at)
+        VALUES (?,?,?,?,'queued',?,?)`
+      ).run(id, type, key, JSON.stringify(input), maxAttempts, Date.now());
+      return id;
+    });
+  }
+  claim(owner, { now = Date.now(), leaseMs = 3e4 } = {}) {
+    if (!owner || !Number.isFinite(leaseMs) || leaseMs <= 0)
+      throw new Error("Invalid job lease");
+    return transaction(this.db, () => {
+      this.db.prepare(
+        "UPDATE model_job SET state='cancelled' WHERE cancel_requested=1 AND (state!='running' OR lease_until<=?)"
+      ).run(now);
+      this.db.prepare(
+        "UPDATE model_job SET state='failed',error='ATTEMPTS_EXHAUSTED' WHERE attempt>=max_attempts AND state='running' AND lease_until<=?"
+      ).run(now);
+      const row = this.db.prepare(
+        `SELECT * FROM model_job WHERE cancel_requested=0 AND attempt<max_attempts AND
+        ((state IN ('queued','retry') AND next_run_at<=?) OR (state='running' AND lease_until<=?)) ORDER BY created_at LIMIT 1`
+      ).get(now, now);
+      if (!row) return null;
+      this.db.prepare(
+        "UPDATE model_job SET state='running',owner=?,lease_until=?,generation=generation+1,attempt=attempt+1 WHERE id=?"
+      ).run(owner, now + leaseMs, row.id);
+      return this.get(row.id);
+    });
+  }
+  get(id) {
+    const row = this.db.prepare("SELECT * FROM model_job WHERE id=?").get(id);
+    return row && {
+      ...row,
+      input: JSON.parse(row.input),
+      progress: JSON.parse(row.progress)
+    };
+  }
+  checkpoint(job, progress, { done = false, now = Date.now(), leaseMs = 3e4, commit } = {}) {
+    return transaction(this.db, () => {
+      const row = this.get(job.id);
+      if (!row || row.state !== "running" || row.owner !== job.owner || row.generation !== job.generation || row.lease_until <= now)
+        throw new Error("Stale job lease");
+      if (row.cancel_requested) {
+        this.db.prepare("UPDATE model_job SET state='cancelled' WHERE id=?").run(job.id);
+        return false;
+      }
+      if (commit) commit();
+      this.db.prepare(
+        "UPDATE model_job SET progress=?,state=?,lease_until=? WHERE id=?"
+      ).run(
+        JSON.stringify(progress),
+        done ? "done" : "running",
+        now + leaseMs,
+        job.id
+      );
+      return true;
+    });
+  }
+  yield(job) {
+    this.db.prepare(
+      `UPDATE model_job SET state='queued',owner=NULL,lease_until=0,attempt=attempt-1
+      WHERE id=? AND owner=? AND generation=? AND state='running'`
+    ).run(job.id, job.owner, job.generation);
+  }
+  fail(job, error, { now = Date.now() } = {}) {
+    this.db.prepare(
+      `UPDATE model_job SET state=CASE WHEN attempt>=max_attempts THEN 'failed' ELSE 'retry' END,
+      error=?,next_run_at=?,lease_until=0 WHERE id=? AND owner=? AND generation=? AND state='running' AND lease_until>?`
+    ).run(
+      String(error).slice(0, 500),
+      now + 1e3 * 2 ** job.attempt,
+      job.id,
+      job.owner,
+      job.generation,
+      now
+    );
+  }
+  cancel(id) {
+    this.db.prepare(
+      "UPDATE model_job SET cancel_requested=1 WHERE id=? AND state IN ('queued','running','retry')"
+    ).run(id);
+  }
+};
+
+// src/model/reconcile.js
+import { randomUUID as randomUUID4 } from "node:crypto";
+var sameAudio = (a, b) => a.size != null && a.size === b.size && a.durationMs != null && a.durationMs === b.durationMs;
+function match(previous, candidate) {
+  const old = JSON.parse(previous.evidence);
+  if (old.fingerprint && candidate.fingerprint && old.fingerprint !== candidate.fingerprint || old.durationMs != null && candidate.durationMs != null && old.durationMs !== candidate.durationMs)
+    return false;
+  if (old.fingerprint && old.fingerprint === candidate.fingerprint) return true;
+  if (old.stableFileId && old.stableFileId === candidate.stableFileId && sameAudio(old, candidate))
+    return true;
+  return previous.core_id === candidate.coreId && previous.file_id === candidate.fileId && old.path === candidate.path && sameAudio(old, candidate);
+}
+function reconcile(catalogue, snapshot) {
+  if (snapshot?.version !== 1 || snapshot.complete !== true || !snapshot.instanceId || !snapshot.epoch || !Number.isSafeInteger(snapshot.generation) || snapshot.generation < 1 || !Array.isArray(snapshot.tracks))
+    throw new Error(
+      "A complete, versioned installation/epoch snapshot is required"
+    );
+  const tracks = snapshot.tracks;
+  const keys = /* @__PURE__ */ new Set();
+  for (const item of tracks) {
+    if (typeof item.coreId !== "string" || !item.coreId || typeof item.fileId !== "string" || !item.fileId || typeof item.path !== "string" || !item.path || !Number.isSafeInteger(item.size) || item.size < 0 || !Number.isSafeInteger(item.durationMs) || item.durationMs <= 0 || item.fingerprint != null && typeof item.fingerprint !== "string" || item.stableFileId != null && typeof item.stableFileId !== "string")
+      throw new Error("Invalid track evidence");
+    const key = json([item.coreId, item.fileId]);
+    if (keys.has(key))
+      throw new Error("Duplicate snapshot track/file identity");
+    keys.add(key);
+  }
+  return transaction(catalogue.db, () => {
+    const db = catalogue.db;
+    const instance = db.prepare("SELECT * FROM core_instance WHERE id=?").get(snapshot.instanceId);
+    if (instance && snapshot.generation <= instance.generation)
+      throw new Error("Stale or repeated scan generation");
+    const changedEpoch = instance && instance.epoch !== snapshot.epoch;
+    db.prepare(
+      `INSERT INTO core_instance VALUES (?,?,?) ON CONFLICT(id) DO UPDATE SET epoch=excluded.epoch,generation=excluded.generation`
+    ).run(snapshot.instanceId, snapshot.epoch, snapshot.generation);
+    const previous = db.prepare("SELECT * FROM track_link WHERE instance_id=?").all(snapshot.instanceId);
+    const index = /* @__PURE__ */ new Map();
+    for (const item of tracks) {
+      for (const key of [
+        json(["core", item.coreId, item.fileId]),
+        ...item.fingerprint ? [json(["hash", item.fingerprint])] : [],
+        ...item.stableFileId ? [json(["stable", item.stableFileId])] : []
+      ]) {
+        if (!index.has(key)) index.set(key, []);
+        index.get(key).push(item);
+      }
+    }
+    const candidates = previous.map((old) => {
+      const evidence2 = JSON.parse(old.evidence);
+      const pool = /* @__PURE__ */ new Set([
+        ...index.get(json(["core", old.core_id, old.file_id])) || [],
+        ...index.get(json(["hash", evidence2.fingerprint])) || [],
+        ...index.get(json(["stable", evidence2.stableFileId])) || []
+      ]);
+      const exact = [...pool].find(
+        (item) => item.coreId === old.core_id && item.fileId === old.file_id && item.path === evidence2.path && match(old, item)
+      );
+      return {
+        old,
+        items: changedEpoch ? [] : exact ? [exact] : [...pool].filter((item) => match(old, item))
+      };
+    });
+    const demand = /* @__PURE__ */ new Map();
+    for (const c of candidates)
+      for (const item of c.items) demand.set(item, (demand.get(item) || 0) + 1);
+    const claimed = /* @__PURE__ */ new Set(), rows = [], now = Date.now();
+    db.prepare("UPDATE track_link SET state='missing' WHERE instance_id=?").run(
+      snapshot.instanceId
+    );
+    for (const { old, items } of candidates) {
+      if (items.length === 1 && demand.get(items[0]) === 1) {
+        const item = items[0];
+        claimed.add(item);
+        db.prepare(
+          "UPDATE track_link SET core_id=?,file_id=?,state='active',evidence=?,revision=revision+1,updated_at=? WHERE id=?"
+        ).run(item.coreId, item.fileId, json(item), now, old.id);
+        db.prepare(
+          "INSERT INTO track_evidence(track_link_id,generation,evidence,observed_at) VALUES (?,?,?,?)"
+        ).run(old.id, snapshot.generation, json(item), now);
+        catalogue.audit("track.reconcile", old.id, {
+          previous: JSON.parse(old.evidence),
+          next: item,
+          generation: snapshot.generation
+        });
+        rows.push({ ...item, id: old.id });
+      } else {
+        const reused = tracks.filter(
+          (t) => t.coreId === old.core_id || t.path === JSON.parse(old.evidence).path
+        );
+        if (changedEpoch || items.length || reused.length) {
+          db.prepare(
+            "UPDATE track_link SET state='review',updated_at=? WHERE id=?"
+          ).run(now, old.id);
+          catalogue.review("track_link", old.id, {
+            epochChanged: !!changedEpoch,
+            candidates: items,
+            reused
+          });
+        }
+      }
+    }
+    for (const item of tracks.filter((t) => !claimed.has(t))) {
+      if (demand.has(item)) continue;
+      const id = randomUUID4();
+      db.prepare(
+        "INSERT INTO track_link VALUES (?,?,?,?,'active',?,1,?,?)"
+      ).run(
+        id,
+        snapshot.instanceId,
+        item.coreId,
+        item.fileId,
+        json(item),
+        now,
+        now
+      );
+      db.prepare(
+        "INSERT INTO metadata_target(id,track_link_id) VALUES (?,?)"
+      ).run(id, id);
+      db.prepare(
+        "INSERT INTO track_evidence(track_link_id,generation,evidence,observed_at) VALUES (?,?,?,?)"
+      ).run(id, snapshot.generation, json(item), now);
+      catalogue.audit("track.create", id, { generation: snapshot.generation });
+      rows.push({ ...item, id });
+    }
+    return rows;
+  });
+}
+function classify(catalogue, target, hints, { manual = null, actor = null, inherited = null } = {}) {
+  return transaction(catalogue.db, () => {
+    const prior = catalogue.db.prepare("SELECT * FROM classification WHERE target_id=?").get(target);
+    if (!manual && prior?.pinned) return prior.state;
+    if (inherited && !["classical", "not_classical", "unsure"].includes(inherited))
+      throw new Error("Invalid inherited classification");
+    if (manual && (!actor || !["classical", "not_classical", "unsure"].includes(manual)))
+      throw new Error("Invalid classification override");
+    const genres = (hints.genres || []).map((s) => s.toLowerCase());
+    const classicalGenre = genres.some(
+      (s) => /\b(classical|baroque|opera|chamber|romantic|choral)\b/.test(s)
+    );
+    const ordinaryGenre = genres.some(
+      (s) => /\b(rock|jazz|pop|electronic|soundtrack)\b/.test(s)
+    );
+    const score = (hints.work ? 4 : 0) + (hints.movement ? 4 : 0) + (classicalGenre ? 4 : 0) + (hints.classicalComposerRelation ? 4 : 0) + (hints.catalogueNumber ? 2 : 0) + (hints.composerDistinct ? 1 : 0);
+    const state = manual || inherited || (score >= 4 ? "classical" : ordinaryGenre && score === 0 ? "not_classical" : "unsure");
+    catalogue.db.prepare(
+      `INSERT INTO classification VALUES (?,?,?,?,?,1,?) ON CONFLICT(target_id)
+      DO UPDATE SET state=excluded.state,pinned=excluded.pinned,score=excluded.score,evidence=excluded.evidence,updated_at=excluded.updated_at`
+    ).run(target, state, manual ? 1 : 0, score, json(hints), Date.now());
+    if (state === "unsure")
+      catalogue.review("classification", target, { hints, score });
+    if (manual) catalogue.audit("classification.pin", target, { state }, actor);
+    return state;
+  });
+}
+
+// src/user-operations.js
+var UserOperations = class {
+  constructor(api, fetchImpl = fetch) {
+    if (api?.version !== 1 || !api.url || !api.token)
+      throw new Error("Local comparison requires the fork's user-operations v1 capability. Update the host; no playlist was changed.");
+    this.api = api;
+    this.fetch = fetchImpl;
+  }
+  async request(method, route, body) {
+    const response = await this.fetch(`${this.api.url}${route}`, {
+      method,
+      headers: { "X-Action-Grant": this.api.token, "Content-Type": "application/json" },
+      ...body !== void 0 && { body: JSON.stringify(body) },
+      signal: AbortSignal.timeout(3e4)
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || `Action failed: ${response.status}`);
+    return data;
+  }
+  async library() {
+    const snapshot = await this.request("GET", "/library");
+    if (snapshot.version !== 1 || snapshot.complete !== true) throw new Error("Incomplete library snapshot; comparison cancelled");
+    return snapshot.library;
+  }
+  async playlist(key, name, tracks) {
+    const queued = await this.request("POST", "/playlists", {
+      key,
+      name,
+      tracks: tracks.map((t) => ({ path: t.path, artistName: t.artist || "Local", trackName: t.title || "Local track" }))
+    });
+    const until = Date.now() + 20 * 6e4;
+    while (Date.now() < until) {
+      const status = await this.request("GET", `/jobs/${queued.operationId}`);
+      if (status.state === "done") return queued.playlistId;
+      if (["failed", "cancelled"].includes(status.state)) throw new Error(status.error || "Playlist operation failed");
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+    throw new Error(`Playlist operation ${queued.operationId} is still pending; completion was not confirmed`);
+  }
+};
 
 // src/tags.js
 var import_node_taglib_sharp = __toESM(require_dist(), 1);
-import { randomUUID } from "node:crypto";
+import { randomUUID as randomUUID5 } from "node:crypto";
 import { closeSync, fstatSync, openSync, readSync } from "node:fs";
-import fs from "node:fs/promises";
-import path from "node:path";
+import fs2 from "node:fs/promises";
+import path2 from "node:path";
 import_node_taglib_sharp.Id3v2Settings.useNumericGenres = false;
 var READ_STYLE = import_node_taglib_sharp.ReadStyle.None | import_node_taglib_sharp.ReadStyle.PictureLazy;
 var READ_WITH_PROPERTIES = import_node_taglib_sharp.ReadStyle.Average | import_node_taglib_sharp.ReadStyle.PictureLazy;
@@ -35221,10 +36092,10 @@ var ADDED_TAG_TYPES = import_node_taglib_sharp.TagTypes.Id3v1 | import_node_tagl
 var ITUNES_MEAN = "com.apple.iTunes";
 var MUSICBRAINZ_UFID_OWNER = "http://musicbrainz.org";
 var AUDIO_EXTENSIONS = /* @__PURE__ */ new Set([".flac", ".mp3", ".m4a", ".mp4", ".ogg", ".oga", ".opus"]);
-var isAudioPath = (file) => AUDIO_EXTENSIONS.has(path.extname(file).toLowerCase());
+var isAudioPath = (file) => AUDIO_EXTENSIONS.has(path2.extname(file).toLowerCase());
 var text = (value) => value == null ? "" : String(value).trim();
 var texts = (value) => (Array.isArray(value) ? value : [value]).map(text).filter(Boolean);
-var positive = (value) => {
+var positive2 = (value) => {
   const number = Number(value);
   return Number.isSafeInteger(number) && number > 0 ? number : 0;
 };
@@ -35329,10 +36200,10 @@ function isFragmentedMp4(filePath) {
 var UnsupportedFormat = class extends Error {
 };
 function openFile(filePath, readStyle = READ_STYLE, asPath = filePath) {
-  if (!isAudioPath(asPath)) throw new UnsupportedFormat(`can't tag ${path.extname(asPath) || "this kind of"} files`);
+  if (!isAudioPath(asPath)) throw new UnsupportedFormat(`can't tag ${path2.extname(asPath) || "this kind of"} files`);
   if (isFragmentedMp4(filePath)) throw new UnsupportedFormat("can't tag fragmented MP4 files");
   try {
-    return import_node_taglib_sharp.File.createFromPath(filePath, `taglib/${path.extname(asPath).slice(1).toLowerCase()}`, readStyle);
+    return import_node_taglib_sharp.File.createFromPath(filePath, `taglib/${path2.extname(asPath).slice(1).toLowerCase()}`, readStyle);
   } catch (error) {
     if (/unsupported format/i.test(String(error?.message))) throw new UnsupportedFormat("can't tag this kind of file");
     throw error;
@@ -35365,8 +36236,8 @@ function readTags(filePath) {
       composer: texts(tag.composers ?? []),
       work: workField.read(file)[0] ?? "",
       workId: workIdField.read(file)[0] ?? "",
-      trackNumber: positive(tag.track),
-      discNumber: positive(tag.disc),
+      trackNumber: positive2(tag.track),
+      discNumber: positive2(tag.disc),
       durationMs: Math.round(file.properties?.durationMilliseconds || 0)
     };
   } finally {
@@ -35375,7 +36246,7 @@ function readTags(filePath) {
 }
 var same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 async function writeTags(filePath, values) {
-  const source = path.resolve(filePath);
+  const source = path2.resolve(filePath);
   const preview = openFile(source);
   let changed;
   try {
@@ -35384,9 +36255,9 @@ async function writeTags(filePath, values) {
     preview.dispose();
   }
   if (!changed.length) return [];
-  const extension = path.extname(source);
-  const working = path.join(path.dirname(source), `.${path.basename(source, extension)}.${randomUUID()}.tagging`);
-  await fs.copyFile(source, working, fs.constants.COPYFILE_FICLONE);
+  const extension = path2.extname(source);
+  const working = path2.join(path2.dirname(source), `.${path2.basename(source, extension)}.${randomUUID5()}.tagging`);
+  await fs2.copyFile(source, working, fs2.constants.COPYFILE_FICLONE);
   try {
     const file = openFile(working, READ_STYLE, source);
     try {
@@ -35407,84 +36278,233 @@ async function writeTags(filePath, values) {
     } finally {
       verified.dispose();
     }
-    await fs.rename(working, source);
+    await fs2.rename(working, source);
   } catch (error) {
-    await fs.rm(working, { force: true }).catch(() => {
+    await fs2.rm(working, { force: true }).catch(() => {
     });
     throw error;
   }
   return changed;
 }
 
-// src/user-operations.js
-var UserOperations = class {
-  constructor(api, fetchImpl = fetch) {
-    if (api?.version !== 1 || !api.url || !api.token)
-      throw new Error("Local comparison requires the fork's user-operations v1 capability. Update the host; no playlist was changed.");
-    this.api = api;
-    this.fetch = fetchImpl;
-  }
-  async request(method, route, body) {
-    const response = await this.fetch(`${this.api.url}${route}`, {
-      method,
-      headers: { "X-Action-Grant": this.api.token, "Content-Type": "application/json" },
-      ...body !== void 0 && { body: JSON.stringify(body) },
-      signal: AbortSignal.timeout(3e4)
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || `Action failed: ${response.status}`);
-    return data;
-  }
-  async library() {
-    const snapshot = await this.request("GET", "/library");
-    if (snapshot.version !== 1 || snapshot.complete !== true) throw new Error("Incomplete library snapshot; comparison cancelled");
-    return snapshot.library;
-  }
-  async playlist(key, name, tracks) {
-    const queued = await this.request("POST", "/playlists", {
-      key,
-      name,
-      tracks: tracks.map((t) => ({ path: t.path, artistName: t.artist || "Local", trackName: t.title || "Local track" }))
-    });
-    const until = Date.now() + 20 * 6e4;
-    while (Date.now() < until) {
-      const status = await this.request("GET", `/jobs/${queued.operationId}`);
-      if (status.state === "done") return queued.playlistId;
-      if (["failed", "cancelled"].includes(status.state)) throw new Error(status.error || "Playlist operation failed");
-      await new Promise((resolve) => setTimeout(resolve, 250));
-    }
-    throw new Error(`Playlist operation ${queued.operationId} is still pending; completion was not confirmed`);
-  }
+// src/model/runtime.js
+var modelFolder = (ctx) => path3.join(ctx.dataFolder, "model");
+var fingerprint = async (file) => {
+  const hash = createHash("sha256");
+  for await (const bytes of createReadStream(file)) hash.update(bytes);
+  return `file-sha256-v1:${hash.digest("hex")}`;
 };
+async function modelStatus(ctx) {
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  try {
+    return {
+      ...catalogue.diagnostics(),
+      jobs: catalogue.db.prepare("SELECT state,count(*) AS count FROM model_job GROUP BY state").all()
+    };
+  } finally {
+    catalogue.close();
+  }
+}
+async function enqueueModelScan(ctx, actor) {
+  if (actor?.role !== "admin")
+    throw new Error("Classical model scans require a current host admin");
+  const library = await new UserOperations(
+    ctx.userOperations,
+    ctx.fetch
+  ).library();
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  try {
+    let instance = catalogue.db.prepare("SELECT * FROM core_instance LIMIT 1").get();
+    if (!instance) {
+      const id = randomUUID6();
+      catalogue.db.prepare("INSERT INTO core_instance VALUES (?,?,0)").run(id, ctx.settings.libraryEpoch || "initial");
+      instance = { id, generation: 0 };
+    }
+    const files = library.tracks.flatMap(
+      (track) => track.files.filter((f) => f.available && f.source !== "flow").map((file) => ({
+        coreId: String(track.id),
+        fileId: String(file.id ?? file.path),
+        path: file.path,
+        readPath: file.readPath || file.path,
+        durationMs: file.durationMs ?? track.durationMs,
+        albumId: file.albumId
+      }))
+    );
+    const jobs = new ModelJobs(catalogue);
+    return jobs.enqueue("library_scan", "library_scan", {
+      actor: String(actor.id),
+      instanceId: instance.id,
+      epoch: ctx.settings.libraryEpoch || "initial",
+      generation: instance.generation + 1,
+      files
+    });
+  } finally {
+    catalogue.close();
+  }
+}
+async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 10 } = {}) {
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  const jobs = new ModelJobs(catalogue), owner = randomUUID6(), deadline = Date.now() + budgetMs;
+  try {
+    const job = jobs.claim(owner, { leaseMs: 6e4 });
+    if (!job) return;
+    try {
+      if (job.type !== "library_scan")
+        throw new Error("Unknown model job type");
+      const input = job.input;
+      let cursor = job.progress.cursor || 0;
+      const collected = job.progress.collected || [];
+      const root = await fs3.realpath(ctx.libraryFolder);
+      while (cursor < input.files.length && Date.now() < deadline) {
+        const stop = Math.min(cursor + batchSize, input.files.length);
+        for (; cursor < stop; cursor++) {
+          if (jobs.get(job.id).cancel_requested) break;
+          const file = input.files[cursor];
+          const real = await fs3.realpath(file.readPath);
+          const relative = path3.relative(root, real);
+          if (!relative || relative === ".." || relative.startsWith(`..${path3.sep}`) || path3.isAbsolute(relative))
+            throw new Error(
+              "Indexed model file is outside the configured library"
+            );
+          const before = await fs3.stat(real);
+          const hash = await fingerprint(real);
+          const tags = readTags(real);
+          const after = await fs3.stat(real);
+          if (before.size !== after.size || before.mtimeMs !== after.mtimeMs || before.ino !== after.ino)
+            throw new Error(
+              "Library file changed during model scan; retry required"
+            );
+          const durationMs = tags.durationMs || file.durationMs;
+          if (!Number.isSafeInteger(durationMs) || durationMs <= 0)
+            throw new Error("Missing track duration");
+          collected.push({
+            ...file,
+            observedRealPath: real,
+            size: after.size,
+            durationMs,
+            fingerprint: hash,
+            hints: {
+              genres: tags.genres,
+              work: tags.work,
+              composerDistinct: tags.composer.length > 0 && !tags.composer.includes(tags.artist)
+            }
+          });
+        }
+        if (!jobs.checkpoint(job, { cursor, collected }, { leaseMs: 6e4 }))
+          return;
+      }
+      const done = cursor === input.files.length;
+      const committed = jobs.checkpoint(
+        job,
+        { cursor, collected },
+        {
+          done,
+          leaseMs: 6e4,
+          commit: done ? () => {
+            const rows = reconcile(catalogue, {
+              version: 1,
+              complete: true,
+              instanceId: input.instanceId,
+              epoch: input.epoch,
+              generation: input.generation,
+              tracks: collected
+            });
+            const albums = /* @__PURE__ */ new Map();
+            for (const row of rows) {
+              const albumTarget = row.albumId == null ? null : catalogue.albumTarget(input.instanceId, row.albumId);
+              const albumPin = albumTarget && catalogue.db.prepare(
+                "SELECT state,pinned FROM classification WHERE target_id=?"
+              ).get(albumTarget);
+              const inherited = albumPin?.pinned ? albumPin.state : null;
+              const state = classify(
+                catalogue,
+                row.id,
+                {
+                  ...row.hints,
+                  ...inherited && { albumOverride: inherited }
+                },
+                { inherited }
+              );
+              if (row.albumId != null) {
+                if (!albums.has(row.albumId)) albums.set(row.albumId, []);
+                albums.get(row.albumId).push(state);
+              }
+            }
+            for (const [albumId, states] of albums) {
+              const target = catalogue.albumTarget(
+                input.instanceId,
+                albumId
+              );
+              const state = states.every((s) => s === "classical") ? "classical" : states.every((s) => s === "not_classical") ? "not_classical" : "unsure";
+              const prior = catalogue.db.prepare(
+                "SELECT pinned FROM classification WHERE target_id=?"
+              ).get(target);
+              if (!prior?.pinned)
+                catalogue.db.prepare(
+                  `INSERT INTO classification VALUES (?,?,0,0,?,1,?)
+            ON CONFLICT(target_id) DO UPDATE SET state=excluded.state,evidence=excluded.evidence,updated_at=excluded.updated_at`
+                ).run(
+                  target,
+                  state,
+                  JSON.stringify({ trackStates: states }),
+                  Date.now()
+                );
+            }
+          } : void 0
+        }
+      );
+      if (committed && !done) jobs.yield(job);
+    } catch (error) {
+      jobs.fail(job, error.message);
+      throw error;
+    }
+  } finally {
+    catalogue.close();
+  }
+}
+async function cancelModelScan(ctx, actor) {
+  if (actor?.role !== "admin")
+    throw new Error("Cancelling model scans requires a current host admin");
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  try {
+    const jobs = new ModelJobs(catalogue);
+    for (const row of catalogue.db.prepare(
+      "SELECT id FROM model_job WHERE state IN ('queued','running','retry')"
+    ).all())
+      jobs.cancel(row.id);
+  } finally {
+    catalogue.close();
+  }
+}
 
 // src/store.js
-import { createHash, randomUUID as randomUUID2 } from "node:crypto";
-import fs2 from "node:fs/promises";
-import path2 from "node:path";
+import { createHash as createHash2, randomUUID as randomUUID7 } from "node:crypto";
+import fs4 from "node:fs/promises";
+import path4 from "node:path";
 var sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 async function readJson(file, fallback) {
   try {
-    return JSON.parse(await fs2.readFile(file, "utf8"));
+    return JSON.parse(await fs4.readFile(file, "utf8"));
   } catch {
     return fallback;
   }
 }
 async function writeJson(file, value) {
-  await fs2.mkdir(path2.dirname(file), { recursive: true });
-  const temp = `${file}.${process.pid}.${randomUUID2()}.tmp`;
-  await fs2.writeFile(temp, JSON.stringify(value));
-  await fs2.rename(temp, file);
+  await fs4.mkdir(path4.dirname(file), { recursive: true });
+  const temp = `${file}.${process.pid}.${randomUUID7()}.tmp`;
+  await fs4.writeFile(temp, JSON.stringify(value));
+  await fs4.rename(temp, file);
 }
 async function tryLock(dir, staleMs) {
   try {
-    await fs2.mkdir(dir);
+    await fs4.mkdir(dir);
   } catch (error) {
     if (error.code !== "EEXIST") throw error;
-    const stat = await fs2.stat(dir).catch(() => null);
+    const stat = await fs4.stat(dir).catch(() => null);
     if (stat && Date.now() - stat.mtimeMs < staleMs) return null;
-    await fs2.rm(dir, { recursive: true, force: true });
+    await fs4.rm(dir, { recursive: true, force: true });
     try {
-      await fs2.mkdir(dir);
+      await fs4.mkdir(dir);
     } catch {
       return null;
     }
@@ -35494,12 +36514,12 @@ async function tryLock(dir, staleMs) {
     async touch() {
       if (released) return;
       const now = /* @__PURE__ */ new Date();
-      await fs2.utimes(dir, now, now).catch(() => {
+      await fs4.utimes(dir, now, now).catch(() => {
       });
     },
     async release() {
       released = true;
-      await fs2.rm(dir, { recursive: true, force: true }).catch(() => {
+      await fs4.rm(dir, { recursive: true, force: true }).catch(() => {
       });
     }
   };
@@ -35515,26 +36535,29 @@ async function withLock(dir, staleMs, run, { waitMs = 3e4 } = {}) {
         await lock.release();
       }
     }
-    if (Date.now() > until) throw new Error(`Timed out waiting for ${path2.basename(dir)}`);
+    if (Date.now() > until) throw new Error(`Timed out waiting for ${path4.basename(dir)}`);
     await sleep(50 + Math.random() * 100);
   }
 }
 var Throttle = class {
   constructor(folder, intervalMs) {
-    this.lockDir = path2.join(folder, "mb-throttle.lock");
-    this.stateFile = path2.join(folder, "mb-throttle.json");
+    this.lockDir = path4.join(folder, "mb-throttle.lock");
+    this.stateFile = path4.join(folder, "mb-throttle.json");
     this.intervalMs = intervalMs;
   }
-  async wait() {
-    if (!this.intervalMs) return;
-    const slot = await withLock(this.lockDir, 5e3, async () => {
+  async run(dispatch) {
+    if (!this.intervalMs) return dispatch();
+    return withLock(this.lockDir, 12e4, async () => {
       const state = await readJson(this.stateFile, { next: 0 });
-      const at = Math.max(Date.now(), Number(state.next) || 0);
-      await writeJson(this.stateFile, { next: at + this.intervalMs });
-      return at;
-    });
-    const wait = slot - Date.now();
-    if (wait > 0) await sleep(wait);
+      const wait = (Number(state.next) || 0) - Date.now();
+      if (wait > 0) await sleep(wait);
+      await writeJson(this.stateFile, { next: Date.now() + this.intervalMs });
+      try {
+        return await dispatch();
+      } finally {
+        await writeJson(this.stateFile, { next: Date.now() + this.intervalMs });
+      }
+    }, { waitMs: 12e4 });
   }
 };
 var FileCache = class {
@@ -35542,8 +36565,8 @@ var FileCache = class {
     this.folder = folder;
   }
   file(key) {
-    const hash = createHash("sha1").update(key).digest("hex");
-    return path2.join(this.folder, hash.slice(0, 2), `${hash}.json`);
+    const hash = createHash2("sha1").update(key).digest("hex");
+    return path4.join(this.folder, hash.slice(0, 2), `${hash}.json`);
   }
   async get(key, ttlMs) {
     const entry = await readJson(this.file(key), null);
@@ -35556,19 +36579,19 @@ var FileCache = class {
   }
 };
 async function pruneCache(folder, maxAgeMs) {
-  const stamp = path2.join(folder, ".pruned");
-  const last = (await fs2.stat(stamp).catch(() => null))?.mtimeMs ?? 0;
+  const stamp = path4.join(folder, ".pruned");
+  const last = (await fs4.stat(stamp).catch(() => null))?.mtimeMs ?? 0;
   if (Date.now() - last < 24 * 60 * 6e4) return 0;
-  await fs2.mkdir(folder, { recursive: true });
-  await fs2.writeFile(stamp, "");
+  await fs4.mkdir(folder, { recursive: true });
+  await fs4.writeFile(stamp, "");
   let removed = 0;
-  for (const dir of await fs2.readdir(folder).catch(() => [])) {
-    const sub = path2.join(folder, dir);
-    for (const name of await fs2.readdir(sub).catch(() => [])) {
-      const file = path2.join(sub, name);
-      const stat = await fs2.stat(file).catch(() => null);
+  for (const dir of await fs4.readdir(folder).catch(() => [])) {
+    const sub = path4.join(folder, dir);
+    for (const name of await fs4.readdir(sub).catch(() => [])) {
+      const file = path4.join(sub, name);
+      const stat = await fs4.stat(file).catch(() => null);
       if (stat && Date.now() - stat.mtimeMs > maxAgeMs) {
-        await fs2.rm(file, { force: true });
+        await fs4.rm(file, { force: true });
         removed++;
       }
     }
@@ -35577,7 +36600,7 @@ async function pruneCache(folder, maxAgeMs) {
 }
 
 // src/compare.js
-import path3 from "node:path";
+import path5 from "node:path";
 var playlistName = (composer, work) => `Recordings: ${composer}: ${work}`.slice(0, 200);
 async function evidence(ctx, track) {
   let tags = null;
@@ -35643,7 +36666,7 @@ async function compareRecordings(ctx, user, selected) {
     diagnostics.push({ workId: id, playlistId, recordings: items });
     lines.push(`Completed "${playlistName(info.composer, info.work)}": ${items.length} owned recordings`);
   }
-  await writeJson(path3.join(ctx.dataFolder, `comparison-${user.id}.json`), { version: 1, ambiguous, comparisons: diagnostics });
+  await writeJson(path5.join(ctx.dataFolder, `comparison-${user.id}.json`), { version: 1, ambiguous, comparisons: diagnostics });
   if (ambiguous) lines.push(`${ambiguous} files have ambiguous work IDs and need review`);
   return summarize(lines);
 }
@@ -35661,7 +36684,7 @@ function summarize(lines) {
 }
 
 // src/mb.js
-import path4 from "node:path";
+import path6 from "node:path";
 
 // src/version.js
 var VERSION = true ? "1.0.4" : "dev";
@@ -35684,7 +36707,7 @@ var MusicBrainz = class {
     this.userAgent = `AurralClassical/${VERSION} ( ${REPOSITORY} )`;
     this.fetch = fetchImpl;
     this.log = log2;
-    this.cache = new FileCache(path4.join(dataFolder, "mb-cache"));
+    this.cache = new FileCache(path6.join(dataFolder, "mb-cache"));
     const isPublic = this.base === PUBLIC_MB;
     this.throttle = new Throttle(dataFolder, intervalMs ?? (isPublic ? 1e3 : 0));
     this.maxRetries = maxRetries;
@@ -35707,12 +36730,11 @@ var MusicBrainz = class {
   }
   // True when MusicBrainz answers at all.
   async ping() {
-    await this.throttle.wait();
     try {
-      const response = await this.fetch(`${this.base}/ws/2/artist/1f9df192-a621-4f54-8850-2c5373b7eac9?fmt=json`, {
+      const response = await this.throttle.run(() => this.fetch(`${this.base}/ws/2/artist/1f9df192-a621-4f54-8850-2c5373b7eac9?fmt=json`, {
         headers: { "User-Agent": this.userAgent, Accept: "application/json" },
         signal: AbortSignal.timeout(15e3)
-      });
+      }));
       return response.status < 500 ? true : `it answered ${response.status}`;
     } catch (error) {
       return error.cause?.code || error.message;
@@ -35732,14 +36754,13 @@ var MusicBrainz = class {
     const url = `${this.base}/ws/2/${pathAndQuery}`;
     let lastError = null;
     for (let attempt = 0; attempt < this.maxRetries; attempt++) {
-      await this.throttle.wait();
       this.requests++;
       let response;
       try {
-        response = await this.fetch(url, {
+        response = await this.throttle.run(() => this.fetch(url, {
           headers: { "User-Agent": this.userAgent, Accept: "application/json" },
           signal: AbortSignal.timeout(2e4)
-        });
+        }));
       } catch (error) {
         lastError = error;
         if (attempt < this.maxRetries - 1) await sleep(this.retryWaitMs * (attempt + 1));
@@ -36380,7 +37401,7 @@ var ClassicalResolver = class _ClassicalResolver {
   buildFields(credits) {
     credits.composers = _ClassicalResolver.dropPlaceholders(credits.composers, true);
     credits.arrangers = _ClassicalResolver.dropPlaceholders(credits.arrangers, false);
-    const roles = {
+    const roles2 = {
       composers: credits.composers,
       arrangers: credits.arrangers,
       soloists: credits.soloists,
@@ -36397,7 +37418,7 @@ var ClassicalResolver = class _ClassicalResolver {
       hidden = new Set(credits.soloists.map((p) => p.id).filter((id) => !keep.has(id)));
     }
     const parts = [];
-    for (const role of this.order) for (const p of roles[role] || []) if (!hidden.has(p.id)) addPerson(parts, p);
+    for (const role of this.order) for (const p of roles2[role] || []) if (!hidden.has(p.id)) addPerson(parts, p);
     const names = unique(parts.map((p) => p.name));
     const sortNames = unique(parts.map((p) => p.sortName));
     const joined = (people) => people.map((p) => p.name).join(this.listSeparator) || null;
@@ -36450,14 +37471,14 @@ var ROLE_ALIASES = {
 function parseOrder(value) {
   const raw = String(value ?? "").trim();
   if (!raw) return [...DEFAULT_ORDER];
-  const roles = [];
+  const roles2 = [];
   for (const word of raw.toLowerCase().split(/[\s,;>|/]+/).filter(Boolean)) {
     const role = ROLE_ALIASES[word];
     if (!role) throw new Error(`Name order: "${word}" isn't a role. Use ${ROLES.slice(0, 5).join(", ")}.`);
-    if (!roles.includes(role)) roles.push(role);
+    if (!roles2.includes(role)) roles2.push(role);
   }
-  if (!roles.includes("credited")) roles.push("credited");
-  return roles;
+  if (!roles2.includes("credited")) roles2.push("credited");
+  return roles2;
 }
 function parseSeparator(value) {
   const raw = String(value ?? "");
@@ -36473,7 +37494,7 @@ function slskdSettings(settings) {
 }
 
 // src/slskd.js
-import { randomUUID as randomUUID3 } from "node:crypto";
+import { randomUUID as randomUUID8 } from "node:crypto";
 var Slskd = class {
   constructor({ url, apiKey }, fetchImpl = fetch) {
     if (!url || !apiKey) throw new Error("Set the slskd URL and API key on the plugin's page");
@@ -36518,7 +37539,7 @@ var Slskd = class {
   }
   // Starts a search and returns its id.
   async startSearch(searchText, searchTimeoutMs) {
-    const id = randomUUID3();
+    const id = randomUUID8();
     const body = { id, searchText, searchTimeout: searchTimeoutMs, filterResponses: true, minimumResponseFileCount: 1, responseLimit: 200, fileLimit: 2e4 };
     await this.request("POST", "/searches", body, { timeoutMs: searchTimeoutMs + 15e3 });
     return id;
@@ -36560,9 +37581,9 @@ var FAILED_STATES = /Errored|Rejected|Cancelled|TimedOut|Aborted|Failed/i;
 var isSucceeded = (state) => /Completed/i.test(state) && /Succeeded/i.test(state);
 
 // src/source.js
-import { randomUUID as randomUUID4 } from "node:crypto";
-import fs3 from "node:fs/promises";
-import path5 from "node:path";
+import { randomUUID as randomUUID9 } from "node:crypto";
+import fs5 from "node:fs/promises";
+import path7 from "node:path";
 
 // src/works.js
 var CATALOGUES = [
@@ -36584,8 +37605,8 @@ var OPUS = /\bop(?:us|\.)?\s*(\d+[a-z]?)(?:\s*,?\s*(?:no\.?|nr\.?|n°)\s*(\d+))?
 function catalogueNumber(title) {
   const text2 = String(title || "");
   for (const [pattern, prefix] of CATALOGUES) {
-    const match = text2.match(pattern);
-    if (match) return `${prefix} ${match[1].replace(/\s+/g, "")}`;
+    const match2 = text2.match(pattern);
+    if (match2) return `${prefix} ${match2[1].replace(/\s+/g, "")}`;
   }
   const opus = text2.match(OPUS);
   if (opus) return `op ${opus[1]}${opus[2] ? ` no ${opus[2]}` : ""}`;
@@ -36753,10 +37774,10 @@ function albumCandidates(folders, release) {
     matches.sort((a, b) => b.discs.length - a.discs.length || folderScore(a.folder) - folderScore(b.folder));
     const chosen = [];
     const covered = /* @__PURE__ */ new Set();
-    for (const match of matches) {
-      if (match.discs.some((d) => covered.has(d))) continue;
-      chosen.push(match);
-      match.discs.forEach((d) => covered.add(d));
+    for (const match2 of matches) {
+      if (match2.discs.some((d) => covered.has(d))) continue;
+      chosen.push(match2);
+      match2.discs.forEach((d) => covered.add(d));
     }
     if (!wanted.every((d) => covered.has(d))) continue;
     const files = chosen.flatMap(({ folder, discs }) => mapFiles(folder, release, discs));
@@ -36960,7 +37981,7 @@ async function searchAlbum(ctx, album) {
     }
   }));
 }
-var downloadsDir = (ctx) => path5.join(ctx.dataFolder, "downloads");
+var downloadsDir = (ctx) => path7.join(ctx.dataFolder, "downloads");
 async function startDownload(ctx, result, kind) {
   const data = result?.data;
   if (!data?.username || !Array.isArray(data.files) || !data.files.length) throw new Error("The result has no files to download");
@@ -36974,8 +37995,8 @@ async function startDownload(ctx, result, kind) {
   }
   const slskd = slskdFor(ctx);
   await slskd.enqueue(data.username, data.files.map((f) => ({ filename: f.filename, size: f.size })));
-  const id = randomUUID4();
-  await writeJson(path5.join(downloadsDir(ctx), `${id}.json`), { kind, key, username: data.username, files: data.files, startedAt: Date.now() });
+  const id = randomUUID9();
+  await writeJson(path7.join(downloadsDir(ctx), `${id}.json`), { kind, key, username: data.username, files: data.files, startedAt: Date.now() });
   return { pending: id };
 }
 var downloadKey = (username, files) => `${username}\0${files.map((f) => f.filename).sort().join("\0")}`;
@@ -36983,11 +38004,11 @@ var KEEP_DOWNLOADS_MS = 2 * 24 * 60 * 6e4;
 var MISSING_GRACE_MS = 2 * 6e4;
 async function findDownload(ctx, key) {
   const dir = downloadsDir(ctx);
-  for (const name of await fs3.readdir(dir).catch(() => [])) {
+  for (const name of await fs5.readdir(dir).catch(() => [])) {
     if (!name.endsWith(".json")) continue;
-    const record = await readJson(path5.join(dir, name), null);
+    const record = await readJson(path7.join(dir, name), null);
     if (!record || Date.now() - (record.startedAt || 0) > KEEP_DOWNLOADS_MS) {
-      await fs3.rm(path5.join(dir, name), { force: true });
+      await fs5.rm(path7.join(dir, name), { force: true });
       continue;
     }
     if (record.key === key && !record.failed) return name.replace(/\.json$/, "");
@@ -36996,20 +38017,20 @@ async function findDownload(ctx, key) {
 }
 async function locate(downloadFolder, file) {
   const base = remoteBase(file.filename);
-  const direct = path5.join(downloadFolder, remoteBase(remoteDir(file.filename)), base);
-  const stat = await fs3.stat(direct).catch(() => null);
+  const direct = path7.join(downloadFolder, remoteBase(remoteDir(file.filename)), base);
+  const stat = await fs5.stat(direct).catch(() => null);
   if (stat?.isFile()) return direct;
   let seen = 0;
   const walk = async (dir, depth) => {
     if (depth > 4) return null;
-    for (const entry of await fs3.readdir(dir, { withFileTypes: true }).catch(() => [])) {
+    for (const entry of await fs5.readdir(dir, { withFileTypes: true }).catch(() => [])) {
       if (++seen > 5e4) return null;
-      const full = path5.join(dir, entry.name);
+      const full = path7.join(dir, entry.name);
       if (entry.isDirectory()) {
         const found = await walk(full, depth + 1);
         if (found) return found;
       } else if (entry.isFile() && (entry.name === base || entry.name.replace(/_\d{15,}(?=\.[^.]+$)/, "") === base)) {
-        const s = await fs3.stat(full).catch(() => null);
+        const s = await fs5.stat(full).catch(() => null);
         if (s && (!file.size || s.size === file.size)) return full;
       }
     }
@@ -37018,7 +38039,7 @@ async function locate(downloadFolder, file) {
   return walk(downloadFolder, 0);
 }
 async function downloadStatus(ctx, id, directory) {
-  const record = await readJson(path5.join(downloadsDir(ctx), `${id}.json`), null);
+  const record = await readJson(path7.join(downloadsDir(ctx), `${id}.json`), null);
   if (!record) throw new Error("This download is unknown to the plugin");
   const slskd = slskdFor(ctx);
   const transfers = await slskd.downloads(record.username);
@@ -37037,7 +38058,7 @@ async function downloadStatus(ctx, id, directory) {
     }
   }
   const failed = states.find((state) => FAILED_STATES.test(state));
-  if (failed) await writeJson(path5.join(downloadsDir(ctx), `${id}.json`), { ...record, failed: true });
+  if (failed) await writeJson(path7.join(downloadsDir(ctx), `${id}.json`), { ...record, failed: true });
   if (failed) throw new Error(`slskd: ${remoteBase(record.files[states.indexOf(failed)].filename)} ${failed.replace(/^Completed,\s*/, "").toLowerCase()}`);
   if (!states.every(isSucceeded)) return { done: false };
   return finishDownload(ctx, id, record, directory);
@@ -37069,20 +38090,20 @@ async function finishDownload(ctx, id, record, directory) {
 var formatBytes = (bytes) => bytes >= 1024 ** 3 ? `${(bytes / 1024 ** 3).toFixed(1)} GB` : `${Math.max(1, Math.round(bytes / 1024 ** 2))} MB`;
 async function freeBytes(ctx, dir) {
   if (ctx.freeBytes) return ctx.freeBytes(dir);
-  for (let at = dir; ; at = path5.dirname(at)) {
-    const stats = await fs3.statfs(at).catch(() => null);
+  for (let at = dir; ; at = path7.dirname(at)) {
+    const stats = await fs5.statfs(at).catch(() => null);
     if (stats) return stats.bavail * stats.bsize;
-    if (path5.dirname(at) === at) return Infinity;
+    if (path7.dirname(at) === at) return Infinity;
   }
 }
-var link = (ctx, local, target) => (ctx.linkFile ?? fs3.link)(local, target);
+var link = (ctx, local, target) => (ctx.linkFile ?? fs5.link)(local, target);
 async function copyInto(local, target) {
-  const temp = `${target}.${randomUUID4()}.part`;
+  const temp = `${target}.${randomUUID9()}.part`;
   try {
-    await fs3.copyFile(local, temp);
-    await fs3.rename(temp, target);
+    await fs5.copyFile(local, temp);
+    await fs5.rename(temp, target);
   } catch (error) {
-    await fs3.rm(temp, { force: true }).catch(() => {
+    await fs5.rm(temp, { force: true }).catch(() => {
     });
     throw error;
   }
@@ -37094,15 +38115,15 @@ async function moveIntoPlace(ctx, id, record, directory) {
     const local = await locate(downloadFolder, file);
     if (!local) throw new Error(`Couldn't find ${remoteBase(file.filename)} in slskd's download folder`);
     const name = `${String(file.disc || 1).padStart(2, "0")}-${String(i + 1).padStart(3, "0")} ${remoteBase(file.filename)}`.replace(/[\\/]/g, "_");
-    const target = path5.join(directory, record.kind === "album" ? name : remoteBase(file.filename));
-    files.push({ local, target, file, size: (await fs3.stat(local)).size });
+    const target = path7.join(directory, record.kind === "album" ? name : remoteBase(file.filename));
+    files.push({ local, target, file, size: (await fs5.stat(local)).size });
   }
-  await fs3.mkdir(directory, { recursive: true });
+  await fs5.mkdir(directory, { recursive: true });
   const todo = [];
   for (const entry of files) {
-    const there = await fs3.stat(entry.target).catch(() => null);
+    const there = await fs5.stat(entry.target).catch(() => null);
     if (!there || there.size !== entry.size) {
-      await fs3.rm(entry.target, { force: true });
+      await fs5.rm(entry.target, { force: true });
       todo.push(entry);
     }
   }
@@ -37140,17 +38161,50 @@ async function moveIntoPlace(ctx, id, record, directory) {
       await writeTags(target, { title: [file.title], artist: [file.artist].filter(Boolean), recordingMbid: [file.recordingId] });
       tagged++;
     } catch (error) {
-      ctx.log(`Couldn't tag ${path5.basename(target)}: ${error.message}`);
+      ctx.log(`Couldn't tag ${path7.basename(target)}: ${error.message}`);
     }
   }
   ctx.log(`Download ${id}: ${files.length} file(s) ${linked ? "linked" : "copied"}, ${tagged} identified and tagged`);
-  return record.kind === "album" ? { done: true } : { done: true, path: path5.basename(files[0].target) };
+  return record.kind === "album" ? { done: true } : { done: true, path: path7.basename(files[0].target) };
 }
 
 // src/tagger.js
-import { randomUUID as randomUUID5 } from "node:crypto";
-import fs4 from "node:fs/promises";
-import path6 from "node:path";
+import { randomUUID as randomUUID10 } from "node:crypto";
+
+// src/model/write-guard.js
+import fs6 from "node:fs/promises";
+import path8 from "node:path";
+async function modelAllowsTagging(ctx, realPath) {
+  const filename = path8.join(ctx.dataFolder, "model", "classical.sqlite");
+  try {
+    await fs6.access(filename);
+  } catch (error) {
+    if (error.code === "ENOENT") return true;
+    throw error;
+  }
+  let db;
+  try {
+    const { DatabaseSync } = await import("node:sqlite");
+    db = new DatabaseSync(filename, { readOnly: true });
+    const rows = db.prepare(
+      `SELECT t.state AS link_state,c.state FROM track_link t
+      LEFT JOIN classification c ON c.target_id=t.id
+      WHERE json_extract(t.evidence,'$.observedRealPath')=? OR json_extract(t.evidence,'$.path')=? OR json_extract(t.evidence,'$.readPath')=?`
+    ).all(realPath, realPath, realPath);
+    return !rows.length || rows.every(
+      (row) => row.link_state === "active" && row.state === "classical"
+    );
+  } catch (error) {
+    ctx.log?.(`Classical model cannot authorize tagging: ${error.message}`);
+    return false;
+  } finally {
+    db?.close();
+  }
+}
+
+// src/tagger.js
+import fs7 from "node:fs/promises";
+import path9 from "node:path";
 
 // src/aurral.js
 var Aurral = class {
@@ -37196,44 +38250,44 @@ var Aurral = class {
 // src/tagger.js
 var LOCK_STALE_MS = 2 * 6e4;
 var SAVE_EVERY_MS = 3e4;
-var queueDir = (ctx) => path6.join(ctx.dataFolder, "queue");
-var processedFile = (ctx) => path6.join(ctx.dataFolder, "processed.json");
-var indexFile = (ctx) => path6.join(ctx.dataFolder, "library-index.json");
-var originalsFile = (ctx) => path6.join(ctx.dataFolder, "originals.json");
-var excludedFile = (ctx) => path6.join(ctx.dataFolder, "excluded.json");
+var queueDir = (ctx) => path9.join(ctx.dataFolder, "queue");
+var processedFile = (ctx) => path9.join(ctx.dataFolder, "processed.json");
+var indexFile = (ctx) => path9.join(ctx.dataFolder, "library-index.json");
+var originalsFile = (ctx) => path9.join(ctx.dataFolder, "originals.json");
+var excludedFile = (ctx) => path9.join(ctx.dataFolder, "excluded.json");
 var TAG_FIELDS = ["artist", "albumArtist", "composer", "work", "workId"];
 var TAGGING_VERSION = 2;
 var outdated = (record) => record && (record.status === "tagged" || record.status === "unchanged") && (record.v ?? 1) < TAGGING_VERSION;
-var lockDir = (ctx) => path6.join(ctx.dataFolder, "tagging.lock");
-var yieldFile = (ctx) => path6.join(ctx.dataFolder, "tagging.yield");
+var lockDir = (ctx) => path9.join(ctx.dataFolder, "tagging.lock");
+var yieldFile = (ctx) => path9.join(ctx.dataFolder, "tagging.yield");
 var YIELD_FRESH_MS = 10 * 6e4;
 var PRIORITY_WAIT_MS = 5 * 6e4;
 var ACTION_CLAIM_MS = 2 * 6e4;
 async function enqueue(ctx, filePaths, { force = false, source = null } = {}) {
-  await fs4.mkdir(queueDir(ctx), { recursive: true });
+  await fs7.mkdir(queueDir(ctx), { recursive: true });
   const ids = [];
   for (const filePath of filePaths) {
     if (!filePath) continue;
-    const id = `${Date.now().toString().padStart(15, "0")}-${randomUUID5()}`;
-    await writeJson(path6.join(queueDir(ctx), `${id}.json`), { path: filePath, force, source, at: Date.now() });
+    const id = `${Date.now().toString().padStart(15, "0")}-${randomUUID10()}`;
+    await writeJson(path9.join(queueDir(ctx), `${id}.json`), { path: filePath, force, source, at: Date.now() });
     ids.push(id);
   }
   return ids;
 }
 async function queuedEntries(ctx) {
-  const names = (await fs4.readdir(queueDir(ctx)).catch(() => [])).filter((n) => n.endsWith(".json")).sort();
-  return names.map((name) => ({ name, file: path6.join(queueDir(ctx), name) }));
+  const names = (await fs7.readdir(queueDir(ctx)).catch(() => [])).filter((n) => n.endsWith(".json")).sort();
+  return names.map((name) => ({ name, file: path9.join(queueDir(ctx), name) }));
 }
 var queueLength = async (ctx) => (await queuedEntries(ctx)).length;
 async function allowedPath(ctx, filePath) {
-  const real = await fs4.realpath(filePath).catch(() => null);
+  const real = await fs7.realpath(filePath).catch(() => null);
   if (!real) return null;
   for (const root of [ctx.libraryFolder, ctx.dataFolder]) {
     if (!root) continue;
-    const base = await fs4.realpath(root).catch(() => null);
+    const base = await fs7.realpath(root).catch(() => null);
     if (!base) continue;
-    const relative = path6.relative(base, real);
-    if (relative && !relative.startsWith("..") && !path6.isAbsolute(relative)) return real;
+    const relative = path9.relative(base, real);
+    if (relative && !relative.startsWith("..") && !path9.isAbsolute(relative)) return real;
   }
   return null;
 }
@@ -37335,7 +38389,7 @@ var Session = class {
     if (this.state.admins > 0) this.yielding = true;
     else if (!this.yieldCheckedAt || Date.now() - this.yieldCheckedAt >= 500) {
       this.yieldCheckedAt = Date.now();
-      const stat = await fs4.stat(yieldFile(this.ctx)).catch(() => null);
+      const stat = await fs7.stat(yieldFile(this.ctx)).catch(() => null);
       this.yielding = Boolean(stat && Date.now() - stat.mtimeMs < YIELD_FRESH_MS);
     }
     if (this.yielding && !this.yieldLogged) {
@@ -37365,7 +38419,11 @@ var Session = class {
   // removed after that stay removed.
   async processReal(real, { force = false, prefilter = false, upgrade = false, queuedAt = null } = {}) {
     const { ctx } = this;
-    const stat = await fs4.stat(real);
+    const stat = await fs7.stat(real);
+    if (!await modelAllowsTagging(ctx, real)) {
+      this.record(real, stat, { status: "skipped", reason: "model classification or link requires review" });
+      return true;
+    }
     if (!force && sameStat(this.processed[real], stat) && !(upgrade && outdated(this.processed[real]))) return true;
     let tags;
     try {
@@ -37419,7 +38477,7 @@ var Session = class {
       this.record(real, stat, { status: "skipped", reason: "couldn't write tags", recording: tags.recordingMbid });
       return true;
     }
-    const after = await fs4.stat(real);
+    const after = await fs7.stat(real);
     this.index[real] = { ...this.index[real], ...statKey(after), artist: fields.artist, workId: fields.workId || "" };
     this.record(real, after, {
       v: TAGGING_VERSION,
@@ -37430,7 +38488,7 @@ var Session = class {
     });
     if (changed.length) {
       this.changedFiles++;
-      ctx.log(`Tagged ${path6.basename(real)}: ${fields.artist}`);
+      ctx.log(`Tagged ${path9.basename(real)}: ${fields.artist}`);
     }
     return true;
   }
@@ -37444,6 +38502,7 @@ var Session = class {
   }
   async untagReal(real, mode = "restore") {
     const { ctx } = this;
+    if (!await modelAllowsTagging(ctx, real)) return "skipped";
     let tags;
     try {
       tags = readTags(real);
@@ -37465,13 +38524,13 @@ var Session = class {
     }
     const changed = await writeTags(real, values);
     if (mode !== "clear") delete this.originals[real];
-    const after = await fs4.stat(real);
+    const after = await fs7.stat(real);
     this.index[real] = { ...this.index[real] ?? {}, ...indexEntry(readTags(real), after) };
     this.record(real, after, { status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
     this.stats.skipped["classical tags removed"]--;
     if (changed.length) {
       this.changedFiles++;
-      ctx.log(`Removed classical tags from ${path6.basename(real)}`);
+      ctx.log(`Removed classical tags from ${path9.basename(real)}`);
     }
     return changed.length ? original && mode !== "clear" ? "restored" : "cleared" : "unchanged";
   }
@@ -37511,7 +38570,7 @@ var Session = class {
           const reachable = await this.processFile(job.path, { force: job.force, queuedAt: job.at });
           if (!reachable) return false;
         }
-        await fs4.rm(entry.file, { force: true });
+        await fs7.rm(entry.file, { force: true });
       } finally {
         this.state.claimed.delete(entry.name);
       }
@@ -37532,18 +38591,18 @@ var Session = class {
         complete = false;
         return;
       }
-      const entries = await fs4.readdir(dir, { withFileTypes: true }).catch(() => []);
+      const entries = await fs7.readdir(dir, { withFileTypes: true }).catch(() => []);
       for (const entry of entries) {
         if (Date.now() > until || await this.shouldYield()) {
           complete = false;
           return;
         }
         if (entry.name.startsWith(".")) continue;
-        const full = path6.join(dir, entry.name);
+        const full = path9.join(dir, entry.name);
         if (entry.isDirectory()) await walk(full);
         else if (entry.isFile() && isAudioPath(full)) {
           seen.add(full);
-          const stat = await fs4.stat(full).catch(() => null);
+          const stat = await fs7.stat(full).catch(() => null);
           if (!stat) continue;
           if (!sameStat(this.index[full], stat)) {
             try {
@@ -37578,7 +38637,7 @@ async function openState(ctx, priority) {
       await sleep(500);
       lock = await tryLock(lockDir(ctx), LOCK_STALE_MS);
     }
-    await fs4.rm(yieldFile(ctx), { force: true });
+    await fs7.rm(yieldFile(ctx), { force: true });
     if (!lock) ctx.log("Tagging in another process didn't pause within 5 minutes");
   }
   if (!lock) return null;
@@ -37593,7 +38652,7 @@ async function openState(ctx, priority) {
   return state;
 }
 async function withTagging(ctx, work, { priority = false } = {}) {
-  const key = path6.resolve(ctx.dataFolder);
+  const key = path9.resolve(ctx.dataFolder);
   let entry;
   for (; ; ) {
     entry = held.get(key);
@@ -37746,6 +38805,9 @@ function makeContext(input, { fetchImpl = fetch } = {}) {
 }
 var background = null;
 var again = false;
+async function waitForBackgroundTagging() {
+  while (background) await background;
+}
 function tagInBackground(ctx) {
   if (background) {
     again = true;
@@ -37810,6 +38872,20 @@ var index_default = {
     return { message: parts.join(". ").slice(0, 500) };
   },
   actions: {
+    async "classical-model-status"(input) {
+      if (input.user?.role !== "admin") throw new Error("Classical diagnostics require a host admin");
+      return { message: JSON.stringify(await modelStatus(makeContext(input))).slice(0, 500) };
+    },
+    async "classical-model-scan"(input) {
+      const ctx = makeContext(input);
+      const id = await enqueueModelScan(ctx, input.user);
+      await runModelJobs(ctx);
+      return { message: `Classical model scan ${id} saved; remaining batches resume on the host schedule. See model status for completion.` };
+    },
+    async "classical-model-cancel"(input) {
+      await cancelModelScan(makeContext(input), input.user);
+      return { message: "Model scan cancellation requested; catalogue data is retained." };
+    },
     async "preview-remove"(input) {
       const fields = ["composer", "work", "workId"];
       const counts = Object.fromEntries(fields.map((field) => [field, 0]));
@@ -37857,10 +38933,11 @@ var index_default = {
   },
   async scheduled(input) {
     const ctx = makeContext(input);
+    await runModelJobs(ctx).catch((error) => log(`Classical model unavailable: ${error.message}`));
     if (ctx.settings.enableFileWrites !== true) return;
     const stats = await runScheduled(ctx, SCHEDULE_BUDGET_MS);
     if (stats) log(`Scheduled tagging: ${describeStats(stats)}`);
-    await pruneCache(path7.join(ctx.dataFolder, "mb-cache"), TTL.default).catch(() => {
+    await pruneCache(path10.join(ctx.dataFolder, "mb-cache"), TTL.default).catch(() => {
     });
   },
   downloadSource: {
@@ -37874,5 +38951,6 @@ var index_default = {
 };
 export {
   index_default as default,
-  makeContext
+  makeContext,
+  waitForBackgroundTagging
 };

@@ -1,3 +1,19 @@
+# Current shared checkpoint — Phase 2
+
+November 10, 2026. User request: “Phase one should be done. Verify then continue and build phase 2.” This authorizes Phase 2 and supersedes old pending-approval language below. Phase 3 is not authorized.
+
+Phase 1 review source is in open, unmerged plugin PR6 and core PR36. Fresh clones initially had only Phase 0.5 on remote classical. Local existing `aurral-classical` branches were fast-forwarded to plugin `e1a980ad768af6c8d3e5122e85f05a6e68b3629b` and core `581e8b6ca32908652eecb673620ee6f1389a96b5` as the Phase 2 baseline. No remote refs or PRs were merged. Preserve those prerequisites when applying the Phase 2 patch.
+
+Phase 2 implementation lives entirely in the plugin: native SQLite/WAL schema 1, typed catalogue/relationships, provenance/pins, conservative reconciliation, classification and tag guards, persistent fenced scan jobs, admin scan/status/cancel actions, maintenance CLI and operator documentation. Core runtime is unchanged. See central plugin MODEL_V1.md and PHASE_2_REPORT.md for executable APIs, exact checks and limitations.
+
+The final model suite includes all committed synthetic fixtures, full rescans, provider-free broadcasts, reissues and multi-work ranges. No real-library snapshot or production server was used. The host still lacks an automatic database epoch: admin must update Library database epoch after replacing/restoring its database. Hashes guard reused IDs; ambiguous/retagged moves are held for review. No editor, work page, grouping, user picks or new player behavior is claimed.
+
+Phase 1 verification caveat: core head checks and latest disposable integration passed. Plugin push CI at e1a980ad passed all Node versions, but PR run 42882247578 failed Node22 and cancelled its other jobs. Connected GitHub job logs subsequently identified ENOTEMPTY in background-writer test teardown; Phase 2 waits for completion before cleanup. A loaded Node26 run also exposed a dispatch-throttle race, now fixed with serialized rate-limited dispatch and a regression test. Fresh Phase 1 tests passed 138/138; final Phase 2 tests pass 159/159 on Node22/24/26, with 20 model tests on Node22.16 and in a no-network read-only-source container. Keep the original failed observations in the report.
+
+Current checkout paths: /workspace/work/plugin and /workspace/work/aurral. Work is on local existing classical branches, not main. Phase 2 is saved as a separate phase2-review source snapshot; remote classical/main and existing Phase 1 PRs are not merged. No new PR, release or deployment was requested. The source branch and report are the review handoff. Keep main, upstream, preservation branches and existing review PRs untouched. No subagents were used. Stop for review before Phase 3.
+
+Historical handoff follows; its authorization and completion statements are superseded by this checkpoint.
+
 # Codex / Claude shared handoff — Phase 1
 
 ## Published review checkpoint

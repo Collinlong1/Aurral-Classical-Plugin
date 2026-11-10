@@ -202,3 +202,7 @@ AURRAL_MCP_URL=https://aurral.example/api/mcp AURRAL_DEV_KEY=aurral_dev_... node
 Bump `version` in `manifest.json`, run `npm run build`, and push to `main`.
 The release workflow tests, builds, and publishes `aurral-classical.zip`,
 which Aurral installs and updates from.
+
+## Classical data model (Phase 2 review)
+
+The backend model uses independent plugin SQLite storage and requires Node 22.16+. See [MODEL_V1.md](MODEL_V1.md) for admin scans, provenance/pins and backup/restore, and [PHASE_2_REPORT.md](PHASE_2_REPORT.md) for validation. Manual editing, grouping and work pages remain later phases. This is review source, not a tagged production release.

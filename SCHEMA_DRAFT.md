@@ -1,3 +1,7 @@
+# Phase 2 implementation status
+
+The executable model is now in `src/model/schema.js`; see MODEL_V1.md and PHASE_2_REPORT.md. The historical draft below remains design context. Typed common entities and relation edges replace separate subtype tables; user favourites/picks, editor, merge operations and presentation remain later-phase work.
+
 # Schema draft — classical data version 1 (proposal only)
 
 Status update: Phase 1 fixes and generic integration are implemented; see PHASE_1_REPORT.md. This Phase 2 schema remains a proposal with no migrations or classical tables. Plugin SQLite volume/concurrency/migration validation belongs to the next approved phase. Phase 2 is not authorized yet.

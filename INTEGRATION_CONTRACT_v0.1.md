@@ -1,3 +1,11 @@
+# Implemented Phase 2 backend addendum
+
+The plugin adds model schema 1 and admin-only album entry actions classical-model-status, classical-model-scan and classical-model-cancel. Scan opts into the existing userOperations v1 library capability and requires a real host admin. It reads the full library, queues a durable plugin-owned read-only scan and reports queued/completed state through status. Stock hosts without userOperations cannot start this action; model storage itself has no host-hook dependency. No credentials/session grants persist in model jobs.
+
+The host schedule initializes/checks model storage and resumes only explicitly queued scans. Migration/model errors are isolated from existing playback/source/schedule behavior. Non-classical/unsure stored decisions and unresolved links veto file-tag mutations. Disabling the plugin retains its independent data and removes its contributions.
+
+No new core endpoint/capability is added. Library identity is bound locally, the operator changes libraryEpoch on host database replacement, and scans use plugin-local monotonic generations. Full-file SHA-256 supports unique moves but is not an audio-only fingerprint; retagged/ambiguous evidence is reviewed. See MODEL_V1.md for exact semantics and limits. D01 editor/views and D04/D05 presentation/playback remain future phases.
+
 # Integration contract — implemented Phase 1 and future v0.1 design
 
 Current APIs and compatibility are defined in the Implemented Phase 1 contract section at the end: user-operations v1 and acquisition-identity v1. Core PR36 and plugin PR6 implement only those portions. Earlier sections below are historical proposals; views, model, grouping and segment APIs are not implemented.

@@ -23,7 +23,7 @@
   "type": "module",
   "private": true,
   "engines": {
-    "node": ">=22"
+    "node": ">=22.16"
   },
   "description": "Aurral plugin: classical tagging, recording comparisons and an slskd source",
   "license": "MIT"

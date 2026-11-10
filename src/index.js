@@ -1,4 +1,5 @@
 import path from "node:path";
+import { modelStatus, enqueueModelScan, cancelModelScan, runModelJobs } from "./model/runtime.js";
 import { readValues } from "./tags.js";
 import { compareRecordings } from "./compare.js";
 import { MusicBrainz, mbBaseUrl, TTL } from "./mb.js";
@@ -40,6 +41,10 @@ export function makeContext(input, { fetchImpl = fetch } = {}) {
 // another process may hold the lock, and then it works the queue instead.
 let background = null;
 let again = false;
+// Internal lifecycle hook for disposable tests to drain writes before teardown.
+export async function waitForBackgroundTagging() {
+  while (background) await background;
+}
 function tagInBackground(ctx) {
   if (background) {
     again = true;
@@ -117,6 +122,20 @@ export default {
   },
 
   actions: {
+    async "classical-model-status"(input) {
+      if (input.user?.role !== 'admin') throw new Error('Classical diagnostics require a host admin');
+      return { message: JSON.stringify(await modelStatus(makeContext(input))).slice(0,500) };
+    },
+    async "classical-model-scan"(input) {
+      const ctx = makeContext(input);
+      const id = await enqueueModelScan(ctx,input.user);
+      await runModelJobs(ctx);
+      return { message: `Classical model scan ${id} saved; remaining batches resume on the host schedule. See model status for completion.` };
+    },
+    async "classical-model-cancel"(input) {
+      await cancelModelScan(makeContext(input),input.user);
+      return { message:'Model scan cancellation requested; catalogue data is retained.' };
+    },
     async "preview-remove"(input) {
       const fields = ["composer", "work", "workId"];
       const counts = Object.fromEntries(fields.map((field) => [field, 0]));
@@ -171,6 +190,8 @@ export default {
 
   async scheduled(input) {
     const ctx = makeContext(input);
+    // Model failures never suppress the established source/tagging schedule.
+    await runModelJobs(ctx).catch(error => log(`Classical model unavailable: ${error.message}`));
     if (ctx.settings.enableFileWrites !== true) return;
     const stats = await runScheduled(ctx, SCHEDULE_BUDGET_MS);
     if (stats) log(`Scheduled tagging: ${describeStats(stats)}`);

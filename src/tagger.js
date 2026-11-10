@@ -2,6 +2,7 @@
 // process holds the lock, plus a scan of the Library for classical files no
 // one queued (Lidarr imports, files added by hand).
 import { randomUUID } from "node:crypto";
+import { modelAllowsTagging } from "./model/write-guard.js";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { isAudioPath, readTags, readValues, UnsupportedFormat, writeTags } from "./tags.js";
@@ -209,6 +210,10 @@ class Session {
   async processReal(real, { force = false, prefilter = false, upgrade = false, queuedAt = null } = {}) {
     const { ctx } = this;
     const stat = await fs.stat(real);
+    if (!(await modelAllowsTagging(ctx, real))) {
+      this.record(real, stat, { status: "skipped", reason: "model classification or link requires review" });
+      return true;
+    }
     if (!force && sameStat(this.processed[real], stat) && !(upgrade && outdated(this.processed[real]))) return true;
     let tags;
     try {
@@ -294,6 +299,7 @@ class Session {
 
   async untagReal(real, mode = "restore") {
     const { ctx } = this;
+    if (!(await modelAllowsTagging(ctx, real))) return "skipped";
     let tags;
     try {
       tags = readTags(real);

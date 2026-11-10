@@ -1,3 +1,11 @@
+# Phase 2 delta addendum
+
+Phase 2 introduces **zero core runtime/schema/API/UI changes** beyond the Phase 1 baseline. Its entities, SQLite migration 1, metadata precedence, scan jobs, reconciliation and classification guards are entirely plugin-owned. Existing admin action descriptors expose bounded status/scan/cancel; the Phase 1 userOperations v1 capability supplies the scan snapshot. The host grant authenticates the initiating admin; no token is persisted in model jobs.
+
+D06 remains a full in-memory snapshot without automatic installation/epoch/generation detection. Plugin-local scan generations and an explicit admin library-epoch setting are implemented; ambiguous evidence never reattaches silently. Synthetic 10,000-link measurements are in PHASE_2_REPORT.md; they do not benchmark the host query or media hashing. No pagination extension is justified/implemented by this phase. Full host-epoch consistency and library-scale read costs remain contract limitations.
+
+D01/D04/D05 remain proposals. There is no editor/work/diagnostics page, album-grouping contribution or segment playback hook. Admin model diagnostics are available as an action response. All Phase 1 PR links/status below remain unchanged and unmerged. No upstream activity or PR-readiness change.
+
 # Upstream Delta — Phase 1 implementation and later proposals
 
 Current implementation: D02/D03 and the Phase 1 portions of D06/D07 are implemented in core PR36; plugin PR6 consumes them. See the Phase 1 implementation addendum at the end and PHASE_1_REPORT.md for files/tests/contract. The audit baseline and draft table below are historical planning; their no-implementation wording is superseded by that addendum. D01/D04/D05 remain proposals. No upstream PR exists.

@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [22, 24, 26.12.0]
+        node: [22.16.0, 22, 24, 26.12.0]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -22,3 +22,19 @@ jobs:
         run: |
           npm run build
           git diff --exit-code index.js || (echo "Run npm run build and commit index.js" && exit 1)
+
+  model-isolation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26.12.0
+          cache: npm
+      - run: npm ci
+      - name: Model migrations and fixture rescans with read-only source and no network
+        run: |
+          docker run --rm --network none \
+            --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/plugin,readonly" -w /plugin \
+            node:26.12.0-bookworm-slim@sha256:742a0fe7320e09e0321222b68165e6ac731d30470e7ea7f98f9bfc3a6e1034fe \
+            node --test test/model.test.js
