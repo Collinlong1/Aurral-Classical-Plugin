@@ -2,6 +2,10 @@
 
 ## Final local validation
 
+Published reviews: core PR36 https://github.com/Collinlong1/aurral/pull/36 and plugin PR6 https://github.com/Collinlong1/Aurral-Classical-Plugin/pull/6. Both target the user's aurral-classical branch and remain unmerged.
+
+Remote CI initially passed core unit/integration/Perf and plugin Node22/24/26 tests/bundle checks. Core CI encountered inherited workflow failures: Dependency Review unsupported without this fork's Dependency Graph, and uppercase ghcr.io/Collinlong1 image tag. The core PR includes a dependency-change gate and lowercase image normalization; no test failures are hidden and no continue-on-error added. The disposable Compose CI run started; consult live PR checks for its conclusion. These workflow fixes do not change runtime source pinned by the plugin CI.
+
 Core review PR: https://github.com/Collinlong1/aurral/pull/36 (base aurral-classical), source commit aecbb96625340cb3a1bd469787211cfe9bedcab5. Integration CI pins this exact core commit. Plugin companion PR targets its own aurral-classical branch. No PR is merged.
 
 Post-drift full core unit suite: **406 files / 2752 tests passed**. Final focused grants/playlists: **33 tests passed**, including expiry, exact duplicate metadata, revocation and idempotency. Subsonic integration: **40 passed**. Plugin: **138 passed**. Core production frontend builds pass before and after the externally supplied activity update. Core formatting/lint/CSS/generated DB types/typecheck/unsafe-any checks pass after narrowing the final fast-path return; zero type errors and no baseline increase.
