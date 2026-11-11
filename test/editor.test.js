@@ -537,6 +537,16 @@ test("owned-track search results attach using the same parent/performance valida
   });
   assert.equal(result.ok, true, result.message);
   assert.equal(result.selection, recording);
+  const unfilteredRecording = await s.read(recording);
+  assert.equal(
+    unfilteredRecording.forms.some((f) => f.id === "attach"),
+    false,
+    "a large library is not exposed as an arbitrary truncated dropdown",
+  );
+  assert.match(
+    unfilteredRecording.notes.join("\n"),
+    /Use Search items above to find an owned track/,
+  );
   const fromRecording = await s.read(recording, { q: "No. 1 Prelude Presto" });
   assert.equal(
     fromRecording.forms

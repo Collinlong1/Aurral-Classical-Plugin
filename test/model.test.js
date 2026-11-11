@@ -30,6 +30,7 @@ import {
   renderWork,
   applyWorkMutation,
 } from "../src/model/presentation.js";
+import { autoMatchTaggedWorks } from "../src/model/auto-match.js";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 async function setup(t) {
@@ -60,6 +61,79 @@ const snapshot = (tracks, generation = 1, extra = {}) => ({
   generation,
   tracks,
   ...extra,
+});
+
+test("explicit embedded work metadata creates an idempotent read-only work realization", async (t) => {
+  const { c } = await setup(t);
+  const tagged = [
+    track(1, {
+      albumId: "sonata-album",
+      hints: {
+        title: "I. Allegro",
+        album: "Complete Sonatas",
+        composer: ["Example Composer"],
+        work: "Piano Sonata No. 1: I. Allegro",
+        trackNumber: 1,
+        discNumber: 1,
+      },
+    }),
+    track(2, {
+      albumId: "sonata-album",
+      hints: {
+        title: "II. Adagio",
+        album: "Complete Sonatas",
+        composer: ["Example Composer"],
+        work: "Piano Sonata No. 1: II. Adagio",
+        trackNumber: 2,
+        discNumber: 1,
+      },
+    }),
+    track(3, {
+      albumId: "etudes-album",
+      hints: {
+        title: "Étude No. 1",
+        composer: ["Example Composer"],
+        work: "Transcendental Études: No. 1",
+        trackNumber: 1,
+        discNumber: 1,
+      },
+    }),
+    track(4, {
+      albumId: "etudes-album",
+      hints: {
+        title: "Étude No. 2",
+        composer: ["Example Composer"],
+        work: "Transcendental Études: No. 2",
+        trackNumber: 2,
+        discNumber: 1,
+      },
+    }),
+  ];
+  const links = reconcile(c, snapshot(tagged));
+  links.forEach((link) => classify(c, link.id, link.hints));
+  assert.deepEqual(autoMatchTaggedWorks(c, { actor: "model-scan" }), {
+    created: 1,
+    candidates: 1,
+  });
+  assert.deepEqual(autoMatchTaggedWorks(c, { actor: "model-scan" }), {
+    created: 0,
+    candidates: 0,
+  });
+  const album = renderAlbumPresentation(c, "sonata-album");
+  assert.equal(album.groups.length, 1);
+  assert.equal(album.groups[0].title, "Piano Sonata No. 1");
+  assert.equal(album.groups[0].composer, "Example Composer");
+  assert.deepEqual(
+    album.groups[0].items.map((item) => item.title),
+    ["I. Allegro", "II. Adagio"],
+  );
+  assert.equal(renderAlbumPresentation(c, "etudes-album"), null);
+  assert.equal(
+    c.db
+      .prepare("SELECT count(*) AS n FROM audit_event WHERE action='work.auto_match'")
+      .get().n,
+    1,
+  );
 });
 
 test("catalogue models a provider-free broadcast, roles, collections, segments, and reissues", async (t) => {

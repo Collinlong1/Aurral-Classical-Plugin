@@ -133,6 +133,10 @@ try {
   await saved();
   const recording = new URL(page.url()).searchParams.get("selection");
   assert.ok(recording);
+  await page
+    .getByLabel("Search items", { exact: true })
+    .fill("sonata 1.flac");
+  await page.getByRole("button", { name: "Search", exact: true }).click();
   const attach = form("Attach owned track");
   await attach.getByLabel("Owned track", { exact: true }).waitFor();
   const trackOptions = await attach

@@ -7,6 +7,7 @@ import { ModelJobs } from "./jobs.js";
 import { reconcile, classify } from "./reconcile.js";
 import { UserOperations } from "../user-operations.js";
 import { readTags } from "../tags.js";
+import { autoMatchTaggedWorks } from "./auto-match.js";
 
 export const modelFolder = (ctx) => path.join(ctx.dataFolder, "model");
 const fingerprint = async (file) => {
@@ -106,19 +107,31 @@ export async function enqueueModelScan(ctx, actor) {
         .run(id, ctx.settings.libraryEpoch || "initial");
       instance = { id, generation: 0 };
     }
+    const albums = new Map(
+      (library.albums || []).map((album) => [String(album.id), album]),
+    );
     const files = library.tracks.flatMap((track) =>
       track.files
         .filter((f) => f.available && f.source !== "flow")
-        .map((file) => ({
-          coreId: String(track.id),
-          fileId: String(file.id ?? file.path),
-          path: file.path,
-          readPath: file.readPath || file.path,
-          durationMs: file.durationMs ?? track.durationMs,
-          albumId: file.albumId,
-          title: track.title || "",
-          artist: track.artistName || "",
-        })),
+        .map((file) => {
+          const placement = (track.albums || []).find(
+            (album) => String(album.albumId ?? album.id) === String(file.albumId),
+          );
+          const album = albums.get(String(file.albumId));
+          return {
+            coreId: String(track.id),
+            fileId: String(file.id ?? file.path),
+            path: file.path,
+            readPath: file.readPath || file.path,
+            durationMs: file.durationMs ?? track.durationMs,
+            albumId: file.albumId,
+            title: track.title || "",
+            artist: track.artistName || "",
+            album: album?.title || track.albumTitle || "",
+            trackNumber: file.trackNumber ?? placement?.trackNumber ?? 0,
+            discNumber: file.discNumber ?? placement?.discNumber ?? 0,
+          };
+        }),
     );
     const jobs = new ModelJobs(catalogue);
     return jobs.enqueue("library_scan", "library_scan", {
@@ -196,14 +209,16 @@ export async function runModelJobs(
             fingerprint: hash,
             hints: {
               title: tags.title || file.title || "",
-              album: tags.album,
+              album: tags.album || file.album || "",
               artist: tags.artist || file.artist || "",
               albumArtist: tags.albumArtist,
               composer: tags.composer,
-              trackNumber: tags.trackNumber,
-              discNumber: tags.discNumber,
+              trackNumber: tags.trackNumber || file.trackNumber || 0,
+              discNumber: tags.discNumber || file.discNumber || 0,
               genres: tags.genres,
               work: tags.work,
+              workId: tags.workId,
+              recordingMbid: tags.recordingMbid,
               composerDistinct:
                 tags.composer.length > 0 &&
                 !tags.composer.includes(tags.artist),
@@ -287,6 +302,7 @@ export async function runModelJobs(
                         Date.now(),
                       );
                 }
+                autoMatchTaggedWorks(catalogue, { actor: "model-scan" });
               }
             : undefined,
         },
@@ -296,6 +312,20 @@ export async function runModelJobs(
       jobs.fail(job, error.message);
       throw error;
     }
+  } finally {
+    catalogue.close();
+  }
+}
+
+export async function autoMatchWorks(ctx, actor, albumId = null) {
+  if (actor?.role !== "admin")
+    throw new Error("Automatic work matching requires a current host admin");
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  try {
+    return autoMatchTaggedWorks(catalogue, {
+      albumId,
+      actor: String(actor.id),
+    });
   } finally {
     catalogue.close();
   }

@@ -2,6 +2,8 @@
 
 Phase 4 was explicitly authorized on November 10, 2026 (America/Chicago). This review implementation completes the v0.1 grouping/work-page slice on the existing `aurral-classical` branches. It does not begin v0.2 library search, richer v0.3 entity pages, Discover, automatic matching, or tag-writing expansion.
 
+After Phase 4, the user explicitly authorized beginning automatic work matching. The plugin now has a first conservative, read-only import rule for explicit embedded `WORK` + composer + release order evidence. Completed model scans apply it automatically, and an album action can apply it to an existing index. It creates multi-movement realizations for the documented allowlist, stays idempotent, excludes collection-like étude/prelude/song sets, and never writes media or merges on track title alone. Broader provider-parent matching, collection construction and review workflows remain later work.
+
 ## Implemented behavior
 
 - The plugin derives album contributions only from active, manually/reviewed classical track links and explicit realization items. It groups by work and performance realization, orders items by the stored sequence/occurrence, reports canonical movements that are missing, and retains file-local start/end boundaries. Identical titles alone never create or merge a work.
@@ -18,7 +20,7 @@ The generic core delta adds opt-in manifest `albumPresentation` and public resou
 
 ## Validation observed locally
 
-- Plugin suite: **179 tests**, including schema-1 upgrade/backup, grouping/order/missing movements, range references, collection membership, two-user/admin-pick isolation, read-only indexing when tag parsing rejects WAV or malformed-header files, resumption of saved scan progress after a reader correction, and clearing stale retry errors after successful progress.
+- Plugin suite: **180 tests**, including schema-1 upgrade/backup, grouping/order/missing movements, range references, collection membership, two-user/admin-pick isolation, full-index recording attachment search, conservative/idempotent embedded-tag matching, read-only indexing when tag parsing rejects WAV or malformed-header files, resumption of saved scan progress after a reader correction, and clearing stale retry errors after successful progress.
 - Full core unit suite: **2,757 tests across 406 files** passed.
 - Focused core plugin/queue suites: **52 tests** passed, including ordinary-user resource authorization, admin-pick denial, capability fallback, invalid native references, range clamping, range persistence, and refusal to expand bounded playback remotely.
 - Core required checks pass with zero type errors and the unchanged 1,236 unsafe-any baseline. The production frontend build passes.

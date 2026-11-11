@@ -9,6 +9,7 @@ import {
   modelStatus,
   enqueueModelScan,
   cancelModelScan,
+  autoMatchWorks,
   runModelJobs,
 } from "./model/runtime.js";
 import { readValues } from "./tags.js";
@@ -218,6 +219,19 @@ export default {
       return {
         message:
           "Model scan cancellation requested; catalogue data is retained.",
+      };
+    },
+    async "classical-auto-match"(input) {
+      const result = await autoMatchWorks(
+        makeContext(input),
+        input.user,
+        input.album?.id,
+      );
+      return {
+        message:
+          result.created > 0
+            ? `Created ${result.created} work group${result.created === 1 ? "" : "s"} from explicit WORK, composer and track-order metadata. Reload the album to use Works view.`
+            : "No new unambiguous multi-movement work groups were found for this album. Tracks remain available in the metadata editor.",
       };
     },
     async "preview-remove"(input) {

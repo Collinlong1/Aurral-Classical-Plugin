@@ -419,7 +419,10 @@ function render(c, input) {
         WHERE rp.kind='recording_performance' AND rp.source_id=? AND pw.kind='performance_work'`,
         )
         .all(selected.id);
-      const choices = matchingTracks.slice(0, 200);
+      // Never present an arbitrary prefix of a large library. The page-level
+      // Search items query retains the selected recording and narrows the
+      // complete owned-track index before this bounded dropdown is rendered.
+      const choices = q ? matchingTracks.slice(0, 200) : [];
       const movements = pws.flatMap((pw) => movementRows(c, pw.target_id));
       if (choices.length && pws.length)
         forms.push(
@@ -462,12 +465,16 @@ function render(c, input) {
               ),
             ],
             "Attach track",
-            "Search to find a file by album or filename. Attach each movement separately; the audio file is never changed. Non-classical or unsure tracks require explicit confirmation.",
+            "Use Search items above to narrow by title, album, performer or filename. Attach each movement separately; the audio file is never changed. Non-classical or unsure tracks require explicit confirmation.",
           ),
+        );
+      else if (q)
+        notes.push(
+          "No owned tracks match this search. Try a shorter title, album, performer or filename.",
         );
       else
         notes.push(
-          "No matching owned tracks. Scan your library from an album menu, or clear the search.",
+          "Use Search items above to find an owned track by title, album, performer or filename. The selected recording stays open while you search.",
         );
       const attached = c.db
         .prepare(

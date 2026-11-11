@@ -210,3 +210,5 @@ The backend model uses independent plugin SQLite storage and requires Node 22.16
 ## Manual editor (Phase 3 review)
 
 The Phase 3 fork adds an admin form bridge. Open **Settings → Plugins → Aurral Classical → Pages → Open Classical metadata editor** to create provider-free works/broadcasts, reorder movements, attach owned audio and manage pinned metadata. See [EDITOR_GUIDE.md](EDITOR_GUIDE.md) and [PHASE_3_REPORT.md](PHASE_3_REPORT.md). Edits stay in the plugin database and work with read-only media. Stock hosts without the bridge have no editor entry. No production release/deployment is implied by this source branch.
+
+Recording attachment uses the editor's page-level **Search items** box, which searches the complete indexed library and retains the selected recording. Completed read-only model scans also apply a conservative automatic work pass based on explicit `WORK`, composer and release-order tags for allowlisted multi-movement forms. An album's **Auto-match classical works (read only)** action can apply the same rule to an existing index. It changes only plugin metadata; ambiguous and collection-like sets remain for review.

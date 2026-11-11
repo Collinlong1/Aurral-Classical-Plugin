@@ -1,5 +1,7 @@
 # Phase 4 delta
 
+Post-Phase-4 plugin-only work adds complete-index search guidance to recording attachment and begins conservative automatic work construction from explicit embedded metadata. Completed scans and an album action can create safe multi-movement realizations in plugin storage without media writes or provider requests. This adds no core code, API, database or UI hook beyond the already implemented Phase 4 contracts.
+
 D04 album presentation and the bounded local portion of D05 are now implemented on the fork review source. D04 is opt-in and failure-safe: core validates native references and renders a generic work grouping; the plugin owns classification, work/realization identity, grouping, ordering and missing-item decisions. D05 adds optional queue segment boundaries to native entries, persistence, start/end enforcement and range-aware controls. Bounded entries are not exported through the existing range-unaware remote queue.
 
 The Phase 3 page transport gains separately declared regular-user resource pages with trusted current-user context and validated data/actions. Core adds no classical schema or rules. Plugin schema 2 owns favourites and picks. See `PHASE_4_REPORT.md` for validation and limits.

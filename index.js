@@ -8445,11 +8445,11 @@ var require_genres = __commonJS({
           const trimRegex = /^\(+|\)+$/g;
           text4 = text4.replace(trimRegex, "");
         }
-        const normalized2 = text4.trim();
-        if (!/^\d+$/.test(normalized2)) {
+        const normalized3 = text4.trim();
+        if (!/^\d+$/.test(normalized3)) {
           return 255;
         }
-        const index = parseInt(normalized2, 10);
+        const index = parseInt(normalized3, 10);
         return Number.isNaN(index) ? 255 : index;
       }
     };
@@ -35759,14 +35759,14 @@ var Catalogue = class {
     );
     return id;
   }
-  catalogueNumber(entity, system, display, normalized2) {
+  catalogueNumber(entity, system, display, normalized3) {
     this.entity(entity, ["work", "collection"]);
-    if (![system, display, normalized2].every(
+    if (![system, display, normalized3].every(
       (v) => typeof v === "string" && v.length
     ))
       throw new Error("Invalid catalogue number");
     const id = randomUUID2();
-    this.db.prepare("INSERT INTO catalogue_number VALUES (?,?,?,?,?,NULL)").run(id, entity, system, display, normalized2);
+    this.db.prepare("INSERT INTO catalogue_number VALUES (?,?,?,?,?,NULL)").run(id, entity, system, display, normalized3);
     return id;
   }
   albumTarget(instance, album) {
@@ -36051,7 +36051,7 @@ function reconcile(catalogue, snapshot) {
         index.get(key).push(item);
       }
     }
-    const candidates = previous.map((old) => {
+    const candidates2 = previous.map((old) => {
       const evidence2 = JSON.parse(old.evidence);
       const pool = /* @__PURE__ */ new Set([
         ...index.get(json(["core", old.core_id, old.file_id])) || [],
@@ -36067,13 +36067,13 @@ function reconcile(catalogue, snapshot) {
       };
     });
     const demand = /* @__PURE__ */ new Map();
-    for (const c of candidates)
+    for (const c of candidates2)
       for (const item of c.items) demand.set(item, (demand.get(item) || 0) + 1);
     const claimed = /* @__PURE__ */ new Set(), rows = [], now = Date.now();
     db.prepare("UPDATE track_link SET state='missing' WHERE instance_id=?").run(
       snapshot.instanceId
     );
-    for (const { old, items } of candidates) {
+    for (const { old, items } of candidates2) {
       if (items.length === 1 && demand.get(items[0]) === 1) {
         const item = items[0];
         claimed.add(item);
@@ -36537,7 +36537,7 @@ Provider value: ${providerText}`;
         `SELECT pw.* FROM relation rp JOIN relation pw ON pw.source_id=rp.target_id
         WHERE rp.kind='recording_performance' AND rp.source_id=? AND pw.kind='performance_work'`
       ).all(selected.id);
-      const choices = matchingTracks.slice(0, 200);
+      const choices = q ? matchingTracks.slice(0, 200) : [];
       const movements = pws.flatMap((pw) => movementRows(c, pw.target_id));
       if (choices.length && pws.length)
         forms.push(
@@ -36580,12 +36580,16 @@ Provider value: ${providerText}`;
               )
             ],
             "Attach track",
-            "Search to find a file by album or filename. Attach each movement separately; the audio file is never changed. Non-classical or unsure tracks require explicit confirmation."
+            "Use Search items above to narrow by title, album, performer or filename. Attach each movement separately; the audio file is never changed. Non-classical or unsure tracks require explicit confirmation."
           )
+        );
+      else if (q)
+        notes.push(
+          "No owned tracks match this search. Try a shorter title, album, performer or filename."
         );
       else
         notes.push(
-          "No matching owned tracks. Scan your library from an album menu, or clear the search."
+          "Use Search items above to find an owned track by title, album, performer or filename. The selected recording stays open while you search."
         );
       const attached = c.db.prepare(
         `SELECT i.*,s.track_link_id FROM realization_item i JOIN realization r ON r.id=i.realization_id
@@ -37232,7 +37236,7 @@ async function albumPresentation(input) {
 }
 
 // src/model/runtime.js
-import { createHash, randomUUID as randomUUID7 } from "node:crypto";
+import { createHash as createHash2, randomUUID as randomUUID7 } from "node:crypto";
 import { createReadStream } from "node:fs";
 import fs3 from "node:fs/promises";
 import path6 from "node:path";
@@ -37586,10 +37590,162 @@ async function writeTags(filePath, values) {
   return changed;
 }
 
+// src/model/auto-match.js
+import { createHash } from "node:crypto";
+var MULTI_MOVEMENT = /\b(symphony|sonata|concerto|suite|partita|quartet|quintet|sextet|septet|octet|trio|serenade|divertimento)\b/i;
+var COLLECTION_LIKE = /\b(etudes?|études?|preludes?|préludes?|songs?|lieder)\b/i;
+var clean = (value) => String(value || "").trim().replace(/\s+/g, " ");
+var normalized2 = (value) => clean(value).normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase();
+var identity = (...values) => createHash("sha256").update(JSON.stringify(values)).digest("hex");
+function proposedWork(work) {
+  const tagged = clean(work);
+  if (!tagged || COLLECTION_LIKE.test(tagged)) return null;
+  const parent = clean(tagged.split(/\s*:\s*/, 1)[0]);
+  const candidate = MULTI_MOVEMENT.test(parent) ? parent : tagged;
+  return MULTI_MOVEMENT.test(candidate) ? candidate : null;
+}
+function candidates(catalogue, albumId = null) {
+  const rows = catalogue.db.prepare(
+    `SELECT t.id,t.instance_id,t.evidence,
+        EXISTS(SELECT 1 FROM segment s WHERE s.track_link_id=t.id) AS attached
+       FROM track_link t
+       JOIN classification c ON c.target_id=t.id AND c.state='classical'
+       WHERE t.state='active'`
+  ).all().map((row) => ({ ...row, evidence: JSON.parse(row.evidence) })).filter(
+    (row) => row.evidence.albumId != null && (albumId == null || String(row.evidence.albumId) === String(albumId))
+  );
+  const groups = /* @__PURE__ */ new Map();
+  for (const row of rows) {
+    const hints = row.evidence.hints || {};
+    const work = proposedWork(hints.work);
+    const composers = [
+      ...new Set((hints.composer || []).map(clean).filter(Boolean))
+    ];
+    const trackNumber = Number(hints.trackNumber);
+    const discNumber = Number(hints.discNumber) || 1;
+    if (!work || !composers.length || !Number.isSafeInteger(trackNumber) || trackNumber < 1)
+      continue;
+    const key = JSON.stringify([
+      row.instance_id,
+      String(row.evidence.albumId),
+      normalized2(work),
+      composers.map(normalized2).sort()
+    ]);
+    if (!groups.has(key))
+      groups.set(key, {
+        key,
+        work,
+        composers,
+        albumId: String(row.evidence.albumId),
+        album: clean(hints.album),
+        tracks: []
+      });
+    groups.get(key).tracks.push({
+      ...row,
+      title: clean(hints.title),
+      discNumber,
+      trackNumber
+    });
+  }
+  return [...groups.values()].filter((group) => {
+    if (group.tracks.length < 2 || group.tracks.some((track) => track.attached))
+      return false;
+    const positions = group.tracks.map(
+      (track) => `${track.discNumber}:${track.trackNumber}`
+    );
+    return new Set(positions).size === positions.length && new Set(group.tracks.map((track) => normalized2(track.title))).size === group.tracks.length;
+  });
+}
+function existingIdentity(catalogue, recordKind, recordId) {
+  return catalogue.db.prepare(
+    `SELECT entity_id FROM external_identity
+       WHERE provider='embedded-tags' AND record_kind=? AND record_id=? AND state='active'`
+  ).get(recordKind, recordId)?.entity_id;
+}
+function composerEntity(catalogue, metadata, name) {
+  const person = catalogue.createEntity("person");
+  metadata.derived(person, "name", name);
+  return person;
+}
+function createGroup(catalogue, group, actor3) {
+  const metadata = new Metadata(catalogue);
+  const recordId = identity("album-work", group.key);
+  if (existingIdentity(catalogue, "album-work", recordId)) return false;
+  return transaction(catalogue.db, () => {
+    const work = catalogue.createEntity("work");
+    metadata.derived(work, "title", group.work);
+    catalogue.externalIdentity(work, "embedded-tags", "album-work", recordId, {
+      evidence: {
+        albumId: group.albumId,
+        work: group.work,
+        composers: group.composers
+      }
+    });
+    group.composers.forEach(
+      (name, index) => catalogue.credit(
+        work,
+        composerEntity(catalogue, metadata, name),
+        "composer",
+        { position: index + 1 }
+      )
+    );
+    const performance = catalogue.createEntity("performance");
+    const performanceWork = catalogue.relate(
+      "performance_work",
+      performance,
+      work
+    );
+    const ordered = group.tracks.sort(
+      (a, b) => a.discNumber - b.discNumber || a.trackNumber - b.trackNumber || a.id.localeCompare(b.id)
+    );
+    const realization = catalogue.realization(
+      work,
+      performanceWork,
+      group.album || null
+    );
+    ordered.forEach((track, index) => {
+      const movement = catalogue.createEntity("movement");
+      metadata.derived(movement, "title", track.title || `Movement ${index + 1}`);
+      metadata.derived(movement, "movementNumber", String(index + 1));
+      catalogue.relate("movement", work, movement, { position: index + 1 });
+      const recording = catalogue.createEntity("recording", {
+        durationMs: track.evidence.durationMs
+      });
+      catalogue.relate("recording_performance", recording, performance);
+      const content = catalogue.recordingContent(recording, performanceWork, {
+        movement
+      });
+      const segment = catalogue.segment(track.id, { kind: "whole" });
+      catalogue.segmentContent(segment, content);
+      catalogue.realizationItem(realization, segment, {
+        movement,
+        sequence: index + 1
+      });
+    });
+    catalogue.audit(
+      "work.auto_match",
+      work,
+      {
+        rule: "embedded-work-composer-album-v1",
+        albumId: group.albumId,
+        tracks: ordered.map((track) => track.id)
+      },
+      actor3
+    );
+    return true;
+  });
+}
+function autoMatchTaggedWorks(catalogue, { albumId = null, actor: actor3 = null } = {}) {
+  const groups = candidates(catalogue, albumId);
+  let created = 0;
+  for (const group of groups) if (createGroup(catalogue, group, actor3)) created++;
+  return { created, candidates: groups.length };
+}
+
 // src/model/runtime.js
 var modelFolder = (ctx) => path6.join(ctx.dataFolder, "model");
 var fingerprint = async (file) => {
-  const hash = createHash("sha256");
+  const hash = createHash2("sha256");
   for await (const bytes of createReadStream(file)) hash.update(bytes);
   return `file-sha256-v1:${hash.digest("hex")}`;
 };
@@ -37662,17 +37818,29 @@ async function enqueueModelScan(ctx, actor3) {
       catalogue.db.prepare("INSERT INTO core_instance VALUES (?,?,0)").run(id, ctx.settings.libraryEpoch || "initial");
       instance = { id, generation: 0 };
     }
+    const albums = new Map(
+      (library.albums || []).map((album) => [String(album.id), album])
+    );
     const files = library.tracks.flatMap(
-      (track) => track.files.filter((f) => f.available && f.source !== "flow").map((file) => ({
-        coreId: String(track.id),
-        fileId: String(file.id ?? file.path),
-        path: file.path,
-        readPath: file.readPath || file.path,
-        durationMs: file.durationMs ?? track.durationMs,
-        albumId: file.albumId,
-        title: track.title || "",
-        artist: track.artistName || ""
-      }))
+      (track) => track.files.filter((f) => f.available && f.source !== "flow").map((file) => {
+        const placement = (track.albums || []).find(
+          (album2) => String(album2.albumId ?? album2.id) === String(file.albumId)
+        );
+        const album = albums.get(String(file.albumId));
+        return {
+          coreId: String(track.id),
+          fileId: String(file.id ?? file.path),
+          path: file.path,
+          readPath: file.readPath || file.path,
+          durationMs: file.durationMs ?? track.durationMs,
+          albumId: file.albumId,
+          title: track.title || "",
+          artist: track.artistName || "",
+          album: album?.title || track.albumTitle || "",
+          trackNumber: file.trackNumber ?? placement?.trackNumber ?? 0,
+          discNumber: file.discNumber ?? placement?.discNumber ?? 0
+        };
+      })
     );
     const jobs = new ModelJobs(catalogue);
     return jobs.enqueue("library_scan", "library_scan", {
@@ -37730,14 +37898,16 @@ async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 10 } = {}) {
             fingerprint: hash,
             hints: {
               title: tags.title || file.title || "",
-              album: tags.album,
+              album: tags.album || file.album || "",
               artist: tags.artist || file.artist || "",
               albumArtist: tags.albumArtist,
               composer: tags.composer,
-              trackNumber: tags.trackNumber,
-              discNumber: tags.discNumber,
+              trackNumber: tags.trackNumber || file.trackNumber || 0,
+              discNumber: tags.discNumber || file.discNumber || 0,
               genres: tags.genres,
               work: tags.work,
+              workId: tags.workId,
+              recordingMbid: tags.recordingMbid,
               composerDistinct: tags.composer.length > 0 && !tags.composer.includes(tags.artist)
             }
           });
@@ -37802,6 +37972,7 @@ async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 10 } = {}) {
                   Date.now()
                 );
             }
+            autoMatchTaggedWorks(catalogue, { actor: "model-scan" });
           } : void 0
         }
       );
@@ -37810,6 +37981,19 @@ async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 10 } = {}) {
       jobs.fail(job, error.message);
       throw error;
     }
+  } finally {
+    catalogue.close();
+  }
+}
+async function autoMatchWorks(ctx, actor3, albumId = null) {
+  if (actor3?.role !== "admin")
+    throw new Error("Automatic work matching requires a current host admin");
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  try {
+    return autoMatchTaggedWorks(catalogue, {
+      albumId,
+      actor: String(actor3.id)
+    });
   } finally {
     catalogue.close();
   }
@@ -37830,7 +38014,7 @@ async function cancelModelScan(ctx, actor3) {
 }
 
 // src/store.js
-import { createHash as createHash2, randomUUID as randomUUID8 } from "node:crypto";
+import { createHash as createHash3, randomUUID as randomUUID8 } from "node:crypto";
 import fs4 from "node:fs/promises";
 import path7 from "node:path";
 var sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -37917,7 +38101,7 @@ var FileCache = class {
     this.folder = folder;
   }
   file(key) {
-    const hash = createHash2("sha1").update(key).digest("hex");
+    const hash = createHash3("sha1").update(key).digest("hex");
     return path7.join(this.folder, hash.slice(0, 2), `${hash}.json`);
   }
   async get(key, ttlMs) {
@@ -38039,7 +38223,7 @@ function summarize(lines) {
 import path9 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.4" : "dev";
+var VERSION = true ? "1.0.5" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js
@@ -38471,12 +38655,12 @@ var ClassicalResolver = class _ClassicalResolver {
   }
   // -- names --------------------------------------------------------------
   static bestEnglishAlias(aliases) {
-    const candidates = (aliases || []).filter(
+    const candidates2 = (aliases || []).filter(
       (a) => String(a.locale || "").replaceAll("-", "_").split("_")[0] === "en" && a.name && a.type !== "Search hint" && !a.ended
     );
-    if (!candidates.length) return null;
+    if (!candidates2.length) return null;
     const key = (a) => [a.primary ? 0 : 1, a.type == null || a.type === "Artist name" ? 0 : 1];
-    return [...candidates].sort((x, y) => {
+    return [...candidates2].sort((x, y) => {
       const [a, b] = [key(x), key(y)];
       return a[0] - b[0] || a[1] - b[1];
     })[0];
@@ -39121,7 +39305,7 @@ function albumCandidates(folders, release) {
     byUser.get(folder.username).push({ folder, discs });
   }
   const wanted = release.discs.map((d) => d.position);
-  const candidates = [];
+  const candidates2 = [];
   for (const [username, matches] of byUser) {
     matches.sort((a, b) => b.discs.length - a.discs.length || folderScore(a.folder) - folderScore(b.folder));
     const chosen = [];
@@ -39134,9 +39318,9 @@ function albumCandidates(folders, release) {
     if (!wanted.every((d) => covered.has(d))) continue;
     const files = chosen.flatMap(({ folder, discs }) => mapFiles(folder, release, discs));
     const first = chosen[0].folder;
-    candidates.push({ username, folders: chosen.map((c) => c.folder), files, score: Math.max(...chosen.map((c) => folderScore(c.folder))), format: first.format, bitRate: first.files[0]?.bitRate ?? null });
+    candidates2.push({ username, folders: chosen.map((c) => c.folder), files, score: Math.max(...chosen.map((c) => folderScore(c.folder))), format: first.format, bitRate: first.files[0]?.bitRate ?? null });
   }
-  return candidates.sort((a, b) => a.score - b.score);
+  return candidates2.sort((a, b) => a.score - b.score);
 }
 function trackCandidates(folders, release, discPosition, trackIndexInDisc) {
   const out = [];
@@ -39205,10 +39389,10 @@ function searchQueries(info, { albumTitle = "", album = false } = {}) {
     [performer, ensemble, composer, title],
     [performer, ensemble, title]
   ];
-  const candidates = album ? [...byAlbum, ...byWork] : [byWork[0], byAlbum[0], byWork[1], byWork[2], byAlbum[1]];
+  const candidates2 = album ? [...byAlbum, ...byWork] : [byWork[0], byAlbum[0], byWork[1], byWork[2], byAlbum[1]];
   const seen = /* @__PURE__ */ new Set();
   const queries = [];
-  for (const parts of candidates) {
+  for (const parts of candidates2) {
     const query = searchWords(parts.filter(Boolean).join(" "));
     if (query.split(" ").length < 3 || seen.has(query.toLowerCase())) continue;
     seen.add(query.toLowerCase());
@@ -40290,6 +40474,16 @@ var index_default = {
       await cancelModelScan(makeContext(input), input.user);
       return {
         message: "Model scan cancellation requested; catalogue data is retained."
+      };
+    },
+    async "classical-auto-match"(input) {
+      const result = await autoMatchWorks(
+        makeContext(input),
+        input.user,
+        input.album?.id
+      );
+      return {
+        message: result.created > 0 ? `Created ${result.created} work group${result.created === 1 ? "" : "s"} from explicit WORK, composer and track-order metadata. Reload the album to use Works view.` : "No new unambiguous multi-movement work groups were found for this album. Tracks remain available in the metadata editor."
       };
     },
     async "preview-remove"(input) {
