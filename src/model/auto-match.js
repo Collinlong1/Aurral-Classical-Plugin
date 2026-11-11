@@ -5,6 +5,8 @@ import { transaction } from "./database.js";
 const MULTI_MOVEMENT =
   /\b(symphony|sonata|concerto|suite|partita|quartet|quintet|sextet|septet|octet|trio|serenade|divertimento)\b/i;
 const COLLECTION_LIKE = /\b(etudes?|études?|preludes?|préludes?|songs?|lieder)\b/i;
+export const isCollectionLike = (value) => COLLECTION_LIKE.test(clean(value));
+const MOVEMENT_PREFIX = /^(?:[IVXLCDM]+|\d+)[.)\s:-]/i;
 const clean = (value) => String(value || "").trim().replace(/\s+/g, " ");
 const normalized = (value) =>
   clean(value)
@@ -14,15 +16,29 @@ const normalized = (value) =>
 const identity = (...values) =>
   createHash("sha256").update(JSON.stringify(values)).digest("hex");
 
-function proposedWork(work) {
+function proposedWork(work, title, allowStructuredTitles) {
   const tagged = clean(work);
-  if (!tagged || COLLECTION_LIKE.test(tagged)) return null;
-  const parent = clean(tagged.split(/\s*:\s*/, 1)[0]);
-  const candidate = MULTI_MOVEMENT.test(parent) ? parent : tagged;
-  return MULTI_MOVEMENT.test(candidate) ? candidate : null;
+  if (tagged && !isCollectionLike(tagged)) {
+    const parent = clean(tagged.split(/\s*:\s*/, 1)[0]);
+    const candidate = MULTI_MOVEMENT.test(parent) ? parent : tagged;
+    if (MULTI_MOVEMENT.test(candidate))
+      return { title: candidate, evidence: "work-tag" };
+  }
+  if (!allowStructuredTitles) return null;
+  const structured = clean(title).match(/^(.+?)(?::|\s+[–—-]\s+)\s*(.+)$/);
+  if (!structured || !MOVEMENT_PREFIX.test(structured[2])) return null;
+  const candidate = clean(structured[1]);
+  return MULTI_MOVEMENT.test(candidate) && !isCollectionLike(candidate)
+    ? { title: candidate, evidence: "structured-title" }
+    : null;
 }
 
-function candidates(catalogue, albumId = null) {
+function candidates(
+  catalogue,
+  albumId = null,
+  allowStructuredTitles = false,
+  providerMatches = new Map(),
+) {
   const rows = catalogue.db
     .prepare(
       `SELECT t.id,t.instance_id,t.evidence,
@@ -41,14 +57,25 @@ function candidates(catalogue, albumId = null) {
   const groups = new Map();
   for (const row of rows) {
     const hints = row.evidence.hints || {};
-    const work = proposedWork(hints.work);
+    const provider = providerMatches.get(row.id);
+    const proposal = provider
+      ? {
+          title: clean(provider.work),
+          evidence: "musicbrainz-parent",
+          identity: provider.workId,
+        }
+      : proposedWork(hints.work, hints.title, allowStructuredTitles);
     const composers = [
-      ...new Set((hints.composer || []).map(clean).filter(Boolean)),
+      ...new Set(
+        (hints.composer?.length ? hints.composer : provider?.composers || [])
+          .map(clean)
+          .filter(Boolean),
+      ),
     ];
     const trackNumber = Number(hints.trackNumber);
     const discNumber = Number(hints.discNumber) || 1;
     if (
-      !work ||
+      !proposal ||
       !composers.length ||
       !Number.isSafeInteger(trackNumber) ||
       trackNumber < 1
@@ -57,13 +84,16 @@ function candidates(catalogue, albumId = null) {
     const key = JSON.stringify([
       row.instance_id,
       String(row.evidence.albumId),
-      normalized(work),
+      proposal.identity || normalized(proposal.title),
       composers.map(normalized).sort(),
+      proposal.evidence,
     ]);
     if (!groups.has(key))
       groups.set(key, {
         key,
-        work,
+        work: proposal.title,
+        evidence: proposal.evidence,
+        providerWorkId: proposal.identity || null,
         composers,
         albumId: String(row.evidence.albumId),
         album: clean(hints.album),
@@ -119,6 +149,7 @@ function createGroup(catalogue, group, actor) {
         albumId: group.albumId,
         work: group.work,
         composers: group.composers,
+        providerWorkId: group.providerWorkId,
       },
     });
     group.composers.forEach((name, index) =>
@@ -169,7 +200,8 @@ function createGroup(catalogue, group, actor) {
       "work.auto_match",
       work,
       {
-        rule: "embedded-work-composer-album-v1",
+        rule: "classical-grouping-v1",
+        evidence: group.evidence,
         albumId: group.albumId,
         tracks: ordered.map((track) => track.id),
       },
@@ -182,9 +214,19 @@ function createGroup(catalogue, group, actor) {
 // This only changes the plugin catalogue. It never writes the indexed media.
 export function autoMatchTaggedWorks(
   catalogue,
-  { albumId = null, actor = null } = {},
+  {
+    albumId = null,
+    actor = null,
+    allowStructuredTitles = false,
+    providerMatches = new Map(),
+  } = {},
 ) {
-  const groups = candidates(catalogue, albumId);
+  const groups = candidates(
+    catalogue,
+    albumId,
+    allowStructuredTitles,
+    providerMatches,
+  );
   let created = 0;
   for (const group of groups) if (createGroup(catalogue, group, actor)) created++;
   return { created, candidates: groups.length };

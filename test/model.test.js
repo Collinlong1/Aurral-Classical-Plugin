@@ -19,6 +19,7 @@ import {
   modelStatus,
   runModelJobs,
   cancelModelScan,
+  autoMatchWorks,
 } from "../src/model/runtime.js";
 import { tempFolders, copyFixture, json as response } from "./helpers.js";
 import { writeTags } from "../src/tags.js";
@@ -108,6 +109,50 @@ test("explicit embedded work metadata creates an idempotent read-only work reali
         discNumber: 1,
       },
     }),
+    track(5, {
+      albumId: "symphony-album",
+      hints: {
+        title: "Symphony No. 5 in C Minor, Op. 67: I. Allegro con brio",
+        composer: ["Ludwig van Beethoven"],
+        work: "",
+        trackNumber: 1,
+        discNumber: 1,
+        genres: ["Classical"],
+      },
+    }),
+    track(6, {
+      albumId: "symphony-album",
+      hints: {
+        title: "Symphony No. 5 in C Minor, Op. 67: II. Andante con moto",
+        composer: ["Ludwig van Beethoven"],
+        work: "",
+        trackNumber: 2,
+        discNumber: 1,
+        genres: ["Classical"],
+      },
+    }),
+    track(7, {
+      albumId: "provider-album",
+      hints: {
+        title: "Allegro",
+        composer: ["Provider Composer"],
+        recordingMbid: "recording-one",
+        trackNumber: 1,
+        discNumber: 1,
+        genres: ["Classical"],
+      },
+    }),
+    track(8, {
+      albumId: "provider-album",
+      hints: {
+        title: "Adagio",
+        composer: ["Provider Composer"],
+        recordingMbid: "recording-two",
+        trackNumber: 2,
+        discNumber: 1,
+        genres: ["Classical"],
+      },
+    }),
   ];
   const links = reconcile(c, snapshot(tagged));
   links.forEach((link) => classify(c, link.id, link.hints));
@@ -115,6 +160,42 @@ test("explicit embedded work metadata creates an idempotent read-only work reali
     created: 1,
     candidates: 1,
   });
+  assert.deepEqual(autoMatchTaggedWorks(c, { actor: "model-scan" }), {
+    created: 0,
+    candidates: 0,
+  });
+  assert.deepEqual(
+    autoMatchTaggedWorks(c, {
+      actor: "admin",
+      allowStructuredTitles: true,
+    }),
+    { created: 1, candidates: 1 },
+  );
+  assert.deepEqual(
+    autoMatchTaggedWorks(c, {
+      actor: "admin",
+      allowStructuredTitles: true,
+    }),
+    { created: 0, candidates: 0 },
+  );
+  assert.equal(
+    renderAlbumPresentation(c, "symphony-album").groups[0].title,
+    "Symphony No. 5 in C Minor, Op. 67",
+  );
+  assert.deepEqual(
+    autoMatchTaggedWorks(c, {
+      actor: "admin",
+      providerMatches: new Map([
+        [links[6].id, { workId: "parent-work", work: "Provider Work", composers: [] }],
+        [links[7].id, { workId: "parent-work", work: "Provider Work", composers: [] }],
+      ]),
+    }),
+    { created: 1, candidates: 1 },
+  );
+  assert.equal(
+    renderAlbumPresentation(c, "provider-album").groups[0].title,
+    "Provider Work",
+  );
   assert.deepEqual(autoMatchTaggedWorks(c, { actor: "model-scan" }), {
     created: 0,
     candidates: 0,
@@ -132,8 +213,84 @@ test("explicit embedded work metadata creates an idempotent read-only work reali
     c.db
       .prepare("SELECT count(*) AS n FROM audit_event WHERE action='work.auto_match'")
       .get().n,
-    1,
+    3,
   );
+});
+
+test("explicit album matching resolves saved recording identities without writing files", async (t) => {
+  const folders = await tempFolders();
+  t.after(() => fs.rm(folders.root, { recursive: true, force: true }));
+  const folder = path.join(folders.dataFolder, "model");
+  const c = await openCatalogue(folder);
+  const links = reconcile(
+    c,
+    snapshot([
+      track(1, {
+        albumId: 42,
+        hints: {
+          title: "I. Allegro",
+          composer: ["Known Composer"],
+          recordingMbid: "recording-1",
+          trackNumber: 1,
+          discNumber: 1,
+          genres: ["Classical"],
+        },
+      }),
+      track(2, {
+        albumId: 42,
+        hints: {
+          title: "II. Adagio",
+          composer: ["Known Composer"],
+          recordingMbid: "recording-2",
+          trackNumber: 2,
+          discNumber: 1,
+          genres: ["Classical"],
+        },
+      }),
+    ]),
+  );
+  links.forEach((link) => classify(c, link.id, link.hints));
+  c.close();
+  const result = await autoMatchWorks(
+    {
+      ...folders,
+      resolver: {
+        resolve: async (id) => ({
+          workId: id === "recording-1" ? "movement-1" : "movement-2",
+          composers: ["Known Composer"],
+        }),
+      },
+      mb: {
+        get: async (_kind, id) =>
+          id === "parent-work"
+            ? { id, title: "MusicBrainz Parent Work", relations: [] }
+            : {
+                id,
+                title: id,
+                relations: [
+                  {
+                    type: "parts",
+                    direction: "backward",
+                    work: { id: "parent-work" },
+                  },
+                ],
+              },
+      },
+      log: () => {},
+    },
+    { id: 1, role: "admin" },
+    42,
+  );
+  assert.deepEqual(result, { created: 1, candidates: 1 });
+  const saved = await openCatalogue(folder);
+  try {
+    assert.equal(
+      renderAlbumPresentation(saved, 42).groups[0].title,
+      "MusicBrainz Parent Work",
+    );
+  } finally {
+    saved.close();
+  }
 });
 
 test("catalogue models a provider-free broadcast, roles, collections, segments, and reissues", async (t) => {
@@ -838,6 +995,7 @@ test("read-only model scans index WAV files using host metadata without opening 
           tracks: [
             {
               id: 17,
+              mbid: "00000000-0000-4000-8000-000000000017",
               title: "Host WAV title",
               artistName: "Host WAV artist",
               durationMs: 2000,
@@ -867,6 +1025,10 @@ test("read-only model scans index WAV files using host metadata without opening 
     );
     assert.equal(evidence.hints.title, "Host WAV title");
     assert.equal(evidence.hints.artist, "Host WAV artist");
+    assert.equal(
+      evidence.hints.recordingMbid,
+      "00000000-0000-4000-8000-000000000017",
+    );
     assert.equal(evidence.durationMs, 2000);
   } finally {
     catalogue.close();

@@ -37594,17 +37594,26 @@ async function writeTags(filePath, values) {
 import { createHash } from "node:crypto";
 var MULTI_MOVEMENT = /\b(symphony|sonata|concerto|suite|partita|quartet|quintet|sextet|septet|octet|trio|serenade|divertimento)\b/i;
 var COLLECTION_LIKE = /\b(etudes?|études?|preludes?|préludes?|songs?|lieder)\b/i;
+var isCollectionLike = (value) => COLLECTION_LIKE.test(clean(value));
+var MOVEMENT_PREFIX = /^(?:[IVXLCDM]+|\d+)[.)\s:-]/i;
 var clean = (value) => String(value || "").trim().replace(/\s+/g, " ");
 var normalized2 = (value) => clean(value).normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase();
 var identity = (...values) => createHash("sha256").update(JSON.stringify(values)).digest("hex");
-function proposedWork(work) {
+function proposedWork(work, title, allowStructuredTitles) {
   const tagged = clean(work);
-  if (!tagged || COLLECTION_LIKE.test(tagged)) return null;
-  const parent = clean(tagged.split(/\s*:\s*/, 1)[0]);
-  const candidate = MULTI_MOVEMENT.test(parent) ? parent : tagged;
-  return MULTI_MOVEMENT.test(candidate) ? candidate : null;
+  if (tagged && !isCollectionLike(tagged)) {
+    const parent = clean(tagged.split(/\s*:\s*/, 1)[0]);
+    const candidate2 = MULTI_MOVEMENT.test(parent) ? parent : tagged;
+    if (MULTI_MOVEMENT.test(candidate2))
+      return { title: candidate2, evidence: "work-tag" };
+  }
+  if (!allowStructuredTitles) return null;
+  const structured = clean(title).match(/^(.+?)(?::|\s+[–—-]\s+)\s*(.+)$/);
+  if (!structured || !MOVEMENT_PREFIX.test(structured[2])) return null;
+  const candidate = clean(structured[1]);
+  return MULTI_MOVEMENT.test(candidate) && !isCollectionLike(candidate) ? { title: candidate, evidence: "structured-title" } : null;
 }
-function candidates(catalogue, albumId = null) {
+function candidates(catalogue, albumId = null, allowStructuredTitles = false, providerMatches = /* @__PURE__ */ new Map()) {
   const rows = catalogue.db.prepare(
     `SELECT t.id,t.instance_id,t.evidence,
         EXISTS(SELECT 1 FROM segment s WHERE s.track_link_id=t.id) AS attached
@@ -37617,24 +37626,34 @@ function candidates(catalogue, albumId = null) {
   const groups = /* @__PURE__ */ new Map();
   for (const row of rows) {
     const hints = row.evidence.hints || {};
-    const work = proposedWork(hints.work);
+    const provider = providerMatches.get(row.id);
+    const proposal = provider ? {
+      title: clean(provider.work),
+      evidence: "musicbrainz-parent",
+      identity: provider.workId
+    } : proposedWork(hints.work, hints.title, allowStructuredTitles);
     const composers = [
-      ...new Set((hints.composer || []).map(clean).filter(Boolean))
+      ...new Set(
+        (hints.composer?.length ? hints.composer : provider?.composers || []).map(clean).filter(Boolean)
+      )
     ];
     const trackNumber = Number(hints.trackNumber);
     const discNumber = Number(hints.discNumber) || 1;
-    if (!work || !composers.length || !Number.isSafeInteger(trackNumber) || trackNumber < 1)
+    if (!proposal || !composers.length || !Number.isSafeInteger(trackNumber) || trackNumber < 1)
       continue;
     const key = JSON.stringify([
       row.instance_id,
       String(row.evidence.albumId),
-      normalized2(work),
-      composers.map(normalized2).sort()
+      proposal.identity || normalized2(proposal.title),
+      composers.map(normalized2).sort(),
+      proposal.evidence
     ]);
     if (!groups.has(key))
       groups.set(key, {
         key,
-        work,
+        work: proposal.title,
+        evidence: proposal.evidence,
+        providerWorkId: proposal.identity || null,
         composers,
         albumId: String(row.evidence.albumId),
         album: clean(hints.album),
@@ -37678,7 +37697,8 @@ function createGroup(catalogue, group, actor3) {
       evidence: {
         albumId: group.albumId,
         work: group.work,
-        composers: group.composers
+        composers: group.composers,
+        providerWorkId: group.providerWorkId
       }
     });
     group.composers.forEach(
@@ -37726,7 +37746,8 @@ function createGroup(catalogue, group, actor3) {
       "work.auto_match",
       work,
       {
-        rule: "embedded-work-composer-album-v1",
+        rule: "classical-grouping-v1",
+        evidence: group.evidence,
         albumId: group.albumId,
         tracks: ordered.map((track) => track.id)
       },
@@ -37735,11 +37756,80 @@ function createGroup(catalogue, group, actor3) {
     return true;
   });
 }
-function autoMatchTaggedWorks(catalogue, { albumId = null, actor: actor3 = null } = {}) {
-  const groups = candidates(catalogue, albumId);
+function autoMatchTaggedWorks(catalogue, {
+  albumId = null,
+  actor: actor3 = null,
+  allowStructuredTitles = false,
+  providerMatches = /* @__PURE__ */ new Map()
+} = {}) {
+  const groups = candidates(
+    catalogue,
+    albumId,
+    allowStructuredTitles,
+    providerMatches
+  );
   let created = 0;
   for (const group of groups) if (createGroup(catalogue, group, actor3)) created++;
   return { created, candidates: groups.length };
+}
+
+// src/works.js
+var CATALOGUES = [
+  [/\bBWV\s*(\d+[a-z]?)/i, "BWV"],
+  [/\bHWV\s*(\d+[a-z]?)/i, "HWV"],
+  [/\bRV\s*(\d+[a-z]?)/i, "RV"],
+  [/\bK(?:V|\.)?\s*(\d+[a-z]?)\b/, "K"],
+  [/\bD\.?\s*(\d+[a-z]?)\b/, "D"],
+  [/\bHob\.?\s*([IVXL]+[a-z]?:\s*\d+[a-z]?)/i, "Hob"],
+  [/\bWoO\s*(\d+)/i, "WoO"],
+  [/\bS\.\s*(\d+)/, "S"],
+  [/\bSz\.?\s*(\d+)/i, "Sz"],
+  [/\bBB\s*(\d+)/, "BB"],
+  [/\bTrV\s*(\d+)/i, "TrV"],
+  [/\bL\.\s*(\d+)/, "L"],
+  [/\bFP\s*(\d+)/, "FP"]
+];
+var OPUS = /\bop(?:us|\.)?\s*(\d+[a-z]?)(?:\s*,?\s*(?:no\.?|nr\.?|n°)\s*(\d+))?/i;
+function catalogueNumber(title) {
+  const text4 = String(title || "");
+  for (const [pattern, prefix] of CATALOGUES) {
+    const match2 = text4.match(pattern);
+    if (match2) return `${prefix} ${match2[1].replace(/\s+/g, "")}`;
+  }
+  const opus = text4.match(OPUS);
+  if (opus) return `op ${opus[1]}${opus[2] ? ` no ${opus[2]}` : ""}`;
+  return "";
+}
+function shortWorkTitle(title) {
+  let text4 = String(title || "").split(":")[0];
+  text4 = text4.replace(OPUS, " ");
+  for (const [pattern] of CATALOGUES) text4 = text4.replace(pattern, " ");
+  text4 = text4.replace(/\bin\s+[A-G](?:[- ]?(?:flat|sharp|♭|♯|b|#))?\s*(?:major|minor|maj|min|dur|moll)\b/gi, " ").replace(/\b(?:no|nr|n°)\.?\s*(?=\d)/gi, " ").replace(/[“”"'’,;()[\]]/g, " ");
+  return searchWords(text4);
+}
+function searchWords(text4) {
+  return String(text4 || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim().split(/\s+/).filter(Boolean).join(" ");
+}
+function surname(person) {
+  if (!person) return "";
+  const sort = String(person.sortName || "");
+  if (sort.includes(",")) return searchWords(sort.split(",")[0]);
+  return searchWords(person.name);
+}
+function creditString(credit) {
+  return (credit || []).map((entry) => `${entry.name ?? entry.artist?.name ?? ""}${entry.joinphrase ?? ""}`).join("").trim();
+}
+async function topWork(mb, work, depth = 0) {
+  if (!work || depth >= 3) return work;
+  const parent = (work.relations || []).find((rel) => rel.type === "parts" && rel.direction === "backward" && rel.work?.id);
+  if (!parent) return work;
+  const data = await mb.get("work", parent.work.id, "artist-rels+work-rels");
+  return data ? topWork(mb, data, depth + 1) : work;
+}
+var RELEASE_INC = "recordings+artist-credits+release-groups+media";
+function releaseYear(date) {
+  const year = Number(String(date || "").slice(0, 4));
+  return Number.isInteger(year) && year > 0 ? year : null;
 }
 
 // src/model/runtime.js
@@ -37836,6 +37926,7 @@ async function enqueueModelScan(ctx, actor3) {
           albumId: file.albumId,
           title: track.title || "",
           artist: track.artistName || "",
+          recordingMbid: track.mbid || "",
           album: album?.title || track.albumTitle || "",
           trackNumber: file.trackNumber ?? placement?.trackNumber ?? 0,
           discNumber: file.discNumber ?? placement?.discNumber ?? 0
@@ -37907,7 +37998,7 @@ async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 10 } = {}) {
               genres: tags.genres,
               work: tags.work,
               workId: tags.workId,
-              recordingMbid: tags.recordingMbid,
+              recordingMbid: tags.recordingMbid || file.recordingMbid || "",
               composerDistinct: tags.composer.length > 0 && !tags.composer.includes(tags.artist)
             }
           });
@@ -37990,10 +38081,62 @@ async function autoMatchWorks(ctx, actor3, albumId = null) {
     throw new Error("Automatic work matching requires a current host admin");
   const catalogue = await openCatalogue(modelFolder(ctx));
   try {
-    return autoMatchTaggedWorks(catalogue, {
+    const local = autoMatchTaggedWorks(catalogue, {
       albumId,
-      actor: String(actor3.id)
+      actor: String(actor3.id),
+      // This is an explicit admin action. A structured classical title may be
+      // accepted with matching composer, album, classification and ordering;
+      // unattended scans continue to require an embedded WORK tag.
+      allowStructuredTitles: true
     });
+    const providerMatches = /* @__PURE__ */ new Map();
+    const rows = catalogue.db.prepare(
+      `SELECT t.id,t.evidence FROM track_link t
+         JOIN classification c ON c.target_id=t.id AND c.state='classical'
+         WHERE t.state='active'
+         AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?
+         AND NOT EXISTS(SELECT 1 FROM segment s WHERE s.track_link_id=t.id)`
+    ).all(String(albumId));
+    for (const row of rows) {
+      const hints = JSON.parse(row.evidence).hints || {};
+      try {
+        let workId = hints.workId;
+        let composers = hints.composer || [];
+        if (!workId && hints.recordingMbid) {
+          const fields = await ctx.resolver.resolve(hints.recordingMbid, {
+            confirmed: true
+          });
+          workId = fields?.workId;
+          if (!composers.length) composers = fields?.composers || [];
+        }
+        if (!workId) continue;
+        const leaf = await ctx.mb.get(
+          "work",
+          workId,
+          "artist-rels+work-rels"
+        );
+        const parent = leaf && await topWork(ctx.mb, leaf);
+        if (!parent?.id || parent.id === leaf.id || isCollectionLike(parent.title))
+          continue;
+        providerMatches.set(row.id, {
+          workId: parent.id,
+          work: parent.title,
+          composers
+        });
+      } catch (error) {
+        ctx.log(`Classical work identification skipped: ${error.message}`);
+      }
+    }
+    const provider = autoMatchTaggedWorks(catalogue, {
+      albumId,
+      actor: String(actor3.id),
+      allowStructuredTitles: true,
+      providerMatches
+    });
+    return {
+      created: local.created + provider.created,
+      candidates: local.candidates + provider.candidates
+    };
   } finally {
     catalogue.close();
   }
@@ -38223,7 +38366,7 @@ function summarize(lines) {
 import path9 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.5" : "dev";
+var VERSION = true ? "1.0.6" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js
@@ -39120,67 +39263,6 @@ var isSucceeded = (state) => /Completed/i.test(state) && /Succeeded/i.test(state
 import { randomUUID as randomUUID10 } from "node:crypto";
 import fs5 from "node:fs/promises";
 import path10 from "node:path";
-
-// src/works.js
-var CATALOGUES = [
-  [/\bBWV\s*(\d+[a-z]?)/i, "BWV"],
-  [/\bHWV\s*(\d+[a-z]?)/i, "HWV"],
-  [/\bRV\s*(\d+[a-z]?)/i, "RV"],
-  [/\bK(?:V|\.)?\s*(\d+[a-z]?)\b/, "K"],
-  [/\bD\.?\s*(\d+[a-z]?)\b/, "D"],
-  [/\bHob\.?\s*([IVXL]+[a-z]?:\s*\d+[a-z]?)/i, "Hob"],
-  [/\bWoO\s*(\d+)/i, "WoO"],
-  [/\bS\.\s*(\d+)/, "S"],
-  [/\bSz\.?\s*(\d+)/i, "Sz"],
-  [/\bBB\s*(\d+)/, "BB"],
-  [/\bTrV\s*(\d+)/i, "TrV"],
-  [/\bL\.\s*(\d+)/, "L"],
-  [/\bFP\s*(\d+)/, "FP"]
-];
-var OPUS = /\bop(?:us|\.)?\s*(\d+[a-z]?)(?:\s*,?\s*(?:no\.?|nr\.?|n°)\s*(\d+))?/i;
-function catalogueNumber(title) {
-  const text4 = String(title || "");
-  for (const [pattern, prefix] of CATALOGUES) {
-    const match2 = text4.match(pattern);
-    if (match2) return `${prefix} ${match2[1].replace(/\s+/g, "")}`;
-  }
-  const opus = text4.match(OPUS);
-  if (opus) return `op ${opus[1]}${opus[2] ? ` no ${opus[2]}` : ""}`;
-  return "";
-}
-function shortWorkTitle(title) {
-  let text4 = String(title || "").split(":")[0];
-  text4 = text4.replace(OPUS, " ");
-  for (const [pattern] of CATALOGUES) text4 = text4.replace(pattern, " ");
-  text4 = text4.replace(/\bin\s+[A-G](?:[- ]?(?:flat|sharp|♭|♯|b|#))?\s*(?:major|minor|maj|min|dur|moll)\b/gi, " ").replace(/\b(?:no|nr|n°)\.?\s*(?=\d)/gi, " ").replace(/[“”"'’,;()[\]]/g, " ");
-  return searchWords(text4);
-}
-function searchWords(text4) {
-  return String(text4 || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim().split(/\s+/).filter(Boolean).join(" ");
-}
-function surname(person) {
-  if (!person) return "";
-  const sort = String(person.sortName || "");
-  if (sort.includes(",")) return searchWords(sort.split(",")[0]);
-  return searchWords(person.name);
-}
-function creditString(credit) {
-  return (credit || []).map((entry) => `${entry.name ?? entry.artist?.name ?? ""}${entry.joinphrase ?? ""}`).join("").trim();
-}
-async function topWork(mb, work, depth = 0) {
-  if (!work || depth >= 3) return work;
-  const parent = (work.relations || []).find((rel) => rel.type === "parts" && rel.direction === "backward" && rel.work?.id);
-  if (!parent) return work;
-  const data = await mb.get("work", parent.work.id, "artist-rels+work-rels");
-  return data ? topWork(mb, data, depth + 1) : work;
-}
-var RELEASE_INC = "recordings+artist-credits+release-groups+media";
-function releaseYear(date) {
-  const year = Number(String(date || "").slice(0, 4));
-  return Number.isInteger(year) && year > 0 ? year : null;
-}
-
-// src/source.js
 var LENGTH_TOLERANCE_MS = 2e3;
 var SEARCH_BUDGET_MS = 5e4;
 var SEARCH_TIMEOUT_MS = 12e3;
@@ -40483,7 +40565,7 @@ var index_default = {
         input.album?.id
       );
       return {
-        message: result.created > 0 ? `Created ${result.created} work group${result.created === 1 ? "" : "s"} from explicit WORK, composer and track-order metadata. Reload the album to use Works view.` : "No new unambiguous multi-movement work groups were found for this album. Tracks remain available in the metadata editor."
+        message: result.created > 0 ? `Created ${result.created} work group${result.created === 1 ? "" : "s"} from classical WORK/title, composer and track-order evidence. Reload the album to use Works view.` : "No new groups matched this album's WORK tags, structured titles or MusicBrainz parent-work evidence. Tracks remain available in the metadata editor."
       };
     },
     async "preview-remove"(input) {

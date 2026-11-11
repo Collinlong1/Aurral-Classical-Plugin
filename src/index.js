@@ -230,8 +230,8 @@ export default {
       return {
         message:
           result.created > 0
-            ? `Created ${result.created} work group${result.created === 1 ? "" : "s"} from explicit WORK, composer and track-order metadata. Reload the album to use Works view.`
-            : "No new unambiguous multi-movement work groups were found for this album. Tracks remain available in the metadata editor.",
+            ? `Created ${result.created} work group${result.created === 1 ? "" : "s"} from classical WORK/title, composer and track-order evidence. Reload the album to use Works view.`
+            : "No new groups matched this album's WORK tags, structured titles or MusicBrainz parent-work evidence. Tracks remain available in the metadata editor.",
       };
     },
     async "preview-remove"(input) {

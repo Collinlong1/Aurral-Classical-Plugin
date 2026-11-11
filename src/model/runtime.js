@@ -7,7 +7,8 @@ import { ModelJobs } from "./jobs.js";
 import { reconcile, classify } from "./reconcile.js";
 import { UserOperations } from "../user-operations.js";
 import { readTags } from "../tags.js";
-import { autoMatchTaggedWorks } from "./auto-match.js";
+import { autoMatchTaggedWorks, isCollectionLike } from "./auto-match.js";
+import { topWork } from "../works.js";
 
 export const modelFolder = (ctx) => path.join(ctx.dataFolder, "model");
 const fingerprint = async (file) => {
@@ -127,6 +128,7 @@ export async function enqueueModelScan(ctx, actor) {
             albumId: file.albumId,
             title: track.title || "",
             artist: track.artistName || "",
+            recordingMbid: track.mbid || "",
             album: album?.title || track.albumTitle || "",
             trackNumber: file.trackNumber ?? placement?.trackNumber ?? 0,
             discNumber: file.discNumber ?? placement?.discNumber ?? 0,
@@ -218,7 +220,7 @@ export async function runModelJobs(
               genres: tags.genres,
               work: tags.work,
               workId: tags.workId,
-              recordingMbid: tags.recordingMbid,
+              recordingMbid: tags.recordingMbid || file.recordingMbid || "",
               composerDistinct:
                 tags.composer.length > 0 &&
                 !tags.composer.includes(tags.artist),
@@ -322,10 +324,68 @@ export async function autoMatchWorks(ctx, actor, albumId = null) {
     throw new Error("Automatic work matching requires a current host admin");
   const catalogue = await openCatalogue(modelFolder(ctx));
   try {
-    return autoMatchTaggedWorks(catalogue, {
+    const local = autoMatchTaggedWorks(catalogue, {
       albumId,
       actor: String(actor.id),
+      // This is an explicit admin action. A structured classical title may be
+      // accepted with matching composer, album, classification and ordering;
+      // unattended scans continue to require an embedded WORK tag.
+      allowStructuredTitles: true,
     });
+    const providerMatches = new Map();
+    const rows = catalogue.db
+      .prepare(
+        `SELECT t.id,t.evidence FROM track_link t
+         JOIN classification c ON c.target_id=t.id AND c.state='classical'
+         WHERE t.state='active'
+         AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?
+         AND NOT EXISTS(SELECT 1 FROM segment s WHERE s.track_link_id=t.id)`,
+      )
+      .all(String(albumId));
+    for (const row of rows) {
+      const hints = JSON.parse(row.evidence).hints || {};
+      try {
+        let workId = hints.workId;
+        let composers = hints.composer || [];
+        if (!workId && hints.recordingMbid) {
+          const fields = await ctx.resolver.resolve(hints.recordingMbid, {
+            confirmed: true,
+          });
+          workId = fields?.workId;
+          if (!composers.length) composers = fields?.composers || [];
+        }
+        if (!workId) continue;
+        const leaf = await ctx.mb.get(
+          "work",
+          workId,
+          "artist-rels+work-rels",
+        );
+        const parent = leaf && (await topWork(ctx.mb, leaf));
+        if (
+          !parent?.id ||
+          parent.id === leaf.id ||
+          isCollectionLike(parent.title)
+        )
+          continue;
+        providerMatches.set(row.id, {
+          workId: parent.id,
+          work: parent.title,
+          composers,
+        });
+      } catch (error) {
+        ctx.log(`Classical work identification skipped: ${error.message}`);
+      }
+    }
+    const provider = autoMatchTaggedWorks(catalogue, {
+      albumId,
+      actor: String(actor.id),
+      allowStructuredTitles: true,
+      providerMatches,
+    });
+    return {
+      created: local.created + provider.created,
+      candidates: local.candidates + provider.candidates,
+    };
   } finally {
     catalogue.close();
   }
