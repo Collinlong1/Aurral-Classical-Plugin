@@ -1,3 +1,64 @@
+# User server deployment layout and update procedure
+
+The current test deployment is on the user's server under `~/aurral-phase3-test`. Despite the directory name, it runs the Phase 4 test image. The observed layout is:
+
+```text
+~/aurral-phase3-test/
+├── compose.yaml
+├── core/                         # Collinlong1/aurral checkout
+├── plugin/                       # Collinlong1/Aurral-Classical-Plugin checkout
+├── config-test/                  # persistent /config bind mount
+│   └── plugins/
+│       └── aurral-classical/
+│           ├── index.js          # installed plugin bundle copied from plugin/
+│           └── manifest.json     # installed manifest copied from plugin/
+└── library-test/                 # writable /library bind mount used by Aurral
+```
+
+The Compose project is inferred from that directory. Its service is `aurral-test`, and the generated running container name is `aurral-phase3-test-aurral-test-1`. The observed `compose.yaml` is:
+
+```yaml
+services:
+  aurral-test:
+    image: aurral:phase4-test
+    ports:
+      - "127.0.0.1:3303:3001"
+    environment:
+      LIBRARY_FOLDER: /library
+      AURRAL_UID: "${AURRAL_UID}"
+      AURRAL_GID: "${AURRAL_GID}"
+    volumes:
+      - ./config-test:/config
+      - ./library-test:/library
+      - /data/media/music:/library/music:ro
+```
+
+The real music library is deliberately mounted read-only at `/library/music`. Classical-model scans and automatic work matching must write only under `/config`; they must not require a writable media mount. `AURRAL_UID` and `AURRAL_GID` are supplied by the server environment.
+
+Use these commands from the server, one at a time, to update the current review deployment:
+
+```bash
+cd ~/aurral-phase3-test
+git -C plugin fetch origin phase4-review
+git -C plugin merge --ff-only origin/phase4-review
+git -C core fetch origin phase4-review
+git -C core merge --ff-only origin/phase4-review
+docker build -t aurral:phase4-test ./core
+install -m 0644 plugin/index.js config-test/plugins/aurral-classical/index.js
+install -m 0644 plugin/manifest.json config-test/plugins/aurral-classical/manifest.json
+docker compose up -d --force-recreate aurral-test
+```
+
+The core image must be rebuilt when the companion core changes. Copying `index.js` and `manifest.json` installs the plugin into the persistent `/config` bind mount; rebuilding the core image alone does not update those files. Verify the installed plugin version and service with:
+
+```bash
+grep '"version"' config-test/plugins/aurral-classical/manifest.json
+docker compose ps aurral-test
+docker compose logs --tail=100 aurral-test
+```
+
+After an update that changes scan evidence, run a new **Scan classical model (read only)** from an album menu and allow it to finish before invoking **Auto-match classical works (read only)**. The browser may need a hard refresh after a core frontend rebuild. Multiple Aurral Classical album actions appear under the **Aurral Classical** submenu.
+
 # Post-Phase-4 recording search and automatic matching start
 
 The recording attachment form now requires the page-level **Search items** query and searches the complete owned-track index while retaining the selected recording; it no longer exposes a misleading arbitrary 200-file prefix. A first conservative automatic matcher builds multi-movement work realizations from confirmed-classical tracks with explicit embedded `WORK`, composer and unique release-order evidence. It runs when a full model scan commits and is also exposed as **Auto-match classical works (read only)** for already indexed albums. The explicit admin action additionally accepts a shared structured title prefix with a numbered/Roman movement suffix when composer, album, classification and unique release order agree, and resolves saved MusicBrainz recording/work identities to a shared parent work through the existing rate-limited cache. Unattended scans retain the stricter tag-only rule. The matcher is idempotent, plugin-database-only and excludes collection-like étude/prelude/song sets. No media writes or writable mount are required.
