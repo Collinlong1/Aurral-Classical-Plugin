@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: Collinlong1/aurral
-          ref: f678ac4cb5de95db539964c499006ab49386620a
+          ref: 45da13b38bd8167b800a5dbe50e8ec32eda3e75e
           path: core
       - uses: actions/setup-node@v4
         with:
