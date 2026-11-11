@@ -1,3 +1,77 @@
+# Post-Phase-4 recording search and automatic matching start
+
+The recording attachment form now requires the page-level **Search items** query and searches the complete owned-track index while retaining the selected recording; it no longer exposes a misleading arbitrary 200-file prefix. A first conservative automatic matcher builds multi-movement work realizations from confirmed-classical tracks with explicit embedded `WORK`, composer and unique release-order evidence. It runs when a full model scan commits and is also exposed as **Auto-match classical works (read only)** for already indexed albums. The explicit admin action additionally accepts a shared structured title prefix with a numbered/Roman movement suffix when composer, album, classification and unique release order agree, and resolves saved MusicBrainz recording/work identities to a shared parent work through the existing rate-limited cache. Unattended scans retain the stricter tag-only rule. The matcher is idempotent, plugin-database-only and excludes collection-like étude/prelude/song sets. No media writes or writable mount are required.
+
+# Phase 4 scan compatibility correction
+
+The user's schema-2 production-model scan first failed at 4,130/12,802 files with `can't tag .wav files`, then reached 4,360 and retried on `MPEG audio header not found`. The read-only model scanner was incorrectly making optional tag parsing fatal. Files rejected by the tag parser now retain full-file hash evidence and use the host's trusted title/artist/duration metadata without being opened for tagging or modified. An explicit Scan reuses the active retry or requeues the latest failed saved job with its existing cursor and snapshot. A later `running; processed 4420/12802; Error: MPEG audio header not found` report was successful forward progress with stale retry text; successful claims/checkpoints now clear stored errors and status shows errors only for retry/failed states. All 179 plugin tests pass. Core, schema and the unrelated BrainzMash refresher are unchanged.
+
+# Current checkpoint — Phase 4 complete for review
+
+The user explicitly authorized Phase 4 on November 10, 2026 (America/Chicago). Grouping, bounded playback, the basic work page, schema-2 user state and generic host hooks are complete locally. Validation passed 175 plugin tests, 2,757 core unit tests across 406 files, 52 focused Phase 4 tests, required checks/build, real Chromium, restart persistence and exact-file playback for an admin and two users. See `PHASE_4_REPORT.md`. Stop before v0.2 search or later page/Discover scope. The user's container name is `aurral-phase3-test-aurral-test-1`; no agent access to it is authorized. BrainzMash refresher code remains untouched at the user's request.
+
+Companion core implementation: `019e93f5a2f4720f8f0238c40c851dfb1070b740`, published on the user fork `phase4-review` branch and pinned in integration CI.
+
+Final observed implementation CI is green for plugin source `ce351e16d9a82f1cbc0284548ee218491146b29c`: run `43011161488` passed the four Node-version jobs plus isolated no-network model migrations, and integration run `43011160969` passed the pinned core checks/build, synthetic startup, Chromium Phase 4 workflow, restart/media verification and admin/two-user playback smoke. Later documentation-only commits do not change runtime source.
+
+# Phase 3 scan throughput correction
+
+The user's installed search patch was verified, but its first full-library scan had processed only 60 of 12,802 files and remained queued with no committed tracks. The five-second model runner budget was incorrectly used by both the explicit background action and the 15-minute schedule. This is our scan-processing limitation, separate from the pre-existing BrainzMash refresher, which remains unchanged per the user's instruction.
+
+Explicit scans now use the existing 25-minute background-action budget; scheduled model work uses the existing 8.5-minute scheduled budget, shared with any enabled tagging work so the host's 10-minute call limit is respected. Incomplete scans remain durable and resumable. Run Scan again to resume immediately, or enable the plugin schedule for automatic continuation. File hashing/identity checks, read-only media, fenced publication and full-snapshot reconciliation remain in place; no partial scan is published or schema changed.
+
+Resuming an existing scan reuses its original host snapshot without another full-library fetch. Cancellation/checkpoint checks avoid repeatedly parsing all saved input/evidence. Model status and the completion notification now show scan state and processed/total file counts rather than an ambiguous queued-only summary. The editor still becomes searchable after full reconciliation completes.
+
+Validation: **173 plugin tests pass**, including two deterministic regressions that pause a scan after five seconds and then finish it via the actual admin action and scheduled export. Both verify the same job identity, one snapshot fetch, exact counts and unchanged read-only media. Existing lease/rollback/cancellation and editor suites also pass. No production server or credentials were accessed; no core/refresher changes, deployment, merge, upstream writes or subagents.
+
+Update the installed plugin `index.js` from this review revision, restart the test instance, then invoke **Scan classical model (read only)** once to resume the queued scan. No library remount, core rebuild, database deletion or new scan is necessary. Local synthetic Compose scan preparation, exact-title Chromium editor workflow, metadata/media checks and admin/two-user comparison streaming also pass on this correction. Remote CI results remain separate from these local checks.
+
+# Phase 3 editor search correction
+
+The reported `No. 1 Prélude (Presto)` query exposed two gaps: Search items listed only catalogue entities, and scan evidence omitted track titles/album/performer metadata. The plugin now retains those read-only scan hints, searches owned tracks alongside catalogue entries, ignores accents/punctuation and matches query words in any order. Selecting a track shows its metadata and permits attachment to an existing recording/work through the existing guarded command. Scans do not fabricate work identities.
+
+Update the plugin bundle/manifest from `phase3-review`, restart the test instance, then rerun **Scan classical model (read only)** from an album menu and reload the editor. Existing scan evidence needs this explicit rescan for title/album/performer searches; opening Search items does not rescan. No schema migration or core update is required for this correction. Read-only library mounts remain supported.
+
+Local validation: all **171 plugin tests** passed; real Chromium found the exact Liszt/Trifonov title and its unaccented spelling in a synthetic read-only library, then completed the existing editor workflow. Persistence/media checks passed before and after restart, and existing admin/two-user comparison streaming passed afterward. Remote CI for this correction is recorded separately when observed.
+
+The user's BrainzMash cooldown logs come from the existing core release-date refresher. Phase 3 did not modify that code; the user explicitly asked to leave it alone, and no refresher/provider changes were made. Ordinary-user work browsing/grouping remains Phase 4 and is not implemented here. No production server access, deployment, merge, upstream change or subagents.
+
+# Current checkpoint — Phase 3
+
+Final observed implementation CI is green: plugin source 84ea58d39362532f1f3551906e4fef01a7eda77b / pinned core 7ea6b2211f469d9c1342fee998fe82d2289232ff; runs 42934882603 and 42934882763 passed all six jobs, including four Node versions, isolated model/editor tests, core checks/build, Chromium, permissions, restart/media hashes and existing comparison playback. Later documentation-only commits record this outcome; no runtime change.
+
+November 10, 2026 (America/Chicago). The user explicitly said “Lets begin phase 3” and “Continue with phase 3.” Phase 3 is complete for review. Phase 4 is not authorized.
+
+Companion core implementation: `7ea6b2211f469d9c1342fee998fe82d2289232ff`, published on the user fork phase3-review branch and pinned in editor CI.
+
+The plugin now provides an admin manual editor over schema 1: provider-free composers/works/broadcasts, typed field edits/provenance/pins/unpin, canonical movement reordering, role credits, owned-track attach/detach, read-only media and stale-tab protection. Generic core admin-forms v1 adds only opt-in manifest pages, authenticated bounded transport and a host renderer/Settings entry. No classical core schema or new migration. See the central plugin PHASE_3_REPORT.md, EDITOR_GUIDE.md and UPSTREAM_DELTA.md.
+
+Validation: 2,755 core unit tests (406 files); 23 focused core plugin tests; 168 plugin tests including 9 editor tests; required checks with zero type errors and unchanged 1,236 unsafe-any baseline; frontend/docs/plugin builds; real Chromium desktop/phone workflow, regular-user denial, provider/pin/blank/conflict and stale-tab handling; real Compose restart with unchanged read-only media and existing admin/two-user streaming. The report distinguishes broad-run source from later CSS/docs/test typing refinements and records remote CI separately.
+
+Local paths remain /workspace/work/plugin and /workspace/work/aurral. Implemented on existing local classical branches atop plugin bf47025 and core d93cd812. Separate phase3-review source snapshots are used without moving remote classical/main or merging prior PRs. No new PR, merge, release, upstream activity or production access. Preservation branches are untouched. No subagents.
+
+The editor requires the matching fork's admin-forms bridge; no stock editor fallback is claimed. Work pages, grouping, segment playback, entity merges and richer pages remain Phase 4/later. The fixture HTTP relay is test tooling only and does not proxy WebSockets. Do not claim production-library or real-library operational acceptance.
+
+Historical checkpoints below retain their original observations; their authorization/completion wording is superseded by the current checkpoint.
+
+# Current shared checkpoint — Phase 2
+
+Final observed Phase 2 implementation CI: plugin run 42887705310 passed all five jobs on `eb997d521ccf1aad2d1f611b0fd5b62bcba6e8eb` (159 full-suite tests on each Node22.16/22/24/26 plus isolated model tests and bundle consistency). Source snapshots are in both user repositories on phase2-review; core snapshot bae8d4ba is documentation only. Later handoff/result commits do not change runtime source. No new PR or merge.
+
+November 10, 2026. User request: “Phase one should be done. Verify then continue and build phase 2.” This authorizes Phase 2 and supersedes old pending-approval language below. Phase 3 is not authorized.
+
+Phase 1 review source is in open, unmerged plugin PR6 and core PR36. Fresh clones initially had only Phase 0.5 on remote classical. Local existing `aurral-classical` branches were fast-forwarded to plugin `e1a980ad768af6c8d3e5122e85f05a6e68b3629b` and core `581e8b6ca32908652eecb673620ee6f1389a96b5` as the Phase 2 baseline. No remote refs or PRs were merged. Preserve those prerequisites when applying the Phase 2 patch.
+
+Phase 2 implementation lives entirely in the plugin: native SQLite/WAL schema 1, typed catalogue/relationships, provenance/pins, conservative reconciliation, classification and tag guards, persistent fenced scan jobs, admin scan/status/cancel actions, maintenance CLI and operator documentation. Core runtime is unchanged. See central plugin MODEL_V1.md and PHASE_2_REPORT.md for executable APIs, exact checks and limitations.
+
+The final model suite includes all committed synthetic fixtures, full rescans, provider-free broadcasts, reissues and multi-work ranges. No real-library snapshot or production server was used. The host still lacks an automatic database epoch: admin must update Library database epoch after replacing/restoring its database. Hashes guard reused IDs; ambiguous/retagged moves are held for review. No editor, work page, grouping, user picks or new player behavior is claimed.
+
+Phase 1 verification caveat: core head checks and latest disposable integration passed. Plugin push CI at e1a980ad passed all Node versions, but PR run 42882247578 failed Node22 and cancelled its other jobs. Connected GitHub job logs subsequently identified ENOTEMPTY in background-writer test teardown; Phase 2 waits for completion before cleanup. A loaded Node26 run also exposed a dispatch-throttle race, now fixed with serialized rate-limited dispatch and a regression test. Fresh Phase 1 tests passed 138/138; final Phase 2 tests pass 159/159 on Node22/24/26, with 20 model tests on Node22.16 and in a no-network read-only-source container. Keep the original failed observations in the report.
+
+Current checkout paths: /workspace/work/plugin and /workspace/work/aurral. Work is on local existing classical branches, not main. Phase 2 is saved as a separate phase2-review source snapshot; remote classical/main and existing Phase 1 PRs are not merged. No new PR, release or deployment was requested. The source branch and report are the review handoff. Keep main, upstream, preservation branches and existing review PRs untouched. No subagents were used. Stop for review before Phase 3.
+
+Historical handoff follows; its authorization and completion statements are superseded by this checkpoint.
+
 # Codex / Claude shared handoff — Phase 1
 
 ## Published review checkpoint
@@ -44,4 +118,3 @@ Compose project aurral-classical-phase1 has only synthetic named volumes and an 
 ## Persistent boundaries
 
 No main writes/merges, upstream edits/branches/PRs/comments, production credentials/server access or automatic deployments. No subagents without explicit user approval. Keep classical logic/storage in plugin and core hooks generic. No automatic PR merge. User approval is required before Phase 2. Update this shared handoff and report at each session boundary.
-

@@ -15,7 +15,8 @@
   },
   "homepage": "https://github.com/Collinlong1/Aurral-Classical-Plugin#readme",
   "devDependencies": {
-    "esbuild": "^0.25.12"
+    "esbuild": "^0.25.12",
+    "playwright": "1.61.1"
   },
   "dependencies": {
     "node-taglib-sharp": "^6.0.3"
@@ -23,7 +24,7 @@
   "type": "module",
   "private": true,
   "engines": {
-    "node": ">=22"
+    "node": ">=22.16"
   },
   "description": "Aurral plugin: classical tagging, recording comparisons and an slskd source",
   "license": "MIT"

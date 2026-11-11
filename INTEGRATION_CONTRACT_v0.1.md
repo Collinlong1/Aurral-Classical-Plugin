@@ -1,3 +1,17 @@
+# Implemented Phase 4 presentation/playback addendum
+
+The fork now implements opt-in `albumPresentation`, regular-user resource pages and bounded native queue items. Album contributions are validated and native album/track references are resolved by core; absent/disabled/failing contributions return the unchanged stock album. Public resource pages require a real authenticated user and receive host-owned identity. Optional segment start/end coordinates persist locally and are enforced by local playback; range-unaware remote handoff refuses bounded items.
+
+The plugin owns work/realization identity, grouping, missing-movement decisions, page content, favourites and picks in schema 2. The core owns authenticated transport, bounded validation, stream resolution and rendering. Exact implemented response shapes live in `src/model/presentation.js` and the companion core `pluginPresentation.ts`; the earlier proposal below remains historical where it describes unimplemented cursor/general-resource expansion.
+
+# Implemented Phase 2 backend addendum
+
+The plugin adds model schema 1 and admin-only album entry actions classical-model-status, classical-model-scan and classical-model-cancel. Scan opts into the existing userOperations v1 library capability and requires a real host admin. It reads the full library, queues a durable plugin-owned read-only scan and reports queued/completed state through status. Stock hosts without userOperations cannot start this action; model storage itself has no host-hook dependency. No credentials/session grants persist in model jobs.
+
+The host schedule initializes/checks model storage and resumes only explicitly queued scans. Migration/model errors are isolated from existing playback/source/schedule behavior. Non-classical/unsure stored decisions and unresolved links veto file-tag mutations. Disabling the plugin retains its independent data and removes its contributions.
+
+No new core endpoint/capability is added. Library identity is bound locally, the operator changes libraryEpoch on host database replacement, and scans use plugin-local monotonic generations. Full-file SHA-256 supports unique moves but is not an audio-only fingerprint; retagged/ambiguous evidence is reviewed. See MODEL_V1.md for exact semantics and limits. D01 editor/views and D04/D05 presentation/playback remain future phases.
+
 # Integration contract — implemented Phase 1 and future v0.1 design
 
 Current APIs and compatibility are defined in the Implemented Phase 1 contract section at the end: user-operations v1 and acquisition-identity v1. Core PR36 and plugin PR6 implement only those portions. Earlier sections below are historical proposals; views, model, grouping and segment APIs are not implemented.
@@ -62,6 +76,7 @@ Identification begins only after admin action; enabling reads and advertises cap
 ## Compatibility acceptance
 
 Test current stock with no hooks (honest missing UI), fork with each capability separately off, fork with complete hooks, old API-1 plugin under new host, plugin absent/disabled/crashed, and weekly latest-upstream drift. Use two users plus admin, synthetic mixed library and provider fixtures. Negative tests include forged user IDs/tokens, wrong playlist owner, revoked permissions, unsafe local ref, invalid segment and stale revision. Native playback/non-classical ranking must remain unchanged when plugin returns no opinion.
+
 # Implemented Phase 1 contract — user-operations v1 / acquisition-identity v1
 
 This section supersedes draft status only for the following interfaces. API manifest version remains 1; later sections describe future v0.1 design.
@@ -74,12 +89,19 @@ Action manifest localPlaylists:true opts into action input userOperations:{versi
 
 Acquisition manifest downloadSource.acquisitionIdentity:true adds an independently switchable acquisitionIdentity capability under the existing enabled download source. Host calls downloadSource.acquisitionIdentity with track input before native Soulseek queries regardless of source priority. Return null for no opinion, {blocked:true} for known unresolved identity, or {artist,aliases,requiredTerms?}. Required terms are bounded strings, matched as normalized words in native result paths. Identity persists with search attempts, does not rewrite display artist, and does not bypass existing duration/quality/integrity checks. Provider errors hold acquisition; playback is independent. Disabled/absent hooks use stock behavior.
 
-| Host | Phase 1 tag/source | User-owned local compare | Later editor/work/grouping/segments |
-| --- | --- | --- | --- |
-| Frozen stock API-1 | Existing actions/source; background media writes opt-in | Unsupported; explanatory error, no admin-owned fallback | Unavailable |
-| Fork before Phase 1 | Same | Unsupported | Unavailable |
-| Fork with Phase 1 review | Clear/restore/preview and performer queries | Supported for real admin/regular accounts; accessPlaylists required, acquisition permission unnecessary | Unavailable; future phases |
-| Phase 1 fork, plugin disabled/no opinion | Stock playback/queries | Hidden/denied | Unavailable |
+| Host                                     | Phase 1 tag/source                                      | User-owned local compare                                                                                | Later editor/work/grouping/segments |
+| ---------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| Frozen stock API-1                       | Existing actions/source; background media writes opt-in | Unsupported; explanatory error, no admin-owned fallback                                                 | Unavailable                         |
+| Fork before Phase 1                      | Same                                                    | Unsupported                                                                                             | Unavailable                         |
+| Fork with Phase 1 review                 | Clear/restore/preview and performer queries             | Supported for real admin/regular accounts; accessPlaylists required, acquisition permission unnecessary | Unavailable; future phases          |
+| Phase 1 fork, plugin disabled/no opinion | Stock playback/queries                                  | Hidden/denied                                                                                           | Unavailable                         |
 
 No SQL schema migration. No service/iframe/player replacement. No claim of the later full native-ref, view, cursor, optimistic revision or classical model interfaces yet.
 
+## Implemented Phase 3 — admin forms v1
+
+The matching fork accepts optional `pages:[{id,label}]`, defaults to no pages, exposes independent `page:ID` capability switches and adds a Settings link. Real admin read/mutate routes call only `pages.read`/`pages.mutate` with host Base/user/pageId and `capabilities.adminForms:1`. Plugin/synthetic API-key accounts and ordinary users are denied; safe mode/disabled/unknown pages return unavailable. No credentials or Base context are serialized to the browser.
+
+Reads return a version-1 title/revision/navigation/notes/forms document. Forms support plain text, textarea, select, checkbox and ordered choices, bounded by schema. The renderer never evaluates plugin HTML/scripts or serves arbitrary assets. Writes receive `{revision,command,values}`; plugins validate target/commands and atomically compare revision/commit, then return success or 400/409. Cross-site requests, oversized bodies (64KB), invalid outputs (512KB) and calls over 15 seconds fail. Drafts are preserved on conflict; form edits disable background refetch and unrelated navigation until saved/cancelled.
+
+The classical editor keeps all work/recording/role/provenance logic in plugin storage on schema 1. Existing model scan is still an explicit admin action. No new core library/queue/write API, SQL migration, editor iframe or standalone service. This is an admin-forms subset of D01, not the later ordinary-user work-page/view bridge. Stock API-1 hosts hide pages and retain existing actions; a stock editor fallback is not claimed.

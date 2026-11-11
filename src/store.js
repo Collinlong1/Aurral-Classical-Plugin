@@ -77,16 +77,18 @@ export class Throttle {
     this.intervalMs = intervalMs;
   }
 
-  async wait() {
-    if (!this.intervalMs) return;
-    const slot = await withLock(this.lockDir, 5_000, async () => {
+  async run(dispatch) {
+    if (!this.intervalMs) return dispatch();
+    // Hold the cross-process rate lock through actual dispatch. Reserving future
+    // slots and sleeping after release lets late clients bunch up under load.
+    return withLock(this.lockDir, 120_000, async () => {
       const state = await readJson(this.stateFile, { next: 0 });
-      const at = Math.max(Date.now(), Number(state.next) || 0);
-      await writeJson(this.stateFile, { next: at + this.intervalMs });
-      return at;
-    });
-    const wait = slot - Date.now();
-    if (wait > 0) await sleep(wait);
+      const wait = (Number(state.next) || 0) - Date.now();
+      if (wait > 0) await sleep(wait);
+      await writeJson(this.stateFile, { next: Date.now() + this.intervalMs });
+      try { return await dispatch(); }
+      finally { await writeJson(this.stateFile, { next: Date.now() + this.intervalMs }); }
+    }, { waitMs: 120_000 });
   }
 }
 

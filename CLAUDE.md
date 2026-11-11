@@ -1,4 +1,3 @@
 # Claude Code
 
-Read AGENTS.md, HANDOFF.md, CLAUDE_CODE_HANDOFF.md and PHASE_1_REPORT.md. Phase 1 and user-fork PRs targeting aurral-classical are authorized. Phase 2 requires review approval. No main/upstream writes, production access, automatic merge or deployment.
-
+Read AGENTS.md, HANDOFF.md and PHASE_3_REPORT.md. The user authorized Phase 3, now complete for review. Phase 4 is not authorized. Preserve main/upstream and review branches; no automatic PRs, merges or deployment. No production access or subagents.

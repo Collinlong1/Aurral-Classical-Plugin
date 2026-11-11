@@ -1,0 +1,87 @@
+name: Phase 4 work-view integration
+on:
+  push:
+    branches: [phase4-review]
+  pull_request:
+    branches: [aurral-classical]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  editor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      ASTRO_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: plugin
+      - uses: actions/checkout@v4
+        with:
+          repository: Collinlong1/aurral
+          ref: 019e93f5a2f4720f8f0238c40c851dfb1070b740
+          path: core
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26.12.0
+      - run: npm ci && npm run build
+        working-directory: plugin
+      - run: npx playwright install --with-deps chromium
+        working-directory: plugin
+      - run: npm install --global pnpm@12.15.0
+      - run: pnpm install --frozen-lockfile && pnpm check && pnpm build
+        working-directory: core
+      - name: Start synthetic instance and verify comparisons
+        working-directory: plugin
+        env:
+          AURRAL_CORE_PATH: ${{ github.workspace }}/core
+        run: |
+          docker compose -f compose.dev.yaml up -d
+          for attempt in $(seq 1 60); do
+            if docker compose -f compose.dev.yaml exec -T aurral node -e 'fetch("http://127.0.0.1:3001/api/health/live").then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))'; then break; fi
+            sleep 1
+          done
+          docker compose -f compose.dev.yaml exec -T aurral node /plugin/dev/smoke.mjs
+          docker compose -f compose.dev.yaml exec -T aurral node /plugin/dev/editor-fixtures.mjs prepare
+      - name: Browser editor and permissions
+        working-directory: plugin
+        env:
+          EDITOR_TEST_URL: http://127.0.0.1:3305
+          EDITOR_SCREENSHOT_DIR: browser-evidence
+        run: |
+          node dev/fixture-relay.mjs > fixture-relay.log 2>&1 &
+          echo $! > fixture-relay.pid
+          for attempt in $(seq 1 30); do
+            if curl --noproxy '*' -fsS http://127.0.0.1:3305/api/health/live; then break; fi
+            sleep 1
+          done
+          node dev/editor-browser.mjs
+      - name: Verify restart persistence and unchanged media
+        working-directory: plugin
+        env:
+          AURRAL_CORE_PATH: ${{ github.workspace }}/core
+        run: |
+          docker compose -f compose.dev.yaml exec -T aurral node /plugin/dev/editor-fixtures.mjs check
+          docker compose -f compose.dev.yaml restart aurral
+          for attempt in $(seq 1 60); do
+            if docker compose -f compose.dev.yaml exec -T aurral node -e 'fetch("http://127.0.0.1:3001/api/health/live").then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))'; then break; fi
+            sleep 1
+          done
+          docker compose -f compose.dev.yaml exec -T aurral node /plugin/dev/editor-fixtures.mjs check
+          docker compose -f compose.dev.yaml exec -T aurral node /plugin/dev/smoke.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: editor-browser-evidence
+          path: plugin/browser-evidence
+          if-no-files-found: ignore
+      - name: Capture logs and stop fixture
+        if: always()
+        working-directory: plugin
+        env:
+          AURRAL_CORE_PATH: ${{ github.workspace }}/core
+        run: |
+          if [ -f fixture-relay.pid ]; then kill "$(cat fixture-relay.pid)" || true; fi
+          docker compose -f compose.dev.yaml logs
+          docker compose -f compose.dev.yaml down
