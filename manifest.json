@@ -146,5 +146,11 @@
   },
   "importList": null,
   "schedule": "15m",
-  "apiAccess": true
+  "apiAccess": true,
+  "pages": [
+    {
+      "id": "editor",
+      "label": "Classical metadata editor"
+    }
+  ]
 }

@@ -4056,8 +4056,8 @@ var require_byteVector = __commonJS({
         }
         return IConv.decode(data, this._encoding);
       }
-      encode(text2) {
-        return IConv.encode(text2, this._encoding);
+      encode(text3) {
+        return IConv.encode(text3, this._encoding);
       }
     };
     exports.Encoding = Encoding;
@@ -4235,9 +4235,9 @@ var require_byteVector = __commonJS({
        * Creates a {@link ByteVector} using the contents of a file as the data
        * @param path Path to the file to store in the ByteVector
        */
-      static fromPath(path11) {
-        utils_1.Guards.truthy(path11, "path");
-        const fileBuffer = fs8.readFileSync(path11);
+      static fromPath(path12) {
+        utils_1.Guards.truthy(path12, "path");
+        const fileBuffer = fs8.readFileSync(path12);
         return _ByteVector.fromByteArray(fileBuffer);
       }
       /**
@@ -4271,9 +4271,9 @@ var require_byteVector = __commonJS({
        * @param readStream Readable stream that will be read in entirety.
        */
       static fromStream(readStream) {
-        return new Promise((complete, fail) => {
+        return new Promise((complete, fail2) => {
           if (!readStream) {
-            fail(new Error("Null argument exception: Stream was not provided"));
+            fail2(new Error("Null argument exception: Stream was not provided"));
           }
           const output = _ByteVector.empty();
           readStream.on("readable", () => {
@@ -4286,7 +4286,7 @@ var require_byteVector = __commonJS({
             complete(output);
           });
           readStream.on("error", (error) => {
-            fail(error);
+            fail2(error);
           });
         });
       }
@@ -4298,19 +4298,19 @@ var require_byteVector = __commonJS({
        * @param length Number of characters from the string to store in the ByteVector. Must be a
        *        positive 32-bit integer.
        */
-      static fromString(text2, type, length = Number.MAX_SAFE_INTEGER) {
-        utils_1.Guards.notNullOrUndefined(text2, "text");
+      static fromString(text3, type, length = Number.MAX_SAFE_INTEGER) {
+        utils_1.Guards.notNullOrUndefined(text3, "text");
         if (!Number.isInteger(length) || !Number.isSafeInteger(length) || length < 0) {
           throw new Error("Argument out of range exception: length is invalid");
         }
         const vector = type === StringType2.UTF16 ? new _ByteVector(new Uint8Array([255, 254])) : _ByteVector.empty();
-        if (!text2) {
+        if (!text3) {
           return vector;
         }
-        if (text2.length > length) {
-          text2 = text2.substring(0, length);
+        if (text3.length > length) {
+          text3 = text3.substring(0, length);
         }
-        const textBytes = Encoding.getEncoding(type, vector).encode(text2);
+        const textBytes = Encoding.getEncoding(type, vector).encode(text3);
         vector.addByteArray(textBytes);
         return vector;
       }
@@ -5269,12 +5269,12 @@ var require_stream = __commonJS({
         this._position = 0;
         this._length = fs8.fstatSync(fd).size;
       }
-      static createAsRead(path11) {
-        const fd = fs8.openSync(path11, "r");
+      static createAsRead(path12) {
+        const fd = fs8.openSync(path12, "r");
         return new _Stream(fd, false);
       }
-      static createAsReadWrite(path11) {
-        const fd = fs8.openSync(path11, "r+");
+      static createAsReadWrite(path12) {
+        const fd = fs8.openSync(path12, "r+");
         return new _Stream(fd, true);
       }
       // #endregion
@@ -5373,9 +5373,9 @@ var require_fileAbstraction = __commonJS({
        * @param path Path of the file to use in the new instance
        * @throws Error Thrown if `path` is falsy
        */
-      constructor(path11) {
-        utils_1.Guards.truthy(path11, "path");
-        this._name = path11;
+      constructor(path12) {
+        utils_1.Guards.truthy(path12, "path");
+        this._name = path12;
       }
       /** @inheritDoc */
       get name() {
@@ -8440,16 +8440,16 @@ var require_genres = __commonJS({
         const index = _Genres.VIDEO_GENRES.indexOf(name);
         return index < 0 ? 255 : index;
       }
-      static stringToByte(text2, allowParenthesis) {
+      static stringToByte(text3, allowParenthesis) {
         if (allowParenthesis) {
           const trimRegex = /^\(+|\)+$/g;
-          text2 = text2.replace(trimRegex, "");
+          text3 = text3.replace(trimRegex, "");
         }
-        const normalized = text2.trim();
-        if (!/^\d+$/.test(normalized)) {
+        const normalized2 = text3.trim();
+        if (!/^\d+$/.test(normalized2)) {
           return 255;
         }
-        const index = parseInt(normalized, 10);
+        const index = parseInt(normalized2, 10);
         return Number.isNaN(index) ? 255 : index;
       }
     };
@@ -8655,7 +8655,7 @@ var require_picture = __commonJS({
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PictureLazy = exports.Picture = exports.PictureType = void 0;
-    var path11 = __require("path");
+    var path12 = __require("path");
     var byteVector_1 = require_byteVector();
     var fileAbstraction_1 = require_fileAbstraction();
     var utils_1 = require_utils();
@@ -8700,7 +8700,7 @@ var require_picture = __commonJS({
         utils_1.Guards.truthy(filePath, "filePath");
         const picture = new _Picture();
         picture.data = byteVector_1.ByteVector.fromPath(filePath);
-        picture.filename = path11.basename(filePath);
+        picture.filename = path12.basename(filePath);
         picture.description = picture.filename;
         picture.mimeType = _Picture.getMimeTypeFromFilename(picture.filename);
         picture.type = picture.mimeType.startsWith("image/") ? PictureType.FrontCover : PictureType.NotAPicture;
@@ -9049,7 +9049,7 @@ var require_picture = __commonJS({
         utils_1.Guards.truthy(filePath, "path");
         const picture = new _PictureLazy();
         picture._file = new fileAbstraction_1.LocalFileAbstraction(filePath);
-        picture._filename = path11.basename(filePath);
+        picture._filename = path12.basename(filePath);
         picture._description = picture._filename;
         picture._mimeType = Picture.getMimeTypeFromFilename(picture._filename);
         picture._type = picture._mimeType.startsWith("image/") ? PictureType.FrontCover : PictureType.NotAPicture;
@@ -9990,14 +9990,14 @@ var require_apeTag = __commonJS({
        * @remarks Stored in the `Year` item
        */
       get year() {
-        let text2 = this.getStringValue("Year");
-        if (!text2) {
+        let text3 = this.getStringValue("Year");
+        if (!text3) {
           return 0;
         }
-        let asInt = Number.parseInt(text2, 10);
+        let asInt = Number.parseInt(text3, 10);
         if (Number.isNaN(asInt)) {
-          text2 = text2.substring(0, 4);
-          asInt = Number.parseInt(text2, 10);
+          text3 = text3.substring(0, 4);
+          asInt = Number.parseInt(text3, 10);
           if (Number.isNaN(asInt)) {
             return 0;
           }
@@ -10315,14 +10315,14 @@ var require_apeTag = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_TRACK_GAIN` item
        */
       get replayGainTrackGain() {
-        let text2 = this.getStringValue("REPLAYGAIN_TRACK_GAIN");
-        if (!text2) {
+        let text3 = this.getStringValue("REPLAYGAIN_TRACK_GAIN");
+        if (!text3) {
           return NaN;
         }
-        if (text2.toLowerCase().endsWith("db")) {
-          text2 = text2.substring(0, text2.length - 2).trim();
+        if (text3.toLowerCase().endsWith("db")) {
+          text3 = text3.substring(0, text3.length - 2).trim();
         }
-        return Number.parseFloat(text2);
+        return Number.parseFloat(text3);
       }
       /**
        * @inheritDoc
@@ -10332,8 +10332,8 @@ var require_apeTag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.removeItem("REPLAYGAIN_TRACK_GAIN");
         } else {
-          const text2 = `${value.toFixed(2)} dB`;
-          this.setStringValue("REPLAYGAIN_TRACK_GAIN", text2);
+          const text3 = `${value.toFixed(2)} dB`;
+          this.setStringValue("REPLAYGAIN_TRACK_GAIN", text3);
         }
       }
       /**
@@ -10341,8 +10341,8 @@ var require_apeTag = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_TRACK_PEAK` item
        */
       get replayGainTrackPeak() {
-        const text2 = this.getStringValue("REPLAYGAIN_TRACK_PEAK");
-        return text2 ? Number.parseFloat(text2) : NaN;
+        const text3 = this.getStringValue("REPLAYGAIN_TRACK_PEAK");
+        return text3 ? Number.parseFloat(text3) : NaN;
       }
       /**
        * @inheritDoc
@@ -10352,8 +10352,8 @@ var require_apeTag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.removeItem("REPLAYGAIN_TRACK_PEAK");
         } else {
-          const text2 = value.toFixed(6).toString();
-          this.setStringValue("REPLAYGAIN_TRACK_PEAK", text2);
+          const text3 = value.toFixed(6).toString();
+          this.setStringValue("REPLAYGAIN_TRACK_PEAK", text3);
         }
       }
       /**
@@ -10361,14 +10361,14 @@ var require_apeTag = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_ALBUM_GAIN` item
        */
       get replayGainAlbumGain() {
-        let text2 = this.getStringValue("REPLAYGAIN_ALBUM_GAIN");
-        if (!text2) {
+        let text3 = this.getStringValue("REPLAYGAIN_ALBUM_GAIN");
+        if (!text3) {
           return NaN;
         }
-        if (text2.toLowerCase().endsWith("db")) {
-          text2 = text2.substring(0, text2.length - 2).trim();
+        if (text3.toLowerCase().endsWith("db")) {
+          text3 = text3.substring(0, text3.length - 2).trim();
         }
-        return Number.parseFloat(text2);
+        return Number.parseFloat(text3);
       }
       /**
        * @inheritDoc
@@ -10378,8 +10378,8 @@ var require_apeTag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.removeItem("REPLAYGAIN_ALBUM_GAIN");
         } else {
-          const text2 = `${value.toFixed(2).toString()} dB`;
-          this.setStringValue("REPLAYGAIN_ALBUM_GAIN", text2);
+          const text3 = `${value.toFixed(2).toString()} dB`;
+          this.setStringValue("REPLAYGAIN_ALBUM_GAIN", text3);
         }
       }
       /**
@@ -10387,8 +10387,8 @@ var require_apeTag = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_ALBUM_PEAK` item
        */
       get replayGainAlbumPeak() {
-        const text2 = this.getStringValue("REPLAYGAIN_ALBUM_PEAK");
-        return text2 ? Number.parseFloat(text2) : NaN;
+        const text3 = this.getStringValue("REPLAYGAIN_ALBUM_PEAK");
+        return text3 ? Number.parseFloat(text3) : NaN;
       }
       /**
        * @inheritDoc
@@ -10398,8 +10398,8 @@ var require_apeTag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.removeItem("REPLAYGAIN_ALBUM_PEAK");
         } else {
-          const text2 = value.toFixed(6).toString();
-          this.setStringValue("REPLAYGAIN_ALBUM_PEAK", text2);
+          const text3 = value.toFixed(6).toString();
+          this.setStringValue("REPLAYGAIN_ALBUM_PEAK", text3);
         }
       }
       /**
@@ -10631,11 +10631,11 @@ var require_apeTag = __commonJS({
         return item ? item.text : [];
       }
       getUint32Value(key, index) {
-        const text2 = this.getStringValue(key);
-        if (!text2) {
+        const text3 = this.getStringValue(key);
+        if (!text3) {
           return 0;
         }
-        const values = text2.split("/", index + 2);
+        const values = text3.split("/", index + 2);
         if (values.length < index + 1) {
           return 0;
         }
@@ -14597,9 +14597,9 @@ var require_synchronizedLyricsFrame = __commonJS({
        *     displayed. See {@link TimestampFormat} for possible values.
        * @param text Text for the point in time
        */
-      constructor(time, text2) {
+      constructor(time, text3) {
         utils_1.Guards.uint(time, "time");
-        this.text = text2;
+        this.text = text3;
         this._time = time;
       }
       /**
@@ -14879,13 +14879,13 @@ var require_synchronizedLyricsFrame = __commonJS({
           if (lyricsLength < 0) {
             throw new errors_1.CorruptFileError("Text delimiter for synchronized lyric not found");
           }
-          const text2 = data.subarray(offset, lyricsLength).toString(this.textEncoding);
+          const text3 = data.subarray(offset, lyricsLength).toString(this.textEncoding);
           offset += lyricsLength + delim.length;
           if (offset + 4 > data.length) {
             break;
           }
           const time = data.subarray(offset, 4).toUint();
-          l.push(new SynchronizedText(time, text2));
+          l.push(new SynchronizedText(time, text3));
           offset += 4;
         }
         this._text = l;
@@ -15034,22 +15034,22 @@ var require_textInformationFrame = __commonJS({
         if (version2 !== 3 || this.frameId !== frameIdentifiers_1.FrameIdentifiers.TDRC) {
           return super.render(version2);
         }
-        const text2 = this.toString();
-        if (text2.length < 10 || text2[4] !== "-" || text2[7] !== "-") {
+        const text3 = this.toString();
+        if (text3.length < 10 || text3[4] !== "-" || text3[7] !== "-") {
           return super.render(version2);
         }
         const output = byteVector_1.ByteVector.empty();
         let frame = new _TextInformationFrame(new frameHeader_1.Id3v2FrameHeader(frameIdentifiers_1.FrameIdentifiers.TYER));
-        frame.text = [text2.substring(0, 4)];
+        frame.text = [text3.substring(0, 4)];
         output.addByteVector(frame.render(version2));
         frame = new _TextInformationFrame(new frameHeader_1.Id3v2FrameHeader(frameIdentifiers_1.FrameIdentifiers.TDAT));
-        frame.text = [text2.substring(5, 7) + text2.substring(8, 10)];
+        frame.text = [text3.substring(5, 7) + text3.substring(8, 10)];
         output.addByteVector(frame.render(version2));
-        if (text2.length < 16 || text2[10] !== "T" || text2[13] !== ":") {
+        if (text3.length < 16 || text3[10] !== "T" || text3[13] !== ":") {
           return output;
         }
         frame = new _TextInformationFrame(new frameHeader_1.Id3v2FrameHeader(frameIdentifiers_1.FrameIdentifiers.TIME));
-        frame.text = [text2.substring(11, 13) + text2.substring(14, 16)];
+        frame.text = [text3.substring(11, 13) + text3.substring(14, 16)];
         output.addByteVector(frame.render(version2));
         return output;
       }
@@ -15140,10 +15140,10 @@ var require_textInformationFrame = __commonJS({
         }
         const encoding = _TextInformationFrame.correctEncoding(this.textEncoding, version2);
         const v = byteVector_1.ByteVector.empty();
-        let text2 = this._textFields;
+        let text3 = this._textFields;
         v.addByte(encoding);
         if (version2 > 3 && this.frameId === frameIdentifiers_1.FrameIdentifiers.TCON) {
-          text2 = text2.map((g) => {
+          text3 = text3.map((g) => {
             switch (g) {
               case _TextInformationFrame.COVER_STRING:
                 return _TextInformationFrame.COVER_ABBREV;
@@ -15161,24 +15161,24 @@ var require_textInformationFrame = __commonJS({
         const isTxxx = this.frameId === frameIdentifiers_1.FrameIdentifiers.TXXX;
         if (version2 > 3 || isTxxx) {
           if (isTxxx) {
-            if (text2.length === 0) {
-              text2 = [null, null];
-            } else if (text2.length === 1) {
-              text2 = [text2[0], null];
+            if (text3.length === 0) {
+              text3 = [null, null];
+            } else if (text3.length === 1) {
+              text3 = [text3[0], null];
             }
           }
-          for (let i = 0; i < text2.length; i++) {
+          for (let i = 0; i < text3.length; i++) {
             if (i !== 0) {
               v.addByteVector(byteVector_1.ByteVector.getTextDelimiter(encoding));
             }
-            if (text2[i]) {
-              v.addByteVector(byteVector_1.ByteVector.fromString(text2[i], encoding));
+            if (text3[i]) {
+              v.addByteVector(byteVector_1.ByteVector.fromString(text3[i], encoding));
             }
           }
         } else if (this.frameId === frameIdentifiers_1.FrameIdentifiers.TCON) {
           const numericGenres = [];
           const textGenres = [];
-          for (const s of text2) {
+          for (const s of text3) {
             if (id3v2Settings_1.default.useNumericGenres) {
               switch (s) {
                 case _TextInformationFrame.COVER_STRING:
@@ -15202,13 +15202,13 @@ var require_textInformationFrame = __commonJS({
           const genreString = `${numericGenres.join("")}${textGenres.join(";")}`;
           v.addByteVector(byteVector_1.ByteVector.fromString(genreString, encoding));
         } else {
-          v.addByteVector(byteVector_1.ByteVector.fromString(text2.join("/"), encoding));
+          v.addByteVector(byteVector_1.ByteVector.fromString(text3.join("/"), encoding));
         }
         return v;
       }
       // #endregion
-      parseTconAsStandardNumeric(field) {
-        if (field[0] !== "(") {
+      parseTconAsStandardNumeric(field2) {
+        if (field2[0] !== "(") {
           return void 0;
         }
         const results = [];
@@ -15223,11 +15223,11 @@ var require_textInformationFrame = __commonJS({
           const lastResult = results[results.length - 1];
           results[results.length - 1] = refinementAdded ? `${lastResult}${chunk}` : `${lastResult} ${chunk}`;
         };
-        for (let i = 1; i < field.length; i++) {
+        for (let i = 1; i < field2.length; i++) {
           if (inParentheses) {
-            if (field[i] === ")") {
+            if (field2[i] === ")") {
               close = i;
-              const parenContents = field.substring(open + 1, close);
+              const parenContents = field2.substring(open + 1, close);
               const numericGenre = genres_1.default.indexToAudioDirect(parenContents);
               if (numericGenre !== void 0) {
                 results.push(numericGenre);
@@ -15244,13 +15244,13 @@ var require_textInformationFrame = __commonJS({
             }
           } else {
             let refinementChunk;
-            if (field[i] === "(") {
-              if (field[i + 1] === "(") {
-                refinementChunk = field.substring(open, i + 1);
+            if (field2[i] === "(") {
+              if (field2[i + 1] === "(") {
+                refinementChunk = field2.substring(open, i + 1);
                 open = i + 2;
                 i++;
               } else {
-                refinementChunk = field.substring(open, i);
+                refinementChunk = field2.substring(open, i);
                 inParentheses = true;
                 open = i;
               }
@@ -15262,7 +15262,7 @@ var require_textInformationFrame = __commonJS({
         if (results.length === 0) {
           return void 0;
         }
-        appendToLastResult(field.substring(open));
+        appendToLastResult(field2.substring(open));
         return results;
       }
     };
@@ -15341,8 +15341,8 @@ var require_textInformationFrame = __commonJS({
        * Gets the description stored in the current instance.
        */
       get description() {
-        const text2 = super.text;
-        return text2.length > 0 ? text2[0] : void 0;
+        const text3 = super.text;
+        return text3.length > 0 ? text3[0] : void 0;
       }
       /**
        * Sets the description stored in the current instance.
@@ -15350,13 +15350,13 @@ var require_textInformationFrame = __commonJS({
        * @param value Description to store in the current instance.
        */
       set description(value) {
-        let text2 = super.text;
-        if (text2.length > 0) {
-          text2[0] = value;
+        let text3 = super.text;
+        if (text3.length > 0) {
+          text3[0] = value;
         } else {
-          text2 = [value];
+          text3 = [value];
         }
-        super.text = text2;
+        super.text = text3;
       }
       /**
        * Gets the text contained in the current instance.
@@ -15364,11 +15364,11 @@ var require_textInformationFrame = __commonJS({
        * current instance. The value must be reassigned for the value to change.
        */
       get text() {
-        const text2 = super.text;
-        if (text2.length < 2) {
+        const text3 = super.text;
+        if (text3.length < 2) {
           return [];
         }
-        return text2.slice(1);
+        return text3.slice(1);
       }
       /**
        * Sets the text contained in the current instance.
@@ -15593,8 +15593,8 @@ var require_urlLinkFrame = __commonJS({
             }
           }
         }
-        const text2 = textFields.join("/");
-        return byteVector_1.ByteVector.concatenate(isWxxx ? encoding : void 0, byteVector_1.ByteVector.fromString(text2, byteVector_1.StringType.Latin1));
+        const text3 = textFields.join("/");
+        return byteVector_1.ByteVector.concatenate(isWxxx ? encoding : void 0, byteVector_1.ByteVector.fromString(text3, byteVector_1.StringType.Latin1));
       }
     };
     exports.UrlLinkFrame = UrlLinkFrame;
@@ -15653,8 +15653,8 @@ var require_urlLinkFrame = __commonJS({
        * Gets the description stored in the current instance.
        */
       get description() {
-        const text2 = super.text;
-        return text2.length > 0 ? text2[0] : void 0;
+        const text3 = super.text;
+        return text3.length > 0 ? text3[0] : void 0;
       }
       /**
        * Sets the description stored in the current instance.
@@ -15662,13 +15662,13 @@ var require_urlLinkFrame = __commonJS({
        */
       set description(value) {
         const normalizedValue = value || void 0;
-        let text2 = super.text;
-        if (text2.length > 0) {
-          text2[0] = normalizedValue;
+        let text3 = super.text;
+        if (text3.length > 0) {
+          text3[0] = normalizedValue;
         } else {
-          text2 = [normalizedValue];
+          text3 = [normalizedValue];
         }
-        super.text = text2;
+        super.text = text3;
       }
       /**
        * Gets the text contained in the current instance.
@@ -15676,13 +15676,13 @@ var require_urlLinkFrame = __commonJS({
        * current instance. The value must be reassigned for the value to change.
        */
       get text() {
-        const text2 = super.text;
-        if (text2.length < 2) {
+        const text3 = super.text;
+        if (text3.length < 2) {
           return [];
         }
-        const newText = new Array(text2.length - 1);
+        const newText = new Array(text3.length - 1);
         for (let i = 0; i < newText.length; i++) {
-          newText[i] = text2[i + 1];
+          newText[i] = text3[i + 1];
         }
         return newText;
       }
@@ -16522,11 +16522,11 @@ var require_id3v2Tag = __commonJS({
        * @remarks Stored in the `TBPM` frame
        */
       get beatsPerMinute() {
-        const text2 = this.getTextAsString(frameIdentifiers_1.FrameIdentifiers.TBPM);
-        if (!text2) {
+        const text3 = this.getTextAsString(frameIdentifiers_1.FrameIdentifiers.TBPM);
+        if (!text3) {
           return 0;
         }
-        const num = Number.parseFloat(text2);
+        const num = Number.parseFloat(text3);
         return Number.isNaN(num) || num < 0 ? 0 : Math.round(num);
       }
       /**
@@ -16742,14 +16742,14 @@ var require_id3v2Tag = __commonJS({
        * @remarks via a TXXX `REPLAY_GAIN_TRACK_GAIN` frame
        */
       get replayGainTrackGain() {
-        let text2 = this.getUserTextAsString("REPLAYGAIN_TRACK_GAIN", false);
-        if (!text2) {
+        let text3 = this.getUserTextAsString("REPLAYGAIN_TRACK_GAIN", false);
+        if (!text3) {
           return NaN;
         }
-        if (text2.toLowerCase().endsWith("db")) {
-          text2 = text2.substring(0, text2.length - 2).trim();
+        if (text3.toLowerCase().endsWith("db")) {
+          text3 = text3.substring(0, text3.length - 2).trim();
         }
-        return Number.parseFloat(text2);
+        return Number.parseFloat(text3);
       }
       /**
        * @inheritDoc
@@ -16759,8 +16759,8 @@ var require_id3v2Tag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.setUserTextAsString("REPLAYGAIN_TRACK_GAIN", void 0, false);
         } else {
-          const text2 = `${value.toFixed(2).toString()} dB`;
-          this.setUserTextAsString("REPLAYGAIN_TRACK_GAIN", text2, false);
+          const text3 = `${value.toFixed(2).toString()} dB`;
+          this.setUserTextAsString("REPLAYGAIN_TRACK_GAIN", text3, false);
         }
       }
       /**
@@ -16768,8 +16768,8 @@ var require_id3v2Tag = __commonJS({
        * @remarks via a TXXX `REPLAYGAIN_TRACK_PEAK` frame
        */
       get replayGainTrackPeak() {
-        const text2 = this.getUserTextAsString("REPLAYGAIN_TRACK_PEAK", false);
-        return text2 ? Number.parseFloat(text2) : NaN;
+        const text3 = this.getUserTextAsString("REPLAYGAIN_TRACK_PEAK", false);
+        return text3 ? Number.parseFloat(text3) : NaN;
       }
       /**
        * @inheritDoc
@@ -16779,8 +16779,8 @@ var require_id3v2Tag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.setUserTextAsString("REPLAYGAIN_TRACK_PEAK", void 0, false);
         } else {
-          const text2 = value.toFixed(6).toString();
-          this.setUserTextAsString("REPLAYGAIN_TRACK_PEAK", text2, false);
+          const text3 = value.toFixed(6).toString();
+          this.setUserTextAsString("REPLAYGAIN_TRACK_PEAK", text3, false);
         }
       }
       /**
@@ -16788,14 +16788,14 @@ var require_id3v2Tag = __commonJS({
        * @remarks via a TXXX `REPLAYGAIN_ALBUM_GAIN` frame
        */
       get replayGainAlbumGain() {
-        let text2 = this.getUserTextAsString("REPLAYGAIN_ALBUM_GAIN", false);
-        if (!text2) {
+        let text3 = this.getUserTextAsString("REPLAYGAIN_ALBUM_GAIN", false);
+        if (!text3) {
           return NaN;
         }
-        if (text2.toLowerCase().endsWith("db")) {
-          text2 = text2.substring(0, text2.length - 2).trim();
+        if (text3.toLowerCase().endsWith("db")) {
+          text3 = text3.substring(0, text3.length - 2).trim();
         }
-        return Number.parseFloat(text2);
+        return Number.parseFloat(text3);
       }
       /**
        * @inheritDoc
@@ -16805,8 +16805,8 @@ var require_id3v2Tag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.setUserTextAsString("REPLAYGAIN_ALBUM_GAIN", void 0, false);
         } else {
-          const text2 = `${value.toFixed(2).toString()} dB`;
-          this.setUserTextAsString("REPLAYGAIN_ALBUM_GAIN", text2, false);
+          const text3 = `${value.toFixed(2).toString()} dB`;
+          this.setUserTextAsString("REPLAYGAIN_ALBUM_GAIN", text3, false);
         }
       }
       /**
@@ -16814,8 +16814,8 @@ var require_id3v2Tag = __commonJS({
        * @remarks via a TXXX `REPLAYGAIN_ALBUM_PEAK` frame
        */
       get replayGainAlbumPeak() {
-        const text2 = this.getUserTextAsString("REPLAYGAIN_ALBUM_PEAK", false);
-        return text2 ? Number.parseFloat(text2) : NaN;
+        const text3 = this.getUserTextAsString("REPLAYGAIN_ALBUM_PEAK", false);
+        return text3 ? Number.parseFloat(text3) : NaN;
       }
       /**
        * @inheritDoc
@@ -16825,8 +16825,8 @@ var require_id3v2Tag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.setUserTextAsString("REPLAYGAIN_ALBUM_PEAK", void 0, false);
         } else {
-          const text2 = value.toFixed(6).toString();
-          this.setUserTextAsString("REPLAYGAIN_ALBUM_PEAK", text2, false);
+          const text3 = value.toFixed(6).toString();
+          this.setUserTextAsString("REPLAYGAIN_ALBUM_PEAK", text3, false);
         }
       }
       /**
@@ -17161,12 +17161,12 @@ var require_id3v2Tag = __commonJS({
        * @param text Text to set for the specified frame or `undefined`/`null`/`""` to remove all
        *     frames with that identifier.
        */
-      setTextFrame(ident, ...text2) {
+      setTextFrame(ident, ...text3) {
         utils_1.Guards.truthy(ident, "ident");
         let empty = true;
-        if (text2) {
-          for (let i = 0; empty && i < text2.length; i++) {
-            if (text2[i]) {
+        if (text3) {
+          for (let i = 0; empty && i < text3.length; i++) {
+            if (text3[i]) {
               empty = false;
             }
           }
@@ -17182,7 +17182,7 @@ var require_id3v2Tag = __commonJS({
             urlFrame = urlLinkFrame_1.UrlLinkFrame.fromIdentity(ident);
             this.addFrame(urlFrame);
           }
-          urlFrame.text = text2;
+          urlFrame.text = text3;
           urlFrame.textEncoding = id3v2Settings_1.default.defaultEncoding;
         } else {
           const frames = this.getFramesByClassType(frame_1.FrameClassType.TextInformationFrame);
@@ -17191,7 +17191,7 @@ var require_id3v2Tag = __commonJS({
             frame = textInformationFrame_1.TextInformationFrame.fromIdentifier(ident);
             this.addFrame(frame);
           }
-          frame.text = text2;
+          frame.text = text3;
           frame.textEncoding = id3v2Settings_1.default.defaultEncoding;
         }
       }
@@ -17256,11 +17256,11 @@ var require_id3v2Tag = __commonJS({
         return frame ? frame.text : [];
       }
       getTextAsUint32(ident, index) {
-        const text2 = this.getTextAsString(ident);
-        if (text2 === null || text2 === void 0) {
+        const text3 = this.getTextAsString(ident);
+        if (text3 === null || text3 === void 0) {
           return 0;
         }
-        const values = text2.split("/", index + 2);
+        const values = text3.split("/", index + 2);
         if (values.length < index + 1) {
           return 0;
         }
@@ -17282,21 +17282,21 @@ var require_id3v2Tag = __commonJS({
         const result = frame ? frame.text.join(";") : void 0;
         return result || void 0;
       }
-      setUfidText(owner, text2) {
+      setUfidText(owner, text3) {
         const frames = this.getFramesByClassType(frame_1.FrameClassType.UniqueFileIdentifierFrame);
         let frame = uniqueFileIdentifierFrame_1.default.find(frames, owner);
-        if (!text2 && frame) {
+        if (!text3 && frame) {
           this.removeFrame(frame);
         } else {
-          const identifier = byteVector_1.ByteVector.fromString(text2, byteVector_1.StringType.UTF8);
+          const identifier = byteVector_1.ByteVector.fromString(text3, byteVector_1.StringType.UTF8);
           frame = uniqueFileIdentifierFrame_1.default.fromData(owner, identifier);
           this.addFrame(frame);
         }
       }
-      setUserTextAsString(description, text2, caseSensitive = true) {
+      setUserTextAsString(description, text3, caseSensitive = true) {
         const frames = this.getFramesByClassType(frame_1.FrameClassType.UserTextInformationFrame);
         let frame = textInformationFrame_1.UserTextInformationFrame.findUserTextInformationFrame(frames, description, caseSensitive);
-        if (!text2) {
+        if (!text3) {
           if (frame) {
             this.removeFrame(frame);
           }
@@ -17305,7 +17305,7 @@ var require_id3v2Tag = __commonJS({
             frame = textInformationFrame_1.UserTextInformationFrame.fromDescription(description, id3v2Settings_1.default.defaultEncoding);
             this.addFrame(frame);
           }
-          frame.text = text2.split(";");
+          frame.text = text3.split(";");
         }
       }
     };
@@ -19969,11 +19969,11 @@ var require_asfTag = __commonJS({
        *     https://docs.microsoft.com/en-us/windows/win32/wmformat/wm-year
        */
       get year() {
-        const text2 = this.getDescriptorString("WM/Year");
-        if (!text2 || text2.length < 4) {
+        const text3 = this.getDescriptorString("WM/Year");
+        if (!text3 || text3.length < 4) {
           return 0;
         }
-        const parsed = Number.parseInt(text2.substring(0, 4), 10);
+        const parsed = Number.parseInt(text3.substring(0, 4), 10);
         return Number.isNaN(parsed) ? 0 : parsed;
       }
       /**
@@ -20349,8 +20349,8 @@ var require_asfTag = __commonJS({
         if (Number.isNaN(value)) {
           this.removeDescriptors("ReplayGain/Track");
         } else {
-          const text2 = value.toFixed(2);
-          this.setDescriptorString(`${text2} dB`, "ReplayGain/Track");
+          const text3 = value.toFixed(2);
+          this.setDescriptorString(`${text3} dB`, "ReplayGain/Track");
         }
       }
       /**
@@ -20369,8 +20369,8 @@ var require_asfTag = __commonJS({
         if (Number.isNaN(value)) {
           this.removeDescriptors("ReplayGain/Track Peak");
         } else {
-          const text2 = value.toFixed(6);
-          this.setDescriptorString(text2, "ReplayGain/Track Peak");
+          const text3 = value.toFixed(6);
+          this.setDescriptorString(text3, "ReplayGain/Track Peak");
         }
       }
       /**
@@ -20396,8 +20396,8 @@ var require_asfTag = __commonJS({
         if (Number.isNaN(value)) {
           this.removeDescriptors("ReplayGain/Album");
         } else {
-          const text2 = value.toFixed(2);
-          this.setDescriptorString(`${text2} dB`, "ReplayGain/Album");
+          const text3 = value.toFixed(2);
+          this.setDescriptorString(`${text3} dB`, "ReplayGain/Album");
         }
       }
       /**
@@ -20416,8 +20416,8 @@ var require_asfTag = __commonJS({
         if (Number.isNaN(value)) {
           this.removeDescriptors("ReplayGain/Album Peak");
         } else {
-          const text2 = value.toFixed(6);
-          this.setDescriptorString(text2, "ReplayGain/Album Peak");
+          const text3 = value.toFixed(6);
+          this.setDescriptorString(text3, "ReplayGain/Album Peak");
         }
       }
       /**
@@ -24175,11 +24175,11 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `DATE` field
        */
       get year() {
-        const text2 = this.getFieldFirstValue("DATE");
-        if (!text2) {
+        const text3 = this.getFieldFirstValue("DATE");
+        if (!text3) {
           return 0;
         }
-        const parsedText = Number.parseInt(text2.substring(0, 4), 10);
+        const parsedText = Number.parseInt(text3.substring(0, 4), 10);
         return Number.isNaN(parsedText) ? 0 : parsedText;
       }
       /**
@@ -24199,11 +24199,11 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `TRACKNUMBER` field
        */
       get track() {
-        const text2 = this.getFieldFirstValue("TRACKNUMBER");
-        if (!text2) {
+        const text3 = this.getFieldFirstValue("TRACKNUMBER");
+        if (!text3) {
           return 0;
         }
-        const splitText = text2.split("/");
+        const splitText = text3.split("/");
         const parsedText = Number.parseInt(splitText[0], 10);
         return Number.isNaN(parsedText) ? 0 : parsedText;
       }
@@ -24222,16 +24222,16 @@ var require_xiphComment = __commonJS({
        *     used if `TRACKTOTAL` is not available.
        */
       get trackCount() {
-        let text2 = this.getFieldFirstValue("TRACKTOTAL");
-        if (text2) {
-          const parsedValue = Number.parseInt(text2, 10);
+        let text3 = this.getFieldFirstValue("TRACKTOTAL");
+        if (text3) {
+          const parsedValue = Number.parseInt(text3, 10);
           if (!Number.isNaN(parsedValue)) {
             return parsedValue;
           }
         }
-        text2 = this.getFieldFirstValue("TRACKNUMBER");
-        if (text2) {
-          const textSplit = text2.split("/");
+        text3 = this.getFieldFirstValue("TRACKNUMBER");
+        if (text3) {
+          const textSplit = text3.split("/");
           if (textSplit.length > 1) {
             const parsedValue = Number.parseInt(textSplit[1], 10);
             if (!Number.isNaN(parsedValue)) {
@@ -24254,11 +24254,11 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `DISCNUMBER` field
        */
       get disc() {
-        const text2 = this.getFieldFirstValue("DISCNUMBER");
-        if (!text2) {
+        const text3 = this.getFieldFirstValue("DISCNUMBER");
+        if (!text3) {
           return 0;
         }
-        const splitText = text2.split("/");
+        const splitText = text3.split("/");
         const parsedText = Number.parseInt(splitText[0], 10);
         return Number.isNaN(parsedText) ? 0 : parsedText;
       }
@@ -24277,16 +24277,16 @@ var require_xiphComment = __commonJS({
        *     used if `DISCTOTAL` is not available.
        */
       get discCount() {
-        let text2 = this.getFieldFirstValue("DISCTOTAL");
-        if (text2) {
-          const parsedValue = Number.parseInt(text2, 10);
+        let text3 = this.getFieldFirstValue("DISCTOTAL");
+        if (text3) {
+          const parsedValue = Number.parseInt(text3, 10);
           if (!Number.isNaN(parsedValue)) {
             return parsedValue;
           }
         }
-        text2 = this.getFieldFirstValue("DISCNUMBER");
-        if (text2) {
-          const textSplit = text2.split("/");
+        text3 = this.getFieldFirstValue("DISCNUMBER");
+        if (text3) {
+          const textSplit = text3.split("/");
           if (textSplit.length > 1) {
             const parsedValue = Number.parseInt(textSplit[1], 10);
             if (!Number.isNaN(parsedValue)) {
@@ -24340,11 +24340,11 @@ var require_xiphComment = __commonJS({
        *     behavior can be controlled Stored in the {@link XiphSettings.useTempoToStoreBpm}.
        */
       get beatsPerMinute() {
-        let text2 = this.getFieldFirstValue("TEMPO");
-        if (!text2) {
-          text2 = this.getFieldFirstValue("BPM");
+        let text3 = this.getFieldFirstValue("TEMPO");
+        if (!text3) {
+          text3 = this.getFieldFirstValue("BPM");
         }
-        const parsedNumber = Number.parseInt(text2, 10);
+        const parsedNumber = Number.parseInt(text3, 10);
         return Number.isNaN(parsedNumber) ? 0 : parsedNumber;
       }
       /**
@@ -24396,8 +24396,8 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `DATETAGGED` field
        */
       get dateTagged() {
-        const text2 = this.getFieldFirstValue("DATETAGGED");
-        const date = new Date(text2);
+        const text3 = this.getFieldFirstValue("DATETAGGED");
+        const date = new Date(text3);
         return Number.isNaN(date.getTime()) ? void 0 : date;
       }
       /**
@@ -24601,8 +24601,8 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_TRACK_GAIN` field
        */
       get replayGainTrackGain() {
-        const text2 = this.getFieldFirstValue("REPLAYGAIN_TRACK_GAIN");
-        return Number.parseFloat(text2);
+        const text3 = this.getFieldFirstValue("REPLAYGAIN_TRACK_GAIN");
+        return Number.parseFloat(text3);
       }
       /**
        * @inheritDoc
@@ -24620,8 +24620,8 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_TRACK_PEAK` field
        */
       get replayGainTrackPeak() {
-        const text2 = this.getFieldFirstValue("REPLAYGAIN_TRACK_PEAK");
-        return Number.parseFloat(text2);
+        const text3 = this.getFieldFirstValue("REPLAYGAIN_TRACK_PEAK");
+        return Number.parseFloat(text3);
       }
       /**
        * @inheritDoc
@@ -24639,8 +24639,8 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_ALBUM_GAIN` field
        */
       get replayGainAlbumGain() {
-        const text2 = this.getFieldFirstValue("REPLAYGAIN_ALBUM_GAIN");
-        return Number.parseFloat(text2);
+        const text3 = this.getFieldFirstValue("REPLAYGAIN_ALBUM_GAIN");
+        return Number.parseFloat(text3);
       }
       /**
        * @inheritDoc
@@ -24658,8 +24658,8 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_ALBUM_PEAK` field
        */
       get replayGainAlbumPeak() {
-        const text2 = this.getFieldFirstValue("REPLAYGAIN_ALBUM_PEAK");
-        return Number.parseFloat(text2);
+        const text3 = this.getFieldFirstValue("REPLAYGAIN_ALBUM_PEAK");
+        return Number.parseFloat(text3);
       }
       /**
        * @inheritDoc
@@ -29424,8 +29424,8 @@ var require_appleTag = __commonJS({
       }
       /** @inheritDoc */
       get genres() {
-        let text2 = this.getQuickTimeStrings(mpeg4BoxType_1.default.GEN);
-        if (text2.length === 0) {
+        let text3 = this.getQuickTimeStrings(mpeg4BoxType_1.default.GEN);
+        if (text3.length === 0) {
           for (const data of this.getQuickTimeData(mpeg4BoxType_1.default.GNRE)) {
             const index = data.toUshort(true);
             if (index === 0) {
@@ -29435,11 +29435,11 @@ var require_appleTag = __commonJS({
             if (!str) {
               continue;
             }
-            text2 = [str];
+            text3 = [str];
             break;
           }
         }
-        return text2;
+        return text3;
       }
       /** @inheritDoc */
       set genres(v) {
@@ -29548,8 +29548,8 @@ var require_appleTag = __commonJS({
       }
       /** @inheritDoc */
       get dateTagged() {
-        for (const text2 of this.getQuickTimeStrings(mpeg4BoxType_1.default.DTAG)) {
-          const date = new Date(text2);
+        for (const text3 of this.getQuickTimeStrings(mpeg4BoxType_1.default.DTAG)) {
+          const date = new Date(text3);
           if (!isNaN(date.getTime())) {
             return date;
           }
@@ -29694,14 +29694,14 @@ var require_appleTag = __commonJS({
       }
       /** @inheritDoc */
       get replayGainTrackGain() {
-        let text2 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_TRACK_GAIN");
-        if (!text2) {
+        let text3 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_TRACK_GAIN");
+        if (!text3) {
           return NaN;
         }
-        if (text2.toLowerCase().endsWith("db")) {
-          text2 = text2.substring(0, text2.length - 2).trim();
+        if (text3.toLowerCase().endsWith("db")) {
+          text3 = text3.substring(0, text3.length - 2).trim();
         }
-        return Number.parseFloat(text2);
+        return Number.parseFloat(text3);
       }
       /** @inheritDoc */
       set replayGainTrackGain(v) {
@@ -29710,24 +29710,24 @@ var require_appleTag = __commonJS({
       }
       /** @inheritDoc */
       get replayGainTrackPeak() {
-        const text2 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_TRACK_PEAK");
-        return text2 ? Number.parseFloat(text2) : NaN;
+        const text3 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_TRACK_PEAK");
+        return text3 ? Number.parseFloat(text3) : NaN;
       }
       /** @inheritDoc */
       set replayGainTrackPeak(v) {
-        const text2 = Number.isNaN(v) ? void 0 : v.toFixed(6);
-        this.setItunesStrings("com.apple.iTunes", "REPLAYGAIN_TRACK_PEAK", text2);
+        const text3 = Number.isNaN(v) ? void 0 : v.toFixed(6);
+        this.setItunesStrings("com.apple.iTunes", "REPLAYGAIN_TRACK_PEAK", text3);
       }
       /** @inheritDoc */
       get replayGainAlbumGain() {
-        let text2 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_ALBUM_GAIN");
-        if (!text2) {
+        let text3 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_ALBUM_GAIN");
+        if (!text3) {
           return NaN;
         }
-        if (text2.toLowerCase().endsWith("db")) {
-          text2 = text2.substring(0, text2.length - 2).trim();
+        if (text3.toLowerCase().endsWith("db")) {
+          text3 = text3.substring(0, text3.length - 2).trim();
         }
-        return Number.parseFloat(text2);
+        return Number.parseFloat(text3);
       }
       set replayGainAlbumGain(v) {
         const value = Number.isNaN(v) ? void 0 : `${v.toFixed(2)} dB`;
@@ -29735,13 +29735,13 @@ var require_appleTag = __commonJS({
       }
       /** @inheritDoc */
       get replayGainAlbumPeak() {
-        const text2 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_ALBUM_PEAK");
-        return text2 ? Number.parseFloat(text2) : NaN;
+        const text3 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_ALBUM_PEAK");
+        return text3 ? Number.parseFloat(text3) : NaN;
       }
       /** @inheritDoc */
       set replayGainAlbumPeak(v) {
-        const text2 = Number.isNaN(v) ? void 0 : v.toFixed(6);
-        this.setItunesStrings("com.apple.iTunes", "REPLAYGAIN_ALBUM_PEAK", text2);
+        const text3 = Number.isNaN(v) ? void 0 : v.toFixed(6);
+        this.setItunesStrings("com.apple.iTunes", "REPLAYGAIN_ALBUM_PEAK", text3);
       }
       /** @inheritDoc */
       get initialKey() {
@@ -29855,8 +29855,8 @@ var require_appleTag = __commonJS({
       getQuickTimeStrings(boxType) {
         return this._ilstBox.getQuickTimeDataBoxes(boxType).filter((b) => utils_1.NumberUtils.hasFlag(b.flags, appleDataBox_1.AppleDataBoxFlagType.ContainsText, true)).reduce((accum, b) => {
           if (b.text) {
-            for (const text2 of b.text.split(";")) {
-              utils_1.ArrayUtils.safePush(accum, text2.trim());
+            for (const text3 of b.text.split(";")) {
+              utils_1.ArrayUtils.safePush(accum, text3.trim());
             }
           }
           return accum;
@@ -35206,13 +35206,10 @@ var require_dist = __commonJS({
 });
 
 // src/index.js
-import path10 from "node:path";
+import path11 from "node:path";
 
-// src/model/runtime.js
-import { createHash, randomUUID as randomUUID6 } from "node:crypto";
-import { createReadStream } from "node:fs";
-import fs3 from "node:fs/promises";
-import path3 from "node:path";
+// src/model/editor.js
+import path2 from "node:path";
 
 // src/model/catalogue.js
 import { randomUUID as randomUUID2 } from "node:crypto";
@@ -35516,10 +35513,10 @@ var Catalogue = class {
   backup(destination) {
     return backupDatabase(this.db, destination);
   }
-  audit(action, target, data = {}, actor = null) {
+  audit(action, target, data = {}, actor2 = null) {
     this.db.prepare(
       "INSERT INTO audit_event(actor,action,target_id,data,created_at) VALUES (?,?,?,?,?)"
-    ).run(actor, action, target, json(data), Date.now());
+    ).run(actor2, action, target, json(data), Date.now());
   }
   review(kind, target, evidence2) {
     this.db.prepare(
@@ -35732,30 +35729,30 @@ var Catalogue = class {
       return id;
     });
   }
-  alias(entity, text2, { language = null, kind = "alternate", assertionId = null } = {}) {
+  alias(entity, text3, { language = null, kind = "alternate", assertionId = null } = {}) {
     this.entity(entity);
-    if (typeof text2 !== "string" || !text2.trim())
+    if (typeof text3 !== "string" || !text3.trim())
       throw new Error("Invalid alias");
     const id = randomUUID2();
     this.db.prepare("INSERT INTO alias VALUES (?,?,?,?,?,?,?)").run(
       id,
       entity,
-      text2,
-      text2.normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase(),
+      text3,
+      text3.normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase(),
       language,
       kind,
       assertionId
     );
     return id;
   }
-  catalogueNumber(entity, system, display, normalized) {
+  catalogueNumber(entity, system, display, normalized2) {
     this.entity(entity, ["work", "collection"]);
-    if (![system, display, normalized].every(
+    if (![system, display, normalized2].every(
       (v) => typeof v === "string" && v.length
     ))
       throw new Error("Invalid catalogue number");
     const id = randomUUID2();
-    this.db.prepare("INSERT INTO catalogue_number VALUES (?,?,?,?,?,NULL)").run(id, entity, system, display, normalized);
+    this.db.prepare("INSERT INTO catalogue_number VALUES (?,?,?,?,?,NULL)").run(id, entity, system, display, normalized2);
     return id;
   }
   albumTarget(instance, album) {
@@ -35784,101 +35781,211 @@ async function openCatalogue(folder, options) {
   return new Catalogue(db, filename);
 }
 
-// src/model/jobs.js
+// src/model/metadata.js
 import { randomUUID as randomUUID3 } from "node:crypto";
-var ModelJobs = class {
+var providerOrder = { musicbrainz: 0, openopus: 1 };
+var Metadata = class {
   constructor(catalogue) {
+    this.catalogue = catalogue;
     this.db = catalogue.db;
   }
-  enqueue(type, key, input, { maxAttempts = 3 } = {}) {
-    if (!type || !key || !Number.isSafeInteger(maxAttempts) || maxAttempts < 1)
-      throw new Error("Invalid job");
-    return transaction(this.db, () => {
-      const existing = this.db.prepare(
-        "SELECT id FROM model_job WHERE key=? AND state IN ('queued','running','retry')"
-      ).get(key);
-      if (existing) return existing.id;
-      const id = randomUUID3();
-      this.db.prepare(
-        `INSERT INTO model_job(id,type,key,input,state,max_attempts,created_at)
-        VALUES (?,?,?,?,'queued',?,?)`
-      ).run(id, type, key, JSON.stringify(input), maxAttempts, Date.now());
-      return id;
-    });
+  validate(target, field2, value) {
+    if (!this.db.prepare("SELECT 1 FROM metadata_target WHERE id=?").get(target))
+      throw new Error("Unknown metadata target");
+    const definition = this.db.prepare("SELECT type FROM field_definition WHERE key=?").get(field2);
+    const type = Array.isArray(value) ? "array" : typeof value;
+    if (!definition || value === void 0 || value !== null && (type !== definition.type || type === "number" && !Number.isFinite(value)))
+      throw new Error("Invalid metadata field/value");
+    if (JSON.stringify(JSON.parse(json(value))) !== json(value))
+      throw new Error("Invalid JSON value");
   }
-  claim(owner, { now = Date.now(), leaseMs = 3e4 } = {}) {
-    if (!owner || !Number.isFinite(leaseMs) || leaseMs <= 0)
-      throw new Error("Invalid job lease");
-    return transaction(this.db, () => {
-      this.db.prepare(
-        "UPDATE model_job SET state='cancelled' WHERE cancel_requested=1 AND (state!='running' OR lease_until<=?)"
-      ).run(now);
-      this.db.prepare(
-        "UPDATE model_job SET state='failed',error='ATTEMPTS_EXHAUSTED' WHERE attempt>=max_attempts AND state='running' AND lease_until<=?"
-      ).run(now);
-      const row = this.db.prepare(
-        `SELECT * FROM model_job WHERE cancel_requested=0 AND attempt<max_attempts AND
-        ((state IN ('queued','retry') AND next_run_at<=?) OR (state='running' AND lease_until<=?)) ORDER BY created_at LIMIT 1`
-      ).get(now, now);
-      if (!row) return null;
-      this.db.prepare(
-        "UPDATE model_job SET state='running',owner=?,lease_until=?,generation=generation+1,attempt=attempt+1 WHERE id=?"
-      ).run(owner, now + leaseMs, row.id);
-      return this.get(row.id);
-    });
+  append(target, field2, value, {
+    source,
+    provider = null,
+    recordId = null,
+    confidence = null,
+    actor: actor2 = null,
+    state = "active"
+  }) {
+    this.validate(target, field2, value);
+    const prior = this.db.prepare(
+      `SELECT id FROM assertion WHERE target_id=? AND field=? AND source=?
+      AND provider IS ? AND record_id IS ? AND state!='superseded' ORDER BY rowid DESC LIMIT 1`
+    ).get(target, field2, source, provider, recordId);
+    if (prior)
+      this.db.prepare("UPDATE assertion SET state='superseded' WHERE id=?").run(prior.id);
+    const id = randomUUID3();
+    this.db.prepare("INSERT INTO assertion VALUES (?,?,?,?,?,?,?,?,?,?,?,?)").run(
+      id,
+      target,
+      field2,
+      json(value),
+      source,
+      provider,
+      recordId,
+      state,
+      confidence,
+      actor2,
+      Date.now(),
+      prior?.id ?? null
+    );
+    return id;
   }
-  get(id) {
-    const row = this.db.prepare("SELECT * FROM model_job WHERE id=?").get(id);
-    return row && {
-      ...row,
-      input: JSON.parse(row.input),
-      progress: JSON.parse(row.progress)
-    };
-  }
-  checkpoint(job, progress, { done = false, now = Date.now(), leaseMs = 3e4, commit } = {}) {
+  // Editing a provider-filled field pins automatically. Explicit pin=false cannot undo this.
+  manual(target, field2, value, { actor: actor2, pin = false } = {}) {
+    if (typeof actor2 !== "string" || !actor2)
+      throw new Error("Manual edits require host actor attribution");
     return transaction(this.db, () => {
-      const row = this.get(job.id);
-      if (!row || row.state !== "running" || row.owner !== job.owner || row.generation !== job.generation || row.lease_until <= now)
-        throw new Error("Stale job lease");
-      if (row.cancel_requested) {
-        this.db.prepare("UPDATE model_job SET state='cancelled' WHERE id=?").run(job.id);
-        return false;
-      }
-      if (commit) commit();
-      this.db.prepare(
-        "UPDATE model_job SET progress=?,state=?,lease_until=? WHERE id=?"
-      ).run(
-        JSON.stringify(progress),
-        done ? "done" : "running",
-        now + leaseMs,
-        job.id
+      const provider = this.db.prepare(
+        "SELECT 1 FROM assertion WHERE target_id=? AND field=? AND source='provider'"
+      ).get(target, field2);
+      const existingPin = this.db.prepare("SELECT 1 FROM pinned_override WHERE target_id=? AND field=?").get(target, field2);
+      const id = this.append(target, field2, value, { source: "manual", actor: actor2 });
+      if (pin || provider || existingPin)
+        this.db.prepare(
+          `INSERT INTO pinned_override VALUES (?,?,?,?,?)
+        ON CONFLICT(target_id,field) DO UPDATE SET assertion_id=excluded.assertion_id,actor=excluded.actor,updated_at=excluded.updated_at`
+        ).run(target, field2, id, actor2, Date.now());
+      this.catalogue.audit(
+        "metadata.manual",
+        target,
+        { field: field2, assertionId: id },
+        actor2
       );
-      return true;
+      return this.resolve(target, field2);
     });
   }
-  yield(job) {
-    this.db.prepare(
-      `UPDATE model_job SET state='queued',owner=NULL,lease_until=0,attempt=attempt-1
-      WHERE id=? AND owner=? AND generation=? AND state='running'`
-    ).run(job.id, job.owner, job.generation);
+  derived(target, field2, value) {
+    return transaction(this.db, () => {
+      this.append(target, field2, value, { source: "derived" });
+      return this.resolve(target, field2);
+    });
   }
-  fail(job, error, { now = Date.now() } = {}) {
-    this.db.prepare(
-      `UPDATE model_job SET state=CASE WHEN attempt>=max_attempts THEN 'failed' ELSE 'retry' END,
-      error=?,next_run_at=?,lease_until=0 WHERE id=? AND owner=? AND generation=? AND state='running' AND lease_until>?`
-    ).run(
-      String(error).slice(0, 500),
-      now + 1e3 * 2 ** job.attempt,
-      job.id,
-      job.owner,
-      job.generation,
-      now
+  refresh(target, provider, recordId, fields, { state = "active", confidence = 1, complete = true } = {}) {
+    if (!Object.hasOwn(providerOrder, provider) || !recordId || !fields || Array.isArray(fields) || typeof fields !== "object" || !["active", "stale", "deleted", "conflict"].includes(state) || !Number.isFinite(confidence) || confidence < 0 || confidence > 1)
+      throw new Error("Invalid provider refresh");
+    return transaction(this.db, () => {
+      const known = this.db.prepare(
+        "SELECT DISTINCT field FROM assertion WHERE target_id=? AND provider=? AND record_id=?"
+      ).all(target, provider, recordId).map((r) => r.field);
+      const affected = /* @__PURE__ */ new Set([...known, ...Object.keys(fields)]);
+      for (const field2 of affected) this.resolve(target, field2);
+      if (confidence < 0.95) {
+        this.catalogue.review("provider_match", target, {
+          provider,
+          recordId,
+          confidence,
+          fields
+        });
+        return { review: true };
+      }
+      if (state !== "active") {
+        this.db.prepare(
+          "UPDATE assertion SET state=? WHERE target_id=? AND provider=? AND record_id=? AND state!='superseded'"
+        ).run(state, target, provider, recordId);
+        this.catalogue.review("provider_state", target, {
+          provider,
+          recordId,
+          state
+        });
+      } else {
+        for (const [field2, value] of Object.entries(fields))
+          this.append(target, field2, value, {
+            source: "provider",
+            provider,
+            recordId,
+            confidence
+          });
+        if (complete)
+          for (const field2 of known.filter((f) => !Object.hasOwn(fields, f))) {
+            this.db.prepare(
+              "UPDATE assertion SET state='stale' WHERE target_id=? AND field=? AND provider=? AND record_id=? AND state!='superseded'"
+            ).run(target, field2, provider, recordId);
+            this.catalogue.review("provider_omission", target, {
+              provider,
+              recordId,
+              field: field2
+            });
+          }
+      }
+      this.db.prepare(
+        `INSERT INTO provider_record VALUES (?,?,?,?,?) ON CONFLICT(provider,record_id,target_id)
+        DO UPDATE SET state=excluded.state,updated_at=excluded.updated_at`
+      ).run(provider, recordId, target, state, Date.now());
+      const result = Object.fromEntries(
+        [...affected].map((field2) => [field2, this.resolve(target, field2)])
+      );
+      this.catalogue.audit("provider.refresh", target, {
+        provider,
+        recordId,
+        state
+      });
+      return result;
+    });
+  }
+  useProvider(target, field2, { actor: actor2 } = {}) {
+    if (!actor2) throw new Error("Unpin requires host actor attribution");
+    return transaction(this.db, () => {
+      this.db.prepare("DELETE FROM pinned_override WHERE target_id=? AND field=?").run(target, field2);
+      this.catalogue.audit("metadata.unpin", target, { field: field2 }, actor2);
+      return this.resolve(target, field2, { acceptProviderChange: true });
+    });
+  }
+  resolve(target, field2, { acceptProviderChange = false } = {}) {
+    return transaction(
+      this.db,
+      () => this.resolveField(target, field2, { acceptProviderChange })
     );
   }
-  cancel(id) {
+  resolveField(target, field2, { acceptProviderChange = false } = {}) {
+    const pin = this.db.prepare(
+      "SELECT assertion_id FROM pinned_override WHERE target_id=? AND field=?"
+    ).get(target, field2);
+    const rows = this.db.prepare(
+      "SELECT *,rowid AS ordinal FROM assertion WHERE target_id=? AND field=? AND state='active' ORDER BY rowid DESC"
+    ).all(target, field2);
+    const providers = rows.filter((r) => r.source === "provider").sort(
+      (a, b) => providerOrder[a.provider] - providerOrder[b.provider] || b.ordinal - a.ordinal
+    );
+    const previous = this.db.prepare(
+      `SELECT a.* FROM field_resolution f JOIN assertion a ON a.id=f.assertion_id
+      WHERE f.target_id=? AND f.field=?`
+    ).get(target, field2);
+    let chosen;
+    if (pin)
+      chosen = this.db.prepare("SELECT * FROM assertion WHERE id=?").get(pin.assertion_id);
+    else if (!acceptProviderChange && previous?.source === "provider" && ["stale", "deleted", "conflict"].includes(previous.state))
+      chosen = previous;
+    else
+      chosen = providers[0] || rows.find((r) => r.source === "manual") || rows.find((r) => r.source === "derived");
+    if (providers.length > 1 && providers.some((r) => r.value !== providers[0].value))
+      this.catalogue.review("provider_conflict", target, {
+        field: field2,
+        assertions: providers.map((r) => r.id)
+      });
+    if (!chosen)
+      return {
+        value: void 0,
+        source: "unknown",
+        pinned: false,
+        providerValue: void 0
+      };
     this.db.prepare(
-      "UPDATE model_job SET cancel_requested=1 WHERE id=? AND state IN ('queued','running','retry')"
-    ).run(id);
+      `INSERT INTO field_resolution VALUES (?,?,?) ON CONFLICT(target_id,field)
+      DO UPDATE SET assertion_id=excluded.assertion_id`
+    ).run(target, field2, chosen.id);
+    return {
+      value: JSON.parse(chosen.value),
+      source: chosen.source,
+      provider: chosen.provider,
+      recordId: chosen.record_id,
+      pinned: !!pin,
+      updatedAt: chosen.updated_at,
+      confidence: chosen.confidence,
+      state: chosen.state,
+      assertionId: chosen.id,
+      providerValue: providers[0] ? JSON.parse(providers[0].value) : void 0
+    };
   }
 };
 
@@ -36010,13 +36117,13 @@ function reconcile(catalogue, snapshot) {
     return rows;
   });
 }
-function classify(catalogue, target, hints, { manual = null, actor = null, inherited = null } = {}) {
+function classify(catalogue, target, hints, { manual = null, actor: actor2 = null, inherited = null } = {}) {
   return transaction(catalogue.db, () => {
     const prior = catalogue.db.prepare("SELECT * FROM classification WHERE target_id=?").get(target);
     if (!manual && prior?.pinned) return prior.state;
     if (inherited && !["classical", "not_classical", "unsure"].includes(inherited))
       throw new Error("Invalid inherited classification");
-    if (manual && (!actor || !["classical", "not_classical", "unsure"].includes(manual)))
+    if (manual && (!actor2 || !["classical", "not_classical", "unsure"].includes(manual)))
       throw new Error("Invalid classification override");
     const genres = (hints.genres || []).map((s) => s.toLowerCase());
     const classicalGenre = genres.some(
@@ -36033,10 +36140,816 @@ function classify(catalogue, target, hints, { manual = null, actor = null, inher
     ).run(target, state, manual ? 1 : 0, score, json(hints), Date.now());
     if (state === "unsure")
       catalogue.review("classification", target, { hints, score });
-    if (manual) catalogue.audit("classification.pin", target, { state }, actor);
+    if (manual) catalogue.audit("classification.pin", target, { state }, actor2);
     return state;
   });
 }
+
+// src/model/editor.js
+var EditorError = class extends Error {
+  constructor(message, status = 400) {
+    super(message);
+    this.status = status;
+  }
+};
+var fail = (message) => {
+  throw new EditorError(message);
+};
+var actor = (input) => {
+  if (input.pageId !== "editor" || input.capabilities?.adminForms !== 1 || input.user?.role !== "admin" || !Number.isSafeInteger(input.user.id) || input.user.id <= 0)
+    throw new Error(
+      "The classical editor requires the host admin-forms v1 capability and a real admin"
+    );
+  return String(input.user.id);
+};
+function text(value, label, { optional = false, max = 1e4 } = {}) {
+  if (typeof value !== "string" || value.length > max || !optional && !value.trim())
+    fail(`Enter a valid ${label}`);
+  return value;
+}
+var revision = (c) => `${c.db.prepare("SELECT coalesce(max(id),0) AS n FROM audit_event").get().n}:${c.db.prepare("SELECT coalesce(max(rowid),0) AS n FROM assertion").get().n}`;
+var normalized = (s) => s.normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase();
+var validDate = (value) => /^\d{4}(-(0[1-9]|1[0-2])(-(0[1-9]|[12]\d|3[01]))?)?$/.test(value) && (value.length !== 10 || (/* @__PURE__ */ new Date(`${value}T00:00:00Z`)).toISOString().slice(0, 10) === value);
+var kindLabel = {
+  person: "Person",
+  ensemble: "Ensemble",
+  work: "Work",
+  movement: "Movement",
+  collection: "Collection",
+  performance: "Performance",
+  recording: "Recording",
+  release: "Release"
+};
+function entries(c) {
+  return c.db.prepare(
+    `SELECT e.*, (SELECT a.value FROM field_resolution f JOIN assertion a ON a.id=f.assertion_id
+    WHERE f.target_id=e.id AND f.field IN ('title','name') ORDER BY f.field LIMIT 1) AS label
+    FROM entity e WHERE e.deleted_at IS NULL ORDER BY e.created_at,e.id`
+  ).all().map((e) => ({
+    ...e,
+    label: e.label && JSON.parse(e.label) || `Untitled ${e.kind}`,
+    data: JSON.parse(e.data)
+  }));
+}
+var form = (id, title, command, args, fields, submitLabel, help) => ({
+  id,
+  title,
+  command,
+  arguments: args,
+  fields,
+  submitLabel,
+  ...help && { help }
+});
+var field = (key, label, value = "", type = "text", extra = {}) => ({
+  key,
+  label,
+  value,
+  type,
+  ...extra
+});
+var option = (value, label) => ({
+  value,
+  label: String(label).slice(0, 200)
+});
+var movementRows = (c, work) => c.db.prepare(
+  "SELECT * FROM relation WHERE kind='movement' AND source_id=? ORDER BY position"
+).all(work);
+function render(c, input) {
+  const m = new Metadata(c), all = entries(c), query = input.query || {}, q = normalized(text(query.q || "", "search", { optional: true, max: 200 }));
+  const offset = Number(query.offset || 0);
+  if (!Number.isSafeInteger(offset) || offset < 0 || offset > 1e7)
+    fail("Invalid page offset");
+  const filtered = all.filter(
+    (e) => normalized(`${e.label} ${e.kind}`).includes(q)
+  );
+  const selected = query.selection ? all.find((e) => e.id === query.selection) : null;
+  if (query.selection && !selected)
+    fail("This catalogue entry no longer exists");
+  const label = (id) => all.find((e) => e.id === id)?.label || "Untitled entry";
+  const composers = all.filter(
+    (e) => e.kind === "person" && (e.data.roles?.includes("composer") || c.db.prepare(
+      "SELECT 1 FROM credit WHERE contributor_id=? AND role='composer'"
+    ).get(e.id))
+  );
+  const entityType = (e) => e.kind === "person" && composers.some((person) => person.id === e.id) ? "Composer" : kindLabel[e.kind];
+  const composerOptions = [
+    option("", "Unknown composer"),
+    ...all.filter((e) => e.kind === "person").filter(
+      (e) => !q || normalized(e.label).includes(q) || e.id === selected?.id
+    ).sort(
+      (a, b) => Number(b.id === selected?.id) - Number(a.id === selected?.id)
+    ).slice(0, 199).map((e) => option(e.id, e.label))
+  ];
+  const forms = [
+    form(
+      "create-composer",
+      "Create composer",
+      "create-composer",
+      {},
+      [field("name", "Composer name", "", "text", { required: true })],
+      "Create composer"
+    ),
+    form(
+      "create-work",
+      "Create work",
+      "create-work",
+      {},
+      [
+        field("title", "Work title", "", "text", { required: true }),
+        field(
+          "composer",
+          "Composer",
+          selected?.kind === "person" ? selected.id : "",
+          "select",
+          { options: composerOptions }
+        ),
+        field("movements", "Movement titles (one per line)", "", "textarea")
+      ],
+      "Create work",
+      "External catalogue IDs are optional. These changes are saved in your classical catalogue; your audio files are read only."
+    )
+  ];
+  forms.push(
+    form(
+      "create-contributor",
+      "Create performer or ensemble",
+      "create-contributor",
+      {},
+      [
+        field("name", "Contributor name", "", "text", { required: true }),
+        field("kind", "Contributor type", "person", "select", {
+          options: [
+            option("person", "Person"),
+            option("ensemble", "Ensemble, orchestra or choir")
+          ]
+        })
+      ],
+      "Create contributor"
+    )
+  );
+  const notes = [];
+  if (selected) {
+    notes.push(`${entityType(selected)}: ${selected.label}`.slice(0, 8e3));
+    if (["work", "recording", "performance", "release"].includes(selected.kind)) {
+      const contributors = all.filter(
+        (e) => ["person", "ensemble"].includes(e.kind) && (!q || normalized(e.label).includes(q))
+      ).slice(0, 200);
+      if (contributors.length)
+        forms.push(
+          form(
+            "add-credit",
+            "Role-aware credit",
+            "add-credit",
+            { target: selected.id },
+            [
+              field(
+                "contributor",
+                "Contributor",
+                contributors[0].id,
+                "select",
+                { options: contributors.map((e) => option(e.id, e.label)) }
+              ),
+              field("role", "Role", "performer", "select", {
+                options: [
+                  "composer",
+                  "soloist",
+                  "performer",
+                  "conductor",
+                  "orchestra",
+                  "ensemble",
+                  "choir",
+                  "arranger"
+                ].map((s) => option(s, s))
+              }),
+              field("instrument", "Instrument or vocal range")
+            ],
+            "Add credit"
+          )
+        );
+      const credits = c.db.prepare("SELECT * FROM credit WHERE target_id=? ORDER BY position").all(selected.id);
+      if (credits.length)
+        forms.push(
+          form(
+            "remove-credit",
+            "Credits",
+            "remove-credit",
+            { target: selected.id },
+            [
+              field("credit", "Credit", credits[0].id, "select", {
+                options: credits.map(
+                  (r) => option(
+                    r.id,
+                    `${r.role}: ${label(r.contributor_id)}${r.instrument ? ` (${r.instrument})` : ""}`
+                  )
+                )
+              })
+            ],
+            "Remove credit"
+          )
+        );
+    }
+    const keys = selected.kind === "person" ? ["name", "description", "date"] : selected.kind === "work" ? [
+      "title",
+      "nickname",
+      "description",
+      "period",
+      "form",
+      "catalogue",
+      "instrumentation"
+    ] : selected.kind === "movement" ? ["title", "movementNumber", "tempo"] : ["title", "description", "date"];
+    for (const key of keys) {
+      const resolved = m.resolve(selected.id, key), definition = c.db.prepare("SELECT type FROM field_definition WHERE key=?").get(key);
+      const value = resolved.value;
+      const display = Array.isArray(value) ? value.join("\n") : value ?? "";
+      const providerText = resolved.providerValue === void 0 ? "No active provider value" : JSON.stringify(resolved.providerValue).slice(0, 8e3);
+      const help = `Source: ${resolved.provider || resolved.source}${resolved.pinned ? " \xB7 Pinned override" : ""}${resolved.state ? ` \xB7 ${resolved.state}` : ""}
+Provider value: ${providerText}`;
+      forms.push(
+        form(
+          `edit-${key}`,
+          `Edit ${key}`,
+          "edit-field",
+          { target: selected.id, field: key },
+          [
+            field(
+              "value",
+              key[0].toUpperCase() + key.slice(1),
+              String(display),
+              definition.type === "array" || key === "description" ? "textarea" : "text",
+              { help }
+            ),
+            field(
+              "blank",
+              "Intentionally blank (null)",
+              value === null,
+              "checkbox"
+            ),
+            field(
+              "pin",
+              "Pin this value",
+              resolved.pinned || resolved.providerValue !== void 0,
+              "checkbox"
+            )
+          ],
+          "Save value",
+          definition.type === "array" ? "Enter one value per line." : void 0
+        )
+      );
+      if (resolved.pinned)
+        forms.push(
+          form(
+            `unpin-${key}`,
+            `Provider value for ${key}`,
+            "use-provider",
+            { target: selected.id, field: key },
+            [],
+            resolved.providerValue === void 0 ? "Remove pin" : "Use provider value",
+            `Remove the pin and recompute this field. ${providerText}`
+          )
+        );
+    }
+    if (selected.kind === "work") {
+      const movements = movementRows(c, selected.id);
+      forms.push(
+        form(
+          "add-movement",
+          "Add movement",
+          "add-movement",
+          { work: selected.id },
+          [field("title", "Movement title", "", "text", { required: true })],
+          "Add movement"
+        )
+      );
+      if (movements.length)
+        forms.push(
+          form(
+            "reorder",
+            "Movement order",
+            "reorder-movements",
+            { work: selected.id },
+            [
+              field(
+                "order",
+                "Movements",
+                movements.map((r) => r.target_id),
+                "order",
+                {
+                  options: movements.map(
+                    (r) => option(r.target_id, label(r.target_id))
+                  )
+                }
+              )
+            ],
+            "Save movement order"
+          )
+        );
+      forms.push(
+        form(
+          "create-broadcast",
+          "Create broadcast recording",
+          "create-broadcast",
+          { work: selected.id },
+          [
+            field("title", "Recording title", "", "text", { required: true }),
+            field("date", "Broadcast date (year, month or full date)"),
+            field("description", "Recording notes", "", "textarea")
+          ],
+          "Create broadcast recording",
+          "This creates a performance and recording without requiring MusicBrainz. Attach owned audio from the recording entry."
+        )
+      );
+      const recordings = c.db.prepare(
+        `SELECT DISTINCT r.source_id AS id FROM relation r JOIN relation pw ON pw.source_id=r.target_id
+        WHERE r.kind='recording_performance' AND pw.kind='performance_work' AND pw.target_id=?`
+      ).all(selected.id);
+      if (recordings.length)
+        notes.push(
+          `Recordings (${recordings.length}): ${recordings.slice(0, 20).map((r) => label(r.id).slice(0, 200)).join("; ")}`
+        );
+    }
+    if (selected.kind === "recording") {
+      const pws = c.db.prepare(
+        `SELECT pw.* FROM relation rp JOIN relation pw ON pw.source_id=rp.target_id
+        WHERE rp.kind='recording_performance' AND rp.source_id=? AND pw.kind='performance_work'`
+      ).all(selected.id);
+      const tracks = c.db.prepare(
+        "SELECT t.*,c.state AS classification FROM track_link t LEFT JOIN classification c ON c.target_id=t.id WHERE t.state='active'"
+      ).all().map((row) => ({ ...row, evidence: JSON.parse(row.evidence) }));
+      const matchingTracks = tracks.filter(
+        (row) => normalized(
+          `${row.evidence.hints?.title || ""} ${row.evidence.path} ${row.evidence.albumId || ""}`
+        ).includes(q)
+      ).slice(0, 200);
+      const movements = pws.flatMap((pw) => movementRows(c, pw.target_id));
+      if (matchingTracks.length && pws.length)
+        forms.push(
+          form(
+            "attach",
+            "Attach owned track",
+            "attach-track",
+            { recording: selected.id },
+            [
+              field(
+                "performanceWork",
+                "Work performance",
+                pws[0].id,
+                "select",
+                {
+                  options: pws.map((pw) => option(pw.id, label(pw.target_id)))
+                }
+              ),
+              field("movement", "Movement (or whole work)", "", "select", {
+                options: [
+                  option("", "Whole work"),
+                  ...movements.map(
+                    (r) => option(r.target_id, label(r.target_id))
+                  )
+                ]
+              }),
+              field("track", "Owned track", matchingTracks[0].id, "select", {
+                options: matchingTracks.map(
+                  (t) => option(
+                    t.id,
+                    `${path2.basename(path2.dirname(t.evidence.path))} / ${path2.basename(t.evidence.path)} \xB7 ${t.classification || "unsure"}`
+                  )
+                )
+              }),
+              field(
+                "confirmClassical",
+                "Confirm this track is classical",
+                false,
+                "checkbox"
+              )
+            ],
+            "Attach track",
+            "Search to find a file by album or filename. Attach each movement separately; the audio file is never changed. Non-classical or unsure tracks require explicit confirmation."
+          )
+        );
+      else
+        notes.push(
+          "No matching owned tracks. Scan your library from an album menu, or clear the search."
+        );
+      const attached = c.db.prepare(
+        `SELECT i.*,s.track_link_id FROM realization_item i JOIN realization r ON r.id=i.realization_id
+        JOIN segment s ON s.id=i.segment_id JOIN relation pw ON pw.id=r.performance_work_id
+        JOIN relation rp ON rp.target_id=pw.source_id AND rp.kind='recording_performance' WHERE rp.source_id=? ORDER BY i.sequence`
+      ).all(selected.id);
+      if (attached.length)
+        forms.push(
+          form(
+            "detach",
+            "Attached tracks",
+            "detach-track",
+            { recording: selected.id },
+            [
+              field("item", "Attachment", attached[0].id, "select", {
+                options: attached.map(
+                  (i) => option(
+                    i.id,
+                    `${i.movement_id ? label(i.movement_id) : "Whole work"} \xB7 ${path2.basename(JSON.parse(c.db.prepare("SELECT evidence FROM track_link WHERE id=?").get(i.track_link_id).evidence).path)}`
+                  )
+                )
+              })
+            ],
+            "Detach track",
+            "Removes the catalogue attachment and retains the audio and evidence history."
+          )
+        );
+    }
+  }
+  if (c.db.prepare(
+    "SELECT 1 FROM review_item WHERE status='open' AND kind='provider_conflict' LIMIT 1"
+  ).get())
+    notes.push(
+      "Conflicting provider values are retained for review. Refresh never replaces a pinned value."
+    );
+  return {
+    version: 1,
+    title: "Classical metadata editor",
+    description: "Works, movements and recordings in your library. Admin edits stay in the classical catalogue; audio files are not modified.",
+    revision: revision(c),
+    navigation: {
+      items: filtered.slice(offset, offset + 100).map((e) => ({
+        id: e.id,
+        label: `${entityType(e)} \xB7 ${e.label}`.slice(0, 500)
+      })),
+      total: filtered.length,
+      offset
+    },
+    notes,
+    forms: selected ? forms.filter(
+      (f) => !["create-composer", "create-contributor"].includes(f.command) && (f.command !== "create-work" || selected.kind === "person")
+    ).sort((a, b) => {
+      const order = (command) => ["edit-field", "use-provider"].includes(command) ? 0 : ["add-movement", "reorder-movements"].includes(command) ? 1 : command === "create-work" ? 5 : 2;
+      return order(a.command) - order(b.command);
+    }) : forms
+  };
+}
+function apply(c, input, who) {
+  const request = input.mutation;
+  if (!request || typeof request !== "object" || typeof request.command !== "string" || !request.values || Array.isArray(request.values))
+    fail("Invalid editor request");
+  if (request.revision !== revision(c))
+    throw new EditorError(
+      "This catalogue changed. Reload before saving so newer edits are preserved.",
+      409
+    );
+  const v = request.values, m = new Metadata(c), manual = (target, key, value, pin = false) => m.manual(target, key, value, { actor: who, pin });
+  const allowed = {
+    "create-composer": ["name"],
+    "create-contributor": ["name", "kind"],
+    "create-work": ["title", "composer", "movements"],
+    "edit-field": ["target", "field", "value", "blank", "pin"],
+    "use-provider": ["target", "field"],
+    "add-movement": ["work", "title"],
+    "reorder-movements": ["work", "order"],
+    "create-broadcast": ["work", "title", "date", "description"],
+    "attach-track": [
+      "recording",
+      "performanceWork",
+      "movement",
+      "track",
+      "confirmClassical"
+    ],
+    "detach-track": ["recording", "item"],
+    "add-credit": ["target", "contributor", "role", "instrument"],
+    "remove-credit": ["target", "credit"]
+  }[request.command];
+  if (!allowed || Object.keys(v).some((key) => !allowed.includes(key)))
+    fail("Unknown editor command or fields");
+  let selection;
+  switch (request.command) {
+    case "create-contributor": {
+      const name = text(v.name, "contributor name", { max: 500 }).trim();
+      if (!["person", "ensemble"].includes(v.kind))
+        fail("Select a valid contributor type");
+      selection = c.createEntity(v.kind, {
+        roles: v.kind === "person" ? ["performer"] : []
+      });
+      manual(selection, "name", name);
+      break;
+    }
+    case "add-credit": {
+      selection = text(v.target, "entry", { max: 200 });
+      c.entity(selection, ["work", "recording", "performance", "release"]);
+      const contributor = text(v.contributor, "contributor", { max: 200 }), role = text(v.role, "role", { max: 80 }), instrument = text(v.instrument, "instrument", {
+        optional: true,
+        max: 200
+      }).trim() || null;
+      if (c.db.prepare(
+        "SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?"
+      ).get(selection, contributor, role, instrument))
+        fail("That role credit already exists");
+      const position = c.db.prepare(
+        "SELECT coalesce(max(position),0)+1 AS n FROM credit WHERE target_id=?"
+      ).get(selection).n;
+      c.credit(selection, contributor, role, { instrument, position });
+      break;
+    }
+    case "remove-credit": {
+      selection = text(v.target, "entry", { max: 200 });
+      c.entity(selection);
+      const credit = text(v.credit, "credit", { max: 200 });
+      if (!c.db.prepare("SELECT 1 FROM credit WHERE id=? AND target_id=?").get(credit, selection))
+        fail("Credit does not belong to this entry");
+      c.db.prepare("DELETE FROM credit WHERE id=?").run(credit);
+      break;
+    }
+    case "create-composer": {
+      const name = text(v.name, "composer name", { max: 500 }).trim();
+      selection = c.createEntity("person", { roles: ["composer"] });
+      manual(selection, "name", name);
+      break;
+    }
+    case "create-work": {
+      const title = text(v.title, "work title", { max: 2e3 }).trim();
+      const composer = text(v.composer, "composer", {
+        optional: true,
+        max: 200
+      });
+      if (composer) c.entity(composer, "person");
+      const movements = text(v.movements, "movement titles", { optional: true }).split("\n").map((s) => s.trim()).filter(Boolean);
+      if (movements.length > 100)
+        fail("Create no more than 100 movements at a time");
+      selection = c.createEntity("work");
+      manual(selection, "title", title);
+      if (composer) c.credit(selection, composer, "composer");
+      movements.forEach((title2, i) => {
+        const id = c.createEntity("movement");
+        manual(id, "title", title2);
+        c.relate("movement", selection, id, { position: i + 1 });
+      });
+      break;
+    }
+    case "edit-field": {
+      const target = text(v.target, "entry", { max: 200 }), key = text(v.field, "field", { max: 80 });
+      c.entity(target);
+      const definition = c.db.prepare("SELECT type FROM field_definition WHERE key=?").get(key);
+      if (!definition || !["string", "array"].includes(definition.type))
+        fail("This field is not editable");
+      const raw = text(v.value, "value", { optional: true });
+      if (typeof v.blank !== "boolean" || typeof v.pin !== "boolean")
+        fail("Invalid override options");
+      const value = v.blank ? null : definition.type === "array" ? raw.split("\n").map((s) => s.trim()).filter(Boolean) : raw;
+      if (key === "date" && value && !validDate(value))
+        fail("Use a valid year, year-month or full ISO date");
+      manual(target, key, value, v.pin);
+      selection = target;
+      break;
+    }
+    case "use-provider": {
+      selection = text(v.target, "entry", { max: 200 });
+      c.entity(selection);
+      const field2 = text(v.field, "field", { max: 80 });
+      if (!c.db.prepare("SELECT 1 FROM field_definition WHERE key=?").get(field2))
+        fail("Unknown metadata field");
+      m.useProvider(selection, field2, {
+        actor: who
+      });
+      break;
+    }
+    case "add-movement": {
+      selection = text(v.work, "work", { max: 200 });
+      c.entity(selection, "work");
+      const title = text(v.title, "movement title", { max: 2e3 }).trim(), rows = movementRows(c, selection);
+      const id = c.createEntity("movement");
+      manual(id, "title", title);
+      c.relate("movement", selection, id, {
+        position: (rows.at(-1)?.position || 0) + 1
+      });
+      break;
+    }
+    case "reorder-movements": {
+      selection = text(v.work, "work", { max: 200 });
+      c.entity(selection, "work");
+      const rows = movementRows(c, selection), ids = rows.map((r) => r.target_id);
+      if (!Array.isArray(v.order) || v.order.length !== ids.length || new Set(v.order).size !== ids.length || v.order.some((id) => !ids.includes(id)))
+        fail("Movement order must contain each movement exactly once");
+      const offset = Math.max(0, ...rows.map((r) => r.position)) + rows.length + 1;
+      c.db.prepare(
+        "UPDATE relation SET position=position+? WHERE kind='movement' AND source_id=?"
+      ).run(offset, selection);
+      v.order.forEach(
+        (id, index) => c.db.prepare(
+          "UPDATE relation SET position=? WHERE kind='movement' AND source_id=? AND target_id=?"
+        ).run(index + 1, selection, id)
+      );
+      break;
+    }
+    case "create-broadcast": {
+      const work = text(v.work, "work", { max: 200 });
+      c.entity(work, "work");
+      const title = text(v.title, "recording title", { max: 2e3 }).trim(), date = text(v.date, "broadcast date", {
+        optional: true,
+        max: 10
+      }).trim();
+      if (date && !validDate(date))
+        fail("Use a valid year, year-month or full ISO date");
+      const p = c.createEntity("performance", {
+        type: "broadcast",
+        ...date && {
+          date,
+          datePrecision: date.length === 4 ? "year" : date.length === 7 ? "month" : "day"
+        }
+      });
+      c.relate("performance_work", p, work);
+      selection = c.createEntity("recording", { type: "broadcast" });
+      c.relate("recording_performance", selection, p);
+      manual(selection, "title", title);
+      if (date) manual(selection, "date", date);
+      const description = text(v.description, "recording notes", {
+        optional: true
+      });
+      if (description) manual(selection, "description", description);
+      break;
+    }
+    case "attach-track": {
+      selection = text(v.recording, "recording", { max: 200 });
+      c.entity(selection, "recording");
+      const pw = c.performanceWork(
+        text(v.performanceWork, "work performance", { max: 200 })
+      );
+      if (!c.db.prepare(
+        "SELECT 1 FROM relation WHERE kind='recording_performance' AND source_id=? AND target_id=?"
+      ).get(selection, pw.source_id))
+        fail("This recording does not capture that performance");
+      const movement = text(v.movement, "movement", { optional: true, max: 200 }) || null;
+      c.checkMovement(pw.target_id, movement);
+      const track = text(v.track, "owned track", { max: 200 }), link2 = c.db.prepare("SELECT * FROM track_link WHERE id=? AND state='active'").get(track);
+      if (!link2) fail("This owned track is missing or requires review");
+      const state = c.db.prepare("SELECT state FROM classification WHERE target_id=?").get(track)?.state;
+      if (state !== "classical" && v.confirmClassical !== true)
+        fail("Confirm that this track is classical before attaching it");
+      if (v.confirmClassical === true)
+        classify(c, track, {}, { manual: "classical", actor: who });
+      const ordinal = c.db.prepare(
+        "SELECT coalesce(max(position),0)+1 AS n FROM recording_content WHERE recording_id=?"
+      ).get(selection).n;
+      const content = c.recordingContent(selection, pw.id, {
+        movement,
+        position: ordinal
+      });
+      const segment = c.segment(track, { kind: "whole" });
+      c.segmentContent(segment, content);
+      let realization = c.db.prepare("SELECT id FROM realization WHERE performance_work_id=?").get(pw.id)?.id;
+      if (!realization) realization = c.realization(pw.target_id, pw.id);
+      const sequence = c.db.prepare(
+        "SELECT coalesce(max(sequence),0)+1 AS n FROM realization_item WHERE realization_id=?"
+      ).get(realization).n;
+      c.realizationItem(realization, segment, { movement, sequence });
+      break;
+    }
+    case "detach-track": {
+      selection = text(v.recording, "recording", { max: 200 });
+      c.entity(selection, "recording");
+      const item = text(v.item, "attachment", { max: 200 });
+      const owned = c.db.prepare(
+        `SELECT 1 FROM realization_item i JOIN realization r ON r.id=i.realization_id JOIN relation pw ON pw.id=r.performance_work_id
+        JOIN relation rp ON rp.target_id=pw.source_id AND rp.kind='recording_performance' WHERE rp.source_id=? AND i.id=?`
+      ).get(selection, item);
+      if (!owned) fail("Attachment does not belong to this recording");
+      c.db.prepare("DELETE FROM realization_item WHERE id=?").run(item);
+      break;
+    }
+    default:
+      fail("Unknown editor command");
+  }
+  c.audit(`editor.${request.command}`, selection || "", { values: v }, who);
+  return {
+    ok: true,
+    message: "Saved to the classical catalogue. Audio files are unchanged.",
+    selection
+  };
+}
+async function readEditor(input) {
+  actor(input);
+  const c = await openCatalogue(path2.join(input.dataFolder, "model"));
+  try {
+    return transaction(c.db, () => render(c, input));
+  } finally {
+    c.close();
+  }
+}
+async function mutateEditor(input) {
+  const who = actor(input), c = await openCatalogue(path2.join(input.dataFolder, "model"));
+  try {
+    try {
+      return transaction(c.db, () => apply(c, input, who));
+    } catch (error) {
+      if (error instanceof EditorError)
+        return { ok: false, status: error.status, message: error.message };
+      if (error instanceof Error && !error.code)
+        return { ok: false, status: 400, message: error.message.slice(0, 200) };
+      throw error;
+    }
+  } finally {
+    c.close();
+  }
+}
+
+// src/model/runtime.js
+import { createHash, randomUUID as randomUUID7 } from "node:crypto";
+import { createReadStream } from "node:fs";
+import fs3 from "node:fs/promises";
+import path4 from "node:path";
+
+// src/model/jobs.js
+import { randomUUID as randomUUID5 } from "node:crypto";
+var ModelJobs = class {
+  constructor(catalogue) {
+    this.db = catalogue.db;
+  }
+  enqueue(type, key, input, { maxAttempts = 3 } = {}) {
+    if (!type || !key || !Number.isSafeInteger(maxAttempts) || maxAttempts < 1)
+      throw new Error("Invalid job");
+    return transaction(this.db, () => {
+      const existing = this.db.prepare(
+        "SELECT id FROM model_job WHERE key=? AND state IN ('queued','running','retry')"
+      ).get(key);
+      if (existing) return existing.id;
+      const id = randomUUID5();
+      this.db.prepare(
+        `INSERT INTO model_job(id,type,key,input,state,max_attempts,created_at)
+        VALUES (?,?,?,?,'queued',?,?)`
+      ).run(id, type, key, JSON.stringify(input), maxAttempts, Date.now());
+      return id;
+    });
+  }
+  claim(owner, { now = Date.now(), leaseMs = 3e4 } = {}) {
+    if (!owner || !Number.isFinite(leaseMs) || leaseMs <= 0)
+      throw new Error("Invalid job lease");
+    return transaction(this.db, () => {
+      this.db.prepare(
+        "UPDATE model_job SET state='cancelled' WHERE cancel_requested=1 AND (state!='running' OR lease_until<=?)"
+      ).run(now);
+      this.db.prepare(
+        "UPDATE model_job SET state='failed',error='ATTEMPTS_EXHAUSTED' WHERE attempt>=max_attempts AND state='running' AND lease_until<=?"
+      ).run(now);
+      const row = this.db.prepare(
+        `SELECT * FROM model_job WHERE cancel_requested=0 AND attempt<max_attempts AND
+        ((state IN ('queued','retry') AND next_run_at<=?) OR (state='running' AND lease_until<=?)) ORDER BY created_at LIMIT 1`
+      ).get(now, now);
+      if (!row) return null;
+      this.db.prepare(
+        "UPDATE model_job SET state='running',owner=?,lease_until=?,generation=generation+1,attempt=attempt+1 WHERE id=?"
+      ).run(owner, now + leaseMs, row.id);
+      return this.get(row.id);
+    });
+  }
+  get(id) {
+    const row = this.db.prepare("SELECT * FROM model_job WHERE id=?").get(id);
+    return row && {
+      ...row,
+      input: JSON.parse(row.input),
+      progress: JSON.parse(row.progress)
+    };
+  }
+  checkpoint(job, progress, { done = false, now = Date.now(), leaseMs = 3e4, commit } = {}) {
+    return transaction(this.db, () => {
+      const row = this.get(job.id);
+      if (!row || row.state !== "running" || row.owner !== job.owner || row.generation !== job.generation || row.lease_until <= now)
+        throw new Error("Stale job lease");
+      if (row.cancel_requested) {
+        this.db.prepare("UPDATE model_job SET state='cancelled' WHERE id=?").run(job.id);
+        return false;
+      }
+      if (commit) commit();
+      this.db.prepare(
+        "UPDATE model_job SET progress=?,state=?,lease_until=? WHERE id=?"
+      ).run(
+        JSON.stringify(progress),
+        done ? "done" : "running",
+        now + leaseMs,
+        job.id
+      );
+      return true;
+    });
+  }
+  yield(job) {
+    this.db.prepare(
+      `UPDATE model_job SET state='queued',owner=NULL,lease_until=0,attempt=attempt-1
+      WHERE id=? AND owner=? AND generation=? AND state='running'`
+    ).run(job.id, job.owner, job.generation);
+  }
+  fail(job, error, { now = Date.now() } = {}) {
+    this.db.prepare(
+      `UPDATE model_job SET state=CASE WHEN attempt>=max_attempts THEN 'failed' ELSE 'retry' END,
+      error=?,next_run_at=?,lease_until=0 WHERE id=? AND owner=? AND generation=? AND state='running' AND lease_until>?`
+    ).run(
+      String(error).slice(0, 500),
+      now + 1e3 * 2 ** job.attempt,
+      job.id,
+      job.owner,
+      job.generation,
+      now
+    );
+  }
+  cancel(id) {
+    this.db.prepare(
+      "UPDATE model_job SET cancel_requested=1 WHERE id=? AND state IN ('queued','running','retry')"
+    ).run(id);
+  }
+};
 
 // src/user-operations.js
 var UserOperations = class {
@@ -36081,10 +36994,10 @@ var UserOperations = class {
 
 // src/tags.js
 var import_node_taglib_sharp = __toESM(require_dist(), 1);
-import { randomUUID as randomUUID5 } from "node:crypto";
+import { randomUUID as randomUUID6 } from "node:crypto";
 import { closeSync, fstatSync, openSync, readSync } from "node:fs";
 import fs2 from "node:fs/promises";
-import path2 from "node:path";
+import path3 from "node:path";
 import_node_taglib_sharp.Id3v2Settings.useNumericGenres = false;
 var READ_STYLE = import_node_taglib_sharp.ReadStyle.None | import_node_taglib_sharp.ReadStyle.PictureLazy;
 var READ_WITH_PROPERTIES = import_node_taglib_sharp.ReadStyle.Average | import_node_taglib_sharp.ReadStyle.PictureLazy;
@@ -36092,9 +37005,9 @@ var ADDED_TAG_TYPES = import_node_taglib_sharp.TagTypes.Id3v1 | import_node_tagl
 var ITUNES_MEAN = "com.apple.iTunes";
 var MUSICBRAINZ_UFID_OWNER = "http://musicbrainz.org";
 var AUDIO_EXTENSIONS = /* @__PURE__ */ new Set([".flac", ".mp3", ".m4a", ".mp4", ".ogg", ".oga", ".opus"]);
-var isAudioPath = (file) => AUDIO_EXTENSIONS.has(path2.extname(file).toLowerCase());
-var text = (value) => value == null ? "" : String(value).trim();
-var texts = (value) => (Array.isArray(value) ? value : [value]).map(text).filter(Boolean);
+var isAudioPath = (file) => AUDIO_EXTENSIONS.has(path3.extname(file).toLowerCase());
+var text2 = (value) => value == null ? "" : String(value).trim();
+var texts = (value) => (Array.isArray(value) ? value : [value]).map(text2).filter(Boolean);
 var positive2 = (value) => {
   const number = Number(value);
   return Number.isSafeInteger(number) && number > 0 ? number : 0;
@@ -36200,10 +37113,10 @@ function isFragmentedMp4(filePath) {
 var UnsupportedFormat = class extends Error {
 };
 function openFile(filePath, readStyle = READ_STYLE, asPath = filePath) {
-  if (!isAudioPath(asPath)) throw new UnsupportedFormat(`can't tag ${path2.extname(asPath) || "this kind of"} files`);
+  if (!isAudioPath(asPath)) throw new UnsupportedFormat(`can't tag ${path3.extname(asPath) || "this kind of"} files`);
   if (isFragmentedMp4(filePath)) throw new UnsupportedFormat("can't tag fragmented MP4 files");
   try {
-    return import_node_taglib_sharp.File.createFromPath(filePath, `taglib/${path2.extname(asPath).slice(1).toLowerCase()}`, readStyle);
+    return import_node_taglib_sharp.File.createFromPath(filePath, `taglib/${path3.extname(asPath).slice(1).toLowerCase()}`, readStyle);
   } catch (error) {
     if (/unsupported format/i.test(String(error?.message))) throw new UnsupportedFormat("can't tag this kind of file");
     throw error;
@@ -36212,7 +37125,7 @@ function openFile(filePath, readStyle = READ_STYLE, asPath = filePath) {
 function readValues(filePath, fields) {
   const file = openFile(filePath);
   try {
-    return Object.fromEntries(fields.map((field) => [field, WRITERS[field].read(file)]));
+    return Object.fromEntries(fields.map((field2) => [field2, WRITERS[field2].read(file)]));
   } finally {
     file.dispose();
   }
@@ -36222,15 +37135,15 @@ function readTags(filePath) {
   try {
     const tag = file.tag;
     return {
-      title: text(tag.title),
-      artist: text(tag.performers?.[0]),
-      albumArtist: text(tag.albumArtists?.[0]),
-      album: text(tag.album),
-      recordingMbid: text(tag.musicBrainzTrackId),
-      releaseMbid: text(tag.musicBrainzReleaseId),
-      releaseGroupMbid: text(tag.musicBrainzReleaseGroupId),
+      title: text2(tag.title),
+      artist: text2(tag.performers?.[0]),
+      albumArtist: text2(tag.albumArtists?.[0]),
+      album: text2(tag.album),
+      recordingMbid: text2(tag.musicBrainzTrackId),
+      releaseMbid: text2(tag.musicBrainzReleaseId),
+      releaseGroupMbid: text2(tag.musicBrainzReleaseGroupId),
       // Every album artist ID: taglib's own property has only the first.
-      albumArtistMbids: [...new Set([...albumArtistIdsField.read(file), text(tag.musicBrainzReleaseArtistId)].flatMap((v) => texts(v.split(/[;/]/))))],
+      albumArtistMbids: [...new Set([...albumArtistIdsField.read(file), text2(tag.musicBrainzReleaseArtistId)].flatMap((v) => texts(v.split(/[;/]/))))],
       artistMbids: artistIdsField.read(file).flatMap((value) => texts(value.split(/[;/]/))),
       genres: texts(tag.genres ?? []).flatMap((genre) => texts(genre.split(";"))),
       composer: texts(tag.composers ?? []),
@@ -36246,17 +37159,17 @@ function readTags(filePath) {
 }
 var same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 async function writeTags(filePath, values) {
-  const source = path2.resolve(filePath);
+  const source = path3.resolve(filePath);
   const preview = openFile(source);
   let changed;
   try {
-    changed = Object.keys(values).filter((field) => !same(WRITERS[field].read(preview), texts(values[field])));
+    changed = Object.keys(values).filter((field2) => !same(WRITERS[field2].read(preview), texts(values[field2])));
   } finally {
     preview.dispose();
   }
   if (!changed.length) return [];
-  const extension = path2.extname(source);
-  const working = path2.join(path2.dirname(source), `.${path2.basename(source, extension)}.${randomUUID5()}.tagging`);
+  const extension = path3.extname(source);
+  const working = path3.join(path3.dirname(source), `.${path3.basename(source, extension)}.${randomUUID6()}.tagging`);
   await fs2.copyFile(source, working, fs2.constants.COPYFILE_FICLONE);
   try {
     const file = openFile(working, READ_STYLE, source);
@@ -36264,16 +37177,16 @@ async function writeTags(filePath, values) {
       file.removeTags(ADDED_TAG_TYPES & ~file.tagTypesOnDisk);
       const id3 = id3Of(file);
       if (id3 && !(file.tagTypesOnDisk & import_node_taglib_sharp.TagTypes.Id3v2)) id3.version = 4;
-      for (const field of changed) WRITERS[field].write(file, texts(values[field]));
+      for (const field2 of changed) WRITERS[field2].write(file, texts(values[field2]));
       file.save();
     } finally {
       file.dispose();
     }
     const verified = openFile(working, READ_STYLE, source);
     try {
-      for (const field of changed) {
-        if (!same(WRITERS[field].read(verified), texts(values[field])))
-          throw new Error(`Tag verification failed for ${field}`);
+      for (const field2 of changed) {
+        if (!same(WRITERS[field2].read(verified), texts(values[field2])))
+          throw new Error(`Tag verification failed for ${field2}`);
       }
     } finally {
       verified.dispose();
@@ -36288,7 +37201,7 @@ async function writeTags(filePath, values) {
 }
 
 // src/model/runtime.js
-var modelFolder = (ctx) => path3.join(ctx.dataFolder, "model");
+var modelFolder = (ctx) => path4.join(ctx.dataFolder, "model");
 var fingerprint = async (file) => {
   const hash = createHash("sha256");
   for await (const bytes of createReadStream(file)) hash.update(bytes);
@@ -36305,8 +37218,8 @@ async function modelStatus(ctx) {
     catalogue.close();
   }
 }
-async function enqueueModelScan(ctx, actor) {
-  if (actor?.role !== "admin")
+async function enqueueModelScan(ctx, actor2) {
+  if (actor2?.role !== "admin")
     throw new Error("Classical model scans require a current host admin");
   const library = await new UserOperations(
     ctx.userOperations,
@@ -36316,7 +37229,7 @@ async function enqueueModelScan(ctx, actor) {
   try {
     let instance = catalogue.db.prepare("SELECT * FROM core_instance LIMIT 1").get();
     if (!instance) {
-      const id = randomUUID6();
+      const id = randomUUID7();
       catalogue.db.prepare("INSERT INTO core_instance VALUES (?,?,0)").run(id, ctx.settings.libraryEpoch || "initial");
       instance = { id, generation: 0 };
     }
@@ -36332,7 +37245,7 @@ async function enqueueModelScan(ctx, actor) {
     );
     const jobs = new ModelJobs(catalogue);
     return jobs.enqueue("library_scan", "library_scan", {
-      actor: String(actor.id),
+      actor: String(actor2.id),
       instanceId: instance.id,
       epoch: ctx.settings.libraryEpoch || "initial",
       generation: instance.generation + 1,
@@ -36344,7 +37257,7 @@ async function enqueueModelScan(ctx, actor) {
 }
 async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 10 } = {}) {
   const catalogue = await openCatalogue(modelFolder(ctx));
-  const jobs = new ModelJobs(catalogue), owner = randomUUID6(), deadline = Date.now() + budgetMs;
+  const jobs = new ModelJobs(catalogue), owner = randomUUID7(), deadline = Date.now() + budgetMs;
   try {
     const job = jobs.claim(owner, { leaseMs: 6e4 });
     if (!job) return;
@@ -36361,8 +37274,8 @@ async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 10 } = {}) {
           if (jobs.get(job.id).cancel_requested) break;
           const file = input.files[cursor];
           const real = await fs3.realpath(file.readPath);
-          const relative = path3.relative(root, real);
-          if (!relative || relative === ".." || relative.startsWith(`..${path3.sep}`) || path3.isAbsolute(relative))
+          const relative = path4.relative(root, real);
+          if (!relative || relative === ".." || relative.startsWith(`..${path4.sep}`) || path4.isAbsolute(relative))
             throw new Error(
               "Indexed model file is outside the configured library"
             );
@@ -36462,8 +37375,8 @@ async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 10 } = {}) {
     catalogue.close();
   }
 }
-async function cancelModelScan(ctx, actor) {
-  if (actor?.role !== "admin")
+async function cancelModelScan(ctx, actor2) {
+  if (actor2?.role !== "admin")
     throw new Error("Cancelling model scans requires a current host admin");
   const catalogue = await openCatalogue(modelFolder(ctx));
   try {
@@ -36478,9 +37391,9 @@ async function cancelModelScan(ctx, actor) {
 }
 
 // src/store.js
-import { createHash as createHash2, randomUUID as randomUUID7 } from "node:crypto";
+import { createHash as createHash2, randomUUID as randomUUID8 } from "node:crypto";
 import fs4 from "node:fs/promises";
-import path4 from "node:path";
+import path5 from "node:path";
 var sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 async function readJson(file, fallback) {
   try {
@@ -36490,8 +37403,8 @@ async function readJson(file, fallback) {
   }
 }
 async function writeJson(file, value) {
-  await fs4.mkdir(path4.dirname(file), { recursive: true });
-  const temp = `${file}.${process.pid}.${randomUUID7()}.tmp`;
+  await fs4.mkdir(path5.dirname(file), { recursive: true });
+  const temp = `${file}.${process.pid}.${randomUUID8()}.tmp`;
   await fs4.writeFile(temp, JSON.stringify(value));
   await fs4.rename(temp, file);
 }
@@ -36535,14 +37448,14 @@ async function withLock(dir, staleMs, run, { waitMs = 3e4 } = {}) {
         await lock.release();
       }
     }
-    if (Date.now() > until) throw new Error(`Timed out waiting for ${path4.basename(dir)}`);
+    if (Date.now() > until) throw new Error(`Timed out waiting for ${path5.basename(dir)}`);
     await sleep(50 + Math.random() * 100);
   }
 }
 var Throttle = class {
   constructor(folder, intervalMs) {
-    this.lockDir = path4.join(folder, "mb-throttle.lock");
-    this.stateFile = path4.join(folder, "mb-throttle.json");
+    this.lockDir = path5.join(folder, "mb-throttle.lock");
+    this.stateFile = path5.join(folder, "mb-throttle.json");
     this.intervalMs = intervalMs;
   }
   async run(dispatch) {
@@ -36566,7 +37479,7 @@ var FileCache = class {
   }
   file(key) {
     const hash = createHash2("sha1").update(key).digest("hex");
-    return path4.join(this.folder, hash.slice(0, 2), `${hash}.json`);
+    return path5.join(this.folder, hash.slice(0, 2), `${hash}.json`);
   }
   async get(key, ttlMs) {
     const entry = await readJson(this.file(key), null);
@@ -36579,16 +37492,16 @@ var FileCache = class {
   }
 };
 async function pruneCache(folder, maxAgeMs) {
-  const stamp = path4.join(folder, ".pruned");
+  const stamp = path5.join(folder, ".pruned");
   const last = (await fs4.stat(stamp).catch(() => null))?.mtimeMs ?? 0;
   if (Date.now() - last < 24 * 60 * 6e4) return 0;
   await fs4.mkdir(folder, { recursive: true });
   await fs4.writeFile(stamp, "");
   let removed = 0;
   for (const dir of await fs4.readdir(folder).catch(() => [])) {
-    const sub = path4.join(folder, dir);
+    const sub = path5.join(folder, dir);
     for (const name of await fs4.readdir(sub).catch(() => [])) {
-      const file = path4.join(sub, name);
+      const file = path5.join(sub, name);
       const stat = await fs4.stat(file).catch(() => null);
       if (stat && Date.now() - stat.mtimeMs > maxAgeMs) {
         await fs4.rm(file, { force: true });
@@ -36600,7 +37513,7 @@ async function pruneCache(folder, maxAgeMs) {
 }
 
 // src/compare.js
-import path5 from "node:path";
+import path6 from "node:path";
 var playlistName = (composer, work) => `Recordings: ${composer}: ${work}`.slice(0, 200);
 async function evidence(ctx, track) {
   let tags = null;
@@ -36666,7 +37579,7 @@ async function compareRecordings(ctx, user, selected) {
     diagnostics.push({ workId: id, playlistId, recordings: items });
     lines.push(`Completed "${playlistName(info.composer, info.work)}": ${items.length} owned recordings`);
   }
-  await writeJson(path5.join(ctx.dataFolder, `comparison-${user.id}.json`), { version: 1, ambiguous, comparisons: diagnostics });
+  await writeJson(path6.join(ctx.dataFolder, `comparison-${user.id}.json`), { version: 1, ambiguous, comparisons: diagnostics });
   if (ambiguous) lines.push(`${ambiguous} files have ambiguous work IDs and need review`);
   return summarize(lines);
 }
@@ -36684,7 +37597,7 @@ function summarize(lines) {
 }
 
 // src/mb.js
-import path6 from "node:path";
+import path7 from "node:path";
 
 // src/version.js
 var VERSION = true ? "1.0.4" : "dev";
@@ -36707,7 +37620,7 @@ var MusicBrainz = class {
     this.userAgent = `AurralClassical/${VERSION} ( ${REPOSITORY} )`;
     this.fetch = fetchImpl;
     this.log = log2;
-    this.cache = new FileCache(path6.join(dataFolder, "mb-cache"));
+    this.cache = new FileCache(path7.join(dataFolder, "mb-cache"));
     const isPublic = this.base === PUBLIC_MB;
     this.throttle = new Throttle(dataFolder, intervalMs ?? (isPublic ? 1e3 : 0));
     this.maxRetries = maxRetries;
@@ -36992,11 +37905,11 @@ function isSoloistRelation(rel) {
 }
 var unique = (values) => [...new Set(values.filter(Boolean))];
 function isPlaceholder(name) {
-  const text2 = String(name || "").trim();
-  return text2.startsWith("[") && text2.endsWith("]");
+  const text3 = String(name || "").trim();
+  return text3.startsWith("[") && text3.endsWith("]");
 }
-function isLatin(text2) {
-  for (const ch of String(text2 || "")) {
+function isLatin(text3) {
+  for (const ch of String(text3 || "")) {
     if (new RegExp("\\p{L}", "u").test(ch) && !new RegExp("\\p{Script=Latin}", "u").test(ch)) return false;
   }
   return true;
@@ -37010,7 +37923,7 @@ function genreNames(entity) {
   names.delete("");
   return names;
 }
-var escapeRegex = (text2) => text2.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+var escapeRegex = (text3) => text3.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 function addPerson(people, person) {
   if (person && people.every((p) => p.id !== person.id)) people.push(person);
 }
@@ -37494,7 +38407,7 @@ function slskdSettings(settings) {
 }
 
 // src/slskd.js
-import { randomUUID as randomUUID8 } from "node:crypto";
+import { randomUUID as randomUUID9 } from "node:crypto";
 var Slskd = class {
   constructor({ url, apiKey }, fetchImpl = fetch) {
     if (!url || !apiKey) throw new Error("Set the slskd URL and API key on the plugin's page");
@@ -37539,7 +38452,7 @@ var Slskd = class {
   }
   // Starts a search and returns its id.
   async startSearch(searchText, searchTimeoutMs) {
-    const id = randomUUID8();
+    const id = randomUUID9();
     const body = { id, searchText, searchTimeout: searchTimeoutMs, filterResponses: true, minimumResponseFileCount: 1, responseLimit: 200, fileLimit: 2e4 };
     await this.request("POST", "/searches", body, { timeoutMs: searchTimeoutMs + 15e3 });
     return id;
@@ -37581,9 +38494,9 @@ var FAILED_STATES = /Errored|Rejected|Cancelled|TimedOut|Aborted|Failed/i;
 var isSucceeded = (state) => /Completed/i.test(state) && /Succeeded/i.test(state);
 
 // src/source.js
-import { randomUUID as randomUUID9 } from "node:crypto";
+import { randomUUID as randomUUID10 } from "node:crypto";
 import fs5 from "node:fs/promises";
-import path7 from "node:path";
+import path8 from "node:path";
 
 // src/works.js
 var CATALOGUES = [
@@ -37603,24 +38516,24 @@ var CATALOGUES = [
 ];
 var OPUS = /\bop(?:us|\.)?\s*(\d+[a-z]?)(?:\s*,?\s*(?:no\.?|nr\.?|n°)\s*(\d+))?/i;
 function catalogueNumber(title) {
-  const text2 = String(title || "");
+  const text3 = String(title || "");
   for (const [pattern, prefix] of CATALOGUES) {
-    const match2 = text2.match(pattern);
+    const match2 = text3.match(pattern);
     if (match2) return `${prefix} ${match2[1].replace(/\s+/g, "")}`;
   }
-  const opus = text2.match(OPUS);
+  const opus = text3.match(OPUS);
   if (opus) return `op ${opus[1]}${opus[2] ? ` no ${opus[2]}` : ""}`;
   return "";
 }
 function shortWorkTitle(title) {
-  let text2 = String(title || "").split(":")[0];
-  text2 = text2.replace(OPUS, " ");
-  for (const [pattern] of CATALOGUES) text2 = text2.replace(pattern, " ");
-  text2 = text2.replace(/\bin\s+[A-G](?:[- ]?(?:flat|sharp|♭|♯|b|#))?\s*(?:major|minor|maj|min|dur|moll)\b/gi, " ").replace(/\b(?:no|nr|n°)\.?\s*(?=\d)/gi, " ").replace(/[“”"'’,;()[\]]/g, " ");
-  return searchWords(text2);
+  let text3 = String(title || "").split(":")[0];
+  text3 = text3.replace(OPUS, " ");
+  for (const [pattern] of CATALOGUES) text3 = text3.replace(pattern, " ");
+  text3 = text3.replace(/\bin\s+[A-G](?:[- ]?(?:flat|sharp|♭|♯|b|#))?\s*(?:major|minor|maj|min|dur|moll)\b/gi, " ").replace(/\b(?:no|nr|n°)\.?\s*(?=\d)/gi, " ").replace(/[“”"'’,;()[\]]/g, " ");
+  return searchWords(text3);
 }
-function searchWords(text2) {
-  return String(text2 || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim().split(/\s+/).filter(Boolean).join(" ");
+function searchWords(text3) {
+  return String(text3 || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim().split(/\s+/).filter(Boolean).join(" ");
 }
 function surname(person) {
   if (!person) return "";
@@ -37981,7 +38894,7 @@ async function searchAlbum(ctx, album) {
     }
   }));
 }
-var downloadsDir = (ctx) => path7.join(ctx.dataFolder, "downloads");
+var downloadsDir = (ctx) => path8.join(ctx.dataFolder, "downloads");
 async function startDownload(ctx, result, kind) {
   const data = result?.data;
   if (!data?.username || !Array.isArray(data.files) || !data.files.length) throw new Error("The result has no files to download");
@@ -37995,8 +38908,8 @@ async function startDownload(ctx, result, kind) {
   }
   const slskd = slskdFor(ctx);
   await slskd.enqueue(data.username, data.files.map((f) => ({ filename: f.filename, size: f.size })));
-  const id = randomUUID9();
-  await writeJson(path7.join(downloadsDir(ctx), `${id}.json`), { kind, key, username: data.username, files: data.files, startedAt: Date.now() });
+  const id = randomUUID10();
+  await writeJson(path8.join(downloadsDir(ctx), `${id}.json`), { kind, key, username: data.username, files: data.files, startedAt: Date.now() });
   return { pending: id };
 }
 var downloadKey = (username, files) => `${username}\0${files.map((f) => f.filename).sort().join("\0")}`;
@@ -38006,9 +38919,9 @@ async function findDownload(ctx, key) {
   const dir = downloadsDir(ctx);
   for (const name of await fs5.readdir(dir).catch(() => [])) {
     if (!name.endsWith(".json")) continue;
-    const record = await readJson(path7.join(dir, name), null);
+    const record = await readJson(path8.join(dir, name), null);
     if (!record || Date.now() - (record.startedAt || 0) > KEEP_DOWNLOADS_MS) {
-      await fs5.rm(path7.join(dir, name), { force: true });
+      await fs5.rm(path8.join(dir, name), { force: true });
       continue;
     }
     if (record.key === key && !record.failed) return name.replace(/\.json$/, "");
@@ -38017,7 +38930,7 @@ async function findDownload(ctx, key) {
 }
 async function locate(downloadFolder, file) {
   const base = remoteBase(file.filename);
-  const direct = path7.join(downloadFolder, remoteBase(remoteDir(file.filename)), base);
+  const direct = path8.join(downloadFolder, remoteBase(remoteDir(file.filename)), base);
   const stat = await fs5.stat(direct).catch(() => null);
   if (stat?.isFile()) return direct;
   let seen = 0;
@@ -38025,7 +38938,7 @@ async function locate(downloadFolder, file) {
     if (depth > 4) return null;
     for (const entry of await fs5.readdir(dir, { withFileTypes: true }).catch(() => [])) {
       if (++seen > 5e4) return null;
-      const full = path7.join(dir, entry.name);
+      const full = path8.join(dir, entry.name);
       if (entry.isDirectory()) {
         const found = await walk(full, depth + 1);
         if (found) return found;
@@ -38039,7 +38952,7 @@ async function locate(downloadFolder, file) {
   return walk(downloadFolder, 0);
 }
 async function downloadStatus(ctx, id, directory) {
-  const record = await readJson(path7.join(downloadsDir(ctx), `${id}.json`), null);
+  const record = await readJson(path8.join(downloadsDir(ctx), `${id}.json`), null);
   if (!record) throw new Error("This download is unknown to the plugin");
   const slskd = slskdFor(ctx);
   const transfers = await slskd.downloads(record.username);
@@ -38058,7 +38971,7 @@ async function downloadStatus(ctx, id, directory) {
     }
   }
   const failed = states.find((state) => FAILED_STATES.test(state));
-  if (failed) await writeJson(path7.join(downloadsDir(ctx), `${id}.json`), { ...record, failed: true });
+  if (failed) await writeJson(path8.join(downloadsDir(ctx), `${id}.json`), { ...record, failed: true });
   if (failed) throw new Error(`slskd: ${remoteBase(record.files[states.indexOf(failed)].filename)} ${failed.replace(/^Completed,\s*/, "").toLowerCase()}`);
   if (!states.every(isSucceeded)) return { done: false };
   return finishDownload(ctx, id, record, directory);
@@ -38090,15 +39003,15 @@ async function finishDownload(ctx, id, record, directory) {
 var formatBytes = (bytes) => bytes >= 1024 ** 3 ? `${(bytes / 1024 ** 3).toFixed(1)} GB` : `${Math.max(1, Math.round(bytes / 1024 ** 2))} MB`;
 async function freeBytes(ctx, dir) {
   if (ctx.freeBytes) return ctx.freeBytes(dir);
-  for (let at = dir; ; at = path7.dirname(at)) {
+  for (let at = dir; ; at = path8.dirname(at)) {
     const stats = await fs5.statfs(at).catch(() => null);
     if (stats) return stats.bavail * stats.bsize;
-    if (path7.dirname(at) === at) return Infinity;
+    if (path8.dirname(at) === at) return Infinity;
   }
 }
 var link = (ctx, local, target) => (ctx.linkFile ?? fs5.link)(local, target);
 async function copyInto(local, target) {
-  const temp = `${target}.${randomUUID9()}.part`;
+  const temp = `${target}.${randomUUID10()}.part`;
   try {
     await fs5.copyFile(local, temp);
     await fs5.rename(temp, target);
@@ -38115,7 +39028,7 @@ async function moveIntoPlace(ctx, id, record, directory) {
     const local = await locate(downloadFolder, file);
     if (!local) throw new Error(`Couldn't find ${remoteBase(file.filename)} in slskd's download folder`);
     const name = `${String(file.disc || 1).padStart(2, "0")}-${String(i + 1).padStart(3, "0")} ${remoteBase(file.filename)}`.replace(/[\\/]/g, "_");
-    const target = path7.join(directory, record.kind === "album" ? name : remoteBase(file.filename));
+    const target = path8.join(directory, record.kind === "album" ? name : remoteBase(file.filename));
     files.push({ local, target, file, size: (await fs5.stat(local)).size });
   }
   await fs5.mkdir(directory, { recursive: true });
@@ -38161,21 +39074,21 @@ async function moveIntoPlace(ctx, id, record, directory) {
       await writeTags(target, { title: [file.title], artist: [file.artist].filter(Boolean), recordingMbid: [file.recordingId] });
       tagged++;
     } catch (error) {
-      ctx.log(`Couldn't tag ${path7.basename(target)}: ${error.message}`);
+      ctx.log(`Couldn't tag ${path8.basename(target)}: ${error.message}`);
     }
   }
   ctx.log(`Download ${id}: ${files.length} file(s) ${linked ? "linked" : "copied"}, ${tagged} identified and tagged`);
-  return record.kind === "album" ? { done: true } : { done: true, path: path7.basename(files[0].target) };
+  return record.kind === "album" ? { done: true } : { done: true, path: path8.basename(files[0].target) };
 }
 
 // src/tagger.js
-import { randomUUID as randomUUID10 } from "node:crypto";
+import { randomUUID as randomUUID11 } from "node:crypto";
 
 // src/model/write-guard.js
 import fs6 from "node:fs/promises";
-import path8 from "node:path";
+import path9 from "node:path";
 async function modelAllowsTagging(ctx, realPath) {
-  const filename = path8.join(ctx.dataFolder, "model", "classical.sqlite");
+  const filename = path9.join(ctx.dataFolder, "model", "classical.sqlite");
   try {
     await fs6.access(filename);
   } catch (error) {
@@ -38204,7 +39117,7 @@ async function modelAllowsTagging(ctx, realPath) {
 
 // src/tagger.js
 import fs7 from "node:fs/promises";
-import path9 from "node:path";
+import path10 from "node:path";
 
 // src/aurral.js
 var Aurral = class {
@@ -38250,16 +39163,16 @@ var Aurral = class {
 // src/tagger.js
 var LOCK_STALE_MS = 2 * 6e4;
 var SAVE_EVERY_MS = 3e4;
-var queueDir = (ctx) => path9.join(ctx.dataFolder, "queue");
-var processedFile = (ctx) => path9.join(ctx.dataFolder, "processed.json");
-var indexFile = (ctx) => path9.join(ctx.dataFolder, "library-index.json");
-var originalsFile = (ctx) => path9.join(ctx.dataFolder, "originals.json");
-var excludedFile = (ctx) => path9.join(ctx.dataFolder, "excluded.json");
+var queueDir = (ctx) => path10.join(ctx.dataFolder, "queue");
+var processedFile = (ctx) => path10.join(ctx.dataFolder, "processed.json");
+var indexFile = (ctx) => path10.join(ctx.dataFolder, "library-index.json");
+var originalsFile = (ctx) => path10.join(ctx.dataFolder, "originals.json");
+var excludedFile = (ctx) => path10.join(ctx.dataFolder, "excluded.json");
 var TAG_FIELDS = ["artist", "albumArtist", "composer", "work", "workId"];
 var TAGGING_VERSION = 2;
 var outdated = (record) => record && (record.status === "tagged" || record.status === "unchanged") && (record.v ?? 1) < TAGGING_VERSION;
-var lockDir = (ctx) => path9.join(ctx.dataFolder, "tagging.lock");
-var yieldFile = (ctx) => path9.join(ctx.dataFolder, "tagging.yield");
+var lockDir = (ctx) => path10.join(ctx.dataFolder, "tagging.lock");
+var yieldFile = (ctx) => path10.join(ctx.dataFolder, "tagging.yield");
 var YIELD_FRESH_MS = 10 * 6e4;
 var PRIORITY_WAIT_MS = 5 * 6e4;
 var ACTION_CLAIM_MS = 2 * 6e4;
@@ -38268,15 +39181,15 @@ async function enqueue(ctx, filePaths, { force = false, source = null } = {}) {
   const ids = [];
   for (const filePath of filePaths) {
     if (!filePath) continue;
-    const id = `${Date.now().toString().padStart(15, "0")}-${randomUUID10()}`;
-    await writeJson(path9.join(queueDir(ctx), `${id}.json`), { path: filePath, force, source, at: Date.now() });
+    const id = `${Date.now().toString().padStart(15, "0")}-${randomUUID11()}`;
+    await writeJson(path10.join(queueDir(ctx), `${id}.json`), { path: filePath, force, source, at: Date.now() });
     ids.push(id);
   }
   return ids;
 }
 async function queuedEntries(ctx) {
   const names = (await fs7.readdir(queueDir(ctx)).catch(() => [])).filter((n) => n.endsWith(".json")).sort();
-  return names.map((name) => ({ name, file: path9.join(queueDir(ctx), name) }));
+  return names.map((name) => ({ name, file: path10.join(queueDir(ctx), name) }));
 }
 var queueLength = async (ctx) => (await queuedEntries(ctx)).length;
 async function allowedPath(ctx, filePath) {
@@ -38286,8 +39199,8 @@ async function allowedPath(ctx, filePath) {
     if (!root) continue;
     const base = await fs7.realpath(root).catch(() => null);
     if (!base) continue;
-    const relative = path9.relative(base, real);
-    if (relative && !relative.startsWith("..") && !path9.isAbsolute(relative)) return real;
+    const relative = path10.relative(base, real);
+    if (relative && !relative.startsWith("..") && !path10.isAbsolute(relative)) return real;
   }
   return null;
 }
@@ -38488,7 +39401,7 @@ var Session = class {
     });
     if (changed.length) {
       this.changedFiles++;
-      ctx.log(`Tagged ${path9.basename(real)}: ${fields.artist}`);
+      ctx.log(`Tagged ${path10.basename(real)}: ${fields.artist}`);
     }
     return true;
   }
@@ -38513,7 +39426,7 @@ var Session = class {
     const original = this.originals[real];
     let values;
     if (mode === "clear") values = { composer: [], work: [], workId: [] };
-    else if (original) values = Object.fromEntries(TAG_FIELDS.map((field) => [field, original[field] ?? []]));
+    else if (original) values = Object.fromEntries(TAG_FIELDS.map((field2) => [field2, original[field2] ?? []]));
     else {
       const credit = await this.trackCredit(tags);
       values = { composer: [], work: [], workId: [], ...credit && { artist: [credit] } };
@@ -38530,7 +39443,7 @@ var Session = class {
     this.stats.skipped["classical tags removed"]--;
     if (changed.length) {
       this.changedFiles++;
-      ctx.log(`Removed classical tags from ${path9.basename(real)}`);
+      ctx.log(`Removed classical tags from ${path10.basename(real)}`);
     }
     return changed.length ? original && mode !== "clear" ? "restored" : "cleared" : "unchanged";
   }
@@ -38591,14 +39504,14 @@ var Session = class {
         complete = false;
         return;
       }
-      const entries = await fs7.readdir(dir, { withFileTypes: true }).catch(() => []);
-      for (const entry of entries) {
+      const entries2 = await fs7.readdir(dir, { withFileTypes: true }).catch(() => []);
+      for (const entry of entries2) {
         if (Date.now() > until || await this.shouldYield()) {
           complete = false;
           return;
         }
         if (entry.name.startsWith(".")) continue;
-        const full = path9.join(dir, entry.name);
+        const full = path10.join(dir, entry.name);
         if (entry.isDirectory()) await walk(full);
         else if (entry.isFile() && isAudioPath(full)) {
           seen.add(full);
@@ -38652,7 +39565,7 @@ async function openState(ctx, priority) {
   return state;
 }
 async function withTagging(ctx, work, { priority = false } = {}) {
-  const key = path9.resolve(ctx.dataFolder);
+  const key = path10.resolve(ctx.dataFolder);
   let entry;
   for (; ; ) {
     entry = held.get(key);
@@ -38854,6 +39767,7 @@ function artistFiles(index, artist) {
   ).map(([file]) => file);
 }
 var index_default = {
+  pages: { read: readEditor, mutate: mutateEditor },
   async test(input) {
     const ctx = makeContext(input);
     const parts = [];
@@ -38888,10 +39802,10 @@ var index_default = {
     },
     async "preview-remove"(input) {
       const fields = ["composer", "work", "workId"];
-      const counts = Object.fromEntries(fields.map((field) => [field, 0]));
+      const counts = Object.fromEntries(fields.map((field2) => [field2, 0]));
       for (const track of input.album.tracks.filter((t) => t.path)) {
         const values = readValues(track.path, fields);
-        for (const field of fields) counts[field] += values[field].length;
+        for (const field2 of fields) counts[field2] += values[field2].length;
       }
       return { message: `Clear classical fields will remove ${counts.composer} composer, ${counts.work} work and ${counts.workId} work-ID values. Restore originals uses backups instead; original values may remain. No files changed.` };
     },
@@ -38937,7 +39851,7 @@ var index_default = {
     if (ctx.settings.enableFileWrites !== true) return;
     const stats = await runScheduled(ctx, SCHEDULE_BUDGET_MS);
     if (stats) log(`Scheduled tagging: ${describeStats(stats)}`);
-    await pruneCache(path10.join(ctx.dataFolder, "mb-cache"), TTL.default).catch(() => {
+    await pruneCache(path11.join(ctx.dataFolder, "mb-cache"), TTL.default).catch(() => {
     });
   },
   downloadSource: {

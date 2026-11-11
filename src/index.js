@@ -1,4 +1,5 @@
 import path from "node:path";
+import { readEditor, mutateEditor } from "./model/editor.js";
 import { modelStatus, enqueueModelScan, cancelModelScan, runModelJobs } from "./model/runtime.js";
 import { readValues } from "./tags.js";
 import { compareRecordings } from "./compare.js";
@@ -103,6 +104,7 @@ function artistFiles(index, artist) {
 }
 
 export default {
+  pages: { read: readEditor, mutate: mutateEditor },
   async test(input) {
     const ctx = makeContext(input);
     const parts = [];

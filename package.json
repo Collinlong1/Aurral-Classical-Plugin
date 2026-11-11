@@ -15,7 +15,8 @@
   },
   "homepage": "https://github.com/Collinlong1/Aurral-Classical-Plugin#readme",
   "devDependencies": {
-    "esbuild": "^0.25.12"
+    "esbuild": "^0.25.12",
+    "playwright": "1.61.1"
   },
   "dependencies": {
     "node-taglib-sharp": "^6.0.3"

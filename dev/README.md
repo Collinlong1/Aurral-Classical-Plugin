@@ -15,3 +15,9 @@ Stock lacks the delegated playlist capability and comparisons explain the missin
 ## Phase 2 model checks
 
 `npm test` includes model migrations, provenance, concurrent writers, interruption/restore, classification and all committed fixture scans. The model tests run without network access. The existing Compose smoke still verifies Phase 1 HTTP playback; the model backend has no page to browser-test. Admin model actions are described in MODEL_V1.md.
+
+## Phase 3 browser and restart checks
+
+Use the matching Phase 3 core source, build the frontend/plugin, and start the existing disposable Compose fixture. Run `node /plugin/dev/editor-fixtures.mjs prepare` with Compose exec to save media hashes, set synthetic audio read-only and run the explicit model scan. Install the locked Playwright development dependency and its Chromium browser. Start `node dev/fixture-relay.mjs` on the host, then run `EDITOR_TEST_URL=http://127.0.0.1:3305 node dev/editor-browser.mjs`. A system Chromium can be selected with `CHROMIUM_PATH`. The relay is test-only HTTP transport for the internal-network fixture; it does not proxy WebSockets or form part of the plugin architecture.
+
+Run `node /plugin/dev/editor-fixtures.mjs check` inside Compose before and after restarting Aurral, then repeat `dev/smoke.mjs`. These commands verify persisted manual metadata, pins, order, audio associations, read-only byte equality and existing admin/two-user playback. A dedicated CI workflow runs this sequence with a pinned core commit and uploads screenshots. Stop the host relay and Compose after testing. The seed preserves existing fixture audio on restart instead of regenerating it.

@@ -206,3 +206,7 @@ which Aurral installs and updates from.
 ## Classical data model (Phase 2 review)
 
 The backend model uses independent plugin SQLite storage and requires Node 22.16+. See [MODEL_V1.md](MODEL_V1.md) for admin scans, provenance/pins and backup/restore, and [PHASE_2_REPORT.md](PHASE_2_REPORT.md) for validation. Manual editing, grouping and work pages remain later phases. This is review source, not a tagged production release.
+
+## Manual editor (Phase 3 review)
+
+The Phase 3 fork adds an admin form bridge. Open **Settings → Plugins → Aurral Classical → Pages → Open Classical metadata editor** to create provider-free works/broadcasts, reorder movements, attach owned audio and manage pinned metadata. See [EDITOR_GUIDE.md](EDITOR_GUIDE.md) and [PHASE_3_REPORT.md](PHASE_3_REPORT.md). Edits stay in the plugin database and work with read-only media. Stock hosts without the bridge have no editor entry. No production release/deployment is implied by this source branch.

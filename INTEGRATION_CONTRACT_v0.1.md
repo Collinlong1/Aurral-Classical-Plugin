@@ -91,3 +91,11 @@ Acquisition manifest downloadSource.acquisitionIdentity:true adds an independent
 
 No SQL schema migration. No service/iframe/player replacement. No claim of the later full native-ref, view, cursor, optimistic revision or classical model interfaces yet.
 
+
+## Implemented Phase 3 — admin forms v1
+
+The matching fork accepts optional `pages:[{id,label}]`, defaults to no pages, exposes independent `page:ID` capability switches and adds a Settings link. Real admin read/mutate routes call only `pages.read`/`pages.mutate` with host Base/user/pageId and `capabilities.adminForms:1`. Plugin/synthetic API-key accounts and ordinary users are denied; safe mode/disabled/unknown pages return unavailable. No credentials or Base context are serialized to the browser.
+
+Reads return a version-1 title/revision/navigation/notes/forms document. Forms support plain text, textarea, select, checkbox and ordered choices, bounded by schema. The renderer never evaluates plugin HTML/scripts or serves arbitrary assets. Writes receive `{revision,command,values}`; plugins validate target/commands and atomically compare revision/commit, then return success or 400/409. Cross-site requests, oversized bodies (64KB), invalid outputs (512KB) and calls over 15 seconds fail. Drafts are preserved on conflict; form edits disable background refetch and unrelated navigation until saved/cancelled.
+
+The classical editor keeps all work/recording/role/provenance logic in plugin storage on schema 1. Existing model scan is still an explicit admin action. No new core library/queue/write API, SQL migration, editor iframe or standalone service. This is an admin-forms subset of D01, not the later ordinary-user work-page/view bridge. Stock API-1 hosts hide pages and retain existing actions; a stock editor fallback is not claimed.

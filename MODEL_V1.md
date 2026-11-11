@@ -55,3 +55,7 @@ Backup uses SQLite's online backup API and validates the result. Offline restore
 Tests cover provider-free works/broadcasts, reissues, multi-work segments, precedence/pins/blanks/conflicts, full rescans, ambiguous/reused identities, mixed libraries, failed migrations, process death, verified restore, concurrent writers and job fencing. The isolated Node container uses a read-only source mount and no network. Existing Phase 1 real-HTTP Compose CI is separately recorded in PHASE_2_REPORT.md.
 
 No production library or server is accessed. An anonymized real-library snapshot, automatic core epoch/generation detection, audio-only fingerprinting, large-library throughput and complete stock-host UI compatibility are not claimed. The model has no editor, work page, classification-rule UI or new playback behavior yet. A scan remains read-only after its initiating admin action; it persists no session/grant token and does not perform deferred remote/user mutations.
+
+## Phase 3 editor update
+
+The Phase 3 review build adds the admin editor described in EDITOR_GUIDE.md. It uses the existing schema 1, model relationships, metadata precedence and SQLite transactions. The generic fork bridge renders bounded forms without plugin browser scripts. Prior references above to an unimplemented editor describe the Phase 2 checkpoint; the model's scan/identity/backup limits still apply. Grouping and work pages remain later work.

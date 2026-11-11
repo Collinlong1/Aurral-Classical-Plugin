@@ -51,3 +51,13 @@ Current source record: PHASE_1_REPORT.md. Core review target is the user's aurra
 
 The original design table below remains planning history; its draft/no-implementation wording is superseded only for the Phase 1 portions listed above. The full v0.1 native-reference/view contract is not claimed implemented.
 
+
+## Phase 3 — D01 admin forms v1 implementation
+
+D01's admin-editor subset is implemented and tested in the user's fork. Core production changes: `backend/services/plugins/pluginManifest.ts` (optional page declaration/capability), new `pluginPages.ts` (validated 15-second read/mutate dispatch and real-admin gate), `backend/routes/plugins.ts` (authenticated bounded same-origin routes), plugin type/reference docs, `frontend/src/pages/PluginPage.tsx`/CSS (host-rendered forms, dirty-state/revision handling), App lazy route and PluginsSection Settings links. Approximately 700 production lines plus docs/tests; exact review diff is authoritative.
+
+Database: **no core or plugin schema migration**. API/UI: additive page listing and admin GET/POST page transport; ordinary manifests have zero pages. No composer/work/provider logic in core. Compatibility: plugin absence, disabled page, safe mode and old manifests leave native album/search/queue behavior intact. Unknown or unavailable pages return a bounded error. Stock hosts do not have an editor; existing plugin actions remain supported.
+
+Tests: generic plugin/permission/output/size/origin tests; 2,755 core unit tests; required checks/builds; 168 plugin tests including 9 editor cases; real browser and synthetic Compose restart/media/streaming tests. No unsafe-any/type baseline increase. The companion plugin CI pins the exact source commit.
+
+PR readiness: **draft, fork review source only**. No new PR or upstream submission. D01 still needs an ordinary-user read/page contract for Phase 4 work browsing. D04/D05 grouping and queue ranges remain proposals. The plugin owns all model/editor business behavior, provenance and data. See PHASE_3_REPORT.md for exact evidence and outstanding real-library/stock limitations.
