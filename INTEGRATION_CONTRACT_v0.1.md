@@ -1,3 +1,9 @@
+# Implemented Phase 4 presentation/playback addendum
+
+The fork now implements opt-in `albumPresentation`, regular-user resource pages and bounded native queue items. Album contributions are validated and native album/track references are resolved by core; absent/disabled/failing contributions return the unchanged stock album. Public resource pages require a real authenticated user and receive host-owned identity. Optional segment start/end coordinates persist locally and are enforced by local playback; range-unaware remote handoff refuses bounded items.
+
+The plugin owns work/realization identity, grouping, missing-movement decisions, page content, favourites and picks in schema 2. The core owns authenticated transport, bounded validation, stream resolution and rendering. Exact implemented response shapes live in `src/model/presentation.js` and the companion core `pluginPresentation.ts`; the earlier proposal below remains historical where it describes unimplemented cursor/general-resource expansion.
+
 # Implemented Phase 2 backend addendum
 
 The plugin adds model schema 1 and admin-only album entry actions classical-model-status, classical-model-scan and classical-model-cancel. Scan opts into the existing userOperations v1 library capability and requires a real host admin. It reads the full library, queues a durable plugin-owned read-only scan and reports queued/completed state through status. Stock hosts without userOperations cannot start this action; model storage itself has no host-hook dependency. No credentials/session grants persist in model jobs.
@@ -70,6 +76,7 @@ Identification begins only after admin action; enabling reads and advertises cap
 ## Compatibility acceptance
 
 Test current stock with no hooks (honest missing UI), fork with each capability separately off, fork with complete hooks, old API-1 plugin under new host, plugin absent/disabled/crashed, and weekly latest-upstream drift. Use two users plus admin, synthetic mixed library and provider fixtures. Negative tests include forged user IDs/tokens, wrong playlist owner, revoked permissions, unsafe local ref, invalid segment and stale revision. Native playback/non-classical ranking must remain unchanged when plugin returns no opinion.
+
 # Implemented Phase 1 contract — user-operations v1 / acquisition-identity v1
 
 This section supersedes draft status only for the following interfaces. API manifest version remains 1; later sections describe future v0.1 design.
@@ -82,15 +89,14 @@ Action manifest localPlaylists:true opts into action input userOperations:{versi
 
 Acquisition manifest downloadSource.acquisitionIdentity:true adds an independently switchable acquisitionIdentity capability under the existing enabled download source. Host calls downloadSource.acquisitionIdentity with track input before native Soulseek queries regardless of source priority. Return null for no opinion, {blocked:true} for known unresolved identity, or {artist,aliases,requiredTerms?}. Required terms are bounded strings, matched as normalized words in native result paths. Identity persists with search attempts, does not rewrite display artist, and does not bypass existing duration/quality/integrity checks. Provider errors hold acquisition; playback is independent. Disabled/absent hooks use stock behavior.
 
-| Host | Phase 1 tag/source | User-owned local compare | Later editor/work/grouping/segments |
-| --- | --- | --- | --- |
-| Frozen stock API-1 | Existing actions/source; background media writes opt-in | Unsupported; explanatory error, no admin-owned fallback | Unavailable |
-| Fork before Phase 1 | Same | Unsupported | Unavailable |
-| Fork with Phase 1 review | Clear/restore/preview and performer queries | Supported for real admin/regular accounts; accessPlaylists required, acquisition permission unnecessary | Unavailable; future phases |
-| Phase 1 fork, plugin disabled/no opinion | Stock playback/queries | Hidden/denied | Unavailable |
+| Host                                     | Phase 1 tag/source                                      | User-owned local compare                                                                                | Later editor/work/grouping/segments |
+| ---------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| Frozen stock API-1                       | Existing actions/source; background media writes opt-in | Unsupported; explanatory error, no admin-owned fallback                                                 | Unavailable                         |
+| Fork before Phase 1                      | Same                                                    | Unsupported                                                                                             | Unavailable                         |
+| Fork with Phase 1 review                 | Clear/restore/preview and performer queries             | Supported for real admin/regular accounts; accessPlaylists required, acquisition permission unnecessary | Unavailable; future phases          |
+| Phase 1 fork, plugin disabled/no opinion | Stock playback/queries                                  | Hidden/denied                                                                                           | Unavailable                         |
 
 No SQL schema migration. No service/iframe/player replacement. No claim of the later full native-ref, view, cursor, optimistic revision or classical model interfaces yet.
-
 
 ## Implemented Phase 3 — admin forms v1
 

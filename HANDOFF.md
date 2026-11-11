@@ -1,3 +1,9 @@
+# Current checkpoint — Phase 4 complete for review
+
+The user explicitly authorized Phase 4 on November 10, 2026 (America/Chicago). Grouping, bounded playback, the basic work page, schema-2 user state and generic host hooks are complete locally. Validation passed 175 plugin tests, 2,757 core unit tests across 406 files, 52 focused Phase 4 tests, required checks/build, real Chromium, restart persistence and exact-file playback for an admin and two users. See `PHASE_4_REPORT.md`. Stop before v0.2 search or later page/Discover scope. The user's container name is `aurral-phase3-test-aurral-test-1`; no agent access to it is authorized. BrainzMash refresher code remains untouched at the user's request.
+
+Companion core implementation: `019e93f5a2f4720f8f0238c40c851dfb1070b740`, published on the user fork `phase4-review` branch and pinned in integration CI.
+
 # Phase 3 scan throughput correction
 
 The user's installed search patch was verified, but its first full-library scan had processed only 60 of 12,802 files and remained queued with no committed tracks. The five-second model runner budget was incorrectly used by both the explicit background action and the 15-minute schedule. This is our scan-processing limitation, separate from the pre-existing BrainzMash refresher, which remains unchanged per the user's instruction.
@@ -102,4 +108,3 @@ Compose project aurral-classical-phase1 has only synthetic named volumes and an 
 ## Persistent boundaries
 
 No main writes/merges, upstream edits/branches/PRs/comments, production credentials/server access or automatic deployments. No subagents without explicit user approval. Keep classical logic/storage in plugin and core hooks generic. No automatic PR merge. User approval is required before Phase 2. Update this shared handoff and report at each session boundary.
-

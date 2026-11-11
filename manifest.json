@@ -137,9 +137,7 @@
       "admin": true
     }
   ],
-  "events": [
-    "download.finished"
-  ],
+  "events": ["download.finished"],
   "downloadSource": {
     "acquisitionIdentity": true,
     "albums": true
@@ -151,6 +149,12 @@
     {
       "id": "editor",
       "label": "Classical metadata editor"
+    },
+    {
+      "id": "work",
+      "label": "Classical work",
+      "admin": false
     }
-  ]
+  ],
+  "albumPresentation": true
 }

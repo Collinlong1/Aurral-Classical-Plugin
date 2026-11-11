@@ -259,11 +259,87 @@ try {
     ).status(),
     403,
   );
+  fixture("phase4-reset");
+  const phase4 = JSON.parse(fixture("phase4"));
+  await ordinary.goto(`${url}/album/${phase4.albumId}`);
+  await ordinary
+    .getByRole("button", { name: "By Work", exact: true })
+    .waitFor();
+  await ordinary
+    .getByRole("heading", { name: "Fixture Sonata", exact: true })
+    .first()
+    .waitFor();
+  assert.equal(
+    await ordinary.getByText(/Missing: II\. Adagio/).count(),
+    1,
+    "incomplete recording names its missing movement",
+  );
+  await ordinary.getByRole("button", { name: "By Track", exact: true }).click();
+  await ordinary.getByRole("list", { name: /tracks$/ }).waitFor();
+  await ordinary.getByRole("button", { name: "By Work", exact: true }).click();
+  await ordinary
+    .getByRole("link", { name: "Fixture Sonata", exact: true })
+    .first()
+    .click();
+  await ordinary
+    .getByRole("heading", { name: "Owned recordings", exact: true })
+    .waitFor();
+  await ordinary
+    .getByRole("button", { name: "Your pick (admin fallback)", exact: true })
+    .waitFor();
+  const completeRecording = ordinary.locator("article").filter({
+    has: ordinary.getByRole("heading", {
+      name: "Complete fixture recording",
+      exact: true,
+    }),
+  });
+  await completeRecording
+    .getByRole("button", { name: "Play whole work", exact: true })
+    .click();
+  await ordinary.waitForFunction(() =>
+    ["I. Allegro", "II. Adagio", "III. Finale"].includes(
+      document.querySelector(".global-player__title")?.textContent || "",
+    ),
+  );
+  await ordinary
+    .getByRole("button", { name: "Favourite work", exact: true })
+    .click();
+  await ordinary
+    .getByRole("button", { name: "Remove favourite", exact: true })
+    .waitFor();
+  const incomplete = ordinary
+    .locator("article")
+    .filter({
+      has: ordinary.getByRole("heading", {
+        name: "Incomplete fixture recording",
+        exact: true,
+      }),
+    });
+  await incomplete
+    .getByRole("button", { name: "Make my pick", exact: true })
+    .click();
+  await incomplete
+    .getByRole("button", { name: "Your pick", exact: true })
+    .waitFor();
+  const secondUser = await browser.newContext({
+    extraHTTPHeaders: {
+      "X-Api-Key": "fixture-two-synthetic-key-0000000000000000",
+    },
+  });
+  const secondWork = await secondUser.newPage();
+  await secondWork.goto(`${url}/plugins/aurral-classical/work/${phase4.work}`);
+  await secondWork
+    .getByRole("button", { name: "Favourite work", exact: true })
+    .waitFor();
+  await secondWork
+    .getByRole("button", { name: "Your pick (admin fallback)", exact: true })
+    .waitFor();
+  await secondUser.close();
   await regular.close();
   fixture("remember", JSON.stringify({ work, recording }));
   assert.deepEqual(errors, []);
   console.log(
-    "PASS: browser composer/work/broadcast, reorder, owned attachment, provider/pins/unpin/blank/conflict, stale tab, phone layout and regular-user denial",
+    "PASS: browser editor plus Phase 4 work grouping, stock toggle, work page, incomplete movement and isolated user state",
   );
 } finally {
   await browser.close();

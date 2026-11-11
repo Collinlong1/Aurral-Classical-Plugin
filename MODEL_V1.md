@@ -1,6 +1,6 @@
 # Classical model version 1
 
-Phase 2 implements the backend model. The manual editor, album grouping and work pages remain Phases 3 and 4.
+Phase 2 introduced the backend model; Phases 3 and 4 now add the manual editor, album grouping, bounded play plans and basic work page. Schema 2 adds only per-user work state and the admin fallback pick.
 
 ## Storage and identity
 

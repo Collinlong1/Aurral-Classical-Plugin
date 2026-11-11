@@ -1,7 +1,7 @@
-name: Phase 3 editor integration
+name: Phase 4 work-view integration
 on:
   push:
-    branches: [phase3-review]
+    branches: [phase4-review]
   pull_request:
     branches: [aurral-classical]
   workflow_dispatch:
@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: Collinlong1/aurral
-          ref: 7ea6b2211f469d9c1342fee998fe82d2289232ff
+          ref: 019e93f5a2f4720f8f0238c40c851dfb1070b740
           path: core
       - uses: actions/setup-node@v4
         with:

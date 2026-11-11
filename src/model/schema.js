@@ -142,4 +142,18 @@ CREATE TABLE model_job (
 CREATE UNIQUE INDEX job_active ON model_job(key) WHERE state IN ('queued','running','retry');
 `,
   },
+  {
+    version: 2,
+    sql: `
+CREATE TABLE user_work_state (
+ user_id INTEGER NOT NULL CHECK(user_id>0), work_id TEXT NOT NULL REFERENCES entity(id),
+ favourite INTEGER NOT NULL DEFAULT 0 CHECK(favourite IN (0,1)), picked_realization_id TEXT REFERENCES realization(id),
+ updated_at INTEGER NOT NULL, PRIMARY KEY(user_id,work_id)
+);
+CREATE TABLE admin_work_pick (
+ work_id TEXT PRIMARY KEY REFERENCES entity(id), realization_id TEXT NOT NULL REFERENCES realization(id),
+ actor_id INTEGER NOT NULL CHECK(actor_id>0), updated_at INTEGER NOT NULL
+);
+`,
+  },
 ];

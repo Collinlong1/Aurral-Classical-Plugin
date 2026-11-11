@@ -14,7 +14,9 @@ Before attaching audio, run **Scan classical model (read only)** from an album m
 
 Role-aware credits distinguish composers, soloists, conductors and ensembles. Create a person or ensemble, then add the appropriate credit to a selected work/recording/performance/release. Invalid role/contributor combinations and duplicate credits are rejected.
 
-All edits stay in the plugin database. Read-only media is supported; no audio tags are written. Opening the editor starts no provider identification, scan or acquisition. Back up/restore the model using MODEL_V1.md; disabling the editor retains its data. Stock hosts without the bridge have no editor entry. Grouping, playback plans and work pages remain Phase 4.
+All edits stay in the plugin database. Read-only media is supported; no audio tags are written. Opening the editor starts no provider identification, scan or acquisition. Back up/restore the model using MODEL_V1.md; disabling the editor retains its data.
+
+On the matching Phase 4 fork, albums with an explicitly attached multi-movement work show **By Work / By Track**. Select a work title for its basic page, owned recordings, completeness, favourites and per-user/admin picks. **Play whole work** uses the stored realization order and skips visibly missing movements. Scanning alone does not invent work identities: create/review the work, recording and attachments here first. Disabling the presentation/page capabilities returns the stock album UI while retaining plugin data.
 
 When updating from the original Phase 3 build, replace the installed plugin's `index.js` and `manifest.json` with the updated `phase3-review` files and restart your test instance using your existing installation procedure. Rerun **Scan classical model (read only)** and reload the editor: older scan evidence lacks titles, albums and performers. A read-only library mount alone does not populate the model. Empty/legacy indexes now explain this in the editor. No core rebuild or database migration is needed for this search correction.
 

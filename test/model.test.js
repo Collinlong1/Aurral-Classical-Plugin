@@ -24,6 +24,12 @@ import { tempFolders, copyFixture, json as response } from "./helpers.js";
 import { writeTags } from "../src/tags.js";
 import { modelAllowsTagging } from "../src/model/write-guard.js";
 import plugin from "../src/index.js";
+import { migrations } from "../src/model/schema.js";
+import {
+  renderAlbumPresentation,
+  renderWork,
+  applyWorkMutation,
+} from "../src/model/presentation.js";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 async function setup(t) {
@@ -112,6 +118,133 @@ test("catalogue models a provider-free broadcast, roles, collections, segments, 
   assert.match(work, /^[\da-f]{8}-/);
   assert.equal(m.resolve(work, "title").value, "Private broadcast");
   validateDatabase(c.db);
+});
+
+test("Phase 4 groups an album by work and isolates user picks with an admin fallback", async (t) => {
+  const { c, m, folders } = await setup(t);
+  const composer = c.createEntity("person");
+  m.manual(composer, "name", "Fixture Composer", { actor: "admin" });
+  const work = c.createEntity("work");
+  m.manual(work, "title", "Fixture Symphony", { actor: "admin" });
+  const collection = c.createEntity("collection");
+  m.manual(collection, "title", "Fixture Cycle", { actor: "admin" });
+  c.relate("collection_member", collection, work);
+  c.credit(work, composer, "composer");
+  const movements = ["I. First", "II. Second", "III. Third"].map(
+    (title, index) => {
+      const movement = c.createEntity("movement");
+      m.manual(movement, "title", title, { actor: "admin" });
+      c.relate("movement", work, movement, { position: index + 1 });
+      return movement;
+    },
+  );
+  const tracks = reconcile(
+    c,
+    snapshot(
+      movements.map((movement, index) =>
+        track(index + 1, {
+          coreId: String(index + 1),
+          fileId: String(index + 1),
+          albumId: "album-1",
+          durationMs: 10000,
+          hints: {
+            title: `Movement ${index + 1}`,
+            album: "Fixture Album",
+            artist: "Fixture Orchestra",
+          },
+        }),
+      ),
+    ),
+  );
+  for (const link of tracks)
+    classify(c, link.id, {}, { manual: "classical", actor: "admin" });
+  const makeRealization = (suffix, included) => {
+    const performance = c.createEntity("performance");
+    const performanceWork = c.relate("performance_work", performance, work);
+    const recording = c.createEntity("recording");
+    c.relate("recording_performance", recording, performance);
+    const realization = c.realization(work, performanceWork, suffix);
+    included.forEach((movementIndex, sequence) => {
+      const content = c.recordingContent(recording, performanceWork, {
+        movement: movements[movementIndex],
+        position: sequence + 1,
+      });
+      const segment = c.segment(tracks[movementIndex].id, {
+        startMs: movementIndex === 0 ? 1000 : 0,
+        endMs: movementIndex === 0 ? 9000 : 10000,
+      });
+      c.segmentContent(segment, content);
+      c.realizationItem(realization, segment, {
+        movement: movements[movementIndex],
+        sequence: sequence + 1,
+      });
+    });
+    return realization;
+  };
+  const complete = makeRealization("Complete recording", [0, 1, 2]);
+  const incomplete = makeRealization("Incomplete recording", [0, 2]);
+  const presentation = renderAlbumPresentation(c, "album-1");
+  assert.equal(presentation.supportsToggle, true);
+  assert.equal(presentation.groups.length, 2);
+  const completeGroup = presentation.groups.find(
+    (group) => group.items.length === 3,
+  );
+  const incompleteGroup = presentation.groups.find(
+    (group) => group.items.length === 2,
+  );
+  assert.ok(completeGroup);
+  assert.ok(incompleteGroup);
+  assert.deepEqual(
+    completeGroup.items.map((item) => item.title),
+    ["I. First", "II. Second", "III. Third"],
+  );
+  assert.deepEqual(completeGroup.items[0], {
+    id: completeGroup.items[0].id,
+    trackId: "1",
+    fileId: "1",
+    albumId: "album-1",
+    title: "I. First",
+    artist: "Fixture Orchestra",
+    album: "Fixture Album",
+    durationMs: 10000,
+    startMs: 1000,
+    endMs: 9000,
+  });
+  assert.deepEqual(
+    incompleteGroup.missing.map((item) => item.title),
+    ["II. Second"],
+  );
+  const input = { resourceId: work };
+  applyWorkMutation(
+    c,
+    { ...input, mutation: { command: "admin-pick", realizationId: complete } },
+    { id: 1, role: "admin" },
+  );
+  assert.equal(
+    renderWork(c, work, { id: 2, role: "user" }).pickedRealizationId,
+    complete,
+  );
+  assert.equal(renderWork(c, work, { id: 2, role: "user" }).pickScope, "admin");
+  applyWorkMutation(
+    c,
+    { ...input, mutation: { command: "pick", realizationId: incomplete } },
+    { id: 2, role: "user" },
+  );
+  applyWorkMutation(
+    c,
+    { ...input, mutation: { command: "favourite", value: true } },
+    { id: 2, role: "user" },
+  );
+  const secondUser = renderWork(c, work, { id: 2, role: "user" });
+  assert.equal(secondUser.pickedRealizationId, incomplete);
+  assert.equal(secondUser.pickScope, "user");
+  assert.equal(secondUser.favourite, true);
+  const thirdUser = renderWork(c, work, { id: 3, role: "user" });
+  assert.equal(thirdUser.pickedRealizationId, complete);
+  assert.equal(thirdUser.favourite, false);
+  assert.deepEqual(thirdUser.work.collections, [
+    { id: collection, title: "Fixture Cycle" },
+  ]);
 });
 
 test("wrong kinds, cycles, parent movements, sequence slots and cross-performance play plans fail", async (t) => {
@@ -354,11 +487,11 @@ test("failed migrations roll back DDL and versions; consistent backups restore a
   await c.backup(backup);
   c.close();
   const bad = {
-    version: 2,
+    version: 3,
     sql: "CREATE TABLE should_rollback(id); INSERT INTO no_such_table VALUES (1);",
   };
   await assert.rejects(
-    openDatabase(folders.dataFolder, { migrations: [bad], maxVersion: 2 }),
+    openDatabase(folders.dataFolder, { migrations: [bad], maxVersion: 3 }),
     /no such table/,
   );
   const restored = await openCatalogue(folders.dataFolder);
@@ -373,12 +506,12 @@ test("failed migrations roll back DDL and versions; consistent backups restore a
   );
   assert.equal(
     restored.db.prepare("PRAGMA user_version").get().user_version,
-    1,
+    2,
   );
   restored.close();
   const upgraded = await openDatabase(folders.dataFolder, {
-    migrations: [{ version: 2, sql: "CREATE TABLE future(id);" }],
-    maxVersion: 2,
+    migrations: [{ version: 3, sql: "CREATE TABLE future(id);" }],
+    maxVersion: 3,
   });
   upgraded.db.close();
   await assert.rejects(openCatalogue(folders.dataFolder), /newer/);
@@ -389,10 +522,43 @@ test("failed migrations roll back DDL and versions; consistent backups restore a
   old.close();
 });
 
+test("schema 1 upgrades to user-scoped Phase 4 state without changing catalogue data", async (t) => {
+  const folders = await tempFolders();
+  t.after(() => fs.rm(folders.root, { recursive: true, force: true }));
+  const old = await openDatabase(folders.dataFolder, {
+    migrations: [migrations[0]],
+    maxVersion: 1,
+  });
+  const work = "00000000-0000-4000-8000-000000000004";
+  old.db
+    .prepare("INSERT INTO entity VALUES (?, 'work', '{}', 1, 1, 1, NULL)")
+    .run(work);
+  old.db.close();
+  const upgraded = await openCatalogue(folders.dataFolder);
+  assert.equal(
+    upgraded.db.prepare("PRAGMA user_version").get().user_version,
+    2,
+  );
+  assert.equal(upgraded.entity(work).kind, "work");
+  assert.ok(
+    upgraded.db
+      .prepare(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='user_work_state'",
+      )
+      .get(),
+  );
+  upgraded.close();
+  assert.ok(
+    (await fs.readdir(path.join(folders.dataFolder, "backups"))).some((file) =>
+      file.startsWith("before-v2-"),
+    ),
+  );
+});
+
 test("process death during DDL leaves the old schema recoverable", async (t) => {
   const { c, folders } = await setup(t);
   c.close();
-  const script = `import { DatabaseSync } from 'node:sqlite';const d=new DatabaseSync(${JSON.stringify(c.filename)});d.exec('BEGIN IMMEDIATE; CREATE TABLE interrupted(id); PRAGMA user_version=2');process.kill(process.pid,'SIGKILL');`;
+  const script = `import { DatabaseSync } from 'node:sqlite';const d=new DatabaseSync(${JSON.stringify(c.filename)});d.exec('BEGIN IMMEDIATE; CREATE TABLE interrupted(id); PRAGMA user_version=3');process.kill(process.pid,'SIGKILL');`;
   const child = spawnSync(
     process.execPath,
     ["--input-type=module", "-e", script],
@@ -402,7 +568,7 @@ test("process death during DDL leaves the old schema recoverable", async (t) => 
   const reopened = await openCatalogue(folders.dataFolder);
   assert.equal(
     reopened.db.prepare("PRAGMA user_version").get().user_version,
-    1,
+    2,
   );
   assert.equal(
     reopened.db
