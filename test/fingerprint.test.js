@@ -86,3 +86,75 @@ test("a retag keeps the track link active and its work attachment", async (t) =>
     "review",
   );
 });
+
+function wav(title, sample = 7) {
+  const chunk = (id, body) => {
+    const head = Buffer.alloc(8);
+    head.write(id, 0, "latin1");
+    head.writeUInt32LE(body.length, 4);
+    return Buffer.concat([head, body, body.length % 2 ? Buffer.alloc(1) : Buffer.alloc(0)]);
+  };
+  const fmt = Buffer.alloc(16);
+  fmt.writeUInt16LE(1, 0);
+  fmt.writeUInt16LE(1, 2);
+  fmt.writeUInt32LE(8000, 4);
+  fmt.writeUInt32LE(16000, 8);
+  fmt.writeUInt16LE(2, 12);
+  fmt.writeUInt16LE(16, 14);
+  const name = Buffer.from(`${title}\0`, "latin1");
+  const info = Buffer.concat([Buffer.from("INFOINAM", "latin1"), Buffer.alloc(4), name]);
+  info.writeUInt32LE(name.length, 8);
+  const body = Buffer.concat([
+    Buffer.from("WAVE", "latin1"),
+    chunk("fmt ", fmt),
+    chunk("LIST", info),
+    chunk("data", Buffer.alloc(16000, sample)),
+  ]);
+  const riff = Buffer.alloc(8);
+  riff.write("RIFF", 0, "latin1");
+  riff.writeUInt32LE(body.length, 4);
+  return Buffer.concat([riff, body]);
+}
+
+test("WAV: fingerprints skip tag chunks and never close the file mid-read", async (t) => {
+  const folders = await tempFolders();
+  t.after(() => fs.rm(folders.root, { recursive: true, force: true }));
+  const file = path.join(folders.libraryFolder, "a.wav");
+  await fs.writeFile(file, wav("Original title"));
+  const before = await fingerprint(file);
+  assert.ok(before.startsWith(AUDIO_PREFIX), before);
+  await fs.writeFile(file, wav("A much longer replacement title"));
+  assert.equal(await fingerprint(file), before);
+  await fs.writeFile(file, wav("Original title", 9));
+  assert.notEqual(await fingerprint(file), before);
+});
+
+test("a library scan with WAV files completes", async (t) => {
+  const { enqueueModelScan, runModelJobs, modelStatus } = await import("../src/model/runtime.js");
+  const { json } = await import("./helpers.js");
+  const folders = await tempFolders();
+  t.after(() => fs.rm(folders.root, { recursive: true, force: true }));
+  const files = [];
+  for (let i = 0; i < 3; i++) {
+    const file = path.join(folders.libraryFolder, `${i}.wav`);
+    await fs.writeFile(file, wav(`Track ${i}`, i + 1));
+    files.push(file);
+  }
+  const ctx = {
+    ...folders,
+    settings: {},
+    api: { url: "http://host.test/api", key: "k" },
+    fetch: async () =>
+      json({
+        version: 1,
+        complete: true,
+        library: { tracks: files.map((file, i) => ({ id: i, title: `Track ${i}`, files: [{ id: i, path: file, available: true, durationMs: 1000 }] })) },
+      }),
+  };
+  await enqueueModelScan(ctx, { id: 1, role: "admin" });
+  await runModelJobs(ctx, { budgetMs: 60_000 });
+  const status = await modelStatus(ctx);
+  assert.equal(status.scan.state, "done");
+  assert.equal(status.scan.skipped, 0);
+  assert.equal(status.tracks.find((row) => row.state === "active").count, 3);
+});

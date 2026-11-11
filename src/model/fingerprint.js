@@ -107,7 +107,8 @@ async function audioRanges(file) {
       magic.toString("latin1", 0, 4) === "RIFF" &&
       magic.toString("latin1", 8, 12) === "WAVE"
     )
-      return wavRanges(handle, size);
+      // Await before the finally block closes the handle.
+      return await wavRanges(handle, size);
     const start = await skipId3v2(handle, 0, size);
     const head = await readAt(handle, start, 4);
     if (head.toString("latin1") === "fLaC") {
