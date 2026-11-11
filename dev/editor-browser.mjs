@@ -53,6 +53,29 @@ try {
   await page
     .getByRole("heading", { name: "Classical metadata editor", exact: true })
     .waitFor();
+  await page
+    .getByLabel("Search items", { exact: true })
+    .fill("No. 1 Prélude (Presto)");
+  await page.getByRole("button", { name: "Search", exact: true }).click();
+  const titleResult = page.getByRole("button", {
+    name: /^Track · No\. 1 Prélude \(Presto\)/,
+  });
+  await titleResult.waitFor();
+  assert.match(await titleResult.textContent(), /Daniil Trifonov/);
+  await titleResult.click();
+  await page.getByText(/Owned track: No\. 1 Prélude \(Presto\)/).waitFor();
+  assert.match(
+    await page.locator(".plugin-page__forms").textContent(),
+    /Transcendental - Daniil Trifonov plays Franz Liszt/,
+  );
+  await page
+    .getByLabel("Search items", { exact: true })
+    .fill("no 1 prelude presto");
+  await page.getByRole("button", { name: "Search", exact: true }).click();
+  await titleResult.waitFor();
+  await page.getByLabel("Search items", { exact: true }).fill("");
+  await page.getByRole("button", { name: "Search", exact: true }).click();
+  await page.getByRole("button", { name: "Create new", exact: true }).click();
   const token = String(Date.now());
   await form("Create composer")
     .getByLabel("Composer name")

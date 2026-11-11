@@ -1,3 +1,13 @@
+# Phase 3 editor search correction
+
+The reported `No. 1 Prélude (Presto)` query exposed two gaps: Search items listed only catalogue entities, and scan evidence omitted track titles/album/performer metadata. The plugin now retains those read-only scan hints, searches owned tracks alongside catalogue entries, ignores accents/punctuation and matches query words in any order. Selecting a track shows its metadata and permits attachment to an existing recording/work through the existing guarded command. Scans do not fabricate work identities.
+
+Update the plugin bundle/manifest from `phase3-review`, restart the test instance, then rerun **Scan classical model (read only)** from an album menu and reload the editor. Existing scan evidence needs this explicit rescan for title/album/performer searches; opening Search items does not rescan. No schema migration or core update is required for this correction. Read-only library mounts remain supported.
+
+Local validation: all **171 plugin tests** passed; real Chromium found the exact Liszt/Trifonov title and its unaccented spelling in a synthetic read-only library, then completed the existing editor workflow. Persistence/media checks passed before and after restart, and existing admin/two-user comparison streaming passed afterward. Remote CI for this correction is recorded separately when observed.
+
+The user's BrainzMash cooldown logs come from the existing core release-date refresher. Phase 3 did not modify that code; the user explicitly asked to leave it alone, and no refresher/provider changes were made. Ordinary-user work browsing/grouping remains Phase 4 and is not implemented here. No production server access, deployment, merge, upstream change or subagents.
+
 # Phase 3 addendum
 
 Existing fork preservation branches/main/upstream remain untouched. New D01 admin-forms v1 is a generic, opt-in core hook for the plugin-owned editor: manifest pages/capability, authenticated read/mutate transport, host forms, route/Settings entry and types/docs/tests. No core SQL schema or classical business logic is added. All classical mutations stay in independent plugin storage. The central plugin UPSTREAM_DELTA.md records exact files and limitations. Phase 3 is complete for review; no upstream PR or automatic merge.

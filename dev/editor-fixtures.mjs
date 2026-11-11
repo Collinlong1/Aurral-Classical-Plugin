@@ -42,6 +42,13 @@ if (action === "prepare") {
     "/config/editor-media-evidence.json",
     JSON.stringify(evidence),
   );
+  const beforeScan = await openCatalogue(
+    "/config/plugin-data/aurral-classical/model",
+  );
+  const previousGeneration = beforeScan.db
+    .prepare("SELECT coalesce(max(generation),0) AS n FROM core_instance")
+    .get().n;
+  beforeScan.close();
   await request("/plugins/aurral-classical/actions/classical-model-scan", {
     albumId: library.albums[0].id,
   });
@@ -51,7 +58,10 @@ if (action === "prepare") {
       const c = await openCatalogue(
         "/config/plugin-data/aurral-classical/model",
       );
-      done = !!c.db.prepare("SELECT 1 FROM model_job WHERE state='done'").get();
+      done =
+        c.db
+          .prepare("SELECT coalesce(max(generation),0) AS n FROM core_instance")
+          .get().n > previousGeneration;
       c.close();
       if (done) break;
     } catch {}

@@ -59,6 +59,8 @@ export async function enqueueModelScan(ctx, actor) {
           readPath: file.readPath || file.path,
           durationMs: file.durationMs ?? track.durationMs,
           albumId: file.albumId,
+          title: track.title || "",
+          artist: track.artistName || "",
         })),
     );
     const jobs = new ModelJobs(catalogue);
@@ -131,6 +133,13 @@ export async function runModelJobs(
             durationMs,
             fingerprint: hash,
             hints: {
+              title: tags.title || file.title || "",
+              album: tags.album,
+              artist: tags.artist || file.artist || "",
+              albumArtist: tags.albumArtist,
+              composer: tags.composer,
+              trackNumber: tags.trackNumber,
+              discNumber: tags.discNumber,
               genres: tags.genres,
               work: tags.work,
               composerDistinct:

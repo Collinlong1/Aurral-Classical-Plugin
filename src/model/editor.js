@@ -3,6 +3,7 @@ import { openCatalogue } from "./catalogue.js";
 import { Metadata } from "./metadata.js";
 import { transaction } from "./database.js";
 import { classify } from "./reconcile.js";
+import { searchText, matchesSearch, ownedTracks } from "./editor-search.js";
 
 class EditorError extends Error {
   constructor(message, status = 400) {
@@ -37,8 +38,7 @@ function text(value, label, { optional = false, max = 10000 } = {}) {
 }
 const revision = (c) =>
   `${c.db.prepare("SELECT coalesce(max(id),0) AS n FROM audit_event").get().n}:${c.db.prepare("SELECT coalesce(max(rowid),0) AS n FROM assertion").get().n}`;
-const normalized = (s) =>
-  s.normalize("NFKD").replace(/\p{M}/gu, "").toLowerCase();
+const normalized = searchText;
 const validDate = (value) =>
   /^\d{4}(-(0[1-9]|1[0-2])(-(0[1-9]|[12]\d|3[01]))?)?$/.test(value) &&
   (value.length !== 10 ||
@@ -101,13 +101,18 @@ function render(c, input) {
   const offset = Number(query.offset || 0);
   if (!Number.isSafeInteger(offset) || offset < 0 || offset > 10000000)
     fail("Invalid page offset");
-  const filtered = all.filter((e) =>
-    normalized(`${e.label} ${e.kind}`).includes(q),
+  const tracks = ownedTracks(c);
+  const matchingTracks = tracks.filter((track) =>
+    matchesSearch(track.search, q),
   );
+  const selectedTrack = query.selection?.startsWith("track:")
+    ? tracks.find((track) => `track:${track.id}` === query.selection)
+    : null;
+  const filtered = all.filter((e) => matchesSearch(`${e.label} ${e.kind}`, q));
   const selected = query.selection
     ? all.find((e) => e.id === query.selection)
     : null;
-  if (query.selection && !selected)
+  if (query.selection && !selected && !selectedTrack)
     fail("This catalogue entry no longer exists");
   const label = (id) => all.find((e) => e.id === id)?.label || "Untitled entry";
   const composers = all.filter(
@@ -185,6 +190,20 @@ function render(c, input) {
     ),
   );
   const notes = [];
+  if (!tracks.length)
+    notes.push(
+      "No owned tracks are indexed in the classical model yet. Run “Scan classical model (read only)” from an album menu, then reload this page.",
+    );
+  else if (
+    tracks.some((track) => !Object.hasOwn(track.evidence.hints || {}, "title"))
+  )
+    notes.push(
+      "Some indexed tracks have no saved title metadata. Run “Scan classical model (read only)” again to search their titles, albums and performers.",
+    );
+  if (q && !filtered.length && !matchingTracks.length)
+    notes.push(
+      "No matching catalogue entries or indexed owned tracks. Try a shorter title, album or performer name.",
+    );
   if (selected) {
     notes.push(`${entityType(selected)}: ${selected.label}`.slice(0, 8000));
     if (
@@ -400,21 +419,9 @@ function render(c, input) {
         WHERE rp.kind='recording_performance' AND rp.source_id=? AND pw.kind='performance_work'`,
         )
         .all(selected.id);
-      const tracks = c.db
-        .prepare(
-          "SELECT t.*,c.state AS classification FROM track_link t LEFT JOIN classification c ON c.target_id=t.id WHERE t.state='active'",
-        )
-        .all()
-        .map((row) => ({ ...row, evidence: JSON.parse(row.evidence) }));
-      const matchingTracks = tracks
-        .filter((row) =>
-          normalized(
-            `${row.evidence.hints?.title || ""} ${row.evidence.path} ${row.evidence.albumId || ""}`,
-          ).includes(q),
-        )
-        .slice(0, 200);
+      const choices = matchingTracks.slice(0, 200);
       const movements = pws.flatMap((pw) => movementRows(c, pw.target_id));
-      if (matchingTracks.length && pws.length)
+      if (choices.length && pws.length)
         forms.push(
           form(
             "attach",
@@ -439,11 +446,11 @@ function render(c, input) {
                   ),
                 ],
               }),
-              field("track", "Owned track", matchingTracks[0].id, "select", {
-                options: matchingTracks.map((t) =>
+              field("track", "Owned track", choices[0].id, "select", {
+                options: choices.map((t) =>
                   option(
                     t.id,
-                    `${path.basename(path.dirname(t.evidence.path))} / ${path.basename(t.evidence.path)} · ${t.classification || "unsure"}`,
+                    `${t.label} · ${path.basename(path.dirname(t.evidence.path))} / ${path.basename(t.evidence.path)} · ${t.classification || "unsure"}`,
                   ),
                 ),
               }),
@@ -502,6 +509,86 @@ function render(c, input) {
     notes.push(
       "Conflicting provider values are retained for review. Refresh never replaces a pinned value.",
     );
+  const trackForms = [];
+  if (selectedTrack) {
+    notes.unshift(
+      `Owned track: ${selectedTrack.title}\nAlbum: ${selectedTrack.album || "Unknown album"}\nPerformer: ${selectedTrack.artist || "Unknown performer"}\nFile: ${path.basename(selectedTrack.evidence.path)}\nClassification: ${selectedTrack.classification || "unsure"}`.slice(
+        0,
+        8000,
+      ),
+    );
+    const choices = c.db
+      .prepare(
+        `SELECT rp.source_id AS recording,pw.id AS performanceWork,pw.target_id AS work FROM relation rp
+      JOIN relation pw ON pw.source_id=rp.target_id AND pw.kind='performance_work'
+      WHERE rp.kind='recording_performance' ORDER BY rp.source_id,pw.position LIMIT 200`,
+      )
+      .all();
+    const workIds = [...new Set(choices.map((choice) => choice.work))];
+    const movements = workIds.flatMap((work) => movementRows(c, work));
+    if (choices.length)
+      trackForms.push(
+        form(
+          "attach-found-track",
+          "Attach owned track",
+          "attach-found-track",
+          { track: selectedTrack.id },
+          [
+            field(
+              "choice",
+              "Recording and work performance",
+              `${choices[0].recording}|${choices[0].performanceWork}`,
+              "select",
+              {
+                options: choices.map((choice) =>
+                  option(
+                    `${choice.recording}|${choice.performanceWork}`,
+                    `${label(choice.recording)} — ${label(choice.work)}`,
+                  ),
+                ),
+              },
+            ),
+            field("movement", "Movement (or whole work)", "", "select", {
+              options: [
+                option("", "Whole work"),
+                ...movements
+                  .slice(0, 999)
+                  .map((movement) =>
+                    option(
+                      movement.target_id,
+                      `${label(movement.source_id)}: ${label(movement.target_id)}`,
+                    ),
+                  ),
+              ],
+            }),
+            field(
+              "confirmClassical",
+              "Confirm this track is classical",
+              false,
+              "checkbox",
+            ),
+          ],
+          "Attach track",
+          "Choose an existing recording and a movement belonging to its work. This changes catalogue associations only; the audio file stays read only.",
+        ),
+      );
+    else
+      notes.push(
+        "To attach this track to a work, clear the search, create a work and a recording, then search for the track again. Library scans do not automatically create work identities.",
+      );
+  }
+  const results = [
+    ...filtered.map((e) => ({
+      id: e.id,
+      label: `${entityType(e)} · ${e.label}`.slice(0, 500),
+    })),
+    ...(q
+      ? matchingTracks.map((track) => ({
+          id: `track:${track.id}`,
+          label: `Track · ${track.label}`.slice(0, 500),
+        }))
+      : []),
+  ];
   return {
     version: 1,
     title: "Classical metadata editor",
@@ -509,33 +596,34 @@ function render(c, input) {
       "Works, movements and recordings in your library. Admin edits stay in the classical catalogue; audio files are not modified.",
     revision: revision(c),
     navigation: {
-      items: filtered.slice(offset, offset + 100).map((e) => ({
-        id: e.id,
-        label: `${entityType(e)} · ${e.label}`.slice(0, 500),
-      })),
-      total: filtered.length,
+      items: results.slice(offset, offset + 100),
+      total: results.length,
       offset,
     },
     notes,
-    forms: selected
-      ? forms
-          .filter(
-            (f) =>
-              !["create-composer", "create-contributor"].includes(f.command) &&
-              (f.command !== "create-work" || selected.kind === "person"),
-          )
-          .sort((a, b) => {
-            const order = (command) =>
-              ["edit-field", "use-provider"].includes(command)
-                ? 0
-                : ["add-movement", "reorder-movements"].includes(command)
-                  ? 1
-                  : command === "create-work"
-                    ? 5
-                    : 2;
-            return order(a.command) - order(b.command);
-          })
-      : forms,
+    forms: selectedTrack
+      ? trackForms
+      : selected
+        ? forms
+            .filter(
+              (f) =>
+                !["create-composer", "create-contributor"].includes(
+                  f.command,
+                ) &&
+                (f.command !== "create-work" || selected.kind === "person"),
+            )
+            .sort((a, b) => {
+              const order = (command) =>
+                ["edit-field", "use-provider"].includes(command)
+                  ? 0
+                  : ["add-movement", "reorder-movements"].includes(command)
+                    ? 1
+                    : command === "create-work"
+                      ? 5
+                      : 2;
+              return order(a.command) - order(b.command);
+            })
+        : forms,
   };
 }
 
@@ -574,6 +662,7 @@ function apply(c, input, who) {
       "track",
       "confirmClassical",
     ],
+    "attach-found-track": ["track", "choice", "movement", "confirmClassical"],
     "detach-track": ["recording", "item"],
     "add-credit": ["target", "contributor", "role", "instrument"],
     "remove-credit": ["target", "credit"],
@@ -582,6 +671,31 @@ function apply(c, input, who) {
     fail("Unknown editor command or fields");
   let selection;
   switch (request.command) {
+    case "attach-found-track": {
+      const parts = text(v.choice, "recording and performance", {
+        max: 200,
+      }).split("|");
+      if (parts.length !== 2)
+        fail("Select a valid recording and work performance");
+      return apply(
+        c,
+        {
+          ...input,
+          mutation: {
+            ...request,
+            command: "attach-track",
+            values: {
+              track: v.track,
+              recording: parts[0],
+              performanceWork: parts[1],
+              movement: v.movement,
+              confirmClassical: v.confirmClassical,
+            },
+          },
+        },
+        who,
+      );
+    }
     case "create-contributor": {
       const name = text(v.name, "contributor name", { max: 500 }).trim();
       if (!["person", "ensemble"].includes(v.kind))

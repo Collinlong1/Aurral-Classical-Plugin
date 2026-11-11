@@ -7,6 +7,9 @@ import { openCatalogue } from "../src/model/catalogue.js";
 import { Metadata } from "../src/model/metadata.js";
 import { reconcile, classify } from "../src/model/reconcile.js";
 import { tempFolders, copyFixture } from "./helpers.js";
+import { json } from "./helpers.js";
+import { File } from "node-taglib-sharp";
+import { enqueueModelScan, runModelJobs } from "../src/model/runtime.js";
 
 async function setup(t) {
   const folders = await tempFolders();
@@ -414,4 +417,163 @@ test("long metadata remains editable with bounded choice labels and no unrelated
     ),
   );
   assert.equal(page.forms[0].id, "edit-title");
+});
+
+test("read-only title scan finds the Liszt/Trifonov track by accented title, punctuation, album and performer without a work record", async (t) => {
+  const s = await setup(t),
+    file = await copyFixture(
+      "sine.flac",
+      path.join(s.folders.libraryFolder, "01.flac"),
+    );
+  const media = File.createFromPath(file);
+  media.tag.title = "No. 1 Prélude (Presto)";
+  media.tag.album = "Transcendental - Daniil Trifonov plays Franz Liszt";
+  media.tag.performers = ["Daniil Trifonov"];
+  media.tag.albumArtists = ["Daniil Trifonov"];
+  media.tag.composers = ["Franz Liszt"];
+  media.tag.genres = ["Classical"];
+  media.save();
+  media.dispose();
+  await fs.chmod(file, 0o444);
+  const before = await fs.readFile(file);
+  const ctx = {
+    ...s.input,
+    settings: {},
+    userOperations: {
+      version: 1,
+      url: "http://host.test/ops",
+      token: "fixture",
+    },
+    fetch: async () =>
+      json({
+        version: 1,
+        complete: true,
+        library: {
+          tracks: [
+            {
+              id: 1,
+              title: "No. 1 Prélude (Presto)",
+              artistName: "Daniil Trifonov",
+              files: [{ id: 1, path: file, available: true }],
+            },
+          ],
+        },
+      }),
+  };
+  await enqueueModelScan(ctx, { id: 1, role: "admin" });
+  await runModelJobs(ctx, { budgetMs: 10000 });
+  for (const q of [
+    "No. 1 Prélude (Presto)",
+    "no 1 prelude presto",
+    "PRESTO, Prélude No 1",
+    "Transcendental Trifonov",
+    "Daniil Trifonov",
+    "Franz Liszt",
+  ]) {
+    const page = await s.read("", { q });
+    assert.equal(page.navigation.total, 1, q);
+    assert.match(page.navigation.items[0].label, /No\. 1 Prélude \(Presto\)/);
+    assert.match(page.navigation.items[0].id, /^track:/);
+    const detail = await s.read(page.navigation.items[0].id, { q });
+    assert.match(
+      detail.notes.join("\n"),
+      /Transcendental - Daniil Trifonov plays Franz Liszt/,
+    );
+  }
+  assert.equal(
+    s.c.db.prepare("SELECT count(*) AS n FROM entity").get().n,
+    0,
+    "search does not fabricate work identities",
+  );
+  assert.deepEqual(await fs.readFile(file), before);
+  assert.equal((await fs.stat(file)).mode & 0o777, 0o444);
+});
+
+test("owned-track search results attach using the same parent/performance validation as recording forms", async (t) => {
+  const s = await setup(t),
+    work = await s.work(),
+    recording = await s.broadcast(work);
+  const [link] = reconcile(s.c, {
+    version: 1,
+    complete: true,
+    instanceId: "search-fixture",
+    epoch: "1",
+    generation: 1,
+    tracks: [
+      {
+        coreId: "1",
+        fileId: "1",
+        path: "/library/01.flac",
+        size: 100,
+        durationMs: 2000,
+        fingerprint: "fixture",
+        hints: {
+          title: "No. 1 Prélude (Presto)",
+          album: "Transcendental",
+          artist: "Daniil Trifonov",
+        },
+      },
+    ],
+  });
+  const detail = await s.read(`track:${link.id}`, { q: "prelude" }),
+    form = detail.forms.find((f) => f.command === "attach-found-track");
+  assert.ok(form);
+  const values = {
+    ...form.arguments,
+    ...Object.fromEntries(form.fields.map((f) => [f.key, f.value])),
+  };
+  assert.equal(
+    (await s.mutate("attach-found-track", values)).ok,
+    false,
+    "classification confirmation is still required",
+  );
+  assert.equal(
+    (await s.mutate("attach-found-track", { ...values, choice: "invalid" })).ok,
+    false,
+  );
+  const result = await s.mutate("attach-found-track", {
+    ...values,
+    confirmClassical: true,
+  });
+  assert.equal(result.ok, true, result.message);
+  assert.equal(result.selection, recording);
+  const fromRecording = await s.read(recording, { q: "No. 1 Prelude Presto" });
+  assert.equal(
+    fromRecording.forms
+      .find((f) => f.id === "attach")
+      .fields.find((f) => f.key === "track").options[0].value,
+    link.id,
+  );
+});
+
+test("empty, unmatched and legacy title-less indexes explain the next step instead of failing silently", async (t) => {
+  const s = await setup(t);
+  assert.match(
+    (await s.read("", { q: "prelude" })).notes.join("\n"),
+    /Scan classical model/,
+  );
+  const [link] = reconcile(s.c, {
+    version: 1,
+    complete: true,
+    instanceId: "legacy",
+    epoch: "1",
+    generation: 1,
+    tracks: [
+      {
+        coreId: "1",
+        fileId: "1",
+        path: "/library/01.flac",
+        size: 100,
+        durationMs: 2000,
+        fingerprint: "legacy",
+      },
+    ],
+  });
+  const missing = await s.read("", { q: "No. 1 Prélude (Presto)" });
+  assert.equal(missing.navigation.total, 0);
+  assert.match(missing.notes.join("\n"), /no saved title metadata/);
+  assert.match(missing.notes.join("\n"), /No matching/);
+  const filename = await s.read("", { q: "01.flac" });
+  assert.equal(filename.navigation.items[0].id, `track:${link.id}`);
+  await assert.rejects(s.read("track:missing"), /no longer exists/);
 });
