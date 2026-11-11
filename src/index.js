@@ -126,13 +126,17 @@ export default {
   actions: {
     async "classical-model-status"(input) {
       if (input.user?.role !== 'admin') throw new Error('Classical diagnostics require a host admin');
-      return { message: JSON.stringify(await modelStatus(makeContext(input))).slice(0,500) };
+      const status = await modelStatus(makeContext(input));
+      const indexed = status.tracks.reduce((sum, row) => sum + row.count, 0);
+      const scan = status.scan;
+      return { message: `Classical model schema ${status.schema}; indexed tracks: ${indexed}. ${scan ? `Scan ${scan.id}: ${scan.state}; processed ${scan.processed}/${scan.total} files.${scan.error ? ` Error: ${scan.error}` : ""}` : "No scan has been queued."}`.slice(0, 500) };
     },
     async "classical-model-scan"(input) {
       const ctx = makeContext(input);
       const id = await enqueueModelScan(ctx,input.user);
-      await runModelJobs(ctx);
-      return { message: `Classical model scan ${id} saved; remaining batches resume on the host schedule. See model status for completion.` };
+      await runModelJobs(ctx, { budgetMs: ACTION_BUDGET_MS });
+      const { scan } = await modelStatus(ctx);
+      return { message: `Classical model scan ${id}: ${scan?.state || "saved"}; processed ${scan?.processed ?? 0}/${scan?.total ?? 0} files. ${scan?.state === "done" ? "Reload the editor to search indexed tracks." : "Existing progress is saved. Run Scan again to resume immediately, or enable the plugin schedule for automatic continuation."}`.slice(0, 500) };
     },
     async "classical-model-cancel"(input) {
       await cancelModelScan(makeContext(input),input.user);
@@ -192,10 +196,14 @@ export default {
 
   async scheduled(input) {
     const ctx = makeContext(input);
+    const deadline = Date.now() + SCHEDULE_BUDGET_MS;
+    // Use the scheduled call's budget, sharing it with optional file tagging.
     // Model failures never suppress the established source/tagging schedule.
-    await runModelJobs(ctx).catch(error => log(`Classical model unavailable: ${error.message}`));
+    await runModelJobs(ctx, { budgetMs: SCHEDULE_BUDGET_MS }).catch(error => log(`Classical model unavailable: ${error.message}`));
     if (ctx.settings.enableFileWrites !== true) return;
-    const stats = await runScheduled(ctx, SCHEDULE_BUDGET_MS);
+    const remainingMs = deadline - Date.now();
+    if (remainingMs <= 0) return;
+    const stats = await runScheduled(ctx, remainingMs);
     if (stats) log(`Scheduled tagging: ${describeStats(stats)}`);
     await pruneCache(path.join(ctx.dataFolder, "mb-cache"), TTL.default).catch(() => {});
   },

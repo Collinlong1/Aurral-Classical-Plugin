@@ -59,3 +59,7 @@ No production library or server is accessed. An anonymized real-library snapshot
 ## Phase 3 editor update
 
 The Phase 3 review build adds the admin editor described in EDITOR_GUIDE.md. It uses the existing schema 1, model relationships, metadata precedence and SQLite transactions. The generic fork bridge renders bounded forms without plugin browser scripts. Prior references above to an unimplemented editor describe the Phase 2 checkpoint; the model's scan/identity/backup limits still apply. Grouping and work pages remain later work.
+
+## Scan progress correction
+
+The original five-second processing window was unsuitable for full libraries. Explicit admin scans now use the existing 25-minute background-action window; scheduled scans share the existing 8.5-minute scheduled budget with optional tagging. Status shows the latest scan ID, state and processed/total files. Partial scans are checkpointed but are not searchable until the entire snapshot is reconciled. Repeating Scan resumes the existing job without requesting a new snapshot; the Schedule capability permits automatic continuation. This does not enable background tagging or change media permissions.

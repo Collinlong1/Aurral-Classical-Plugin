@@ -37053,7 +37053,9 @@ var ModelJobs = class {
   }
   checkpoint(job, progress, { done = false, now = Date.now(), leaseMs = 3e4, commit } = {}) {
     return transaction(this.db, () => {
-      const row = this.get(job.id);
+      const row = this.db.prepare(
+        "SELECT state,owner,generation,lease_until,cancel_requested FROM model_job WHERE id=?"
+      ).get(job.id);
       if (!row || row.state !== "running" || row.owner !== job.owner || row.generation !== job.generation || row.lease_until <= now)
         throw new Error("Stale job lease");
       if (row.cancel_requested) {
@@ -37359,6 +37361,12 @@ async function modelStatus(ctx) {
   try {
     return {
       ...catalogue.diagnostics(),
+      scan: catalogue.db.prepare(
+        `SELECT id,state,error,
+          json_array_length(input,'$.files') AS total,
+          coalesce(json_extract(progress,'$.cursor'),0) AS processed
+          FROM model_job WHERE type='library_scan' ORDER BY created_at DESC,rowid DESC LIMIT 1`
+      ).get() || null,
       jobs: catalogue.db.prepare("SELECT state,count(*) AS count FROM model_job GROUP BY state").all()
     };
   } finally {
@@ -37368,12 +37376,14 @@ async function modelStatus(ctx) {
 async function enqueueModelScan(ctx, actor2) {
   if (actor2?.role !== "admin")
     throw new Error("Classical model scans require a current host admin");
-  const library = await new UserOperations(
-    ctx.userOperations,
-    ctx.fetch
-  ).library();
+  const operations = new UserOperations(ctx.userOperations, ctx.fetch);
   const catalogue = await openCatalogue(modelFolder(ctx));
   try {
+    const pending = catalogue.db.prepare(
+      "SELECT id FROM model_job WHERE key='library_scan' AND state IN ('queued','running','retry') LIMIT 1"
+    ).get();
+    if (pending) return pending.id;
+    const library = await operations.library();
     let instance = catalogue.db.prepare("SELECT * FROM core_instance LIMIT 1").get();
     if (!instance) {
       const id = randomUUID7();
@@ -37419,8 +37429,9 @@ async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 10 } = {}) {
       const root = await fs3.realpath(ctx.libraryFolder);
       while (cursor < input.files.length && Date.now() < deadline) {
         const stop = Math.min(cursor + batchSize, input.files.length);
-        for (; cursor < stop; cursor++) {
-          if (jobs.get(job.id).cancel_requested) break;
+        for (; cursor < stop && Date.now() < deadline; cursor++) {
+          if (catalogue.db.prepare("SELECT cancel_requested FROM model_job WHERE id=?").get(job.id).cancel_requested)
+            break;
           const file = input.files[cursor];
           const real = await fs3.realpath(file.readPath);
           const relative = path5.relative(root, real);
@@ -39944,13 +39955,17 @@ var index_default = {
   actions: {
     async "classical-model-status"(input) {
       if (input.user?.role !== "admin") throw new Error("Classical diagnostics require a host admin");
-      return { message: JSON.stringify(await modelStatus(makeContext(input))).slice(0, 500) };
+      const status = await modelStatus(makeContext(input));
+      const indexed = status.tracks.reduce((sum, row) => sum + row.count, 0);
+      const scan = status.scan;
+      return { message: `Classical model schema ${status.schema}; indexed tracks: ${indexed}. ${scan ? `Scan ${scan.id}: ${scan.state}; processed ${scan.processed}/${scan.total} files.${scan.error ? ` Error: ${scan.error}` : ""}` : "No scan has been queued."}`.slice(0, 500) };
     },
     async "classical-model-scan"(input) {
       const ctx = makeContext(input);
       const id = await enqueueModelScan(ctx, input.user);
-      await runModelJobs(ctx);
-      return { message: `Classical model scan ${id} saved; remaining batches resume on the host schedule. See model status for completion.` };
+      await runModelJobs(ctx, { budgetMs: ACTION_BUDGET_MS });
+      const { scan } = await modelStatus(ctx);
+      return { message: `Classical model scan ${id}: ${scan?.state || "saved"}; processed ${scan?.processed ?? 0}/${scan?.total ?? 0} files. ${scan?.state === "done" ? "Reload the editor to search indexed tracks." : "Existing progress is saved. Run Scan again to resume immediately, or enable the plugin schedule for automatic continuation."}`.slice(0, 500) };
     },
     async "classical-model-cancel"(input) {
       await cancelModelScan(makeContext(input), input.user);
@@ -40003,9 +40018,12 @@ var index_default = {
   },
   async scheduled(input) {
     const ctx = makeContext(input);
-    await runModelJobs(ctx).catch((error) => log(`Classical model unavailable: ${error.message}`));
+    const deadline = Date.now() + SCHEDULE_BUDGET_MS;
+    await runModelJobs(ctx, { budgetMs: SCHEDULE_BUDGET_MS }).catch((error) => log(`Classical model unavailable: ${error.message}`));
     if (ctx.settings.enableFileWrites !== true) return;
-    const stats = await runScheduled(ctx, SCHEDULE_BUDGET_MS);
+    const remainingMs = deadline - Date.now();
+    if (remainingMs <= 0) return;
+    const stats = await runScheduled(ctx, remainingMs);
     if (stats) log(`Scheduled tagging: ${describeStats(stats)}`);
     await pruneCache(path12.join(ctx.dataFolder, "mb-cache"), TTL.default).catch(() => {
     });

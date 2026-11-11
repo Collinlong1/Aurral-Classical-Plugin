@@ -838,3 +838,89 @@ test("the complete committed synthetic library scans and rescans without changin
   for (let i = 0; i < files.length; i++)
     assert.deepEqual(await fs.readFile(files[i].path), before[i]);
 });
+
+for (const resumeWith of ["action", "schedule"]) {
+  test(`a partial read-only scan resumes beyond five seconds through ${resumeWith}`, async (t) => {
+    const folders = await tempFolders();
+    t.after(() => fs.rm(folders.root, { recursive: true, force: true }));
+    const files = [];
+    for (let i = 0; i < 30; i++) {
+      const file = await copyFixture(
+        "sine.flac",
+        path.join(folders.libraryFolder, `${i}.flac`),
+      );
+      await fs.chmod(file, 0o444);
+      files.push(file);
+    }
+    const before = await Promise.all(files.map((file) => fs.readFile(file)));
+    let snapshotRequests = 0;
+    const ctx = {
+      ...folders,
+      settings: { enableFileWrites: false },
+      userOperations: {
+        version: 1,
+        url: "http://host.test/ops",
+        token: "test-only",
+      },
+      fetch: async () => {
+        snapshotRequests++;
+        return response({
+          version: 1,
+          complete: true,
+          library: {
+            tracks: files.map((file, i) => ({
+              id: i,
+              files: [{ id: i, path: file, available: true }],
+            })),
+          },
+        });
+      },
+    };
+    const id = await enqueueModelScan(ctx, { id: 1, role: "admin" });
+    let clock = Date.now();
+    t.mock.method(Date, "now", () => clock);
+    const originalStat = fs.stat;
+    t.mock.method(fs, "stat", async (...args) => {
+      const result = await originalStat(...args);
+      if (files.includes(args[0])) clock += 600;
+      return result;
+    });
+    await runModelJobs(ctx);
+    const partial = await modelStatus(ctx);
+    assert.equal(partial.scan.state, "queued");
+    assert.equal(partial.scan.processed, 5);
+    assert.equal(partial.scan.total, 30);
+    assert.deepEqual(
+      partial.tracks,
+      [],
+      "partial scans do not publish incomplete snapshots",
+    );
+    const input = { ...ctx, user: { id: 1, role: "admin" } };
+    const status = await plugin.actions["classical-model-status"](input);
+    assert.match(status.message, /queued; processed 5\/30 files/);
+    // Resuming the admin action must reuse its original complete snapshot.
+    t.mock.method(globalThis, "fetch", async () => {
+      throw new Error("unexpected snapshot/provider request");
+    });
+    if (resumeWith === "action") {
+      const result = await plugin.actions["classical-model-scan"](input);
+      assert.match(result.message, /done; processed 30\/30 files/);
+    } else {
+      await plugin.scheduled(input);
+    }
+    const done = await modelStatus(ctx);
+    assert.equal(done.scan.id, id);
+    assert.equal(done.scan.state, "done");
+    assert.equal(done.scan.processed, 30);
+    assert.equal(done.tracks.find((row) => row.state === "active").count, 30);
+    assert.equal(snapshotRequests, 1);
+    assert.match(
+      (await plugin.actions["classical-model-status"](input)).message,
+      /indexed tracks: 30/,
+    );
+    for (let i = 0; i < files.length; i++) {
+      assert.deepEqual(await fs.readFile(files[i]), before[i]);
+      assert.equal((await fs.stat(files[i])).mode & 0o777, 0o444);
+    }
+  });
+}

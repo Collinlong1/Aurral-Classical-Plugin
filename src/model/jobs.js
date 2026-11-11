@@ -71,7 +71,12 @@ export class ModelJobs {
     { done = false, now = Date.now(), leaseMs = 30_000, commit } = {},
   ) {
     return transaction(this.db, () => {
-      const row = this.get(job.id);
+      // Do not parse the full library snapshot and collected evidence at every checkpoint.
+      const row = this.db
+        .prepare(
+          "SELECT state,owner,generation,lease_until,cancel_requested FROM model_job WHERE id=?",
+        )
+        .get(job.id);
       if (
         !row ||
         row.state !== "running" ||

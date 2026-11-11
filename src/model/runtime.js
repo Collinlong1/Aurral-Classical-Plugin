@@ -20,6 +20,15 @@ export async function modelStatus(ctx) {
   try {
     return {
       ...catalogue.diagnostics(),
+      scan:
+        catalogue.db
+          .prepare(
+            `SELECT id,state,error,
+          json_array_length(input,'$.files') AS total,
+          coalesce(json_extract(progress,'$.cursor'),0) AS processed
+          FROM model_job WHERE type='library_scan' ORDER BY created_at DESC,rowid DESC LIMIT 1`,
+          )
+          .get() || null,
       jobs: catalogue.db
         .prepare("SELECT state,count(*) AS count FROM model_job GROUP BY state")
         .all(),
@@ -32,12 +41,17 @@ export async function modelStatus(ctx) {
 export async function enqueueModelScan(ctx, actor) {
   if (actor?.role !== "admin")
     throw new Error("Classical model scans require a current host admin");
-  const library = await new UserOperations(
-    ctx.userOperations,
-    ctx.fetch,
-  ).library();
+  const operations = new UserOperations(ctx.userOperations, ctx.fetch);
   const catalogue = await openCatalogue(modelFolder(ctx));
   try {
+    // Resume an existing scan without requesting another full host snapshot.
+    const pending = catalogue.db
+      .prepare(
+        "SELECT id FROM model_job WHERE key='library_scan' AND state IN ('queued','running','retry') LIMIT 1",
+      )
+      .get();
+    if (pending) return pending.id;
+    const library = await operations.library();
     // A local binding lives with the plugin data/config. File hashes still guard reused core IDs.
     let instance = catalogue.db
       .prepare("SELECT * FROM core_instance LIMIT 1")
@@ -97,8 +111,13 @@ export async function runModelJobs(
       const root = await fs.realpath(ctx.libraryFolder);
       while (cursor < input.files.length && Date.now() < deadline) {
         const stop = Math.min(cursor + batchSize, input.files.length);
-        for (; cursor < stop; cursor++) {
-          if (jobs.get(job.id).cancel_requested) break;
+        for (; cursor < stop && Date.now() < deadline; cursor++) {
+          if (
+            catalogue.db
+              .prepare("SELECT cancel_requested FROM model_job WHERE id=?")
+              .get(job.id).cancel_requested
+          )
+            break;
           const file = input.files[cursor];
           const real = await fs.realpath(file.readPath);
           const relative = path.relative(root, real);
