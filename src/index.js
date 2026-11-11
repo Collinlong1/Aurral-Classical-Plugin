@@ -195,7 +195,14 @@ export default {
         throw new Error("Classical diagnostics require a host admin");
       const status = await modelStatus(makeContext(input));
       const indexed = status.tracks.reduce((sum, row) => sum + row.count, 0);
-      const scan = status.scan;
+      const scan = status.scan && {
+        ...status.scan,
+        // A running scan whose lease lapsed lost its process; say so.
+        state:
+          status.scan.state === "running" && status.scan.leaseUntil <= status.now
+            ? "interrupted (run Scan again to resume)"
+            : status.scan.state,
+      };
       return {
         message:
           `Classical model schema ${status.schema}; indexed tracks: ${indexed}. ${scan ? `Scan ${scan.id}: ${scan.state}; processed ${scan.processed}/${scan.total} files.${scan.skipped ? ` ${scan.skipped} unreadable file${scan.skipped === 1 ? "" : "s"} skipped.` : ""}${scan.error ? ` Error: ${scan.error}` : ""}` : "No scan has been queued."}`.slice(

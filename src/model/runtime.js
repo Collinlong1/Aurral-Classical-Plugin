@@ -51,10 +51,12 @@ export async function modelStatus(ctx) {
             `SELECT id,state,CASE WHEN state IN ('retry','failed') THEN error ELSE NULL END AS error,
           json_array_length(input,'$.files') AS total,
           coalesce(json_extract(progress,'$.cursor'),0) AS processed,
-          coalesce(json_extract(progress,'$.errorCount'),0) AS skipped
+          coalesce(json_extract(progress,'$.errorCount'),0) AS skipped,
+          lease_until AS leaseUntil
           FROM model_job WHERE type='library_scan' ORDER BY created_at DESC,rowid DESC LIMIT 1`,
           )
           .get() || null,
+      now: Date.now(),
       jobs: catalogue.db
         .prepare("SELECT state,count(*) AS count FROM model_job GROUP BY state")
         .all(),
@@ -338,6 +340,9 @@ export async function runModelJobs(
           } catch (error) {
             skip(file, error, prior);
           }
+          // Tag reading is synchronous; let album pages and the editor get
+          // answers between files instead of waiting behind the whole scan.
+          await new Promise((resolve) => setImmediate(resolve));
         }
         if (
           !jobs.checkpoint(

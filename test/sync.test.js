@@ -121,3 +121,20 @@ test("rescans reuse unchanged fingerprints and add no evidence rows", async (t) 
   const status = await modelStatus(ctx);
   assert.equal(status.tracks.find((r) => r.state === "active").count, 2);
 });
+
+test("a scan whose process died reports as interrupted, then resumes", async (t) => {
+  const { ctx } = await library(t, 2);
+  await enqueueModelScan(ctx, { id: 1, role: "admin" });
+  // Simulate the host killing the plugin mid-scan: running, lease lapsed.
+  const c = await openCatalogue(path.join(ctx.dataFolder, "model"));
+  c.db.prepare("UPDATE model_job SET state='running',owner='dead',lease_until=1,attempt=1").run();
+  c.close();
+  const input = { ...ctx, user: { id: 1, role: "admin" } };
+  t.mock.method(globalThis, "fetch", ctx.fetch);
+  assert.match(
+    (await plugin.actions["classical-model-status"](input)).message,
+    /interrupted \(run Scan again to resume\); processed 0\/2/,
+  );
+  const result = await plugin.actions["classical-model-scan"](input);
+  assert.match(result.message, /done; processed 2\/2/);
+});

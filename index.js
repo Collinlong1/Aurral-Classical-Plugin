@@ -39444,9 +39444,11 @@ async function modelStatus(ctx) {
         `SELECT id,state,CASE WHEN state IN ('retry','failed') THEN error ELSE NULL END AS error,
           json_array_length(input,'$.files') AS total,
           coalesce(json_extract(progress,'$.cursor'),0) AS processed,
-          coalesce(json_extract(progress,'$.errorCount'),0) AS skipped
+          coalesce(json_extract(progress,'$.errorCount'),0) AS skipped,
+          lease_until AS leaseUntil
           FROM model_job WHERE type='library_scan' ORDER BY created_at DESC,rowid DESC LIMIT 1`
       ).get() || null,
+      now: Date.now(),
       jobs: catalogue.db.prepare("SELECT state,count(*) AS count FROM model_job GROUP BY state").all()
     };
   } finally {
@@ -39660,6 +39662,7 @@ async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 200, checkpointMs
           } catch (error) {
             skip(file, error, prior);
           }
+          await new Promise((resolve) => setImmediate(resolve));
         }
         if (!jobs.checkpoint(
           job,
@@ -42195,7 +42198,11 @@ var index_default = {
         throw new Error("Classical diagnostics require a host admin");
       const status = await modelStatus(makeContext(input));
       const indexed = status.tracks.reduce((sum, row) => sum + row.count, 0);
-      const scan = status.scan;
+      const scan = status.scan && {
+        ...status.scan,
+        // A running scan whose lease lapsed lost its process; say so.
+        state: status.scan.state === "running" && status.scan.leaseUntil <= status.now ? "interrupted (run Scan again to resume)" : status.scan.state
+      };
       return {
         message: `Classical model schema ${status.schema}; indexed tracks: ${indexed}. ${scan ? `Scan ${scan.id}: ${scan.state}; processed ${scan.processed}/${scan.total} files.${scan.skipped ? ` ${scan.skipped} unreadable file${scan.skipped === 1 ? "" : "s"} skipped.` : ""}${scan.error ? ` Error: ${scan.error}` : ""}` : "No scan has been queued."}`.slice(
           0,
