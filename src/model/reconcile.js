@@ -212,6 +212,26 @@ export function reconcile(catalogue, snapshot) {
   });
 }
 
+const TEMPO =
+  /\b(allegr(?:o|etto)|adagi(?:o|etto)|andant(?:e|ino)|larghetto|largo|lento|grave|prestissimo|presto|vivace|moderato|scherzo|menuetto|minuet|menuet|rondo|finale|maestoso|sostenuto|cantabile)\b/i;
+const CATALOGUE_NUMBER =
+  /\b(op(?:us)?\.?|bwv|kv?\.?|d\.|hob\.?|rv|woo|hwv|sz\.?|twv)\s*\d/i;
+const FORM =
+  /\b(symphon(?:y|ie)|sinfonia|sonata|concerto|suite|partita|string quartet|piano trio|quintet|nocturne|mazurka|polonaise|etude|prelude|fugue|toccata|cantata|oratorio|requiem|mass in|missa|motet|madrigal|lieder|impromptu|ballade|rhapsody|overture)(?:s|es)?\b/i;
+// Text signals from the track's own title, WORK tag and album title.
+function textEvidence(hints) {
+  const text = [hints.title, hints.work, hints.album]
+    .filter((v) => typeof v === "string")
+    .join(" \n ")
+    .normalize("NFKD")
+    .replace(/\p{M}/gu, "");
+  return {
+    movement: TEMPO.test(text),
+    catalogueNumber: CATALOGUE_NUMBER.test(text),
+    form: FORM.test(text),
+  };
+}
+
 // Model-only decision; this function never writes tags or changes stock search/playback.
 export function classify(
   catalogue,
@@ -241,19 +261,25 @@ export function classify(
     const ordinaryGenre = genres.some((s) =>
       /\b(rock|jazz|pop|electronic|soundtrack)\b/.test(s),
     );
+    const derived = textEvidence(hints);
     const score =
       (hints.work ? 4 : 0) +
-      (hints.movement ? 4 : 0) +
+      (hints.movement ? 4 : derived.movement ? 3 : 0) +
       (classicalGenre ? 4 : 0) +
       (hints.classicalComposerRelation ? 4 : 0) +
-      (hints.catalogueNumber ? 2 : 0) +
+      (hints.catalogueNumber || derived.catalogueNumber ? 2 : 0) +
+      (derived.form ? 2 : 0) +
       (hints.composerDistinct ? 1 : 0);
+    // No classical evidence at all, not even a composer tag, is not an
+    // uncertain match; leave the review queue for genuinely unsure tracks.
+    const noEvidence =
+      score === 0 && !(Array.isArray(hints.composer) && hints.composer.length);
     const state =
       manual ||
       inherited ||
       (score >= 4
         ? "classical"
-        : ordinaryGenre && score === 0
+        : (ordinaryGenre && score === 0) || noEvidence
           ? "not_classical"
           : "unsure");
     catalogue.db
@@ -264,6 +290,12 @@ export function classify(
       .run(target, state, manual ? 1 : 0, score, json(hints), Date.now());
     if (state === "unsure")
       catalogue.review("classification", target, { hints, score });
+    else
+      catalogue.db
+        .prepare(
+          "UPDATE review_item SET status='resolved' WHERE kind='classification' AND target_id=? AND status='open'",
+        )
+        .run(target);
     if (manual) catalogue.audit("classification.pin", target, { state }, actor);
     return state;
   });

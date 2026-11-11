@@ -36260,6 +36260,17 @@ function reconcile(catalogue, snapshot) {
     return rows;
   });
 }
+var TEMPO = /\b(allegr(?:o|etto)|adagi(?:o|etto)|andant(?:e|ino)|larghetto|largo|lento|grave|prestissimo|presto|vivace|moderato|scherzo|menuetto|minuet|menuet|rondo|finale|maestoso|sostenuto|cantabile)\b/i;
+var CATALOGUE_NUMBER = /\b(op(?:us)?\.?|bwv|kv?\.?|d\.|hob\.?|rv|woo|hwv|sz\.?|twv)\s*\d/i;
+var FORM = /\b(symphon(?:y|ie)|sinfonia|sonata|concerto|suite|partita|string quartet|piano trio|quintet|nocturne|mazurka|polonaise|etude|prelude|fugue|toccata|cantata|oratorio|requiem|mass in|missa|motet|madrigal|lieder|impromptu|ballade|rhapsody|overture)(?:s|es)?\b/i;
+function textEvidence(hints) {
+  const text4 = [hints.title, hints.work, hints.album].filter((v) => typeof v === "string").join(" \n ").normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "");
+  return {
+    movement: TEMPO.test(text4),
+    catalogueNumber: CATALOGUE_NUMBER.test(text4),
+    form: FORM.test(text4)
+  };
+}
 function classify(catalogue, target, hints, { manual = null, actor: actor3 = null, inherited = null } = {}) {
   return transaction(catalogue.db, () => {
     const prior = catalogue.db.prepare("SELECT * FROM classification WHERE target_id=?").get(target);
@@ -36275,14 +36286,20 @@ function classify(catalogue, target, hints, { manual = null, actor: actor3 = nul
     const ordinaryGenre = genres.some(
       (s) => /\b(rock|jazz|pop|electronic|soundtrack)\b/.test(s)
     );
-    const score = (hints.work ? 4 : 0) + (hints.movement ? 4 : 0) + (classicalGenre ? 4 : 0) + (hints.classicalComposerRelation ? 4 : 0) + (hints.catalogueNumber ? 2 : 0) + (hints.composerDistinct ? 1 : 0);
-    const state = manual || inherited || (score >= 4 ? "classical" : ordinaryGenre && score === 0 ? "not_classical" : "unsure");
+    const derived = textEvidence(hints);
+    const score = (hints.work ? 4 : 0) + (hints.movement ? 4 : derived.movement ? 3 : 0) + (classicalGenre ? 4 : 0) + (hints.classicalComposerRelation ? 4 : 0) + (hints.catalogueNumber || derived.catalogueNumber ? 2 : 0) + (derived.form ? 2 : 0) + (hints.composerDistinct ? 1 : 0);
+    const noEvidence = score === 0 && !(Array.isArray(hints.composer) && hints.composer.length);
+    const state = manual || inherited || (score >= 4 ? "classical" : ordinaryGenre && score === 0 || noEvidence ? "not_classical" : "unsure");
     catalogue.db.prepare(
       `INSERT INTO classification VALUES (?,?,?,?,?,1,?) ON CONFLICT(target_id)
       DO UPDATE SET state=excluded.state,pinned=excluded.pinned,score=excluded.score,evidence=excluded.evidence,updated_at=excluded.updated_at`
     ).run(target, state, manual ? 1 : 0, score, json(hints), Date.now());
     if (state === "unsure")
       catalogue.review("classification", target, { hints, score });
+    else
+      catalogue.db.prepare(
+        "UPDATE review_item SET status='resolved' WHERE kind='classification' AND target_id=? AND status='open'"
+      ).run(target);
     if (manual) catalogue.audit("classification.pin", target, { state }, actor3);
     return state;
   });
