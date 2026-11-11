@@ -734,6 +734,111 @@ test("host scan runs only by admin action, resumes from durable batches and neve
   done.close();
 });
 
+test("read-only model scans index WAV files using host metadata without opening them for tagging", async (t) => {
+  const folders = await tempFolders();
+  t.after(() => fs.rm(folders.root, { recursive: true, force: true }));
+  const file = await copyFixture(
+    "sine.flac",
+    path.join(folders.libraryFolder, "host-track.wav"),
+  );
+  await fs.chmod(file, 0o444);
+  const before = await fs.readFile(file);
+  const ctx = {
+    ...folders,
+    settings: {},
+    userOperations: {
+      version: 1,
+      url: "http://host.test/ops",
+      token: "test-only",
+    },
+    fetch: async () =>
+      response({
+        version: 1,
+        complete: true,
+        library: {
+          tracks: [
+            {
+              id: 17,
+              title: "Host WAV title",
+              artistName: "Host WAV artist",
+              durationMs: 2000,
+              files: [
+                {
+                  id: 71,
+                  path: file,
+                  albumId: 9,
+                  durationMs: 2000,
+                  available: true,
+                },
+              ],
+            },
+          ],
+        },
+      }),
+  };
+  await enqueueModelScan(ctx, { id: 1, role: "admin" });
+  await runModelJobs(ctx, { budgetMs: 10000 });
+  const status = await modelStatus(ctx);
+  assert.equal(status.scan.state, "done");
+  assert.equal(status.tracks.find((row) => row.state === "active").count, 1);
+  const catalogue = await openCatalogue(path.join(folders.dataFolder, "model"));
+  try {
+    const evidence = JSON.parse(
+      catalogue.db.prepare("SELECT evidence FROM track_link").get().evidence,
+    );
+    assert.equal(evidence.hints.title, "Host WAV title");
+    assert.equal(evidence.hints.artist, "Host WAV artist");
+    assert.equal(evidence.durationMs, 2000);
+  } finally {
+    catalogue.close();
+  }
+  assert.deepEqual(await fs.readFile(file), before);
+  assert.equal((await fs.stat(file)).mode & 0o777, 0o444);
+});
+
+test("an explicit scan resumes failed saved progress after a reader fix", async (t) => {
+  const folders = await tempFolders();
+  t.after(() => fs.rm(folders.root, { recursive: true, force: true }));
+  let snapshotRequests = 0;
+  const ctx = {
+    ...folders,
+    settings: {},
+    userOperations: {
+      version: 1,
+      url: "http://host.test/ops",
+      token: "test-only",
+    },
+    fetch: async () => {
+      snapshotRequests++;
+      return response({ version: 1, complete: true, library: { tracks: [] } });
+    },
+  };
+  const id = await enqueueModelScan(ctx, { id: 1, role: "admin" });
+  const catalogue = await openCatalogue(path.join(folders.dataFolder, "model"));
+  catalogue.db
+    .prepare(
+      `UPDATE model_job SET state='failed',progress=?,attempt=max_attempts,
+      error='old reader failure' WHERE id=?`,
+    )
+    .run(JSON.stringify({ cursor: 4130, collected: [] }), id);
+  catalogue.close();
+  assert.equal(
+    await enqueueModelScan(ctx, { id: 1, role: "admin" }),
+    id,
+  );
+  const resumed = await openCatalogue(path.join(folders.dataFolder, "model"));
+  try {
+    const job = new ModelJobs(resumed).get(id);
+    assert.equal(job.state, "queued");
+    assert.equal(job.attempt, 0);
+    assert.equal(job.error, null);
+    assert.equal(job.progress.cursor, 4130);
+    assert.equal(snapshotRequests, 1);
+  } finally {
+    resumed.close();
+  }
+});
+
 test("stored ordinary/unsure decisions block explicit file writes, even with provider classical evidence", async (t) => {
   const folders = await tempFolders();
   t.after(() => fs.rm(folders.root, { recursive: true, force: true }));

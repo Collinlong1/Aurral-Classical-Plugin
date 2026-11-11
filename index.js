@@ -37593,6 +37593,32 @@ var fingerprint = async (file) => {
   for await (const bytes of createReadStream(file)) hash.update(bytes);
   return `file-sha256-v1:${hash.digest("hex")}`;
 };
+var emptyTags = () => ({
+  title: "",
+  artist: "",
+  albumArtist: "",
+  album: "",
+  recordingMbid: "",
+  releaseMbid: "",
+  releaseGroupMbid: "",
+  albumArtistMbids: [],
+  artistMbids: [],
+  genres: [],
+  composer: [],
+  work: "",
+  workId: "",
+  trackNumber: 0,
+  discNumber: 0,
+  durationMs: 0
+});
+var readModelTags = (file) => {
+  try {
+    return readTags(file);
+  } catch (error) {
+    if (error instanceof UnsupportedFormat) return emptyTags();
+    throw error;
+  }
+};
 async function modelStatus(ctx) {
   const catalogue = await openCatalogue(modelFolder(ctx));
   try {
@@ -37620,6 +37646,16 @@ async function enqueueModelScan(ctx, actor3) {
       "SELECT id FROM model_job WHERE key='library_scan' AND state IN ('queued','running','retry') LIMIT 1"
     ).get();
     if (pending) return pending.id;
+    const latest = catalogue.db.prepare(
+      "SELECT id,state FROM model_job WHERE key='library_scan' ORDER BY created_at DESC,rowid DESC LIMIT 1"
+    ).get();
+    if (latest?.state === "failed") {
+      catalogue.db.prepare(
+        `UPDATE model_job SET state='queued',owner=NULL,lease_until=0,attempt=0,
+          next_run_at=0,cancel_requested=0,error=NULL WHERE id=? AND state='failed'`
+      ).run(latest.id);
+      return latest.id;
+    }
     const library = await operations.library();
     let instance = catalogue.db.prepare("SELECT * FROM core_instance LIMIT 1").get();
     if (!instance) {
@@ -37678,7 +37714,7 @@ async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 10 } = {}) {
             );
           const before = await fs3.stat(real);
           const hash = await fingerprint(real);
-          const tags = readTags(real);
+          const tags = readModelTags(real);
           const after = await fs3.stat(real);
           if (before.size !== after.size || before.mtimeMs !== after.mtimeMs || before.ino !== after.ino)
             throw new Error(

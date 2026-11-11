@@ -6,7 +6,7 @@ import { openCatalogue } from "./catalogue.js";
 import { ModelJobs } from "./jobs.js";
 import { reconcile, classify } from "./reconcile.js";
 import { UserOperations } from "../user-operations.js";
-import { readTags } from "../tags.js";
+import { readTags, UnsupportedFormat } from "../tags.js";
 
 export const modelFolder = (ctx) => path.join(ctx.dataFolder, "model");
 const fingerprint = async (file) => {
@@ -14,6 +14,35 @@ const fingerprint = async (file) => {
   for await (const bytes of createReadStream(file)) hash.update(bytes);
   // Full-file evidence is versioned. A retag needs review unless other evidence agrees.
   return `file-sha256-v1:${hash.digest("hex")}`;
+};
+const emptyTags = () => ({
+  title: "",
+  artist: "",
+  albumArtist: "",
+  album: "",
+  recordingMbid: "",
+  releaseMbid: "",
+  releaseGroupMbid: "",
+  albumArtistMbids: [],
+  artistMbids: [],
+  genres: [],
+  composer: [],
+  work: "",
+  workId: "",
+  trackNumber: 0,
+  discNumber: 0,
+  durationMs: 0,
+});
+const readModelTags = (file) => {
+  try {
+    return readTags(file);
+  } catch (error) {
+    // The host library can play formats the tag writer intentionally does not
+    // edit, including WAV. Keep those owned tracks searchable using the host's
+    // metadata instead of failing an otherwise read-only model scan.
+    if (error instanceof UnsupportedFormat) return emptyTags();
+    throw error;
+  }
 };
 export async function modelStatus(ctx) {
   const catalogue = await openCatalogue(modelFolder(ctx));
@@ -51,6 +80,20 @@ export async function enqueueModelScan(ctx, actor) {
       )
       .get();
     if (pending) return pending.id;
+    const latest = catalogue.db
+      .prepare(
+        "SELECT id,state FROM model_job WHERE key='library_scan' ORDER BY created_at DESC,rowid DESC LIMIT 1",
+      )
+      .get();
+    if (latest?.state === "failed") {
+      catalogue.db
+        .prepare(
+          `UPDATE model_job SET state='queued',owner=NULL,lease_until=0,attempt=0,
+          next_run_at=0,cancel_requested=0,error=NULL WHERE id=? AND state='failed'`,
+        )
+        .run(latest.id);
+      return latest.id;
+    }
     const library = await operations.library();
     // A local binding lives with the plugin data/config. File hashes still guard reused core IDs.
     let instance = catalogue.db
@@ -132,7 +175,7 @@ export async function runModelJobs(
             );
           const before = await fs.stat(real);
           const hash = await fingerprint(real);
-          const tags = readTags(real);
+          const tags = readModelTags(real);
           const after = await fs.stat(real);
           if (
             before.size !== after.size ||

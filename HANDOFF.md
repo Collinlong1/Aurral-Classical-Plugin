@@ -1,3 +1,7 @@
+# Phase 4 scan compatibility correction
+
+The user's schema-2 production-model scan failed at 4,130/12,802 files with `can't tag .wav files`. The read-only model scanner was incorrectly sending every host-owned format through the narrower writable-tag format check. Unsupported writable formats such as WAV now retain full-file hash evidence and use the host's trusted title/artist/duration metadata without being opened for tagging or modified. An explicit Scan requeues the latest failed saved job with its existing cursor and snapshot, so this scan resumes at 4,130 rather than restarting. All 177 plugin tests pass, including read-only WAV media/hash/metadata and failed-progress resumption regressions. Core, schema and the unrelated BrainzMash refresher are unchanged.
+
 # Current checkpoint — Phase 4 complete for review
 
 The user explicitly authorized Phase 4 on November 10, 2026 (America/Chicago). Grouping, bounded playback, the basic work page, schema-2 user state and generic host hooks are complete locally. Validation passed 175 plugin tests, 2,757 core unit tests across 406 files, 52 focused Phase 4 tests, required checks/build, real Chromium, restart persistence and exact-file playback for an admin and two users. See `PHASE_4_REPORT.md`. Stop before v0.2 search or later page/Discover scope. The user's container name is `aurral-phase3-test-aurral-test-1`; no agent access to it is authorized. BrainzMash refresher code remains untouched at the user's request.
