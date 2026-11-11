@@ -4014,7 +4014,7 @@ var require_byteVector = __commonJS({
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ByteVector = exports.Encoding = exports.StringType = void 0;
     var IConv = require_lib();
-    var fs8 = __require("fs");
+    var fs9 = __require("fs");
     var utils_1 = require_utils();
     var StringType2;
     (function(StringType3) {
@@ -4237,7 +4237,7 @@ var require_byteVector = __commonJS({
        */
       static fromPath(path14) {
         utils_1.Guards.truthy(path14, "path");
-        const fileBuffer = fs8.readFileSync(path14);
+        const fileBuffer = fs9.readFileSync(path14);
         return _ByteVector.fromByteArray(fileBuffer);
       }
       /**
@@ -5252,7 +5252,7 @@ var require_stream = __commonJS({
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Stream = exports.SeekOrigin = void 0;
-    var fs8 = __require("fs");
+    var fs9 = __require("fs");
     var utils_1 = require_utils();
     var byteVector_1 = require_byteVector();
     var SeekOrigin;
@@ -5267,14 +5267,14 @@ var require_stream = __commonJS({
         this._canWrite = canWrite;
         this._fd = fd;
         this._position = 0;
-        this._length = fs8.fstatSync(fd).size;
+        this._length = fs9.fstatSync(fd).size;
       }
       static createAsRead(path14) {
-        const fd = fs8.openSync(path14, "r");
+        const fd = fs9.openSync(path14, "r");
         return new _Stream(fd, false);
       }
       static createAsReadWrite(path14) {
-        const fd = fs8.openSync(path14, "r+");
+        const fd = fs9.openSync(path14, "r+");
         return new _Stream(fd, true);
       }
       // #endregion
@@ -5300,11 +5300,11 @@ var require_stream = __commonJS({
       // #region Public Methods
       /** @inheritDoc */
       close() {
-        fs8.closeSync(this._fd);
+        fs9.closeSync(this._fd);
       }
       /** @inheritDoc */
       read(buffer, bufferOffset, length) {
-        const bytes = fs8.readSync(this._fd, buffer, bufferOffset, length, this._position);
+        const bytes = fs9.readSync(this._fd, buffer, bufferOffset, length, this._position);
         this._position += bytes;
         return bytes;
       }
@@ -5332,7 +5332,7 @@ var require_stream = __commonJS({
         if (length === this._length) {
           return;
         }
-        fs8.ftruncateSync(this._fd, length);
+        fs9.ftruncateSync(this._fd, length);
         this._length = length;
         if (this._position > this._length) {
           this._position = this._length;
@@ -5347,7 +5347,7 @@ var require_stream = __commonJS({
           throw new Error("Invalid operation: this stream is a read-only stream");
         }
         const origLength = this._length;
-        const bytes = fs8.writeSync(this._fd, buffer, bufferOffset, length, this._position);
+        const bytes = fs9.writeSync(this._fd, buffer, bufferOffset, length, this._position);
         this._position += bytes;
         if (this._position > origLength) {
           this._length = this._position;
@@ -36005,15 +36005,139 @@ var Metadata = class {
 
 // src/model/reconcile.js
 import { randomUUID as randomUUID4 } from "node:crypto";
+
+// src/model/fingerprint.js
+import { createHash } from "node:crypto";
+import { createReadStream } from "node:fs";
+import fs2 from "node:fs/promises";
+var AUDIO_PREFIX = "audio-sha256-v2:";
+var CONTAINER_PREFIX = "file-sha256-v1:";
+var tagSensitive = (fingerprint2) => typeof fingerprint2 === "string" && fingerprint2.startsWith(CONTAINER_PREFIX);
+async function readAt(handle, position, length) {
+  const buffer = Buffer.alloc(length);
+  const { bytesRead } = await handle.read(buffer, 0, length, position);
+  return buffer.subarray(0, bytesRead);
+}
+var synchsafe = (b, offset) => (b[offset] & 127) << 21 | (b[offset + 1] & 127) << 14 | (b[offset + 2] & 127) << 7 | b[offset + 3] & 127;
+async function skipId3v2(handle, start, size) {
+  let position = start;
+  while (position + 10 <= size) {
+    const header = await readAt(handle, position, 10);
+    if (header.length < 10 || header.toString("latin1", 0, 3) !== "ID3") break;
+    const footer = header[5] & 16 ? 10 : 0;
+    position += 10 + synchsafe(header, 6) + footer;
+  }
+  return position;
+}
+async function trailingTagStart(handle, start, size) {
+  let end = size;
+  for (let changed = true; changed && end > start; ) {
+    changed = false;
+    if (end - start >= 128) {
+      const tail = await readAt(handle, end - 128, 3);
+      if (tail.toString("latin1") === "TAG") {
+        end -= 128;
+        changed = true;
+        continue;
+      }
+    }
+    if (end - start >= 32) {
+      const footer = await readAt(handle, end - 32, 32);
+      if (footer.toString("latin1", 0, 8) === "APETAGEX") {
+        const tagSize = footer.readUInt32LE(12);
+        const hasHeader = (footer.readUInt32LE(20) & 2147483648) !== 0;
+        const total = tagSize + (hasHeader ? 32 : 0);
+        if (total > 0 && total <= end - start) {
+          end -= total;
+          changed = true;
+        }
+      }
+    }
+  }
+  return end;
+}
+async function flacAudioStart(handle, start, size) {
+  let position = start + 4;
+  for (; ; ) {
+    const header = await readAt(handle, position, 4);
+    if (header.length < 4) return null;
+    const last = (header[0] & 128) !== 0;
+    const length = header.readUIntBE(1, 3);
+    position += 4 + length;
+    if (position > size) return null;
+    if (last) return position;
+  }
+}
+async function wavRanges(handle, size) {
+  const ranges = [];
+  let position = 12;
+  while (position + 8 <= size) {
+    const header = await readAt(handle, position, 8);
+    if (header.length < 8) break;
+    const id = header.toString("latin1", 0, 4);
+    const length = header.readUInt32LE(4);
+    const body = position + 8;
+    if (id === "fmt " || id === "data")
+      ranges.push([body, Math.min(size, body + length)]);
+    position = body + length + length % 2;
+  }
+  return ranges.some(([s, e]) => e > s) ? ranges : null;
+}
+async function audioRanges(file) {
+  const handle = await fs2.open(file, "r");
+  try {
+    const { size } = await handle.stat();
+    const magic = await readAt(handle, 0, 12);
+    if (magic.toString("latin1", 0, 4) === "RIFF" && magic.toString("latin1", 8, 12) === "WAVE")
+      return wavRanges(handle, size);
+    const start = await skipId3v2(handle, 0, size);
+    const head = await readAt(handle, start, 4);
+    if (head.toString("latin1") === "fLaC") {
+      const audio = await flacAudioStart(handle, start, size);
+      return audio == null ? null : [[audio, size]];
+    }
+    if (head.length >= 2 && head[0] === 255 && (head[1] & 224) === 224) {
+      const end = await trailingTagStart(handle, start, size);
+      return end > start ? [[start, end]] : null;
+    }
+    return null;
+  } finally {
+    await handle.close();
+  }
+}
+async function hashRanges(file, ranges) {
+  const hash = createHash("sha256");
+  for (const [start, end] of ranges) {
+    if (end <= start) continue;
+    for await (const bytes of createReadStream(file, { start, end: end - 1 }))
+      hash.update(bytes);
+  }
+  return hash.digest("hex");
+}
+async function fingerprint(file) {
+  let ranges = null;
+  try {
+    ranges = await audioRanges(file);
+  } catch {
+    ranges = null;
+  }
+  if (ranges) return `${AUDIO_PREFIX}${await hashRanges(file, ranges)}`;
+  const { size } = await fs2.stat(file);
+  return `${CONTAINER_PREFIX}${await hashRanges(file, [[0, size]])}`;
+}
+
+// src/model/reconcile.js
 var sameAudio = (a, b) => a.size != null && a.size === b.size && a.durationMs != null && a.durationMs === b.durationMs;
+var sameDuration = (a, b) => a.durationMs != null && a.durationMs === b.durationMs;
 function match(previous, candidate) {
   const old = JSON.parse(previous.evidence);
-  if (old.fingerprint && candidate.fingerprint && old.fingerprint !== candidate.fingerprint || old.durationMs != null && candidate.durationMs != null && old.durationMs !== candidate.durationMs)
+  const decisive = old.fingerprint && candidate.fingerprint && !tagSensitive(old.fingerprint) && !tagSensitive(candidate.fingerprint);
+  if (decisive && old.fingerprint !== candidate.fingerprint || old.durationMs != null && candidate.durationMs != null && old.durationMs !== candidate.durationMs)
     return false;
   if (old.fingerprint && old.fingerprint === candidate.fingerprint) return true;
   if (old.stableFileId && old.stableFileId === candidate.stableFileId && sameAudio(old, candidate))
     return true;
-  return previous.core_id === candidate.coreId && previous.file_id === candidate.fileId && old.path === candidate.path && sameAudio(old, candidate);
+  return previous.core_id === candidate.coreId && previous.file_id === candidate.fileId && old.path === candidate.path && sameDuration(old, candidate);
 }
 function reconcile(catalogue, snapshot) {
   if (snapshot?.version !== 1 || snapshot.complete !== true || !snapshot.instanceId || !snapshot.epoch || !Number.isSafeInteger(snapshot.generation) || snapshot.generation < 1 || !Array.isArray(snapshot.tracks))
@@ -37236,9 +37360,8 @@ async function albumPresentation(input) {
 }
 
 // src/model/runtime.js
-import { createHash as createHash2, randomUUID as randomUUID7 } from "node:crypto";
-import { createReadStream } from "node:fs";
-import fs3 from "node:fs/promises";
+import { randomUUID as randomUUID7 } from "node:crypto";
+import fs4 from "node:fs/promises";
 import path6 from "node:path";
 
 // src/model/jobs.js
@@ -37386,7 +37509,7 @@ var UserOperations = class {
 var import_node_taglib_sharp = __toESM(require_dist(), 1);
 import { randomUUID as randomUUID6 } from "node:crypto";
 import { closeSync, fstatSync, openSync, readSync } from "node:fs";
-import fs2 from "node:fs/promises";
+import fs3 from "node:fs/promises";
 import path5 from "node:path";
 import_node_taglib_sharp.Id3v2Settings.useNumericGenres = false;
 var READ_STYLE = import_node_taglib_sharp.ReadStyle.None | import_node_taglib_sharp.ReadStyle.PictureLazy;
@@ -37560,7 +37683,7 @@ async function writeTags(filePath, values) {
   if (!changed.length) return [];
   const extension = path5.extname(source);
   const working = path5.join(path5.dirname(source), `.${path5.basename(source, extension)}.${randomUUID6()}.tagging`);
-  await fs2.copyFile(source, working, fs2.constants.COPYFILE_FICLONE);
+  await fs3.copyFile(source, working, fs3.constants.COPYFILE_FICLONE);
   try {
     const file = openFile(working, READ_STYLE, source);
     try {
@@ -37581,9 +37704,9 @@ async function writeTags(filePath, values) {
     } finally {
       verified.dispose();
     }
-    await fs2.rename(working, source);
+    await fs3.rename(working, source);
   } catch (error) {
-    await fs2.rm(working, { force: true }).catch(() => {
+    await fs3.rm(working, { force: true }).catch(() => {
     });
     throw error;
   }
@@ -37591,14 +37714,14 @@ async function writeTags(filePath, values) {
 }
 
 // src/model/auto-match.js
-import { createHash } from "node:crypto";
+import { createHash as createHash2 } from "node:crypto";
 var MULTI_MOVEMENT = /\b(symphony|sonata|concerto|suite|partita|quartet|quintet|sextet|septet|octet|trio|serenade|divertimento)\b/i;
 var COLLECTION_LIKE = /\b(etudes?|études?|preludes?|préludes?|songs?|lieder)\b/i;
 var isCollectionLike = (value) => COLLECTION_LIKE.test(clean(value));
 var MOVEMENT_PREFIX = /^(?:[IVXLCDM]+|\d+)[.)\s:-]/i;
 var clean = (value) => String(value || "").trim().replace(/\s+/g, " ");
 var normalized2 = (value) => clean(value).normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase();
-var identity = (...values) => createHash("sha256").update(JSON.stringify(values)).digest("hex");
+var identity = (...values) => createHash2("sha256").update(JSON.stringify(values)).digest("hex");
 function proposedWork(work, title, allowStructuredTitles) {
   const tagged = clean(work);
   if (tagged && !isCollectionLike(tagged)) {
@@ -37834,11 +37957,6 @@ function releaseYear(date) {
 
 // src/model/runtime.js
 var modelFolder = (ctx) => path6.join(ctx.dataFolder, "model");
-var fingerprint = async (file) => {
-  const hash = createHash2("sha256");
-  for await (const bytes of createReadStream(file)) hash.update(bytes);
-  return `file-sha256-v1:${hash.digest("hex")}`;
-};
 var emptyTags = () => ({
   title: "",
   artist: "",
@@ -37957,23 +38075,23 @@ async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 10 } = {}) {
       const input = job.input;
       let cursor = job.progress.cursor || 0;
       const collected = job.progress.collected || [];
-      const root = await fs3.realpath(ctx.libraryFolder);
+      const root = await fs4.realpath(ctx.libraryFolder);
       while (cursor < input.files.length && Date.now() < deadline) {
         const stop = Math.min(cursor + batchSize, input.files.length);
         for (; cursor < stop && Date.now() < deadline; cursor++) {
           if (catalogue.db.prepare("SELECT cancel_requested FROM model_job WHERE id=?").get(job.id).cancel_requested)
             break;
           const file = input.files[cursor];
-          const real = await fs3.realpath(file.readPath);
+          const real = await fs4.realpath(file.readPath);
           const relative = path6.relative(root, real);
           if (!relative || relative === ".." || relative.startsWith(`..${path6.sep}`) || path6.isAbsolute(relative))
             throw new Error(
               "Indexed model file is outside the configured library"
             );
-          const before = await fs3.stat(real);
+          const before = await fs4.stat(real);
           const hash = await fingerprint(real);
           const tags = readModelTags(real);
-          const after = await fs3.stat(real);
+          const after = await fs4.stat(real);
           if (before.size !== after.size || before.mtimeMs !== after.mtimeMs || before.ino !== after.ino)
             throw new Error(
               "Library file changed during model scan; retry required"
@@ -38158,32 +38276,32 @@ async function cancelModelScan(ctx, actor3) {
 
 // src/store.js
 import { createHash as createHash3, randomUUID as randomUUID8 } from "node:crypto";
-import fs4 from "node:fs/promises";
+import fs5 from "node:fs/promises";
 import path7 from "node:path";
 var sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 async function readJson(file, fallback) {
   try {
-    return JSON.parse(await fs4.readFile(file, "utf8"));
+    return JSON.parse(await fs5.readFile(file, "utf8"));
   } catch {
     return fallback;
   }
 }
 async function writeJson(file, value) {
-  await fs4.mkdir(path7.dirname(file), { recursive: true });
+  await fs5.mkdir(path7.dirname(file), { recursive: true });
   const temp = `${file}.${process.pid}.${randomUUID8()}.tmp`;
-  await fs4.writeFile(temp, JSON.stringify(value));
-  await fs4.rename(temp, file);
+  await fs5.writeFile(temp, JSON.stringify(value));
+  await fs5.rename(temp, file);
 }
 async function tryLock(dir, staleMs) {
   try {
-    await fs4.mkdir(dir);
+    await fs5.mkdir(dir);
   } catch (error) {
     if (error.code !== "EEXIST") throw error;
-    const stat = await fs4.stat(dir).catch(() => null);
+    const stat = await fs5.stat(dir).catch(() => null);
     if (stat && Date.now() - stat.mtimeMs < staleMs) return null;
-    await fs4.rm(dir, { recursive: true, force: true });
+    await fs5.rm(dir, { recursive: true, force: true });
     try {
-      await fs4.mkdir(dir);
+      await fs5.mkdir(dir);
     } catch {
       return null;
     }
@@ -38193,12 +38311,12 @@ async function tryLock(dir, staleMs) {
     async touch() {
       if (released) return;
       const now = /* @__PURE__ */ new Date();
-      await fs4.utimes(dir, now, now).catch(() => {
+      await fs5.utimes(dir, now, now).catch(() => {
       });
     },
     async release() {
       released = true;
-      await fs4.rm(dir, { recursive: true, force: true }).catch(() => {
+      await fs5.rm(dir, { recursive: true, force: true }).catch(() => {
       });
     }
   };
@@ -38259,18 +38377,18 @@ var FileCache = class {
 };
 async function pruneCache(folder, maxAgeMs) {
   const stamp = path7.join(folder, ".pruned");
-  const last = (await fs4.stat(stamp).catch(() => null))?.mtimeMs ?? 0;
+  const last = (await fs5.stat(stamp).catch(() => null))?.mtimeMs ?? 0;
   if (Date.now() - last < 24 * 60 * 6e4) return 0;
-  await fs4.mkdir(folder, { recursive: true });
-  await fs4.writeFile(stamp, "");
+  await fs5.mkdir(folder, { recursive: true });
+  await fs5.writeFile(stamp, "");
   let removed = 0;
-  for (const dir of await fs4.readdir(folder).catch(() => [])) {
+  for (const dir of await fs5.readdir(folder).catch(() => [])) {
     const sub = path7.join(folder, dir);
-    for (const name of await fs4.readdir(sub).catch(() => [])) {
+    for (const name of await fs5.readdir(sub).catch(() => [])) {
       const file = path7.join(sub, name);
-      const stat = await fs4.stat(file).catch(() => null);
+      const stat = await fs5.stat(file).catch(() => null);
       if (stat && Date.now() - stat.mtimeMs > maxAgeMs) {
-        await fs4.rm(file, { force: true });
+        await fs5.rm(file, { force: true });
         removed++;
       }
     }
@@ -39261,7 +39379,7 @@ var isSucceeded = (state) => /Completed/i.test(state) && /Succeeded/i.test(state
 
 // src/source.js
 import { randomUUID as randomUUID10 } from "node:crypto";
-import fs5 from "node:fs/promises";
+import fs6 from "node:fs/promises";
 import path10 from "node:path";
 var LENGTH_TOLERANCE_MS = 2e3;
 var SEARCH_BUDGET_MS = 5e4;
@@ -39622,11 +39740,11 @@ var KEEP_DOWNLOADS_MS = 2 * 24 * 60 * 6e4;
 var MISSING_GRACE_MS = 2 * 6e4;
 async function findDownload(ctx, key) {
   const dir = downloadsDir(ctx);
-  for (const name of await fs5.readdir(dir).catch(() => [])) {
+  for (const name of await fs6.readdir(dir).catch(() => [])) {
     if (!name.endsWith(".json")) continue;
     const record = await readJson(path10.join(dir, name), null);
     if (!record || Date.now() - (record.startedAt || 0) > KEEP_DOWNLOADS_MS) {
-      await fs5.rm(path10.join(dir, name), { force: true });
+      await fs6.rm(path10.join(dir, name), { force: true });
       continue;
     }
     if (record.key === key && !record.failed) return name.replace(/\.json$/, "");
@@ -39636,19 +39754,19 @@ async function findDownload(ctx, key) {
 async function locate(downloadFolder, file) {
   const base = remoteBase(file.filename);
   const direct = path10.join(downloadFolder, remoteBase(remoteDir(file.filename)), base);
-  const stat = await fs5.stat(direct).catch(() => null);
+  const stat = await fs6.stat(direct).catch(() => null);
   if (stat?.isFile()) return direct;
   let seen = 0;
   const walk = async (dir, depth) => {
     if (depth > 4) return null;
-    for (const entry of await fs5.readdir(dir, { withFileTypes: true }).catch(() => [])) {
+    for (const entry of await fs6.readdir(dir, { withFileTypes: true }).catch(() => [])) {
       if (++seen > 5e4) return null;
       const full = path10.join(dir, entry.name);
       if (entry.isDirectory()) {
         const found = await walk(full, depth + 1);
         if (found) return found;
       } else if (entry.isFile() && (entry.name === base || entry.name.replace(/_\d{15,}(?=\.[^.]+$)/, "") === base)) {
-        const s = await fs5.stat(full).catch(() => null);
+        const s = await fs6.stat(full).catch(() => null);
         if (s && (!file.size || s.size === file.size)) return full;
       }
     }
@@ -39709,19 +39827,19 @@ var formatBytes = (bytes) => bytes >= 1024 ** 3 ? `${(bytes / 1024 ** 3).toFixed
 async function freeBytes(ctx, dir) {
   if (ctx.freeBytes) return ctx.freeBytes(dir);
   for (let at = dir; ; at = path10.dirname(at)) {
-    const stats = await fs5.statfs(at).catch(() => null);
+    const stats = await fs6.statfs(at).catch(() => null);
     if (stats) return stats.bavail * stats.bsize;
     if (path10.dirname(at) === at) return Infinity;
   }
 }
-var link = (ctx, local, target) => (ctx.linkFile ?? fs5.link)(local, target);
+var link = (ctx, local, target) => (ctx.linkFile ?? fs6.link)(local, target);
 async function copyInto(local, target) {
   const temp = `${target}.${randomUUID10()}.part`;
   try {
-    await fs5.copyFile(local, temp);
-    await fs5.rename(temp, target);
+    await fs6.copyFile(local, temp);
+    await fs6.rename(temp, target);
   } catch (error) {
-    await fs5.rm(temp, { force: true }).catch(() => {
+    await fs6.rm(temp, { force: true }).catch(() => {
     });
     throw error;
   }
@@ -39734,14 +39852,14 @@ async function moveIntoPlace(ctx, id, record, directory) {
     if (!local) throw new Error(`Couldn't find ${remoteBase(file.filename)} in slskd's download folder`);
     const name = `${String(file.disc || 1).padStart(2, "0")}-${String(i + 1).padStart(3, "0")} ${remoteBase(file.filename)}`.replace(/[\\/]/g, "_");
     const target = path10.join(directory, record.kind === "album" ? name : remoteBase(file.filename));
-    files.push({ local, target, file, size: (await fs5.stat(local)).size });
+    files.push({ local, target, file, size: (await fs6.stat(local)).size });
   }
-  await fs5.mkdir(directory, { recursive: true });
+  await fs6.mkdir(directory, { recursive: true });
   const todo = [];
   for (const entry of files) {
-    const there = await fs5.stat(entry.target).catch(() => null);
+    const there = await fs6.stat(entry.target).catch(() => null);
     if (!there || there.size !== entry.size) {
-      await fs5.rm(entry.target, { force: true });
+      await fs6.rm(entry.target, { force: true });
       todo.push(entry);
     }
   }
@@ -39790,12 +39908,12 @@ async function moveIntoPlace(ctx, id, record, directory) {
 import { randomUUID as randomUUID11 } from "node:crypto";
 
 // src/model/write-guard.js
-import fs6 from "node:fs/promises";
+import fs7 from "node:fs/promises";
 import path11 from "node:path";
 async function modelAllowsTagging(ctx, realPath) {
   const filename = path11.join(ctx.dataFolder, "model", "classical.sqlite");
   try {
-    await fs6.access(filename);
+    await fs7.access(filename);
   } catch (error) {
     if (error.code === "ENOENT") return true;
     throw error;
@@ -39821,7 +39939,7 @@ async function modelAllowsTagging(ctx, realPath) {
 }
 
 // src/tagger.js
-import fs7 from "node:fs/promises";
+import fs8 from "node:fs/promises";
 import path12 from "node:path";
 
 // src/aurral.js
@@ -39882,7 +40000,7 @@ var YIELD_FRESH_MS = 10 * 6e4;
 var PRIORITY_WAIT_MS = 5 * 6e4;
 var ACTION_CLAIM_MS = 2 * 6e4;
 async function enqueue(ctx, filePaths, { force = false, source = null } = {}) {
-  await fs7.mkdir(queueDir(ctx), { recursive: true });
+  await fs8.mkdir(queueDir(ctx), { recursive: true });
   const ids = [];
   for (const filePath of filePaths) {
     if (!filePath) continue;
@@ -39893,16 +40011,16 @@ async function enqueue(ctx, filePaths, { force = false, source = null } = {}) {
   return ids;
 }
 async function queuedEntries(ctx) {
-  const names = (await fs7.readdir(queueDir(ctx)).catch(() => [])).filter((n) => n.endsWith(".json")).sort();
+  const names = (await fs8.readdir(queueDir(ctx)).catch(() => [])).filter((n) => n.endsWith(".json")).sort();
   return names.map((name) => ({ name, file: path12.join(queueDir(ctx), name) }));
 }
 var queueLength = async (ctx) => (await queuedEntries(ctx)).length;
 async function allowedPath(ctx, filePath) {
-  const real = await fs7.realpath(filePath).catch(() => null);
+  const real = await fs8.realpath(filePath).catch(() => null);
   if (!real) return null;
   for (const root of [ctx.libraryFolder, ctx.dataFolder]) {
     if (!root) continue;
-    const base = await fs7.realpath(root).catch(() => null);
+    const base = await fs8.realpath(root).catch(() => null);
     if (!base) continue;
     const relative = path12.relative(base, real);
     if (relative && !relative.startsWith("..") && !path12.isAbsolute(relative)) return real;
@@ -40007,7 +40125,7 @@ var Session = class {
     if (this.state.admins > 0) this.yielding = true;
     else if (!this.yieldCheckedAt || Date.now() - this.yieldCheckedAt >= 500) {
       this.yieldCheckedAt = Date.now();
-      const stat = await fs7.stat(yieldFile(this.ctx)).catch(() => null);
+      const stat = await fs8.stat(yieldFile(this.ctx)).catch(() => null);
       this.yielding = Boolean(stat && Date.now() - stat.mtimeMs < YIELD_FRESH_MS);
     }
     if (this.yielding && !this.yieldLogged) {
@@ -40037,7 +40155,7 @@ var Session = class {
   // removed after that stay removed.
   async processReal(real, { force = false, prefilter = false, upgrade = false, queuedAt = null } = {}) {
     const { ctx } = this;
-    const stat = await fs7.stat(real);
+    const stat = await fs8.stat(real);
     if (!await modelAllowsTagging(ctx, real)) {
       this.record(real, stat, { status: "skipped", reason: "model classification or link requires review" });
       return true;
@@ -40095,7 +40213,7 @@ var Session = class {
       this.record(real, stat, { status: "skipped", reason: "couldn't write tags", recording: tags.recordingMbid });
       return true;
     }
-    const after = await fs7.stat(real);
+    const after = await fs8.stat(real);
     this.index[real] = { ...this.index[real], ...statKey(after), artist: fields.artist, workId: fields.workId || "" };
     this.record(real, after, {
       v: TAGGING_VERSION,
@@ -40142,7 +40260,7 @@ var Session = class {
     }
     const changed = await writeTags(real, values);
     if (mode !== "clear") delete this.originals[real];
-    const after = await fs7.stat(real);
+    const after = await fs8.stat(real);
     this.index[real] = { ...this.index[real] ?? {}, ...indexEntry(readTags(real), after) };
     this.record(real, after, { status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
     this.stats.skipped["classical tags removed"]--;
@@ -40188,7 +40306,7 @@ var Session = class {
           const reachable = await this.processFile(job.path, { force: job.force, queuedAt: job.at });
           if (!reachable) return false;
         }
-        await fs7.rm(entry.file, { force: true });
+        await fs8.rm(entry.file, { force: true });
       } finally {
         this.state.claimed.delete(entry.name);
       }
@@ -40209,7 +40327,7 @@ var Session = class {
         complete = false;
         return;
       }
-      const entries2 = await fs7.readdir(dir, { withFileTypes: true }).catch(() => []);
+      const entries2 = await fs8.readdir(dir, { withFileTypes: true }).catch(() => []);
       for (const entry of entries2) {
         if (Date.now() > until || await this.shouldYield()) {
           complete = false;
@@ -40220,7 +40338,7 @@ var Session = class {
         if (entry.isDirectory()) await walk(full);
         else if (entry.isFile() && isAudioPath(full)) {
           seen.add(full);
-          const stat = await fs7.stat(full).catch(() => null);
+          const stat = await fs8.stat(full).catch(() => null);
           if (!stat) continue;
           if (!sameStat(this.index[full], stat)) {
             try {
@@ -40255,7 +40373,7 @@ async function openState(ctx, priority) {
       await sleep(500);
       lock = await tryLock(lockDir(ctx), LOCK_STALE_MS);
     }
-    await fs7.rm(yieldFile(ctx), { force: true });
+    await fs8.rm(yieldFile(ctx), { force: true });
     if (!lock) ctx.log("Tagging in another process didn't pause within 5 minutes");
   }
   if (!lock) return null;

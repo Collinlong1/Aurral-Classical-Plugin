@@ -1,18 +1,27 @@
 import { randomUUID } from "node:crypto";
 import { transaction } from "./database.js";
 import { json } from "./catalogue.js";
+import { tagSensitive } from "./fingerprint.js";
 
 const sameAudio = (a, b) =>
   a.size != null &&
   a.size === b.size &&
   a.durationMs != null &&
   a.durationMs === b.durationMs;
+const sameDuration = (a, b) =>
+  a.durationMs != null && a.durationMs === b.durationMs;
 function match(previous, candidate) {
   const old = JSON.parse(previous.evidence);
+  // An audio fingerprint mismatch means different audio. A whole-file hash
+  // mismatch only means the file changed, which includes a tag edit, so it is
+  // not decisive on its own.
+  const decisive =
+    old.fingerprint &&
+    candidate.fingerprint &&
+    !tagSensitive(old.fingerprint) &&
+    !tagSensitive(candidate.fingerprint);
   if (
-    (old.fingerprint &&
-      candidate.fingerprint &&
-      old.fingerprint !== candidate.fingerprint) ||
+    (decisive && old.fingerprint !== candidate.fingerprint) ||
     (old.durationMs != null &&
       candidate.durationMs != null &&
       old.durationMs !== candidate.durationMs)
@@ -26,11 +35,13 @@ function match(previous, candidate) {
   )
     return true;
   // Paths alone, provider recording IDs and titles never establish identity.
+  // The same host track/file at the same path with the same duration is the
+  // same recording even when a tag edit changed its size or container hash.
   return (
     previous.core_id === candidate.coreId &&
     previous.file_id === candidate.fileId &&
     old.path === candidate.path &&
-    sameAudio(old, candidate)
+    sameDuration(old, candidate)
   );
 }
 

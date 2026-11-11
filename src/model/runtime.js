@@ -1,5 +1,4 @@
-import { createHash, randomUUID } from "node:crypto";
-import { createReadStream } from "node:fs";
+import { randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { openCatalogue } from "./catalogue.js";
@@ -9,14 +8,9 @@ import { UserOperations } from "../user-operations.js";
 import { readTags } from "../tags.js";
 import { autoMatchTaggedWorks, isCollectionLike } from "./auto-match.js";
 import { topWork } from "../works.js";
+import { fingerprint } from "./fingerprint.js";
 
 export const modelFolder = (ctx) => path.join(ctx.dataFolder, "model");
-const fingerprint = async (file) => {
-  const hash = createHash("sha256");
-  for await (const bytes of createReadStream(file)) hash.update(bytes);
-  // Full-file evidence is versioned. A retag needs review unless other evidence agrees.
-  return `file-sha256-v1:${hash.digest("hex")}`;
-};
 const emptyTags = () => ({
   title: "",
   artist: "",
