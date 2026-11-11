@@ -166,6 +166,7 @@ export function renderWork(c, workId, user) {
     },
     favourite: state?.favourite === 1,
     pickedRealizationId: state?.picked_realization_id || adminPick || null,
+    adminPickId: adminPick || null,
     pickScope: state?.picked_realization_id
       ? "user"
       : adminPick

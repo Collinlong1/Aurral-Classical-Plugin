@@ -278,6 +278,20 @@ try {
     1,
     "incomplete recording names its missing movement",
   );
+  // Every album track is in a work here, so By Work has no "Other tracks".
+  assert.equal(await ordinary.getByRole("heading", { name: "Other tracks" }).count(), 0);
+  if (process.env.EDITOR_SCREENSHOT_DIR)
+    await ordinary.screenshot({
+      path: `${process.env.EDITOR_SCREENSHOT_DIR}/phase4-by-work.png`,
+      fullPage: true,
+    });
+  await ordinary
+    .getByRole("button", { name: "Play III. Finale", exact: true })
+    .first()
+    .click();
+  await ordinary.waitForFunction(
+    () => document.querySelector(".global-player__title")?.textContent === "III. Finale",
+  );
   await ordinary.getByRole("button", { name: "By Track", exact: true }).click();
   await ordinary.getByRole("list", { name: /tracks$/ }).waitFor();
   await ordinary.getByRole("button", { name: "By Work", exact: true }).click();
@@ -289,12 +303,12 @@ try {
     .getByRole("heading", { name: "Owned recordings", exact: true })
     .waitFor();
   await ordinary
-    .getByRole("button", { name: "Your pick (admin fallback)", exact: true })
+    .getByRole("button", { name: "Server pick · Make my pick", exact: true })
     .waitFor();
   const completeRecording = ordinary.locator("article").filter({
     has: ordinary.getByRole("heading", {
-      name: "Complete fixture recording",
-      exact: true,
+      // Recording headings lead with performers, then the album/recording label.
+      name: /Complete fixture recording$/,
     }),
   });
   await completeRecording
@@ -315,15 +329,14 @@ try {
     .locator("article")
     .filter({
       has: ordinary.getByRole("heading", {
-        name: "Incomplete fixture recording",
-        exact: true,
+        name: /Incomplete fixture recording$/,
       }),
     });
   await incomplete
     .getByRole("button", { name: "Make my pick", exact: true })
     .click();
   await incomplete
-    .getByRole("button", { name: "Your pick", exact: true })
+    .getByRole("button", { name: "Your pick · Clear", exact: true })
     .waitFor();
   const secondUser = await browser.newContext({
     extraHTTPHeaders: {
@@ -336,8 +349,13 @@ try {
     .getByRole("button", { name: "Favourite work", exact: true })
     .waitFor();
   await secondWork
-    .getByRole("button", { name: "Your pick (admin fallback)", exact: true })
+    .getByRole("button", { name: "Server pick · Make my pick", exact: true })
     .waitFor();
+  if (process.env.EDITOR_SCREENSHOT_DIR)
+    await secondWork.screenshot({
+      path: `${process.env.EDITOR_SCREENSHOT_DIR}/phase4-work-page.png`,
+      fullPage: true,
+    });
   await secondUser.close();
   await regular.close();
   fixture("remember", JSON.stringify({ work, recording }));

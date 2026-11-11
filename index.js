@@ -37307,6 +37307,7 @@ function renderWork(c, workId, user) {
     },
     favourite: state?.favourite === 1,
     pickedRealizationId: state?.picked_realization_id || adminPick || null,
+    adminPickId: adminPick || null,
     pickScope: state?.picked_realization_id ? "user" : adminPick ? "admin" : null,
     recordings: [...byRealization.entries()].map(([id, entries2], index) => {
       const present = new Set(
