@@ -37275,7 +37275,7 @@ var ModelJobs = class {
       ).get(now, now);
       if (!row) return null;
       this.db.prepare(
-        "UPDATE model_job SET state='running',owner=?,lease_until=?,generation=generation+1,attempt=attempt+1 WHERE id=?"
+        "UPDATE model_job SET state='running',owner=?,lease_until=?,generation=generation+1,attempt=attempt+1,error=NULL WHERE id=?"
       ).run(owner, now + leaseMs, row.id);
       return this.get(row.id);
     });
@@ -37301,7 +37301,7 @@ var ModelJobs = class {
       }
       if (commit) commit();
       this.db.prepare(
-        "UPDATE model_job SET progress=?,state=?,lease_until=? WHERE id=?"
+        "UPDATE model_job SET progress=?,state=?,lease_until=?,error=NULL WHERE id=?"
       ).run(
         JSON.stringify(progress),
         done ? "done" : "running",
@@ -37624,7 +37624,7 @@ async function modelStatus(ctx) {
     return {
       ...catalogue.diagnostics(),
       scan: catalogue.db.prepare(
-        `SELECT id,state,error,
+        `SELECT id,state,CASE WHEN state IN ('retry','failed') THEN error ELSE NULL END AS error,
           json_array_length(input,'$.files') AS total,
           coalesce(json_extract(progress,'$.cursor'),0) AS processed
           FROM model_job WHERE type='library_scan' ORDER BY created_at DESC,rowid DESC LIMIT 1`

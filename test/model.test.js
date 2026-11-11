@@ -608,7 +608,11 @@ test("persistent jobs fence expired owners, cancel safely, checkpoint atomically
     jobs = new ModelJobs(c);
   const id = jobs.enqueue("scan", "same-key", { fixture: true });
   assert.equal(jobs.enqueue("scan", "same-key", {}), id);
+  c.db
+    .prepare("UPDATE model_job SET error='stale failure' WHERE id=?")
+    .run(id);
   const first = jobs.claim("one", { now: 100, leaseMs: 10 });
+  assert.equal(first.error, null);
   const other = await openCatalogue(folders.dataFolder),
     secondJobs = new ModelJobs(other);
   try {
@@ -637,6 +641,7 @@ test("persistent jobs fence expired owners, cancel safely, checkpoint atomically
       secondJobs.checkpoint(second, { cursor: 2 }, { now: 113 }),
       true,
     );
+    assert.equal(secondJobs.get(id).error, null);
     secondJobs.cancel(id);
     assert.equal(
       secondJobs.checkpoint(second, {}, { now: 114, done: true }),
@@ -897,6 +902,29 @@ test("an explicit scan resumes failed saved progress after a reader fix", async 
   } finally {
     resumed.close();
   }
+});
+
+test("model status shows errors only while a scan is retrying or failed", async (t) => {
+  const folders = await tempFolders();
+  t.after(() => fs.rm(folders.root, { recursive: true, force: true }));
+  const catalogue = await openCatalogue(path.join(folders.dataFolder, "model"));
+  const id = new ModelJobs(catalogue).enqueue("library_scan", "library_scan", {
+    files: [],
+  });
+  catalogue.db
+    .prepare("UPDATE model_job SET state='running',error='old failure' WHERE id=?")
+    .run(id);
+  catalogue.close();
+  assert.equal((await modelStatus(folders)).scan.error, null);
+  const retrying = await openCatalogue(path.join(folders.dataFolder, "model"));
+  retrying.db
+    .prepare("UPDATE model_job SET state='retry',error='current failure' WHERE id=?")
+    .run(id);
+  retrying.close();
+  assert.equal(
+    (await modelStatus(folders)).scan.error,
+    "current failure",
+  );
 });
 
 test("stored ordinary/unsure decisions block explicit file writes, even with provider classical evidence", async (t) => {

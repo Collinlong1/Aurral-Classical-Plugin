@@ -49,7 +49,7 @@ export class ModelJobs {
       if (!row) return null;
       this.db
         .prepare(
-          "UPDATE model_job SET state='running',owner=?,lease_until=?,generation=generation+1,attempt=attempt+1 WHERE id=?",
+          "UPDATE model_job SET state='running',owner=?,lease_until=?,generation=generation+1,attempt=attempt+1,error=NULL WHERE id=?",
         )
         .run(owner, now + leaseMs, row.id);
       return this.get(row.id);
@@ -95,7 +95,7 @@ export class ModelJobs {
       if (commit) commit();
       this.db
         .prepare(
-          "UPDATE model_job SET progress=?,state=?,lease_until=? WHERE id=?",
+          "UPDATE model_job SET progress=?,state=?,lease_until=?,error=NULL WHERE id=?",
         )
         .run(
           JSON.stringify(progress),

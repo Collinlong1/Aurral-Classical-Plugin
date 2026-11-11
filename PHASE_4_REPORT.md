@@ -18,7 +18,7 @@ The generic core delta adds opt-in manifest `albumPresentation` and public resou
 
 ## Validation observed locally
 
-- Plugin suite: **178 tests**, including schema-1 upgrade/backup, grouping/order/missing movements, range references, collection membership, two-user/admin-pick isolation, read-only indexing when tag parsing rejects WAV or malformed-header files, and resumption of saved scan progress after a reader correction.
+- Plugin suite: **179 tests**, including schema-1 upgrade/backup, grouping/order/missing movements, range references, collection membership, two-user/admin-pick isolation, read-only indexing when tag parsing rejects WAV or malformed-header files, resumption of saved scan progress after a reader correction, and clearing stale retry errors after successful progress.
 - Full core unit suite: **2,757 tests across 406 files** passed.
 - Focused core plugin/queue suites: **52 tests** passed, including ordinary-user resource authorization, admin-pick denial, capability fallback, invalid native references, range clamping, range persistence, and refusal to expand bounded playback remotely.
 - Core required checks pass with zero type errors and the unchanged 1,236 unsafe-any baseline. The production frontend build passes.

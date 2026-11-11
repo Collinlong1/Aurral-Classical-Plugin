@@ -52,7 +52,7 @@ export async function modelStatus(ctx) {
       scan:
         catalogue.db
           .prepare(
-            `SELECT id,state,error,
+            `SELECT id,state,CASE WHEN state IN ('retry','failed') THEN error ELSE NULL END AS error,
           json_array_length(input,'$.files') AS total,
           coalesce(json_extract(progress,'$.cursor'),0) AS processed
           FROM model_job WHERE type='library_scan' ORDER BY created_at DESC,rowid DESC LIMIT 1`,
