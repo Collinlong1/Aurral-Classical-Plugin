@@ -4,6 +4,8 @@ The user explicitly authorized Phase 4 on November 10, 2026 (America/Chicago). G
 
 Companion core implementation: `019e93f5a2f4720f8f0238c40c851dfb1070b740`, published on the user fork `phase4-review` branch and pinned in integration CI.
 
+Final observed implementation CI is green for plugin source `ce351e16d9a82f1cbc0284548ee218491146b29c`: run `43011161488` passed the four Node-version jobs plus isolated no-network model migrations, and integration run `43011160969` passed the pinned core checks/build, synthetic startup, Chromium Phase 4 workflow, restart/media verification and admin/two-user playback smoke. Later documentation-only commits do not change runtime source.
+
 # Phase 3 scan throughput correction
 
 The user's installed search patch was verified, but its first full-library scan had processed only 60 of 12,802 files and remained queued with no committed tracks. The five-second model runner budget was incorrectly used by both the explicit background action and the 15-minute schedule. This is our scan-processing limitation, separate from the pre-existing BrainzMash refresher, which remains unchanged per the user's instruction.

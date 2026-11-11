@@ -23,6 +23,7 @@ The generic core delta adds opt-in manifest `albumPresentation` and public resou
 - Focused core plugin/queue suites: **52 tests** passed, including ordinary-user resource authorization, admin-pick denial, capability fallback, invalid native references, range clamping, range persistence, and refusal to expand bounded playback remotely.
 - Core required checks pass with zero type errors and the unchanged 1,236 unsafe-any baseline. The production frontend build passes.
 - Real Chromium through disposable Compose passes the existing editor workflow plus By Work/By Track, basic work navigation, incomplete movement display, admin fallback, two-user favourite/pick isolation and phone layout. Restart checks preserve schema-2 state, media permissions/hashes and the presentation. Existing admin/two-user exact-file comparison streaming still passes with zero acquisitions.
+- Remote implementation CI is green for plugin `ce351e16d9a82f1cbc0284548ee218491146b29c` and pinned core `019e93f5a2f4720f8f0238c40c851dfb1070b740`: plugin run `43011161488` passed five jobs, and integration run `43011160969` passed the core checks/build, Chromium, restart/media and playback workflow.
 
 All browser/Compose evidence uses committed synthetic audio and recorded/local provider fixtures. No production server, credentials, real-library data or provider traffic was accessed. The user's unrelated BrainzMash refresher remains untouched.
 
