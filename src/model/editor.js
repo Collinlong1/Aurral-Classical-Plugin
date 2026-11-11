@@ -36,8 +36,35 @@ function text(value, label, { optional = false, max = 10000 } = {}) {
     fail(`Enter a valid ${label}`);
   return value;
 }
-const revision = (c) =>
-  `${c.db.prepare("SELECT coalesce(max(id),0) AS n FROM audit_event").get().n}:${c.db.prepare("SELECT coalesce(max(rowid),0) AS n FROM assertion").get().n}`;
+// Optimistic concurrency is scoped to the entry being edited (and its
+// movements), so a library scan or an edit to another entry never blocks a
+// save. The scope travels inside the revision token.
+function revision(c, scope = "") {
+  if (!scope) return "catalogue:new";
+  const target = scope.startsWith("track:") ? scope.slice(6) : scope;
+  const ids = [
+    target,
+    ...c.db
+      .prepare("SELECT target_id FROM relation WHERE kind='movement' AND source_id=?")
+      .all(target)
+      .map((r) => r.target_id),
+  ];
+  const marks = ids.map(() => "?").join(",");
+  const audit = c.db
+    .prepare(`SELECT coalesce(max(id),0) AS n FROM audit_event WHERE target_id IN (${marks})`)
+    .get(...ids).n;
+  const assertion = c.db
+    .prepare(`SELECT coalesce(max(rowid),0) AS n FROM assertion WHERE target_id IN (${marks})`)
+    .get(...ids).n;
+  const relation = c.db
+    .prepare("SELECT count(*) AS n FROM relation WHERE kind='movement' AND source_id=?")
+    .get(target).n;
+  return `${scope}|${audit}:${assertion}:${relation}`;
+}
+const revisionScope = (token) =>
+  typeof token === "string" && token.includes("|")
+    ? token.slice(0, token.lastIndexOf("|"))
+    : "";
 const normalized = searchText;
 const validDate = (value) =>
   /^\d{4}(-(0[1-9]|1[0-2])(-(0[1-9]|[12]\d|3[01]))?)?$/.test(value) &&
@@ -601,7 +628,7 @@ function render(c, input) {
     title: "Classical metadata editor",
     description:
       "Works, movements and recordings in your library. Admin edits stay in the classical catalogue; audio files are not modified.",
-    revision: revision(c),
+    revision: revision(c, selectedTrack ? query.selection : selected?.id || ""),
     navigation: {
       items: results.slice(offset, offset + 100),
       total: results.length,
@@ -644,7 +671,7 @@ function apply(c, input, who) {
     Array.isArray(request.values)
   )
     fail("Invalid editor request");
-  if (request.revision !== revision(c))
+  if (request.revision !== revision(c, revisionScope(request.revision)))
     throw new EditorError(
       "This catalogue changed. Reload before saving so newer edits are preserved.",
       409,

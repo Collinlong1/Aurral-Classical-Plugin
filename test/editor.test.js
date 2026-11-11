@@ -587,3 +587,29 @@ test("empty, unmatched and legacy title-less indexes explain the next step inste
   assert.equal(filename.navigation.items[0].id, `track:${link.id}`);
   await assert.rejects(s.read("track:missing"), /no longer exists/);
 });
+
+test("edits to other entries and library scans don't block saving this entry", async (t) => {
+  const s = await setup(t),
+    work = await s.work(),
+    other = await s.work();
+  const open = (await s.read(work)).revision;
+  // Another admin edits a different work, and a scan reconciles tracks.
+  assert.equal(
+    (await s.mutate("edit-field", { target: other, field: "title", value: "Other", blank: false, pin: true })).ok,
+    true,
+  );
+  s.c.audit("track.reconcile", "some-track", {});
+  const save = (revision, value) =>
+    s.mutate("edit-field", {}, {
+      mutation: {
+        revision,
+        command: "edit-field",
+        values: { target: work, field: "title", value, blank: false, pin: true },
+      },
+    });
+  const saved = await save(open, "Saved from the open tab");
+  assert.equal(saved.ok, true, saved.message);
+  // The same entry changed since it was opened: still a conflict.
+  assert.equal((await save(open, "Stale")).status, 409);
+  assert.equal(new Metadata(s.c).resolve(work, "title").value, "Saved from the open tab");
+});

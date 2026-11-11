@@ -18,7 +18,7 @@ function actor(input) {
   return user;
 }
 
-function realizationRows(c, realizationId = null, workId = null) {
+function realizationRows(c, realizationId = null, workId = null, albumId = null) {
   return c.db
     .prepare(
       `SELECT r.id AS realization_id,r.work_id,r.performance_work_id,r.label AS realization_label,
@@ -30,9 +30,10 @@ function realizationRows(c, realizationId = null, workId = null) {
       JOIN track_link t ON t.id=s.track_link_id AND t.state='active'
       JOIN classification c ON c.target_id=t.id AND c.state='classical'
       WHERE (? IS NULL OR r.id=?) AND (? IS NULL OR r.work_id=?)
+        AND (? IS NULL OR CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?)
       ORDER BY r.id,i.sequence,i.occurrence,i.id`,
     )
-    .all(realizationId, realizationId, workId, workId);
+    .all(realizationId, realizationId, workId, workId, albumId, albumId);
 }
 
 function queueItem(metadata, row) {
@@ -90,9 +91,8 @@ function credits(c, metadata, targetId) {
 export function renderAlbumPresentation(c, albumId) {
   const metadata = new Metadata(c);
   const album = String(albumId);
-  const allRows = realizationRows(c).filter(
-    (row) => String(evidenceOf(row).albumId ?? "") === album,
-  );
+  // Filter in SQL: this runs on every album page view.
+  const allRows = realizationRows(c, null, null, album);
   if (!allRows.length) return null;
   const grouped = new Map();
   for (const row of allRows) {
@@ -171,7 +171,7 @@ export function renderWork(c, workId, user) {
       : adminPick
         ? "admin"
         : null,
-    recordings: [...byRealization.entries()].map(([id, entries]) => {
+    recordings: [...byRealization.entries()].map(([id, entries], index) => {
       const present = new Set(
         entries.map((entry) => entry.movement_id).filter(Boolean),
       );
@@ -184,12 +184,20 @@ export function renderWork(c, workId, user) {
         )
         .all(performanceId)
         .map((row) => row.source_id);
+      const performers = credits(c, metadata, performanceId).filter(
+        (credit) => credit.role !== "composer",
+      );
+      const first = evidenceOf(entries[0]);
+      const album = text(entries[0].realization_label, text(first.hints?.album, ""));
+      const artist = performers.length
+        ? performers.map((credit) => credit.name).join(", ")
+        : text(first.hints?.artist, text(first.hints?.albumArtist, ""));
       return {
         id,
-        label: text(
-          entries[0].realization_label,
-          `Recording ${id.slice(0, 8)}`,
-        ),
+        label:
+          [artist, album].filter(Boolean).join(" · ") ||
+          `Recording ${index + 1}`,
+        albumId: first.albumId == null ? null : String(first.albumId),
         recordingIds,
         credits: credits(c, metadata, performanceId),
         items: entries.map((entry) => queueItem(metadata, entry)),
@@ -260,7 +268,9 @@ export function applyWorkMutation(c, input, user) {
           .run(workId, realizationId, user.id, Date.now());
       else
         c.db.prepare("DELETE FROM admin_work_pick WHERE work_id=?").run(workId);
-    } else throw new Error("Unknown work action");
+    } else if (command === "admin-pick")
+      throw new Error("Only admins can set the admin pick");
+    else throw new Error("Unknown work action");
     return { ok: true };
   });
 }

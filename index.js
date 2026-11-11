@@ -36363,7 +36363,20 @@ function text(value, label, { optional = false, max = 1e4 } = {}) {
     fail(`Enter a valid ${label}`);
   return value;
 }
-var revision = (c) => `${c.db.prepare("SELECT coalesce(max(id),0) AS n FROM audit_event").get().n}:${c.db.prepare("SELECT coalesce(max(rowid),0) AS n FROM assertion").get().n}`;
+function revision(c, scope = "") {
+  if (!scope) return "catalogue:new";
+  const target = scope.startsWith("track:") ? scope.slice(6) : scope;
+  const ids = [
+    target,
+    ...c.db.prepare("SELECT target_id FROM relation WHERE kind='movement' AND source_id=?").all(target).map((r) => r.target_id)
+  ];
+  const marks = ids.map(() => "?").join(",");
+  const audit = c.db.prepare(`SELECT coalesce(max(id),0) AS n FROM audit_event WHERE target_id IN (${marks})`).get(...ids).n;
+  const assertion = c.db.prepare(`SELECT coalesce(max(rowid),0) AS n FROM assertion WHERE target_id IN (${marks})`).get(...ids).n;
+  const relation = c.db.prepare("SELECT count(*) AS n FROM relation WHERE kind='movement' AND source_id=?").get(target).n;
+  return `${scope}|${audit}:${assertion}:${relation}`;
+}
+var revisionScope = (token) => typeof token === "string" && token.includes("|") ? token.slice(0, token.lastIndexOf("|")) : "";
 var normalized = searchText;
 var validDate = (value) => /^\d{4}(-(0[1-9]|1[0-2])(-(0[1-9]|[12]\d|3[01]))?)?$/.test(value) && (value.length !== 10 || (/* @__PURE__ */ new Date(`${value}T00:00:00Z`)).toISOString().slice(0, 10) === value);
 var kindLabel = {
@@ -36853,7 +36866,7 @@ Classification: ${selectedTrack.classification || "unsure"}`.slice(
     version: 1,
     title: "Classical metadata editor",
     description: "Works, movements and recordings in your library. Admin edits stay in the classical catalogue; audio files are not modified.",
-    revision: revision(c),
+    revision: revision(c, selectedTrack ? query.selection : selected?.id || ""),
     navigation: {
       items: results.slice(offset, offset + 100),
       total: results.length,
@@ -36874,7 +36887,7 @@ function apply(c, input, who) {
   const request = input.mutation;
   if (!request || typeof request !== "object" || typeof request.command !== "string" || !request.values || Array.isArray(request.values))
     fail("Invalid editor request");
-  if (request.revision !== revision(c))
+  if (request.revision !== revision(c, revisionScope(request.revision)))
     throw new EditorError(
       "This catalogue changed. Reload before saving so newer edits are preserved.",
       409
@@ -37170,7 +37183,7 @@ function actor2(input) {
     throw new Error("A real user account is required");
   return user;
 }
-function realizationRows(c, realizationId = null, workId = null) {
+function realizationRows(c, realizationId = null, workId = null, albumId = null) {
   return c.db.prepare(
     `SELECT r.id AS realization_id,r.work_id,r.performance_work_id,r.label AS realization_label,
         i.id AS item_id,i.movement_id,i.sequence,i.occurrence,s.start_ms,s.end_ms,s.kind AS segment_kind,
@@ -37181,8 +37194,9 @@ function realizationRows(c, realizationId = null, workId = null) {
       JOIN track_link t ON t.id=s.track_link_id AND t.state='active'
       JOIN classification c ON c.target_id=t.id AND c.state='classical'
       WHERE (? IS NULL OR r.id=?) AND (? IS NULL OR r.work_id=?)
+        AND (? IS NULL OR CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?)
       ORDER BY r.id,i.sequence,i.occurrence,i.id`
-  ).all(realizationId, realizationId, workId, workId);
+  ).all(realizationId, realizationId, workId, workId, albumId, albumId);
 }
 function queueItem(metadata, row) {
   const evidence2 = evidenceOf(row);
@@ -37228,9 +37242,7 @@ function credits(c, metadata, targetId) {
 function renderAlbumPresentation(c, albumId) {
   const metadata = new Metadata(c);
   const album = String(albumId);
-  const allRows = realizationRows(c).filter(
-    (row) => String(evidenceOf(row).albumId ?? "") === album
-  );
+  const allRows = realizationRows(c, null, null, album);
   if (!allRows.length) return null;
   const grouped = /* @__PURE__ */ new Map();
   for (const row of allRows) {
@@ -37296,7 +37308,7 @@ function renderWork(c, workId, user) {
     favourite: state?.favourite === 1,
     pickedRealizationId: state?.picked_realization_id || adminPick || null,
     pickScope: state?.picked_realization_id ? "user" : adminPick ? "admin" : null,
-    recordings: [...byRealization.entries()].map(([id, entries2]) => {
+    recordings: [...byRealization.entries()].map(([id, entries2], index) => {
       const present = new Set(
         entries2.map((entry) => entry.movement_id).filter(Boolean)
       );
@@ -37304,12 +37316,16 @@ function renderWork(c, workId, user) {
       const recordingIds = c.db.prepare(
         "SELECT source_id FROM relation WHERE kind='recording_performance' AND target_id=? ORDER BY source_id"
       ).all(performanceId).map((row) => row.source_id);
+      const performers = credits(c, metadata, performanceId).filter(
+        (credit) => credit.role !== "composer"
+      );
+      const first = evidenceOf(entries2[0]);
+      const album = text2(entries2[0].realization_label, text2(first.hints?.album, ""));
+      const artist = performers.length ? performers.map((credit) => credit.name).join(", ") : text2(first.hints?.artist, text2(first.hints?.albumArtist, ""));
       return {
         id,
-        label: text2(
-          entries2[0].realization_label,
-          `Recording ${id.slice(0, 8)}`
-        ),
+        label: [artist, album].filter(Boolean).join(" \xB7 ") || `Recording ${index + 1}`,
+        albumId: first.albumId == null ? null : String(first.albumId),
         recordingIds,
         credits: credits(c, metadata, performanceId),
         items: entries2.map((entry) => queueItem(metadata, entry)),
@@ -37367,7 +37383,9 @@ function applyWorkMutation(c, input, user) {
         ).run(workId, realizationId, user.id, Date.now());
       else
         c.db.prepare("DELETE FROM admin_work_pick WHERE work_id=?").run(workId);
-    } else throw new Error("Unknown work action");
+    } else if (command === "admin-pick")
+      throw new Error("Only admins can set the admin pick");
+    else throw new Error("Unknown work action");
     return { ok: true };
   });
 }
