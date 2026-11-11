@@ -4,6 +4,7 @@ import { Metadata } from "./metadata.js";
 import { transaction } from "./database.js";
 import { classify } from "./reconcile.js";
 import { searchText, matchesSearch, ownedTracks } from "./editor-search.js";
+import { renderV2, lookupV2, applyV2, V2_COMMANDS, EditorV2Error } from "./editor-v2.js";
 
 class EditorError extends Error {
   constructor(message, status = 400) {
@@ -17,7 +18,7 @@ const fail = (message) => {
 const actor = (input) => {
   if (
     input.pageId !== "editor" ||
-    input.capabilities?.adminForms !== 1 ||
+    ![1, 2].includes(input.capabilities?.adminForms) ||
     input.user?.role !== "admin" ||
     !Number.isSafeInteger(input.user.id) ||
     input.user.id <= 0
@@ -40,8 +41,12 @@ function text(value, label, { optional = false, max = 10000 } = {}) {
 // movements), so a library scan or an edit to another entry never blocks a
 // save. The scope travels inside the revision token.
 function revision(c, scope = "") {
-  if (!scope) return "catalogue:new";
-  const target = scope.startsWith("track:") ? scope.slice(6) : scope;
+  if (!scope || scope.startsWith("new:")) return "catalogue:new";
+  const target = scope.startsWith("track:")
+    ? scope.slice(6)
+    : scope.startsWith("review:")
+      ? scope.slice(7)
+      : scope;
   const ids = [
     target,
     ...c.db
@@ -676,6 +681,18 @@ function apply(c, input, who) {
       "This catalogue changed. Reload before saving so newer edits are preserved.",
       409,
     );
+  if (Object.hasOwn(V2_COMMANDS, request.command)) {
+    const keys = V2_COMMANDS[request.command];
+    if (keys && Object.keys(request.values).some((key) => !keys.includes(key)))
+      fail("Unknown editor command or fields");
+    const result = applyV2(c, request, who);
+    c.audit(`editor.${request.command}`, request.values.target || request.values.work || request.values.albumId || result.selection || "", { values: request.values }, who);
+    return {
+      ok: true,
+      message: result.message ?? "Saved",
+      ...(typeof result.selection === "string" && { selection: result.selection }),
+    };
+  }
   const v = request.values,
     m = new Metadata(c),
     manual = (target, key, value, pin = false) =>
@@ -787,12 +804,12 @@ function apply(c, input, who) {
     }
     case "create-work": {
       const title = text(v.title, "work title", { max: 2000 }).trim();
-      const composer = text(v.composer, "composer", {
+      const composer = text(v.composer ?? "", "composer", {
         optional: true,
         max: 200,
       });
       if (composer) c.entity(composer, "person");
-      const movements = text(v.movements, "movement titles", { optional: true })
+      const movements = (Array.isArray(v.movements) ? v.movements.join("\n") : text(v.movements ?? "", "movement titles", { optional: true }))
         .split("\n")
         .map((s) => s.trim())
         .filter(Boolean);
@@ -850,13 +867,19 @@ function apply(c, input, who) {
     case "add-movement": {
       selection = text(v.work, "work", { max: 200 });
       c.entity(selection, "work");
-      const title = text(v.title, "movement title", { max: 2000 }).trim(),
-        rows = movementRows(c, selection);
-      const id = c.createEntity("movement");
-      manual(id, "title", title);
-      c.relate("movement", selection, id, {
-        position: (rows.at(-1)?.position || 0) + 1,
-      });
+      const titles = (Array.isArray(v.title) ? v.title : [text(v.title, "movement title", { max: 2000 })])
+        .map((title) => String(title).trim())
+        .filter(Boolean);
+      if (!titles.length) fail("Enter a movement title");
+      if (titles.length > 100) fail("Add no more than 100 movements at a time");
+      for (const title of titles) {
+        const rows = movementRows(c, selection);
+        const id = c.createEntity("movement");
+        manual(id, "title", title.slice(0, 2000));
+        c.relate("movement", selection, id, {
+          position: (rows.at(-1)?.position || 0) + 1,
+        });
+      }
       break;
     }
     case "reorder-movements": {
@@ -997,6 +1020,14 @@ export async function readEditor(input) {
   actor(input);
   const c = await openCatalogue(path.join(input.dataFolder, "model"));
   try {
+    if (input.capabilities.adminForms >= 2) {
+      const query = input.query || {};
+      return transaction(c.db, () =>
+        query.lookup
+          ? lookupV2(c, query)
+          : renderV2(c, query, revision(c, query.selection || "")),
+      );
+    }
     return transaction(c.db, () => render(c, input));
   } finally {
     c.close();
@@ -1009,8 +1040,8 @@ export async function mutateEditor(input) {
     try {
       return transaction(c.db, () => apply(c, input, who));
     } catch (error) {
-      if (error instanceof EditorError)
-        return { ok: false, status: error.status, message: error.message };
+      if (error instanceof EditorError || error instanceof EditorV2Error)
+        return { ok: false, status: error.status, message: error.message.slice(0, 500) };
       // Model constraint failures are expected validation failures; SQLite/internal errors stay diagnostic.
       if (error instanceof Error && !error.code)
         return { ok: false, status: 400, message: error.message.slice(0, 200) };

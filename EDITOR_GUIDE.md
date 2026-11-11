@@ -1,25 +1,42 @@
-# Manual metadata editor
+# Classical metadata editor
 
-Use the matching Phase 3 fork/plugin source and Node 22.16+. Open **Settings → Plugins → Aurral Classical → Pages → Open Classical metadata editor** as an admin. The plugin and its editor capability must be enabled. This is a review build, not a tagged deployment release.
+Open **Settings → Plugins → Aurral Classical → Pages → Open Classical metadata editor** as an admin. It needs the matching fork (admin pages v2) and the plugin's `page:editor` capability. Older fork builds with only admin forms v1 still get the previous editor.
 
-Choose **Create new** to create a composer, work or performer/ensemble. A work accepts one movement title per line. Select a composer to create a work credited to that person. A work detail provides **Create broadcast recording**, with an optional year, year-month or full date; MusicBrainz is not required.
+Everything here changes the classical catalogue only. Audio files are never written.
 
-Select any catalogue entry to edit it. Each field shows the current source, pinned state and provider value. Correcting a provider-filled field pins the correction. **Pin this value** also pins a manual fallback; **Intentionally blank** stores a deliberate null. Saving an empty string/list is supported. Refreshes retain pins and conflicts. **Use provider value** explicitly unpins; if no active provider exists, **Remove pin** recomputes the normal fallback.
+## Layout
 
-Edit one form at a time, then save or cancel before navigating. A stale revision returns a conflict and keeps the draft visible. Reload explicitly to load newer data. Ordinary validation errors keep the form editable so you can correct them.
+- **Tabs:** Works, Composers, Performers, Albums and Review (with a count of open items).
+- **Left:** a searchable list for the current tab. Search covers titles, composers, performers, album titles and track titles, ignoring accents and punctuation.
+- **Right:** the open item. The breadcrumb leads back up (for example work → composer); on a phone it is also the way back to the list.
+- Each item shows its details as one form with a single **Save**. Leaving with unsaved edits asks first.
 
-On a work, use Up/Down controls and **Save movement order**. The editor requires every movement exactly once and saves the new canonical order atomically. Audio associations stay attached to their movement identities.
+## Common tasks
 
-Before attaching audio, run **Scan classical model (read only)** from an album menu. Select a recording, then use the page-level **Search items** box to search the complete owned-track index by title, album, performer, composer or filename. The selected recording stays open while the results are narrowed; the recording form no longer displays an arbitrary first 200 files. Accents and punctuation are ignored, so `No. 1 Prélude (Presto)` and `No 1 Prelude Presto` find the same track. Select a matching track, performance and movement to attach it. **Detach track** removes the catalogue attachment while retaining the audio and evidence.
+**Group an album.** Albums tab → open the album.
+- **Create a work from this album** creates the work with one movement per track, in album order, and assigns the tracks. The title and composer are suggested from tags.
+- **Assign to an existing work:** search for the work, press Continue, check each track's suggested movement (or Skip), then **Assign tracks**. Tracks you assign are sent to Classical.
+- **Unassign** (under *Works on this album*) removes the album's tracks from a work without touching the work or the audio.
 
-Completed scans now run a conservative automatic grouping pass. It creates an album realization only when confirmed-classical tracks have an explicit embedded `WORK`, the same composer, unique explicit track order and a multi-movement allowlisted form such as sonata, symphony, concerto, suite or chamber work. Run **Auto-match classical works (read only)** from an album menu to apply an expanded admin-requested pass to an existing index. That action also accepts structured titles such as `Symphony No. 5: I. Allegro` when the composer, album, classical classification and unique track order agree. This changes only the plugin catalogue. Étude, prelude, dance and song sets remain independent collections, and unstructured or ambiguous matches remain for manual editing.
+**Send to / Remove from Classical.** On an album or a track. These manual choices beat automatic detection and survive rescans. On a track, **Use automatic detection** returns it to the detector.
 
-Role-aware credits distinguish composers, soloists, conductors and ensembles. Create a person or ensemble, then add the appropriate credit to a selected work/recording/performance/release. Invalid role/contributor combinations and duplicate credits are rejected.
+**Edit a work.** Edit any details and press Save; edited fields are pinned so provider refreshes never overwrite them.
+- Each field shows where its value came from: MusicBrainz, From file tags, Edited, or Intentionally blank. A pinned field whose provider value differs shows that value.
+- Next to a field: **Use MusicBrainz value** unpins it, **Remove pin** recomputes it, and **Mark blank** stores a deliberate blank.
+- **Movements:** Move up/down, Delete (only when no track uses it), and add several at once, one per line.
+- **Credits:** add a person or ensemble with a role and optional instrument; the person search is its own box.
+- **Recordings** lists every owned performance with movement coverage.
+- **Add a broadcast recording** covers radio or concert recordings that aren't on an album.
 
-All edits stay in the plugin database. Read-only media is supported; no audio tags are written. Opening the editor starts no provider identification, scan or acquisition. Back up/restore the model using MODEL_V1.md; disabling the editor retains its data.
+**Duplicates.** On a work, composer or performer, **Merge with another …** moves recordings, credits, favourites and picks into the entry you keep, then removes this one. Works merge when their movements line up by title or number. An unused entry can be deleted.
 
-On the matching Phase 4 fork, albums with an explicitly attached multi-movement work show **By Work / By Track**. Select a work title for its basic page, owned recordings, completeness, favourites and per-user/admin picks. **Play whole work** uses the stored realization order and skips visibly missing movements. Scanning alone does not invent work identities: create/review the work, recording and attachments here first. Disabling the presentation/page capabilities returns the stock album UI while retaining plugin data.
+**Review.** The Review tab lists:
+- unsure classifications, with Send to Classical / Not classical;
+- albums whose tracks didn't line up with a work;
+- possible duplicates.
 
-When updating from the original Phase 3 build, replace the installed plugin's `index.js` and `manifest.json` with the updated `phase3-review` files and restart your test instance using your existing installation procedure. Rerun **Scan classical model (read only)** and reload the editor: older scan evidence lacks titles, albums and performers. A read-only library mount alone does not populate the model. Empty/legacy indexes now explain this in the editor. No core rebuild or database migration is needed for this search correction.
+Dismiss items you've checked.
 
-The scan action covers the whole host library, even when launched from one album. It now works for up to 25 minutes per explicit background action. **Classical model status** reports processed/total files and state; indexed tracks become searchable after the full scan commits. If time runs out, running Scan again resumes the same job immediately without fetching another snapshot. With the plugin's Schedule capability enabled, queued work also resumes automatically with up to 8.5 minutes of processing per scheduled call. Background file tagging can remain off. Keep the host running while scanning; a restart retains checkpointed progress.
+## Scans
+
+Scans run on their own when the plugin schedule and API access are on: after downloads, and every 6 hours. Admins can also run **Scan classical model (read only)** from an album menu. Opening the editor never starts a scan, identification or download.

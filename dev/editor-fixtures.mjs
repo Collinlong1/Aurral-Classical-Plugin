@@ -213,7 +213,8 @@ if (action === "prepare") {
   const c = await openCatalogue("/config/plugin-data/aurral-classical/model");
   try {
     const m = new Metadata(c);
-    assert.equal(m.resolve(saved.work, "title").value, "");
+    // Mark blank stores an intentional, pinned blank.
+    assert.equal(m.resolve(saved.work, "title").value, null);
     assert.equal(m.resolve(saved.work, "title").pinned, true);
     const movements = c.db
       .prepare(
@@ -251,10 +252,11 @@ if (action === "prepare") {
   const page = await request(
     `/plugins/aurral-classical/pages/editor?selection=${saved.work}`,
   );
-  assert.equal(
-    page.forms.find((f) => f.id === "edit-title").fields[0].value,
-    "",
-  );
+  const title = page.view.sections
+    .find((section) => section.id === "details")
+    .fields.find((field) => field.key === "title");
+  assert.equal(title.value, "");
+  assert.match(title.meta.source, /Intentionally blank/);
   const presentation = await request(
     `/plugins/album-presentation/${phase4Saved.albumId}`,
   );

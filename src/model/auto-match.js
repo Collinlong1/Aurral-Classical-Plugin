@@ -163,7 +163,7 @@ function romanValue(value) {
   return total || null;
 }
 // "II. Andante con moto" -> { index: 2, text: "andante con moto" }
-function movementParts(title) {
+export function movementParts(title) {
   const text = words(title);
   const match = text.match(/^((?:[ivxlc]+)|\d+)\s+(.*)$/);
   if (!match) return { index: null, text };
@@ -173,7 +173,7 @@ function movementParts(title) {
   return index ? { index, text: match[2] } : { index: null, text };
 }
 // The movement part of a structured track title or WORK tag.
-function movementTitle(track, workTitle) {
+export function movementTitle(track, workTitle) {
   const work = clean(track.work);
   if (work.includes(":")) {
     const tail = clean(work.slice(work.indexOf(":") + 1));
@@ -213,7 +213,7 @@ function composerNames(catalogue, work) {
 
 // Index existing works and composers once per pass, so manual works the admin
 // created also absorb matching albums.
-function catalogueIndex(catalogue) {
+export function catalogueIndex(catalogue) {
   const works = new Map(),
     people = new Map();
   for (const { id } of catalogue.db
@@ -254,7 +254,7 @@ function composerEntity(catalogue, metadata, index, name) {
   return person;
 }
 
-function workMovements(catalogue, work) {
+export function workMovements(catalogue, work) {
   return catalogue.db
     .prepare(
       `SELECT r.target_id AS id,r.position FROM relation r JOIN entity e ON e.id=r.target_id
@@ -269,7 +269,7 @@ function workMovements(catalogue, work) {
 
 // Map an album's tracks to an existing work's movements: by title, then by
 // numbered prefix, then by order when the counts agree. Null when unsure.
-function mapToMovements(movements, tracks) {
+export function mapToMovements(movements, tracks) {
   const used = new Set(),
     result = [];
   for (const track of tracks) {
@@ -435,6 +435,32 @@ const hasManualEdits = (catalogue, ids) =>
       .get(id),
   );
 
+// Fold one person or ensemble into another: credits move, duplicates drop.
+export function mergeContributor(catalogue, keep, drop, actor) {
+  for (const credit of catalogue.db
+    .prepare("SELECT * FROM credit WHERE contributor_id=?")
+    .all(drop)) {
+    const duplicate = catalogue.db
+      .prepare(
+        "SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?",
+      )
+      .get(credit.target_id, keep, credit.role, credit.instrument);
+    if (duplicate)
+      catalogue.db.prepare("DELETE FROM credit WHERE id=?").run(credit.id);
+    else
+      catalogue.db
+        .prepare("UPDATE credit SET contributor_id=? WHERE id=?")
+        .run(keep, credit.id);
+  }
+  catalogue.db
+    .prepare("UPDATE external_identity SET entity_id=? WHERE entity_id=? AND provider='embedded-tags'")
+    .run(keep, drop);
+  catalogue.db
+    .prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?")
+    .run(Date.now(), Date.now(), drop);
+  catalogue.audit("person.merge", drop, { into: keep }, actor);
+}
+
 // Merge composers that earlier auto-match passes created once per album.
 function mergeDuplicateComposers(catalogue, index, actor) {
   let merged = 0;
@@ -479,7 +505,7 @@ function mergeDuplicateComposers(catalogue, index, actor) {
 }
 
 // Fold a duplicate auto-created work into another work with the same identity.
-function mergeWork(catalogue, keep, drop, actor) {
+export function mergeWork(catalogue, keep, drop, actor) {
   const keepMovements = workMovements(catalogue, keep),
     dropMovements = workMovements(catalogue, drop);
   let map = new Map();

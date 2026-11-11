@@ -33,211 +33,150 @@ page.on("dialog", () => {
   errors.push("Unexpected executable markup");
   void page.keyboard.press("Escape");
 });
-const form = (title) =>
-  page
-    .locator("form")
+// Admin pages v2: sections are titled groups; the detail pane holds the open item.
+const detail = page.locator(".plugin-admin__detail");
+const group = (title) =>
+  detail
+    .locator("section")
     .filter({ has: page.getByRole("heading", { name: title, exact: true }) });
-const saved = async () => {
-  await page
-    .getByRole("status")
-    .filter({ hasText: "Saved to the classical catalogue" })
-    .waitFor();
-  await page.waitForFunction(
-    () =>
-      !!document.querySelector(".plugin-page__form") &&
-      !document.querySelector(".plugin-page__form fieldset:disabled"),
-  );
-};
+const status = (text) =>
+  page.locator(".plugin-admin__status").filter({ hasText: text }).waitFor();
+const selection = () => new URL(page.url()).searchParams.get("selection");
+const titleField = () => group("Details").getByLabel("Title", { exact: true });
 try {
   await page.goto(`${url}/plugins/aurral-classical/editor`);
   await page
-    .getByRole("heading", { name: "Classical metadata editor", exact: true })
+    .getByRole("heading", { name: "Classical metadata", exact: true })
     .waitFor();
-  await page
-    .getByLabel("Search items", { exact: true })
-    .fill("No. 1 Prélude (Presto)");
-  await page.getByRole("button", { name: "Search", exact: true }).click();
-  const titleResult = page.getByRole("button", {
-    name: /^Track · No\. 1 Prélude \(Presto\)/,
-  });
-  await titleResult.waitFor();
-  assert.match(await titleResult.textContent(), /Daniil Trifonov/);
-  await titleResult.click();
-  await page.getByText(/Owned track: No\. 1 Prélude \(Presto\)/).waitFor();
-  assert.match(
-    await page.locator(".plugin-page__forms").textContent(),
-    /Transcendental - Daniil Trifonov plays Franz Liszt/,
-  );
-  await page
-    .getByLabel("Search items", { exact: true })
-    .fill("no 1 prelude presto");
-  await page.getByRole("button", { name: "Search", exact: true }).click();
-  await titleResult.waitFor();
-  await page.getByLabel("Search items", { exact: true }).fill("");
-  await page.getByRole("button", { name: "Search", exact: true }).click();
-  await page.getByRole("button", { name: "Create new", exact: true }).click();
+  // Album search covers track titles and ignores accents and punctuation.
+  await page.getByRole("button", { name: /^Albums/ }).click();
+  const search = page.getByRole("searchbox", { name: /Search albums/ });
+  await search.fill("No. 1 Prélude (Presto)");
+  await search.press("Enter");
+  const album = page
+    .locator(".plugin-admin__list")
+    .getByRole("button", { name: /^Transcendental/ });
+  await album.waitFor();
+  await search.fill("no 1 prelude presto");
+  await search.press("Enter");
+  await album.waitFor();
+  await album.click();
+  await group("Tracks").getByText(/No\. 1 Prélude \(Presto\)/).waitFor();
+  // Create a composer, then a work from the composer page.
+  await page.getByRole("button", { name: /^Composers/ }).click();
+  await page.getByRole("button", { name: "New composer", exact: true }).click();
   const token = String(Date.now());
-  await form("Create composer")
-    .getByLabel("Composer name")
-    .fill(`Fixture composer ${token}`);
-  await form("Create composer")
-    .getByRole("button", { name: "Create composer", exact: true })
-    .click();
-  await saved();
-  await form("Create work")
-    .getByLabel("Work title")
-    .fill(`Fixture sonata ${token}`);
-  await form("Create work")
-    .getByLabel("Movement titles (one per line)")
-    .fill("I. First\nII. Second\nIII. Third");
-  await form("Create work")
-    .getByRole("button", { name: "Create work", exact: true })
-    .click();
-  await saved();
-  const work = new URL(page.url()).searchParams.get("selection");
+  await detail.getByLabel("Name", { exact: true }).fill(`Fixture composer ${token}`);
+  await detail.getByRole("button", { name: "Create composer", exact: true }).click();
+  await status("Saved");
+  const newWork = group(`New work by Fixture composer ${token}`);
+  await newWork.getByLabel("Title", { exact: true }).fill(`Fixture sonata ${token}`);
+  await newWork.getByLabel("Movements", { exact: true }).fill("I. First\nII. Second\nIII. Third");
+  await newWork.getByRole("button", { name: "Create work", exact: true }).click();
+  await detail.getByRole("heading", { name: `Fixture sonata ${token}`, exact: true }).waitFor();
+  const work = selection();
   assert.ok(work);
-  await form("Movement order")
-    .getByRole("button", { name: "Move I. First down", exact: true })
+  // Movement order is one click per move.
+  await group("Movements")
+    .getByRole("button", { name: "Move down: I. First", exact: true })
     .click();
-  await form("Movement order")
-    .getByRole("button", { name: "Save movement order", exact: true })
-    .click();
-  await saved();
-  const order = await form("Movement order")
-    .locator("li > span")
-    .allTextContents();
-  assert.deepEqual(order, ["II. Second", "I. First", "III. Third"]);
-  await form("Create broadcast recording")
-    .getByLabel("Recording title")
-    .fill(`Fixture broadcast ${token}`);
-  await form("Create broadcast recording")
-    .getByLabel("Broadcast date (year, month or full date)")
-    .fill("2026-99");
-  await form("Create broadcast recording")
-    .getByRole("button", { name: "Create broadcast recording", exact: true })
-    .click();
-  await page.getByRole("alert").waitFor();
+  await status("Movement order saved");
+  assert.deepEqual(
+    await group("Movements").locator(".settings-service__name").evaluateAll((rows) =>
+      rows.map((row) => row.firstChild?.textContent),
+    ),
+    ["II. Second", "I. First", "III. Third"],
+  );
+  // Validation errors keep the draft.
+  const broadcast = group("Add a broadcast recording");
+  await broadcast.getByLabel("Title", { exact: true }).fill(`Fixture broadcast ${token}`);
+  await broadcast.getByLabel("Date", { exact: true }).fill("2026-99");
+  await broadcast.getByRole("button", { name: "Add recording", exact: true }).click();
+  await page.getByRole("alert").filter({ hasText: /valid year/ }).waitFor();
   assert.equal(
-    await form("Create broadcast recording")
-      .getByLabel("Recording title")
-      .isEnabled(),
-    true,
+    await broadcast.getByLabel("Title", { exact: true }).inputValue(),
+    `Fixture broadcast ${token}`,
     "validation errors keep the draft editable",
   );
-  await form("Create broadcast recording")
-    .getByLabel("Broadcast date (year, month or full date)")
-    .fill("2026-11");
-  await form("Create broadcast recording")
-    .getByRole("button", { name: "Create broadcast recording", exact: true })
-    .click();
-  await saved();
-  const recording = new URL(page.url()).searchParams.get("selection");
+  await broadcast.getByLabel("Date", { exact: true }).fill("2026-11");
+  await broadcast.getByRole("button", { name: "Add recording", exact: true }).click();
+  await detail.getByRole("heading", { name: `Fixture broadcast ${token}`, exact: true }).waitFor();
+  const recording = selection();
   assert.ok(recording);
-  await page
-    .getByLabel("Search items", { exact: true })
-    .fill("sonata 1.flac");
-  await page.getByRole("button", { name: "Search", exact: true }).click();
-  const attach = form("Attach owned track");
-  await attach.getByLabel("Owned track", { exact: true }).waitFor();
-  const trackOptions = await attach
-    .getByLabel("Owned track", { exact: true })
-    .locator("option")
-    .evaluateAll((options) =>
-      options.map((o) => ({ value: o.value, label: o.textContent })),
-    );
-  const track = trackOptions.find((o) => o.label.includes("sonata / 1.flac"));
-  assert.ok(track, "owned sonata fixture");
-  await attach
-    .getByLabel("Owned track", { exact: true })
-    .selectOption(track.value);
-  await attach
-    .getByLabel("Movement (or whole work)")
-    .selectOption({ label: "I. First" });
-  await attach
-    .getByRole("button", { name: "Attach track", exact: true })
-    .click();
-  await saved();
-  await form("Attached tracks")
-    .getByRole("heading", { name: "Attached tracks", exact: true })
-    .waitFor();
+  // Attach an owned track: the lookup searches on its own.
+  const attach = group("Attach an owned track");
+  await attach.getByRole("combobox", { name: "Track" }).click();
+  await attach.getByRole("combobox", { name: "Track" }).fill("sonata 1.flac");
+  await attach.getByRole("option").first().click();
+  await attach.getByLabel("Movement", { exact: true }).click();
+  await page.getByRole("option", { name: "I. First", exact: true }).click();
+  await attach.getByRole("button", { name: "Attach", exact: true }).click();
+  await group("Owned tracks").locator(".plugin-admin__row").first().waitFor();
+  assert.equal(await group("Owned tracks").locator(".plugin-admin__row").count(), 1);
+  // Provenance: corrections pin, the provider value stays visible, and
+  // Use MusicBrainz value / Mark blank are one click each.
   fixture("refresh", work, "Provider title");
   await page.goto(`${url}/plugins/aurral-classical/editor?selection=${work}`);
-  await form("Edit title")
-    .getByLabel("Title", { exact: true })
-    .fill("Pinned correction");
-  await form("Edit title")
-    .getByRole("button", { name: "Save value", exact: true })
-    .click();
-  await saved();
+  await titleField().fill("Pinned correction");
+  await group("Details").getByRole("button", { name: "Save", exact: true }).click();
+  await status("Saved 1 change");
   fixture("refresh", work, "Provider refreshed");
   await page.reload();
-  await page.waitForFunction(
-    () =>
-      document.querySelector(".plugin-page__form") &&
-      !document.querySelector(".plugin-page__form fieldset:disabled"),
-  );
-  assert.equal(
-    await form("Edit title").getByLabel("Title", { exact: true }).inputValue(),
-    "Pinned correction",
-  );
-  assert.match(await form("Edit title").textContent(), /Provider refreshed/);
-  await form("Provider value for title")
-    .getByRole("button", { name: "Use provider value", exact: true })
-    .click();
-  await saved();
-  assert.equal(
-    await form("Edit title").getByLabel("Title", { exact: true }).inputValue(),
-    "Provider refreshed",
-  );
-  await form("Edit title").getByLabel("Title", { exact: true }).fill("");
-  await form("Edit title")
-    .getByLabel("Pin this value", { exact: true })
-    .check();
-  await form("Edit title")
-    .getByRole("button", { name: "Save value", exact: true })
-    .click();
-  await saved();
+  await titleField().waitFor();
+  assert.equal(await titleField().inputValue(), "Pinned correction");
+  assert.match(await group("Details").textContent(), /MusicBrainz: Provider refreshed/);
+  await group("Details").getByRole("button", { name: "Use MusicBrainz value" }).first().click();
+  await status("Saved");
+  assert.equal(await titleField().inputValue(), "Provider refreshed");
+  await group("Details").getByRole("button", { name: "Mark blank" }).first().click();
+  await status("Marked intentionally blank");
   fixture("refresh", work, "Provider latest");
   await page.reload();
-  await form("Edit title").getByLabel("Title", { exact: true }).waitFor();
+  await titleField().waitFor();
+  assert.equal(await titleField().inputValue(), "");
+  assert.match(await group("Details").textContent(), /Intentionally blank · Pinned/);
+  // Leaving with unsaved edits asks first.
+  await group("Details").getByLabel("Nickname", { exact: true }).fill("Unsaved draft");
+  await page.getByRole("button", { name: /^Albums/ }).click();
+  await page.getByRole("heading", { name: "Discard unsaved changes?" }).waitFor();
+  await page.getByRole("button", { name: "Cancel", exact: true }).click();
   assert.equal(
-    await form("Edit title").getByLabel("Title", { exact: true }).inputValue(),
-    "",
+    await group("Details").getByLabel("Nickname", { exact: true }).inputValue(),
+    "Unsaved draft",
   );
-  // A concurrent provider update must reject the older tab and retain its draft.
-  await form("Edit nickname")
-    .getByLabel("Nickname", { exact: true })
-    .fill("Unsaved stale draft");
+  // A concurrent provider update rejects the older tab and keeps its draft.
   fixture("refresh", work, "Provider newer");
-  await form("Edit nickname")
-    .getByRole("button", { name: "Save value", exact: true })
-    .click();
-  await page
-    .getByRole("alert")
-    .filter({ hasText: "Reload before saving" })
-    .waitFor();
+  await group("Details").getByRole("button", { name: "Save", exact: true }).click();
+  await page.getByRole("alert").filter({ hasText: "Reload before saving" }).waitFor();
   assert.equal(
-    await form("Edit nickname")
-      .getByLabel("Nickname", { exact: true })
-      .inputValue(),
-    "Unsaved stale draft",
+    await group("Details").getByLabel("Nickname", { exact: true }).inputValue(),
+    "Unsaved draft",
   );
-  await page.getByRole("button", { name: "Reload page", exact: true }).click();
+  await page.getByRole("button", { name: "Reload", exact: true }).click();
   await page.getByRole("alert").waitFor({ state: "hidden" });
+  if (process.env.EDITOR_SCREENSHOT_DIR) {
+    await fs.mkdir(process.env.EDITOR_SCREENSHOT_DIR, { recursive: true });
+    await page.screenshot({
+      path: `${process.env.EDITOR_SCREENSHOT_DIR}/editor-work.png`,
+      fullPage: true,
+    });
+  }
   await page.setViewportSize({ width: 390, height: 844 });
+  // Let the app shell switch to its phone layout.
+  await page.waitForTimeout(500);
   assert.ok(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth + 1,
     ),
     "phone layout does not overflow",
   );
-  if (process.env.EDITOR_SCREENSHOT_DIR) {
-    await fs.mkdir(process.env.EDITOR_SCREENSHOT_DIR, { recursive: true });
+  // Phones show the open item with a way back to its list.
+  await page.getByRole("button", { name: /^Works$/ }).first().waitFor();
+  if (process.env.EDITOR_SCREENSHOT_DIR)
     await page.screenshot({
       path: `${process.env.EDITOR_SCREENSHOT_DIR}/editor-phone.png`,
       fullPage: true,
     });
-  }
   const regular = await browser.newContext({
     extraHTTPHeaders: {
       "X-Api-Key": "fixture-one-synthetic-key-0000000000000000",
@@ -363,6 +302,14 @@ try {
   console.log(
     "PASS: browser editor plus Phase 4 work grouping, stock toggle, work page, incomplete movement and isolated user state",
   );
+} catch (error) {
+  if (process.env.EDITOR_SCREENSHOT_DIR) {
+    await fs.mkdir(process.env.EDITOR_SCREENSHOT_DIR, { recursive: true });
+    await page
+      .screenshot({ path: `${process.env.EDITOR_SCREENSHOT_DIR}/failure.png`, fullPage: true })
+      .catch(() => {});
+  }
+  throw error;
 } finally {
   await browser.close();
 }
