@@ -1,6 +1,6 @@
 # Tag input mapping and grouping rules — draft version 1
 
-Status update: Phase 0.5 preservation completed; this remains a proposal, with no classical implementation or migration. Phase 1 approval is pending. Runtime validation now includes Node 26.12.0; see PHASE_05_REPORT.md for exact results and remaining baseline issues.
+Status update: Phase 1 tag clear/restore, preview and backup verification are implemented; see PHASE_1_REPORT.md. Full model identification and grouping rules below remain proposals for later approved phases. No grouping or schema migration was added in Phase 1.
 
 This appendix freezes the proposed v0.1 **read/identification** vocabulary before Phase 1. It is not permission to write media. Optional general tag writing remains v0.3; Phase 1 removal repair is limited to the explicit existing action and synthetic tests. Validate native encodings with fixtures before implementing.
 

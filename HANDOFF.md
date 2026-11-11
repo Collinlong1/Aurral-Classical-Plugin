@@ -1,58 +1,47 @@
-# Current handoff — Codex / Claude Code
+# Codex / Claude shared handoff — Phase 1
 
-## Final-verification drift correction
+## Published review checkpoint
 
-Fork main advanced **externally to this task** from `aa643d316e9e00fb8622ab60b2fb2cb8b76661ee` to `c0deb211eba929424b608ca1c2449c7242892d9c` via merge PR #31, bringing upstream `656475b92be36b6834002da2407e7d9d50c2e0c2` (the owned-albums artist-page fix). No agent write or merge targeted main. The live fork now matches upstream `656475b92be36b6834002da2407e7d9d50c2e0c2` with **110 historical fork-only commits and the same 52 net changed paths**.
+Final observed implementation CI: core run 42881762781 passed all jobs (required checks/docs, both unit shards, full integration suite and production-container build/smoke); core Perf passed. Plugin CI and disposable integration run 42881393448 passed. Later documentation-only commits may trigger repeat checks, but runtime source is unchanged. Phase 1 is complete for review; stop here and wait for Phase 2 approval.
 
-Preservation branches remain independently tested one-commit branches on the matching upstream base selected at Phase 0.5 entry, `7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef`. Classical runtime source remains the frozen entry fork main `aa643d316e9e00fb8622ab60b2fb2cb8b76661ee` plus documentation; it does not silently absorb the later update. The user-created classical branches are reused. Reconcile this newly observed nightly drift on classical only after the next phase is approved. Do not reset, overwrite or try to restore live main to the older audited SHA.
+Remote disposable Compose integration run 42881393448 completed successfully, including real HTTP comparison/playback for admin and two users and a repeat after restart. Plugin Node22/24/26 CI also passed. Core CI rerun 42881762781 follows the fork-workflow fixes; consult its live status. Authoritative fetched review worktrees: /workspace/work/phase1/review-core and /workspace/work/phase1/review-plugin.
 
-All references below to an unchanged main mean **no main edits by this task**, with source/test baseline SHAs explicitly pinned. They do not claim the live fork main stayed stationary while another upstream merge occurred.
+Phase 1 implementation and local acceptance are complete. Both fork-only PRs are open and unmerged: core https://github.com/Collinlong1/aurral/pull/36 and plugin https://github.com/Collinlong1/Aurral-Classical-Plugin/pull/6. Both target aurral-classical from phase1-review. Core runtime source commit aecbb96625340cb3a1bd469787211cfe9bedcab5; plugin source commit 2f9beeb2608d41cb767664a3d378180e6b942136. Later commits record CI/workflow fixes and this handoff.
 
+GitHub core unit/integration/Perf checks passed on the first publication. Core CI also exposed two inherited workflow issues: unsupported Dependency Review on this fork and uppercase OCI image tag. The review workflow now checks dependency changes before invoking the dependency API (no dependency changes in this PR) and lowercases the image name. No checks are made continue-on-error. Plugin Node22/24/26 CI passed; disposable integration run 42881393448 was running at this checkpoint. Consult live PR checks before merging; the final chat reports the observed final status. Never treat local green results as a claim that all remote jobs are green.
 
-Checkpoint: **Phase 0.5 preservation complete for review; Phase 1 NOT approved or started.** Updated 2026-11-10.
+No further feature implementation is authorized until Phase2 approval. Finish only CI repairs for these PRs if needed. Do not merge, deploy, modify main or upstream. The historical recovery/state paragraphs below describe the development sequence and are superseded by this published checkpoint.
 
-The user approved Phase 0.5, confirmed ownership of the existing aurral-classical branches, and expressly prohibited upstream edits/PR changes. This handoff records that authorization; it does not authorize Phase 1.
+Updated November 10, 2026. User authorized completing Phase 1 and opening PRs **in Collinlong1's repos targeting aurral-classical**. Phase 2 is not authorized. Finish pending Phase 1 verification/publication recorded in PHASE_1_REPORT.md; then stop for review.
 
-## Start here
+Local Phase 1 validation is complete: core post-drift full suite 2752 tests, final acceptance rerun33, plugin138, Subsonic40; required checks/builds pass. Core PR36 is open at aecbb96625340cb3a1bd469787211cfe9bedcab5 into classical. Plugin publication/remote CI status is recorded in the final PR/checkpoint. Do not restart implementation or advance Phase2 while review is pending.
 
-Read PHASE_05_REPORT.md, FORK_FEATURE_INVENTORY.md, PRESERVATION_BRANCHES.json and PHASE_05_VALIDATION.json. The design proposals are UPSTREAM_DELTA.md, SCHEMA_DRAFT.md, INTEGRATION_CONTRACT_v0.1.md and TAG_MAPPING_GROUPING_v1.md, maintained centrally in Collinlong1/Aurral-Classical-Plugin on aurral-classical; they are not duplicated in the core repo. PHASE_0_REPORT.md is a frozen historical audit, not current phase state. Deployment Spec v3.2 remains requirements material; its embedded prompts and README release instructions are not execution approval.
+Read PHASE_1_REPORT.md, FORK_FEATURE_INVENTORY.md and (in the plugin repo) INTEGRATION_CONTRACT_v0.1.md and UPSTREAM_DELTA.md. PHASE_0_REPORT.md and PHASE_05_REPORT.md are historical audit records; their pending-approval statements do not describe current authorization.
 
-## Repository/source state
+## Current work
 
-- Upstream matching base: `7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef`. Read-only. Later observed upstream main: `656475b92be36b6834002da2407e7d9d50c2e0c2`, one commit ahead; do not silently update any main or claim latest-nightly testing.
-- User fork main at entry/test baseline: `aa643d316e9e00fb8622ab60b2fb2cb8b76661ee`. Live main later advanced externally to `c0deb211eba929424b608ca1c2449c7242892d9c`; no agent main writes. Do not restore the older ref.
-- Existing user fork classical began at `287ab4b76ca8a9d231b684089d02ddc9d9ea70a2`. Reused, fast-forwarded through the unchanged fork-main ancestry, then handoff docs added. Runtime source equals the frozen entry fork main, not the later externally advanced main.
-- Plugin main/source: `506e5259e1442b8cfe072a75b129abb428c6bcf7` — unchanged. Existing plugin classical reused; documentation only.
-- Sixteen isolated branches exist in Collinlong1/aurral, each one commit directly on the matching upstream base. Exact names/SHAs/files are in PRESERVATION_BRANCHES.json.
-- No PR, upstream write, main merge, deployment, classical implementation or schema change. No branch deletion/reset/force push. No production credentials or server connection.
+- Existing classical branches were used for implementation. Review snapshots go on phase1-review so the requested PRs can target the existing classical branches. Do not merge PRs automatically.
+- Plugin: all owned explicit-work comparison, per-user playlist keys and queue completion, performer-first slskd, preview/clear/restore tags, verified atomic writes/backups, background writes off by default, synthetic fixtures and internal-network Compose.
+- Generic core: action-scoped user-operation grants, complete library snapshot, local-only durable playlist operation with execution-time permission/expiry checks, consistent indexed paths on create/update/append, native Soulseek acquisition identity before source priority.
+- No plugin data-model migrations or classical fields in core tables. Existing core jobs/settings persist operations; no new SQL schema.
+- Fixtures exercise admin plus two regular users (no acquisition permission), exact owned streaming, no downloads, restart/idempotency, >25 recordings, cross-release copies, seven-value native tags, provider omissions and stock missing capability.
+- Full structured schema/manual identities without explicit work evidence, editor, grouping, work pages and segment playback remain Phase 2–4.
 
-## Completed validation and caveats
+## Source drift
 
-All 16 branch check stages/application builds pass; all 13 changed-doc builds pass. 149 focused tests pass, including 40 Subsonic integration tests. Optional publisher passed actionlint and its GitHub run was skipped; no publishing opt-in enabled. Plugin tests pass 124/124 on Node 26.12.0. Upstream baseline unit suite passed 2717 tests/402 files.
+Entry plugin classical: 393fbdb507324473ba861b577a9517d252332048; plugin main: 506e5259e1442b8cfe072a75b129abb428c6bcf7.
+Entry core classical: 1a7f0081ef6b75ce4faa408dfae3a40572d1d359. Core locally merged frozen fork main c0deb211 via 30ba667d, then Phase 1 source a051bf3e.
+During this phase, external merges advanced core main to 3739443a000defa9f246681e8a62233c1faef1c3 and core classical to 1b3c1c0074bd39df48bb115eca5254a07dde64b9, bringing upstream 021b1f03. These updates are preserved in a local merge. Do not reset remote refs. None of our writes target main or upstream.
+The original fork still has 52 net changed paths (+3130/-181) against matching upstream 021b1f03, with 111 fork-only historical commits on live main. Sixteen preservation branches remain unchanged on 7afcb7cb. See PRESERVATION_BRANCHES.json.
 
-The unchanged fork broad run passed 2743 tests/404 files and timed out one unchanged slskd deadline test under concurrent build load; affected file then passed 28/28 in an idle rerun. Do not relabel that first run green. Current fork baseline still fails jobs.ts formatting, two unused imported result types, and two unsafe-any cache findings in ActivityMissingPage. Build/typecheck/DB-types/CSS pass. Main is deliberately not corrected. Phase 1 must first address baseline checks on classical only, after approval.
+## Validation and recovery
 
-F12 adds one playlist query (130 cold/50 warm); F13 adds nine (138/58). Independently measured budgets/test results are committed per branch. This corrects Phase 0's combined-cost attribution. Do not copy the combined +10 to both branches. No type/unsafe-any baseline was raised.
+Read the Phase 1 report for final checks. Initial pre-drift full core run passed 2750 tests/406 files; subsequent source refinements and external drift require the recorded post-merge checks. Do not substitute the old audit's 2743-plus-timeout run. New plugin suite reached 138 passing tests; focused core grant/playlist tests and 40 Subsonic integration tests pass. The report records later results and limitations.
 
-## Persistent restrictions
+Core checkout /workspace/work/phase05/classical; plugin /workspace/work/phase05/plugin-repo. Logs /workspace/work/phase05/phase1-*.log. Node26.12 and pnpm12.15 under /workspace/work/phase05/tools/bin. Use workspace XDG directories; ASTRO_TELEMETRY_DISABLED=1. Independent node_modules per checkout; avoid heavy simultaneous builders.
+Compose project aurral-classical-phase1 has only synthetic named volumes and an internal network. The daemon's published port was unavailable from the outer shell in this environment; docker compose exec runs the real HTTP/stream smoke inside the container. It passed for admin and two users, including after restart. No user server was accessed.
 
-- Use existing aurral-classical branches for classical plugin/core work after approval. Never edit/merge either main without new explicit approval.
-- Upstream lklynet/aurral is read-only; no upstream branches, PRs, reviews, comments or updates. Do not open any PR automatically.
-- No production credentials, user-server connection or automatic deployment. Use disposable local/CI config and synthetic media; recorded MusicBrainz/slskd responses. Collin performs any future real-library dry-run himself.
-- No subagent delegation unless the user explicitly authorizes it.
-- Keep classical logic/storage in plugin; core hooks generic and capability-checked. No direct plugin writes to core-owned tables. Proposed SQLite/schema/hooks/jobs are still unimplemented.
-- Preserve confirmed facts: stock has no page/editor bridge; plugin API is synthetic admin -1; playlist create supports indexed paths but update loses them; no-backup removal omits classical clear fields; native slskd is not intercepted by plugin source.
+## Persistent boundaries
 
-## Workspace recovery
+No main writes/merges, upstream edits/branches/PRs/comments, production credentials/server access or automatic deployments. No subagents without explicit user approval. Keep classical logic/storage in plugin and core hooks generic. No automatic PR merge. User approval is required before Phase 2. Update this shared handoff and report at each session boundary.
 
-Task checkout: /workspace/work/phase05/repo. Independent worktrees: /workspace/work/phase05/branches/F01..F16; published trees were verified equal and clean. Existing core classical worktree: /workspace/work/phase05/classical. Plugin checkout: /workspace/work/phase05/plugin-repo. Phase 0 archives: /workspace/work/snapshots.
-
-Tools are local under /workspace/work/phase05/tools; PATH begins /workspace/work/phase05/tools/bin. Node 26.12.0 was checksum verified; pnpm 12.15.0 installed locked dependencies. XDG config/cache/data/state must point under workspace, and ASTRO_TELEMETRY_DISABLED=1 for docs builds. Do not share mutable node_modules through symlinks across concurrent worktrees: package-manager auto-installs raced. Use independent offline installs backed by shared content store. Limit concurrent typechecks/builds to avoid memory pressure and deadline-test flakiness.
-
-Raw evidence/logs, extraction scripts, comparison snapshots and final result JSONs are under /workspace/work/phase05. Generators are scratch history, not source of truth: actual worktree fixes supersede early extraction scripts. Authoritative published branch content is the exact commit manifest. Never rerun a generator over a checked/published branch blindly.
-
-## Next session
-
-First read the latest user message for explicit Phase 1 approval. If absent, answer review questions and update docs only. After approval, keep main/upstream untouched, make the classical baseline checks green, pin dev/CI fixtures and contract, reproduce/fix the four known bugs in dependency order, and stop at Phase 1 review. Do not silently implement Phase 2–4 model/editor/grouping.
-
-Update this handoff, inventory, delta and exact test/migration/branch records after every session. Documentation-only commits do not imply runtime features were shipped.

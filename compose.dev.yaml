@@ -1,0 +1,36 @@
+name: aurral-classical-phase1
+services:
+  providers:
+    image: node:26.12.0-bookworm-slim@sha256:742a0fe7320e09e0321222b68165e6ac731d30470e7ea7f98f9bfc3a6e1034fe
+    working_dir: /plugin
+    command: [node, dev/mock-providers.mjs]
+    volumes: [".:/plugin:ro"]
+    networks: [fixtures]
+  aurral:
+    image: node:26.12.0-bookworm-slim@sha256:742a0fe7320e09e0321222b68165e6ac731d30470e7ea7f98f9bfc3a6e1034fe
+    working_dir: /app
+    command: [sh, -c, "node /plugin/dev/seed.mjs && exec node backend/server.ts"]
+    environment:
+      AURRAL_DATA_DIR: /config
+      LIBRARY_FOLDER: /library
+      PORT: "3001"
+      HTTP_PROXY: ""
+      HTTPS_PROXY: ""
+      ALL_PROXY: ""
+      http_proxy: ""
+      https_proxy: ""
+    ports: ["127.0.0.1:3301:3001"]
+    volumes:
+      - ${AURRAL_CORE_PATH:?Set AURRAL_CORE_PATH to your prepared classical checkout}:/app:ro
+      - .:/plugin:ro
+      - ./dev/library:/fixtures:ro
+      - fixture-config:/config
+      - fixture-library:/library
+    networks: [fixtures]
+    depends_on: [providers]
+networks:
+  fixtures:
+    internal: true
+volumes:
+  fixture-config:
+  fixture-library:

@@ -1,10 +1,11 @@
 import path from "node:path";
+import { readValues } from "./tags.js";
 import { compareRecordings } from "./compare.js";
 import { MusicBrainz, mbBaseUrl, TTL } from "./mb.js";
 import { ClassicalResolver } from "./resolver.js";
 import { parseOrder, parseSeparator, slskdSettings } from "./settings.js";
 import { Slskd } from "./slskd.js";
-import { downloadStatus, searchAlbum, searchTrack, startDownload } from "./source.js";
+import { acquisitionIdentity, downloadStatus, searchAlbum, searchTrack, startDownload } from "./source.js";
 import { describeStats, enqueue, libraryIndex, runQueue, runScheduled, untagFiles } from "./tagger.js";
 import { pruneCache } from "./store.js";
 
@@ -27,6 +28,7 @@ export function makeContext(input, { fetchImpl = fetch } = {}) {
     libraryFolder: input.libraryFolder,
     dataFolder: input.dataFolder,
     api: input.api,
+    userOperations: input.userOperations,
     fetch: fetchImpl,
     log,
     mb,
@@ -64,12 +66,13 @@ async function tagNow(ctx, paths, what) {
   return `Queued ${paths.length} files from ${what}. Tagging is busy and will get to them.`;
 }
 
-async function untagNow(ctx, paths, what) {
+async function untagNow(ctx, paths, what, mode = "restore") {
   if (!paths.length) return `No files in ${what}`;
   {
-    const counts = await untagFiles(ctx, paths, ACTION_BUDGET_MS, { priority: true });
+    const counts = await untagFiles(ctx, paths, ACTION_BUDGET_MS, { priority: true, mode });
     if (counts) {
       const parts = [`${counts.restored} restored`];
+      if (counts.cleared) parts.push(`${counts.cleared} cleared${mode === "clear" ? " (existing backups retained)" : " (original tags unavailable)"}`);
       if (counts.unchanged) parts.push(`${counts.unchanged} already had no classical tags`);
       if (counts["no backup"]) parts.push(`${counts["no backup"]} couldn't be restored (no backup, and MusicBrainz has no credit)`);
       if (counts.skipped) parts.push(`${counts.skipped} skipped`);
@@ -114,6 +117,18 @@ export default {
   },
 
   actions: {
+    async "preview-remove"(input) {
+      const fields = ["composer", "work", "workId"];
+      const counts = Object.fromEntries(fields.map((field) => [field, 0]));
+      for (const track of input.album.tracks.filter((t) => t.path)) {
+        const values = readValues(track.path, fields);
+        for (const field of fields) counts[field] += values[field].length;
+      }
+      return { message: `Clear classical fields will remove ${counts.composer} composer, ${counts.work} work and ${counts.workId} work-ID values. Restore originals uses backups instead; original values may remain. No files changed.` };
+    },
+    async "clear-classical"(input) {
+      return { message: await untagNow(makeContext(input), input.album.tracks.map((t) => t.path).filter(Boolean), `"${input.album.title}"`, "clear") };
+    },
     async "tag-album"(input) {
       const ctx = makeContext(input);
       const paths = input.album.tracks.map((t) => t.path).filter(Boolean);
@@ -147,6 +162,7 @@ export default {
   events: {
     async "download.finished"(input) {
       const ctx = makeContext(input);
+      if (ctx.settings.enableFileWrites !== true) return;
       if (!input.track?.path) return;
       await enqueue(ctx, [input.track.path], { source: input.source });
       tagInBackground(ctx);
@@ -155,12 +171,14 @@ export default {
 
   async scheduled(input) {
     const ctx = makeContext(input);
+    if (ctx.settings.enableFileWrites !== true) return;
     const stats = await runScheduled(ctx, SCHEDULE_BUDGET_MS);
     if (stats) log(`Scheduled tagging: ${describeStats(stats)}`);
     await pruneCache(path.join(ctx.dataFolder, "mb-cache"), TTL.default).catch(() => {});
   },
 
   downloadSource: {
+    acquisitionIdentity: (input) => acquisitionIdentity(makeContext(input), input.track),
     search: (input) => searchTrack(makeContext(input), input.track),
     searchAlbum: (input) => searchAlbum(makeContext(input), input.album),
     download: (input) => startDownload(makeContext(input), input.result, "track"),

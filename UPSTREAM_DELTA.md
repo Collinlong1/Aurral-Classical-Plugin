@@ -1,4 +1,6 @@
-# Upstream Delta — draft for v0.1 Foundation
+# Upstream Delta — Phase 1 implementation and later proposals
+
+Current implementation: D02/D03 and the Phase 1 portions of D06/D07 are implemented in core PR36; plugin PR6 consumes them. See the Phase 1 implementation addendum at the end and PHASE_1_REPORT.md for files/tests/contract. The audit baseline and draft table below are historical planning; their no-implementation wording is superseded by that addendum. D01/D04/D05 remain proposals. No upstream PR exists.
 
 Audit baseline: upstream `7afcb7cb23274a9ec92d0b57feb6a088c5ae64ef`; fork `aa643d316e9e00fb8622ab60b2fb2cb8b76661ee`; plugin `506e5259e1442b8cfe072a75b129abb428c6bcf7`.
 
@@ -29,3 +31,15 @@ No new search-box hook in v0.1, no Discover hook, no full Library tab injector, 
 Each implemented row must replace estimates with actual paths/line counts, implementation commit, minimum host commit/version, API/schema changes, migration identifier or explicit none, compatibility behavior, executable test result and status `draft/ready/submitted/merged`. Add link only when a PR actually exists. The admin diagnostics view mirrors these rows and negotiated availability, reports plugin/core/data-schema/contract versions and last job failures without secrets. No page exists today; diagnostics depends on D01.
 
 Before any user-approved upstream PR, extract one hook into an upstream-based branch and test with both an old API-1 sample plugin and a generic non-classical consumer. No PR, branch or main merge is authorized by this draft.
+# Phase 1 implementation addendum
+
+Current source record: PHASE_1_REPORT.md. Core review target is the user's aurral-classical branch at externally advanced 1b3c1c00, containing upstream 021b1f03. Nothing was submitted upstream.
+
+- D02 implemented: pluginUserOperations.ts, action input in pluginService.ts/types, opt-in localPlaylists manifest field, narrow grant route/authentication, existing persistent playlist queue and execution-time permission/expiry checks. No new table or migration. Real-user owner comes only from signed host grant; synthetic admin keys cannot substitute. Stable plugin/user/key UUID makes retries idempotent. Own job-status API confirms completion.
+- D03 implemented: playlistTracks.ts preserves paths and exact local identities; playlistOperations.ts reuses indexed-file pinning on create/update/append and rejects stale explicit paths. Different native jobs/files with identical metadata stay distinct. No new creation-only endpoint or metadata columns.
+- D06 Phase 1 bridge implemented in pluginUserOperations.ts: complete indexed owned-library snapshot and mapped readPath. It is a full in-memory read, with no cursor/generation/reconciliation or deletion inference. Phase 2 must measure larger libraries before choosing a pagination extension.
+- D07 implemented: opt-in downloadSource.acquisitionIdentity manifest capability, pluginAcquisitionIdentity.ts validation/host call, and native Soulseek preparation in slskdOrchestrator.ts. Performer query identity is separate from display credit; persisted requiredTerms filter native candidates. Failure holds acquisition rather than silently reverting to composer identity. Non-classical no-op preserves normal queries. No classical/provider parsing in core.
+- D01/D04/D05 remain unimplemented proposals. No views, editor, album-grouping or segment player was added in Phase 1.
+
+The original design table below remains planning history; its draft/no-implementation wording is superseded only for the Phase 1 portions listed above. The full v0.1 native-reference/view contract is not claimed implemented.
+
