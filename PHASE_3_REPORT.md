@@ -1,5 +1,9 @@
 # Phase 3 — manual editor
 
+## Final implementation CI
+
+Implementation plugin commit `84ea58d39362532f1f3551906e4fef01a7eda77b` and pinned core commit `7ea6b2211f469d9c1342fee998fe82d2289232ff` passed remote validation. [Standard CI run 42934882603](https://github.com/Collinlong1/Aurral-Classical-Plugin/actions/runs/42934882603) passed all four Node matrix jobs and isolated model/editor tests, including bundle/source consistency. [Editor integration run 42934882763](https://github.com/Collinlong1/Aurral-Classical-Plugin/actions/runs/42934882763) passed required core checks/build, Chromium editor/permissions, existing comparison streams, restart persistence and read-only media checks; browser evidence was uploaded. All six implementation jobs passed. Follow-up documentation commits record this observed result without changing runtime source.
+
 November 10, 2026 (America/Chicago). The user explicitly authorized beginning and continuing Phase 3. The manual editor and its generic host bridge are complete for review. Phase 4 is not authorized by this report.
 
 ## Result and acceptance
@@ -12,7 +16,7 @@ November 10, 2026 (America/Chicago). The user explicitly authorized beginning an
 | Read-only media | Editor code writes only plugin storage. Fixture media is set read-only; hashes and permissions are checked after editing and after a real host restart. No tag writer runs through editor forms. |
 | Pinned blanks and provider conflicts survive refresh | Tests edit/pin an empty title and intentional nulls, inject recorded provider updates/conflicts, reload, unpin and verify history. Browser checks cover a pinned blank surviving multiple refreshes. |
 
-The editor also creates performers/ensembles and structured role credits, supports search/pagination and typed list fields, and rejects stale tabs with HTTP 409. A dirty form stays intact until saved/cancelled; background refetch and navigation cannot silently discard it. Validation errors keep drafts editable. Unknown commands/fields, wrong entity kinds, missing/ambiguous tracks and invalid dates fail without partial writes.
+The editor also creates performers/ensembles and structured role credits, supports search/pagination and typed list fields, and rejects stale tabs with HTTP 409. Within the editor, a dirty form stays intact until saved/cancelled; background refetch and item navigation cannot silently discard it. Validation errors keep drafts editable. Unknown commands/fields, wrong entity kinds, missing/ambiguous tracks and invalid dates fail without partial writes.
 
 ## Where to find it
 

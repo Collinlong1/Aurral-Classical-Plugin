@@ -1,5 +1,7 @@
 # Current checkpoint — Phase 3
 
+Final observed implementation CI is green: plugin source 84ea58d39362532f1f3551906e4fef01a7eda77b / pinned core 7ea6b2211f469d9c1342fee998fe82d2289232ff; runs 42934882603 and 42934882763 passed all six jobs, including four Node versions, isolated model/editor tests, core checks/build, Chromium, permissions, restart/media hashes and existing comparison playback. Later documentation-only commits record this outcome; no runtime change.
+
 November 10, 2026 (America/Chicago). The user explicitly said “Lets begin phase 3” and “Continue with phase 3.” Phase 3 is complete for review. Phase 4 is not authorized.
 
 Companion core implementation: `7ea6b2211f469d9c1342fee998fe82d2289232ff`, published on the user fork phase3-review branch and pinned in editor CI.
