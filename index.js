@@ -36201,6 +36201,11 @@ function reconcile(catalogue, snapshot) {
       if (items.length === 1 && demand.get(items[0]) === 1) {
         const item = items[0];
         claimed.add(item);
+        if (old.state === "active" && old.core_id === item.coreId && old.file_id === item.fileId && old.evidence === json(item)) {
+          db.prepare("UPDATE track_link SET state='active' WHERE id=?").run(old.id);
+          rows.push({ ...item, id: old.id });
+          continue;
+        }
         db.prepare(
           "UPDATE track_link SET core_id=?,file_id=?,state='active',evidence=?,revision=revision+1,updated_at=? WHERE id=?"
         ).run(item.coreId, item.fileId, json(item), now, old.id);
@@ -38239,7 +38244,8 @@ async function modelStatus(ctx) {
       scan: catalogue.db.prepare(
         `SELECT id,state,CASE WHEN state IN ('retry','failed') THEN error ELSE NULL END AS error,
           json_array_length(input,'$.files') AS total,
-          coalesce(json_extract(progress,'$.cursor'),0) AS processed
+          coalesce(json_extract(progress,'$.cursor'),0) AS processed,
+          coalesce(json_extract(progress,'$.errorCount'),0) AS skipped
           FROM model_job WHERE type='library_scan' ORDER BY created_at DESC,rowid DESC LIMIT 1`
       ).get() || null,
       jobs: catalogue.db.prepare("SELECT state,count(*) AS count FROM model_job GROUP BY state").all()
@@ -38248,10 +38254,60 @@ async function modelStatus(ctx) {
     catalogue.close();
   }
 }
-async function enqueueModelScan(ctx, actor3) {
-  if (actor3?.role !== "admin")
+var PLUGIN_ID = "aurral-classical";
+var SYNC_INTERVAL_MS = 6 * 60 * 6e4;
+var syncFlag = (ctx) => path6.join(modelFolder(ctx), "sync-requested");
+async function hostLibrary(ctx) {
+  if (ctx.userOperations)
+    return new UserOperations(ctx.userOperations, ctx.fetch).library();
+  if (ctx.api?.url && ctx.api?.key) {
+    const response = await (ctx.fetch || fetch)(
+      `${ctx.api.url}/plugins/${PLUGIN_ID}/user-operations/library`,
+      {
+        headers: { "X-Api-Key": ctx.api.key },
+        signal: AbortSignal.timeout(6e4)
+      }
+    );
+    const data = await response.json();
+    if (!response.ok)
+      throw new Error(data.error || `Library snapshot failed: ${response.status}`);
+    if (data.version !== 1 || data.complete !== true)
+      throw new Error("Incomplete library snapshot; scan cancelled");
+    return data.library;
+  }
+  throw new Error(
+    "Classical model scans require the host's user-operations capability or plugin API access"
+  );
+}
+var canReadHostLibrary = (ctx) => !!(ctx.userOperations || ctx.api?.url && ctx.api?.key);
+async function requestModelSync(ctx) {
+  await fs4.mkdir(modelFolder(ctx), { recursive: true });
+  await fs4.writeFile(syncFlag(ctx), String(Date.now()));
+}
+async function modelSyncDue(ctx, { now = Date.now() } = {}) {
+  const requested = await fs4.access(syncFlag(ctx)).then(() => true, () => false);
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  try {
+    if (catalogue.db.prepare(
+      "SELECT 1 FROM model_job WHERE key='library_scan' AND state IN ('queued','running','retry')"
+    ).get())
+      return false;
+    const last = catalogue.db.prepare(
+      "SELECT max(created_at) AS at FROM model_job WHERE key='library_scan' AND state='done'"
+    ).get().at;
+    return requested || !last || now - last >= SYNC_INTERVAL_MS;
+  } finally {
+    catalogue.close();
+  }
+}
+async function enqueueModelScan(ctx, actor3, { system = false } = {}) {
+  if (!system && actor3?.role !== "admin")
     throw new Error("Classical model scans require a current host admin");
-  const operations = new UserOperations(ctx.userOperations, ctx.fetch);
+  if (!canReadHostLibrary(ctx))
+    throw new Error(
+      "Classical model scans require the host's user-operations capability or plugin API access"
+    );
+  await fs4.rm(syncFlag(ctx), { force: true });
   const catalogue = await openCatalogue(modelFolder(ctx));
   try {
     const pending = catalogue.db.prepare(
@@ -38268,7 +38324,7 @@ async function enqueueModelScan(ctx, actor3) {
       ).run(latest.id);
       return latest.id;
     }
-    const library = await operations.library();
+    const library = await hostLibrary(ctx);
     let instance = catalogue.db.prepare("SELECT * FROM core_instance LIMIT 1").get();
     if (!instance) {
       const id = randomUUID7();
@@ -38302,7 +38358,7 @@ async function enqueueModelScan(ctx, actor3) {
     );
     const jobs = new ModelJobs(catalogue);
     return jobs.enqueue("library_scan", "library_scan", {
-      actor: String(actor3.id),
+      actor: system ? "system" : String(actor3.id),
       instanceId: instance.id,
       epoch: ctx.settings.libraryEpoch || "initial",
       generation: instance.generation + 1,
@@ -38312,7 +38368,46 @@ async function enqueueModelScan(ctx, actor3) {
     catalogue.close();
   }
 }
-async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 10 } = {}) {
+async function scanFile(file, root, prior) {
+  const real = await fs4.realpath(file.readPath);
+  const relative = path6.relative(root, real);
+  if (!relative || relative === ".." || relative.startsWith(`..${path6.sep}`) || path6.isAbsolute(relative))
+    throw new Error("Indexed model file is outside the configured library");
+  const before = await fs4.stat(real);
+  const unchanged = prior?.fingerprint && prior.observedRealPath === real && prior.size === before.size && prior.mtimeMs === before.mtimeMs && prior.ino === before.ino;
+  const hash = unchanged ? prior.fingerprint : await fingerprint(real);
+  const tags = readModelTags(real);
+  const after = await fs4.stat(real);
+  if (before.size !== after.size || before.mtimeMs !== after.mtimeMs || before.ino !== after.ino)
+    throw new Error("Library file changed during model scan; retry required");
+  const durationMs = tags.durationMs || file.durationMs;
+  if (!Number.isSafeInteger(durationMs) || durationMs <= 0)
+    throw new Error("Missing track duration");
+  return {
+    ...file,
+    observedRealPath: real,
+    size: after.size,
+    mtimeMs: after.mtimeMs,
+    ino: after.ino,
+    durationMs,
+    fingerprint: hash,
+    hints: {
+      title: tags.title || file.title || "",
+      album: tags.album || file.album || "",
+      artist: tags.artist || file.artist || "",
+      albumArtist: tags.albumArtist,
+      composer: tags.composer,
+      trackNumber: tags.trackNumber || file.trackNumber || 0,
+      discNumber: tags.discNumber || file.discNumber || 0,
+      genres: tags.genres,
+      work: tags.work,
+      workId: tags.workId,
+      recordingMbid: tags.recordingMbid || file.recordingMbid || "",
+      composerDistinct: tags.composer.length > 0 && !tags.composer.includes(tags.artist)
+    }
+  };
+}
+async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 200, checkpointMs = 1e4 } = {}) {
   const catalogue = await openCatalogue(modelFolder(ctx));
   const jobs = new ModelJobs(catalogue), owner = randomUUID7(), deadline = Date.now() + budgetMs;
   try {
@@ -38324,59 +38419,61 @@ async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 10 } = {}) {
       const input = job.input;
       let cursor = job.progress.cursor || 0;
       const collected = job.progress.collected || [];
+      const errors = job.progress.errors || [];
+      let errorCount = job.progress.errorCount || 0;
       const root = await fs4.realpath(ctx.libraryFolder);
-      while (cursor < input.files.length && Date.now() < deadline) {
-        const stop = Math.min(cursor + batchSize, input.files.length);
-        for (; cursor < stop && Date.now() < deadline; cursor++) {
-          if (catalogue.db.prepare("SELECT cancel_requested FROM model_job WHERE id=?").get(job.id).cancel_requested)
-            break;
-          const file = input.files[cursor];
-          const real = await fs4.realpath(file.readPath);
-          const relative = path6.relative(root, real);
-          if (!relative || relative === ".." || relative.startsWith(`..${path6.sep}`) || path6.isAbsolute(relative))
-            throw new Error(
-              "Indexed model file is outside the configured library"
-            );
-          const before = await fs4.stat(real);
-          const hash = await fingerprint(real);
-          const tags = readModelTags(real);
-          const after = await fs4.stat(real);
-          if (before.size !== after.size || before.mtimeMs !== after.mtimeMs || before.ino !== after.ino)
-            throw new Error(
-              "Library file changed during model scan; retry required"
-            );
-          const durationMs = tags.durationMs || file.durationMs;
-          if (!Number.isSafeInteger(durationMs) || durationMs <= 0)
-            throw new Error("Missing track duration");
+      const previous = new Map(
+        catalogue.db.prepare(
+          "SELECT core_id,file_id,evidence FROM track_link WHERE instance_id=? AND state='active'"
+        ).all(input.instanceId).map((row) => [
+          JSON.stringify([row.core_id, row.file_id]),
+          JSON.parse(row.evidence)
+        ])
+      );
+      const skip = (file, error, prior) => {
+        errorCount++;
+        if (errors.length < 50)
+          errors.push({ path: file.path, error: String(error).slice(0, 200) });
+        if (prior && error?.code !== "ENOENT")
           collected.push({
             ...file,
-            observedRealPath: real,
-            size: after.size,
-            durationMs,
-            fingerprint: hash,
-            hints: {
-              title: tags.title || file.title || "",
-              album: tags.album || file.album || "",
-              artist: tags.artist || file.artist || "",
-              albumArtist: tags.albumArtist,
-              composer: tags.composer,
-              trackNumber: tags.trackNumber || file.trackNumber || 0,
-              discNumber: tags.discNumber || file.discNumber || 0,
-              genres: tags.genres,
-              work: tags.work,
-              workId: tags.workId,
-              recordingMbid: tags.recordingMbid || file.recordingMbid || "",
-              composerDistinct: tags.composer.length > 0 && !tags.composer.includes(tags.artist)
-            }
+            observedRealPath: prior.observedRealPath,
+            size: prior.size,
+            durationMs: prior.durationMs,
+            fingerprint: prior.fingerprint,
+            ...prior.mtimeMs != null && { mtimeMs: prior.mtimeMs, ino: prior.ino },
+            hints: prior.hints
           });
+      };
+      while (cursor < input.files.length && Date.now() < deadline) {
+        const stop = Math.min(cursor + batchSize, input.files.length);
+        const checkpointAt = Date.now() + checkpointMs;
+        let cancelled = false;
+        for (; cursor < stop && Date.now() < deadline && Date.now() < checkpointAt; cursor++) {
+          if (catalogue.db.prepare("SELECT cancel_requested FROM model_job WHERE id=?").get(job.id).cancel_requested) {
+            cancelled = true;
+            break;
+          }
+          const file = input.files[cursor];
+          const prior = previous.get(JSON.stringify([file.coreId, file.fileId]));
+          try {
+            collected.push(await scanFile(file, root, prior));
+          } catch (error) {
+            skip(file, error, prior);
+          }
         }
-        if (!jobs.checkpoint(job, { cursor, collected }, { leaseMs: 6e4 }))
+        if (!jobs.checkpoint(
+          job,
+          { cursor, collected, errors, errorCount },
+          { leaseMs: 6e4 }
+        ))
           return;
+        if (cancelled) break;
       }
       const done = cursor === input.files.length;
       const committed = jobs.checkpoint(
         job,
-        { cursor, collected },
+        { cursor, collected, errors, errorCount },
         {
           done,
           leaseMs: 6e4,
@@ -40901,7 +40998,7 @@ var index_default = {
       const indexed = status.tracks.reduce((sum, row) => sum + row.count, 0);
       const scan = status.scan;
       return {
-        message: `Classical model schema ${status.schema}; indexed tracks: ${indexed}. ${scan ? `Scan ${scan.id}: ${scan.state}; processed ${scan.processed}/${scan.total} files.${scan.error ? ` Error: ${scan.error}` : ""}` : "No scan has been queued."}`.slice(
+        message: `Classical model schema ${status.schema}; indexed tracks: ${indexed}. ${scan ? `Scan ${scan.id}: ${scan.state}; processed ${scan.processed}/${scan.total} files.${scan.skipped ? ` ${scan.skipped} unreadable file${scan.skipped === 1 ? "" : "s"} skipped.` : ""}${scan.error ? ` Error: ${scan.error}` : ""}` : "No scan has been queued."}`.slice(
           0,
           500
         )
@@ -40913,7 +41010,7 @@ var index_default = {
       await runModelJobs(ctx, { budgetMs: ACTION_BUDGET_MS });
       const { scan } = await modelStatus(ctx);
       return {
-        message: `Classical model scan ${id}: ${scan?.state || "saved"}; processed ${scan?.processed ?? 0}/${scan?.total ?? 0} files. ${scan?.state === "done" ? "Reload the editor to search indexed tracks." : "Existing progress is saved. Run Scan again to resume immediately, or enable the plugin schedule for automatic continuation."}`.slice(
+        message: `Classical model scan ${id}: ${scan?.state || "saved"}; processed ${scan?.processed ?? 0}/${scan?.total ?? 0} files.${scan?.skipped ? ` ${scan.skipped} unreadable file${scan.skipped === 1 ? "" : "s"} skipped.` : ""} ${scan?.state === "done" ? "Reload the editor to search indexed tracks." : "Existing progress is saved. Run Scan again to resume immediately, or enable the plugin schedule for automatic continuation."}`.slice(
           0,
           500
         )
@@ -40993,6 +41090,9 @@ var index_default = {
   events: {
     async "download.finished"(input) {
       const ctx = makeContext(input);
+      await requestModelSync(ctx).catch(
+        (error) => log(`Classical model sync request failed: ${error.message}`)
+      );
       if (ctx.settings.enableFileWrites !== true) return;
       if (!input.track?.path) return;
       await enqueue(ctx, [input.track.path], { source: input.source });
@@ -41002,9 +41102,16 @@ var index_default = {
   async scheduled(input) {
     const ctx = makeContext(input);
     const deadline = Date.now() + SCHEDULE_BUDGET_MS;
-    await runModelJobs(ctx, { budgetMs: SCHEDULE_BUDGET_MS }).catch(
-      (error) => log(`Classical model unavailable: ${error.message}`)
-    );
+    try {
+      await runModelJobs(ctx, { budgetMs: SCHEDULE_BUDGET_MS });
+      if (canReadHostLibrary(ctx) && await modelSyncDue(ctx)) {
+        await enqueueModelScan(ctx, null, { system: true });
+        const left = deadline - Date.now();
+        if (left > 0) await runModelJobs(ctx, { budgetMs: left });
+      }
+    } catch (error) {
+      log(`Classical model unavailable: ${error.message}`);
+    }
     if (ctx.settings.enableFileWrites !== true) return;
     const remainingMs = deadline - Date.now();
     if (remainingMs <= 0) return;

@@ -11,6 +11,9 @@ import {
   cancelModelScan,
   autoMatchWorks,
   runModelJobs,
+  requestModelSync,
+  modelSyncDue,
+  canReadHostLibrary,
 } from "./model/runtime.js";
 import { readValues } from "./tags.js";
 import { compareRecordings } from "./compare.js";
@@ -195,7 +198,7 @@ export default {
       const scan = status.scan;
       return {
         message:
-          `Classical model schema ${status.schema}; indexed tracks: ${indexed}. ${scan ? `Scan ${scan.id}: ${scan.state}; processed ${scan.processed}/${scan.total} files.${scan.error ? ` Error: ${scan.error}` : ""}` : "No scan has been queued."}`.slice(
+          `Classical model schema ${status.schema}; indexed tracks: ${indexed}. ${scan ? `Scan ${scan.id}: ${scan.state}; processed ${scan.processed}/${scan.total} files.${scan.skipped ? ` ${scan.skipped} unreadable file${scan.skipped === 1 ? "" : "s"} skipped.` : ""}${scan.error ? ` Error: ${scan.error}` : ""}` : "No scan has been queued."}`.slice(
             0,
             500,
           ),
@@ -208,7 +211,7 @@ export default {
       const { scan } = await modelStatus(ctx);
       return {
         message:
-          `Classical model scan ${id}: ${scan?.state || "saved"}; processed ${scan?.processed ?? 0}/${scan?.total ?? 0} files. ${scan?.state === "done" ? "Reload the editor to search indexed tracks." : "Existing progress is saved. Run Scan again to resume immediately, or enable the plugin schedule for automatic continuation."}`.slice(
+          `Classical model scan ${id}: ${scan?.state || "saved"}; processed ${scan?.processed ?? 0}/${scan?.total ?? 0} files.${scan?.skipped ? ` ${scan.skipped} unreadable file${scan.skipped === 1 ? "" : "s"} skipped.` : ""} ${scan?.state === "done" ? "Reload the editor to search indexed tracks." : "Existing progress is saved. Run Scan again to resume immediately, or enable the plugin schedule for automatic continuation."}`.slice(
             0,
             500,
           ),
@@ -298,6 +301,10 @@ export default {
   events: {
     async "download.finished"(input) {
       const ctx = makeContext(input);
+      // New files reach the classical model on the next scheduled run.
+      await requestModelSync(ctx).catch((error) =>
+        log(`Classical model sync request failed: ${error.message}`),
+      );
       if (ctx.settings.enableFileWrites !== true) return;
       if (!input.track?.path) return;
       await enqueue(ctx, [input.track.path], { source: input.source });
@@ -310,9 +317,18 @@ export default {
     const deadline = Date.now() + SCHEDULE_BUDGET_MS;
     // Use the scheduled call's budget, sharing it with optional file tagging.
     // Model failures never suppress the established source/tagging schedule.
-    await runModelJobs(ctx, { budgetMs: SCHEDULE_BUDGET_MS }).catch((error) =>
-      log(`Classical model unavailable: ${error.message}`),
-    );
+    // Continue a queued scan, then start an incremental one when a download
+    // asked for it or the last completed scan is older than the sync interval.
+    try {
+      await runModelJobs(ctx, { budgetMs: SCHEDULE_BUDGET_MS });
+      if (canReadHostLibrary(ctx) && (await modelSyncDue(ctx))) {
+        await enqueueModelScan(ctx, null, { system: true });
+        const left = deadline - Date.now();
+        if (left > 0) await runModelJobs(ctx, { budgetMs: left });
+      }
+    } catch (error) {
+      log(`Classical model unavailable: ${error.message}`);
+    }
     if (ctx.settings.enableFileWrites !== true) return;
     const remainingMs = deadline - Date.now();
     if (remainingMs <= 0) return;

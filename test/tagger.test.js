@@ -322,7 +322,8 @@ test("Aurral is asked to rescan the Library after tags change, and only then", a
   const refreshes = [];
   globalThis.fetch = fakeFetch({
     entities: symphonyEntities(),
-    aurral: (method, route, body) => (refreshes.push([method, route, body]), new Response("{}", { status: 202 })),
+    // The classical model's scheduled sync also asks for a library snapshot; this test is about refreshes.
+    aurral: (method, route, body) => (route.includes("/user-operations/") || refreshes.push([method, route, body]), new Response("{}", { status: 202 })),
   });
   const api = { url: "http://aurral.test/api", key: "plugin-key" };
   await copyFixture("sine.flac", path.join(folders.libraryFolder, "a", "01.flac"));

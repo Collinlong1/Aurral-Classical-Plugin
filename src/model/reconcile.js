@@ -142,6 +142,18 @@ export function reconcile(catalogue, snapshot) {
       if (items.length === 1 && demand.get(items[0]) === 1) {
         const item = items[0];
         claimed.add(item);
+        // An unchanged file needs no new evidence row or audit event; repeated
+        // scans otherwise grow the database by one of each per track.
+        if (
+          old.state === "active" &&
+          old.core_id === item.coreId &&
+          old.file_id === item.fileId &&
+          old.evidence === json(item)
+        ) {
+          db.prepare("UPDATE track_link SET state='active' WHERE id=?").run(old.id);
+          rows.push({ ...item, id: old.id });
+          continue;
+        }
         db.prepare(
           "UPDATE track_link SET core_id=?,file_id=?,state='active',evidence=?,revision=revision+1,updated_at=? WHERE id=?",
         ).run(item.coreId, item.fileId, json(item), now, old.id);
