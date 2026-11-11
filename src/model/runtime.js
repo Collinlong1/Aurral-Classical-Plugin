@@ -6,7 +6,7 @@ import { openCatalogue } from "./catalogue.js";
 import { ModelJobs } from "./jobs.js";
 import { reconcile, classify } from "./reconcile.js";
 import { UserOperations } from "../user-operations.js";
-import { readTags, UnsupportedFormat } from "../tags.js";
+import { readTags } from "../tags.js";
 
 export const modelFolder = (ctx) => path.join(ctx.dataFolder, "model");
 const fingerprint = async (file) => {
@@ -36,12 +36,12 @@ const emptyTags = () => ({
 const readModelTags = (file) => {
   try {
     return readTags(file);
-  } catch (error) {
-    // The host library can play formats the tag writer intentionally does not
-    // edit, including WAV. Keep those owned tracks searchable using the host's
+  } catch {
+    // A full-file hash was read immediately before this. If optional tag
+    // parsing rejects an owned file (unsupported format, malformed header,
+    // or an unusual encoder), keep it searchable from the host's trusted
     // metadata instead of failing an otherwise read-only model scan.
-    if (error instanceof UnsupportedFormat) return emptyTags();
-    throw error;
+    return emptyTags();
   }
 };
 export async function modelStatus(ctx) {

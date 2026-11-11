@@ -37614,9 +37614,8 @@ var emptyTags = () => ({
 var readModelTags = (file) => {
   try {
     return readTags(file);
-  } catch (error) {
-    if (error instanceof UnsupportedFormat) return emptyTags();
-    throw error;
+  } catch {
+    return emptyTags();
   }
 };
 async function modelStatus(ctx) {

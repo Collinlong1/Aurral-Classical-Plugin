@@ -1,6 +1,6 @@
 # Phase 4 scan compatibility correction
 
-The user's schema-2 production-model scan failed at 4,130/12,802 files with `can't tag .wav files`. The read-only model scanner was incorrectly sending every host-owned format through the narrower writable-tag format check. Unsupported writable formats such as WAV now retain full-file hash evidence and use the host's trusted title/artist/duration metadata without being opened for tagging or modified. An explicit Scan requeues the latest failed saved job with its existing cursor and snapshot, so this scan resumes at 4,130 rather than restarting. All 177 plugin tests pass, including read-only WAV media/hash/metadata and failed-progress resumption regressions. Core, schema and the unrelated BrainzMash refresher are unchanged.
+The user's schema-2 production-model scan first failed at 4,130/12,802 files with `can't tag .wav files`, then reached 4,360 and retried on `MPEG audio header not found`. The read-only model scanner was incorrectly making optional tag parsing fatal. Files rejected by the tag parser now retain full-file hash evidence and use the host's trusted title/artist/duration metadata without being opened for tagging or modified. An explicit Scan reuses the active retry or requeues the latest failed saved job with its existing cursor and snapshot. All 178 plugin tests pass, including read-only WAV, malformed-header media/hash/metadata and failed-progress resumption regressions. Core, schema and the unrelated BrainzMash refresher are unchanged.
 
 # Current checkpoint — Phase 4 complete for review
 

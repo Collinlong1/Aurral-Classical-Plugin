@@ -796,6 +796,66 @@ test("read-only model scans index WAV files using host metadata without opening 
   assert.equal((await fs.stat(file)).mode & 0o777, 0o444);
 });
 
+test("read-only model scans survive a tag parser rejecting an owned MPEG file", async (t) => {
+  const folders = await tempFolders();
+  t.after(() => fs.rm(folders.root, { recursive: true, force: true }));
+  const file = path.join(folders.libraryFolder, "unusual.mp3");
+  await fs.writeFile(file, "host-readable fixture with no MPEG audio header");
+  await fs.chmod(file, 0o444);
+  const before = await fs.readFile(file);
+  const ctx = {
+    ...folders,
+    settings: {},
+    userOperations: {
+      version: 1,
+      url: "http://host.test/ops",
+      token: "test-only",
+    },
+    fetch: async () =>
+      response({
+        version: 1,
+        complete: true,
+        library: {
+          tracks: [
+            {
+              id: 18,
+              title: "Host MPEG title",
+              artistName: "Host MPEG artist",
+              durationMs: 3000,
+              files: [
+                {
+                  id: 81,
+                  path: file,
+                  albumId: 10,
+                  durationMs: 3000,
+                  available: true,
+                },
+              ],
+            },
+          ],
+        },
+      }),
+  };
+  await enqueueModelScan(ctx, { id: 1, role: "admin" });
+  await runModelJobs(ctx, { budgetMs: 10000 });
+  const status = await modelStatus(ctx);
+  assert.equal(status.scan.state, "done");
+  assert.equal(status.tracks.find((row) => row.state === "active").count, 1);
+  const catalogue = await openCatalogue(path.join(folders.dataFolder, "model"));
+  try {
+    const evidence = JSON.parse(
+      catalogue.db.prepare("SELECT evidence FROM track_link").get().evidence,
+    );
+    assert.equal(evidence.hints.title, "Host MPEG title");
+    assert.equal(evidence.hints.artist, "Host MPEG artist");
+    assert.equal(evidence.durationMs, 3000);
+  } finally {
+    catalogue.close();
+  }
+  assert.deepEqual(await fs.readFile(file), before);
+  assert.equal((await fs.stat(file)).mode & 0o777, 0o444);
+});
+
 test("an explicit scan resumes failed saved progress after a reader fix", async (t) => {
   const folders = await tempFolders();
   t.after(() => fs.rm(folders.root, { recursive: true, force: true }));
