@@ -1,3 +1,7 @@
+# Fix: first request after a restart timed out on the integrity check
+
+Manifest 1.0.15. Opening the database ran a full `PRAGMA integrity_check` and `foreign_key_check` once per process, on whichever request came first; seconds on a large library, paid by each of core's two plugin workers after a restart, so first requests timed out. Opening no longer checks. Migrations and backups check as before; a library scan checks once per process before it writes, and fails the scan if the check fails. Regression test opens a never-opened copy of a broken database (as after a restart): the page call succeeded only with the fix, and the scan rejects. 269 plugin tests pass. Fixes Collinlong1/Aurral-Classical-Plugin#9. The user's crash logs were not available, so this fixes the known startup timeout, not a confirmed root cause.
+
 # Work matching: GROUPING, catalogue-numbered titles, arrangements
 
 Based on plugin `7e73e61` and companion core `6b7389c7`; manifest 1.0.14. From a real library: Picard files with the work in GROUPING and WORK empty, Trifonov's arrangement of The Bells (MusicBrainz links it by `arrangement`, not `parts`), and unmatched blocks that looked like works.

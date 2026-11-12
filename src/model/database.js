@@ -84,7 +84,17 @@ export async function restoreDatabase(
   }
 }
 
-const validated = new Set();
+// A full integrity check reads the whole file, seconds on a large library,
+// and each plugin process would pay it on its first request: long enough for
+// that request to time out. Opening never runs it. Migrations and backups
+// check as they always did, and a library scan checks once per process
+// before it writes.
+const verified = new Set();
+export function verifyOnce(db, filename) {
+  if (verified.has(filename)) return;
+  validateDatabase(db);
+  verified.add(filename);
+}
 
 export async function openDatabase(
   folder,
@@ -141,12 +151,6 @@ export async function openDatabase(
     }
     if (version !== maxVersion)
       throw new Error(`Missing migration to classical schema ${maxVersion}`);
-    // A full integrity check reads the whole file. Every album page opens
-    // the database, so check once per process; migrations check above.
-    if (!validated.has(filename)) {
-      validateDatabase(db);
-      validated.add(filename);
-    }
     return { db, filename };
   } catch (error) {
     db.close();

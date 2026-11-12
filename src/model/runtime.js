@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { openCatalogue } from "./catalogue.js";
+import { verifyOnce } from "./database.js";
 import { ModelJobs } from "./jobs.js";
 import { reconcile, classify } from "./reconcile.js";
 import { UserOperations } from "../user-operations.js";
@@ -334,6 +335,8 @@ export async function runModelJobs(
     try {
       if (job.type !== "library_scan")
         throw new Error("Unknown model job type");
+      // A scan already runs off any page's clock, so it checks the database.
+      verifyOnce(catalogue.db, catalogue.filename);
       const input = job.input;
       let cursor = job.progress.cursor || 0;
       // Evidence read so far: saved chunk by chunk (older scans kept it all

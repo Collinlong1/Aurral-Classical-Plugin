@@ -35417,7 +35417,12 @@ async function backupDatabase(db, destination) {
   }
   return destination;
 }
-var validated = /* @__PURE__ */ new Set();
+var verified = /* @__PURE__ */ new Set();
+function verifyOnce(db, filename) {
+  if (verified.has(filename)) return;
+  validateDatabase(db);
+  verified.add(filename);
+}
 async function openDatabase(folder, { migrations: migrations2 = migrations, maxVersion = SCHEMA_VERSION } = {}) {
   const { DatabaseSync } = await import("node:sqlite");
   await fs.mkdir(folder, { recursive: true });
@@ -35468,10 +35473,6 @@ async function openDatabase(folder, { migrations: migrations2 = migrations, maxV
     }
     if (version2 !== maxVersion)
       throw new Error(`Missing migration to classical schema ${maxVersion}`);
-    if (!validated.has(filename)) {
-      validateDatabase(db);
-      validated.add(filename);
-    }
     return { db, filename };
   } catch (error) {
     db.close();
@@ -37019,7 +37020,7 @@ function classificationEvidence(hints = {}) {
   else if (credit) add(1, "possible composer in artist field", credit.composers.join("; "));
   const score = signals.reduce((sum, s) => sum + s.points, 0);
   const strong = signals.filter((s) => s.kind === "strong");
-  const verified = strong.filter((s) => s.signal !== "classical genre");
+  const verified2 = strong.filter((s) => s.signal !== "classical genre");
   const supporting = signals.filter((s) => s.kind === "supporting" && s.points > 1);
   const hasComposer = Array.isArray(hints.composer) && hints.composer.length > 0 || !!credit;
   const credited = !!hints.composerDistinct || credit?.confidence === "high";
@@ -37034,7 +37035,7 @@ function classificationEvidence(hints = {}) {
       reason = `${kinds2.ordinary.join("; ")} genre and no verifiable classical evidence`;
     }
   } else if (kinds2.context.length && !kinds2.classical.length) {
-    if (credited && score >= 4 && (verified.length || supporting.length >= 2)) {
+    if (credited && score >= 4 && (verified2.length || supporting.length >= 2)) {
       decision = "classical";
       reason = `verified classical work in a ${kinds2.context.join("; ")} release`;
     } else if (credited || score > 1) {
@@ -41002,14 +41003,14 @@ async function writeTags(filePath, values) {
     } finally {
       file.dispose();
     }
-    const verified = openFile(working, READ_STYLE, source);
+    const verified2 = openFile(working, READ_STYLE, source);
     try {
       for (const field2 of changed) {
-        if (!same(WRITERS[field2].read(verified), texts(values[field2])))
+        if (!same(WRITERS[field2].read(verified2), texts(values[field2])))
           throw new Error(`Tag verification failed for ${field2}`);
       }
     } finally {
-      verified.dispose();
+      verified2.dispose();
     }
     await fs3.rename(working, source);
   } catch (error) {
@@ -41264,6 +41265,7 @@ async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 200, checkpointMs
     try {
       if (job.type !== "library_scan")
         throw new Error("Unknown model job type");
+      verifyOnce(catalogue.db, catalogue.filename);
       const input = job.input;
       let cursor = job.progress.cursor || 0;
       let chunks = job.progress.chunks || 0;
@@ -41783,7 +41785,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.14" : "dev";
+var VERSION = true ? "1.0.15" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js

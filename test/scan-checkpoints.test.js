@@ -148,3 +148,20 @@ test("old finished scans are compacted and stop growing the database", async (t)
     assert.deepEqual(JSON.parse(row.progress), { cursor: 2000, errorCount: 0, errors: [] });
   });
 });
+
+test("opening the database never waits on the full integrity check; a scan runs it", async (t) => {
+  const ctx = await library(t, 2);
+  await enqueueModelScan(ctx, admin);
+  // A broken reference fails the full check, so it shows where the check runs.
+  await withCatalogue(ctx, (c) => {
+    c.db.exec("PRAGMA foreign_keys=OFF");
+    c.db.prepare("INSERT INTO relation(id,kind,source_id,target_id,data) VALUES ('broken','movement','gone','gone','{}')").run();
+  });
+  // As after a restart: a database file this process has never opened.
+  const restarted = { ...ctx, dataFolder: path.join(ctx.dataFolder, "..", "restarted") };
+  await fs.cp(path.join(ctx.dataFolder, "model"), path.join(restarted.dataFolder, "model"), { recursive: true });
+  // Page calls open the database: each plugin process's first one used to
+  // pay a full read of the file first, long enough to time out.
+  assert.ok(await modelStatus(restarted));
+  await assert.rejects(runModelJobs(restarted, { budgetMs: 60_000 }), /integrity check failed/);
+});
