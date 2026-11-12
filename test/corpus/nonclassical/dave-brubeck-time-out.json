@@ -1,0 +1,108 @@
+{
+ "id": "dave-brubeck-time-out",
+ "family": "jazz",
+ "title": "Time Out",
+ "artist": "The Dave Brubeck Quartet",
+ "source": "store download; a jazz title with 'Rondo'",
+ "expect": {
+  "album": "not_classical"
+ },
+ "pins": {
+  "tracks": {
+   "1": "not_classical"
+  },
+  "note": "Admin removes Blue Rondo from Classical; the pin should survive rescans and a retag."
+ },
+ "retag": {
+  "1": {
+   "genres": [
+    "Jazz",
+    "Cool Jazz"
+   ]
+  }
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Blue Rondo à la Turk",
+   "durationMs": 404000,
+   "artist": "The Dave Brubeck Quartet",
+   "composer": [
+    "Dave Brubeck"
+   ],
+   "genres": [
+    "Jazz"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [
+    "misleading-title"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Strange Meadow Lark",
+   "durationMs": 442000,
+   "artist": "The Dave Brubeck Quartet",
+   "composer": [
+    "Dave Brubeck"
+   ],
+   "genres": [
+    "Jazz"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Take Five",
+   "durationMs": 324000,
+   "artist": "The Dave Brubeck Quartet",
+   "composer": [
+    "Paul Desmond"
+   ],
+   "genres": [
+    "Jazz"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Three to Get Ready",
+   "durationMs": 324000,
+   "artist": "The Dave Brubeck Quartet",
+   "composer": [
+    "Dave Brubeck"
+   ],
+   "genres": [
+    "Jazz"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Kathy's Waltz",
+   "durationMs": 288000,
+   "artist": "The Dave Brubeck Quartet",
+   "composer": [
+    "Dave Brubeck"
+   ],
+   "genres": [
+    "Jazz"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  }
+ ]
+}

@@ -1,0 +1,110 @@
+{
+ "id": "shawshank-redemption-soundtrack",
+ "family": "soundtrack-mixed",
+ "title": "The Shawshank Redemption (Original Motion Picture Soundtrack)",
+ "artist": "Thomas Newman",
+ "source": "film score with one Mozart opera recording",
+ "expect": {
+  "album": "unsure",
+  "note": "Mixed: a film score with one genuine Mozart recording."
+ },
+ "pins": {
+  "tracks": {
+   "8": "classical"
+  },
+  "note": "Admin sends the Mozart duet to Classical; the pin survives a rescan and a retag."
+ },
+ "retag": {
+  "8": {
+   "genres": [
+    "Soundtrack",
+    "Score"
+   ]
+  }
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "May",
+   "durationMs": 83000,
+   "artist": "Thomas Newman",
+   "composer": [
+    "Thomas Newman"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Shawshank Prison (Stoic Theme)",
+   "durationMs": 119000,
+   "artist": "Thomas Newman",
+   "composer": [
+    "Thomas Newman"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Brooks Was Here",
+   "durationMs": 248000,
+   "artist": "Thomas Newman",
+   "composer": [
+    "Thomas Newman"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Sull'aria... che soave zeffiretto (from Le nozze di Figaro, K. 492)",
+   "durationMs": 196000,
+   "artist": "Gundula Janowitz, Edith Mathis, Orchester der Deutschen Oper Berlin & Karl Böhm",
+   "composer": [
+    "Wolfgang Amadeus Mozart"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "classical",
+   "scenarios": [
+    "classical-in-mixed",
+    "classical-nonclassical-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "End Title",
+   "durationMs": 247000,
+   "artist": "Thomas Newman",
+   "composer": [
+    "Thomas Newman"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  }
+ ]
+}

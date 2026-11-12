@@ -1,0 +1,121 @@
+{
+ "id": "muse-the-resistance",
+ "family": "rock",
+ "title": "The Resistance",
+ "artist": "Muse",
+ "source": "iTunes 'Use work & movement' on the Exogenesis suite",
+ "expect": {
+  "album": "not_classical"
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Uprising",
+   "durationMs": 304000,
+   "artist": "Muse",
+   "composer": [
+    "Matthew Bellamy"
+   ],
+   "genres": [
+    "Alternative Rock"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "United States of Eurasia (+Collateral Damage)",
+   "durationMs": 347000,
+   "artist": "Muse",
+   "composer": [
+    "Matthew Bellamy",
+    "Frédéric Chopin"
+   ],
+   "genres": [
+    "Alternative Rock"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [],
+   "note": "Ends with a Chopin nocturne quotation inside a rock track."
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "I Belong to You (+Mon Cœur S'ouvre à Ta Voix)",
+   "durationMs": 338000,
+   "artist": "Muse",
+   "composer": [
+    "Matthew Bellamy",
+    "Camille Saint-Saëns"
+   ],
+   "genres": [
+    "Alternative Rock"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [],
+   "note": "Pop song quoting a Saint-Saëns aria."
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Exogenesis: Symphony Part 1 (Overture)",
+   "durationMs": 258000,
+   "artist": "Muse",
+   "composer": [
+    "Matthew Bellamy"
+   ],
+   "genres": [
+    "Alternative Rock"
+   ],
+   "work": "Exogenesis: Symphony",
+   "expect": "not_classical",
+   "scenarios": [
+    "misleading-title",
+    "generic-work-tag"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Exogenesis: Symphony Part 2 (Cross-Pollination)",
+   "durationMs": 236000,
+   "artist": "Muse",
+   "composer": [
+    "Matthew Bellamy"
+   ],
+   "genres": [
+    "Alternative Rock"
+   ],
+   "work": "Exogenesis: Symphony",
+   "expect": "not_classical",
+   "scenarios": [
+    "misleading-title",
+    "generic-work-tag"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Exogenesis: Symphony Part 3 (Redemption)",
+   "durationMs": 277000,
+   "artist": "Muse",
+   "composer": [
+    "Matthew Bellamy"
+   ],
+   "genres": [
+    "Alternative Rock"
+   ],
+   "work": "Exogenesis: Symphony",
+   "expect": "not_classical",
+   "scenarios": [
+    "misleading-title",
+    "generic-work-tag"
+   ]
+  }
+ ]
+}

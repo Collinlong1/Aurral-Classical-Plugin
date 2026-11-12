@@ -1,0 +1,140 @@
+{
+ "id": "dream-theater-six-degrees",
+ "family": "rock",
+ "title": "Six Degrees of Inner Turbulence",
+ "artist": "Dream Theater",
+ "source": "Picard with track relationships: every part carries the suite as WORK",
+ "expect": {
+  "album": "not_classical"
+ },
+ "tracks": [
+  {
+   "disc": 2,
+   "number": 1,
+   "title": "I. Overture",
+   "durationMs": 410000,
+   "artist": "Dream Theater",
+   "composer": [
+    "John Petrucci",
+    "John Myung",
+    "Jordan Rudess",
+    "Mike Portnoy"
+   ],
+   "genres": [
+    "Progressive Metal"
+   ],
+   "work": "Six Degrees of Inner Turbulence",
+   "expect": "not_classical",
+   "scenarios": [
+    "generic-work-tag",
+    "misleading-title"
+   ]
+  },
+  {
+   "disc": 2,
+   "number": 2,
+   "title": "II. About to Crash",
+   "durationMs": 351000,
+   "artist": "Dream Theater",
+   "composer": [
+    "John Petrucci",
+    "John Myung",
+    "Jordan Rudess",
+    "Mike Portnoy"
+   ],
+   "genres": [
+    "Progressive Metal"
+   ],
+   "work": "Six Degrees of Inner Turbulence",
+   "expect": "not_classical",
+   "scenarios": [
+    "generic-work-tag"
+   ]
+  },
+  {
+   "disc": 2,
+   "number": 4,
+   "title": "IV. The Test That Stumped Them All",
+   "durationMs": 303000,
+   "artist": "Dream Theater",
+   "composer": [
+    "John Petrucci",
+    "John Myung",
+    "Jordan Rudess",
+    "Mike Portnoy"
+   ],
+   "genres": [
+    "Progressive Metal"
+   ],
+   "work": "Six Degrees of Inner Turbulence",
+   "expect": "not_classical",
+   "scenarios": [
+    "generic-work-tag"
+   ]
+  },
+  {
+   "disc": 2,
+   "number": 5,
+   "title": "V. Goodnight Kiss",
+   "durationMs": 377000,
+   "artist": "Dream Theater",
+   "composer": [
+    "John Petrucci",
+    "John Myung",
+    "Jordan Rudess",
+    "Mike Portnoy"
+   ],
+   "genres": [
+    "Progressive Metal"
+   ],
+   "work": "Six Degrees of Inner Turbulence",
+   "expect": "not_classical",
+   "scenarios": [
+    "generic-work-tag"
+   ]
+  },
+  {
+   "disc": 2,
+   "number": 7,
+   "title": "VII. About to Crash (Reprise)",
+   "durationMs": 245000,
+   "artist": "Dream Theater",
+   "composer": [
+    "John Petrucci",
+    "John Myung",
+    "Jordan Rudess",
+    "Mike Portnoy"
+   ],
+   "genres": [
+    "Progressive Metal"
+   ],
+   "work": "Six Degrees of Inner Turbulence",
+   "expect": "not_classical",
+   "scenarios": [
+    "generic-work-tag"
+   ]
+  },
+  {
+   "disc": 2,
+   "number": 8,
+   "title": "VIII. Losing Time / Grand Finale",
+   "durationMs": 359000,
+   "artist": "Dream Theater",
+   "composer": [
+    "John Petrucci",
+    "John Myung",
+    "Jordan Rudess",
+    "Mike Portnoy"
+   ],
+   "genres": [
+    "Progressive Metal"
+   ],
+   "work": "Six Degrees of Inner Turbulence",
+   "expect": "not_classical",
+   "scenarios": [
+    "generic-work-tag",
+    "misleading-title"
+   ]
+  }
+ ]
+}

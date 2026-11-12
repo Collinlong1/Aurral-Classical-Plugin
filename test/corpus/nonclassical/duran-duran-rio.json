@@ -1,0 +1,85 @@
+{
+ "id": "duran-duran-rio",
+ "family": "pop",
+ "title": "Rio",
+ "artist": "Duran Duran",
+ "source": "rip with a Last.fm-style genre; band credited as composer",
+ "expect": {
+  "album": "not_classical",
+  "note": "'New Romantic' is a 1980s pop movement, not Romantic-era music."
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Rio",
+   "durationMs": 340000,
+   "artist": "Duran Duran",
+   "composer": [
+    "Duran Duran"
+   ],
+   "genres": [
+    "New Romantic"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [
+    "misleading-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "My Own Way",
+   "durationMs": 291000,
+   "artist": "Duran Duran",
+   "composer": [
+    "Duran Duran"
+   ],
+   "genres": [
+    "New Romantic"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [
+    "misleading-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Hungry Like the Wolf",
+   "durationMs": 221000,
+   "artist": "Duran Duran",
+   "composer": [
+    "Duran Duran"
+   ],
+   "genres": [
+    "New Romantic"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [
+    "misleading-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Save a Prayer",
+   "durationMs": 333000,
+   "artist": "Duran Duran",
+   "composer": [
+    "Duran Duran"
+   ],
+   "genres": [
+    "New Romantic"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [
+    "misleading-genre"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,113 @@
+{
+ "id": "daft-punk-random-access-memories",
+ "family": "electronic",
+ "title": "Random Access Memories",
+ "artist": "Daft Punk",
+ "source": "Picard with track relationships: each song's MusicBrainz work as WORK",
+ "expect": {
+  "album": "not_classical"
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Give Life Back to Music",
+   "durationMs": 274000,
+   "artist": "Daft Punk",
+   "composer": [
+    "Thomas Bangalter",
+    "Guy-Manuel de Homem-Christo",
+    "Nile Rodgers"
+   ],
+   "genres": [
+    "Electronic"
+   ],
+   "work": "Give Life Back to Music",
+   "expect": "not_classical",
+   "scenarios": [
+    "generic-work-tag"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Giorgio by Moroder",
+   "durationMs": 544000,
+   "artist": "Daft Punk",
+   "composer": [
+    "Thomas Bangalter",
+    "Guy-Manuel de Homem-Christo",
+    "Giorgio Moroder"
+   ],
+   "genres": [
+    "Electronic"
+   ],
+   "work": "Giorgio by Moroder",
+   "expect": "not_classical",
+   "scenarios": [
+    "generic-work-tag"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Instant Crush",
+   "durationMs": 337000,
+   "artist": "Daft Punk",
+   "composer": [
+    "Thomas Bangalter",
+    "Guy-Manuel de Homem-Christo",
+    "Julian Casablancas"
+   ],
+   "genres": [
+    "Electronic"
+   ],
+   "work": "Instant Crush",
+   "expect": "not_classical",
+   "scenarios": [
+    "generic-work-tag"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Get Lucky",
+   "durationMs": 369000,
+   "artist": "Daft Punk",
+   "composer": [
+    "Thomas Bangalter",
+    "Guy-Manuel de Homem-Christo",
+    "Pharrell Williams",
+    "Nile Rodgers"
+   ],
+   "genres": [
+    "Electronic"
+   ],
+   "work": "Get Lucky",
+   "expect": "not_classical",
+   "scenarios": [
+    "generic-work-tag"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Contact",
+   "durationMs": 381000,
+   "artist": "Daft Punk",
+   "composer": [
+    "Thomas Bangalter",
+    "Guy-Manuel de Homem-Christo",
+    "DJ Falcon"
+   ],
+   "genres": [
+    "Electronic"
+   ],
+   "work": "Contact",
+   "expect": "not_classical",
+   "scenarios": [
+    "generic-work-tag"
+   ]
+  }
+ ]
+}

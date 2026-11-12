@@ -1,0 +1,92 @@
+{
+ "id": "hans-zimmer-interstellar",
+ "family": "film-score",
+ "title": "Interstellar (Original Motion Picture Soundtrack)",
+ "artist": "Hans Zimmer",
+ "source": "store download; composer is the album artist",
+ "expect": {
+  "album": "not_classical"
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Dreaming of the Crash",
+   "durationMs": 235000,
+   "artist": "Hans Zimmer",
+   "composer": [
+    "Hans Zimmer"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Cornfield Chase",
+   "durationMs": 126000,
+   "artist": "Hans Zimmer",
+   "composer": [
+    "Hans Zimmer"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Stay",
+   "durationMs": 412000,
+   "artist": "Hans Zimmer",
+   "composer": [
+    "Hans Zimmer"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Mountains",
+   "durationMs": 219000,
+   "artist": "Hans Zimmer",
+   "composer": [
+    "Hans Zimmer"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "No Time for Caution",
+   "durationMs": 246000,
+   "artist": "Hans Zimmer",
+   "composer": [
+    "Hans Zimmer"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  }
+ ]
+}

@@ -1,0 +1,104 @@
+{
+ "id": "william-orbit-pieces-in-a-modern-style",
+ "family": "crossover",
+ "title": "Pieces in a Modern Style",
+ "artist": "William Orbit",
+ "source": "electronic arrangements of classical works",
+ "expect": {
+  "album": "unsure",
+  "note": "Synthesised arrangements; placement is a curator's choice."
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Barber's Adagio for Strings",
+   "durationMs": 568000,
+   "artist": "William Orbit",
+   "composer": [
+    "Samuel Barber"
+   ],
+   "genres": [
+    "Electronic"
+   ],
+   "work": "",
+   "expect": "unsure",
+   "scenarios": [
+    "crossover",
+    "misleading-title"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Ravel's Pavane pour une infante défunte",
+   "durationMs": 269000,
+   "artist": "William Orbit",
+   "composer": [
+    "Maurice Ravel"
+   ],
+   "genres": [
+    "Electronic"
+   ],
+   "work": "",
+   "expect": "unsure",
+   "scenarios": [
+    "crossover"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Satie's Ogive Number 1",
+   "durationMs": 334000,
+   "artist": "William Orbit",
+   "composer": [
+    "Erik Satie"
+   ],
+   "genres": [
+    "Electronic"
+   ],
+   "work": "",
+   "expect": "unsure",
+   "scenarios": [
+    "crossover"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Cavalleria rusticana",
+   "durationMs": 301000,
+   "artist": "William Orbit",
+   "composer": [
+    "Pietro Mascagni"
+   ],
+   "genres": [
+    "Electronic"
+   ],
+   "work": "",
+   "expect": "unsure",
+   "scenarios": [
+    "crossover"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Beethoven's Triple Concerto",
+   "durationMs": 408000,
+   "artist": "William Orbit",
+   "composer": [
+    "Ludwig van Beethoven"
+   ],
+   "genres": [
+    "Electronic"
+   ],
+   "work": "",
+   "expect": "unsure",
+   "scenarios": [
+    "crossover"
+   ]
+  }
+ ]
+}

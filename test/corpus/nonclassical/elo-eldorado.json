@@ -1,0 +1,103 @@
+{
+ "id": "elo-eldorado",
+ "family": "rock",
+ "title": "Eldorado – A Symphony by the Electric Light Orchestra",
+ "artist": "Electric Light Orchestra",
+ "source": "store download; 'Symphony' in the album title",
+ "expect": {
+  "album": "not_classical",
+  "note": "A rock concept album; the album title calls it a symphony."
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Eldorado Overture",
+   "durationMs": 132000,
+   "artist": "Electric Light Orchestra",
+   "composer": [
+    "Jeff Lynne"
+   ],
+   "genres": [
+    "Rock"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [
+    "misleading-title"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Can't Get It Out of My Head",
+   "durationMs": 261000,
+   "artist": "Electric Light Orchestra",
+   "composer": [
+    "Jeff Lynne"
+   ],
+   "genres": [
+    "Rock"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [
+    "misleading-title"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Illusions in G Major",
+   "durationMs": 156000,
+   "artist": "Electric Light Orchestra",
+   "composer": [
+    "Jeff Lynne"
+   ],
+   "genres": [
+    "Rock"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [
+    "misleading-title"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Eldorado",
+   "durationMs": 320000,
+   "artist": "Electric Light Orchestra",
+   "composer": [
+    "Jeff Lynne"
+   ],
+   "genres": [
+    "Rock"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [
+    "misleading-title"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Eldorado Finale",
+   "durationMs": 81000,
+   "artist": "Electric Light Orchestra",
+   "composer": [
+    "Jeff Lynne"
+   ],
+   "genres": [
+    "Rock"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [
+    "misleading-title"
+   ]
+  }
+ ]
+}

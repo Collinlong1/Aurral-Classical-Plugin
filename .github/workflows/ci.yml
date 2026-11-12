@@ -37,4 +37,27 @@ jobs:
           docker run --rm --network none \
             --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/plugin,readonly" -w /plugin \
             node:26.12.0-bookworm-slim@sha256:742a0fe7320e09e0321222b68165e6ac731d30470e7ea7f98f9bfc3a6e1034fe \
-            node --test test/model.test.js test/editor.test.js
+            node --test test/model.test.js test/editor.test.js test/corpus-nonclassical.test.js
+
+  corpora:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      # Grouping (Apple Music Classical) and classification (ordinary music)
+      # are scored separately; each test fails on an unexplained regression.
+      - run: node --test test/corpus.test.js test/corpus-apple.test.js test/corpus-nonclassical.test.js
+      - name: Corpus summaries
+        if: always()
+        run: |
+          {
+            echo "## Apple Music Classical corpus (grouping)"
+            node scripts/corpus.mjs --apple | tail -n 3
+            echo
+            echo "# Non-classical corpus (classification)"
+            node scripts/corpus.mjs --nonclassical --markdown
+          } >> "$GITHUB_STEP_SUMMARY"

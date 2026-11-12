@@ -1,0 +1,102 @@
+{
+ "id": "amadeus-soundtrack",
+ "family": "classical-mistagged",
+ "title": "Amadeus (Original Soundtrack Recording)",
+ "artist": "Academy of St Martin in the Fields & Sir Neville Marriner",
+ "source": "film soundtrack of Mozart recordings, tagged Soundtrack",
+ "expect": {
+  "album": "classical"
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Symphony No. 25 in G Minor, K. 183: I. Allegro con brio",
+   "durationMs": 393000,
+   "artist": "Academy of St Martin in the Fields & Sir Neville Marriner",
+   "composer": [
+    "Wolfgang Amadeus Mozart"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "classical",
+   "scenarios": [
+    "classical-nonclassical-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Serenade for Winds in B-flat Major, K. 361: III. Adagio",
+   "durationMs": 303000,
+   "artist": "Academy of St Martin in the Fields & Sir Neville Marriner",
+   "composer": [
+    "Wolfgang Amadeus Mozart"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "classical",
+   "scenarios": [
+    "classical-nonclassical-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Piano Concerto No. 20 in D Minor, K. 466: II. Romance",
+   "durationMs": 552000,
+   "artist": "Imogen Cooper, Academy of St Martin in the Fields & Sir Neville Marriner",
+   "composer": [
+    "Wolfgang Amadeus Mozart"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "classical",
+   "scenarios": [
+    "classical-nonclassical-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Mass in C Minor, K. 427: Kyrie",
+   "durationMs": 418000,
+   "artist": "Academy of St Martin in the Fields & Sir Neville Marriner",
+   "composer": [
+    "Wolfgang Amadeus Mozart"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "classical",
+   "scenarios": [
+    "classical-nonclassical-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Requiem in D Minor, K. 626: Lacrimosa",
+   "durationMs": 218000,
+   "artist": "Academy of St Martin in the Fields & Sir Neville Marriner",
+   "composer": [
+    "Wolfgang Amadeus Mozart"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "classical",
+   "scenarios": [
+    "classical-nonclassical-genre"
+   ]
+  }
+ ]
+}

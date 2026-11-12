@@ -1,0 +1,159 @@
+{
+ "id": "a-clockwork-orange-soundtrack",
+ "family": "soundtrack-mixed",
+ "title": "A Clockwork Orange (Music from the Soundtrack)",
+ "artist": "Various Artists",
+ "source": "soundtrack mixing orchestral recordings, synthesiser realisations and songs",
+ "expect": {
+  "album": "unsure",
+  "note": "Mixed: orchestral classical recordings, crossover synth versions and pop songs."
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Title Music from A Clockwork Orange",
+   "durationMs": 141000,
+   "artist": "Wendy Carlos",
+   "composer": [
+    "Henry Purcell",
+    "Wendy Carlos"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "unsure",
+   "scenarios": [
+    "crossover"
+   ],
+   "note": "Synthesiser piece on Purcell's funeral music."
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "The Thieving Magpie (Abridged)",
+   "durationMs": 357000,
+   "artist": "Unknown Artist",
+   "composer": [
+    "Gioachino Rossini"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "classical",
+   "scenarios": [
+    "classical-in-mixed",
+    "classical-nonclassical-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Ninth Symphony, Second Movement (Abridged)",
+   "durationMs": 227000,
+   "artist": "Berliner Philharmoniker & Ferenc Fricsay",
+   "composer": [
+    "Ludwig van Beethoven"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "classical",
+   "scenarios": [
+    "classical-in-mixed",
+    "classical-nonclassical-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "March from A Clockwork Orange (Ninth Symphony, Fourth Movement, Abridged)",
+   "durationMs": 420000,
+   "artist": "Wendy Carlos",
+   "composer": [
+    "Ludwig van Beethoven"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "unsure",
+   "scenarios": [
+    "crossover"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Pomp and Circumstance March No. 1",
+   "durationMs": 268000,
+   "artist": "Unknown Artist",
+   "composer": [
+    "Edward Elgar"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "classical",
+   "scenarios": [
+    "classical-in-mixed",
+    "classical-nonclassical-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Timesteps (Excerpt)",
+   "durationMs": 253000,
+   "artist": "Wendy Carlos",
+   "composer": [
+    "Wendy Carlos"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Overture to the Sun",
+   "durationMs": 100000,
+   "artist": "Terry Tucker",
+   "composer": [
+    "Terry Tucker"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [
+    "misleading-title"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Singin' in the Rain",
+   "durationMs": 156000,
+   "artist": "Gene Kelly",
+   "composer": [
+    "Nacio Herb Brown",
+    "Arthur Freed"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  }
+ ]
+}
