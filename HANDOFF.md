@@ -6,6 +6,8 @@ Companion core fixes row-menu playback to retain plugin item identity, work sour
 
 Validation: all 262 plugin tests and both corpus gates pass, plus the final 23 manifest/editor tests after the version/bundle refresh. Both identity and stale-album regressions fail on the previous source. Companion core `ece9ead0aab0e28947bd6ac3d03208209cae86b8` passes 57 focused queue/plugin tests, required checks (zero type errors; unsafe-any 1236 unchanged) and the frontend production build. Disposable Chromium checks the editor and all three row-menu actions at desktop/phone widths; restart/media-hash checks and admin/two-user exact-file smoke pass before and after restart. Integration CI pins that core commit; remote CI and live-instance deployment have not been run.
 
+Full core run: all 2,762 assertions passed; 405/406 suites passed, with `app-backup.test.ts` failing only its 10-second cleanup hook. The unchanged backup file passed all four tests and cleanup in an isolated one-second rerun. No backup source, timeout or validation baseline was altered to hide the full-run result.
+
 # Fix: the plugin turned itself off when the editor was open during a scan
 
 November 12, 2026, at the user's request. Reproduced with a host simulator that follows core's rules (256 MB heap, 15 s page calls, broken-call counting) on 12,800 tagged files: on a rescan, an editor read waited more than 15 s. Causes and fixes:
