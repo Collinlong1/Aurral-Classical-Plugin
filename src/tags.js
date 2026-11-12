@@ -189,6 +189,8 @@ export function readTags(filePath) {
       genres: texts(tag.genres ?? []).flatMap((genre) => texts(genre.split(";"))),
       composer: texts(tag.composers ?? []),
       work: workField.read(file)[0] ?? "",
+      // Some taggers put the work here and leave WORK empty.
+      grouping: text(tag.grouping),
       workId: workIdField.read(file)[0] ?? "",
       trackNumber: positive(tag.track),
       discNumber: positive(tag.disc),

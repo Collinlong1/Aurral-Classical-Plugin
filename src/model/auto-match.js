@@ -55,7 +55,31 @@ function standalonePiece(hints, workTitle) {
   return text === head || (text.startsWith(`${head} `) && splitTitle(title).head === "" && !MOVEMENT_PREFIX.test(stripWorkPrefix(title, workTitle)));
 }
 
-function proposedWork(work, title, allowStructuredTitles) {
+// A catalogue range names several works: "Book 1, BWV 846-869", or
+// "HWV 349/350". "Op. 8/3" (No. 3) and "K. 138/125c" (a second catalogue's
+// number) name one.
+const isCatalogueRange = (text) =>
+  /\d+[a-z]?\s*[-–—]\s*\d+/i.test(text) ||
+  [...String(text).matchAll(/\b(\d+)\s*\/\s*(\d+)\b(?![a-z])/gi)].some(([, a, b]) => Number(b) > Number(a));
+// A name reads as a work when it names a form ("Sonata") or carries a
+// catalogue number ("The Bells, op. 35"); a set such as "Études" never does.
+const readsAsWork = (text) =>
+  Boolean(text) &&
+  !isCollectionLike(text) &&
+  (MULTI_MOVEMENT.test(text) || (Boolean(catalogueNumber(text)) && !isCatalogueRange(text)));
+
+// GROUPING is free text in some taggers ("Favourite Sonatas"), so without a
+// catalogue number it counts only when the track's title names it too.
+function groupingWork(grouping, title) {
+  const parent = clean(clean(grouping).split(/\s*:\s*/, 1)[0]);
+  if (!readsAsWork(parent)) return null;
+  if (catalogueNumber(parent) && !isCatalogueRange(parent)) return parent;
+  const named = words(parent);
+  const head = words(titleHead(title) || title);
+  return head === named || head.startsWith(`${named} `) || named.startsWith(`${head} `) ? parent : null;
+}
+
+function proposedWork({ work, grouping, title }, allowStructuredTitles) {
   const tagged = clean(work);
   if (tagged && !isCollectionLike(tagged)) {
     const parent = clean(tagged.split(/\s*:\s*/, 1)[0]);
@@ -64,12 +88,14 @@ function proposedWork(work, title, allowStructuredTitles) {
     if (MULTI_MOVEMENT.test(parent) || catalogueNumber(parent))
       return { title: parent, evidence: "work-tag" };
   }
+  if (!tagged && grouping) {
+    const named = groupingWork(grouping, title);
+    if (named) return { title: named, evidence: "grouping-tag" };
+  }
   if (!allowStructuredTitles) return null;
   // Every track of a work shares the head, numbered or not ("Theme: Largo").
   const candidate = titleHead(title);
-  return candidate && MULTI_MOVEMENT.test(candidate) && !isCollectionLike(candidate)
-    ? { title: candidate, evidence: "structured-title" }
-    : null;
+  return readsAsWork(candidate) ? { title: candidate, evidence: "structured-title" } : null;
 }
 
 function candidates(
@@ -102,7 +128,7 @@ function candidates(
   for (const row of rows) {
     const hints = row.evidence.hints || {};
     const provider = providerMatches.get(row.id);
-    const local = proposedWork(hints.work, hints.title, true);
+    const local = proposedWork(hints, true);
     const proposal = provider
       ? {
           // The tags' own title wins when it names the same catalogue number.
@@ -114,7 +140,7 @@ function candidates(
           identity: provider.workId,
           ...(provider.standalone && { standalone: true }),
         }
-      : proposedWork(hints.work, hints.title, allowStructuredTitles);
+      : proposedWork(hints, allowStructuredTitles);
     if (proposal && !provider && proposal.evidence === "work-tag" && standalonePiece(hints, proposal.title))
       proposal.standalone = true;
     // No composer tag and no provider composer: an artist field such as
@@ -1096,7 +1122,7 @@ export function repairWorkTitles(catalogue) {
     const heads = new Set(
       tracks.all(work.id).map((row) => {
         const hints = JSON.parse(row.evidence).hints || {};
-        return proposedWork(hints.work, hints.title, true)?.title || "";
+        return proposedWork(hints, true)?.title || "";
       }),
     );
     const [head] = heads;

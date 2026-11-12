@@ -25,6 +25,8 @@ function album(id, { title, artist, genre = "Classical", composer, tracks, ...re
       composer: extra.composer ?? (composer ? [composer] : []),
       genres: extra.genres ?? (genre ? [genre] : []),
       work: extra.work ?? "",
+      grouping: extra.grouping ?? "",
+      workId: extra.workId ?? "",
       recordingMbid: extra.recordingMbid ?? "",
     })),
     ...rest,
@@ -344,4 +346,98 @@ export const pop = album("indie-pop", {
   expect: null,
 });
 
-export const albums = [levit, lugansky, recital, recitalPicard, cello, symphonies, seventh, songCycle, compilation, pop];
+// Picard tags with the work in GROUPING and WORK left empty, from a real
+// library. The Bells is Trifonov's piano arrangement: its title names no form,
+// and its MusicBrainz work is the arrangement, linked to the movement it
+// arranges rather than to The Bells.
+const rach = "Sergei Rachmaninoff";
+const trifonovArtist = `${rach} — Daniil Trifonov`;
+const bells = "The Bells, op. 35";
+const rach3 = "Concerto for Piano and Orchestra no. 3 in D minor, op. 30";
+const bellsMovements = [
+  "1. The Silver Sleigh Bells. Allegro ma non tanto",
+  "2. The Mellow Wedding Bells. Lento",
+  "3. The Loud Alarum Bells. Presto",
+  "4. The Mournful Iron Bells. Lento lugubre",
+];
+const rach3Movements = ["1. Allegro ma non tanto", "2. Intermezzo. Adagio", "3. Finale. Alla breve"];
+const bellsWorks = {
+  "mb-bells": { title: bells },
+  ...Object.fromEntries(
+    ["I. Allegro ma non tanto", "II. Lento", "III. Presto", "IV. Lento lugubre"].flatMap((movement, i) => [
+      [`mb-bells-${i + 1}`, { title: `${bells}: ${movement}`, parent: "mb-bells" }],
+      [`mb-bells-arr-${i + 1}`, { title: bellsMovements[i].replace(/^\d\. /, "").split(". ")[0], arrangementOf: `mb-bells-${i + 1}` }],
+    ]),
+  ),
+};
+export const trifonovArrival = album("trifonov-arrival", {
+  title: "Destination Rachmaninov: Arrival",
+  artist: `${rach}; Daniil Trifonov, The Philadelphia Orchestra, Yannick Nézet‐Séguin`,
+  genre: "classical",
+  composer: rach,
+  kind: "Picard tags, work in GROUPING, no WORK",
+  tracks: [
+    ...bellsMovements.map((movement, i) => [1, i + 1, `${bells}: ${movement}`, min(5, 0), { artist: trifonovArtist, grouping: bells, workId: `mb-bells-arr-${i + 1}` }]),
+    [1, 5, "Vocalise, op. 34 no. 14", min(6, 0), { artist: trifonovArtist, grouping: "Vocalise, op. 34 no. 14" }],
+    ...rach3Movements.map((movement, i) => [1, i + 6, `${rach3}: ${movement}`, min(15, 0), { artist: `${rach} — Daniil Trifonov — The Philadelphia Orchestra — Yannick Nézet‐Séguin`, grouping: "Piano Concerto no. 3 in D minor, op. 30" }]),
+  ],
+  musicbrainz: { works: bellsWorks },
+  expect: {
+    groups: [
+      [bells, bellsMovements],
+      ["Vocalise, op. 34 no. 14", ["Vocalise, op. 34 no. 14"]],
+      ["Piano Concerto no. 3 in D minor, op. 30", rach3Movements],
+    ],
+  },
+});
+
+// The same arrangement tagged with only the arrangement's names and
+// MusicBrainz IDs: nothing in the tags names The Bells, so only following
+// MusicBrainz's arrangement link finds it.
+export const trifonovArranged = album("trifonov-arranged", {
+  title: "Rachmaninoff Transcriptions",
+  artist: "Daniil Trifonov",
+  composer: rach,
+  kind: "arrangement known only to MusicBrainz",
+  tracks: bellsMovements.map((movement, i) => [1, i + 1, movement.replace(/^\d\. /, "").split(". ")[0], min(5, 0), { workId: `mb-bells-arr-${i + 1}` }]),
+  musicbrainz: { works: bellsWorks },
+  // Arrival's tracks made the work first, so these join it, with its names.
+  expect: { groups: [[bells, bellsMovements]] },
+});
+
+// GROUPING as free text on a compilation: it reads like a work ("Concerto")
+// but names none of the tracks, so it must not make one.
+export const groupingCompilation = album("grouping-compilation", {
+  title: "Concerto Highlights",
+  artist: "Various Artists",
+  kind: "compilation with free-text GROUPING",
+  tracks: [
+    [1, 1, "Piano Concerto no. 2 in C minor, op. 18: II. Adagio sostenuto", min(11, 0), { composer: [rach], grouping: "Romantic Concerto Highlights" }],
+    [1, 2, "Piano Concerto no. 1 in B-flat minor, op. 23: I. Allegro non troppo", min(20, 0), { composer: ["Pyotr Ilyich Tchaikovsky"], grouping: "Romantic Concerto Highlights" }],
+    [1, 3, "Piano Concerto in A minor, op. 16: II. Adagio", min(6, 0), { composer: ["Edvard Grieg"], grouping: "Romantic Concerto Highlights" }],
+  ],
+  expect: null,
+});
+
+// A recital whose WORK tags name a set with no form or catalogue number.
+// The sonata is a work; the Liszt pieces stay pieces under their WORK name.
+const chopin2 = "Piano Sonata No. 2 in B-flat minor, Op. 35";
+const annees = "Années de pèlerinage, Deuxième année";
+const petrarca = ["Sonetto 47 del Petrarca", "Sonetto 104 del Petrarca", "Sonetto 123 del Petrarca", "Après une lecture du Dante (Fantasia quasi sonata)"];
+export const kobayashi = album("kobayashi-recital", {
+  title: "Chopin & Liszt",
+  artist: "Aimi Kobayashi",
+  kind: "WORK names a set without a form",
+  tracks: [
+    ...["I. Grave - Doppio movimento", "II. Scherzo", "III. Marche funèbre", "IV. Presto"].map((movement, i) => [1, i + 1, movement, min(6, 0), { composer: ["Frédéric Chopin"], work: chopin2 }]),
+    ...petrarca.map((piece, i) => [1, i + 5, `Italie, S. 161, no. ${i + 4}: ${piece}`, min(7, 0), { composer: ["Franz Liszt"], work: annees }]),
+  ],
+  expect: {
+    groups: [
+      [chopin2, ["I. Grave - Doppio movimento", "II. Scherzo", "III. Marche funèbre", "IV. Presto"]],
+      [annees, petrarca.map((piece, i) => `Italie, S. 161, no. ${i + 4}: ${piece}`)],
+    ],
+  },
+});
+
+export const albums = [levit, lugansky, recital, recitalPicard, cello, symphonies, seventh, songCycle, compilation, pop, trifonovArrival, trifonovArranged, groupingCompilation, kobayashi];

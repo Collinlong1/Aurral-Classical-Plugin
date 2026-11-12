@@ -32,6 +32,7 @@ const emptyTags = () => ({
   genres: [],
   composer: [],
   work: "",
+  grouping: "",
   workId: "",
   trackNumber: 0,
   discNumber: 0,
@@ -308,6 +309,8 @@ async function scanFile(file, root, prior) {
       discNumber: tags.discNumber || file.discNumber || 0,
       genres: tags.genres,
       work: tags.work,
+      // Only when set, so files without it keep their stored evidence.
+      ...(tags.grouping && { grouping: tags.grouping }),
       workId: tags.workId,
       recordingMbid: tags.recordingMbid || file.recordingMbid || "",
       composerDistinct:
@@ -498,6 +501,19 @@ export async function runModelJobs(
   }
 }
 
+// An arrangement ("arr. Daniil Trifonov for piano") is a work of its own on
+// MusicBrainz, linked to the movement it arranges instead of to a parent.
+// Matching follows that link once, so the recording joins the original work.
+async function arrangedWork(mb, work, inc) {
+  const relations = work?.relations || [];
+  if (relations.some((rel) => rel.type === "parts" && rel.direction === "backward")) return work;
+  const originals = relations.filter(
+    (rel) => rel.type === "arrangement" && rel.direction === "backward" && rel.work?.id,
+  );
+  if (originals.length !== 1) return work;
+  return (await mb.get("work", originals[0].work.id, inc)) || work;
+}
+
 export async function autoMatchWorks(ctx, actor, albumId = null) {
   if (actor?.role !== "admin")
     throw new Error("Automatic work matching requires a current host admin");
@@ -508,7 +524,7 @@ export async function autoMatchWorks(ctx, actor, albumId = null) {
       actor: String(actor.id),
       // This is an explicit admin action. A structured classical title may be
       // accepted with matching composer, album, classification and ordering;
-      // unattended scans continue to require an embedded WORK tag.
+      // unattended scans continue to require an embedded WORK or GROUPING tag.
       allowStructuredTitles: true,
     });
     const providerMatches = new Map();
@@ -536,7 +552,7 @@ export async function autoMatchWorks(ctx, actor, albumId = null) {
         if (!workId) continue;
         // Aliases come in the same requests, for English titles.
         const inc = "aliases+artist-rels+work-rels";
-        const leaf = await ctx.mb.get("work", workId, inc);
+        const leaf = await arrangedWork(ctx.mb, await ctx.mb.get("work", workId, inc), inc);
         const parent = leaf && (await topWork(ctx.mb, leaf, 0, inc));
         // A work with no parent is a whole piece only when the track's own
         // title reads as one, not as a movement of something MusicBrainz

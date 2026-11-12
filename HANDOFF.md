@@ -1,3 +1,18 @@
+# Work matching: GROUPING, catalogue-numbered titles, arrangements
+
+Based on plugin `7e73e61` and companion core `6b7389c7`; manifest 1.0.14. From a real library: Picard files with the work in GROUPING and WORK empty, Trifonov's arrangement of The Bells (MusicBrainz links it by `arrangement`, not `parts`), and unmatched blocks that looked like works.
+
+- Titles: Auto-match accepts a title head with a catalogue number ("The Bells, op. 35"), not only a form word. Catalogue ranges ("BWV 846-869", "HWV 349/350") name sets and stay unaccepted.
+- GROUPING (FLAC/Opus `GROUPING`, MP3 `TIT1`, M4A `©grp`) is read when WORK is empty, under the same test as WORK. Without a catalogue number it must also be named by the track's title, so free text such as "Romantic Concerto Highlights" makes no work. Scans now create works from WORK or GROUPING; titles still need Auto-match.
+- MusicBrainz: a work with no `parts` parent and exactly one `arrangement` (backward) link is matched as the work it arranges. One extra cached request per arranged track, only during Auto-match.
+- Unmatched blocks of several tracks carry `detail: "Not matched to a work"` (not on sets such as Études). Core renders it under the heading.
+
+Corpus: Destination Rachmaninov: Arrival (as tagged), an arrangement-only album, a free-text-GROUPING compilation and the Kobayashi recital. Apple corpus (one shared library): tracks in real works rose from 1,853 to 2,579 (store) and 1,714 to 2,411 (messy); WORK-tagged unchanged; block matches and false joins unchanged; rows read like Apple's 82%→83% (store), 89%→90% (work-tags). The saved baseline accepts two row-name changes: Scheherazade and Chopin Études now become works shared with another album, whose recording named the movements first ("(Live)" included). Range exclusion was added after the gate caught false joins on Bach's Well-Tempered Clavier and a HWV 349 into 349/350 merge.
+
+Not fixed: a WORK tag naming a set with neither form nor number (Années de pèlerinage) still makes no work. Existing installs need a library scan (to record GROUPING) and Auto-match per album.
+
+Validation: 268 plugin tests (GROUPING read in flac/mp3/m4a/opus); core required checks (zero type errors, unsafe-any 1236), 28 plugin-host tests, frontend build. Node 22 locally. No real-browser pass of the new heading line; no live install accessed.
+
 # Review fixes on the latest Claude source
 
 Based on plugin `1019fd5` and its companion core `f3cea93c`, preserving the mixed-artist/title parser and chunked scan checkpoint changes. Automatic duplicate-work repair now respects distinct verified work and composer identities on later scans. Album revision tokens cover both chosen/attached works and their movement labels, rejecting stale assignments and unassignments with 409. The previously tested standalone-work presentation hotfix is integrated with the new composer/title parsing; manifest 1.0.13 includes it. Already mismerged catalogue entries are not automatically split.

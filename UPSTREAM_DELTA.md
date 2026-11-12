@@ -1,3 +1,7 @@
+# Album presentation detail line
+
+Core adds one optional, generic field to album-presentation groups: `detail`, a short note shown under the block heading (trimmed, at most 200 characters). Older cores drop it; older plugins omit it. The plugin uses it to say a block of several tracks is not matched to a work. No API version change, schema or classical rule in core.
+
 # Messy metadata matching
 
 Plugin-only matching, classification and album-presentation changes (see `MESSY_MATCHING_REPORT.md`). No core code, API, hook, schema or upstream delta.

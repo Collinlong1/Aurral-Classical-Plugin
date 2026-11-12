@@ -83,6 +83,14 @@ function otherTags(file) {
 for (const ext of ["flac", "mp3", "m4a", "opus"]) {
   test(`download.finished tags a ${ext} in the background and keeps every other tag`, async () => {
     const file = await copyFixture(`sine.${ext}`, path.join(folders.libraryFolder, "Beethoven", `01 Allegro.${ext}`));
+    // Some taggers put the work in GROUPING: the model reads it in every format.
+    const grouped = File.createFromPath(file);
+    try {
+      grouped.tag.grouping = "Symphony No. 5 in C minor, op. 67";
+      grouped.save();
+    } finally {
+      grouped.dispose();
+    }
     const before = otherTags(file);
     const started = Date.now();
     await plugin.events["download.finished"](input({ event: "download.finished", track: { path: file, mbid: RECORDING }, source: "test" }));
@@ -93,6 +101,7 @@ for (const ext of ["flac", "mp3", "m4a", "opus"]) {
     assert.deepEqual(tags.composer, ["Ludwig van Beethoven"]);
     assert.equal(tags.work, "Symphony No. 5 in C minor, op. 67: I. Allegro con brio");
     assert.equal(tags.workId, "mvt1");
+    assert.equal(tags.grouping, "Symphony No. 5 in C minor, op. 67");
     assert.equal(tags.recordingMbid, RECORDING);
     assert.equal(tags.title, "Symphony No. 5: I.");
     assert.deepEqual(otherTags(file), before);

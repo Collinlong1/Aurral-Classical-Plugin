@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { albums, lugansky } from "./corpus/albums.js";
+import { albums, kobayashi, lugansky, trifonovArranged } from "./corpus/albums.js";
 import { runCorpus, trackId } from "./corpus/run.js";
 
 const results = await runCorpus(albums);
@@ -22,5 +22,23 @@ test("corpus: an already-matched work gains the tracks an older pass left out", 
   assert.deepEqual(
     later.get(lugansky.id).groups.map((group) => [group.title, group.items.map((item) => item.title)]),
     lugansky.expect.groups,
+  );
+});
+
+test("corpus: an arrangement joins the work it arranges through MusicBrainz", async () => {
+  const alone = await runCorpus([trifonovArranged]);
+  const groups = alone.get(trifonovArranged.id).groups;
+  assert.deepEqual(groups.map((group) => [group.title, group.items.length]), [["The Bells, op. 35", 4]]);
+  assert.ok(groups[0].workId);
+});
+
+test("corpus: tracks under one heading that are not a work say so", () => {
+  const groups = results.get(kobayashi.id).groups;
+  assert.deepEqual(
+    groups.map((group) => [Boolean(group.workId), group.detail ?? null]),
+    [
+      [true, null],
+      [false, "Not matched to a work"],
+    ],
   );
 });

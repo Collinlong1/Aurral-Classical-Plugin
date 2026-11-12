@@ -37351,16 +37351,30 @@ function standalonePiece(hints, workTitle) {
   const text4 = words(title);
   return text4 === head || text4.startsWith(`${head} `) && splitTitle(title).head === "" && !MOVEMENT_PREFIX.test(stripWorkPrefix(title, workTitle));
 }
-function proposedWork(work, title, allowStructuredTitles) {
+var isCatalogueRange = (text4) => /\d+[a-z]?\s*[-–—]\s*\d+/i.test(text4) || [...String(text4).matchAll(/\b(\d+)\s*\/\s*(\d+)\b(?![a-z])/gi)].some(([, a, b]) => Number(b) > Number(a));
+var readsAsWork = (text4) => Boolean(text4) && !isCollectionLike(text4) && (MULTI_MOVEMENT.test(text4) || Boolean(catalogueNumber(text4)) && !isCatalogueRange(text4));
+function groupingWork(grouping, title) {
+  const parent = clean3(clean3(grouping).split(/\s*:\s*/, 1)[0]);
+  if (!readsAsWork(parent)) return null;
+  if (catalogueNumber(parent) && !isCatalogueRange(parent)) return parent;
+  const named = words(parent);
+  const head = words(titleHead(title) || title);
+  return head === named || head.startsWith(`${named} `) || named.startsWith(`${head} `) ? parent : null;
+}
+function proposedWork({ work, grouping, title }, allowStructuredTitles) {
   const tagged = clean3(work);
   if (tagged && !isCollectionLike(tagged)) {
     const parent = clean3(tagged.split(/\s*:\s*/, 1)[0]);
     if (MULTI_MOVEMENT.test(parent) || catalogueNumber(parent))
       return { title: parent, evidence: "work-tag" };
   }
+  if (!tagged && grouping) {
+    const named = groupingWork(grouping, title);
+    if (named) return { title: named, evidence: "grouping-tag" };
+  }
   if (!allowStructuredTitles) return null;
   const candidate = titleHead(title);
-  return candidate && MULTI_MOVEMENT.test(candidate) && !isCollectionLike(candidate) ? { title: candidate, evidence: "structured-title" } : null;
+  return readsAsWork(candidate) ? { title: candidate, evidence: "structured-title" } : null;
 }
 function candidates(catalogue, albumId = null, allowStructuredTitles = false, providerMatches = /* @__PURE__ */ new Map()) {
   const rows = catalogue.db.prepare(
@@ -37378,14 +37392,14 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
   for (const row of rows) {
     const hints = row.evidence.hints || {};
     const provider = providerMatches.get(row.id);
-    const local = proposedWork(hints.work, hints.title, true);
+    const local = proposedWork(hints, true);
     const proposal = provider ? {
       // The tags' own title wins when it names the same catalogue number.
       title: local && sameCatalogue(local.title, provider.work) ? local.title : clean3(provider.work),
       evidence: "musicbrainz-parent",
       identity: provider.workId,
       ...provider.standalone && { standalone: true }
-    } : proposedWork(hints.work, hints.title, allowStructuredTitles);
+    } : proposedWork(hints, allowStructuredTitles);
     if (proposal && !provider && proposal.evidence === "work-tag" && standalonePiece(hints, proposal.title))
       proposal.standalone = true;
     const credit = hints.composer?.length || provider?.composers?.length ? null : artistCredits(hints, { knownComposers });
@@ -38113,7 +38127,7 @@ function repairWorkTitles(catalogue) {
     const heads = new Set(
       tracks.all(work.id).map((row) => {
         const hints = JSON.parse(row.evidence).hints || {};
-        return proposedWork(hints.work, hints.title, true)?.title || "";
+        return proposedWork(hints, true)?.title || "";
       })
     );
     const [head] = heads;
@@ -40435,7 +40449,10 @@ function pieceGroups(c, album, following) {
     ...piece,
     first: items[0].position,
     items: items.map(({ position, ...item }) => item),
-    movementCount: items.length
+    movementCount: items.length,
+    // Several tracks under one heading look like a work; say when they are
+    // not one yet. Sets such as "Études" are never made into works.
+    ...items.length > 1 && !isCollectionLike(piece.title) && { detail: "Not matched to a work" }
   }));
 }
 function renderAlbumPresentation(c, albumId) {
@@ -40949,6 +40966,8 @@ function readTags(filePath) {
       genres: texts(tag.genres ?? []).flatMap((genre) => texts(genre.split(";"))),
       composer: texts(tag.composers ?? []),
       work: workField.read(file)[0] ?? "",
+      // Some taggers put the work here and leave WORK empty.
+      grouping: text3(tag.grouping),
       workId: workIdField.read(file)[0] ?? "",
       trackNumber: positive2(tag.track),
       discNumber: positive2(tag.disc),
@@ -41020,6 +41039,7 @@ var emptyTags = () => ({
   genres: [],
   composer: [],
   work: "",
+  grouping: "",
   workId: "",
   trackNumber: 0,
   discNumber: 0,
@@ -41227,6 +41247,8 @@ async function scanFile(file, root, prior) {
       discNumber: tags.discNumber || file.discNumber || 0,
       genres: tags.genres,
       work: tags.work,
+      // Only when set, so files without it keep their stored evidence.
+      ...tags.grouping && { grouping: tags.grouping },
       workId: tags.workId,
       recordingMbid: tags.recordingMbid || file.recordingMbid || "",
       composerDistinct: tags.composer.length > 0 && !tags.composer.includes(tags.artist)
@@ -41373,6 +41395,15 @@ async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 200, checkpointMs
     catalogue.close();
   }
 }
+async function arrangedWork(mb, work, inc) {
+  const relations2 = work?.relations || [];
+  if (relations2.some((rel) => rel.type === "parts" && rel.direction === "backward")) return work;
+  const originals = relations2.filter(
+    (rel) => rel.type === "arrangement" && rel.direction === "backward" && rel.work?.id
+  );
+  if (originals.length !== 1) return work;
+  return await mb.get("work", originals[0].work.id, inc) || work;
+}
 async function autoMatchWorks(ctx, actor3, albumId = null) {
   if (actor3?.role !== "admin")
     throw new Error("Automatic work matching requires a current host admin");
@@ -41383,7 +41414,7 @@ async function autoMatchWorks(ctx, actor3, albumId = null) {
       actor: String(actor3.id),
       // This is an explicit admin action. A structured classical title may be
       // accepted with matching composer, album, classification and ordering;
-      // unattended scans continue to require an embedded WORK tag.
+      // unattended scans continue to require an embedded WORK or GROUPING tag.
       allowStructuredTitles: true
     });
     const providerMatches = /* @__PURE__ */ new Map();
@@ -41408,7 +41439,7 @@ async function autoMatchWorks(ctx, actor3, albumId = null) {
         }
         if (!workId) continue;
         const inc = "aliases+artist-rels+work-rels";
-        const leaf = await ctx.mb.get("work", workId, inc);
+        const leaf = await arrangedWork(ctx.mb, await ctx.mb.get("work", workId, inc), inc);
         const parent = leaf && await topWork(ctx.mb, leaf, 0, inc);
         const standalone = parent?.id === leaf.id && !(leaf.relations || []).some((rel) => rel.type === "parts" && rel.direction === "backward") && !isCollectionLike(leaf.title) && !String(hints.title || "").includes(":") && !/^(?:[IVXLCDM]+|\d+)[.)]\s/i.test(String(hints.title || "").trim());
         if (!parent?.id || parent.id === leaf.id && !standalone || isCollectionLike(parent.title))
@@ -41752,7 +41783,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.13" : "dev";
+var VERSION = true ? "1.0.14" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js

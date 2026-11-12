@@ -38,7 +38,8 @@ function snapshot(albums) {
           discNumber: track.disc,
           genres: track.genres,
           work: track.work,
-          workId: "",
+          ...(track.grouping && { grouping: track.grouping }),
+          workId: track.workId || "",
           recordingMbid: track.recordingMbid,
           composerDistinct:
             track.composer.length > 0 && !track.composer.includes(track.artist),
@@ -76,9 +77,13 @@ function musicbrainz(albums) {
           id,
           title: work.title,
           aliases: work.aliases || [],
-          relations: work.parent
-            ? [{ type: "parts", direction: "backward", work: { id: work.parent } }]
-            : [],
+          relations: [
+            ...(work.parent ? [{ type: "parts", direction: "backward", work: { id: work.parent } }] : []),
+            // An arrangement links to the work it arranges, not to a parent.
+            ...(work.arrangementOf
+              ? [{ type: "arrangement", direction: "backward", work: { id: work.arrangementOf } }]
+              : []),
+          ],
         };
       },
     },
