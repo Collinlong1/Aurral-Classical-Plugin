@@ -40456,6 +40456,9 @@ function pieceGroups(c, album, following) {
     ...items.length > 1 && !isCollectionLike(piece.title) && { detail: "Not matched to a work" }
   }));
 }
+function compareAlbumGroups(a, b) {
+  return a.first - b.first || b.items.length - a.items.length || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
+}
 function renderAlbumPresentation(c, albumId) {
   const metadata = new DisplayValues(c);
   const album = String(albumId);
@@ -40495,7 +40498,7 @@ function renderAlbumPresentation(c, albumId) {
       first: albumPosition(run[0])
     }));
   });
-  const groups = [...works, ...pieceGroups(c, album, following)].sort((a, b) => a.first - b.first).map(({ first, ...group }) => group);
+  const groups = [...works, ...pieceGroups(c, album, following)].sort(compareAlbumGroups).map(({ first, ...group }) => group);
   if (!groups.some((group) => group.workId || group.items.length > 1)) return null;
   return { version: 1, albumId: album, supportsToggle: true, groups };
 }
@@ -41785,7 +41788,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.15" : "dev";
+var VERSION = true ? "1.0.16" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js

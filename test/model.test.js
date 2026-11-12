@@ -28,6 +28,7 @@ import plugin from "../src/index.js";
 import { migrations } from "../src/model/schema.js";
 import {
   renderAlbumPresentation,
+  compareAlbumGroups,
   renderWork,
   applyWorkMutation,
 } from "../src/model/presentation.js";
@@ -520,6 +521,8 @@ test("Phase 4 groups an album by work and isolates user picks with an admin fall
   );
   assert.ok(completeGroup);
   assert.ok(incompleteGroup);
+  // Both start on track 1; the complete recording leads whatever its id.
+  assert.equal(presentation.groups[0], completeGroup);
   assert.deepEqual(
     completeGroup.items.map((item) => item.title),
     ["I. First", "II. Second", "III. Third"],
@@ -1699,3 +1702,19 @@ for (const resumeWith of ["action", "schedule"]) {
     }
   });
 }
+
+test("album groups that start on the same track order by length, then id, not by random id", () => {
+  const block = (id, first, length) => ({ id, first, items: Array.from({ length }, () => ({})) });
+  // The fragment's id sorts first; it must still follow the complete block.
+  const fragment = block("0000-fragment", 1, 1);
+  const complete = block("ffff-complete", 1, 3);
+  const later = block("aaaa-later", 4, 2);
+  assert.deepEqual(
+    [later, fragment, complete].sort(compareAlbumGroups).map((group) => group.id),
+    ["ffff-complete", "0000-fragment", "aaaa-later"],
+  );
+  assert.deepEqual(
+    [block("b", 2, 1), block("a", 2, 1)].sort(compareAlbumGroups).map((group) => group.id),
+    ["a", "b"],
+  );
+});

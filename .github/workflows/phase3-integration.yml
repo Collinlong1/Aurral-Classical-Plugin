@@ -20,8 +20,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: Collinlong1/aurral
-          # Final core aurral-classical head for the v0.1 bug-fix pass.
-          ref: ece9ead0aab0e28947bd6ac3d03208209cae86b8
+          # Core aurral-classical after the November 12 upstream sync (#1828).
+          ref: f444c963366bc2cfe8ede56de763ad5aa5b26a32
           path: core
       - uses: actions/setup-node@v4
         with:

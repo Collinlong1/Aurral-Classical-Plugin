@@ -209,6 +209,18 @@ function pieceGroups(c, album, following) {
   }));
 }
 
+// Works and pieces follow the album: by each one's first disc and track.
+// Two recordings can start on the same track (one complete, one a
+// fragment); the longer block comes first, then the id, so the order never
+// depends on the random ids alone.
+export function compareAlbumGroups(a, b) {
+  return (
+    a.first - b.first ||
+    b.items.length - a.items.length ||
+    (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)
+  );
+}
+
 export function renderAlbumPresentation(c, albumId) {
   const metadata = new DisplayValues(c);
   const album = String(albumId);
@@ -258,9 +270,8 @@ export function renderAlbumPresentation(c, albumId) {
       first: albumPosition(run[0]),
     }));
   });
-  // Works and pieces follow the album: by each one's first disc and track.
   const groups = [...works, ...pieceGroups(c, album, following)]
-    .sort((a, b) => a.first - b.first)
+    .sort(compareAlbumGroups)
     .map(({ first, ...group }) => group);
   // Matched works have work pages even when each work occupies one track.
   if (!groups.some((group) => group.workId || group.items.length > 1)) return null;

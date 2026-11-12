@@ -13,6 +13,8 @@ const fixture = (...args) =>
   );
 const browser = await chromium.launch({
   headless: true,
+  // Optional: a preinstalled Chromium when Playwright's own build is absent.
+  ...(process.env.CHROMIUM_PATH && { executablePath: process.env.CHROMIUM_PATH }),
   args: ["--no-sandbox"],
   ...(process.env.CHROMIUM_PATH && {
     executablePath: process.env.CHROMIUM_PATH,

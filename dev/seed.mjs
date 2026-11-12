@@ -3,7 +3,10 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 const load = (file) => import(pathToFileURL(path.join("/app", file)));
 const { userOps, dbOps } = await load("backend/db/helpers/index.ts");
-const { hashPassword } = await load("backend/middleware/passwordHash.ts");
+// Upstream moved the hasher out of middleware in #1726; older cores keep it there.
+const { hashPassword } = await load("backend/services/passwordHash.ts").catch(() =>
+  load("backend/middleware/passwordHash.ts"),
+);
 const { scanMusicRoot } = await load("backend/services/libraryFileScanner.ts");
 const { refreshInstalledPlugins, updatePlugin } = await load(
   "backend/services/plugins/pluginService.ts",
