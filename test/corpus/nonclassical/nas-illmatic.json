@@ -1,0 +1,82 @@
+{
+ "id": "nas-illmatic",
+ "family": "hip-hop",
+ "title": "Illmatic",
+ "artist": "Nas",
+ "source": "old CD rip with no genre or composer",
+ "expect": {
+  "album": "not_classical"
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "The Genesis",
+   "durationMs": 105000,
+   "artist": "Nas",
+   "composer": [],
+   "genres": [],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [
+    "missing-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "N.Y. State of Mind",
+   "durationMs": 294000,
+   "artist": "Nas",
+   "composer": [],
+   "genres": [],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [
+    "missing-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Life's a Bitch",
+   "durationMs": 210000,
+   "artist": "Nas",
+   "composer": [],
+   "genres": [],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [
+    "missing-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "The World Is Yours",
+   "durationMs": 290000,
+   "artist": "Nas",
+   "composer": [],
+   "genres": [],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [
+    "missing-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Halftime",
+   "durationMs": 260000,
+   "artist": "Nas",
+   "composer": [],
+   "genres": [],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [
+    "missing-genre"
+   ]
+  }
+ ]
+}

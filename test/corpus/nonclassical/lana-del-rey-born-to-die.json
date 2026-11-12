@@ -1,0 +1,77 @@
+{
+ "id": "lana-del-rey-born-to-die",
+ "family": "pop",
+ "title": "Born to Die",
+ "artist": "Lana Del Rey",
+ "source": "rip with a Last.fm-style genre",
+ "expect": {
+  "album": "not_classical",
+  "note": "'Baroque pop' is a pop style, not Baroque music."
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Born to Die",
+   "durationMs": 286000,
+   "artist": "Lana Del Rey",
+   "composer": [],
+   "genres": [
+    "Baroque Pop"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [
+    "misleading-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Off to the Races",
+   "durationMs": 300000,
+   "artist": "Lana Del Rey",
+   "composer": [],
+   "genres": [
+    "Baroque Pop"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [
+    "misleading-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Blue Jeans",
+   "durationMs": 210000,
+   "artist": "Lana Del Rey",
+   "composer": [],
+   "genres": [
+    "Baroque Pop"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [
+    "misleading-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Video Games",
+   "durationMs": 282000,
+   "artist": "Lana Del Rey",
+   "composer": [],
+   "genres": [
+    "Baroque Pop"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [
+    "misleading-genre"
+   ]
+  }
+ ]
+}

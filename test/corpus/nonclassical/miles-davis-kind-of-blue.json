@@ -1,0 +1,94 @@
+{
+ "id": "miles-davis-kind-of-blue",
+ "family": "jazz",
+ "title": "Kind of Blue",
+ "artist": "Miles Davis",
+ "source": "store download; leader credited as composer",
+ "expect": {
+  "album": "not_classical"
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "So What",
+   "durationMs": 562000,
+   "artist": "Miles Davis",
+   "composer": [
+    "Miles Davis"
+   ],
+   "genres": [
+    "Jazz"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Freddie Freeloader",
+   "durationMs": 586000,
+   "artist": "Miles Davis",
+   "composer": [
+    "Miles Davis"
+   ],
+   "genres": [
+    "Jazz"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Blue in Green",
+   "durationMs": 337000,
+   "artist": "Miles Davis",
+   "composer": [
+    "Miles Davis",
+    "Bill Evans"
+   ],
+   "genres": [
+    "Jazz"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "All Blues",
+   "durationMs": 693000,
+   "artist": "Miles Davis",
+   "composer": [
+    "Miles Davis"
+   ],
+   "genres": [
+    "Jazz"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Flamenco Sketches",
+   "durationMs": 566000,
+   "artist": "Miles Davis",
+   "composer": [
+    "Miles Davis",
+    "Bill Evans"
+   ],
+   "genres": [
+    "Jazz"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  }
+ ]
+}

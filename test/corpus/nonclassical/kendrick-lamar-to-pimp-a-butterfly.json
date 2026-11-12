@@ -1,0 +1,82 @@
+{
+ "id": "kendrick-lamar-to-pimp-a-butterfly",
+ "family": "hip-hop",
+ "title": "To Pimp a Butterfly",
+ "artist": "Kendrick Lamar",
+ "source": "rip without composer tags",
+ "expect": {
+  "album": "not_classical"
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Wesley's Theory",
+   "durationMs": 287000,
+   "artist": "Kendrick Lamar",
+   "composer": [],
+   "genres": [
+    "Hip-Hop/Rap"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "King Kunta",
+   "durationMs": 234000,
+   "artist": "Kendrick Lamar",
+   "composer": [],
+   "genres": [
+    "Hip-Hop/Rap"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Alright",
+   "durationMs": 219000,
+   "artist": "Kendrick Lamar",
+   "composer": [],
+   "genres": [
+    "Hip-Hop/Rap"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "The Blacker the Berry",
+   "durationMs": 328000,
+   "artist": "Kendrick Lamar",
+   "composer": [],
+   "genres": [
+    "Hip-Hop/Rap"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "i",
+   "durationMs": 336000,
+   "artist": "Kendrick Lamar",
+   "composer": [],
+   "genres": [
+    "Hip-Hop/Rap"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  }
+ ]
+}

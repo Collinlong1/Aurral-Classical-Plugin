@@ -1,0 +1,80 @@
+{
+ "id": "adele-21",
+ "family": "pop",
+ "title": "21",
+ "artist": "Adele",
+ "source": "store download with songwriter composer tags",
+ "expect": {
+  "album": "not_classical"
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Rolling in the Deep",
+   "durationMs": 228000,
+   "artist": "Adele",
+   "composer": [
+    "Adele Adkins",
+    "Paul Epworth"
+   ],
+   "genres": [
+    "Pop"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Rumour Has It",
+   "durationMs": 223000,
+   "artist": "Adele",
+   "composer": [
+    "Adele Adkins",
+    "Ryan Tedder"
+   ],
+   "genres": [
+    "Pop"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Set Fire to the Rain",
+   "durationMs": 242000,
+   "artist": "Adele",
+   "composer": [
+    "Adele Adkins",
+    "Fraser T. Smith"
+   ],
+   "genres": [
+    "Pop"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Someone Like You",
+   "durationMs": 285000,
+   "artist": "Adele",
+   "composer": [
+    "Adele Adkins",
+    "Dan Wilson"
+   ],
+   "genres": [
+    "Pop"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  }
+ ]
+}

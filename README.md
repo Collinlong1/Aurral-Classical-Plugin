@@ -201,6 +201,27 @@ the plugin developer tools:
 AURRAL_MCP_URL=https://aurral.example/api/mcp AURRAL_DEV_KEY=aurral_dev_... node scripts/mcp.mjs write-dev
 ```
 
+## Classification report (read-only dry run)
+
+To see why tracks are or aren't classical, or what an updated plugin would
+change before rescanning, run the report from a checkout of this repository
+(Node 22.16 or later). It opens the model database read-only and changes
+nothing; pointing it at a copy of the folder is safest:
+
+```bash
+docker cp <aurral container>:<plugin data folder>/model ./model-copy
+node scripts/model-admin.mjs classification ./model-copy
+```
+
+It lists every classical, unsure, pinned or changing track: its genres,
+composer and WORK tags, each piece of evidence with its points, the score,
+the stored state and whether it came from a track pin, an album pin or the
+automatic classifier, and the state the next scan would store (marked `*` when
+it changes). Pins are never changed by a scan. `--album <id>` limits it to one
+album, `--all` includes ordinary tracks, `--json` prints the data. An admin can
+get one album's summary from its menu: **Classical classification report
+(read only)**.
+
 ## Test corpus
 
 `test/corpus/albums.js` is a library of classical albums written as tags: well
@@ -225,6 +246,26 @@ npm run corpus -- --apple                       # score every release; list the 
 npm run corpus -- --apple <apple album id>      # show one release in each tag style
 npm run corpus -- --apple --update-baseline     # save an improvement
 NODE_USE_ENV_PROXY=1 node scripts/corpus-apple.mjs fetch   # add albums listed in apple-albums.json
+```
+
+`test/corpus/nonclassical/` is the ordinary-music corpus: 30 albums (148
+tracks) of hand-written tags modelled on real pop, rock, hip-hop, jazz,
+electronic, film/game score, mixed-soundtrack, crossover and mistagged
+classical releases. Every track and album has a reviewed expected state
+(`classical`, `not_classical` or `unsure`). The test tags copies of a silent
+fixture and runs the real admin scan, auto-match, album and track pins, a
+retag and rescans. It records each track's score and evidence, whether it is
+grouped, taggable or treated as classical for acquisition, and its outcome.
+`nonclassical-baseline.json` records today's outcomes, and every known failure
+needs a written explanation there; `npm test` fails if any track does worse.
+Its classification metrics are kept apart from the Apple grouping scores, and
+the test enforces zero false classical positives and negatives. See
+`NONCLASSICAL_CORPUS_REPORT.md`.
+
+```bash
+npm run corpus -- --nonclassical                       # summary metrics
+npm run corpus -- --nonclassical --markdown            # by genre/scenario, mismatches, pins
+npm run corpus -- --nonclassical --update-baseline     # save an improvement (explanations kept)
 ```
 
 For a real Aurral, put the generated folder in Aurral's library folder, set

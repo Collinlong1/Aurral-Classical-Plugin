@@ -16,6 +16,7 @@ import {
   canReadHostLibrary,
 } from "./model/runtime.js";
 import { readValues } from "./tags.js";
+import { albumClassificationSummary } from "./model/classification-report.js";
 import { compareRecordings } from "./compare.js";
 import { MusicBrainz, mbBaseUrl, TTL } from "./mb.js";
 import { ClassicalResolver } from "./resolver.js";
@@ -223,6 +224,11 @@ export default {
             500,
           ),
       };
+    },
+    async "classical-classification-report"(input) {
+      if (input.user?.role !== "admin")
+        throw new Error("Classical diagnostics require a host admin");
+      return { message: await albumClassificationSummary(makeContext(input), input.album?.id) };
     },
     async "classical-model-cancel"(input) {
       await cancelModelScan(makeContext(input), input.user);

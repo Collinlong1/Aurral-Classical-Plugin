@@ -1,0 +1,105 @@
+{
+ "id": "kanye-west-mbdtf",
+ "family": "hip-hop",
+ "title": "My Beautiful Dark Twisted Fantasy",
+ "artist": "Kanye West",
+ "source": "store download with long composer credits",
+ "expect": {
+  "album": "not_classical"
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Dark Fantasy",
+   "durationMs": 280000,
+   "artist": "Kanye West",
+   "composer": [
+    "Kanye West",
+    "Jeff Bhasker",
+    "Mike Dean"
+   ],
+   "genres": [
+    "Hip Hop"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "POWER",
+   "durationMs": 292000,
+   "artist": "Kanye West",
+   "composer": [
+    "Kanye West",
+    "Jeff Bhasker",
+    "Mike Dean",
+    "Robert Fripp"
+   ],
+   "genres": [
+    "Hip Hop"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [],
+   "note": "Samples King Crimson; Fripp credited."
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "All of the Lights",
+   "durationMs": 299000,
+   "artist": "Kanye West",
+   "composer": [
+    "Kanye West",
+    "Jeff Bhasker",
+    "Mike Dean"
+   ],
+   "genres": [
+    "Hip Hop"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Runaway",
+   "durationMs": 547000,
+   "artist": "Kanye West",
+   "composer": [
+    "Kanye West",
+    "Jeff Bhasker",
+    "Mike Dean",
+    "Emile Haynie"
+   ],
+   "genres": [
+    "Hip Hop"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Lost in the World",
+   "durationMs": 256000,
+   "artist": "Kanye West",
+   "composer": [
+    "Kanye West",
+    "Justin Vernon",
+    "Jeff Bhasker"
+   ],
+   "genres": [
+    "Hip Hop"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  }
+ ]
+}

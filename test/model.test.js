@@ -786,8 +786,19 @@ test("rock/jazz/pop/electronic/soundtrack are ordinary; crossover tracks classif
       classify(c, links[i].id, { genres: [genre] }),
       "not_classical",
     );
+  // A WORK tag alone doesn't make a soundtrack track classical; a verified
+  // classical work (catalogue number, credited composer) on one does.
   assert.equal(
     classify(c, links[5].id, { genres: ["Soundtrack"], work: "Bach suite" }),
+    "unsure",
+  );
+  assert.equal(
+    classify(c, links[5].id, {
+      genres: ["Soundtrack"],
+      title: "Cello Suite No. 1 in G major, BWV 1007: I. Prélude",
+      composer: ["Johann Sebastian Bach"],
+      composerDistinct: true,
+    }),
     "classical",
   );
   assert.equal(classify(c, links[6].id, { composerDistinct: true }), "unsure");

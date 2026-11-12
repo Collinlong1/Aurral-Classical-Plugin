@@ -6,6 +6,12 @@
 //   node scripts/corpus.mjs --apple         score the real releases in
 //                                           test/corpus/apple against Apple Music
 //                                           Classical; --update-baseline saves it
+//   node scripts/corpus.mjs --nonclassical  run the ordinary-music corpus in
+//                                           test/corpus/nonclassical through the
+//                                           scan, pins and rescans; --markdown
+//                                           prints the full tables,
+//                                           --update-baseline saves it (written
+//                                           explanations are kept)
 //   node scripts/corpus.mjs --serve-musicbrainz <port>
 //                                           answer MusicBrainz lookups from the
 //                                           corpus; set the plugin's MusicBrainz
@@ -17,6 +23,7 @@ import path from "node:path";
 import { albums } from "../test/corpus/albums.js";
 import { runCorpus, layout } from "../test/corpus/run.js";
 import { appleFixtures, baselineFile, scoreApple, summary, toAlbum } from "../test/corpus/apple.js";
+import * as nonclassical from "../test/corpus/nonclassical.js";
 
 const args = process.argv.slice(2);
 const audioAt = args.indexOf("--audio");
@@ -26,9 +33,24 @@ const servePort = serveAt >= 0 ? Number(args.splice(serveAt, 2)[1]) : null;
 const flag = (name) => (args.includes(name) ? (args.splice(args.indexOf(name), 1), true) : false);
 const apple = flag("--apple");
 const updateBaseline = flag("--update-baseline");
+const ordinary = flag("--nonclassical");
+const asMarkdown = flag("--markdown");
 const chosen = args.length ? albums.filter((album) => args.includes(album.id)) : albums;
 
-if (apple) {
+if (ordinary) {
+  const results = await nonclassical.runNonclassical();
+  console.log(asMarkdown ? nonclassical.markdown(results) : nonclassical.summary(results).join("\n"));
+  if (updateBaseline) {
+    let previous = {};
+    try {
+      previous = JSON.parse(await fs.readFile(nonclassical.baselineFile, "utf8"));
+    } catch {}
+    const saved = nonclassical.toBaseline(results, previous);
+    await fs.writeFile(nonclassical.baselineFile, `${JSON.stringify(saved, null, 1)}\n`);
+    const todo = Object.entries(saved.explanations).filter(([, text]) => text.startsWith("TODO"));
+    console.log(`Saved ${nonclassical.baselineFile}${todo.length ? `; ${todo.length} failures need an explanation` : ""}`);
+  }
+} else if (apple) {
   const fixtures = appleFixtures().filter((fixture) => !args.length || args.includes(fixture.id));
   const results = await scoreApple(fixtures);
   // One album's layout per style, to see what a score means.

@@ -1,0 +1,98 @@
+{
+ "id": "tiesto-just-be",
+ "family": "electronic",
+ "title": "Just Be",
+ "artist": "Tiësto",
+ "source": "store download; a trance remake credited to Barber",
+ "expect": {
+  "album": "not_classical"
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Forever Today",
+   "durationMs": 369000,
+   "artist": "Tiësto",
+   "composer": [
+    "Tijs Verwest"
+   ],
+   "genres": [
+    "Trance"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Love Comes Again (feat. BT)",
+   "durationMs": 290000,
+   "artist": "Tiësto",
+   "composer": [
+    "Tijs Verwest",
+    "Brian Transeau"
+   ],
+   "genres": [
+    "Trance"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Traffic",
+   "durationMs": 322000,
+   "artist": "Tiësto",
+   "composer": [
+    "Tijs Verwest"
+   ],
+   "genres": [
+    "Trance"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Adagio for Strings",
+   "durationMs": 372000,
+   "artist": "Tiësto",
+   "composer": [
+    "Samuel Barber",
+    "Tijs Verwest"
+   ],
+   "genres": [
+    "Trance"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [
+    "misleading-title"
+   ],
+   "note": "A trance track built on Barber's melody, not a performance of the work."
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Just Be (feat. Kirsty Hawkshaw)",
+   "durationMs": 469000,
+   "artist": "Tiësto",
+   "composer": [
+    "Tijs Verwest",
+    "Kirsty Hawkshaw"
+   ],
+   "genres": [
+    "Trance"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  }
+ ]
+}

@@ -1685,8 +1685,8 @@
    "parts": 1
   },
   "258372736": {
-   "grouping": false,
-   "parts": 0.971
+   "grouping": true,
+   "parts": 1
   },
   "258630580": {
    "grouping": false,
@@ -1698,7 +1698,7 @@
   },
   "263084597": {
    "grouping": false,
-   "parts": 0.346
+   "parts": 0.923
   },
   "269682146": {
    "grouping": false,
@@ -1714,7 +1714,7 @@
   },
   "337682979": {
    "grouping": false,
-   "parts": 0.55
+   "parts": 1
   },
   "381515547": {
    "grouping": true,
@@ -1733,7 +1733,7 @@
    "parts": 1
   },
   "402785270": {
-   "grouping": false,
+   "grouping": true,
    "parts": 0.077
   },
   "416955662": {
@@ -1749,8 +1749,8 @@
    "parts": 0.25
   },
   "476935391": {
-   "grouping": false,
-   "parts": 0.091
+   "grouping": true,
+   "parts": 1
   },
   "476956688": {
    "grouping": false,
@@ -1802,7 +1802,7 @@
   },
   "694083664": {
    "grouping": false,
-   "parts": 0
+   "parts": 0.263
   },
   "694094571": {
    "grouping": false,
@@ -1821,16 +1821,16 @@
    "parts": 1
   },
   "734587111": {
-   "grouping": false,
-   "parts": 0.736
+   "grouping": true,
+   "parts": 1
   },
   "752033492": {
-   "grouping": false,
-   "parts": 0
+   "grouping": true,
+   "parts": 1
   },
   "769116904": {
-   "grouping": false,
-   "parts": 0.417
+   "grouping": true,
+   "parts": 1
   },
   "818752952": {
    "grouping": false,
@@ -1889,8 +1889,8 @@
    "parts": 0.2
   },
   "1083994403": {
-   "grouping": true,
-   "parts": 0.636
+   "grouping": false,
+   "parts": 1
   },
   "1152447059": {
    "grouping": false,
@@ -1929,8 +1929,8 @@
    "parts": 0.856
   },
   "1387028718": {
-   "grouping": false,
-   "parts": 0
+   "grouping": true,
+   "parts": 1
   },
   "1387816964": {
    "grouping": false,
@@ -1942,7 +1942,7 @@
   },
   "1396495581": {
    "grouping": false,
-   "parts": 0.143
+   "parts": 0.571
   },
   "1396525989": {
    "grouping": true,
@@ -1978,7 +1978,7 @@
   },
   "1439275980": {
    "grouping": true,
-   "parts": 0.818
+   "parts": 1
   },
   "1440734550": {
    "grouping": true,
@@ -2022,11 +2022,11 @@
   },
   "1440800912": {
    "grouping": false,
-   "parts": 0
+   "parts": 0.667
   },
   "1448631706": {
    "grouping": false,
-   "parts": 0
+   "parts": 1
   },
   "1452133133": {
    "grouping": true,
@@ -2045,8 +2045,8 @@
    "parts": 1
   },
   "1452138402": {
-   "grouping": false,
-   "parts": 0
+   "grouping": true,
+   "parts": 1
   },
   "1452145443": {
    "grouping": true,
@@ -2065,16 +2065,16 @@
    "parts": 0
   },
   "1452156896": {
-   "grouping": false,
-   "parts": 0
+   "grouping": true,
+   "parts": 1
   },
   "1452156898": {
    "grouping": true,
    "parts": 1
   },
   "1452159322": {
-   "grouping": false,
-   "parts": 0
+   "grouping": true,
+   "parts": 1
   },
   "1452164711": {
    "grouping": false,
@@ -2082,7 +2082,7 @@
   },
   "1452166308": {
    "grouping": false,
-   "parts": 0
+   "parts": 0.643
   },
   "1452171319": {
    "grouping": false,
@@ -2097,8 +2097,8 @@
    "parts": 1
   },
   "1452184807": {
-   "grouping": false,
-   "parts": 0.6
+   "grouping": true,
+   "parts": 1
   },
   "1452194647": {
    "grouping": true,
@@ -2122,7 +2122,7 @@
   },
   "1452214965": {
    "grouping": false,
-   "parts": 0.2
+   "parts": 1
   },
   "1452215425": {
    "grouping": true,
@@ -2197,8 +2197,8 @@
    "parts": 1
   },
   "1452373339": {
-   "grouping": false,
-   "parts": 0
+   "grouping": true,
+   "parts": 1
   },
   "1452380844": {
    "grouping": false,
@@ -2218,7 +2218,7 @@
   },
   "1452529948": {
    "grouping": false,
-   "parts": 0
+   "parts": 1
   },
   "1452530324": {
    "grouping": true,
@@ -2226,11 +2226,11 @@
   },
   "1452534005": {
    "grouping": false,
-   "parts": 0.114
+   "parts": 1
   },
   "1452548501": {
-   "grouping": false,
-   "parts": 0
+   "grouping": true,
+   "parts": 1
   },
   "1452556367": {
    "grouping": true,
@@ -2246,7 +2246,7 @@
   },
   "1452579983": {
    "grouping": false,
-   "parts": 0.882
+   "parts": 1
   },
   "1452627720": {
    "grouping": false,
@@ -2257,8 +2257,8 @@
    "parts": 0.5
   },
   "1452663367": {
-   "grouping": false,
-   "parts": 0.333
+   "grouping": true,
+   "parts": 1
   },
   "1452669078": {
    "grouping": false,
@@ -2274,11 +2274,11 @@
   },
   "1452755388": {
    "grouping": false,
-   "parts": 0.957
+   "parts": 0.943
   },
   "1452886617": {
    "grouping": false,
-   "parts": 0.475
+   "parts": 0.921
   },
   "1452972792": {
    "grouping": false,
@@ -2290,15 +2290,15 @@
   },
   "1467965079": {
    "grouping": false,
-   "parts": 0.167
+   "parts": 0.667
   },
   "1481992380": {
    "grouping": false,
-   "parts": 0.511
+   "parts": 0.532
   },
   "1499326494": {
-   "grouping": false,
-   "parts": 0
+   "grouping": true,
+   "parts": 1
   },
   "1511876052": {
    "grouping": true,
@@ -2345,8 +2345,8 @@
    "parts": 0.967
   },
   "1608042390": {
-   "grouping": false,
-   "parts": 0.912
+   "grouping": true,
+   "parts": 1
   },
   "1613578929": {
    "grouping": true,
@@ -2369,8 +2369,8 @@
    "parts": 1
   },
   "1650387312": {
-   "grouping": false,
-   "parts": 0
+   "grouping": true,
+   "parts": 1
   },
   "1671919893": {
    "grouping": false,
@@ -2382,23 +2382,23 @@
   },
   "1683561964": {
    "grouping": false,
-   "parts": 0.095
+   "parts": 1
   },
   "1686454298": {
    "grouping": true,
    "parts": 1
   },
   "1689033997": {
-   "grouping": false,
-   "parts": 0
+   "grouping": true,
+   "parts": 1
   },
   "1691120087": {
    "grouping": true,
    "parts": 1
   },
   "1694676611": {
-   "grouping": false,
-   "parts": 0
+   "grouping": true,
+   "parts": 1
   },
   "1701280027": {
    "grouping": false,
@@ -2421,8 +2421,8 @@
    "parts": 0.667
   },
   "1730778868": {
-   "grouping": false,
-   "parts": 0
+   "grouping": true,
+   "parts": 1
   },
   "1751268500": {
    "grouping": true,
@@ -2434,7 +2434,7 @@
   },
   "1779059876": {
    "grouping": false,
-   "parts": 0.242
+   "parts": 0.394
   },
   "1804679810": {
    "grouping": false,
