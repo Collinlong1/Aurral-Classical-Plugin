@@ -31,7 +31,10 @@ import {
   renderWork,
   applyWorkMutation,
 } from "../src/model/presentation.js";
-import { autoMatchTaggedWorks } from "../src/model/auto-match.js";
+import {
+  autoMatchTaggedWorks,
+  repairMovementTitles,
+} from "../src/model/auto-match.js";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 async function setup(t) {
@@ -62,6 +65,82 @@ const snapshot = (tracks, generation = 1, extra = {}) => ({
   generation,
   tracks,
   ...extra,
+});
+
+test("album works follow the album, and movement titles drop the work's name", async (t) => {
+  const { c, m } = await setup(t);
+  const on = (id, disc, number, work, title, extra = {}) =>
+    track(id, {
+      albumId: "cycle-album",
+      hints: {
+        title,
+        album: "Cycle",
+        composer: ["Ludwig van Beethoven"],
+        work,
+        trackNumber: number,
+        discNumber: disc,
+        ...extra,
+      },
+    });
+  const hammerklavier = "Piano Sonata No. 29 in B-flat major, Op. 106";
+  const links = reconcile(
+    c,
+    snapshot([
+      on(1, 2, 1, "Piano Sonata No. 1: I. Allegro", "I. Allegro"),
+      on(2, 2, 2, "Piano Sonata No. 1: II. Adagio", "II. Adagio"),
+      on(3, 1, 3, hammerklavier, `${hammerklavier} - "Hammerklavier": Allegro`),
+      on(4, 1, 4, hammerklavier, `${hammerklavier} - "Hammerklavier": Adagio sostenuto`),
+      on(5, 1, 1, "Piano Sonata No. 8", "Piano Sonata No. 8: Grave", { recordingMbid: "pathetique-1" }),
+      on(6, 1, 2, "Piano Sonata No. 8", "Piano Sonata No. 8: Rondo", { recordingMbid: "pathetique-2" }),
+    ]),
+  );
+  links.forEach((link) => classify(c, link.id, link.hints));
+  const pathetique = "Piano Sonata no. 8 in C minor, op. 13 “Pathétique”";
+  autoMatchTaggedWorks(c, {
+    actor: "admin",
+    providerMatches: new Map([
+      [links[4].id, { workId: "pathetique", work: pathetique, movement: `${pathetique}: I. Grave – Allegro di molto e con brio`, composers: [] }],
+      [links[5].id, { workId: "pathetique", work: pathetique, movement: `${pathetique}: III. Rondo. Allegro`, composers: [] }],
+    ]),
+  });
+  autoMatchTaggedWorks(c, { actor: "model-scan" });
+  const album = renderAlbumPresentation(c, "cycle-album");
+  assert.deepEqual(
+    album.groups.map((group) => group.title),
+    [pathetique, hammerklavier, "Piano Sonata No. 1"],
+  );
+  assert.deepEqual(
+    album.groups.map((group) => group.items.map((item) => item.title)),
+    [
+      ["I. Grave – Allegro di molto e con brio", "III. Rondo. Allegro"],
+      ["Allegro", "Adagio sostenuto"],
+      ["I. Allegro", "II. Adagio"],
+    ],
+  );
+
+  // Fields the title states fill in; an admin's value is never replaced.
+  const hammerklavierWork = album.groups[1].workId;
+  assert.equal(m.resolve(hammerklavierWork, "key").value, "B-flat major");
+  assert.deepEqual(m.resolve(hammerklavierWork, "catalogue").value, ["Op. 106"]);
+  assert.equal(m.resolve(hammerklavierWork, "form").value, "sonata");
+  assert.deepEqual(m.resolve(hammerklavierWork, "instrumentation").value, ["Piano"]);
+  assert.equal(m.resolve(album.groups[0].workId, "nickname").value, "Pathétique");
+  m.manual(hammerklavierWork, "form", "grand sonata", { actor: "admin" });
+  autoMatchTaggedWorks(c, { actor: "model-scan" });
+  assert.equal(m.resolve(hammerklavierWork, "form").value, "grand sonata");
+
+  // Titles derived before this fix are repaired; manual titles stay.
+  const movements = c.db
+    .prepare("SELECT target_id FROM relation WHERE kind='movement' AND source_id=? ORDER BY position")
+    .all(album.groups[1].workId)
+    .map((row) => row.target_id);
+  m.derived(movements[0], "title", `${hammerklavier}: Allegro`);
+  m.manual(movements[1], "title", `${hammerklavier}: Kept`, { actor: "admin" });
+  assert.equal(repairMovementTitles(c), 1);
+  assert.deepEqual(
+    renderAlbumPresentation(c, "cycle-album").groups[1].items.map((item) => item.title),
+    ["Allegro", `${hammerklavier}: Kept`],
+  );
 });
 
 test("explicit embedded work metadata creates an idempotent read-only work realization", async (t) => {
@@ -718,11 +797,11 @@ test("failed migrations roll back DDL and versions; consistent backups restore a
   await c.backup(backup);
   c.close();
   const bad = {
-    version: 3,
+    version: 4,
     sql: "CREATE TABLE should_rollback(id); INSERT INTO no_such_table VALUES (1);",
   };
   await assert.rejects(
-    openDatabase(folders.dataFolder, { migrations: [bad], maxVersion: 3 }),
+    openDatabase(folders.dataFolder, { migrations: [bad], maxVersion: 4 }),
     /no such table/,
   );
   const restored = await openCatalogue(folders.dataFolder);
@@ -737,12 +816,12 @@ test("failed migrations roll back DDL and versions; consistent backups restore a
   );
   assert.equal(
     restored.db.prepare("PRAGMA user_version").get().user_version,
-    2,
+    3,
   );
   restored.close();
   const upgraded = await openDatabase(folders.dataFolder, {
-    migrations: [{ version: 3, sql: "CREATE TABLE future(id);" }],
-    maxVersion: 3,
+    migrations: [{ version: 4, sql: "CREATE TABLE future(id);" }],
+    maxVersion: 4,
   });
   upgraded.db.close();
   await assert.rejects(openCatalogue(folders.dataFolder), /newer/);
@@ -768,7 +847,7 @@ test("schema 1 upgrades to user-scoped Phase 4 state without changing catalogue 
   const upgraded = await openCatalogue(folders.dataFolder);
   assert.equal(
     upgraded.db.prepare("PRAGMA user_version").get().user_version,
-    2,
+    3,
   );
   assert.equal(upgraded.entity(work).kind, "work");
   assert.ok(
@@ -789,7 +868,7 @@ test("schema 1 upgrades to user-scoped Phase 4 state without changing catalogue 
 test("process death during DDL leaves the old schema recoverable", async (t) => {
   const { c, folders } = await setup(t);
   c.close();
-  const script = `import { DatabaseSync } from 'node:sqlite';const d=new DatabaseSync(${JSON.stringify(c.filename)});d.exec('BEGIN IMMEDIATE; CREATE TABLE interrupted(id); PRAGMA user_version=3');process.kill(process.pid,'SIGKILL');`;
+  const script = `import { DatabaseSync } from 'node:sqlite';const d=new DatabaseSync(${JSON.stringify(c.filename)});d.exec('BEGIN IMMEDIATE; CREATE TABLE interrupted(id); PRAGMA user_version=4');process.kill(process.pid,'SIGKILL');`;
   const child = spawnSync(
     process.execPath,
     ["--input-type=module", "-e", script],
@@ -799,7 +878,7 @@ test("process death during DDL leaves the old schema recoverable", async (t) => 
   const reopened = await openCatalogue(folders.dataFolder);
   assert.equal(
     reopened.db.prepare("PRAGMA user_version").get().user_version,
-    2,
+    3,
   );
   assert.equal(
     reopened.db

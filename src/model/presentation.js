@@ -1,10 +1,23 @@
 import path from "node:path";
 import { openCatalogue } from "./catalogue.js";
-import { Metadata } from "./metadata.js";
 import { transaction } from "./database.js";
 
 const text = (value, fallback) =>
   typeof value === "string" && value.trim() ? value.trim() : fallback;
+// Pages only read. Every write path stores its resolution in
+// field_resolution, so reading it avoids a write transaction per name.
+class DisplayValues {
+  constructor(c) {
+    this.statement = c.db.prepare(
+      `SELECT a.value FROM field_resolution f JOIN assertion a ON a.id=f.assertion_id
+       WHERE f.target_id=? AND f.field=?`,
+    );
+  }
+  resolve(id, field) {
+    const row = this.statement.get(id, field);
+    return { value: row ? JSON.parse(row.value) : undefined };
+  }
+}
 const entityValue = (metadata, id, field, fallback) =>
   text(metadata.resolve(id, field).value, fallback);
 const evidenceOf = (row) => JSON.parse(row.evidence);
@@ -19,6 +32,13 @@ function actor(input) {
 }
 
 function realizationRows(c, realizationId = null, workId = null, albumId = null) {
+  // Only the filters in use go into the query, so SQLite can start from the
+  // album or work index instead of every realization.
+  const filters = [
+    [realizationId, "r.id=?"],
+    [workId, "r.work_id=?"],
+    [albumId, "CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?"],
+  ].filter(([value]) => value !== null);
   return c.db
     .prepare(
       `SELECT r.id AS realization_id,r.work_id,r.performance_work_id,r.label AS realization_label,
@@ -29,11 +49,10 @@ function realizationRows(c, realizationId = null, workId = null, albumId = null)
       JOIN segment s ON s.id=i.segment_id
       JOIN track_link t ON t.id=s.track_link_id AND t.state='active'
       JOIN classification c ON c.target_id=t.id AND c.state='classical'
-      WHERE (? IS NULL OR r.id=?) AND (? IS NULL OR r.work_id=?)
-        AND (? IS NULL OR CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?)
+      ${filters.length ? `WHERE ${filters.map(([, sql]) => sql).join(" AND ")}` : ""}
       ORDER BY r.id,i.sequence,i.occurrence,i.id`,
     )
-    .all(realizationId, realizationId, workId, workId, albumId, albumId);
+    .all(...filters.map(([value]) => value));
 }
 
 function queueItem(metadata, row) {
@@ -89,7 +108,7 @@ function credits(c, metadata, targetId) {
 }
 
 export function renderAlbumPresentation(c, albumId) {
-  const metadata = new Metadata(c);
+  const metadata = new DisplayValues(c);
   const album = String(albumId);
   // Filter in SQL: this runs on every album page view.
   const allRows = realizationRows(c, null, null, album);
@@ -100,7 +119,17 @@ export function renderAlbumPresentation(c, albumId) {
     group.push(row);
     grouped.set(row.realization_id, group);
   }
-  const groups = [...grouped.entries()].map(([realizationId, rows]) => {
+  // Works follow the album: by each one's first disc and track.
+  const albumPosition = (row) => {
+    const hints = evidenceOf(row).hints || {};
+    return (Number(hints.discNumber) || 1) * 10000 + (Number(hints.trackNumber) || 9999);
+  };
+  const firstPosition = new Map(
+    [...grouped].map(([id, rows]) => [id, Math.min(...rows.map(albumPosition))]),
+  );
+  const groups = [...grouped.entries()]
+    .sort(([a], [b]) => firstPosition.get(a) - firstPosition.get(b))
+    .map(([realizationId, rows]) => {
     const workId = rows[0].work_id;
     const movements = workMovements(c, metadata, workId);
     const present = new Set(rows.map((row) => row.movement_id).filter(Boolean));
@@ -124,7 +153,7 @@ export function renderAlbumPresentation(c, albumId) {
 
 export function renderWork(c, workId, user) {
   c.entity(workId, "work");
-  const metadata = new Metadata(c);
+  const metadata = new DisplayValues(c);
   const movements = workMovements(c, metadata, workId);
   const rows = realizationRows(c, null, workId);
   const byRealization = new Map();

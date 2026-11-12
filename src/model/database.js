@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { migrations as shippedMigrations } from "./schema.js";
 
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 export function validateDatabase(db) {
   if (
@@ -84,6 +84,8 @@ export async function restoreDatabase(
   }
 }
 
+const validated = new Set();
+
 export async function openDatabase(
   folder,
   { migrations = shippedMigrations, maxVersion = SCHEMA_VERSION } = {},
@@ -139,7 +141,12 @@ export async function openDatabase(
     }
     if (version !== maxVersion)
       throw new Error(`Missing migration to classical schema ${maxVersion}`);
-    validateDatabase(db);
+    // A full integrity check reads the whole file. Every album page opens
+    // the database, so check once per process; migrations check above.
+    if (!validated.has(filename)) {
+      validateDatabase(db);
+      validated.add(filename);
+    }
     return { db, filename };
   } catch (error) {
     db.close();

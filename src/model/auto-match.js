@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { Metadata } from "./metadata.js";
 import { transaction } from "./database.js";
+import { catalogueNumber } from "../works.js";
 
 const MULTI_MOVEMENT =
   /\b(symphon(?:y|ie)|sinfonia|sonata|sonatina|concerto|suite|partita|quartet|quintet|sextet|septet|octet|nonet|trio|serenade|divertimento|cassation|mass|missa|requiem|stabat mater|magnificat|te deum|vespers|cantata|oratorio|passion|variations|ballet)\b/i;
@@ -94,6 +95,7 @@ function candidates(
         work: proposal.title,
         evidence: proposal.evidence,
         providerWorkId: proposal.identity || null,
+        providerAliases: provider?.aliases || [],
         composers,
         albumId: String(row.evidence.albumId),
         album: clean(hints.album),
@@ -101,6 +103,7 @@ function candidates(
       });
     groups.get(key).tracks.push({
       ...row,
+      providerMovement: provider?.movement ? clean(provider.movement) : null,
       title: clean(hints.title),
       discNumber,
       trackNumber,
@@ -177,18 +180,37 @@ export function movementTitle(track, workTitle) {
   const work = clean(track.work);
   if (work.includes(":")) {
     const tail = clean(work.slice(work.indexOf(":") + 1));
-    if (tail) return tail;
+    if (tail) return stripWorkPrefix(tail, workTitle);
   }
-  const structured = clean(track.title).match(
-    /^(.+?)(?::|\s+[–—-]\s+)\s*(.+)$/,
-  );
-  if (
-    structured &&
-    (words(structured[1]) === words(workTitle) ||
-      MOVEMENT_PREFIX.test(structured[2]))
-  )
-    return clean(structured[2]);
-  return clean(track.title);
+  return stripWorkPrefix(clean(track.title), workTitle);
+}
+
+const SEPARATOR = /:\s*|\s+[–—-]\s+/g;
+const NICKNAME = /^["“„«'‘][^"”»'’]+["”»'’]\s*(?::|\s[–—-])\s*(.+)$/;
+// "Piano Sonata No. 29, Op. 106 - "Hammerklavier": Allegro" -> "Allegro".
+// A head names the work when it matches its words or catalogue number.
+export function stripWorkPrefix(title, workTitle) {
+  const text = clean(title);
+  const separators = [...text.matchAll(SEPARATOR)];
+  const tailAt = (match) => clean(text.slice(match.index + match[0].length));
+  // A numbered movement starts the movement part: "…: I. Allegro".
+  for (const match of separators) {
+    const tail = tailAt(match);
+    if (tail && MOVEMENT_PREFIX.test(tail)) return tail;
+  }
+  const workWords = words(workTitle);
+  const workCatalogue = catalogueNumber(workTitle).toLowerCase();
+  for (const match of separators) {
+    const head = text.slice(0, match.index);
+    const tail = tailAt(match);
+    const headWords = words(head);
+    const namesWork =
+      (workWords && (headWords === workWords || headWords.startsWith(`${workWords} `) || workWords.startsWith(`${headWords} `))) ||
+      (workCatalogue && catalogueNumber(head).toLowerCase() === workCatalogue);
+    if (!tail || !namesWork) continue;
+    return clean(tail.match(NICKNAME)?.[1] ?? tail);
+  }
+  return text;
 }
 
 function resolvedName(catalogue, id, field) {
@@ -307,10 +329,12 @@ function createGroup(catalogue, group, actor, index) {
       )
       .map((track) => ({
         ...track,
-        movementTitle: movementTitle(
-          { title: track.title, work: track.evidence.hints?.work },
-          group.work,
-        ),
+        movementTitle: track.providerMovement
+          ? stripWorkPrefix(track.providerMovement, group.work)
+          : movementTitle(
+              { title: track.title, work: track.evidence.hints?.work },
+              group.work,
+            ),
       }));
     const key = group.providerWorkId
       ? JSON.stringify(["musicbrainz", group.providerWorkId])
@@ -354,6 +378,8 @@ function createGroup(catalogue, group, actor, index) {
           { position: i + 1 },
         ),
       );
+      if (group.providerAliases?.length)
+        metadata.derived(work, "aliases", group.providerAliases);
       if (group.providerWorkId)
         catalogue.externalIdentity(
           work,
@@ -574,6 +600,79 @@ export function mergeDuplicateAutoWorks(catalogue, { actor = null } = {}) {
 }
 
 // This only changes the plugin catalogue. It never writes the indexed media.
+const INSTRUMENT =
+  /\b(piano|violin|viola|cello|violoncello|double bass|flute|oboe|clarinet|bassoon|horn|trumpet|trombone|organ|harpsichord|guitar|harp|string|wind|piano and violin|violin and piano|cello and piano)\s+(?=(?:sonata|sonatina|concerto|quartet|quintet|trio|sextet|octet|suite|partita)\b)/i;
+const KEY = /\bin\s+([a-h])(?:[\s-]?(flat|sharp|♭|♯))?\s+(major|minor)\b/i;
+const CATALOGUE_TEXT =
+  /\b(?:op(?:us|\.)?\s*\d+[a-z]?(?:\s*,?\s*no\.?\s*\d+)?|(?:BWV|HWV|RV|WoO|TWV|K(?:V|\.)?|D\.?|Hob\.?\s*[IVXL]+[a-z]?:?)\s*\d+[a-z]?)/gi;
+const tidyCatalogue = (value) =>
+  clean(value)
+    .replace(/^op(?:us|\.)?\s*/i, "Op. ")
+    .replace(/\s*,?\s*no\.?\s*(\d)/i, " No. $1");
+// Fields a work's title states outright: "Piano Sonata no. 1 in F minor, op. 2 no. 1".
+export function workFieldsFromTitle(title) {
+  const text = clean(title);
+  const fields = {};
+  const key = text.match(KEY);
+  if (key)
+    fields.key = `${key[1].toUpperCase()}${key[2] ? `-${key[2].toLowerCase().replace("♭", "flat").replace("♯", "sharp")}` : ""} ${key[3].toLowerCase()}`;
+  const catalogue = [...new Set((text.match(CATALOGUE_TEXT) || []).map(tidyCatalogue))];
+  if (catalogue.length) fields.catalogue = catalogue;
+  const form = text.match(MULTI_MOVEMENT);
+  if (form) fields.form = form[1].toLowerCase();
+  const nickname = text.match(/["“„«]([^"”»]+)["”»]/);
+  if (nickname) fields.nickname = clean(nickname[1]);
+  const instrument = text.match(INSTRUMENT);
+  if (instrument)
+    fields.instrumentation = instrument[1]
+      .toLowerCase()
+      .split(/\s+and\s+/)
+      .map((name) => name[0].toUpperCase() + name.slice(1));
+  return fields;
+}
+
+// Fill a work's empty fields from its title. Fields with any value are kept.
+export function deriveWorkFields(catalogue, work, metadata = new Metadata(catalogue)) {
+  const title = resolvedName(catalogue, work, "title");
+  if (typeof title !== "string") return 0;
+  const known = catalogue.db.prepare("SELECT 1 FROM field_resolution WHERE target_id=? AND field=?");
+  let filled = 0;
+  for (const [field, value] of Object.entries(workFieldsFromTitle(title)))
+    if (!known.get(work, field)) {
+      metadata.derived(work, field, value);
+      filled++;
+    }
+  return filled;
+}
+
+// Movement titles derived before stripWorkPrefix understood a title can
+// still carry the work's name. Manual and provider titles are left alone.
+export function repairMovementTitles(catalogue) {
+  const metadata = new Metadata(catalogue);
+  const rows = catalogue.db
+    .prepare(
+      `SELECT r.source_id AS work,r.target_id AS movement,a.value,a.source
+       FROM relation r JOIN field_resolution f ON f.target_id=r.target_id AND f.field='title'
+       JOIN assertion a ON a.id=f.assertion_id
+       WHERE r.kind='movement' AND a.source='derived'`,
+    )
+    .all();
+  const titles = new Map();
+  let repaired = 0;
+  for (const row of rows) {
+    if (!titles.has(row.work)) titles.set(row.work, resolvedName(catalogue, row.work, "title"));
+    const workTitle = titles.get(row.work);
+    const current = JSON.parse(row.value);
+    if (typeof workTitle !== "string" || typeof current !== "string") continue;
+    const stripped = stripWorkPrefix(current, workTitle);
+    if (stripped && stripped !== current) {
+      metadata.derived(row.movement, "title", stripped);
+      repaired++;
+    }
+  }
+  return repaired;
+}
+
 export function autoMatchTaggedWorks(
   catalogue,
   {
@@ -590,6 +689,12 @@ export function autoMatchTaggedWorks(
     providerMatches,
   );
   mergeDuplicateAutoWorks(catalogue, { actor });
+  repairMovementTitles(catalogue);
+  const metadata = new Metadata(catalogue);
+  for (const { id } of catalogue.db
+    .prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL")
+    .all())
+    deriveWorkFields(catalogue, id, metadata);
   const index = catalogueIndex(catalogue);
   let created = 0;
   for (const group of groups)

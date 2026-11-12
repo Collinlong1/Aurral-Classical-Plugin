@@ -8,7 +8,15 @@ import { UserOperations } from "../user-operations.js";
 import { readTags } from "../tags.js";
 import { autoMatchTaggedWorks, isCollectionLike } from "./auto-match.js";
 import { topWork } from "../works.js";
+import { ClassicalResolver, isLatin } from "../resolver.js";
 import { fingerprint } from "./fingerprint.js";
+
+// A work's English title, as artist names pick theirs: a primary English
+// alias, or any English alias when MusicBrainz's title isn't Latin script.
+function englishTitle(work, fallback = work.title) {
+  const alias = ClassicalResolver.bestEnglishAlias(work.aliases);
+  return alias && (alias.primary || !isLatin(work.title)) ? alias.name : fallback;
+}
 
 export const modelFolder = (ctx) => path.join(ctx.dataFolder, "model");
 const emptyTags = () => ({
@@ -479,12 +487,10 @@ export async function autoMatchWorks(ctx, actor, albumId = null) {
           if (!composers.length) composers = fields?.composers || [];
         }
         if (!workId) continue;
-        const leaf = await ctx.mb.get(
-          "work",
-          workId,
-          "artist-rels+work-rels",
-        );
-        const parent = leaf && (await topWork(ctx.mb, leaf));
+        // Aliases come in the same requests, for English titles.
+        const inc = "aliases+artist-rels+work-rels";
+        const leaf = await ctx.mb.get("work", workId, inc);
+        const parent = leaf && (await topWork(ctx.mb, leaf, 0, inc));
         if (
           !parent?.id ||
           parent.id === leaf.id ||
@@ -493,7 +499,16 @@ export async function autoMatchWorks(ctx, actor, albumId = null) {
           continue;
         providerMatches.set(row.id, {
           workId: parent.id,
-          work: parent.title,
+          work: englishTitle(parent),
+          movement: englishTitle(leaf, null),
+          aliases: [
+            ...new Set(
+              (parent.aliases || [])
+                .filter((alias) => alias.name && alias.type !== "Search hint")
+                .map((alias) => alias.name)
+                .filter((name) => name !== englishTitle(parent)),
+            ),
+          ].slice(0, 20),
           composers,
         });
       } catch (error) {

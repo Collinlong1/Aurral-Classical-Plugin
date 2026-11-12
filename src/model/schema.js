@@ -156,4 +156,16 @@ CREATE TABLE admin_work_pick (
 );
 `,
   },
+  {
+    // Album and work pages look up one album's tracks and walk from tracks
+    // to realizations; without these each view scans the whole catalogue.
+    version: 3,
+    sql: `
+CREATE INDEX track_album ON track_link(CAST(json_extract(evidence,'$.albumId') AS TEXT));
+CREATE INDEX segment_track ON segment(track_link_id);
+CREATE INDEX realization_item_segment ON realization_item(segment_id);
+CREATE INDEX relation_target ON relation(kind,target_id);
+CREATE INDEX realization_work ON realization(work_id);
+`,
+  },
 ];
