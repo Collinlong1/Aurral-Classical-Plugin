@@ -219,8 +219,8 @@ the stored state and whether it came from a track pin, an album pin or the
 automatic classifier, and the state the next scan would store (marked `*` when
 it changes). Pins are never changed by a scan. `--album <id>` limits it to one
 album, `--all` includes ordinary tracks, `--json` prints the data. An admin can
-get one album's summary from its menu: **Classical classification report
-(read only)**.
+get one album's summary from its menu: **Classification report (read
+only)**.
 
 ## Test corpus
 

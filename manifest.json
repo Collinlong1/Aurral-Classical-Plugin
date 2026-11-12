@@ -132,7 +132,7 @@
     },
     {
       "id": "classical-classification-report",
-      "label": "Classical classification report (read only)",
+      "label": "Classification report (read only)",
       "target": "album",
       "admin": true
     },

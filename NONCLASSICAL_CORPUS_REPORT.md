@@ -59,7 +59,7 @@ the corpora. Pins and inherited album pins keep precedence, exactly as before.
   each evidence signal with points, the score, the stored state, the state's source (track pin,
   album pin or automatic) and the state the next scan would store. It opens the database read-only;
   the corpus asserts the database and any existing WAL stay byte-identical.
-- The admin album action **Classical classification report (read only)** gives the same answer for
+- The admin album action **Classification report (read only)** gives the same answer for
   one album, within the host's 500-character message limit.
 
 ### Real-library dry run (for you to run)
