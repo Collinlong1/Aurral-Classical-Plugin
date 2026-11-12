@@ -14,6 +14,7 @@ import {
   HARD_NON_CLASSICAL_GENRES,
   normGenre,
 } from "../resolver.js";
+import { artistCredits } from "./credits.js";
 
 const escape = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const wordList = (terms) =>
@@ -59,8 +60,10 @@ const TEMPO =
 // "II. Adagio sostenuto", "Spring - I. Allegro": a movement numbered with a
 // Roman numeral and marked with a tempo, rather than a song called "Finale".
 const NUMBERED_TEMPO = new RegExp(`(?:^|[:;\\-–—]\\s*)[IVXL]{1,6}\\.\\s*${TEMPO.source.replace(/^\\b/, "")}`, "i");
+// Single-letter systems (Debussy's L., Ravel's M., Liszt's S.) only after a
+// comma, as in "La Mer, L. 109", so ordinary words and initials never count.
 const CATALOGUE_NUMBER =
-  /\b(op(?:us)?\.?|bwv|kv?\.?|d\.|hob\.?|rv|woo|hwv|sz\.?|twv)\s*\d/i;
+  /\b(op(?:us)?\.?|bwv|buxwv|swv|wwv|kv?\.?|d\.|hob\.?|rv|woo|hwv|sz\.?|twv|trv)\s*\d|,\s*(?:L\.|M\.|S\.|FP)\s*\d/i;
 const FORM =
   /\b(symphon(?:y|ie)|sinfonia|sonata|concerto|suite|partita|string quartet|piano trio|quintet|nocturne|mazurka|polonaise|etude|prelude|fugue|toccata|cantata|oratorio|requiem|mass in|missa|motet|madrigal|lieder|impromptu|ballade|rhapsody|overture)(?:s|es)?\b/i;
 // "Bach: The Goldberg Variations", "Ravel: Boléro": an album named after a
@@ -116,13 +119,20 @@ export function classificationEvidence(hints = {}) {
   const albumComposer = album.trim().match(COMPOSER_ALBUM)?.[0];
   if (albumComposer) add(2, "album named after a composer", albumComposer.replace(/:\s*$/, ""));
   if (hints.composerDistinct) add(1, "composer differs from artist", (hints.composer || []).join("; "));
+  // No composer tag, but the artist field names one beside the performers
+  // ("Bedřich Smetana; Vienna Philharmonic"). Corroborated by the album or
+  // track title or the catalogue system, it counts as a credited composer;
+  // alone it only keeps the track out of "not classical".
+  const credit = artistCredits(hints);
+  if (credit?.confidence === "high") add(2, "composer named in artist field", `${credit.composers.join("; ")} (${credit.evidence.join(", ")})`);
+  else if (credit) add(1, "possible composer in artist field", credit.composers.join("; "));
 
   const score = signals.reduce((sum, s) => sum + s.points, 0);
   const strong = signals.filter((s) => s.kind === "strong");
   const verified = strong.filter((s) => s.signal !== "classical genre");
   const supporting = signals.filter((s) => s.kind === "supporting" && s.points > 1);
-  const hasComposer = Array.isArray(hints.composer) && hints.composer.length > 0;
-  const credited = !!hints.composerDistinct;
+  const hasComposer = (Array.isArray(hints.composer) && hints.composer.length > 0) || !!credit;
+  const credited = !!hints.composerDistinct || credit?.confidence === "high";
 
   let decision;
   let reason;

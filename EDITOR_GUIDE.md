@@ -33,6 +33,7 @@ Everything here changes the classical catalogue only. Audio files are never writ
 **Review.** The Review tab lists what needs a decision, with the action that settles it:
 - unsure classifications: **Send to Classical** / **Not classical**;
 - albums whose tracks didn't line up with a work, or that several works or composers could fit: **Open album** and an **Open** link per candidate. Assigning the album resolves the item;
+- albums whose composer appears only in the artist field ("Composer; Performers") with nothing else naming them: **Open album**, then create or assign the work. Nothing is created automatically for these;
 - possible duplicate works: **Merge into the other work**;
 - composers who share a name: **Same person: merge into …**;
 - MusicBrainz and Open Opus disagreeing on a field: one **use … value** action per value, for every conflicting field. The value you choose is pinned;

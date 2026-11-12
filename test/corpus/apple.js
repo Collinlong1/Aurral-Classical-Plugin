@@ -81,14 +81,56 @@ export function score(album, presentation) {
   };
 }
 
-// Every style's results: { style: { appleId: { grouping, parts } } }.
+// Pair-by-pair comparison of one album's blocks with Apple's, for audits and
+// the false-join gate. A false join is two adjacent tracks we put in one
+// block that Apple shows apart: an incorrect automatic match.
+export function auditAlbum(album, presentation) {
+  const ordered = [...album.tracks].sort((a, b) => a.disc - b.disc || a.number - b.number);
+  const blockOf = new Map();
+  const rowTitle = new Map();
+  const groupTitle = new Map();
+  for (const group of presentation?.groups || [])
+    for (const item of group.items) {
+      blockOf.set(item.trackId, group.id);
+      rowTitle.set(item.trackId, item.title);
+      groupTitle.set(item.trackId, group.title);
+    }
+  let falseJoins = 0;
+  let missedJoins = 0;
+  let appleJoins = 0;
+  const label = new Map();
+  const rows = ordered.map((track, index) => {
+    const id = trackId(album, track);
+    const previous = ordered[index - 1];
+    const ours = previous && blockOf.has(id) && blockOf.get(id) === blockOf.get(trackId(album, previous));
+    const apple = previous && track.apple.block === previous.apple.block;
+    if (apple) appleJoins++;
+    if (ours && !apple) falseJoins++;
+    if (apple && !ours) missedJoins++;
+    if (blockOf.has(id) && !label.has(blockOf.get(id))) label.set(blockOf.get(id), `w${label.size + 1}`);
+    return {
+      ours: blockOf.has(id) ? label.get(blockOf.get(id)) : "-",
+      apple: track.apple.block,
+      mark: ours && !apple ? "FALSE" : apple && !ours ? "miss " : "     ",
+      title: track.title,
+      shown: blockOf.has(id) ? `${groupTitle.get(id)} | ${rowTitle.get(id)}` : "(single)",
+    };
+  });
+  const { parts } = score(album, presentation);
+  return { exact: !falseJoins && !missedJoins, falseJoins, missedJoins, appleJoins, parts, rows };
+}
+
+// Every style's results: { style: { appleId: { grouping, parts, falseJoins } } }.
 export async function scoreApple(fixtures = appleFixtures()) {
   const results = {};
   for (const style of Object.keys(styles)) {
     const albums = fixtures.map((fixture) => toAlbum(fixture, style));
     const presentations = await runCorpus(albums);
     results[style] = Object.fromEntries(
-      albums.map((album) => [album.appleId, score(album, presentations.get(album.id))]),
+      albums.map((album) => {
+        const presentation = presentations.get(album.id);
+        return [album.appleId, { ...score(album, presentation), falseJoins: auditAlbum(album, presentation).falseJoins }];
+      }),
     );
   }
   return results;
@@ -99,6 +141,7 @@ export function summary(results) {
     const scores = Object.values(albums);
     const grouped = scores.filter((entry) => entry.grouping).length;
     const parts = scores.reduce((sum, entry) => sum + entry.parts, 0) / (scores.length || 1);
-    return `${style.padEnd(10)} blocks match Apple on ${grouped}/${scores.length} albums; rows read like Apple's ${Math.round(parts * 100)}%`;
+    const falseJoins = scores.reduce((sum, entry) => sum + (entry.falseJoins || 0), 0);
+    return `${style.padEnd(10)} blocks match Apple on ${grouped}/${scores.length} albums; rows read like Apple's ${Math.round(parts * 100)}%; false joins ${falseJoins}`;
   });
 }

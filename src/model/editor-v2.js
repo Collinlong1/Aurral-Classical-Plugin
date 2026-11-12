@@ -221,7 +221,9 @@ function reviewLabel(c, review) {
             ? "Several works match; choose the right one"
             : review.evidence.reason === "ambiguous-composer"
               ? "Several composers share this name; choose the right one"
-              : "Tracks didn't line up with the work's movements",
+              : review.evidence.reason === "uncertain-composer"
+                ? `Composer read from the artist field only (${(review.evidence.composers || []).join(", ") || "unknown"}); confirm before a work is made`
+                : "Tracks didn't line up with the work's movements",
       };
     case "identity":
       return {

@@ -3,6 +3,7 @@ import { openCatalogue } from "./catalogue.js";
 import { transaction } from "./database.js";
 import { movementTitle, splitTitle } from "./auto-match.js";
 import { catalogueNumber } from "../works.js";
+import { composersOf } from "./credits.js";
 
 const text = (value, fallback) =>
   typeof value === "string" && value.trim() ? value.trim() : fallback;
@@ -63,7 +64,7 @@ const words = (value) =>
 // heads the work, so rows name only who plays.
 function performerOf(hints) {
   const artist = text(hints?.artist, text(hints?.albumArtist, ""));
-  const composers = new Set((hints?.composer || []).map(words));
+  const composers = new Set(composersOf(hints || {}).map(words));
   const performers = artist
     .split(/\s+[—–]\s+|\s*;\s*/)
     .filter((name) => name && !composers.has(words(name)));
@@ -128,7 +129,21 @@ const albumPosition = (row) => {
   return (Number(hints.discNumber) || 1) * 10000 + (Number(hints.trackNumber) || 9999);
 };
 
-const ACT = /,\s*(?:act|akt|atto|acte|part|teil|scene|szene)\s+[ivxlc\d]+\b.*$/i;
+const ACT = /,\s*(?:act|akt|atto|acte|part|pt\.?|teil|scene|szene)\s*[ivxlc\d]+\b.*$/i;
+// "Tristan und Isolde" and "Tristan und Isolde, WWV 90": the same name before
+// the comma, and only one of them carries a catalogue number.
+const nameBeforeComma = (title) => words(String(title).split(",")[0]);
+function sameNamedWork(a, b) {
+  if (a === b) return true;
+  const catalogueA = catalogueNumber(a).toLowerCase();
+  const catalogueB = catalogueNumber(b).toLowerCase();
+  if (catalogueA && catalogueB) return catalogueA === catalogueB;
+  // The shorter must be the longer cut at a comma: "Études, Book 1" and
+  // "Études, Book 3" are different books.
+  const [short, long] = a.length <= b.length ? [a, b] : [b, a];
+  const name = nameBeforeComma(long);
+  return name.length >= 4 && words(short) === name && long.includes(",");
+}
 
 // Classical tracks outside every work become pieces, as Apple Music
 // Classical shows a recital: neighbouring tracks of one set share a block
@@ -156,7 +171,7 @@ function pieceGroups(c, album, following) {
     // "La traviata", the way Apple Music Classical shows it.
     const head = fullHead.replace(ACT, "");
     const heading = head || tail;
-    const composer = (evidence.hints?.composer || []).join(", ");
+    const composer = composersOf(evidence.hints || {}).join(", ");
     const last = pieces.at(-1);
     const item = {
       id: `piece:${row.track_link_id}`,
@@ -174,10 +189,7 @@ function pieceGroups(c, album, following) {
     };
     // Neighbours of one work share a block, even spelled differently
     // ("Theme by Paganini, Op. 43" and "Theme of Paganini, Op. 43").
-    const sameWork =
-      last &&
-      (last.title === heading ||
-        (catalogueNumber(heading) && catalogueNumber(heading).toLowerCase() === catalogueNumber(last.title).toLowerCase()));
+    const sameWork = last && sameNamedWork(last.title, heading);
     if (head && sameWork && last.composer === composer && following.get(last.next) === item.position)
       last.items.push(item);
     else

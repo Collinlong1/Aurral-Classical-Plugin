@@ -1,3 +1,7 @@
+# Messy metadata matching
+
+Plugin-only matching, classification and album-presentation changes (see `MESSY_MATCHING_REPORT.md`). No core code, API, hook, schema or upstream delta.
+
 # Phase 4 delta
 
 Post-Phase-4 plugin-only work adds complete-index search guidance to recording attachment and begins conservative automatic work construction from explicit embedded metadata. Completed scans and an album action can create safe multi-movement realizations in plugin storage without media writes or provider requests. This adds no core code, API, database or UI hook beyond the already implemented Phase 4 contracts.

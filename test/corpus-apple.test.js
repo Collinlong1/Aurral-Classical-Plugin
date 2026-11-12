@@ -1,6 +1,8 @@
 // Holds the line on the real releases in test/corpus/apple: an album whose
-// blocks match Apple Music Classical's today must keep matching, and no
-// album's rows may read less like Apple's. To save an improvement:
+// blocks match Apple Music Classical's today must keep matching, no album's
+// rows may read less like Apple's, and no album may gain a false join (two
+// neighbouring tracks put in one block that Apple shows apart: an incorrect
+// automatic match). To save an improvement:
 //   node scripts/corpus.mjs --apple --update-baseline
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -18,7 +20,9 @@ test("corpus: real releases group no worse than the saved baseline", async () =>
       if (!now) continue;
       if (before.grouping && !now.grouping) worse.push(`${style} ${id}: blocks no longer match Apple's`);
       if (now.parts < before.parts) worse.push(`${style} ${id}: rows read like Apple's ${before.parts} -> ${now.parts}`);
-      if ((!before.grouping && now.grouping) || now.parts > before.parts) better++;
+      if (before.falseJoins != null && now.falseJoins > before.falseJoins)
+        worse.push(`${style} ${id}: false joins ${before.falseJoins} -> ${now.falseJoins}`);
+      if ((!before.grouping && now.grouping) || now.parts > before.parts || now.falseJoins < (before.falseJoins ?? 0)) better++;
     }
   if (better) console.log(`${better} album results improved; save them with --update-baseline.\n${summary(results).join("\n")}`);
   assert.deepEqual(worse, []);

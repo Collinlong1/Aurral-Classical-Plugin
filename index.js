@@ -36875,6 +36875,78 @@ var ClassicalResolver = class _ClassicalResolver {
   }
 };
 
+// src/model/credits.js
+var plain = (value) => String(value || "").normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+var clean = (value) => String(value || "").trim().replace(/\s+/g, " ");
+var PARTS = /\s*;\s*|\s+\/\s+|\s+[—–-]\s+/;
+var ENSEMBLE = /\b(orchestr\w*|orchester|orkest\w*|philharmoni\w*|symphon\w*|sinfoni\w*|ensemble\w*|quartet\w*|quartett\w*|quatuor|quintet\w*|trio|choir\w*|chor\w*|coro|chorus|consort\w*|singers|players|soloists|camerata|academy|academie|akademie|band|cappella|capella|kammer\w*|virtuos\w*|musici|baroque|collegium|concerto|concert|staatskapelle|gewandhaus\w*|opera|operas|oper|cellists|brass|strings|voices)\b/i;
+var LIST = /,|&|\s(?:and|und|et|e|y|with|feat\.?|featuring)\s/i;
+var NAME = /^[\p{Lu}][\p{L}'’.-]*(?:\s+(?:[\p{Lu}][\p{L}'’.-]*|van|von|der|den|de|des|da|di|du|del|della|la|le|y|zu|ten|ter|af))*$/u;
+var CATALOGUE_OWNERS = [
+  [/\bBWV\s*\d/i, "bach"],
+  [/\bBuxWV\s*\d/i, "buxtehude"],
+  [/\bSWV\s*\d/i, "schutz"],
+  [/\bTWV\s*\d/i, "telemann"],
+  [/\bHWV\s*\d/i, "handel"],
+  [/\bRV\s*\d/, "vivaldi"],
+  [/\bK(?:V|\.)?\s*\d+[a-z]?\b/, "mozart"],
+  [/\bHob\.?\s*[IVXL]+/i, "haydn"],
+  [/\bWoO\s*\d/i, "beethoven"],
+  [/\bD\.?\s*\d{2,3}[a-z]?\b/, "schubert"],
+  [/\bS\.\s*\d/, "liszt"],
+  [/\b(?:Sz\.?|BB)\s*\d/, "bartok"],
+  [/,\s*(?:L\.|CD)\s*\d/, "debussy"],
+  [/,\s*M\.\s*\d/, "ravel"],
+  [/\bWWV\s*\d/, "wagner"],
+  [/\bFP\s*\d/, "poulenc"],
+  [/\bTrV\s*\d/i, "strauss"],
+  [/\bJB\s*\d/, "smetana"],
+  [/\bTh\.?\s*\d/, "tchaikovsky"],
+  [/,\s*Z\.?\s*\d/, "purcell"]
+];
+var surnameOf = (name) => plain(name).split(" ").filter(Boolean).at(-1) || "";
+var hasWord = (text4, word) => word.length >= 3 && ` ${plain(text4)} `.includes(` ${word} `);
+function performerLike(part, albumArtists) {
+  const words3 = plain(part);
+  if (!words3) return true;
+  if (ENSEMBLE.test(part) || LIST.test(part)) return true;
+  return albumArtists.some((artist) => artist === words3 || ` ${artist} `.includes(` ${words3} `) || ` ${words3} `.includes(` ${artist} `));
+}
+function artistCredits(hints = {}, { knownComposers = null } = {}) {
+  if (Array.isArray(hints.composer) && hints.composer.length) return null;
+  const parts = clean(hints.artist).split(PARTS).map(clean).filter(Boolean);
+  if (parts.length < 2) return null;
+  const albumArtists = clean(hints.albumArtist).split(/\s*(?:;|,|&|\/|\s+(?:and|und|with)\s+)\s*/i).map(plain).filter((name) => name.length >= 3);
+  const candidates2 = parts.filter((part) => !performerLike(part, albumArtists)).filter((name) => {
+    const words3 = name.split(/\s+/);
+    return words3.length <= 5 && !/\d|:/.test(name) && NAME.test(name) && parts.filter((part) => plain(part) === plain(name)).length === 1;
+  }).map((name) => ({ name, evidence: corroboration(name, hints, knownComposers) }));
+  const backed = candidates2.filter((candidate) => candidate.evidence.length);
+  const chosen = candidates2.length === 1 ? candidates2[0] : backed.length === 1 ? backed[0] : null;
+  if (!chosen) return null;
+  return {
+    composers: [chosen.name],
+    performers: parts.filter((part) => part !== chosen.name),
+    confidence: chosen.evidence.length ? "high" : "medium",
+    evidence: chosen.evidence
+  };
+}
+function corroboration(name, hints, knownComposers) {
+  const surname2 = surnameOf(name);
+  const evidence2 = [];
+  if (hasWord(hints.album, surname2)) evidence2.push("album title");
+  if (hasWord(hints.title, surname2) || hasWord(hints.work, surname2)) evidence2.push("track title");
+  const titled = `${hints.title || ""} ${hints.work || ""}`;
+  if (CATALOGUE_OWNERS.some(([pattern, owner]) => owner === surname2 && pattern.test(titled))) evidence2.push("catalogue number");
+  if (knownComposers?.has(plain(name))) evidence2.push("known composer");
+  return evidence2;
+}
+function composersOf(hints = {}, options) {
+  if (Array.isArray(hints.composer) && hints.composer.length) return hints.composer;
+  const credit = artistCredits(hints, options);
+  return credit?.confidence === "high" ? credit.composers : [];
+}
+
 // src/model/classify-evidence.js
 var escape = (text4) => text4.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 var wordList = (terms) => new RegExp(
@@ -36908,17 +36980,17 @@ function genreKinds(genres = []) {
 }
 var TEMPO = /\b(allegr(?:o|etto)|adagi(?:o|etto)|andant(?:e|ino)|larghetto|largo|lento|grave|prestissimo|presto|vivace|moderato|scherzo|menuetto|minuet|menuet|rondo|finale|maestoso|sostenuto|cantabile)\b/i;
 var NUMBERED_TEMPO = new RegExp(`(?:^|[:;\\-\u2013\u2014]\\s*)[IVXL]{1,6}\\.\\s*${TEMPO.source.replace(/^\\b/, "")}`, "i");
-var CATALOGUE_NUMBER = /\b(op(?:us)?\.?|bwv|kv?\.?|d\.|hob\.?|rv|woo|hwv|sz\.?|twv)\s*\d/i;
+var CATALOGUE_NUMBER = /\b(op(?:us)?\.?|bwv|buxwv|swv|wwv|kv?\.?|d\.|hob\.?|rv|woo|hwv|sz\.?|twv|trv)\s*\d|,\s*(?:L\.|M\.|S\.|FP)\s*\d/i;
 var FORM = /\b(symphon(?:y|ie)|sinfonia|sonata|concerto|suite|partita|string quartet|piano trio|quintet|nocturne|mazurka|polonaise|etude|prelude|fugue|toccata|cantata|oratorio|requiem|mass in|missa|motet|madrigal|lieder|impromptu|ballade|rhapsody|overture)(?:s|es)?\b/i;
 var NAME_WORD = "\\p{Lu}[\\p{L}'\u2019.\\-]+";
 var COMPOSER_ALBUM = new RegExp(`^(?!The\\s)${NAME_WORD}(?:\\s+(?:van|von|de|da|di|du|del|der|le|la|${NAME_WORD})){0,3}:\\s`, "u");
-var plain = (value) => String(value || "").normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
-var clean = (value) => String(value || "").normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "");
+var plain2 = (value) => String(value || "").normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+var clean2 = (value) => String(value || "").normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "");
 var STRONG = /* @__PURE__ */ new Set(["classical genre", "catalogue number", "movement tag", "classical composer relation"]);
 function classificationEvidence(hints = {}) {
-  const title = clean(hints.title);
-  const work = clean(hints.work);
-  const album = clean(hints.album);
+  const title = clean2(hints.title);
+  const work = clean2(hints.work);
+  const album = clean2(hints.album);
   const ownText = [title, work].filter(Boolean).join(" \n ");
   const kinds2 = genreKinds(hints.genres);
   const signals = [];
@@ -36928,7 +37000,7 @@ function classificationEvidence(hints = {}) {
   if (hints.classicalComposerRelation) add(4, "classical composer relation");
   const catalogue = hints.catalogueNumber || (ownText + " \n " + album).match(CATALOGUE_NUMBER)?.[0];
   if (catalogue) add(3, "catalogue number", catalogue);
-  if (work && plain(work) !== plain(title)) add(3, "WORK tag", hints.work);
+  if (work && plain2(work) !== plain2(title)) add(3, "WORK tag", hints.work);
   const tempo = ownText.match(TEMPO)?.[0];
   if (!hints.movement && tempo) add(2, "tempo word in title", tempo);
   const numbered = !hints.movement && ownText.match(NUMBERED_TEMPO)?.[0];
@@ -36942,12 +37014,15 @@ function classificationEvidence(hints = {}) {
   const albumComposer = album.trim().match(COMPOSER_ALBUM)?.[0];
   if (albumComposer) add(2, "album named after a composer", albumComposer.replace(/:\s*$/, ""));
   if (hints.composerDistinct) add(1, "composer differs from artist", (hints.composer || []).join("; "));
+  const credit = artistCredits(hints);
+  if (credit?.confidence === "high") add(2, "composer named in artist field", `${credit.composers.join("; ")} (${credit.evidence.join(", ")})`);
+  else if (credit) add(1, "possible composer in artist field", credit.composers.join("; "));
   const score = signals.reduce((sum, s) => sum + s.points, 0);
   const strong = signals.filter((s) => s.kind === "strong");
   const verified = strong.filter((s) => s.signal !== "classical genre");
   const supporting = signals.filter((s) => s.kind === "supporting" && s.points > 1);
-  const hasComposer = Array.isArray(hints.composer) && hints.composer.length > 0;
-  const credited = !!hints.composerDistinct;
+  const hasComposer = Array.isArray(hints.composer) && hints.composer.length > 0 || !!credit;
+  const credited = !!hints.composerDistinct || credit?.confidence === "high";
   let decision;
   let reason;
   if (kinds2.ordinary.length) {
@@ -37248,33 +37323,38 @@ function releaseYear(date) {
 // src/model/auto-match.js
 var MULTI_MOVEMENT = /\b(symphon(?:y|ie)|sinfonia|sonata|sonatina|concerto|suite|partita|quartet|quintet|sextet|septet|octet|nonet|trio|serenade|divertimento|cassation|mass|missa|requiem|stabat mater|magnificat|te deum|vespers|cantata|oratorio|passion|variations?|ballet)\b/i;
 var COLLECTION_LIKE = /\b(etudes?|études?|preludes?|préludes?|songs?|lieder)\b/i;
-var isCollectionLike = (value) => COLLECTION_LIKE.test(clean2(value));
+var isCollectionLike = (value) => COLLECTION_LIKE.test(clean3(value));
 var MOVEMENT_PREFIX = /^(?:[IVXLCDM]+|\d+)[.)\s:-]/i;
-var clean2 = (value) => String(value || "").trim().replace(/\s+/g, " ");
-var normalized = (value) => clean2(value).normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase();
+var clean3 = (value) => String(value || "").trim().replace(/\s+/g, " ");
+var normalized = (value) => clean3(value).normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase();
 var sameCatalogue = (a, b) => {
   const number = catalogueNumber(a).toLowerCase();
   return Boolean(number) && number === catalogueNumber(b).toLowerCase();
 };
 var identity = (...values) => createHash2("sha256").update(JSON.stringify(values)).digest("hex");
-var WORK_HEAD = /^(.+?)(?:\s*[:;]|\s+[–—-])\s+(.+)$/;
+var WORK_HEAD = /^(.+?)(?:\s*[:;]\s+|\s+[–—-]\s+|:(?=["“„'‘]))(.+)$/;
 var titleHead = (title) => splitTitle(title).head;
+var COMMA_MOVEMENT = /^(.{4,}?),\s+((?:[IVXLC]+|\d{1,2})\.\s+(?!\d)\S.*)$/;
 function splitTitle(title) {
-  const match2 = clean2(title).match(WORK_HEAD);
-  return match2 ? { head: clean2(match2[1]), tail: clean2(match2[2]) } : { head: "", tail: clean2(title) };
+  const text4 = clean3(title);
+  const match2 = text4.match(WORK_HEAD);
+  const comma = text4.match(COMMA_MOVEMENT);
+  if (comma && (!match2 || comma[1].length < match2[1].length) && (catalogueNumber(comma[1]) || MULTI_MOVEMENT.test(comma[1])))
+    return { head: clean3(comma[1]), tail: clean3(comma[2]) };
+  return match2 ? { head: clean3(match2[1]), tail: clean3(match2[2]) } : { head: "", tail: text4 };
 }
 function standalonePiece(hints, workTitle) {
-  const tagged = clean2(hints.work);
-  const title = clean2(hints.title);
+  const tagged = clean3(hints.work);
+  const title = clean3(hints.title);
   if (!tagged || tagged.includes(":") || isCollectionLike(tagged) || title.includes(":")) return false;
   const head = words(workTitle);
   const text4 = words(title);
   return text4 === head || text4.startsWith(`${head} `) && splitTitle(title).head === "" && !MOVEMENT_PREFIX.test(stripWorkPrefix(title, workTitle));
 }
 function proposedWork(work, title, allowStructuredTitles) {
-  const tagged = clean2(work);
+  const tagged = clean3(work);
   if (tagged && !isCollectionLike(tagged)) {
-    const parent = clean2(tagged.split(/\s*:\s*/, 1)[0]);
+    const parent = clean3(tagged.split(/\s*:\s*/, 1)[0]);
     if (MULTI_MOVEMENT.test(parent) || catalogueNumber(parent))
       return { title: parent, evidence: "work-tag" };
   }
@@ -37294,22 +37374,24 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
     (row) => row.evidence.albumId != null && (albumId == null || String(row.evidence.albumId) === String(albumId))
   );
   const groups = /* @__PURE__ */ new Map();
+  const knownComposers = rows.length ? knownComposerNames(catalogue) : /* @__PURE__ */ new Set();
   for (const row of rows) {
     const hints = row.evidence.hints || {};
     const provider = providerMatches.get(row.id);
     const local = proposedWork(hints.work, hints.title, true);
     const proposal = provider ? {
       // The tags' own title wins when it names the same catalogue number.
-      title: local && sameCatalogue(local.title, provider.work) ? local.title : clean2(provider.work),
+      title: local && sameCatalogue(local.title, provider.work) ? local.title : clean3(provider.work),
       evidence: "musicbrainz-parent",
       identity: provider.workId,
       ...provider.standalone && { standalone: true }
     } : proposedWork(hints.work, hints.title, allowStructuredTitles);
     if (proposal && !provider && proposal.evidence === "work-tag" && standalonePiece(hints, proposal.title))
       proposal.standalone = true;
+    const credit = hints.composer?.length || provider?.composers?.length ? null : artistCredits(hints, { knownComposers });
     const composers = [
       ...new Set(
-        (hints.composer?.length ? hints.composer : provider?.composers || []).map(clean2).filter(Boolean)
+        (hints.composer?.length ? hints.composer : provider?.composers?.length ? provider.composers : credit?.composers || []).map(clean3).filter(Boolean)
       )
     ];
     const trackNumber = Number(hints.trackNumber);
@@ -37323,7 +37405,9 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
       composers.map(normalized).sort(),
       proposal.evidence,
       // Appended only for whole pieces, so earlier groups keep their keys.
-      ...proposal.standalone ? ["standalone"] : []
+      ...proposal.standalone ? ["standalone"] : [],
+      // Likewise for composers read from the artist field.
+      ...credit ? [`artist-field:${credit.confidence}`] : []
     ]);
     if (!groups.has(key))
       groups.set(key, {
@@ -37337,16 +37421,17 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
         providerAliases: provider?.aliases || [],
         composers,
         composerIds: provider?.composerIds || {},
+        composerSource: credit ? { field: "artist", confidence: credit.confidence, evidence: credit.evidence } : null,
         albumId: String(row.evidence.albumId),
-        album: clean2(hints.album),
+        album: clean3(hints.album),
         tracks: []
       });
     const group = groups.get(key);
     group.titles.set(proposal.title, (group.titles.get(proposal.title) || 0) + 1);
     group.tracks.push({
       ...row,
-      providerMovement: provider?.movement ? clean2(provider.movement) : null,
-      title: clean2(hints.title),
+      providerMovement: provider?.movement ? clean3(provider.movement) : null,
+      title: clean3(hints.title),
       discNumber,
       trackNumber
     });
@@ -37360,6 +37445,17 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
     );
     return new Set(positions).size === positions.length && new Set(group.tracks.map((track) => normalized(track.title))).size === group.tracks.length;
   });
+}
+function knownComposerNames(catalogue) {
+  const names = /* @__PURE__ */ new Set();
+  for (const { id } of catalogue.db.prepare(
+    `SELECT DISTINCT c.contributor_id AS id FROM credit c JOIN entity e ON e.id=c.contributor_id
+       WHERE c.role='composer' AND e.deleted_at IS NULL`
+  ).all()) {
+    const name = resolvedName(catalogue, id, "name");
+    if (typeof name === "string" && words(name)) names.add(words(name));
+  }
+  return names;
 }
 function existingIdentity(catalogue, recordKind, recordId) {
   return catalogue.db.prepare(
@@ -37398,11 +37494,11 @@ function movementParts(title) {
   return index ? { index, text: match2[2] } : { index: null, text: text4 };
 }
 function movementTitle(track, workTitle) {
-  const fromTitle = stripWorkPrefix(clean2(track.title), workTitle);
-  if (fromTitle !== clean2(track.title) || MOVEMENT_PREFIX.test(fromTitle)) return fromTitle;
-  const work = clean2(track.work);
+  const fromTitle = stripWorkPrefix(clean3(track.title), workTitle);
+  if (fromTitle !== clean3(track.title) || MOVEMENT_PREFIX.test(fromTitle)) return fromTitle;
+  const work = clean3(track.work);
   if (work.includes(":")) {
-    const tail = clean2(work.slice(work.indexOf(":") + 1));
+    const tail = clean3(work.slice(work.indexOf(":") + 1));
     if (tail) return stripWorkPrefix(tail, workTitle);
   }
   return fromTitle;
@@ -37410,15 +37506,18 @@ function movementTitle(track, workTitle) {
 var SEPARATOR = /[:;]\s*|\s+[–—-]\s+/g;
 var NICKNAME = /^["“„«'‘][^"”»'’]+["”»'’]\s*(?:[:;]|\s[–—-])\s*(.+)$/;
 function stripWorkPrefix(title, workTitle) {
-  const text4 = clean2(title);
+  const text4 = clean3(title);
   const separators = [...text4.matchAll(SEPARATOR)];
-  const tailAt = (match2) => clean2(text4.slice(match2.index + match2[0].length));
+  const tailAt = (match2) => clean3(text4.slice(match2.index + match2[0].length));
   for (const match2 of separators) {
     const tail = tailAt(match2);
     if (tail && MOVEMENT_PREFIX.test(tail)) return tail;
   }
   const workWords = words(workTitle);
   const workCatalogue = catalogueNumber(workTitle).toLowerCase();
+  const comma = splitTitle(text4);
+  if (comma.head && text4.startsWith(`${comma.head},`) && (workWords && words(comma.head) === workWords || workCatalogue && catalogueNumber(comma.head).toLowerCase() === workCatalogue))
+    return comma.tail;
   const workName = words(String(workTitle).split(",")[0]);
   for (const match2 of separators) {
     const head = text4.slice(0, match2.index);
@@ -37426,7 +37525,7 @@ function stripWorkPrefix(title, workTitle) {
     const headWords = words(head);
     const namesWork = workWords && (headWords === workWords || headWords.startsWith(`${workWords} `) || workWords.startsWith(`${headWords} `)) || workCatalogue && catalogueNumber(head).toLowerCase() === workCatalogue || workName.length >= 4 && words(head.split(",")[0]) === workName;
     if (!tail || !namesWork) continue;
-    return clean2(tail.match(NICKNAME)?.[1] ?? tail);
+    return clean3(tail.match(NICKNAME)?.[1] ?? tail);
   }
   return text4;
 }
@@ -37607,6 +37706,18 @@ function unassignedByAdmin(catalogue, work, albumId) {
   ).get(work, String(albumId))?.action === "editor.unassign-album";
 }
 function createGroup(catalogue, group, actor3, index) {
+  if (group.composerSource?.confidence === "medium") {
+    const tracks = [...group.tracks].sort(albumOrder);
+    catalogue.review("auto_match", tracks[0].id, {
+      reason: "uncertain-composer",
+      composers: group.composers,
+      work: group.work,
+      source: "artist field",
+      albumId: group.albumId,
+      tracks: tracks.map((t) => t.id)
+    });
+    return false;
+  }
   if (group.tracks.some((track) => track.attached))
     return extendRealization(catalogue, group, actor3);
   const metadata = new Metadata(catalogue);
@@ -37911,9 +38022,9 @@ function mergeDuplicateAutoWorks(catalogue, { actor: actor3 = null } = {}) {
 var INSTRUMENT = /\b(piano|violin|viola|cello|violoncello|double bass|flute|oboe|clarinet|bassoon|horn|trumpet|trombone|organ|harpsichord|guitar|harp|string|wind|piano and violin|violin and piano|cello and piano)\s+(?=(?:sonata|sonatina|concerto|quartet|quintet|trio|sextet|octet|suite|partita)\b)/i;
 var KEY = /\bin\s+([a-h])(?:[\s-]?(flat|sharp|♭|♯))?\s+(major|minor)\b/i;
 var CATALOGUE_TEXT = /\b(?:op(?:us|\.)?\s*\d+[a-z]?(?:\s*,?\s*no\.?\s*\d+)?|(?:BWV|HWV|RV|WoO|TWV|K(?:V|\.)?|D\.?|Hob\.?\s*[IVXL]+[a-z]?:?)\s*\d+[a-z]?)/gi;
-var tidyCatalogue = (value) => clean2(value).replace(/^op(?:us|\.)?\s*/i, "Op. ").replace(/\s*,?\s*no\.?\s*(\d)/i, " No. $1");
+var tidyCatalogue = (value) => clean3(value).replace(/^op(?:us|\.)?\s*/i, "Op. ").replace(/\s*,?\s*no\.?\s*(\d)/i, " No. $1");
 function workFieldsFromTitle(title) {
-  const text4 = clean2(title);
+  const text4 = clean3(title);
   const fields = {};
   const key = text4.match(KEY);
   if (key)
@@ -37923,7 +38034,7 @@ function workFieldsFromTitle(title) {
   const form2 = text4.match(MULTI_MOVEMENT);
   if (form2) fields.form = form2[1].toLowerCase();
   const nickname = text4.match(/["“„«]([^"”»]+)["”»]/);
-  if (nickname) fields.nickname = clean2(nickname[1]);
+  if (nickname) fields.nickname = clean3(nickname[1]);
   const instrument = text4.match(INSTRUMENT);
   if (instrument)
     fields.instrumentation = instrument[1].toLowerCase().split(/\s+and\s+/).map((name) => name[0].toUpperCase() + name.slice(1));
@@ -38180,7 +38291,7 @@ function reviewLabel(c, review) {
     case "auto_match":
       return {
         label: trackName ? `Album with \u201C${trackName}\u201D` : "Album",
-        detail: review.evidence.reason === "ambiguous-work" ? "Several works match; choose the right one" : review.evidence.reason === "ambiguous-composer" ? "Several composers share this name; choose the right one" : "Tracks didn't line up with the work's movements"
+        detail: review.evidence.reason === "ambiguous-work" ? "Several works match; choose the right one" : review.evidence.reason === "ambiguous-composer" ? "Several composers share this name; choose the right one" : review.evidence.reason === "uncertain-composer" ? `Composer read from the artist field only (${(review.evidence.composers || []).join(", ") || "unknown"}); confirm before a work is made` : "Tracks didn't line up with the work's movements"
       };
     case "identity":
       return {
@@ -40196,7 +40307,7 @@ function realizationRows(c, realizationId = null, workId = null, albumId = null)
 var words2 = (value) => String(value || "").normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 function performerOf(hints) {
   const artist = text2(hints?.artist, text2(hints?.albumArtist, ""));
-  const composers = new Set((hints?.composer || []).map(words2));
+  const composers = new Set(composersOf(hints || {}).map(words2));
   const performers = artist.split(/\s+[—–]\s+|\s*;\s*/).filter((name) => name && !composers.has(words2(name)));
   return performers.length ? performers.join(", ") : artist;
 }
@@ -40246,7 +40357,17 @@ var albumPosition = (row) => {
   const hints = evidenceOf(row).hints || {};
   return (Number(hints.discNumber) || 1) * 1e4 + (Number(hints.trackNumber) || 9999);
 };
-var ACT = /,\s*(?:act|akt|atto|acte|part|teil|scene|szene)\s+[ivxlc\d]+\b.*$/i;
+var ACT = /,\s*(?:act|akt|atto|acte|part|pt\.?|teil|scene|szene)\s*[ivxlc\d]+\b.*$/i;
+var nameBeforeComma = (title) => words2(String(title).split(",")[0]);
+function sameNamedWork(a, b) {
+  if (a === b) return true;
+  const catalogueA = catalogueNumber(a).toLowerCase();
+  const catalogueB = catalogueNumber(b).toLowerCase();
+  if (catalogueA && catalogueB) return catalogueA === catalogueB;
+  const [short, long] = a.length <= b.length ? [a, b] : [b, a];
+  const name = nameBeforeComma(long);
+  return name.length >= 4 && words2(short) === name && long.includes(",");
+}
 function pieceGroups(c, album, following) {
   const rows = c.db.prepare(
     `SELECT t.id AS track_link_id,t.core_id,t.file_id,t.evidence FROM track_link t
@@ -40264,7 +40385,7 @@ function pieceGroups(c, album, following) {
     const tail = work ? movementTitle({ title: trackTitle2(evidence2), work: workTag }, work) : split.tail;
     const head = fullHead.replace(ACT, "");
     const heading = head || tail;
-    const composer = (evidence2.hints?.composer || []).join(", ");
+    const composer = composersOf(evidence2.hints || {}).join(", ");
     const last = pieces.at(-1);
     const item = {
       id: `piece:${row.track_link_id}`,
@@ -40280,7 +40401,7 @@ function pieceGroups(c, album, following) {
       endMs: null,
       position: albumPosition(row)
     };
-    const sameWork = last && (last.title === heading || catalogueNumber(heading) && catalogueNumber(heading).toLowerCase() === catalogueNumber(last.title).toLowerCase());
+    const sameWork = last && sameNamedWork(last.title, heading);
     if (head && sameWork && last.composer === composer && following.get(last.next) === item.position)
       last.items.push(item);
     else
@@ -41565,7 +41686,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.10" : "dev";
+var VERSION = true ? "1.0.11" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js

@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { Metadata } from "./metadata.js";
 import { transaction } from "./database.js";
 import { catalogueNumber } from "../works.js";
+import { artistCredits } from "./credits.js";
 
 const MULTI_MOVEMENT =
   /\b(symphon(?:y|ie)|sinfonia|sonata|sonatina|concerto|suite|partita|quartet|quintet|sextet|septet|octet|nonet|trio|serenade|divertimento|cassation|mass|missa|requiem|stabat mater|magnificat|te deum|vespers|cantata|oratorio|passion|variations?|ballet)\b/i;
@@ -23,11 +24,23 @@ const identity = (...values) =>
 
 // The work part of a structured title: text before the first ":", ";" or
 // spaced dash. "B-flat" has no spaces, so it stays in the work.
-const WORK_HEAD = /^(.+?)(?:\s*[:;]|\s+[–—-])\s+(.+)$/;
+// A colon straight before a quote counts too ('Carmen, Act 1:"Avec la
+// garde…"'); "Hob. XVI:52" has none, so it stays whole.
+const WORK_HEAD = /^(.+?)(?:\s*[:;]\s+|\s+[–—-]\s+|:(?=["“„'‘]))(.+)$/;
 export const titleHead = (title) => splitTitle(title).head;
+// Some stores separate a numbered movement with a comma instead:
+// "Winterreise, D. 911, II. Die Wetterfahne". That counts only when the head
+// reads as a work (a catalogue number or a form such as Sonata) and the
+// comma comes before any other separator.
+// "L. 103" after the comma is a catalogue number, not movement fifty.
+const COMMA_MOVEMENT = /^(.{4,}?),\s+((?:[IVXLC]+|\d{1,2})\.\s+(?!\d)\S.*)$/;
 export function splitTitle(title) {
-  const match = clean(title).match(WORK_HEAD);
-  return match ? { head: clean(match[1]), tail: clean(match[2]) } : { head: "", tail: clean(title) };
+  const text = clean(title);
+  const match = text.match(WORK_HEAD);
+  const comma = text.match(COMMA_MOVEMENT);
+  if (comma && (!match || comma[1].length < match[1].length) && (catalogueNumber(comma[1]) || MULTI_MOVEMENT.test(comma[1])))
+    return { head: clean(comma[1]), tail: clean(comma[2]) };
+  return match ? { head: clean(match[1]), tail: clean(match[2]) } : { head: "", tail: text };
 }
 
 // A track that is a whole piece: its WORK tag names the work with no
@@ -83,6 +96,9 @@ function candidates(
         (albumId == null || String(row.evidence.albumId) === String(albumId)),
     );
   const groups = new Map();
+  // Composers the library already credits corroborate a name read from an
+  // artist field.
+  const knownComposers = rows.length ? knownComposerNames(catalogue) : new Set();
   for (const row of rows) {
     const hints = row.evidence.hints || {};
     const provider = providerMatches.get(row.id);
@@ -101,9 +117,16 @@ function candidates(
       : proposedWork(hints.work, hints.title, allowStructuredTitles);
     if (proposal && !provider && proposal.evidence === "work-tag" && standalonePiece(hints, proposal.title))
       proposal.standalone = true;
+    // No composer tag and no provider composer: an artist field such as
+    // "Bedřich Smetana; Vienna Philharmonic" may name one. Only a
+    // corroborated name makes a work; an uncorroborated one goes to review.
+    const credit =
+      hints.composer?.length || provider?.composers?.length
+        ? null
+        : artistCredits(hints, { knownComposers });
     const composers = [
       ...new Set(
-        (hints.composer?.length ? hints.composer : provider?.composers || [])
+        (hints.composer?.length ? hints.composer : provider?.composers?.length ? provider.composers : credit?.composers || [])
           .map(clean)
           .filter(Boolean),
       ),
@@ -125,6 +148,8 @@ function candidates(
       proposal.evidence,
       // Appended only for whole pieces, so earlier groups keep their keys.
       ...(proposal.standalone ? ["standalone"] : []),
+      // Likewise for composers read from the artist field.
+      ...(credit ? [`artist-field:${credit.confidence}`] : []),
     ]);
     if (!groups.has(key))
       groups.set(key, {
@@ -138,6 +163,7 @@ function candidates(
         providerAliases: provider?.aliases || [],
         composers,
         composerIds: provider?.composerIds || {},
+        composerSource: credit ? { field: "artist", confidence: credit.confidence, evidence: credit.evidence } : null,
         albumId: String(row.evidence.albumId),
         album: clean(hints.album),
         tracks: [],
@@ -167,6 +193,20 @@ function candidates(
         group.tracks.length
     );
   });
+}
+
+function knownComposerNames(catalogue) {
+  const names = new Set();
+  for (const { id } of catalogue.db
+    .prepare(
+      `SELECT DISTINCT c.contributor_id AS id FROM credit c JOIN entity e ON e.id=c.contributor_id
+       WHERE c.role='composer' AND e.deleted_at IS NULL`,
+    )
+    .all()) {
+    const name = resolvedName(catalogue, id, "name");
+    if (typeof name === "string" && words(name)) names.add(words(name));
+  }
+  return names;
 }
 
 function existingIdentity(catalogue, recordKind, recordId) {
@@ -251,6 +291,11 @@ export function stripWorkPrefix(title, workTitle) {
   }
   const workWords = words(workTitle);
   const workCatalogue = catalogueNumber(workTitle).toLowerCase();
+  // "Winterreise, D. 911, II. Die Wetterfahne" under "Winterreise, D. 911".
+  const comma = splitTitle(text);
+  if (comma.head && text.startsWith(`${comma.head},`) &&
+    ((workWords && words(comma.head) === workWords) || (workCatalogue && catalogueNumber(comma.head).toLowerCase() === workCatalogue)))
+    return comma.tail;
   // "Iberia, T. 105 / Book 4" names "Iberia, B. 47": same name before the comma.
   const workName = words(String(workTitle).split(",")[0]);
   for (const match of separators) {
@@ -522,6 +567,20 @@ function unassignedByAdmin(catalogue, work, albumId) {
 }
 
 function createGroup(catalogue, group, actor, index) {
+  // A composer read from the artist field with nothing to back it up: an
+  // admin confirms before any work is made.
+  if (group.composerSource?.confidence === "medium") {
+    const tracks = [...group.tracks].sort(albumOrder);
+    catalogue.review("auto_match", tracks[0].id, {
+      reason: "uncertain-composer",
+      composers: group.composers,
+      work: group.work,
+      source: "artist field",
+      albumId: group.albumId,
+      tracks: tracks.map((t) => t.id),
+    });
+    return false;
+  }
   if (group.tracks.some((track) => track.attached))
     return extendRealization(catalogue, group, actor);
   const metadata = new Metadata(catalogue);
