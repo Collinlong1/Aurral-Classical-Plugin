@@ -299,6 +299,48 @@ test("#15 tracks marked Not classical are skipped when creating a work, and Skip
   assert.equal((await s.mutate("create-work-from-album", { albumId: "B", tracks: [b[1]], include: [], title: "Nothing", composer: "", composerName: "" }, "album:B")).ok, false);
 });
 
+test("#7 an ambiguous match queues a review and creates no work or composer", async (t) => {
+  const s = await setup(t);
+  // Two same-key works already exist (say, an admin kept them apart on purpose).
+  const first = (await s.ok("create-work", { title: "Symphony No. 5 in C minor, Op. 67", composer: "", movements: titles })).selection;
+  const second = (await s.ok("create-work", { title: "Symphony No. 5 in C minor, Op. 67", composer: "", movements: titles })).selection;
+  const beethoven = (await s.ok("create-contributor", { name: "Ludwig van Beethoven", kind: "person" })).selection;
+  for (const work of [first, second]) await s.ok("add-credit", { target: work, contributor: beethoven, role: "composer", instrument: "" }, work);
+  const count = (kind) => s.c.db.prepare("SELECT count(*) AS n FROM entity WHERE kind=? AND deleted_at IS NULL").get(kind).n;
+  const before = { works: count("work"), people: count("person") };
+  assert.equal(autoMatchTaggedWorks(s.c, { albumId: "A", allowStructuredTitles: true }).created, 0);
+  assert.deepEqual({ works: count("work"), people: count("person") }, before);
+  const review = s.c.db.prepare("SELECT * FROM review_item WHERE kind='auto_match' AND status='open'").get();
+  assert.deepEqual(JSON.parse(review.evidence).candidates.sort(), [first, second].sort());
+  // Rescans don't pile up duplicates either.
+  autoMatchTaggedWorks(s.c, { albumId: "A", allowStructuredTitles: true });
+  assert.equal(count("work"), before.works);
+  // The review names the choice and links each candidate; assigning resolves it.
+  const items = (await s.read({ tab: "review" })).list.items;
+  const view = (await s.read({ selection: items[0].selection })).view;
+  assert.match(view.subtitle, /Several works match/);
+  assert.deepEqual(view.actions.filter((a) => a.label.startsWith("Open “Symphony")).map((a) => a.arguments.selection).sort(), [first, second].sort());
+  const chosen = await s.ok("choose-album-work", { albumId: "A", work: first }, "album:A");
+  const assign = section((await s.read({ selection: chosen.selection })).view, "assign");
+  await s.ok("assign-album", { ...assign.arguments, mapping: assign.fields[0].value }, chosen.selection);
+  assert.equal(s.c.db.prepare("SELECT status FROM review_item WHERE id=?").get(review.id).status, "resolved");
+});
+
+test("#7 a composer name several people share queues a review instead of adding another", async (t) => {
+  const s = await setup(t);
+  // Two different people the admin keeps apart, both credited as composers.
+  for (const title of ["Sketch 1", "Sketch 2"]) {
+    const work = (await s.ok("create-work", { title, composer: "", movements: [] })).selection;
+    const person = (await s.ok("create-contributor", { name: "Ludwig van Beethoven", kind: "person" })).selection;
+    await s.ok("add-credit", { target: work, contributor: person, role: "composer", instrument: "" }, work);
+  }
+  const people = s.c.db.prepare("SELECT count(*) AS n FROM entity WHERE kind='person' AND deleted_at IS NULL").get().n;
+  assert.equal(autoMatchTaggedWorks(s.c, { albumId: "A", allowStructuredTitles: true }).created, 0);
+  assert.equal(s.c.db.prepare("SELECT count(*) AS n FROM entity WHERE kind='person' AND deleted_at IS NULL").get().n, people);
+  const review = s.c.db.prepare("SELECT evidence FROM review_item WHERE kind='auto_match' AND status='open'").get();
+  assert.equal(JSON.parse(review.evidence).reason, "ambiguous-composer");
+});
+
 test("v1 hosts still get the v1 editor", async (t) => {
   const s = await setup(t);
   const folders = await tempFolders();

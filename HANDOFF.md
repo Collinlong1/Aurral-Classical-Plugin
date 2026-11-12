@@ -1,3 +1,12 @@
+# v0.1 bug-fix scope — matching fixes #7 and #9
+
+Same day, at the user's request (“Keep going with #7 and #9”). Plugin-only; core, schema and media unchanged.
+
+- **#7 Duplicate creation on ambiguity.** When more than one existing work matched an album, auto-match created yet another work, re-pointed its index at that new copy (so later albums landed there too) and only then opened a review. It now opens an `auto_match` review (`ambiguous-work`, listing the candidates) and creates nothing. A composer name shared by several existing people likewise queues `ambiguous-composer` instead of adding another person. The review page links each candidate; assigning the album from the editor resolves the review.
+- **#9 Metadata erased on parse failure.** When the tag parser rejected a file, the scan replaced its evidence with empty tags, wiping composer, WORK, MusicBrainz IDs and genres (and with them classification and matching). The scan now keeps the evidence an earlier scan read, marked `tagsUnreadable`, unless the audio hash shows different audio; host title/artist/album fill only fields the tags never had.
+
+Validation: 224/224 plugin tests including both corpora; 3 new regressions confirmed to fail on the previous source. Integration CI and real-library scan not run here. Still open from the scope: #5, #8, #10, #20 (beyond the ambiguity guard), #21, #22, #6, #11, #16, #4, #12.
+
 # v0.1 bug-fix scope — data-integrity fixes (#1, #2, #3, #15)
 
 November 12, 2026. The user asked to work from the *Aurral Classical — v0.1 Bug-Fix Scope* document. This pass fixes its data-integrity group only; the matching/metadata, editor/review, integration (#4) and README (#12) items remain open. Plugin-only; core, schema and media are unchanged.

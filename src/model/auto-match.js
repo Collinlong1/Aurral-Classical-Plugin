@@ -482,6 +482,17 @@ function createGroup(catalogue, group, actor, index) {
     const known = providerWork
       ? [providerWork]
       : index.works.get(workKey(group.work, group.composers)) || [];
+    // Several works fit: an admin picks one. Creating another would only add
+    // a third copy for the next album to land on.
+    if (known.length > 1) {
+      catalogue.review("auto_match", ordered[0].id, {
+        reason: "ambiguous-work",
+        candidates: known,
+        albumId: group.albumId,
+        tracks: ordered.map((t) => t.id),
+      });
+      return false;
+    }
     let work = known.length === 1 ? known[0] : null;
     let movements = null;
     // An admin took this album out of this work; a rescan must not put it back.
@@ -502,6 +513,18 @@ function createGroup(catalogue, group, actor, index) {
         return false;
       }
     } else {
+      // Same for a composer name several people share.
+      const ambiguous = group.composers.filter((name) => (index.people.get(words(name)) || []).length > 1);
+      if (ambiguous.length) {
+        catalogue.review("auto_match", ordered[0].id, {
+          reason: "ambiguous-composer",
+          composers: ambiguous,
+          candidates: ambiguous.flatMap((name) => index.people.get(words(name))),
+          albumId: group.albumId,
+          tracks: ordered.map((t) => t.id),
+        });
+        return false;
+      }
       work = catalogue.createEntity("work");
       metadata.derived(work, "title", group.work);
       group.composers.forEach((name, i) =>
@@ -523,8 +546,6 @@ function createGroup(catalogue, group, actor, index) {
           { evidence: { source: "parent-work" } },
         );
       index.works.set(workKey(group.work, group.composers), [work]);
-      if (known.length > 1)
-        catalogue.review("identity", work, { reason: "ambiguous-work", key });
     }
     if (!movements)
       movements = ordered.map((track, i) => {

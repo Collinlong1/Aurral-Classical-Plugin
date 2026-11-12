@@ -9,7 +9,7 @@ import { readTags } from "../tags.js";
 import { autoMatchTaggedWorks, isCollectionLike } from "./auto-match.js";
 import { topWork } from "../works.js";
 import { ClassicalResolver, isLatin } from "../resolver.js";
-import { fingerprint } from "./fingerprint.js";
+import { fingerprint, tagSensitive } from "./fingerprint.js";
 
 // A work's English title, as artist names pick theirs: a primary English
 // alias, or any English alias when MusicBrainz's title isn't Latin script.
@@ -45,9 +45,14 @@ const readModelTags = (file) => {
     // parsing rejects an owned file (unsupported format, malformed header,
     // or an unusual encoder), keep it searchable from the host's trusted
     // metadata instead of failing an otherwise read-only model scan.
-    return emptyTags();
+    return null;
   }
 };
+// Tags read on an earlier scan still describe this file unless its audio
+// hash proves the audio itself changed. (A whole-file hash changes with any
+// tag edit, so a mismatch there proves nothing.)
+const sameAudio = (prior, hash) =>
+  prior.fingerprint === hash || (tagSensitive(prior.fingerprint) && tagSensitive(hash));
 export async function modelStatus(ctx) {
   const catalogue = await openCatalogue(modelFolder(ctx));
   try {
@@ -238,7 +243,8 @@ async function scanFile(file, root, prior) {
     prior.mtimeMs === before.mtimeMs &&
     prior.ino === before.ino;
   const hash = unchanged ? prior.fingerprint : await fingerprint(real);
-  const tags = readModelTags(real);
+  const parsed = readModelTags(real);
+  const tags = parsed || emptyTags();
   const after = await fs.stat(real);
   if (
     before.size !== after.size ||
@@ -246,9 +252,29 @@ async function scanFile(file, root, prior) {
     before.ino !== after.ino
   )
     throw new Error("Library file changed during model scan; retry required");
-  const durationMs = tags.durationMs || file.durationMs;
+  // The parser rejected the file this time: keep what it read before rather
+  // than erasing composer, WORK, MusicBrainz and genre evidence.
+  const kept = !parsed && prior?.hints && sameAudio(prior, hash) ? prior : null;
+  const durationMs = tags.durationMs || file.durationMs || kept?.durationMs;
   if (!Number.isSafeInteger(durationMs) || durationMs <= 0)
     throw new Error("Missing track duration");
+  if (kept)
+    return {
+      ...file,
+      observedRealPath: real,
+      size: after.size,
+      mtimeMs: after.mtimeMs,
+      ino: after.ino,
+      durationMs,
+      fingerprint: hash,
+      hints: {
+        ...kept.hints,
+        title: kept.hints.title || file.title || "",
+        album: kept.hints.album || file.album || "",
+        artist: kept.hints.artist || file.artist || "",
+        tagsUnreadable: true,
+      },
+    };
   return {
     ...file,
     observedRealPath: real,

@@ -1187,6 +1187,79 @@ test("read-only model scans survive a tag parser rejecting an owned MPEG file", 
   assert.equal((await fs.stat(file)).mode & 0o777, 0o444);
 });
 
+test("#9 a rescan that can't parse a file keeps the tag evidence an earlier scan read", async (t) => {
+  const folders = await tempFolders();
+  t.after(() => fs.rm(folders.root, { recursive: true, force: true }));
+  const file = path.join(folders.libraryFolder, "unusual.mp3");
+  await fs.writeFile(file, "host-readable fixture with no MPEG audio header");
+  await fs.chmod(file, 0o444);
+  const ctx = {
+    ...folders,
+    settings: {},
+    userOperations: { version: 1, url: "http://host.test/ops", token: "test-only" },
+    fetch: async () =>
+      response({
+        version: 1,
+        complete: true,
+        library: {
+          tracks: [
+            {
+              id: 18,
+              title: "Host title",
+              artistName: "Host artist",
+              durationMs: 3000,
+              files: [{ id: 81, path: file, albumId: 10, durationMs: 3000, available: true }],
+            },
+          ],
+        },
+      }),
+  };
+  const scan = async () => {
+    await enqueueModelScan(ctx, { id: 1, role: "admin" });
+    await runModelJobs(ctx, { budgetMs: 10000 });
+    assert.equal((await modelStatus(ctx)).scan.state, "done");
+  };
+  const stored = async (change) => {
+    const catalogue = await openCatalogue(path.join(folders.dataFolder, "model"));
+    try {
+      const row = catalogue.db.prepare("SELECT id,evidence FROM track_link WHERE state='active'").get();
+      const evidence = JSON.parse(row.evidence);
+      if (change) {
+        change(evidence);
+        catalogue.db.prepare("UPDATE track_link SET evidence=? WHERE id=?").run(JSON.stringify(evidence), row.id);
+      }
+      return { evidence, state: catalogue.db.prepare("SELECT state FROM classification WHERE target_id=?").get(row.id)?.state };
+    } finally {
+      catalogue.close();
+    }
+  };
+  await scan();
+  // As if an earlier parser had read this file's tags successfully.
+  const tags = {
+    title: "Symphony No. 5 in C minor, Op. 67: I. Allegro con brio",
+    composer: ["Ludwig van Beethoven"],
+    work: "Symphony No. 5 in C minor, Op. 67",
+    workId: "mb-work-5",
+    recordingMbid: "mb-recording-1",
+    genres: ["Classical"],
+    composerDistinct: true,
+  };
+  await stored((evidence) => Object.assign(evidence.hints, tags));
+  await scan();
+  const { evidence, state } = await stored();
+  for (const [key, value] of Object.entries(tags)) assert.deepEqual(evidence.hints[key], value, key);
+  assert.equal(evidence.hints.tagsUnreadable, true);
+  assert.equal(evidence.hints.artist, "Host artist", "host metadata fills fields the tags never had");
+  assert.equal(state, "classical", "classification still sees the retained evidence");
+  // Different audio under the same host IDs gets no inherited tags.
+  await stored((evidence) => {
+    evidence.fingerprint = "audio-sha256-v2:other-audio";
+    evidence.mtimeMs = 1; // force a rehash, which no longer matches that audio
+  });
+  await scan();
+  assert.deepEqual((await stored()).evidence.hints.composer, []);
+});
+
 test("an explicit scan resumes failed saved progress after a reader fix", async (t) => {
   const folders = await tempFolders();
   t.after(() => fs.rm(folders.root, { recursive: true, force: true }));

@@ -213,7 +213,15 @@ function reviewLabel(c, review) {
     case "classification":
       return { label: trackName || "Track", detail: "Unsure whether this is classical" };
     case "auto_match":
-      return { label: trackName ? `Album with “${trackName}”` : "Album", detail: "Tracks didn't line up with the work's movements" };
+      return {
+        label: trackName ? `Album with “${trackName}”` : "Album",
+        detail:
+          review.evidence.reason === "ambiguous-work"
+            ? "Several works match; choose the right one"
+            : review.evidence.reason === "ambiguous-composer"
+              ? "Several composers share this name; choose the right one"
+              : "Tracks didn't line up with the work's movements",
+      };
     case "identity":
       return {
         label: labelOf(c, review.target_id) || "Catalogue entry",
@@ -847,6 +855,9 @@ function reviewView(c, id) {
   if (evidence?.albumId != null) actions.push(open("Open album", `album:${evidence.albumId}`));
   if (entity) actions.push(open("Open entry", review.target_id));
   if (review.evidence.keep) actions.push(open("Open the other work", review.evidence.keep));
+  for (const candidate of (Array.isArray(review.evidence.candidates) ? review.evidence.candidates : []).slice(0, 5))
+    if (c.db.prepare("SELECT 1 FROM entity WHERE id=? AND deleted_at IS NULL").get(candidate))
+      actions.push(open(`Open “${labelOf(c, candidate) || "candidate"}”`.slice(0, 100), candidate));
   actions.push(action("Dismiss", "resolve-review", { id }));
   const items = [];
   if (evidence)
@@ -1139,6 +1150,9 @@ function assignTracks(c, m, who, work, tracks, mapping) {
     c.realizationItem(realization, segment, { movement: movement === "whole" ? null : movement, sequence: index + 1 });
     if (classification(c, track).state !== "classical") classify(c, track, {}, { manual: "classical", actor: who });
   });
+  // The admin grouped these tracks, which answers any open match question about them.
+  for (const { track } of chosen)
+    c.db.prepare("UPDATE review_item SET status='resolved' WHERE kind='auto_match' AND status='open' AND target_id=?").run(track);
   return chosen.length;
 }
 

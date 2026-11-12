@@ -36798,6 +36798,15 @@ function createGroup(catalogue, group, actor3, index) {
            AND x.state='active' AND e.deleted_at IS NULL`
     ).get(group.providerWorkId)?.entity_id;
     const known = providerWork ? [providerWork] : index.works.get(workKey(group.work, group.composers)) || [];
+    if (known.length > 1) {
+      catalogue.review("auto_match", ordered[0].id, {
+        reason: "ambiguous-work",
+        candidates: known,
+        albumId: group.albumId,
+        tracks: ordered.map((t) => t.id)
+      });
+      return false;
+    }
     let work = known.length === 1 ? known[0] : null;
     let movements = null;
     if (work && unassignedByAdmin(catalogue, work, group.albumId)) return false;
@@ -36814,6 +36823,17 @@ function createGroup(catalogue, group, actor3, index) {
         return false;
       }
     } else {
+      const ambiguous = group.composers.filter((name) => (index.people.get(words(name)) || []).length > 1);
+      if (ambiguous.length) {
+        catalogue.review("auto_match", ordered[0].id, {
+          reason: "ambiguous-composer",
+          composers: ambiguous,
+          candidates: ambiguous.flatMap((name) => index.people.get(words(name))),
+          albumId: group.albumId,
+          tracks: ordered.map((t) => t.id)
+        });
+        return false;
+      }
       work = catalogue.createEntity("work");
       metadata.derived(work, "title", group.work);
       group.composers.forEach(
@@ -36835,8 +36855,6 @@ function createGroup(catalogue, group, actor3, index) {
           { evidence: { source: "parent-work" } }
         );
       index.works.set(workKey(group.work, group.composers), [work]);
-      if (known.length > 1)
-        catalogue.review("identity", work, { reason: "ambiguous-work", key });
     }
     if (!movements)
       movements = ordered.map((track, i) => {
@@ -37304,7 +37322,10 @@ function reviewLabel(c, review) {
     case "classification":
       return { label: trackName || "Track", detail: "Unsure whether this is classical" };
     case "auto_match":
-      return { label: trackName ? `Album with \u201C${trackName}\u201D` : "Album", detail: "Tracks didn't line up with the work's movements" };
+      return {
+        label: trackName ? `Album with \u201C${trackName}\u201D` : "Album",
+        detail: review.evidence.reason === "ambiguous-work" ? "Several works match; choose the right one" : review.evidence.reason === "ambiguous-composer" ? "Several composers share this name; choose the right one" : "Tracks didn't line up with the work's movements"
+      };
     case "identity":
       return {
         label: labelOf(c, review.target_id) || "Catalogue entry",
@@ -37864,6 +37885,9 @@ function reviewView(c, id) {
   if (evidence2?.albumId != null) actions.push(open("Open album", `album:${evidence2.albumId}`));
   if (entity) actions.push(open("Open entry", review.target_id));
   if (review.evidence.keep) actions.push(open("Open the other work", review.evidence.keep));
+  for (const candidate of (Array.isArray(review.evidence.candidates) ? review.evidence.candidates : []).slice(0, 5))
+    if (c.db.prepare("SELECT 1 FROM entity WHERE id=? AND deleted_at IS NULL").get(candidate))
+      actions.push(open(`Open \u201C${labelOf(c, candidate) || "candidate"}\u201D`.slice(0, 100), candidate));
   actions.push(action("Dismiss", "resolve-review", { id }));
   const items = [];
   if (evidence2)
@@ -38108,6 +38132,8 @@ function assignTracks(c, m, who, work, tracks, mapping) {
     c.realizationItem(realization, segment, { movement: movement === "whole" ? null : movement, sequence: index + 1 });
     if (classification(c, track).state !== "classical") classify(c, track, {}, { manual: "classical", actor: who });
   });
+  for (const { track } of chosen)
+    c.db.prepare("UPDATE review_item SET status='resolved' WHERE kind='auto_match' AND status='open' AND target_id=?").run(track);
   return chosen.length;
 }
 function applyV2(c, request, who) {
@@ -40497,9 +40523,10 @@ var readModelTags = (file) => {
   try {
     return readTags(file);
   } catch {
-    return emptyTags();
+    return null;
   }
 };
+var sameAudio2 = (prior, hash) => prior.fingerprint === hash || tagSensitive(prior.fingerprint) && tagSensitive(hash);
 async function modelStatus(ctx) {
   const catalogue = await openCatalogue(modelFolder(ctx));
   try {
@@ -40642,13 +40669,32 @@ async function scanFile(file, root, prior) {
   const before = await fs4.stat(real);
   const unchanged = prior?.fingerprint && prior.observedRealPath === real && prior.size === before.size && prior.mtimeMs === before.mtimeMs && prior.ino === before.ino;
   const hash = unchanged ? prior.fingerprint : await fingerprint(real);
-  const tags = readModelTags(real);
+  const parsed = readModelTags(real);
+  const tags = parsed || emptyTags();
   const after = await fs4.stat(real);
   if (before.size !== after.size || before.mtimeMs !== after.mtimeMs || before.ino !== after.ino)
     throw new Error("Library file changed during model scan; retry required");
-  const durationMs = tags.durationMs || file.durationMs;
+  const kept = !parsed && prior?.hints && sameAudio2(prior, hash) ? prior : null;
+  const durationMs = tags.durationMs || file.durationMs || kept?.durationMs;
   if (!Number.isSafeInteger(durationMs) || durationMs <= 0)
     throw new Error("Missing track duration");
+  if (kept)
+    return {
+      ...file,
+      observedRealPath: real,
+      size: after.size,
+      mtimeMs: after.mtimeMs,
+      ino: after.ino,
+      durationMs,
+      fingerprint: hash,
+      hints: {
+        ...kept.hints,
+        title: kept.hints.title || file.title || "",
+        album: kept.hints.album || file.album || "",
+        artist: kept.hints.artist || file.artist || "",
+        tagsUnreadable: true
+      }
+    };
   return {
     ...file,
     observedRealPath: real,
