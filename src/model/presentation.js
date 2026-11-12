@@ -145,6 +145,23 @@ function sameNamedWork(a, b) {
   return name.length >= 4 && words(short) === name && long.includes(",");
 }
 
+// The same people in any order credit the same piece. One catalogue number
+// is one work even when its movements credit different completers, as long
+// as a composer runs through all of them.
+function sameCredits(last, heading, names) {
+  const these = new Set(names.map(words));
+  if (last.names.length === these.size && last.names.every((name) => these.has(name))) return true;
+  const shared = last.names.filter((name) => these.has(name));
+  const same = shared.length > 0 && Boolean(catalogueNumber(last.title)) && catalogueNumber(last.title) === catalogueNumber(heading);
+  // Later movements must share the composer every earlier one named, and
+  // the heading names only those.
+  if (same) {
+    last.composer = last.credited.filter((name) => shared.includes(words(name))).join(", ");
+    last.names = shared;
+  }
+  return same;
+}
+
 // Classical tracks outside every work become pieces, as Apple Music
 // Classical shows a recital: neighbouring tracks of one set share a block
 // headed by the set ("Études, Book 1"), and a lone piece heads itself.
@@ -173,7 +190,8 @@ function pieceGroups(c, album, following) {
     // "La traviata", the way Apple Music Classical shows it.
     const head = fullHead.replace(ACT, "");
     const heading = head || tail;
-    const composer = composersOf(evidence.hints || {}).join(", ");
+    const names = composersOf(evidence.hints || {});
+    const composer = names.join(", ");
     const last = pieces.at(-1);
     const item = {
       id: `piece:${row.track_link_id}`,
@@ -192,13 +210,13 @@ function pieceGroups(c, album, following) {
     // Neighbours of one work share a block, even spelled differently
     // ("Theme by Paganini, Op. 43" and "Theme of Paganini, Op. 43").
     const sameWork = last && sameNamedWork(last.title, heading);
-    if (head && sameWork && last.composer === composer && following.get(last.next) === item.position)
+    if (head && sameWork && sameCredits(last, heading, names) && following.get(last.next) === item.position)
       last.items.push(item);
     else
-      pieces.push({ id: item.id, workId: null, title: heading, composer, items: [item], missing: [] });
+      pieces.push({ id: item.id, workId: null, title: heading, composer, names: names.map(words), credited: names, items: [item], missing: [] });
     pieces.at(-1).next = item.position;
   }
-  return pieces.map(({ next, items, ...piece }) => ({
+  return pieces.map(({ next, names, credited, items, ...piece }) => ({
     ...piece,
     first: items[0].position,
     items: items.map(({ position, ...item }) => item),

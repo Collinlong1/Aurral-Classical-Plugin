@@ -109,7 +109,7 @@ async function catalogueWith(t, albums) {
   });
   c.db.prepare("INSERT INTO core_instance VALUES ('i','e',0)").run();
   const tracks = albums.flatMap(({ id, album, albumArtist, artist, titles }) =>
-    titles.map((title, i) => ({
+    titles.map((entry, i) => ({
       coreId: `${id}-${i}`,
       fileId: `${id}-${i}`,
       path: `/library/${id}/${i}.flac`,
@@ -117,7 +117,8 @@ async function catalogueWith(t, albums) {
       durationMs: 60000,
       fingerprint: `audio-sha256-v2:${id}-${i}`,
       albumId: id,
-      hints: { title, album, albumArtist, artist, composer: [], genres: [], work: "", trackNumber: i + 1, discNumber: 1 },
+      // A title, or a title with its own tags.
+      hints: { album, albumArtist, artist, composer: [], genres: [], work: "", trackNumber: i + 1, discNumber: 1, ...(typeof entry === "string" ? { title: entry } : entry) },
     })),
   );
   for (const row of reconcile(c, { version: 1, complete: true, instanceId: "i", epoch: "e", generation: 1, tracks }))
@@ -180,4 +181,141 @@ test("album page: an opera heads as one work with or without its catalogue numbe
   assert.equal(tristan.groups[0].composer, "Richard Wagner");
   // Two different books of études: two blocks (no view by work needed).
   assert.equal(renderAlbumPresentation(c, "ligeti"), null);
+});
+
+test("matching: a work whose movements credit different completers is one work", async (t) => {
+  const mozart = "Wolfgang Amadeus Mozart";
+  const movements = [
+    ["Introitus", [mozart, "Franz Xaver Süßmayr"]],
+    ["Kyrie", [mozart, "Franz Xaver Süßmayr"]],
+    ["Dies irae", [mozart, "Joseph Eybler"]],
+    ["Tuba mirum", [mozart, "Joseph Eybler"]],
+    ["Rex tremendae", [mozart, "Joseph Eybler"]],
+    ["Recordare", [mozart, "Joseph Eybler"]],
+    ["Confutatis", [mozart, "Joseph Eybler", "Franz Xaver Süßmayr"]],
+    ["Lacrimosa", [mozart, "Franz Xaver Süßmayr", "Joseph Eybler"]],
+  ];
+  const c = await catalogueWith(t, [
+    {
+      id: "history",
+      album: "The History of Classical Music, Part 2",
+      albumArtist: "Various Artists",
+      artist: "Various Artists",
+      titles: movements.map(([name, composer]) => ({ title: `Requiem in D minor, K 626: ${name}`, composer })),
+    },
+    {
+      id: "unmatched",
+      album: "Requiem",
+      albumArtist: "Choir",
+      artist: "Choir",
+      titles: movements.map(([name, composer]) => ({ title: `Requiem in D minor, K 626: ${name}`, composer })),
+    },
+  ]);
+  // Before any match, the album page shows one block too, whatever order
+  // the names come in.
+  assert.deepEqual(
+    renderAlbumPresentation(c, "unmatched").groups.map((group) => [group.composer, group.items.length, group.detail]),
+    [[mozart, 8, "Not matched to a work"]],
+  );
+  autoMatchTaggedWorks(c, { albumId: "history", actor: "admin", allowStructuredTitles: true });
+  const works = c.db.prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL").all();
+  assert.equal(works.length, 1);
+  const page = renderAlbumPresentation(c, "history");
+  assert.deepEqual(page.groups.map((group) => [group.composer, group.items.length]), [[mozart, 8]]);
+  // The completers stay credited, on the movements that name them.
+  const credited = (name) =>
+    c.db
+      .prepare(
+        `SELECT COUNT(*) AS n FROM credit cr JOIN entity r ON r.id=cr.target_id AND r.kind='recording'
+         JOIN field_resolution f ON f.target_id=cr.contributor_id AND f.field='name'
+         JOIN assertion a ON a.id=f.assertion_id WHERE cr.role='composer' AND a.value=?`,
+      )
+      .get(JSON.stringify(name)).n;
+  assert.equal(credited("Franz Xaver Süßmayr"), 4);
+  assert.equal(credited("Joseph Eybler"), 6);
+  // Matching again changes nothing.
+  assert.equal(autoMatchTaggedWorks(c, { albumId: "history", actor: "admin", allowStructuredTitles: true }).created, 0);
+});
+
+test("matching: a completer split made by earlier matching is repaired, keeping favourites and picks", async (t) => {
+  const mozart = "Wolfgang Amadeus Mozart";
+  const credits = [
+    [mozart, "Franz Xaver Süßmayr"],
+    [mozart, "Franz Xaver Süßmayr"],
+    [mozart, "Joseph Eybler"],
+    [mozart, "Joseph Eybler"],
+    [mozart, "Joseph Eybler", "Franz Xaver Süßmayr"],
+    [mozart, "Franz Xaver Süßmayr", "Joseph Eybler"],
+  ];
+  const names = ["Introitus", "Kyrie", "Dies irae", "Tuba mirum", "Confutatis", "Lacrimosa"];
+  const c = await catalogueWith(t, [
+    {
+      id: "split",
+      album: "Requiem",
+      albumArtist: "Choir",
+      artist: "Choir",
+      titles: names.map((name, i) => ({ title: `Requiem in D minor, K 626: ${name}`, composer: credits[i] })),
+    },
+  ]);
+  // Earlier matching made one work per credit combination. Reproduce it by
+  // matching each combination's tracks on their own, with the works made so
+  // far marked as edited, which the repair leaves alone.
+  const tracks = c.db.prepare("SELECT id FROM track_link ORDER BY json_extract(evidence,'$.hints.trackNumber')").all().map((row) => row.id);
+  const only = (indexes) =>
+    tracks.forEach((id, i) => c.db.prepare("UPDATE classification SET state=? WHERE target_id=?").run(indexes.includes(i) ? "classical" : "not_classical", id));
+  const live = () => c.db.prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL ORDER BY rowid").all().map((row) => row.id);
+  const edited = (source) =>
+    live().forEach((work) => c.db.prepare("UPDATE assertion SET source=? WHERE target_id=? AND field='title'").run(source, work));
+  for (const part of [[0, 1], [2, 3], [4, 5]]) {
+    only(part);
+    autoMatchTaggedWorks(c, { albumId: "split", actor: "admin", allowStructuredTitles: true });
+    edited("manual");
+  }
+  only([0, 1, 2, 3, 4, 5]);
+  const [first, second, third] = live();
+  assert.equal(live().length, 3);
+  const realizationOf = (work) => c.db.prepare("SELECT id FROM realization WHERE work_id=?").get(work).id;
+  c.db.prepare("INSERT INTO user_work_state VALUES (7,?,1,?,?)").run(third, realizationOf(third), Date.now());
+  c.db.prepare("INSERT INTO admin_work_pick VALUES (?,?,1,?)").run(second, realizationOf(second), Date.now());
+  // Edited works are left alone.
+  autoMatchTaggedWorks(c, { albumId: "split", actor: "admin", allowStructuredTitles: true });
+  assert.equal(live().length, 3);
+  edited("derived");
+
+  autoMatchTaggedWorks(c, { albumId: "split", actor: "admin", allowStructuredTitles: true });
+  assert.deepEqual(live(), [first]);
+  const page = renderAlbumPresentation(c, "split");
+  assert.deepEqual(
+    page.groups.map((group) => [group.workId, group.composer, group.items.map((item) => item.title)]),
+    [[first, mozart, names]],
+  );
+  const kept = realizationOf(first);
+  assert.deepEqual({ ...c.db.prepare("SELECT favourite,picked_realization_id FROM user_work_state WHERE user_id=7 AND work_id=?").get(first) }, { favourite: 1, picked_realization_id: kept });
+  assert.equal(c.db.prepare("SELECT realization_id FROM admin_work_pick WHERE work_id=?").get(first).realization_id, kept);
+});
+
+test("matching: a set WORK names is one work per catalogue number in its titles", async (t) => {
+  const liszt = ["Franz Liszt"];
+  const book = (id, work, titles) => ({ id, album: id, albumArtist: "Pianist", artist: "Pianist", titles: titles.map((title) => ({ title, work, composer: liszt })) });
+  const c = await catalogueWith(t, [
+    book("kobayashi", "Années de pèlerinage, Deuxième année", ["Italie, S. 161, no. 4: Sonetto 47 del Petrarca", "Italie, S. 161, no. 5: Sonetto 104 del Petrarca"]),
+    // The same book on another album, tagged with the cycle's name only.
+    book("other", "Années de pèlerinage", ["Italie, S. 161, no. 6: Sonetto 123 del Petrarca", "Italie, S. 161, no. 7: Après une lecture du Dante"]),
+    // Another book under that name stays its own work.
+    book("suisse", "Années de pèlerinage", ["Suisse, S. 160, no. 1: Chapelle de Guillaume Tell", "Suisse, S. 160, no. 2: Au lac de Wallenstadt"]),
+    // A label over a symphony's movements doesn't name it.
+    { id: "label", album: "label", albumArtist: "Orchestra", artist: "Orchestra", titles: ["Symphony No. 5 in C minor, Op. 67: I. Allegro con brio", "Symphony No. 5 in C minor, Op. 67: II. Andante con moto"].map((title) => ({ title, work: "Favourites", composer: ["Ludwig van Beethoven"] })) },
+  ]);
+  for (const albumId of ["kobayashi", "other", "suisse", "label"]) autoMatchTaggedWorks(c, { albumId, actor: "admin", allowStructuredTitles: true });
+  const workOf = (albumId) => renderAlbumPresentation(c, albumId).groups.map((group) => [group.workId, group.title]);
+  const [[annees, title]] = workOf("kobayashi");
+  assert.equal(title, "Années de pèlerinage, Deuxième année");
+  assert.deepEqual(workOf("other"), [[annees, title]]);
+  assert.notEqual(workOf("suisse")[0][0], annees);
+  assert.equal(workOf("label")[0][1], "Symphony No. 5 in C minor, Op. 67");
+  // The rows keep the parts' own numbers.
+  assert.deepEqual(
+    renderAlbumPresentation(c, "kobayashi").groups[0].items.map((item) => item.title),
+    ["Italie, S. 161, no. 4: Sonetto 47 del Petrarca", "Italie, S. 161, no. 5: Sonetto 104 del Petrarca"],
+  );
 });

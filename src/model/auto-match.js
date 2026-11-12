@@ -43,11 +43,11 @@ export function splitTitle(title) {
   return match ? { head: clean(match[1]), tail: clean(match[2]) } : { head: "", tail: text };
 }
 
-// A track that is a whole piece: its WORK tag names the work with no
-// movement part, and its title is that work with nothing after it but
+// A track that is a whole piece: its WORK (or GROUPING) tag names the work
+// with no movement part, and its title is that work with nothing after it but
 // details such as "(Live)". A lone movement on a compilation never is.
-function standalonePiece(hints, workTitle) {
-  const tagged = clean(hints.work);
+function standalonePiece(hints, workTitle, tag = hints.work) {
+  const tagged = clean(tag);
   const title = clean(hints.title);
   if (!tagged || tagged.includes(":") || isCollectionLike(tagged) || title.includes(":")) return false;
   const head = words(workTitle);
@@ -79,6 +79,9 @@ function groupingWork(grouping, title) {
   return head === named || head.startsWith(`${named} `) || named.startsWith(`${head} `) ? parent : null;
 }
 
+// "S 161" -> "S. 161", which reads back as the same catalogue number.
+const catalogueText = (number) => number.replace(/^([A-Z])\s/, "$1. ");
+
 function proposedWork({ work, grouping, title }, allowStructuredTitles) {
   const tagged = clean(work);
   if (tagged && !isCollectionLike(tagged)) {
@@ -87,6 +90,15 @@ function proposedWork({ work, grouping, title }, allowStructuredTitles) {
     // a catalogue number, as song cycles do ("Winterreise, D. 911").
     if (MULTI_MOVEMENT.test(parent) || catalogueNumber(parent))
       return { title: parent, evidence: "work-tag" };
+    // A set's name with its catalogue number only in the titles: WORK
+    // "Années de pèlerinage, Deuxième année" on "Italie, S. 161, no. 4:
+    // Sonetto 47 del Petrarca". The number, not the name, is its identity.
+    // A title that names its own form ("Symphony No. 5, Op. 67: I.") is
+    // that work, whatever label WORK carries.
+    const head = titleHead(title) || title;
+    const number = catalogueNumber(head);
+    if (number && !isCatalogueRange(head) && !MULTI_MOVEMENT.test(head))
+      return { title: parent, evidence: "work-tag", catalogue: catalogueText(number) };
   }
   if (!tagged && grouping) {
     const named = groupingWork(grouping, title);
@@ -141,7 +153,13 @@ function candidates(
           ...(provider.standalone && { standalone: true }),
         }
       : proposedWork(hints, allowStructuredTitles);
-    if (proposal && !provider && proposal.evidence === "work-tag" && standalonePiece(hints, proposal.title))
+    // GROUPING names a whole piece the way WORK does.
+    if (
+      proposal &&
+      !provider &&
+      ((proposal.evidence === "work-tag" && standalonePiece(hints, proposal.title)) ||
+        (proposal.evidence === "grouping-tag" && standalonePiece(hints, proposal.title, hints.grouping)))
+    )
       proposal.standalone = true;
     // No composer tag and no provider composer: an artist field such as
     // "Bedřich Smetana; Vienna Philharmonic" may name one. Only a
@@ -176,6 +194,8 @@ function candidates(
       ...(proposal.standalone ? ["standalone"] : []),
       // Likewise for composers read from the artist field.
       ...(credit ? [`artist-field:${credit.confidence}`] : []),
+      // And for a set named by WORK with its number in the titles.
+      ...(proposal.catalogue ? [`catalogue:${proposal.catalogue}`] : []),
     ]);
     if (!groups.has(key))
       groups.set(key, {
@@ -183,6 +203,7 @@ function candidates(
         work: proposal.title,
         titles: new Map(),
         evidence: proposal.evidence,
+        catalogue: proposal.catalogue || null,
         standalone: !!proposal.standalone,
         providerWorkId: proposal.identity || null,
         localTitle: provider && local ? local.title : null,
@@ -198,13 +219,14 @@ function candidates(
     group.titles.set(proposal.title, (group.titles.get(proposal.title) || 0) + 1);
     group.tracks.push({
       ...row,
+      composers,
       providerMovement: provider?.movement ? clean(provider.movement) : null,
       title: clean(hints.title),
       discNumber,
       trackNumber,
     });
   }
-  return [...groups.values()].filter((group) => {
+  return mergeCompletions([...groups.values()]).filter((group) => {
     // The title most of the work's tracks use, so one typo doesn't name it.
     group.work = [...group.titles].sort((a, b) => b[1] - a[1])[0][0];
     if (group.tracks.every((track) => track.attached)) return false;
@@ -219,6 +241,46 @@ function candidates(
         group.tracks.length
     );
   });
+}
+
+// One work whose movements credit different people: Mozart's Requiem names
+// Süßmayr on some movements and Eybler on others. An album's groups that
+// share a MusicBrainz work, or a catalogue number and a composer, are that
+// one work, credited to the composers every movement names. The others stay
+// on the recordings of the movements that name them.
+function mergeCompletions(groups) {
+  const subject = (group) =>
+    group.providerWorkId ? `mb:${group.providerWorkId}` : catalogueSubject(group.work);
+  const families = new Map();
+  for (const group of groups) {
+    const key = subject(group);
+    if (!key || group.standalone || group.composerSource) continue;
+    const family = JSON.stringify([group.tracks[0].instance_id, group.albumId, group.evidence, key]);
+    families.set(family, [...(families.get(family) || []), group]);
+  }
+  const merged = new Set();
+  const result = [];
+  for (const family of families.values()) {
+    if (family.length < 2) continue;
+    const shared = family[0].composers.filter((name) =>
+      family.every((group) => group.composers.some((other) => normalized(other) === normalized(name))),
+    );
+    if (!shared.length) continue;
+    const group = {
+      ...family[0],
+      key: JSON.stringify([...JSON.parse(family[0].key).slice(0, 2), subject(family[0]), shared.map(normalized).sort(), family[0].evidence, "completion"]),
+      composers: shared,
+      titles: new Map(),
+      tracks: [],
+    };
+    for (const part of family) {
+      merged.add(part);
+      for (const [title, count] of part.titles) group.titles.set(title, (group.titles.get(title) || 0) + count);
+      group.tracks.push(...part.tracks);
+    }
+    result.push(group);
+  }
+  return [...groups.filter((group) => !merged.has(group)), ...result];
 }
 
 function knownComposerNames(catalogue) {
@@ -255,12 +317,21 @@ const CATALOGUE =
   /\b(op|opus|bwv|kv|k|d|hob|rv|woo|hwv|sz|twv|bb)\s*((?:[ivxlc]+\s+)?\d+[a-z]?)(?:\s+(?:no|nr|n)\s*(\d+))?\b/;
 const KEY_PHRASE =
   /\bin\s+[a-h](?:\s*(?:flat|sharp|b|#))?(?:\s+(?:major|minor|dur|moll))?\b/g;
+// The catalogue number a work's identity rests on, or "" without one.
+export function catalogueSubject(title) {
+  const cat = words(title).match(CATALOGUE);
+  if (cat)
+    return `cat:${cat[1] === "opus" ? "op" : cat[1] === "kv" ? "k" : cat[1]}:${cat[2].replace(/\s+/g, "")}${cat[3] ? `:${cat[3]}` : ""}`;
+  // Systems the word form can't tell from ordinary words ("S. 161", "L. 109")
+  // come from the catalogue reader, which needs their punctuation.
+  const number = catalogueNumber(title).toLowerCase();
+  return number ? `cat:${number.replace(/\s+/g, ":")}` : "";
+}
 export function workKey(title, composers) {
   const text = words(title);
-  const cat = text.match(CATALOGUE);
-  const subject = cat
-    ? `cat:${cat[1] === "opus" ? "op" : cat[1] === "kv" ? "k" : cat[1]}:${cat[2].replace(/\s+/g, "")}${cat[3] ? `:${cat[3]}` : ""}`
-    : `title:${text.replace(KEY_PHRASE, " ").replace(/\s+/g, " ").trim()}`;
+  const subject =
+    catalogueSubject(title) ||
+    `title:${text.replace(KEY_PHRASE, " ").replace(/\s+/g, " ").trim()}`;
   return JSON.stringify([
     [...new Set(composers.map(words))].filter(Boolean).sort(),
     subject,
@@ -513,7 +584,20 @@ function shiftUp(catalogue, table, column, where, args, from) {
 // A work this album already has gains the album's other tracks of it, such
 // as a theme or intermezzo an earlier pass left out. Each new movement goes
 // right after the movement of the track before it on the album.
-function extendRealization(catalogue, group, actor) {
+// A movement's own composers beyond the work's, such as Süßmayr on the
+// Lacrimosa, stay on that movement's recording.
+function creditMovementComposers(catalogue, metadata, index, recording, track, group) {
+  const work = new Set(group.composers.map(normalized));
+  (track.composers || [])
+    .filter((name) => !work.has(normalized(name)))
+    .forEach((name, i) => {
+      const person = composerEntity(catalogue, metadata, index, name, group.composerIds?.[name]);
+      if (!catalogue.db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role='composer'").get(recording, person))
+        catalogue.credit(recording, person, "composer", { position: i + 1 });
+    });
+}
+
+function extendRealization(catalogue, group, actor, people) {
   const attached = group.tracks.filter((track) => track.attached);
   const found = catalogue.db
     .prepare(
@@ -561,6 +645,7 @@ function extendRealization(catalogue, group, actor) {
       shiftUp(catalogue, "realization_item", "sequence", "realization_id=?", [realization.id], sequence);
       const recording = catalogue.createEntity("recording", { durationMs: track.evidence.durationMs });
       metadata.derived(recording, "title", track.title);
+      creditMovementComposers(catalogue, metadata, people, recording, track, group);
       catalogue.relate("recording_performance", recording, performance);
       const content = catalogue.recordingContent(recording, realization.performance_work_id, { movement });
       const segment = catalogue.segment(track.id, { kind: "whole" });
@@ -608,7 +693,7 @@ function createGroup(catalogue, group, actor, index) {
     return false;
   }
   if (group.tracks.some((track) => track.attached))
-    return extendRealization(catalogue, group, actor);
+    return extendRealization(catalogue, group, actor, index);
   const metadata = new Metadata(catalogue);
   const recordId = identity("album-work", group.key);
   if (existingIdentity(catalogue, "album-work", recordId)) return false;
@@ -654,10 +739,15 @@ function createGroup(catalogue, group, actor, index) {
         });
     // An unrecorded MusicBrainz work can still be one the tags already made:
     // look it up under the tags' title and MusicBrainz's aliases too.
-    const titles = [
-      group.work,
-      ...(group.providerWorkId ? [group.localTitle, ...(group.providerAliases || [])] : []),
-    ].filter(Boolean);
+    // A set named by WORK is found by its catalogue number alone, so another
+    // book under the same name ("Années de pèlerinage") stays apart.
+    const catalogued = group.catalogue && `${group.work}, ${group.catalogue}`;
+    const titles = catalogued
+      ? [catalogued]
+      : [
+          group.work,
+          ...(group.providerWorkId ? [group.localTitle, ...(group.providerAliases || [])] : []),
+        ].filter(Boolean);
     const known = providerWork
       ? [providerWork]
       : [
@@ -742,6 +832,10 @@ function createGroup(catalogue, group, actor, index) {
       );
       if (group.providerAliases?.length)
         metadata.derived(work, "aliases", group.providerAliases);
+      else if (catalogued) {
+        metadata.derived(work, "aliases", [catalogued]);
+        index.aliases.set(workKey(catalogued, group.composers), [work]);
+      }
       if (group.providerWorkId)
         catalogue.externalIdentity(
           work,
@@ -750,7 +844,7 @@ function createGroup(catalogue, group, actor, index) {
           group.providerWorkId,
           { evidence: { source: "parent-work" } },
         );
-      index.works.set(workKey(group.work, group.composers), [work]);
+      if (!catalogued) index.works.set(workKey(group.work, group.composers), [work]);
     }
     // A whole piece has no movements; its one track realizes the work.
     if (group.standalone && !workMovements(catalogue, work).length) movements = [null];
@@ -787,6 +881,7 @@ function createGroup(catalogue, group, actor, index) {
         durationMs: track.evidence.durationMs,
       });
       metadata.derived(recording, "title", track.title || track.movementTitle);
+      creditMovementComposers(catalogue, metadata, index, recording, track, group);
       catalogue.relate("recording_performance", recording, performance);
       const content = catalogue.recordingContent(recording, performanceWork, {
         movement,
@@ -1025,6 +1120,107 @@ export function mergeDuplicateAutoWorks(catalogue, { actor = null } = {}) {
   });
 }
 
+// Repairs albums matched before completer credits were merged: one auto-made
+// work per credit combination (Mozart and Süßmayr; Mozart and Eybler). The
+// work the album reaches first keeps the identity; the others' tracks are
+// detached so this match adds them to it, and favourites and picks follow.
+// Only unedited auto works of one album, sharing a catalogue number and a
+// composer, with no conflicting verified identity, are combined.
+function repairCompletionSplits(catalogue, albumId, actor) {
+  const db = catalogue.db;
+  const families = new Map();
+  for (const { entity_id: work, album } of db
+    .prepare(
+      `SELECT x.entity_id,CAST(json_extract(x.evidence,'$.albumId') AS TEXT) AS album FROM external_identity x
+       JOIN entity e ON e.id=x.entity_id AND e.deleted_at IS NULL
+       WHERE x.provider='embedded-tags' AND x.record_kind='album-work' AND x.state='active'
+       ${albumId == null ? "" : "AND CAST(json_extract(x.evidence,'$.albumId') AS TEXT)=?"}`,
+    )
+    .all(...(albumId == null ? [] : [String(albumId)]))) {
+    const subject = catalogueSubject(String(resolvedName(catalogue, work, "title") || ""));
+    if (!subject) continue;
+    const key = JSON.stringify([album, subject]);
+    families.set(key, [...new Set([...(families.get(key) || []), work])]);
+  }
+  let repaired = 0;
+  for (const [key, works] of families) {
+    if (works.length < 2) continue;
+    const [album] = JSON.parse(key);
+    const realizations = works.map((work) =>
+      db
+        .prepare(
+          `SELECT r.id,MIN(COALESCE(CAST(json_extract(t.evidence,'$.hints.discNumber') AS INTEGER),1)*10000+CAST(json_extract(t.evidence,'$.hints.trackNumber') AS INTEGER)) AS first,
+             SUM(CAST(json_extract(t.evidence,'$.albumId') AS TEXT)!=?) AS elsewhere
+           FROM realization r JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
+           JOIN track_link t ON t.id=s.track_link_id WHERE r.work_id=? GROUP BY r.id`,
+        )
+        .all(album, work),
+    );
+    const names = (work) => composerNames(catalogue, work).map(words);
+    const shared = names(works[0]).filter((name) => works.every((work) => names(work).includes(name)));
+    if (
+      !shared.length ||
+      realizations.some((list) => list.length !== 1 || list[0].elsewhere > 0) ||
+      works.some((work) => hasManualEdits(catalogue, [work, ...workMovements(catalogue, work).map((m) => m.id)]))
+    )
+      continue;
+    const order = works.map((work, i) => ({ work, realization: realizations[i][0] })).sort((a, b) => a.realization.first - b.realization.first);
+    const [keep, ...drops] = order;
+    if (drops.some(({ work }) => !compatibleAutoWorks(catalogue, keep.work, work))) continue;
+    transaction(db, () => {
+      const now = Date.now();
+      for (const drop of drops) {
+        for (const state of db.prepare("SELECT * FROM user_work_state WHERE work_id=?").all(drop.work)) {
+          const picked = state.picked_realization_id === drop.realization.id ? keep.realization.id : state.picked_realization_id;
+          const kept = db.prepare("SELECT * FROM user_work_state WHERE user_id=? AND work_id=?").get(state.user_id, keep.work);
+          if (kept)
+            db.prepare("UPDATE user_work_state SET favourite=?,picked_realization_id=?,updated_at=? WHERE user_id=? AND work_id=?").run(
+              kept.favourite || state.favourite ? 1 : 0, kept.picked_realization_id || picked, now, state.user_id, keep.work,
+            );
+          else
+            db.prepare("INSERT INTO user_work_state VALUES (?,?,?,?,?)").run(state.user_id, keep.work, state.favourite, picked, now);
+          db.prepare("DELETE FROM user_work_state WHERE user_id=? AND work_id=?").run(state.user_id, drop.work);
+        }
+        const pick = db.prepare("SELECT * FROM admin_work_pick WHERE work_id=?").get(drop.work);
+        if (pick && !db.prepare("SELECT 1 FROM admin_work_pick WHERE work_id=?").get(keep.work))
+          db.prepare("INSERT INTO admin_work_pick VALUES (?,?,?,?)").run(
+            keep.work, pick.realization_id === drop.realization.id ? keep.realization.id : pick.realization_id, pick.actor_id, now,
+          );
+        db.prepare("DELETE FROM admin_work_pick WHERE work_id=?").run(drop.work);
+        for (const { id } of db.prepare("SELECT id FROM realization_item WHERE realization_id=?").all(drop.realization.id))
+          catalogue.detachItem(id, { dropRecording: true });
+        for (const movement of workMovements(catalogue, drop.work))
+          db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(now, now, movement.id);
+        db.prepare("DELETE FROM relation WHERE kind='movement' AND source_id=?").run(drop.work);
+        db.prepare("DELETE FROM credit WHERE target_id=?").run(drop.work);
+        transferIdentities(db, keep.work, drop.work);
+        db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(now, now, drop.work);
+        catalogue.audit("work.merge", drop.work, { into: keep.work, reason: "completion-split" }, actor);
+      }
+      // The kept work names only the composers every movement shares; its
+      // own movements keep their other composers on their recordings.
+      const metadata = new Metadata(catalogue);
+      const index = catalogueIndex(catalogue);
+      const group = { composers: [], composerIds: {} };
+      for (const credit of db.prepare("SELECT id,contributor_id FROM credit WHERE target_id=? AND role='composer'").all(keep.work)) {
+        const name = resolvedName(catalogue, credit.contributor_id, "name");
+        if (shared.includes(words(name))) group.composers.push(name);
+        else db.prepare("DELETE FROM credit WHERE id=?").run(credit.id);
+      }
+      for (const row of db
+        .prepare(
+          `SELECT DISTINCT c.recording_id,t.evidence FROM realization_item i JOIN segment s ON s.id=i.segment_id
+           JOIN segment_content sc ON sc.segment_id=s.id JOIN recording_content c ON c.id=sc.content_id
+           JOIN track_link t ON t.id=s.track_link_id WHERE i.realization_id=?`,
+        )
+        .all(keep.realization.id))
+        creditMovementComposers(catalogue, metadata, index, row.recording_id, { composers: JSON.parse(row.evidence).hints?.composer || [] }, group);
+      repaired += drops.length;
+    });
+  }
+  return repaired;
+}
+
 // This only changes the plugin catalogue. It never writes the indexed media.
 const INSTRUMENT =
   /\b(piano|violin|viola|cello|violoncello|double bass|flute|oboe|clarinet|bassoon|horn|trumpet|trombone|organ|harpsichord|guitar|harp|string|wind|piano and violin|violin and piano|cello and piano)\s+(?=(?:sonata|sonatina|concerto|quartet|quintet|trio|sextet|octet|suite|partita)\b)/i;
@@ -1143,6 +1339,7 @@ export function autoMatchTaggedWorks(
     providerMatches = new Map(),
   } = {},
 ) {
+  repairCompletionSplits(catalogue, albumId, actor);
   const groups = candidates(
     catalogue,
     albumId,

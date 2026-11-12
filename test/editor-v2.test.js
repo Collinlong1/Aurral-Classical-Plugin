@@ -485,6 +485,14 @@ test("#5 a whole piece on one track becomes a work; a lone movement does not", a
   assert.equal(presentation.groups[0].movementCount, 1);
   assert.equal(autoMatchTaggedWorks(s.c, { albumId: "C" }).created, 0);
   assert.deepEqual(renderAlbumPresentation(s.c, "C"), presentation);
+  // GROUPING names a whole piece the same way WORK does.
+  const [grouped, ...rest] = s.trackIds("A");
+  for (const track of rest) s.c.db.prepare("UPDATE track_link SET state='missing' WHERE id=?").run(track);
+  setHints(s, grouped, { title: "Danse macabre, Op. 40", work: "", grouping: "Danse macabre, Op. 40", composer: ["Camille Saint-Saëns"], genres: ["Classical"] });
+  classify(s.c, grouped, {}, { manual: "classical", actor: "1" });
+  autoMatchTaggedWorks(s.c, { albumId: "A" });
+  assert.deepEqual(workOfTrack(s, grouped), [work]);
+  assert.deepEqual(liveWorks(s), [work]);
 });
 
 test("#8 tag-made and MusicBrainz-identified albums of one work share it", async (t) => {

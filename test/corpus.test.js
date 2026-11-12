@@ -32,13 +32,13 @@ test("corpus: an arrangement joins the work it arranges through MusicBrainz", as
   assert.ok(groups[0].workId);
 });
 
-test("corpus: tracks under one heading that are not a work say so", () => {
+test("corpus: a set WORK names is matched by the catalogue number in its titles", () => {
   const groups = results.get(kobayashi.id).groups;
   assert.deepEqual(
     groups.map((group) => [Boolean(group.workId), group.detail ?? null]),
     [
       [true, null],
-      [false, "Not matched to a work"],
+      [true, null],
     ],
   );
 });

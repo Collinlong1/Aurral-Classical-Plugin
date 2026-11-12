@@ -37344,8 +37344,8 @@ function splitTitle(title) {
     return { head: clean3(comma[1]), tail: clean3(comma[2]) };
   return match2 ? { head: clean3(match2[1]), tail: clean3(match2[2]) } : { head: "", tail: text4 };
 }
-function standalonePiece(hints, workTitle) {
-  const tagged = clean3(hints.work);
+function standalonePiece(hints, workTitle, tag = hints.work) {
+  const tagged = clean3(tag);
   const title = clean3(hints.title);
   if (!tagged || tagged.includes(":") || isCollectionLike(tagged) || title.includes(":")) return false;
   const head = words(workTitle);
@@ -37362,12 +37362,17 @@ function groupingWork(grouping, title) {
   const head = words(titleHead(title) || title);
   return head === named || head.startsWith(`${named} `) || named.startsWith(`${head} `) ? parent : null;
 }
+var catalogueText = (number) => number.replace(/^([A-Z])\s/, "$1. ");
 function proposedWork({ work, grouping, title }, allowStructuredTitles) {
   const tagged = clean3(work);
   if (tagged && !isCollectionLike(tagged)) {
     const parent = clean3(tagged.split(/\s*:\s*/, 1)[0]);
     if (MULTI_MOVEMENT.test(parent) || catalogueNumber(parent))
       return { title: parent, evidence: "work-tag" };
+    const head = titleHead(title) || title;
+    const number = catalogueNumber(head);
+    if (number && !isCatalogueRange(head) && !MULTI_MOVEMENT.test(head))
+      return { title: parent, evidence: "work-tag", catalogue: catalogueText(number) };
   }
   if (!tagged && grouping) {
     const named = groupingWork(grouping, title);
@@ -37401,7 +37406,7 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
       identity: provider.workId,
       ...provider.standalone && { standalone: true }
     } : proposedWork(hints, allowStructuredTitles);
-    if (proposal && !provider && proposal.evidence === "work-tag" && standalonePiece(hints, proposal.title))
+    if (proposal && !provider && (proposal.evidence === "work-tag" && standalonePiece(hints, proposal.title) || proposal.evidence === "grouping-tag" && standalonePiece(hints, proposal.title, hints.grouping)))
       proposal.standalone = true;
     const credit = hints.composer?.length || provider?.composers?.length ? null : artistCredits(hints, { knownComposers });
     const composers = [
@@ -37422,7 +37427,9 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
       // Appended only for whole pieces, so earlier groups keep their keys.
       ...proposal.standalone ? ["standalone"] : [],
       // Likewise for composers read from the artist field.
-      ...credit ? [`artist-field:${credit.confidence}`] : []
+      ...credit ? [`artist-field:${credit.confidence}`] : [],
+      // And for a set named by WORK with its number in the titles.
+      ...proposal.catalogue ? [`catalogue:${proposal.catalogue}`] : []
     ]);
     if (!groups.has(key))
       groups.set(key, {
@@ -37430,6 +37437,7 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
         work: proposal.title,
         titles: /* @__PURE__ */ new Map(),
         evidence: proposal.evidence,
+        catalogue: proposal.catalogue || null,
         standalone: !!proposal.standalone,
         providerWorkId: proposal.identity || null,
         localTitle: provider && local ? local.title : null,
@@ -37445,13 +37453,14 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
     group.titles.set(proposal.title, (group.titles.get(proposal.title) || 0) + 1);
     group.tracks.push({
       ...row,
+      composers,
       providerMovement: provider?.movement ? clean3(provider.movement) : null,
       title: clean3(hints.title),
       discNumber,
       trackNumber
     });
   }
-  return [...groups.values()].filter((group) => {
+  return mergeCompletions([...groups.values()]).filter((group) => {
     group.work = [...group.titles].sort((a, b) => b[1] - a[1])[0][0];
     if (group.tracks.every((track) => track.attached)) return false;
     if (group.standalone ? group.tracks.length !== 1 : group.tracks.length < 2) return false;
@@ -37460,6 +37469,39 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
     );
     return new Set(positions).size === positions.length && new Set(group.tracks.map((track) => normalized(track.title))).size === group.tracks.length;
   });
+}
+function mergeCompletions(groups) {
+  const subject = (group) => group.providerWorkId ? `mb:${group.providerWorkId}` : catalogueSubject(group.work);
+  const families = /* @__PURE__ */ new Map();
+  for (const group of groups) {
+    const key = subject(group);
+    if (!key || group.standalone || group.composerSource) continue;
+    const family = JSON.stringify([group.tracks[0].instance_id, group.albumId, group.evidence, key]);
+    families.set(family, [...families.get(family) || [], group]);
+  }
+  const merged = /* @__PURE__ */ new Set();
+  const result = [];
+  for (const family of families.values()) {
+    if (family.length < 2) continue;
+    const shared = family[0].composers.filter(
+      (name) => family.every((group2) => group2.composers.some((other) => normalized(other) === normalized(name)))
+    );
+    if (!shared.length) continue;
+    const group = {
+      ...family[0],
+      key: JSON.stringify([...JSON.parse(family[0].key).slice(0, 2), subject(family[0]), shared.map(normalized).sort(), family[0].evidence, "completion"]),
+      composers: shared,
+      titles: /* @__PURE__ */ new Map(),
+      tracks: []
+    };
+    for (const part of family) {
+      merged.add(part);
+      for (const [title, count] of part.titles) group.titles.set(title, (group.titles.get(title) || 0) + count);
+      group.tracks.push(...part.tracks);
+    }
+    result.push(group);
+  }
+  return [...groups.filter((group) => !merged.has(group)), ...result];
 }
 function knownComposerNames(catalogue) {
   const names = /* @__PURE__ */ new Set();
@@ -37482,10 +37524,16 @@ function existingIdentity(catalogue, recordKind, recordId) {
 var words = (value) => normalized(value).replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 var CATALOGUE = /\b(op|opus|bwv|kv|k|d|hob|rv|woo|hwv|sz|twv|bb)\s*((?:[ivxlc]+\s+)?\d+[a-z]?)(?:\s+(?:no|nr|n)\s*(\d+))?\b/;
 var KEY_PHRASE = /\bin\s+[a-h](?:\s*(?:flat|sharp|b|#))?(?:\s+(?:major|minor|dur|moll))?\b/g;
+function catalogueSubject(title) {
+  const cat = words(title).match(CATALOGUE);
+  if (cat)
+    return `cat:${cat[1] === "opus" ? "op" : cat[1] === "kv" ? "k" : cat[1]}:${cat[2].replace(/\s+/g, "")}${cat[3] ? `:${cat[3]}` : ""}`;
+  const number = catalogueNumber(title).toLowerCase();
+  return number ? `cat:${number.replace(/\s+/g, ":")}` : "";
+}
 function workKey(title, composers) {
   const text4 = words(title);
-  const cat = text4.match(CATALOGUE);
-  const subject = cat ? `cat:${cat[1] === "opus" ? "op" : cat[1] === "kv" ? "k" : cat[1]}:${cat[2].replace(/\s+/g, "")}${cat[3] ? `:${cat[3]}` : ""}` : `title:${text4.replace(KEY_PHRASE, " ").replace(/\s+/g, " ").trim()}`;
+  const subject = catalogueSubject(title) || `title:${text4.replace(KEY_PHRASE, " ").replace(/\s+/g, " ").trim()}`;
   return JSON.stringify([
     [...new Set(composers.map(words))].filter(Boolean).sort(),
     subject
@@ -37662,7 +37710,15 @@ function shiftUp(catalogue, table, column, where, args, from) {
   catalogue.db.prepare(`UPDATE ${table} SET ${column}=${column}+1000000 WHERE ${where} AND ${column}>=?`).run(...args, from);
   catalogue.db.prepare(`UPDATE ${table} SET ${column}=${column}-999999 WHERE ${where} AND ${column}>=1000000`).run(...args);
 }
-function extendRealization(catalogue, group, actor3) {
+function creditMovementComposers(catalogue, metadata, index, recording, track, group) {
+  const work = new Set(group.composers.map(normalized));
+  (track.composers || []).filter((name) => !work.has(normalized(name))).forEach((name, i) => {
+    const person = composerEntity(catalogue, metadata, index, name, group.composerIds?.[name]);
+    if (!catalogue.db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role='composer'").get(recording, person))
+      catalogue.credit(recording, person, "composer", { position: i + 1 });
+  });
+}
+function extendRealization(catalogue, group, actor3, people) {
   const attached = group.tracks.filter((track) => track.attached);
   const found = catalogue.db.prepare(
     `SELECT DISTINCT i.realization_id AS id,r.work_id,r.performance_work_id FROM realization_item i
@@ -37697,6 +37753,7 @@ function extendRealization(catalogue, group, actor3) {
       shiftUp(catalogue, "realization_item", "sequence", "realization_id=?", [realization.id], sequence);
       const recording = catalogue.createEntity("recording", { durationMs: track.evidence.durationMs });
       metadata.derived(recording, "title", track.title);
+      creditMovementComposers(catalogue, metadata, people, recording, track, group);
       catalogue.relate("recording_performance", recording, performance);
       const content = catalogue.recordingContent(recording, realization.performance_work_id, { movement });
       const segment = catalogue.segment(track.id, { kind: "whole" });
@@ -37734,7 +37791,7 @@ function createGroup(catalogue, group, actor3, index) {
     return false;
   }
   if (group.tracks.some((track) => track.attached))
-    return extendRealization(catalogue, group, actor3);
+    return extendRealization(catalogue, group, actor3, index);
   const metadata = new Metadata(catalogue);
   const recordId = identity("album-work", group.key);
   if (existingIdentity(catalogue, "album-work", recordId)) return false;
@@ -37759,7 +37816,8 @@ function createGroup(catalogue, group, actor3, index) {
       const held2 = artistIdOf(catalogue, person);
       return mbid && held2 && held2 !== mbid;
     });
-    const titles = [
+    const catalogued = group.catalogue && `${group.work}, ${group.catalogue}`;
+    const titles = catalogued ? [catalogued] : [
       group.work,
       ...group.providerWorkId ? [group.localTitle, ...group.providerAliases || []] : []
     ].filter(Boolean);
@@ -37829,6 +37887,10 @@ function createGroup(catalogue, group, actor3, index) {
       );
       if (group.providerAliases?.length)
         metadata.derived(work, "aliases", group.providerAliases);
+      else if (catalogued) {
+        metadata.derived(work, "aliases", [catalogued]);
+        index.aliases.set(workKey(catalogued, group.composers), [work]);
+      }
       if (group.providerWorkId)
         catalogue.externalIdentity(
           work,
@@ -37837,7 +37899,7 @@ function createGroup(catalogue, group, actor3, index) {
           group.providerWorkId,
           { evidence: { source: "parent-work" } }
         );
-      index.works.set(workKey(group.work, group.composers), [work]);
+      if (!catalogued) index.works.set(workKey(group.work, group.composers), [work]);
     }
     if (group.standalone && !workMovements(catalogue, work).length) movements = [null];
     if (!movements)
@@ -37873,6 +37935,7 @@ function createGroup(catalogue, group, actor3, index) {
         durationMs: track.evidence.durationMs
       });
       metadata.derived(recording, "title", track.title || track.movementTitle);
+      creditMovementComposers(catalogue, metadata, index, recording, track, group);
       catalogue.relate("recording_performance", recording, performance);
       const content = catalogue.recordingContent(recording, performanceWork, {
         movement
@@ -38054,6 +38117,95 @@ function mergeDuplicateAutoWorks(catalogue, { actor: actor3 = null } = {}) {
     return { people, works };
   });
 }
+function repairCompletionSplits(catalogue, albumId, actor3) {
+  const db = catalogue.db;
+  const families = /* @__PURE__ */ new Map();
+  for (const { entity_id: work, album } of db.prepare(
+    `SELECT x.entity_id,CAST(json_extract(x.evidence,'$.albumId') AS TEXT) AS album FROM external_identity x
+       JOIN entity e ON e.id=x.entity_id AND e.deleted_at IS NULL
+       WHERE x.provider='embedded-tags' AND x.record_kind='album-work' AND x.state='active'
+       ${albumId == null ? "" : "AND CAST(json_extract(x.evidence,'$.albumId') AS TEXT)=?"}`
+  ).all(...albumId == null ? [] : [String(albumId)])) {
+    const subject = catalogueSubject(String(resolvedName(catalogue, work, "title") || ""));
+    if (!subject) continue;
+    const key = JSON.stringify([album, subject]);
+    families.set(key, [.../* @__PURE__ */ new Set([...families.get(key) || [], work])]);
+  }
+  let repaired = 0;
+  for (const [key, works] of families) {
+    if (works.length < 2) continue;
+    const [album] = JSON.parse(key);
+    const realizations2 = works.map(
+      (work) => db.prepare(
+        `SELECT r.id,MIN(COALESCE(CAST(json_extract(t.evidence,'$.hints.discNumber') AS INTEGER),1)*10000+CAST(json_extract(t.evidence,'$.hints.trackNumber') AS INTEGER)) AS first,
+             SUM(CAST(json_extract(t.evidence,'$.albumId') AS TEXT)!=?) AS elsewhere
+           FROM realization r JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
+           JOIN track_link t ON t.id=s.track_link_id WHERE r.work_id=? GROUP BY r.id`
+      ).all(album, work)
+    );
+    const names = (work) => composerNames(catalogue, work).map(words);
+    const shared = names(works[0]).filter((name) => works.every((work) => names(work).includes(name)));
+    if (!shared.length || realizations2.some((list) => list.length !== 1 || list[0].elsewhere > 0) || works.some((work) => hasManualEdits(catalogue, [work, ...workMovements(catalogue, work).map((m) => m.id)])))
+      continue;
+    const order = works.map((work, i) => ({ work, realization: realizations2[i][0] })).sort((a, b) => a.realization.first - b.realization.first);
+    const [keep, ...drops] = order;
+    if (drops.some(({ work }) => !compatibleAutoWorks(catalogue, keep.work, work))) continue;
+    transaction(db, () => {
+      const now = Date.now();
+      for (const drop of drops) {
+        for (const state of db.prepare("SELECT * FROM user_work_state WHERE work_id=?").all(drop.work)) {
+          const picked = state.picked_realization_id === drop.realization.id ? keep.realization.id : state.picked_realization_id;
+          const kept = db.prepare("SELECT * FROM user_work_state WHERE user_id=? AND work_id=?").get(state.user_id, keep.work);
+          if (kept)
+            db.prepare("UPDATE user_work_state SET favourite=?,picked_realization_id=?,updated_at=? WHERE user_id=? AND work_id=?").run(
+              kept.favourite || state.favourite ? 1 : 0,
+              kept.picked_realization_id || picked,
+              now,
+              state.user_id,
+              keep.work
+            );
+          else
+            db.prepare("INSERT INTO user_work_state VALUES (?,?,?,?,?)").run(state.user_id, keep.work, state.favourite, picked, now);
+          db.prepare("DELETE FROM user_work_state WHERE user_id=? AND work_id=?").run(state.user_id, drop.work);
+        }
+        const pick = db.prepare("SELECT * FROM admin_work_pick WHERE work_id=?").get(drop.work);
+        if (pick && !db.prepare("SELECT 1 FROM admin_work_pick WHERE work_id=?").get(keep.work))
+          db.prepare("INSERT INTO admin_work_pick VALUES (?,?,?,?)").run(
+            keep.work,
+            pick.realization_id === drop.realization.id ? keep.realization.id : pick.realization_id,
+            pick.actor_id,
+            now
+          );
+        db.prepare("DELETE FROM admin_work_pick WHERE work_id=?").run(drop.work);
+        for (const { id } of db.prepare("SELECT id FROM realization_item WHERE realization_id=?").all(drop.realization.id))
+          catalogue.detachItem(id, { dropRecording: true });
+        for (const movement of workMovements(catalogue, drop.work))
+          db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(now, now, movement.id);
+        db.prepare("DELETE FROM relation WHERE kind='movement' AND source_id=?").run(drop.work);
+        db.prepare("DELETE FROM credit WHERE target_id=?").run(drop.work);
+        transferIdentities(db, keep.work, drop.work);
+        db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(now, now, drop.work);
+        catalogue.audit("work.merge", drop.work, { into: keep.work, reason: "completion-split" }, actor3);
+      }
+      const metadata = new Metadata(catalogue);
+      const index = catalogueIndex(catalogue);
+      const group = { composers: [], composerIds: {} };
+      for (const credit of db.prepare("SELECT id,contributor_id FROM credit WHERE target_id=? AND role='composer'").all(keep.work)) {
+        const name = resolvedName(catalogue, credit.contributor_id, "name");
+        if (shared.includes(words(name))) group.composers.push(name);
+        else db.prepare("DELETE FROM credit WHERE id=?").run(credit.id);
+      }
+      for (const row of db.prepare(
+        `SELECT DISTINCT c.recording_id,t.evidence FROM realization_item i JOIN segment s ON s.id=i.segment_id
+           JOIN segment_content sc ON sc.segment_id=s.id JOIN recording_content c ON c.id=sc.content_id
+           JOIN track_link t ON t.id=s.track_link_id WHERE i.realization_id=?`
+      ).all(keep.realization.id))
+        creditMovementComposers(catalogue, metadata, index, row.recording_id, { composers: JSON.parse(row.evidence).hints?.composer || [] }, group);
+      repaired += drops.length;
+    });
+  }
+  return repaired;
+}
 var INSTRUMENT = /\b(piano|violin|viola|cello|violoncello|double bass|flute|oboe|clarinet|bassoon|horn|trumpet|trombone|organ|harpsichord|guitar|harp|string|wind|piano and violin|violin and piano|cello and piano)\s+(?=(?:sonata|sonatina|concerto|quartet|quintet|trio|sextet|octet|suite|partita)\b)/i;
 var KEY = /\bin\s+([a-h])(?:[\s-]?(flat|sharp|♭|♯))?\s+(major|minor)\b/i;
 var CATALOGUE_TEXT = /\b(?:op(?:us|\.)?\s*\d+[a-z]?(?:\s*,?\s*no\.?\s*\d+)?|(?:BWV|HWV|RV|WoO|TWV|K(?:V|\.)?|D\.?|Hob\.?\s*[IVXL]+[a-z]?:?)\s*\d+[a-z]?)/gi;
@@ -38145,6 +38297,7 @@ function autoMatchTaggedWorks(catalogue, {
   allowStructuredTitles = false,
   providerMatches = /* @__PURE__ */ new Map()
 } = {}) {
+  repairCompletionSplits(catalogue, albumId, actor3);
   const groups = candidates(
     catalogue,
     albumId,
@@ -40404,6 +40557,17 @@ function sameNamedWork(a, b) {
   const name = nameBeforeComma(long);
   return name.length >= 4 && words2(short) === name && long.includes(",");
 }
+function sameCredits(last, heading, names) {
+  const these = new Set(names.map(words2));
+  if (last.names.length === these.size && last.names.every((name) => these.has(name))) return true;
+  const shared = last.names.filter((name) => these.has(name));
+  const same2 = shared.length > 0 && Boolean(catalogueNumber(last.title)) && catalogueNumber(last.title) === catalogueNumber(heading);
+  if (same2) {
+    last.composer = last.credited.filter((name) => shared.includes(words2(name))).join(", ");
+    last.names = shared;
+  }
+  return same2;
+}
 function pieceGroups(c, album, following) {
   const rows = c.db.prepare(
     `SELECT t.id AS track_link_id,t.core_id,t.file_id,t.evidence FROM track_link t
@@ -40423,7 +40587,8 @@ function pieceGroups(c, album, following) {
     const tail = words2(ownTail).endsWith(` ${words2(taggedTail)}`) ? taggedTail : ownTail;
     const head = fullHead.replace(ACT, "");
     const heading = head || tail;
-    const composer = composersOf(evidence2.hints || {}).join(", ");
+    const names = composersOf(evidence2.hints || {});
+    const composer = names.join(", ");
     const last = pieces.at(-1);
     const item = {
       id: `piece:${row.track_link_id}`,
@@ -40440,13 +40605,13 @@ function pieceGroups(c, album, following) {
       position: albumPosition(row)
     };
     const sameWork = last && sameNamedWork(last.title, heading);
-    if (head && sameWork && last.composer === composer && following.get(last.next) === item.position)
+    if (head && sameWork && sameCredits(last, heading, names) && following.get(last.next) === item.position)
       last.items.push(item);
     else
-      pieces.push({ id: item.id, workId: null, title: heading, composer, items: [item], missing: [] });
+      pieces.push({ id: item.id, workId: null, title: heading, composer, names: names.map(words2), credited: names, items: [item], missing: [] });
     pieces.at(-1).next = item.position;
   }
-  return pieces.map(({ next, items, ...piece }) => ({
+  return pieces.map(({ next, names, credited, items, ...piece }) => ({
     ...piece,
     first: items[0].position,
     items: items.map(({ position, ...item }) => item),
