@@ -1,33 +1,33 @@
 {
  "summary": [
-  "148 tracks on 30 albums (expected: 108 not classical, 20 classical, 20 unsure)",
-  "false classical positives 30/108; not-classical tracks left unsure 47",
-  "classical recognised 7/20, unsure 8, false negatives 5",
-  "crossover tracks classified classical 14/20; overall unsure rate 40.5%",
-  "non-classical or unsure tracks given classical behaviour 44"
+  "157 tracks on 32 albums (expected: 117 not classical, 20 classical, 20 unsure)",
+  "false classical positives 0/117; not-classical tracks left unsure 10",
+  "classical recognised 9/20, unsure 11, false negatives 0",
+  "crossover tracks classified classical 0/20; overall unsure rate 20.4%",
+  "non-classical or unsure tracks given classical behaviour 0"
  ],
  "metrics": {
-  "tracks": 148,
+  "tracks": 157,
   "expected": {
-   "not_classical": 108,
+   "not_classical": 117,
    "classical": 20,
    "unsure": 20
   },
-  "falsePositives": 30,
-  "falseNegatives": 5,
-  "notClassicalUnsure": 47,
-  "classicalUnsure": 8,
-  "classicalRecognised": 7,
-  "crossoverClassical": 14,
-  "unsureRate": 0.40540540540540543,
-  "leaks": 44
+  "falsePositives": 0,
+  "falseNegatives": 0,
+  "notClassicalUnsure": 10,
+  "classicalUnsure": 11,
+  "classicalRecognised": 9,
+  "crossoverClassical": 0,
+  "unsureRate": 0.20382165605095542,
+  "leaks": 0
  },
  "tracks": {
   "2001-a-space-odyssey-soundtrack#1-1": {
    "expect": "classical",
-   "state": "unsure",
-   "score": 3,
-   "outcome": "unsure",
+   "state": "classical",
+   "score": 4,
+   "outcome": "match",
    "leaks": []
   },
   "2001-a-space-odyssey-soundtrack#1-3": {
@@ -39,15 +39,15 @@
   },
   "2001-a-space-odyssey-soundtrack#1-4": {
    "expect": "classical",
-   "state": "unsure",
-   "score": 3,
-   "outcome": "unsure",
+   "state": "classical",
+   "score": 4,
+   "outcome": "match",
    "leaks": []
   },
   "2001-a-space-odyssey-soundtrack#1-5": {
    "expect": "classical",
    "state": "classical",
-   "score": 6,
+   "score": 5,
    "outcome": "match",
    "leaks": []
   },
@@ -116,415 +116,359 @@
   },
   "adele-21#1-1": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 1,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "adele-21#1-2": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 1,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "adele-21#1-5": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 1,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "adele-21#1-11": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 1,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "amadeus-soundtrack#1-1": {
    "expect": "classical",
    "state": "classical",
-   "score": 8,
+   "score": 10,
    "outcome": "match",
    "leaks": []
   },
   "amadeus-soundtrack#1-3": {
    "expect": "classical",
    "state": "classical",
-   "score": 6,
+   "score": 8,
    "outcome": "match",
    "leaks": []
   },
   "amadeus-soundtrack#1-5": {
    "expect": "classical",
    "state": "classical",
-   "score": 5,
+   "score": 6,
    "outcome": "match",
    "leaks": []
   },
   "amadeus-soundtrack#1-7": {
    "expect": "classical",
    "state": "classical",
-   "score": 5,
+   "score": 6,
    "outcome": "match",
    "leaks": []
   },
   "amadeus-soundtrack#1-11": {
    "expect": "classical",
    "state": "classical",
-   "score": 5,
+   "score": 6,
    "outcome": "match",
    "leaks": []
   },
   "andrea-bocelli-romanza#1-1": {
    "expect": "unsure",
-   "state": "classical",
-   "score": 5,
-   "outcome": "crossover_classical",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "unsure",
+   "score": 1,
+   "outcome": "match",
+   "leaks": []
   },
   "andrea-bocelli-romanza#1-2": {
    "expect": "unsure",
-   "state": "classical",
-   "score": 5,
-   "outcome": "crossover_classical",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "unsure",
+   "score": 1,
+   "outcome": "match",
+   "leaks": []
   },
   "andrea-bocelli-romanza#1-4": {
    "expect": "unsure",
-   "state": "classical",
-   "score": 5,
-   "outcome": "crossover_classical",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "unsure",
+   "score": 1,
+   "outcome": "match",
+   "leaks": []
   },
   "andrea-bocelli-romanza#1-8": {
    "expect": "unsure",
-   "state": "classical",
-   "score": 5,
-   "outcome": "crossover_classical",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "unsure",
+   "score": 1,
+   "outcome": "match",
+   "leaks": []
   },
   "andrea-bocelli-romanza#1-12": {
    "expect": "unsure",
-   "state": "classical",
-   "score": 5,
-   "outcome": "crossover_classical",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "unsure",
+   "score": 1,
+   "outcome": "match",
+   "leaks": []
   },
   "clean-bandit-what-is-love#1-3": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 3,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "clean-bandit-what-is-love#1-4": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 1,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "clean-bandit-what-is-love#1-6": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 1,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "clean-bandit-what-is-love#1-9": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 1,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "daft-punk-random-access-memories#1-1": {
    "expect": "not_classical",
-   "state": "classical",
-   "score": 5,
-   "outcome": "false_positive",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 1,
+   "outcome": "match",
+   "leaks": []
   },
   "daft-punk-random-access-memories#1-3": {
    "expect": "not_classical",
-   "state": "classical",
-   "score": 5,
-   "outcome": "false_positive",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 1,
+   "outcome": "match",
+   "leaks": []
   },
   "daft-punk-random-access-memories#1-5": {
    "expect": "not_classical",
-   "state": "classical",
-   "score": 5,
-   "outcome": "false_positive",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 1,
+   "outcome": "match",
+   "leaks": []
   },
   "daft-punk-random-access-memories#1-8": {
    "expect": "not_classical",
-   "state": "classical",
-   "score": 5,
-   "outcome": "false_positive",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 1,
+   "outcome": "match",
+   "leaks": []
   },
   "daft-punk-random-access-memories#1-13": {
    "expect": "not_classical",
-   "state": "classical",
-   "score": 5,
-   "outcome": "false_positive",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 1,
+   "outcome": "match",
+   "leaks": []
   },
   "dave-brubeck-time-out#1-1": {
    "expect": "not_classical",
-   "state": "classical",
-   "score": 4,
-   "outcome": "false_positive",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 3,
+   "outcome": "match",
+   "leaks": []
   },
   "dave-brubeck-time-out#1-2": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 1,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "dave-brubeck-time-out#1-3": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 1,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "dave-brubeck-time-out#1-4": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 1,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "dave-brubeck-time-out#1-5": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 1,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "deep-purple-concerto-for-group-and-orchestra#1-1": {
    "expect": "unsure",
-   "state": "classical",
-   "score": 6,
-   "outcome": "crossover_classical",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 4,
+   "outcome": "crossover_not_classical",
+   "leaks": []
   },
   "deep-purple-concerto-for-group-and-orchestra#1-2": {
    "expect": "unsure",
-   "state": "classical",
-   "score": 6,
-   "outcome": "crossover_classical",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 4,
+   "outcome": "crossover_not_classical",
+   "leaks": []
   },
   "deep-purple-concerto-for-group-and-orchestra#1-3": {
    "expect": "unsure",
-   "state": "classical",
-   "score": 6,
-   "outcome": "crossover_classical",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 4,
+   "outcome": "crossover_not_classical",
+   "leaks": []
   },
   "dream-theater-six-degrees#2-1": {
    "expect": "not_classical",
-   "state": "classical",
-   "score": 7,
-   "outcome": "false_positive",
-   "leaks": [
-    "grouped in a work view",
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 6,
+   "outcome": "match",
+   "leaks": []
   },
   "dream-theater-six-degrees#2-2": {
    "expect": "not_classical",
-   "state": "classical",
-   "score": 5,
-   "outcome": "false_positive",
-   "leaks": [
-    "grouped in a work view",
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 4,
+   "outcome": "match",
+   "leaks": []
   },
   "dream-theater-six-degrees#2-4": {
    "expect": "not_classical",
-   "state": "classical",
-   "score": 5,
-   "outcome": "false_positive",
-   "leaks": [
-    "grouped in a work view",
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 4,
+   "outcome": "match",
+   "leaks": []
   },
   "dream-theater-six-degrees#2-5": {
    "expect": "not_classical",
-   "state": "classical",
-   "score": 5,
-   "outcome": "false_positive",
-   "leaks": [
-    "grouped in a work view",
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 4,
+   "outcome": "match",
+   "leaks": []
   },
   "dream-theater-six-degrees#2-7": {
    "expect": "not_classical",
-   "state": "classical",
-   "score": 5,
-   "outcome": "false_positive",
-   "leaks": [
-    "grouped in a work view",
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 4,
+   "outcome": "match",
+   "leaks": []
   },
   "dream-theater-six-degrees#2-8": {
    "expect": "not_classical",
-   "state": "classical",
-   "score": 8,
-   "outcome": "false_positive",
-   "leaks": [
-    "grouped in a work view",
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 6,
+   "outcome": "match",
+   "leaks": []
   },
   "duran-duran-rio#1-1": {
    "expect": "not_classical",
-   "state": "classical",
-   "score": 4,
-   "outcome": "false_positive",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 0,
+   "outcome": "match",
+   "leaks": []
   },
   "duran-duran-rio#1-2": {
    "expect": "not_classical",
-   "state": "classical",
-   "score": 4,
-   "outcome": "false_positive",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 0,
+   "outcome": "match",
+   "leaks": []
   },
   "duran-duran-rio#1-4": {
    "expect": "not_classical",
-   "state": "classical",
-   "score": 4,
-   "outcome": "false_positive",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 0,
+   "outcome": "match",
+   "leaks": []
   },
   "duran-duran-rio#1-6": {
    "expect": "not_classical",
-   "state": "classical",
-   "score": 4,
-   "outcome": "false_positive",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 0,
+   "outcome": "match",
+   "leaks": []
   },
   "elo-eldorado#1-1": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 3,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "elo-eldorado#1-2": {
    "expect": "not_classical",
-   "state": "unsure",
-   "score": 3,
-   "outcome": "unsure",
+   "state": "not_classical",
+   "score": 2,
+   "outcome": "match",
    "leaks": []
   },
   "elo-eldorado#1-8": {
    "expect": "not_classical",
-   "state": "unsure",
-   "score": 3,
-   "outcome": "unsure",
+   "state": "not_classical",
+   "score": 2,
+   "outcome": "match",
    "leaks": []
   },
   "elo-eldorado#1-9": {
    "expect": "not_classical",
-   "state": "unsure",
-   "score": 3,
-   "outcome": "unsure",
+   "state": "not_classical",
+   "score": 2,
+   "outcome": "match",
    "leaks": []
   },
   "elo-eldorado#1-10": {
    "expect": "not_classical",
-   "state": "classical",
-   "score": 6,
-   "outcome": "false_positive",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 4,
+   "outcome": "match",
+   "leaks": []
   },
   "glenn-gould-goldberg-1981-rip#1-1": {
    "expect": "classical",
-   "state": "not_classical",
-   "score": 0,
-   "outcome": "false_negative",
+   "state": "unsure",
+   "score": 2,
+   "outcome": "unsure",
    "leaks": []
   },
   "glenn-gould-goldberg-1981-rip#1-2": {
    "expect": "classical",
-   "state": "not_classical",
-   "score": 0,
-   "outcome": "false_negative",
+   "state": "unsure",
+   "score": 2,
+   "outcome": "unsure",
    "leaks": []
   },
   "glenn-gould-goldberg-1981-rip#1-3": {
    "expect": "classical",
-   "state": "not_classical",
-   "score": 0,
-   "outcome": "false_negative",
+   "state": "unsure",
+   "score": 2,
+   "outcome": "unsure",
    "leaks": []
   },
   "glenn-gould-goldberg-1981-rip#1-4": {
    "expect": "classical",
-   "state": "not_classical",
-   "score": 0,
-   "outcome": "false_negative",
+   "state": "unsure",
+   "score": 2,
+   "outcome": "unsure",
    "leaks": []
   },
   "glenn-gould-goldberg-1981-rip#1-32": {
    "expect": "classical",
-   "state": "not_classical",
-   "score": 0,
-   "outcome": "false_negative",
+   "state": "unsure",
+   "score": 2,
+   "outcome": "unsure",
    "leaks": []
   },
   "hans-zimmer-interstellar#1-1": {
@@ -564,82 +508,72 @@
   },
   "jacques-loussier-play-bach#1-1": {
    "expect": "unsure",
-   "state": "classical",
-   "score": 5,
-   "outcome": "crossover_classical",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "unsure",
+   "score": 6,
+   "outcome": "match",
+   "leaks": []
   },
   "jacques-loussier-play-bach#1-2": {
    "expect": "unsure",
-   "state": "classical",
-   "score": 5,
-   "outcome": "crossover_classical",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "unsure",
+   "score": 6,
+   "outcome": "match",
+   "leaks": []
   },
   "jacques-loussier-play-bach#1-3": {
    "expect": "unsure",
-   "state": "classical",
-   "score": 5,
-   "outcome": "crossover_classical",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "unsure",
+   "score": 6,
+   "outcome": "match",
+   "leaks": []
   },
   "jacques-loussier-play-bach#1-4": {
    "expect": "unsure",
-   "state": "classical",
-   "score": 5,
-   "outcome": "crossover_classical",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "unsure",
+   "score": 6,
+   "outcome": "match",
+   "leaks": []
   },
   "jacques-loussier-play-bach#1-5": {
    "expect": "unsure",
-   "state": "classical",
-   "score": 8,
-   "outcome": "crossover_classical",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "unsure",
+   "score": 10,
+   "outcome": "match",
+   "leaks": []
   },
   "jeremy-soule-skyrim#1-1": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 0,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "jeremy-soule-skyrim#1-2": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 0,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "jeremy-soule-skyrim#1-3": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 0,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "jeremy-soule-skyrim#1-4": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 0,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "jeremy-soule-skyrim#1-12": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 0,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "john-williams-star-wars#1-1": {
@@ -675,6 +609,41 @@
    "state": "unsure",
    "score": 1,
    "outcome": "unsure",
+   "leaks": []
+  },
+  "kanye-west-mbdtf#1-1": {
+   "expect": "not_classical",
+   "state": "not_classical",
+   "score": 0,
+   "outcome": "match",
+   "leaks": []
+  },
+  "kanye-west-mbdtf#1-3": {
+   "expect": "not_classical",
+   "state": "not_classical",
+   "score": 0,
+   "outcome": "match",
+   "leaks": []
+  },
+  "kanye-west-mbdtf#1-5": {
+   "expect": "not_classical",
+   "state": "not_classical",
+   "score": 0,
+   "outcome": "match",
+   "leaks": []
+  },
+  "kanye-west-mbdtf#1-9": {
+   "expect": "not_classical",
+   "state": "not_classical",
+   "score": 0,
+   "outcome": "match",
+   "leaks": []
+  },
+  "kanye-west-mbdtf#1-12": {
+   "expect": "not_classical",
+   "state": "not_classical",
+   "score": 0,
+   "outcome": "match",
    "leaks": []
   },
   "kendrick-lamar-to-pimp-a-butterfly#1-1": {
@@ -714,39 +683,31 @@
   },
   "lana-del-rey-born-to-die#1-1": {
    "expect": "not_classical",
-   "state": "classical",
-   "score": 4,
-   "outcome": "false_positive",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 0,
+   "outcome": "match",
+   "leaks": []
   },
   "lana-del-rey-born-to-die#1-2": {
    "expect": "not_classical",
-   "state": "classical",
-   "score": 4,
-   "outcome": "false_positive",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 0,
+   "outcome": "match",
+   "leaks": []
   },
   "lana-del-rey-born-to-die#1-3": {
    "expect": "not_classical",
-   "state": "classical",
-   "score": 4,
-   "outcome": "false_positive",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 0,
+   "outcome": "match",
+   "leaks": []
   },
   "lana-del-rey-born-to-die#1-4": {
    "expect": "not_classical",
-   "state": "classical",
-   "score": 4,
-   "outcome": "false_positive",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 0,
+   "outcome": "match",
+   "leaks": []
   },
   "miles-davis-kind-of-blue#1-1": {
    "expect": "not_classical",
@@ -785,54 +746,73 @@
   },
   "muse-the-resistance#1-1": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 1,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "muse-the-resistance#1-4": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 1,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "muse-the-resistance#1-8": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 1,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "muse-the-resistance#1-9": {
    "expect": "not_classical",
-   "state": "classical",
-   "score": 7,
-   "outcome": "false_positive",
-   "leaks": [
-    "grouped in a work view",
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 6,
+   "outcome": "match",
+   "leaks": []
   },
   "muse-the-resistance#1-10": {
    "expect": "not_classical",
-   "state": "classical",
-   "score": 7,
-   "outcome": "false_positive",
-   "leaks": [
-    "grouped in a work view",
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 6,
+   "outcome": "match",
+   "leaks": []
   },
   "muse-the-resistance#1-11": {
    "expect": "not_classical",
-   "state": "classical",
-   "score": 7,
-   "outcome": "false_positive",
-   "leaks": [
-    "grouped in a work view",
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 6,
+   "outcome": "match",
+   "leaks": []
+  },
+  "nas-gods-son#1-2": {
+   "expect": "not_classical",
+   "state": "not_classical",
+   "score": 1,
+   "outcome": "match",
+   "leaks": []
+  },
+  "nas-gods-son#1-3": {
+   "expect": "not_classical",
+   "state": "not_classical",
+   "score": 1,
+   "outcome": "match",
+   "leaks": []
+  },
+  "nas-gods-son#1-4": {
+   "expect": "not_classical",
+   "state": "not_classical",
+   "score": 1,
+   "outcome": "match",
+   "leaks": []
+  },
+  "nas-gods-son#1-12": {
+   "expect": "not_classical",
+   "state": "not_classical",
+   "score": 1,
+   "outcome": "match",
+   "leaks": []
   },
   "nas-illmatic#1-1": {
    "expect": "not_classical",
@@ -878,37 +858,37 @@
   },
   "nobuo-uematsu-final-fantasy-vii#1-2": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 0,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "nobuo-uematsu-final-fantasy-vii#1-3": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 0,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "nobuo-uematsu-final-fantasy-vii#1-5": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 0,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "nobuo-uematsu-final-fantasy-vii#4-83": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 0,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "platoon-soundtrack#1-1": {
    "expect": "classical",
-   "state": "classical",
-   "score": 4,
-   "outcome": "match",
+   "state": "unsure",
+   "score": 3,
+   "outcome": "unsure",
    "leaks": []
   },
   "platoon-soundtrack#1-2": {
@@ -941,37 +921,37 @@
   },
   "queen-a-night-at-the-opera#1-2": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 1,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "queen-a-night-at-the-opera#1-4": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 1,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "queen-a-night-at-the-opera#1-5": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 1,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "queen-a-night-at-the-opera#1-11": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 3,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "queen-a-night-at-the-opera#1-12": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 1,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "shawshank-redemption-soundtrack#1-1": {
@@ -997,9 +977,9 @@
   },
   "shawshank-redemption-soundtrack#1-8": {
    "expect": "classical",
-   "state": "unsure",
-   "score": 3,
-   "outcome": "unsure",
+   "state": "classical",
+   "score": 4,
+   "outcome": "match",
    "leaks": []
   },
   "shawshank-redemption-soundtrack#1-18": {
@@ -1039,121 +1019,107 @@
   },
   "the-who-tommy#1-1": {
    "expect": "not_classical",
-   "state": "classical",
-   "score": 7,
-   "outcome": "false_positive",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 3,
+   "outcome": "match",
+   "leaks": []
   },
   "the-who-tommy#1-2": {
    "expect": "not_classical",
-   "state": "classical",
-   "score": 5,
-   "outcome": "false_positive",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 1,
+   "outcome": "match",
+   "leaks": []
   },
   "the-who-tommy#1-4": {
    "expect": "not_classical",
-   "state": "classical",
-   "score": 5,
-   "outcome": "false_positive",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 1,
+   "outcome": "match",
+   "leaks": []
   },
   "the-who-tommy#1-13": {
    "expect": "not_classical",
-   "state": "classical",
-   "score": 5,
-   "outcome": "false_positive",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 1,
+   "outcome": "match",
+   "leaks": []
   },
   "the-who-tommy#1-24": {
    "expect": "not_classical",
-   "state": "classical",
-   "score": 5,
-   "outcome": "false_positive",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 1,
+   "outcome": "match",
+   "leaks": []
   },
   "tiesto-just-be#1-1": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 1,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "tiesto-just-be#1-3": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 1,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "tiesto-just-be#1-4": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 1,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "tiesto-just-be#1-7": {
    "expect": "not_classical",
-   "state": "classical",
-   "score": 4,
-   "outcome": "false_positive",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 3,
+   "outcome": "match",
+   "leaks": []
   },
   "tiesto-just-be#1-11": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 1,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "william-orbit-pieces-in-a-modern-style#1-1": {
    "expect": "unsure",
-   "state": "classical",
-   "score": 4,
-   "outcome": "crossover_classical",
-   "leaks": [
-    "classical tag writes allowed"
-   ]
+   "state": "not_classical",
+   "score": 3,
+   "outcome": "crossover_not_classical",
+   "leaks": []
   },
   "william-orbit-pieces-in-a-modern-style#1-2": {
    "expect": "unsure",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 1,
-   "outcome": "match",
+   "outcome": "crossover_not_classical",
    "leaks": []
   },
   "william-orbit-pieces-in-a-modern-style#1-3": {
    "expect": "unsure",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 1,
-   "outcome": "match",
+   "outcome": "crossover_not_classical",
    "leaks": []
   },
   "william-orbit-pieces-in-a-modern-style#1-6": {
    "expect": "unsure",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 1,
-   "outcome": "match",
+   "outcome": "crossover_not_classical",
    "leaks": []
   },
   "william-orbit-pieces-in-a-modern-style#1-9": {
    "expect": "unsure",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 3,
-   "outcome": "match",
+   "outcome": "crossover_not_classical",
    "leaks": []
   }
  },
@@ -1170,8 +1136,8 @@
   },
   "adele-21": {
    "expect": "not_classical",
-   "state": "unsure",
-   "outcome": "unsure"
+   "state": "not_classical",
+   "outcome": "match"
   },
   "amadeus-soundtrack": {
    "expect": "classical",
@@ -1180,48 +1146,48 @@
   },
   "andrea-bocelli-romanza": {
    "expect": "unsure",
-   "state": "classical",
-   "outcome": "crossover_classical"
+   "state": "unsure",
+   "outcome": "match"
   },
   "clean-bandit-what-is-love": {
    "expect": "not_classical",
-   "state": "unsure",
-   "outcome": "unsure"
+   "state": "not_classical",
+   "outcome": "match"
   },
   "daft-punk-random-access-memories": {
    "expect": "not_classical",
-   "state": "classical",
-   "outcome": "false_positive"
+   "state": "not_classical",
+   "outcome": "match"
   },
   "dave-brubeck-time-out": {
    "expect": "not_classical",
-   "state": "unsure",
-   "outcome": "unsure"
+   "state": "not_classical",
+   "outcome": "match"
   },
   "deep-purple-concerto-for-group-and-orchestra": {
    "expect": "unsure",
-   "state": "classical",
-   "outcome": "crossover_classical"
+   "state": "not_classical",
+   "outcome": "crossover_not_classical"
   },
   "dream-theater-six-degrees": {
    "expect": "not_classical",
-   "state": "classical",
-   "outcome": "false_positive"
+   "state": "not_classical",
+   "outcome": "match"
   },
   "duran-duran-rio": {
    "expect": "not_classical",
-   "state": "classical",
-   "outcome": "false_positive"
+   "state": "not_classical",
+   "outcome": "match"
   },
   "elo-eldorado": {
    "expect": "not_classical",
-   "state": "unsure",
-   "outcome": "unsure"
+   "state": "not_classical",
+   "outcome": "match"
   },
   "glenn-gould-goldberg-1981-rip": {
    "expect": "classical",
-   "state": "not_classical",
-   "outcome": "false_negative"
+   "state": "unsure",
+   "outcome": "unsure"
   },
   "hans-zimmer-interstellar": {
    "expect": "not_classical",
@@ -1230,18 +1196,23 @@
   },
   "jacques-loussier-play-bach": {
    "expect": "unsure",
-   "state": "classical",
-   "outcome": "crossover_classical"
+   "state": "unsure",
+   "outcome": "match"
   },
   "jeremy-soule-skyrim": {
    "expect": "not_classical",
-   "state": "unsure",
-   "outcome": "unsure"
+   "state": "not_classical",
+   "outcome": "match"
   },
   "john-williams-star-wars": {
    "expect": "not_classical",
    "state": "unsure",
    "outcome": "unsure"
+  },
+  "kanye-west-mbdtf": {
+   "expect": "not_classical",
+   "state": "not_classical",
+   "outcome": "match"
   },
   "kendrick-lamar-to-pimp-a-butterfly": {
    "expect": "not_classical",
@@ -1250,8 +1221,8 @@
   },
   "lana-del-rey-born-to-die": {
    "expect": "not_classical",
-   "state": "classical",
-   "outcome": "false_positive"
+   "state": "not_classical",
+   "outcome": "match"
   },
   "miles-davis-kind-of-blue": {
    "expect": "not_classical",
@@ -1260,8 +1231,13 @@
   },
   "muse-the-resistance": {
    "expect": "not_classical",
-   "state": "unsure",
-   "outcome": "unsure"
+   "state": "not_classical",
+   "outcome": "match"
+  },
+  "nas-gods-son": {
+   "expect": "not_classical",
+   "state": "not_classical",
+   "outcome": "match"
   },
   "nas-illmatic": {
    "expect": "not_classical",
@@ -1280,8 +1256,8 @@
   },
   "queen-a-night-at-the-opera": {
    "expect": "not_classical",
-   "state": "unsure",
-   "outcome": "unsure"
+   "state": "not_classical",
+   "outcome": "match"
   },
   "shawshank-redemption-soundtrack": {
    "expect": "unsure",
@@ -1295,69 +1271,19 @@
   },
   "the-who-tommy": {
    "expect": "not_classical",
-   "state": "classical",
-   "outcome": "false_positive"
+   "state": "not_classical",
+   "outcome": "match"
   },
   "tiesto-just-be": {
    "expect": "not_classical",
-   "state": "unsure",
-   "outcome": "unsure"
+   "state": "not_classical",
+   "outcome": "match"
   },
   "william-orbit-pieces-in-a-modern-style": {
    "expect": "unsure",
-   "state": "unsure",
-   "outcome": "match"
+   "state": "not_classical",
+   "outcome": "crossover_not_classical"
   }
  },
- "explanations": {
-  "andrea-bocelli-romanza#1-1": "Crossover (expected unsure): the genre 'Classical Crossover' contains 'classical' (+4), so pop ballads become classical and taggable. The MusicBrainz resolver treats crossover as non-classical. Curator decision; classifier change needs separate approval.",
-  "andrea-bocelli-romanza#1-2": "Crossover (expected unsure): the genre 'Classical Crossover' contains 'classical' (+4), so pop ballads become classical and taggable. The MusicBrainz resolver treats crossover as non-classical. Curator decision; classifier change needs separate approval.",
-  "andrea-bocelli-romanza#1-4": "Crossover (expected unsure): the genre 'Classical Crossover' contains 'classical' (+4), so pop ballads become classical and taggable. The MusicBrainz resolver treats crossover as non-classical. Curator decision; classifier change needs separate approval.",
-  "andrea-bocelli-romanza#1-8": "Crossover (expected unsure): the genre 'Classical Crossover' contains 'classical' (+4), so pop ballads become classical and taggable. The MusicBrainz resolver treats crossover as non-classical. Curator decision; classifier change needs separate approval.",
-  "andrea-bocelli-romanza#1-12": "Crossover (expected unsure): the genre 'Classical Crossover' contains 'classical' (+4), so pop ballads become classical and taggable. The MusicBrainz resolver treats crossover as non-classical. Curator decision; classifier change needs separate approval.",
-  "daft-punk-random-access-memories#1-1": "Generic WORK tag: Picard with track relationships writes each pop song's MusicBrainz work as WORK, and classify() gives any WORK tag +4, enough on its own for classical. Needs a classifier change (separate approval).",
-  "daft-punk-random-access-memories#1-3": "Generic WORK tag: Picard with track relationships writes each pop song's MusicBrainz work as WORK, and classify() gives any WORK tag +4, enough on its own for classical. Needs a classifier change (separate approval).",
-  "daft-punk-random-access-memories#1-5": "Generic WORK tag: Picard with track relationships writes each pop song's MusicBrainz work as WORK, and classify() gives any WORK tag +4, enough on its own for classical. Needs a classifier change (separate approval).",
-  "daft-punk-random-access-memories#1-8": "Generic WORK tag: Picard with track relationships writes each pop song's MusicBrainz work as WORK, and classify() gives any WORK tag +4, enough on its own for classical. Needs a classifier change (separate approval).",
-  "daft-punk-random-access-memories#1-13": "Generic WORK tag: Picard with track relationships writes each pop song's MusicBrainz work as WORK, and classify() gives any WORK tag +4, enough on its own for classical. Needs a classifier change (separate approval).",
-  "dave-brubeck-time-out#1-1": "Misleading title: 'Rondo' is a tempo/form word (+3) and the leader-as-composer differs from 'The Dave Brubeck Quartet' (+1) = 4. Fixed here by the admin's track pin, which survives a retag and rescans. Needs a classifier change (separate approval).",
-  "deep-purple-concerto-for-group-and-orchestra#1-1": "Crossover (expected unsure): tempo words in the movement titles (+3) and 'Concerto' in the album title (+2) score as classical. Arguably a real concerto; curator decision.",
-  "deep-purple-concerto-for-group-and-orchestra#1-2": "Crossover (expected unsure): tempo words in the movement titles (+3) and 'Concerto' in the album title (+2) score as classical. Arguably a real concerto; curator decision.",
-  "deep-purple-concerto-for-group-and-orchestra#1-3": "Crossover (expected unsure): tempo words in the movement titles (+3) and 'Concerto' in the album title (+2) score as classical. Arguably a real concerto; curator decision.",
-  "dream-theater-six-degrees#2-1": "Generic WORK tag: the prog-metal suite's name in WORK scores +4 on its own; the automatic matcher then builds a work from it, so the tracks are grouped and taggable. Needs a classifier change (separate approval).",
-  "dream-theater-six-degrees#2-2": "Generic WORK tag: the prog-metal suite's name in WORK scores +4 on its own; the automatic matcher then builds a work from it, so the tracks are grouped and taggable. Needs a classifier change (separate approval).",
-  "dream-theater-six-degrees#2-4": "Generic WORK tag: the prog-metal suite's name in WORK scores +4 on its own; the automatic matcher then builds a work from it, so the tracks are grouped and taggable. Needs a classifier change (separate approval).",
-  "dream-theater-six-degrees#2-5": "Generic WORK tag: the prog-metal suite's name in WORK scores +4 on its own; the automatic matcher then builds a work from it, so the tracks are grouped and taggable. Needs a classifier change (separate approval).",
-  "dream-theater-six-degrees#2-7": "Generic WORK tag: the prog-metal suite's name in WORK scores +4 on its own; the automatic matcher then builds a work from it, so the tracks are grouped and taggable. Needs a classifier change (separate approval).",
-  "dream-theater-six-degrees#2-8": "Generic WORK tag: the prog-metal suite's name in WORK scores +4 on its own; the automatic matcher then builds a work from it, so the tracks are grouped and taggable. Needs a classifier change (separate approval).",
-  "duran-duran-rio#1-1": "Genre word match: 'new romantic' contains 'romantic' (+4). Needs a classifier change (separate approval).",
-  "duran-duran-rio#1-2": "Genre word match: 'new romantic' contains 'romantic' (+4). Needs a classifier change (separate approval).",
-  "duran-duran-rio#1-4": "Genre word match: 'new romantic' contains 'romantic' (+4). Needs a classifier change (separate approval).",
-  "duran-duran-rio#1-6": "Genre word match: 'new romantic' contains 'romantic' (+4). Needs a classifier change (separate approval).",
-  "elo-eldorado#1-10": "Misleading title: 'Finale' (+3) plus 'Symphony' in the album title (+2) plus composer credit (+1). Needs a classifier change (separate approval).",
-  "glenn-gould-goldberg-1981-rip#1-1": "False negative on a pure classical album: an old disc-database rip with no composer, genre 'Other' and titles ('Aria', 'Variatio') that match no tempo, form or catalogue pattern scores 0 and becomes not_classical rather than unsure. Admin can pin the album; classifier change needs separate approval.",
-  "glenn-gould-goldberg-1981-rip#1-2": "False negative on a pure classical album: an old disc-database rip with no composer, genre 'Other' and titles ('Aria', 'Variatio') that match no tempo, form or catalogue pattern scores 0 and becomes not_classical rather than unsure. Admin can pin the album; classifier change needs separate approval.",
-  "glenn-gould-goldberg-1981-rip#1-3": "False negative on a pure classical album: an old disc-database rip with no composer, genre 'Other' and titles ('Aria', 'Variatio') that match no tempo, form or catalogue pattern scores 0 and becomes not_classical rather than unsure. Admin can pin the album; classifier change needs separate approval.",
-  "glenn-gould-goldberg-1981-rip#1-4": "False negative on a pure classical album: an old disc-database rip with no composer, genre 'Other' and titles ('Aria', 'Variatio') that match no tempo, form or catalogue pattern scores 0 and becomes not_classical rather than unsure. Admin can pin the album; classifier change needs separate approval.",
-  "glenn-gould-goldberg-1981-rip#1-32": "False negative on a pure classical album: an old disc-database rip with no composer, genre 'Other' and titles ('Aria', 'Variatio') that match no tempo, form or catalogue pattern scores 0 and becomes not_classical rather than unsure. Admin can pin the album; classifier change needs separate approval.",
-  "jacques-loussier-play-bach#1-1": "Crossover (expected unsure): jazz arrangements titled by Bach's works carry BWV numbers and form words, so they score as classical. Curator decision; a pin fixes it.",
-  "jacques-loussier-play-bach#1-2": "Crossover (expected unsure): jazz arrangements titled by Bach's works carry BWV numbers and form words, so they score as classical. Curator decision; a pin fixes it.",
-  "jacques-loussier-play-bach#1-3": "Crossover (expected unsure): jazz arrangements titled by Bach's works carry BWV numbers and form words, so they score as classical. Curator decision; a pin fixes it.",
-  "jacques-loussier-play-bach#1-4": "Crossover (expected unsure): jazz arrangements titled by Bach's works carry BWV numbers and form words, so they score as classical. Curator decision; a pin fixes it.",
-  "jacques-loussier-play-bach#1-5": "Crossover (expected unsure): jazz arrangements titled by Bach's works carry BWV numbers and form words, so they score as classical. Curator decision; a pin fixes it.",
-  "lana-del-rey-born-to-die#1-1": "Genre word match: 'baroque pop' contains 'baroque' (+4). The MusicBrainz resolver treats the same genre as non-classical. Needs a classifier change (separate approval).",
-  "lana-del-rey-born-to-die#1-2": "Genre word match: 'baroque pop' contains 'baroque' (+4). The MusicBrainz resolver treats the same genre as non-classical. Needs a classifier change (separate approval).",
-  "lana-del-rey-born-to-die#1-3": "Genre word match: 'baroque pop' contains 'baroque' (+4). The MusicBrainz resolver treats the same genre as non-classical. Needs a classifier change (separate approval).",
-  "lana-del-rey-born-to-die#1-4": "Genre word match: 'baroque pop' contains 'baroque' (+4). The MusicBrainz resolver treats the same genre as non-classical. Needs a classifier change (separate approval).",
-  "muse-the-resistance#1-9": "Generic WORK tag ('Exogenesis: Symphony') +4 plus the form word 'Symphony' +2; the suite is then grouped as a work. Needs a classifier change (separate approval).",
-  "muse-the-resistance#1-10": "Generic WORK tag ('Exogenesis: Symphony') +4 plus the form word 'Symphony' +2; the suite is then grouped as a work. Needs a classifier change (separate approval).",
-  "muse-the-resistance#1-11": "Generic WORK tag ('Exogenesis: Symphony') +4 plus the form word 'Symphony' +2; the suite is then grouped as a work. Needs a classifier change (separate approval).",
-  "the-who-tommy#1-1": "Genre word match: 'rock opera' contains 'opera', which classify() counts as a classical genre (+4). Fixed for this album by the admin's album pin, which the corpus confirms survives rescans. Needs a classifier change (separate approval).",
-  "the-who-tommy#1-2": "Genre word match: 'rock opera' contains 'opera', which classify() counts as a classical genre (+4). Fixed for this album by the admin's album pin, which the corpus confirms survives rescans. Needs a classifier change (separate approval).",
-  "the-who-tommy#1-4": "Genre word match: 'rock opera' contains 'opera', which classify() counts as a classical genre (+4). Fixed for this album by the admin's album pin, which the corpus confirms survives rescans. Needs a classifier change (separate approval).",
-  "the-who-tommy#1-13": "Genre word match: 'rock opera' contains 'opera', which classify() counts as a classical genre (+4). Fixed for this album by the admin's album pin, which the corpus confirms survives rescans. Needs a classifier change (separate approval).",
-  "the-who-tommy#1-24": "Genre word match: 'rock opera' contains 'opera', which classify() counts as a classical genre (+4). Fixed for this album by the admin's album pin, which the corpus confirms survives rescans. Needs a classifier change (separate approval).",
-  "tiesto-just-be#1-7": "Misleading title: a trance track titled 'Adagio for Strings' (+3) credits Barber as composer (+1) = 4. Needs a classifier change (separate approval).",
-  "william-orbit-pieces-in-a-modern-style#1-1": "Crossover (expected unsure): an electronic arrangement titled 'Adagio' (+3) with Barber credited (+1) scores as classical. Curator decision; a pin fixes it."
- }
+ "explanations": {}
 }

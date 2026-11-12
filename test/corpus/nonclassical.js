@@ -25,6 +25,8 @@ import { File } from "node-taglib-sharp";
 import { openCatalogue } from "../../src/model/catalogue.js";
 import { applyV2 } from "../../src/model/editor-v2.js";
 import { classify } from "../../src/model/reconcile.js";
+import { classificationEvidence } from "../../src/model/classify-evidence.js";
+import { classificationReport, openModelReadOnly } from "../../src/model/classification-report.js";
 import { autoMatchWorks, enqueueModelScan, modelStatus, runModelJobs } from "../../src/model/runtime.js";
 import { renderAlbumPresentation } from "../../src/model/presentation.js";
 import { modelAllowsTagging } from "../../src/model/write-guard.js";
@@ -89,35 +91,11 @@ export function scenariosOf(track) {
 }
 
 // --- why the classifier scored what it did ---------------------------------
-// A reading of the score terms in src/model/reconcile.js classify(). The
-// harness checks that these terms add up to the score the pipeline stored,
-// so a classifier change can't silently leave this explanation stale.
-const TEMPO =
-  /\b(allegr(?:o|etto)|adagi(?:o|etto)|andant(?:e|ino)|larghetto|largo|lento|grave|prestissimo|presto|vivace|moderato|scherzo|menuetto|minuet|menuet|rondo|finale|maestoso|sostenuto|cantabile)\b/i;
-const CATALOGUE_NUMBER = /\b(op(?:us)?\.?|bwv|kv?\.?|d\.|hob\.?|rv|woo|hwv|sz\.?|twv)\s*\d/i;
-const FORM =
-  /\b(symphon(?:y|ie)|sinfonia|sonata|concerto|suite|partita|string quartet|piano trio|quintet|nocturne|mazurka|polonaise|etude|prelude|fugue|toccata|cantata|oratorio|requiem|mass in|missa|motet|madrigal|lieder|impromptu|ballade|rhapsody|overture)(?:s|es)?\b/i;
-const CLASSICAL_GENRE = /\b(classical|baroque|opera|chamber|romantic|choral)\b/;
+// The classifier's own evidence breakdown (src/model/classify-evidence.js);
+// the harness checks it adds up to the score the pipeline stored.
 export function explain(hints) {
-  const text = [hints.title, hints.work, hints.album]
-    .filter((value) => typeof value === "string")
-    .join(" \n ")
-    .normalize("NFKD")
-    .replace(/\p{M}/gu, "");
-  const genres = (hints.genres || []).map((genre) => genre.toLowerCase());
-  const match = (re) => text.match(re)?.[0];
-  const genre = genres.find((g) => CLASSICAL_GENRE.test(g));
-  const signals = [];
-  if (hints.work) signals.push({ points: 4, signal: "WORK tag", value: hints.work });
-  if (hints.movement) signals.push({ points: 4, signal: "movement tag", value: hints.movement });
-  else if (match(TEMPO)) signals.push({ points: 3, signal: "tempo word", value: match(TEMPO) });
-  if (genre) signals.push({ points: 4, signal: "classical genre word", value: genre });
-  if (hints.classicalComposerRelation) signals.push({ points: 4, signal: "classical composer relation" });
-  if (hints.catalogueNumber || match(CATALOGUE_NUMBER))
-    signals.push({ points: 2, signal: "catalogue number", value: hints.catalogueNumber || match(CATALOGUE_NUMBER) });
-  if (match(FORM)) signals.push({ points: 2, signal: "form word", value: match(FORM) });
-  if (hints.composerDistinct) signals.push({ points: 1, signal: "composer differs from artist", value: (hints.composer || []).join("; ") });
-  return { signals, score: signals.reduce((sum, s) => sum + s.points, 0) };
+  const { signals, score, decision, reason } = classificationEvidence(hints);
+  return { signals, score, decision, reason };
 }
 
 // --- the library -------------------------------------------------------------
@@ -383,6 +361,26 @@ export async function runNonclassical(fixtures = nonclassicalFixtures()) {
     await scan(ctx);
     const rescanned = await observe(ctx, files);
 
+    // The read-only report over the finished library: the database and any
+    // existing write-ahead log stay byte-identical. (SQLite creates an empty
+    // -wal and its -shm index when no connection has them open; they hold
+    // no data.)
+    const modelFolder = path.join(dataFolder, "model");
+    const file = (name) => path.join(modelFolder, name);
+    const read = (name) => (fs.existsSync(file(name)) ? fs.readFileSync(file(name)) : null);
+    const before = { db: read("classical.sqlite"), wal: read("classical.sqlite-wal") };
+    const db = await openModelReadOnly(modelFolder);
+    let report;
+    try {
+      report = classificationReport(db, { all: true });
+    } finally {
+      db.close();
+    }
+    const walAfter = read("classical.sqlite-wal");
+    const reportReadOnly =
+      before.db.equals(read("classical.sqlite")) &&
+      (before.wal ? before.wal.equals(walAfter) : !walAfter || walAfter.length === 0);
+
     const tracks = [];
     const albums = [];
     for (const album of fixtures) {
@@ -401,7 +399,7 @@ export async function runNonclassical(fixtures = nonclassicalFixtures()) {
       for (const track of album.tracks) {
         const key = trackKey(album, track);
         const result = first.tracks.get(key);
-        const { signals, score } = explain(result.hints);
+        const { signals, score, reason } = explain(result.hints);
         const want = pinnedExpectation(album, track, result.state);
         const hasPin = !!(album.pins?.album || album.pins?.tracks?.[track.number]);
         tracks.push({
@@ -415,6 +413,7 @@ export async function runNonclassical(fixtures = nonclassicalFixtures()) {
           score: result.score,
           explainedScore: score,
           signals,
+          reason,
           outcome: outcomeOf(track.expect, result.state),
           grouped: result.grouped,
           inWork: result.inWork,
@@ -436,7 +435,7 @@ export async function runNonclassical(fixtures = nonclassicalFixtures()) {
         });
       }
     }
-    return { tracks, albums, unchangedMedia };
+    return { tracks, albums, unchangedMedia, report, reportReadOnly };
   } finally {
     await fsp.rm(root, { recursive: true, force: true });
   }

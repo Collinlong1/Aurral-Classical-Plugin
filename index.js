@@ -4235,9 +4235,9 @@ var require_byteVector = __commonJS({
        * Creates a {@link ByteVector} using the contents of a file as the data
        * @param path Path to the file to store in the ByteVector
        */
-      static fromPath(path15) {
-        utils_1.Guards.truthy(path15, "path");
-        const fileBuffer = fs9.readFileSync(path15);
+      static fromPath(path16) {
+        utils_1.Guards.truthy(path16, "path");
+        const fileBuffer = fs9.readFileSync(path16);
         return _ByteVector.fromByteArray(fileBuffer);
       }
       /**
@@ -5269,12 +5269,12 @@ var require_stream = __commonJS({
         this._position = 0;
         this._length = fs9.fstatSync(fd).size;
       }
-      static createAsRead(path15) {
-        const fd = fs9.openSync(path15, "r");
+      static createAsRead(path16) {
+        const fd = fs9.openSync(path16, "r");
         return new _Stream(fd, false);
       }
-      static createAsReadWrite(path15) {
-        const fd = fs9.openSync(path15, "r+");
+      static createAsReadWrite(path16) {
+        const fd = fs9.openSync(path16, "r+");
         return new _Stream(fd, true);
       }
       // #endregion
@@ -5373,9 +5373,9 @@ var require_fileAbstraction = __commonJS({
        * @param path Path of the file to use in the new instance
        * @throws Error Thrown if `path` is falsy
        */
-      constructor(path15) {
-        utils_1.Guards.truthy(path15, "path");
-        this._name = path15;
+      constructor(path16) {
+        utils_1.Guards.truthy(path16, "path");
+        this._name = path16;
       }
       /** @inheritDoc */
       get name() {
@@ -8655,7 +8655,7 @@ var require_picture = __commonJS({
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PictureLazy = exports.Picture = exports.PictureType = void 0;
-    var path15 = __require("path");
+    var path16 = __require("path");
     var byteVector_1 = require_byteVector();
     var fileAbstraction_1 = require_fileAbstraction();
     var utils_1 = require_utils();
@@ -8700,7 +8700,7 @@ var require_picture = __commonJS({
         utils_1.Guards.truthy(filePath, "filePath");
         const picture = new _Picture();
         picture.data = byteVector_1.ByteVector.fromPath(filePath);
-        picture.filename = path15.basename(filePath);
+        picture.filename = path16.basename(filePath);
         picture.description = picture.filename;
         picture.mimeType = _Picture.getMimeTypeFromFilename(picture.filename);
         picture.type = picture.mimeType.startsWith("image/") ? PictureType.FrontCover : PictureType.NotAPicture;
@@ -9049,7 +9049,7 @@ var require_picture = __commonJS({
         utils_1.Guards.truthy(filePath, "path");
         const picture = new _PictureLazy();
         picture._file = new fileAbstraction_1.LocalFileAbstraction(filePath);
-        picture._filename = path15.basename(filePath);
+        picture._filename = path16.basename(filePath);
         picture._description = picture._filename;
         picture._mimeType = Picture.getMimeTypeFromFilename(picture._filename);
         picture._type = picture._mimeType.startsWith("image/") ? PictureType.FrontCover : PictureType.NotAPicture;
@@ -35206,7 +35206,7 @@ var require_dist = __commonJS({
 });
 
 // src/index.js
-import path14 from "node:path";
+import path15 from "node:path";
 
 // src/model/editor.js
 import path4 from "node:path";
@@ -36142,6 +36142,774 @@ async function fingerprint(file) {
   return `${CONTAINER_PREFIX}${await hashRanges(file, [[0, size]])}`;
 }
 
+// src/resolver.js
+var DEFAULT_KNOWN_NAMES = {
+  "\u0421\u0435\u0440\u0433\u0435\u0439 \u0421\u0435\u0440\u0433\u0435\u0435\u0432\u0438\u0447 \u041F\u0440\u043E\u043A\u043E\u0444\u044C\u0435\u0432": "Sergei Prokofiev",
+  "\u041F\u0451\u0442\u0440 \u0418\u043B\u044C\u0438\u0447 \u0427\u0430\u0439\u043A\u043E\u0432\u0441\u043A\u0438\u0439": "Pyotr Tchaikovsky",
+  "\u041F\u0435\u0442\u0440 \u0418\u043B\u044C\u0438\u0447 \u0427\u0430\u0439\u043A\u043E\u0432\u0441\u043A\u0438\u0439": "Pyotr Tchaikovsky",
+  "\u0414\u043C\u0438\u0442\u0440\u0438\u0439 \u0414\u043C\u0438\u0442\u0440\u0438\u0435\u0432\u0438\u0447 \u0428\u043E\u0441\u0442\u0430\u043A\u043E\u0432\u0438\u0447": "Dmitri Shostakovich",
+  "\u041C\u043E\u0434\u0435\u0441\u0442 \u041F\u0435\u0442\u0440\u043E\u0432\u0438\u0447 \u041C\u0443\u0441\u043E\u0440\u0433\u0441\u043A\u0438\u0439": "Modest Mussorgsky",
+  "\u041D\u0438\u043A\u043E\u043B\u0430\u0439 \u0410\u043D\u0434\u0440\u0435\u0435\u0432\u0438\u0447 \u0420\u0438\u043C\u0441\u043A\u0438\u0439-\u041A\u043E\u0440\u0441\u0430\u043A\u043E\u0432": "Nikolai Rimsky-Korsakov",
+  "\u0418\u0433\u043E\u0440\u044C \u0424\u0451\u0434\u043E\u0440\u043E\u0432\u0438\u0447 \u0421\u0442\u0440\u0430\u0432\u0438\u043D\u0441\u043A\u0438\u0439": "Igor Stravinsky",
+  "\u0418\u0433\u043E\u0440\u044C \u0424\u0435\u0434\u043E\u0440\u043E\u0432\u0438\u0447 \u0421\u0442\u0440\u0430\u0432\u0438\u043D\u0441\u043A\u0438\u0439": "Igor Stravinsky",
+  "\u0421\u0435\u0440\u0433\u0435\u0439 \u0412\u0430\u0441\u0438\u043B\u044C\u0435\u0432\u0438\u0447 \u0420\u0430\u0445\u043C\u0430\u043D\u0438\u043D\u043E\u0432": "Sergei Rachmaninoff",
+  "\u041C\u0438\u0445\u0430\u0438\u043B \u0418\u0432\u0430\u043D\u043E\u0432\u0438\u0447 \u0413\u043B\u0438\u043D\u043A\u0430": "Mikhail Glinka",
+  "\u0410\u043B\u0435\u043A\u0441\u0430\u043D\u0434\u0440 \u041F\u043E\u0440\u0444\u0438\u0440\u044C\u0435\u0432\u0438\u0447 \u0411\u043E\u0440\u043E\u0434\u0438\u043D": "Alexander Borodin",
+  "Fryderyk Chopin": "Fr\xE9d\xE9ric Chopin",
+  "Fryderyk Franciszek Chopin": "Fr\xE9d\xE9ric Chopin",
+  "\u0424\u0440\u0438\u0434\u0435\u0440\u0438\u043A \u0428\u043E\u043F\u0435\u043D": "Fr\xE9d\xE9ric Chopin",
+  "\u0424\u0440\u0438\u0434\u0435\u0440\u0438\u043A \u0424\u0440\u0430\u043D\u0446\u0438\u0448\u0435\u043A \u0428\u043E\u043F\u0435\u043D": "Fr\xE9d\xE9ric Chopin",
+  "\u0418\u043E\u0433\u0430\u043D\u043D \u0421\u0435\u0431\u0430\u0441\u0442\u044C\u044F\u043D \u0411\u0430\u0445": "Johann Sebastian Bach",
+  "\u05D4\u05EA\u05D6\u05DE\u05D5\u05E8\u05EA \u05D4\u05E4\u05D9\u05DC\u05D4\u05E8\u05DE\u05D5\u05E0\u05D9\u05EA \u05D4\u05D9\u05E9\u05E8\u05D0\u05DC\u05D9\u05EA": "Israel Philharmonic Orchestra"
+};
+var DEFAULT_NON_CLASSICAL_ARTISTS = [
+  "28503ab7-8bf2-4666-a7bd-2644bfc7cb1d",
+  // Dream Theater
+  "bc641be9-ca36-4c61-9394-5230433f6646",
+  // Liquid Tension Experiment
+  "72eabb1a-4d2c-4de6-90f2-671b2cada42b",
+  // Caravan Palace
+  "6f45f514-a46b-4153-808b-731fccd3da74",
+  // Abstract Orchestra
+  "0aef8ffd-942e-4e03-bf4a-1749ddebc00a"
+  // Evan Marien
+];
+var DEFAULT_CLASSICAL_GENRES = [
+  "baroque",
+  "renaissance",
+  "medieval",
+  "early music",
+  "romanticism",
+  "opera",
+  "operetta",
+  "chamber music",
+  "art song",
+  "lied",
+  "choral",
+  "orchestral",
+  "symphony",
+  "concerto",
+  "sonata",
+  "oratorio",
+  "mass",
+  "requiem",
+  "string quartet",
+  "impressionism",
+  "neoclassicism",
+  "minimalism",
+  "serialism",
+  "twelve-tone",
+  "gregorian chant",
+  "sacred choral music"
+];
+var DEFAULT_NON_CLASSICAL_GENRES = [
+  "rock",
+  "pop",
+  "metal",
+  "punk",
+  "grunge",
+  "emo",
+  "indie",
+  "hip hop",
+  "hiphop",
+  "rap",
+  "trap",
+  "drill",
+  "grime",
+  "phonk",
+  "r&b",
+  "rnb",
+  "soul",
+  "funk",
+  "disco",
+  "gospel",
+  "blues",
+  "jazz",
+  "swing",
+  "country",
+  "folk",
+  "bluegrass",
+  "americana",
+  "singer songwriter",
+  "reggae",
+  "dancehall",
+  "reggaeton",
+  "ska",
+  "afrobeats",
+  "electronic",
+  "electro",
+  "edm",
+  "dance",
+  "house",
+  "techno",
+  "trance",
+  "dubstep",
+  "drum and bass",
+  "breakbeat",
+  "hyperpop",
+  "synthwave",
+  "darkwave",
+  "shoegaze",
+  "lo fi"
+];
+var HARD_NON_CLASSICAL_GENRES = [
+  "christmas",
+  "holiday",
+  "soundtrack",
+  "film score",
+  "film soundtrack",
+  "cinematic",
+  "video game",
+  "game music",
+  "musical",
+  "musicals",
+  "show tunes",
+  "broadway",
+  "crossover",
+  "easy listening",
+  "children's music",
+  "lullaby",
+  "new age",
+  "lounge",
+  "bossa nova",
+  "trailer music"
+];
+var NON_CLASSICAL_RELEASE_TYPES = ["soundtrack", "spokenword", "audiobook", "audio drama", "interview", "dj-mix", "mixtape/street"];
+var CLASSICAL_WORK_TYPES = [
+  "aria",
+  "ballet",
+  "cantata",
+  "concerto",
+  "\xE9tude",
+  "etude",
+  "incidental music",
+  "madrigal",
+  "mass",
+  "motet",
+  "opera",
+  "operetta",
+  "oratorio",
+  "overture",
+  "partita",
+  "quartet",
+  "sonata",
+  "song-cycle",
+  "suite",
+  "symphonic poem",
+  "symphony",
+  "zarzuela",
+  "variations",
+  "prelude",
+  "chorale",
+  "chanson"
+];
+var NON_CLASSICAL_WORK_TYPES = ["soundtrack", "musical", "play", "audio drama", "beijing opera"];
+var EARLY_COMPOSER_YEAR = 1900;
+var DEFAULT_COMPOSER_RELATIONS = ["composer", "writer"];
+var DEFAULT_ORDER = [
+  "composers",
+  "arrangers",
+  "soloists",
+  "ensembles",
+  "conductors",
+  "credited"
+];
+var ROLES = DEFAULT_ORDER;
+var LYRICIST_RELATIONS = /* @__PURE__ */ new Set(["lyricist", "librettist"]);
+var ARRANGER_RELATIONS = /* @__PURE__ */ new Set([
+  "arranger",
+  "instrument arranger",
+  "orchestrator",
+  "vocal arranger"
+]);
+var PERFORMER_RELATIONS = /* @__PURE__ */ new Set(["instrument", "vocal", "performer"]);
+var ENSEMBLE_ARTIST_TYPES = /* @__PURE__ */ new Set(["orchestra", "choir", "group"]);
+var PERFORMER_ROLE_RELATIONS = /* @__PURE__ */ new Set([
+  ...PERFORMER_RELATIONS,
+  "conductor",
+  "performing orchestra",
+  "chorus master"
+]);
+var GROUP_VOCAL_ATTRIBUTES = /* @__PURE__ */ new Set(["choir vocals", "background vocals"]);
+var WORK_PARTS_RELATION = "parts";
+var MAX_PARENT_WORK_DEPTH = 3;
+var lowerSet = (values) => new Set((values || []).map((a) => String(a).toLowerCase()));
+function isSoloistRelation(rel) {
+  const attributes = lowerSet(rel.attributes);
+  if (attributes.has("solo")) return true;
+  return rel.type === "vocal" && [...attributes].some((a) => !GROUP_VOCAL_ATTRIBUTES.has(a));
+}
+var unique = (values) => [...new Set(values.filter(Boolean))];
+function isPlaceholder(name) {
+  const text4 = String(name || "").trim();
+  return text4.startsWith("[") && text4.endsWith("]");
+}
+function isLatin(text4) {
+  for (const ch of String(text4 || "")) {
+    if (new RegExp("\\p{L}", "u").test(ch) && !new RegExp("\\p{Script=Latin}", "u").test(ch)) return false;
+  }
+  return true;
+}
+var CLASSICAL_WORD = /(^|\s)classical(\s|$)/;
+function normGenre(name) {
+  return String(name || "").toLowerCase().replaceAll("-", " ").split(/\s+/).filter(Boolean).join(" ");
+}
+function genreNames(entity) {
+  const names = new Set((entity?.genres || []).map((g) => normGenre(g?.name)));
+  names.delete("");
+  return names;
+}
+var escapeRegex = (text4) => text4.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+function addPerson(people, person) {
+  if (person && people.every((p) => p.id !== person.id)) people.push(person);
+}
+var emptyCredits = () => ({
+  composers: [],
+  lyricists: [],
+  arrangers: [],
+  soloists: [],
+  ensembles: [],
+  conductors: [],
+  credited: [],
+  work: null
+});
+var ClassicalResolver = class _ClassicalResolver {
+  static RECORDING_INC = "artist-credits+artist-rels+work-rels+genres";
+  static RELEASE_GROUP_INC = "genres";
+  static WORK_INC = "artist-rels+work-rels";
+  static ARTIST_INC = "aliases+genres";
+  static MEMBERSHIP_INC = "artist-rels";
+  static MIN_CREDITED_LINEUP = 3;
+  // `mb` is { get(entityType, id, inc, { ttl }) -> Promise<object|null> }.
+  constructor(mb, {
+    log: log2 = () => {
+    },
+    knownNames = DEFAULT_KNOWN_NAMES,
+    nonClassicalArtists = DEFAULT_NON_CLASSICAL_ARTISTS,
+    classicalGenres = DEFAULT_CLASSICAL_GENRES,
+    nonClassicalGenres = DEFAULT_NON_CLASSICAL_GENRES,
+    composerRelations = DEFAULT_COMPOSER_RELATIONS,
+    checkArtistGenres = true,
+    separator = " \u2014 ",
+    listSeparator = " / ",
+    order = DEFAULT_ORDER,
+    maxSoloists = 4,
+    maxArtistSoloists = 4,
+    trackArtistFallback = false,
+    requireEvidence = true,
+    recordingTtlMs
+  } = {}) {
+    this.mb = mb;
+    this.log = log2;
+    this.knownNames = { ...knownNames };
+    this.nonClassicalArtists = new Set(nonClassicalArtists);
+    this.classicalGenres = new Set(classicalGenres.map(normGenre));
+    const terms = [...new Set(nonClassicalGenres.map(normGenre))].filter(Boolean).sort((a, b) => b.length - a.length);
+    this.nonClassicalRe = terms.length ? new RegExp(`(?<![\\p{L}\\p{N}_])(?:${terms.map(escapeRegex).join("|")})(?![\\p{L}\\p{N}_])`, "u") : null;
+    this.composerRelations = new Set(composerRelations);
+    this.checkArtistGenres = checkArtistGenres;
+    this.separator = separator;
+    this.listSeparator = listSeparator;
+    this.order = [...order];
+    this.maxSoloists = maxSoloists;
+    this.maxArtistSoloists = maxArtistSoloists;
+    this.trackArtistFallback = trackArtistFallback;
+    this.requireEvidence = requireEvidence;
+    const hard = HARD_NON_CLASSICAL_GENRES.map(normGenre).sort((a, b) => b.length - a.length);
+    this.hardNonClassicalRe = new RegExp(`(?<![\\p{L}\\p{N}_])(?:${hard.map(escapeRegex).join("|")})(?![\\p{L}\\p{N}_])`, "u");
+    this.recordingTtlMs = recordingTtlMs;
+    this.skipReason = null;
+  }
+  // -- fetching -----------------------------------------------------------
+  getRecording(id) {
+    return this.mb.get("recording", id, _ClassicalResolver.RECORDING_INC, { ttl: this.recordingTtlMs });
+  }
+  getWork(id) {
+    return id ? this.mb.get("work", id, _ClassicalResolver.WORK_INC) : null;
+  }
+  getArtist(id) {
+    return id ? this.mb.get("artist", id, _ClassicalResolver.ARTIST_INC) : null;
+  }
+  getReleaseGroup(id) {
+    return id ? this.mb.get("release-group", id, _ClassicalResolver.RELEASE_GROUP_INC) : null;
+  }
+  // -- genres -------------------------------------------------------------
+  isHardNonClassicalGenre(name) {
+    return this.hardNonClassicalRe.test(name);
+  }
+  isClassicalGenre(name) {
+    if (this.isHardNonClassicalGenre(name)) return false;
+    return this.classicalGenres.has(name) || CLASSICAL_WORD.test(name);
+  }
+  isNonClassicalGenre(name) {
+    return this.isHardNonClassicalGenre(name) || Boolean(this.nonClassicalRe && this.nonClassicalRe.test(name));
+  }
+  // true (classical), false (not classical) or null (no signal). A
+  // classical genre wins over "pop" or "rock" on the same entity, but not
+  // over Christmas, soundtrack or crossover genres.
+  classifyGenres(genres) {
+    const list = [...genres];
+    if (list.some((g) => this.isHardNonClassicalGenre(g))) return false;
+    if (list.some((g) => this.isClassicalGenre(g))) return true;
+    if (list.some((g) => this.isNonClassicalGenre(g))) return false;
+    return null;
+  }
+  async isNonClassicalArtist(artist) {
+    const id = artist?.id;
+    if (this.nonClassicalArtists.has(id)) return true;
+    if (!this.checkArtistGenres || !id) return false;
+    const data = await this.getArtist(id) || {};
+    const genres = data.genres || [];
+    if (!genres.length) return false;
+    if (this.classifyGenres(genreNames(data)) === true) return false;
+    const top = Math.max(...genres.map((g) => g.count || 0));
+    const topNames = genreNames({ genres: genres.filter((g) => (g.count || 0) === top) });
+    return [...topNames].some((g) => this.isNonClassicalGenre(g));
+  }
+  // -- names --------------------------------------------------------------
+  static bestEnglishAlias(aliases) {
+    const candidates2 = (aliases || []).filter(
+      (a) => String(a.locale || "").replaceAll("-", "_").split("_")[0] === "en" && a.name && a.type !== "Search hint" && !a.ended
+    );
+    if (!candidates2.length) return null;
+    const key = (a) => [a.primary ? 0 : 1, a.type == null || a.type === "Artist name" ? 0 : 1];
+    return [...candidates2].sort((x, y) => {
+      const [a, b] = [key(x), key(y)];
+      return a[0] - b[0] || a[1] - b[1];
+    })[0];
+  }
+  static pickEnglishAlias(aliases) {
+    return _ClassicalResolver.bestEnglishAlias(aliases)?.name ?? null;
+  }
+  async englishName(artist) {
+    return (await this.englishNames(artist))[0];
+  }
+  async englishNames(artist) {
+    if (!artist) return [null, null];
+    const id = artist.id;
+    const name = artist.name || "";
+    const sortName = artist["sort-name"] || artist.sort_name || "";
+    const override = [id, name, sortName].filter((key) => key && Object.hasOwn(this.knownNames, key)).map((key) => this.knownNames[key])[0];
+    if (!name && !override) return [null, null];
+    let aliases = artist.aliases;
+    if (aliases == null) aliases = (await this.getArtist(id) || {}).aliases || [];
+    const alias = _ClassicalResolver.bestEnglishAlias(aliases);
+    const aliasSort = alias ? alias["sort-name"] : null;
+    if (override) return [override, aliasSort || sortName || null];
+    if (alias && (alias.primary || !isLatin(name))) return [alias.name, aliasSort || sortName || null];
+    if (isLatin(name)) return [name, sortName || null];
+    if (sortName && sortName.includes(",") && isLatin(sortName)) {
+      const [surname2, rest] = sortName.split(/,(.*)/s).map((s) => (s || "").trim());
+      const given = rest ? rest.split(/\s+/)[0] : "";
+      return [`${given} ${surname2}`.trim(), sortName];
+    }
+    return [name, sortName || null];
+  }
+  async person(artist) {
+    const [name, sortName] = await this.englishNames(artist);
+    if (!name) return null;
+    return { id: artist.id || name, name, sortName: sortName || name };
+  }
+  // -- credits ------------------------------------------------------------
+  async collectWorkCredits(workId, credits3, depth = 0, seen = /* @__PURE__ */ new Set()) {
+    if (!workId || seen.has(workId)) return;
+    seen.add(workId);
+    const work = await this.getWork(workId);
+    if (!work) return;
+    if (credits3.work == null) credits3.work = work;
+    let foundComposer = false;
+    const parents = [];
+    for (const rel of work.relations || []) {
+      const type = rel.type;
+      if (rel["target-type"] === "work" || "work" in rel) {
+        if (type === WORK_PARTS_RELATION && rel.direction === "backward") parents.push(rel.work?.id);
+        continue;
+      }
+      const artist = rel.artist;
+      if (!artist) continue;
+      if (this.composerRelations.has(type)) {
+        addPerson(credits3.composers, await this.person(artist));
+        foundComposer = true;
+      } else if (LYRICIST_RELATIONS.has(type)) {
+        addPerson(credits3.lyricists, await this.person(artist));
+      } else if (ARRANGER_RELATIONS.has(type)) {
+        addPerson(credits3.arrangers, await this.person(artist));
+      }
+    }
+    if (!foundComposer && depth < MAX_PARENT_WORK_DEPTH) {
+      for (const parentId of parents) await this.collectWorkCredits(parentId, credits3, depth + 1, seen);
+    }
+  }
+  async workCredits(recording) {
+    const credits3 = emptyCredits();
+    for (const rel of recording.relations || []) {
+      if (rel.type !== "performance") continue;
+      await this.collectWorkCredits(rel.work?.id, credits3);
+    }
+    return credits3;
+  }
+  async isMemberOf(artistId, ensembleIds) {
+    const data = await this.mb.get("artist", artistId, _ClassicalResolver.MEMBERSHIP_INC) || {};
+    return (data.relations || []).some(
+      (rel) => rel.type === "member of band" && (rel.direction ?? "forward") === "forward" && ensembleIds.has(rel.artist?.id)
+    );
+  }
+  async artistType(artist) {
+    let type = artist?.type;
+    if (type == null && artist?.id) type = (await this.getArtist(artist.id) || {}).type;
+    return String(type || "").toLowerCase();
+  }
+  async addPerformers(recording, credits3) {
+    const markedSoloists = [];
+    const individuals = [];
+    const voiceOnly = /* @__PURE__ */ new Set();
+    const wanted = /* @__PURE__ */ new Set(["conductor", "performing orchestra", ...PERFORMER_RELATIONS, ...ARRANGER_RELATIONS]);
+    for (const rel of recording.relations || []) {
+      const type = rel.type;
+      const artist = rel.artist;
+      if (!artist || !wanted.has(type)) continue;
+      const person = await this.person(artist);
+      if (type === "conductor") addPerson(credits3.conductors, person);
+      else if (ARRANGER_RELATIONS.has(type)) addPerson(credits3.arrangers, person);
+      else if (type === "performing orchestra" || ENSEMBLE_ARTIST_TYPES.has(await this.artistType(artist)))
+        addPerson(credits3.ensembles, person);
+      else if (isSoloistRelation(rel)) {
+        addPerson(markedSoloists, person);
+        if (person && !lowerSet(rel.attributes).has("solo")) voiceOnly.add(person.id);
+      } else addPerson(individuals, person);
+    }
+    const creditedIds = /* @__PURE__ */ new Set();
+    for (const credit of recording["artist-credit"] || []) {
+      const artist = credit.artist || {};
+      creditedIds.add(artist.id);
+      if (ENSEMBLE_ARTIST_TYPES.has(await this.artistType(artist)))
+        addPerson(credits3.ensembles, await this.person(artist));
+    }
+    const ensembleIds = new Set(credits3.ensembles.map((p) => p.id));
+    const isMember = async (person) => ensembleIds.size > 0 && await this.isMemberOf(person.id, ensembleIds);
+    const keptSoloists = [];
+    for (const p of markedSoloists) if (!voiceOnly.has(p.id) || !await isMember(p)) keptSoloists.push(p);
+    const creditedIndividuals = individuals.filter((p) => creditedIds.has(p.id));
+    let creditedMembers = /* @__PURE__ */ new Set();
+    for (const p of creditedIndividuals) if (await isMember(p)) creditedMembers.add(p.id);
+    if (creditedMembers.size < _ClassicalResolver.MIN_CREDITED_LINEUP) creditedMembers = /* @__PURE__ */ new Set();
+    for (const p of creditedIndividuals) if (!creditedMembers.has(p.id)) addPerson(keptSoloists, p);
+    const others = individuals.filter((p) => !creditedIds.has(p.id));
+    for (const p of keptSoloists) addPerson(credits3.soloists, p);
+    if (!credits3.ensembles.length && others.length <= this.maxSoloists) {
+      for (const p of others) addPerson(credits3.soloists, p);
+    } else if (others.length) {
+      this.log(`left out ${others.length} individual performer(s) as ensemble members`);
+    }
+    const sparse = !(recording.relations || []).some((rel) => PERFORMER_ROLE_RELATIONS.has(rel.type));
+    const placed = new Set(
+      [credits3.composers, credits3.arrangers, credits3.soloists, credits3.ensembles, credits3.conductors].flat().map((p) => p.id)
+    );
+    for (const credit of recording["artist-credit"] || []) {
+      const artist = credit.artist || {};
+      const person = await this.person(artist);
+      if (person && creditedMembers.has(person.id)) continue;
+      addPerson(credits3.credited, person);
+      if (sparse && !credits3.ensembles.length && person && !placed.has(person.id) && await this.artistType(artist) === "person")
+        addPerson(credits3.soloists, person);
+    }
+  }
+  async composersFromTrackArtist(recording, trackArtistIds, credits3) {
+    const recordingIds = new Set((recording["artist-credit"] || []).map((c) => c.artist?.id));
+    for (const id of unique(trackArtistIds || [])) {
+      if (recordingIds.has(id) || this.nonClassicalArtists.has(id)) continue;
+      const artist = await this.getArtist(id);
+      if (!artist || String(artist.type || "").toLowerCase() !== "person") continue;
+      if (await this.isNonClassicalArtist({ id })) continue;
+      const person = await this.person(artist);
+      if (person) addPerson(credits3.composers, person);
+    }
+  }
+  static orderByBilling(recording, albumArtistIds, credits3) {
+    const billing = [...albumArtistIds || [], ...(recording["artist-credit"] || []).map((c) => c.artist?.id)];
+    const rank = /* @__PURE__ */ new Map();
+    billing.forEach((id, position) => {
+      if (!rank.has(id)) rank.set(id, position);
+    });
+    for (const role of ["soloists", "ensembles", "conductors"]) {
+      const people = credits3[role];
+      const sorted = people.map((p, i) => [rank.has(p.id) ? rank.get(p.id) : billing.length, i, p]).sort((a, b) => a[0] - b[0] || a[1] - b[1]).map(([, , p]) => p);
+      credits3[role] = sorted;
+    }
+  }
+  // -- evidence -----------------------------------------------------------
+  // An artist known only for classical music: their most-voted genres are
+  // classical, and none of them isn't.
+  async isClassicalArtist(id) {
+    const data = await this.getArtist(id) || {};
+    const genres = data.genres || [];
+    if (!genres.length) return false;
+    const top = Math.max(...genres.map((g) => g.count || 0));
+    const names = [...genreNames({ genres: genres.filter((g) => (g.count || 0) === top) })];
+    return names.some((g) => this.isClassicalGenre(g)) && !names.some((g) => this.isNonClassicalGenre(g));
+  }
+  async isEarlyComposer(id) {
+    const year = Number(String((await this.getArtist(id) || {})["life-span"]?.begin || "").slice(0, 4));
+    return year > 0 && year < EARLY_COMPOSER_YEAR;
+  }
+  // The types of the recorded Work and the Work it belongs to.
+  async workTypes(credits3) {
+    const work = credits3.work;
+    if (!work) return [];
+    const types = [work.type];
+    const parent = (work.relations || []).find((rel) => rel.type === "parts" && rel.direction === "backward" && rel.work?.id);
+    if (parent) types.push((await this.getWork(parent.work.id) || {}).type);
+    return types.filter(Boolean).map((t) => String(t).toLowerCase());
+  }
+  // Why this recording is classical, or null when nothing says so.
+  async classicalEvidence(recording, credits3, workTypes) {
+    if (workTypes.some((t) => CLASSICAL_WORK_TYPES.includes(t))) return "work type";
+    for (const p of credits3.composers) {
+      if (p.id === p.name) continue;
+      if (await this.isEarlyComposer(p.id)) return "composer's dates";
+      if (await this.isClassicalArtist(p.id)) return "composer's genres";
+    }
+    for (const credit of recording["artist-credit"] || [])
+      if (credit.artist?.id && await this.isClassicalArtist(credit.artist.id)) return "performer's genres";
+    return null;
+  }
+  // -- entry point --------------------------------------------------------
+  // Returns the classical fields for a recording, or null to leave it alone.
+  // `skipReason` says why: "no composer", "non-classical", or null when
+  // MusicBrainz couldn't be reached.
+  // `confirmed`: an admin said it's classical, so missing evidence doesn't
+  // keep it from being tagged (signs that it isn't classical still do).
+  async resolve(recordingId, { trackArtistIds = [], albumArtistIds = [], releaseGroupId = null, confirmed = false } = {}) {
+    this.skipReason = null;
+    if (!recordingId) return null;
+    const recording = await this.getRecording(recordingId);
+    if (!recording) {
+      this.skipReason = this.mb.lastResult === "missing" ? "not on MusicBrainz" : "unreachable";
+      return null;
+    }
+    for (const credit of recording["artist-credit"] || []) {
+      if (this.nonClassicalArtists.has(credit.artist?.id)) {
+        this.skipReason = "non-classical";
+        return null;
+      }
+    }
+    const needAlbum = this.requireEvidence || this.classifyGenres(genreNames(recording)) == null;
+    const releaseGroup = releaseGroupId && needAlbum ? await this.getReleaseGroup(releaseGroupId) || {} : {};
+    const albumTypes = (releaseGroup["secondary-types"] || []).map((t) => String(t).toLowerCase());
+    if (this.requireEvidence && albumTypes.some((t) => NON_CLASSICAL_RELEASE_TYPES.includes(t))) {
+      this.skipReason = "non-classical";
+      return null;
+    }
+    let verdict = this.classifyGenres(genreNames(recording));
+    const albumVerdict = this.classifyGenres(genreNames(releaseGroup));
+    if (this.requireEvidence && albumVerdict === false && [...genreNames(releaseGroup)].some((g) => this.isHardNonClassicalGenre(g)))
+      verdict = false;
+    if (verdict == null) verdict = albumVerdict;
+    if (verdict === false) {
+      this.skipReason = "non-classical";
+      return null;
+    }
+    const credits3 = await this.workCredits(recording);
+    if (!credits3.composers.length && this.trackArtistFallback)
+      await this.composersFromTrackArtist(recording, trackArtistIds, credits3);
+    if (!credits3.composers.length) {
+      this.skipReason = "no composer";
+      return null;
+    }
+    if (verdict == null) {
+      const performers = (recording["artist-credit"] || []).map((c) => c.artist || {});
+      const composers = credits3.composers.filter((p) => p.id !== p.name).map((p) => ({ id: p.id, name: p.name }));
+      for (const artist of [...performers, ...composers]) {
+        if (await this.isNonClassicalArtist(artist)) {
+          this.skipReason = "non-classical";
+          return null;
+        }
+      }
+    }
+    if (this.requireEvidence) {
+      const types = await this.workTypes(credits3);
+      if (types.some((t) => NON_CLASSICAL_WORK_TYPES.includes(t))) {
+        this.skipReason = "non-classical";
+        return null;
+      }
+      if (!confirmed && verdict !== true && !await this.classicalEvidence(recording, credits3, types)) {
+        this.skipReason = "not clearly classical";
+        return null;
+      }
+    }
+    await this.addPerformers(recording, credits3);
+    _ClassicalResolver.orderByBilling(recording, albumArtistIds, credits3);
+    const fields = this.buildFields(credits3);
+    fields.recording = recording;
+    return fields;
+  }
+  static dropPlaceholders(people, keepIfAlone) {
+    const real = people.filter((p) => !isPlaceholder(p.name));
+    return real.length || !keepIfAlone ? real : people;
+  }
+  buildFields(credits3) {
+    credits3.composers = _ClassicalResolver.dropPlaceholders(credits3.composers, true);
+    credits3.arrangers = _ClassicalResolver.dropPlaceholders(credits3.arrangers, false);
+    const roles2 = {
+      composers: credits3.composers,
+      arrangers: credits3.arrangers,
+      soloists: credits3.soloists,
+      ensembles: credits3.ensembles,
+      conductors: credits3.conductors,
+      credited: credits3.credited
+    };
+    let hidden = /* @__PURE__ */ new Set();
+    if (this.maxArtistSoloists && credits3.ensembles.length && credits3.soloists.length > this.maxArtistSoloists) {
+      const creditedIds = new Set(credits3.credited.map((p) => p.id));
+      let headline = credits3.soloists.filter((p) => creditedIds.has(p.id));
+      if (!(headline.length > 0 && headline.length <= this.maxArtistSoloists)) headline = [];
+      const keep = new Set(headline.map((p) => p.id));
+      hidden = new Set(credits3.soloists.map((p) => p.id).filter((id) => !keep.has(id)));
+    }
+    const parts = [];
+    for (const role of this.order) for (const p of roles2[role] || []) if (!hidden.has(p.id)) addPerson(parts, p);
+    const names = unique(parts.map((p) => p.name));
+    const sortNames = unique(parts.map((p) => p.sortName));
+    const joined = (people) => people.map((p) => p.name).join(this.listSeparator) || null;
+    const work = credits3.work || null;
+    return {
+      artist: names.join(this.separator),
+      artists: names,
+      artistSort: sortNames.join(this.separator),
+      artistsSort: sortNames,
+      composers: credits3.composers.map((p) => p.name),
+      composersIds: credits3.composers.map((p) => p.id),
+      composerSort: credits3.composers.map((p) => p.sortName).join(", "),
+      lyricists: credits3.lyricists.map((p) => p.name),
+      arrangers: credits3.arrangers.map((p) => p.name),
+      classicalComposers: joined(credits3.composers),
+      classicalArrangers: joined(credits3.arrangers),
+      classicalSoloists: joined(credits3.soloists),
+      classicalEnsembles: joined(credits3.ensembles),
+      classicalConductors: joined(credits3.conductors),
+      people: {
+        composers: credits3.composers,
+        arrangers: credits3.arrangers,
+        soloists: credits3.soloists,
+        ensembles: credits3.ensembles,
+        conductors: credits3.conductors
+      },
+      work: work ? work.title : null,
+      workId: work ? work.id : null
+    };
+  }
+};
+
+// src/model/classify-evidence.js
+var escape = (text4) => text4.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+var wordList = (terms) => new RegExp(
+  `(?<![\\p{L}\\p{N}_])(?:${[...new Set(terms.map(normGenre))].sort((a, b) => b.length - a.length).map(escape).join("|")})(?![\\p{L}\\p{N}_])`,
+  "u"
+);
+var ORDINARY = wordList([
+  ...DEFAULT_NON_CLASSICAL_GENRES,
+  "new romantic",
+  "new wave",
+  "synthpop",
+  "electronica",
+  "alternative",
+  "k pop"
+]);
+var CONTEXT = wordList([...HARD_NON_CLASSICAL_GENRES, "score", "game", "anime"]);
+var CLASSICAL_NAMES = new Set(
+  [...DEFAULT_CLASSICAL_GENRES, "romantic", "classical period", "early romantic", "late romantic", "contemporary", "modern composition", "avant garde"].map(normGenre)
+);
+var CLASSICAL_WORD2 = /(^|\s)classical(\s|$)/;
+function genreKinds(genres = []) {
+  const kinds2 = { classical: [], ordinary: [], context: [] };
+  for (const raw of genres) {
+    const genre = normGenre(raw);
+    if (!genre) continue;
+    if (ORDINARY.test(genre)) kinds2.ordinary.push(raw);
+    else if (CONTEXT.test(genre)) kinds2.context.push(raw);
+    else if (CLASSICAL_NAMES.has(genre) || CLASSICAL_WORD2.test(genre)) kinds2.classical.push(raw);
+  }
+  return kinds2;
+}
+var TEMPO = /\b(allegr(?:o|etto)|adagi(?:o|etto)|andant(?:e|ino)|larghetto|largo|lento|grave|prestissimo|presto|vivace|moderato|scherzo|menuetto|minuet|menuet|rondo|finale|maestoso|sostenuto|cantabile)\b/i;
+var NUMBERED_TEMPO = new RegExp(`(?:^|[:;\\-\u2013\u2014]\\s*)[IVXL]{1,6}\\.\\s*${TEMPO.source.replace(/^\\b/, "")}`, "i");
+var CATALOGUE_NUMBER = /\b(op(?:us)?\.?|bwv|kv?\.?|d\.|hob\.?|rv|woo|hwv|sz\.?|twv)\s*\d/i;
+var FORM = /\b(symphon(?:y|ie)|sinfonia|sonata|concerto|suite|partita|string quartet|piano trio|quintet|nocturne|mazurka|polonaise|etude|prelude|fugue|toccata|cantata|oratorio|requiem|mass in|missa|motet|madrigal|lieder|impromptu|ballade|rhapsody|overture)(?:s|es)?\b/i;
+var NAME_WORD = "\\p{Lu}[\\p{L}'\u2019.\\-]+";
+var COMPOSER_ALBUM = new RegExp(`^(?!The\\s)${NAME_WORD}(?:\\s+(?:van|von|de|da|di|du|del|der|le|la|${NAME_WORD})){0,3}:\\s`, "u");
+var plain = (value) => String(value || "").normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+var clean = (value) => String(value || "").normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "");
+var STRONG = /* @__PURE__ */ new Set(["classical genre", "catalogue number", "movement tag", "classical composer relation"]);
+function classificationEvidence(hints = {}) {
+  const title = clean(hints.title);
+  const work = clean(hints.work);
+  const album = clean(hints.album);
+  const ownText = [title, work].filter(Boolean).join(" \n ");
+  const kinds2 = genreKinds(hints.genres);
+  const signals = [];
+  const add = (points, signal, value) => signals.push({ points, signal, kind: STRONG.has(signal) ? "strong" : "supporting", ...value != null && { value: String(value) } });
+  if (kinds2.classical.length) add(4, "classical genre", kinds2.classical.join("; "));
+  if (hints.movement) add(4, "movement tag", hints.movement);
+  if (hints.classicalComposerRelation) add(4, "classical composer relation");
+  const catalogue = hints.catalogueNumber || (ownText + " \n " + album).match(CATALOGUE_NUMBER)?.[0];
+  if (catalogue) add(3, "catalogue number", catalogue);
+  if (work && plain(work) !== plain(title)) add(3, "WORK tag", hints.work);
+  const tempo = ownText.match(TEMPO)?.[0];
+  if (!hints.movement && tempo) add(2, "tempo word in title", tempo);
+  const numbered = !hints.movement && ownText.match(NUMBERED_TEMPO)?.[0];
+  if (numbered) add(2, "numbered movement", numbered.replace(/^[:;\-–—]\s*/, ""));
+  const form2 = ownText.match(FORM)?.[0];
+  if (form2) add(2, "form word in title", form2);
+  else {
+    const albumForm = album.match(FORM)?.[0] || album.match(TEMPO)?.[0];
+    if (albumForm) add(1, "form word in album title", albumForm);
+  }
+  const albumComposer = album.trim().match(COMPOSER_ALBUM)?.[0];
+  if (albumComposer) add(2, "album named after a composer", albumComposer.replace(/:\s*$/, ""));
+  if (hints.composerDistinct) add(1, "composer differs from artist", (hints.composer || []).join("; "));
+  const score = signals.reduce((sum, s) => sum + s.points, 0);
+  const strong = signals.filter((s) => s.kind === "strong");
+  const verified = strong.filter((s) => s.signal !== "classical genre");
+  const supporting = signals.filter((s) => s.kind === "supporting" && s.points > 1);
+  const hasComposer = Array.isArray(hints.composer) && hints.composer.length > 0;
+  const credited = !!hints.composerDistinct;
+  let decision;
+  let reason;
+  if (kinds2.ordinary.length) {
+    if (strong.length) {
+      decision = "unsure";
+      reason = `${kinds2.ordinary.join("; ")} genre conflicts with ${strong.map((s) => s.signal).join(", ")}`;
+    } else {
+      decision = "not_classical";
+      reason = `${kinds2.ordinary.join("; ")} genre and no verifiable classical evidence`;
+    }
+  } else if (kinds2.context.length && !kinds2.classical.length) {
+    if (credited && score >= 4 && (verified.length || supporting.length >= 2)) {
+      decision = "classical";
+      reason = `verified classical work in a ${kinds2.context.join("; ")} release`;
+    } else if (credited || score > 1) {
+      decision = "unsure";
+      reason = `${kinds2.context.join("; ")} genre with some classical evidence`;
+    } else {
+      decision = "not_classical";
+      reason = `${kinds2.context.join("; ")} genre and no classical evidence`;
+    }
+  } else if (kinds2.classical.length) {
+    decision = "classical";
+    reason = kinds2.context.length ? `classical genre beside ${kinds2.context.join("; ")}` : "classical genre";
+  } else if (score >= 4 && (strong.length || supporting.length >= 2)) {
+    decision = "classical";
+    reason = "corroborated classical evidence";
+  } else if (score > 0 || hasComposer) {
+    decision = "unsure";
+    reason = score > 0 ? "uncorroborated classical evidence" : "composer credit only";
+  } else {
+    decision = "not_classical";
+    reason = "no classical evidence";
+  }
+  return { signals, score, kinds: kinds2, decision, reason };
+}
+
 // src/model/reconcile.js
 var sameAudio = (a, b) => a.size != null && a.size === b.size && a.durationMs != null && a.durationMs === b.durationMs;
 var sameDuration = (a, b) => a.durationMs != null && a.durationMs === b.durationMs;
@@ -36276,17 +37044,6 @@ function reconcile(catalogue, snapshot) {
     return rows;
   });
 }
-var TEMPO = /\b(allegr(?:o|etto)|adagi(?:o|etto)|andant(?:e|ino)|larghetto|largo|lento|grave|prestissimo|presto|vivace|moderato|scherzo|menuetto|minuet|menuet|rondo|finale|maestoso|sostenuto|cantabile)\b/i;
-var CATALOGUE_NUMBER = /\b(op(?:us)?\.?|bwv|kv?\.?|d\.|hob\.?|rv|woo|hwv|sz\.?|twv)\s*\d/i;
-var FORM = /\b(symphon(?:y|ie)|sinfonia|sonata|concerto|suite|partita|string quartet|piano trio|quintet|nocturne|mazurka|polonaise|etude|prelude|fugue|toccata|cantata|oratorio|requiem|mass in|missa|motet|madrigal|lieder|impromptu|ballade|rhapsody|overture)(?:s|es)?\b/i;
-function textEvidence(hints) {
-  const text4 = [hints.title, hints.work, hints.album].filter((v) => typeof v === "string").join(" \n ").normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "");
-  return {
-    movement: TEMPO.test(text4),
-    catalogueNumber: CATALOGUE_NUMBER.test(text4),
-    form: FORM.test(text4)
-  };
-}
 function classify(catalogue, target, hints, { manual = null, actor: actor3 = null, inherited = null } = {}) {
   return transaction(catalogue.db, () => {
     const prior = catalogue.db.prepare("SELECT * FROM classification WHERE target_id=?").get(target);
@@ -36295,17 +37052,8 @@ function classify(catalogue, target, hints, { manual = null, actor: actor3 = nul
       throw new Error("Invalid inherited classification");
     if (manual && (!actor3 || !["classical", "not_classical", "unsure"].includes(manual)))
       throw new Error("Invalid classification override");
-    const genres = (hints.genres || []).map((s) => s.toLowerCase());
-    const classicalGenre = genres.some(
-      (s) => /\b(classical|baroque|opera|chamber|romantic|choral)\b/.test(s)
-    );
-    const ordinaryGenre = genres.some(
-      (s) => /\b(rock|jazz|pop|electronic|soundtrack)\b/.test(s)
-    );
-    const derived = textEvidence(hints);
-    const score = (hints.work ? 4 : 0) + (hints.movement ? 4 : derived.movement ? 3 : 0) + (classicalGenre ? 4 : 0) + (hints.classicalComposerRelation ? 4 : 0) + (hints.catalogueNumber || derived.catalogueNumber ? 2 : 0) + (derived.form ? 2 : 0) + (hints.composerDistinct ? 1 : 0);
-    const noEvidence = score === 0 && !(Array.isArray(hints.composer) && hints.composer.length);
-    const state = manual || inherited || (score >= 4 ? "classical" : ordinaryGenre && score === 0 || noEvidence ? "not_classical" : "unsure");
+    const { score, decision } = classificationEvidence(hints);
+    const state = manual || inherited || decision;
     catalogue.db.prepare(
       `INSERT INTO classification VALUES (?,?,?,?,?,1,?) ON CONFLICT(target_id)
       DO UPDATE SET state=excluded.state,pinned=excluded.pinned,score=excluded.score,evidence=excluded.evidence,updated_at=excluded.updated_at`
@@ -36425,10 +37173,10 @@ function releaseYear(date) {
 // src/model/auto-match.js
 var MULTI_MOVEMENT = /\b(symphon(?:y|ie)|sinfonia|sonata|sonatina|concerto|suite|partita|quartet|quintet|sextet|septet|octet|nonet|trio|serenade|divertimento|cassation|mass|missa|requiem|stabat mater|magnificat|te deum|vespers|cantata|oratorio|passion|variations?|ballet)\b/i;
 var COLLECTION_LIKE = /\b(etudes?|études?|preludes?|préludes?|songs?|lieder)\b/i;
-var isCollectionLike = (value) => COLLECTION_LIKE.test(clean(value));
+var isCollectionLike = (value) => COLLECTION_LIKE.test(clean2(value));
 var MOVEMENT_PREFIX = /^(?:[IVXLCDM]+|\d+)[.)\s:-]/i;
-var clean = (value) => String(value || "").trim().replace(/\s+/g, " ");
-var normalized = (value) => clean(value).normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase();
+var clean2 = (value) => String(value || "").trim().replace(/\s+/g, " ");
+var normalized = (value) => clean2(value).normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase();
 var sameCatalogue = (a, b) => {
   const number = catalogueNumber(a).toLowerCase();
   return Boolean(number) && number === catalogueNumber(b).toLowerCase();
@@ -36437,13 +37185,13 @@ var identity = (...values) => createHash2("sha256").update(JSON.stringify(values
 var WORK_HEAD = /^(.+?)(?:\s*[:;]|\s+[–—-])\s+(.+)$/;
 var titleHead = (title) => splitTitle(title).head;
 function splitTitle(title) {
-  const match2 = clean(title).match(WORK_HEAD);
-  return match2 ? { head: clean(match2[1]), tail: clean(match2[2]) } : { head: "", tail: clean(title) };
+  const match2 = clean2(title).match(WORK_HEAD);
+  return match2 ? { head: clean2(match2[1]), tail: clean2(match2[2]) } : { head: "", tail: clean2(title) };
 }
 function proposedWork(work, title, allowStructuredTitles) {
-  const tagged = clean(work);
+  const tagged = clean2(work);
   if (tagged && !isCollectionLike(tagged)) {
-    const parent = clean(tagged.split(/\s*:\s*/, 1)[0]);
+    const parent = clean2(tagged.split(/\s*:\s*/, 1)[0]);
     if (MULTI_MOVEMENT.test(parent) || catalogueNumber(parent))
       return { title: parent, evidence: "work-tag" };
   }
@@ -36469,13 +37217,13 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
     const local = proposedWork(hints.work, hints.title, true);
     const proposal = provider ? {
       // The tags' own title wins when it names the same catalogue number.
-      title: local && sameCatalogue(local.title, provider.work) ? local.title : clean(provider.work),
+      title: local && sameCatalogue(local.title, provider.work) ? local.title : clean2(provider.work),
       evidence: "musicbrainz-parent",
       identity: provider.workId
     } : proposedWork(hints.work, hints.title, allowStructuredTitles);
     const composers = [
       ...new Set(
-        (hints.composer?.length ? hints.composer : provider?.composers || []).map(clean).filter(Boolean)
+        (hints.composer?.length ? hints.composer : provider?.composers || []).map(clean2).filter(Boolean)
       )
     ];
     const trackNumber = Number(hints.trackNumber);
@@ -36499,15 +37247,15 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
         providerAliases: provider?.aliases || [],
         composers,
         albumId: String(row.evidence.albumId),
-        album: clean(hints.album),
+        album: clean2(hints.album),
         tracks: []
       });
     const group = groups.get(key);
     group.titles.set(proposal.title, (group.titles.get(proposal.title) || 0) + 1);
     group.tracks.push({
       ...row,
-      providerMovement: provider?.movement ? clean(provider.movement) : null,
-      title: clean(hints.title),
+      providerMovement: provider?.movement ? clean2(provider.movement) : null,
+      title: clean2(hints.title),
       discNumber,
       trackNumber
     });
@@ -36558,11 +37306,11 @@ function movementParts(title) {
   return index ? { index, text: match2[2] } : { index: null, text: text4 };
 }
 function movementTitle(track, workTitle) {
-  const fromTitle = stripWorkPrefix(clean(track.title), workTitle);
-  if (fromTitle !== clean(track.title) || MOVEMENT_PREFIX.test(fromTitle)) return fromTitle;
-  const work = clean(track.work);
+  const fromTitle = stripWorkPrefix(clean2(track.title), workTitle);
+  if (fromTitle !== clean2(track.title) || MOVEMENT_PREFIX.test(fromTitle)) return fromTitle;
+  const work = clean2(track.work);
   if (work.includes(":")) {
-    const tail = clean(work.slice(work.indexOf(":") + 1));
+    const tail = clean2(work.slice(work.indexOf(":") + 1));
     if (tail) return stripWorkPrefix(tail, workTitle);
   }
   return fromTitle;
@@ -36570,9 +37318,9 @@ function movementTitle(track, workTitle) {
 var SEPARATOR = /[:;]\s*|\s+[–—-]\s+/g;
 var NICKNAME = /^["“„«'‘][^"”»'’]+["”»'’]\s*(?:[:;]|\s[–—-])\s*(.+)$/;
 function stripWorkPrefix(title, workTitle) {
-  const text4 = clean(title);
+  const text4 = clean2(title);
   const separators = [...text4.matchAll(SEPARATOR)];
-  const tailAt = (match2) => clean(text4.slice(match2.index + match2[0].length));
+  const tailAt = (match2) => clean2(text4.slice(match2.index + match2[0].length));
   for (const match2 of separators) {
     const tail = tailAt(match2);
     if (tail && MOVEMENT_PREFIX.test(tail)) return tail;
@@ -36586,7 +37334,7 @@ function stripWorkPrefix(title, workTitle) {
     const headWords = words(head);
     const namesWork = workWords && (headWords === workWords || headWords.startsWith(`${workWords} `) || workWords.startsWith(`${headWords} `)) || workCatalogue && catalogueNumber(head).toLowerCase() === workCatalogue || workName.length >= 4 && words(head.split(",")[0]) === workName;
     if (!tail || !namesWork) continue;
-    return clean(tail.match(NICKNAME)?.[1] ?? tail);
+    return clean2(tail.match(NICKNAME)?.[1] ?? tail);
   }
   return text4;
 }
@@ -36947,9 +37695,9 @@ function mergeDuplicateAutoWorks(catalogue, { actor: actor3 = null } = {}) {
 var INSTRUMENT = /\b(piano|violin|viola|cello|violoncello|double bass|flute|oboe|clarinet|bassoon|horn|trumpet|trombone|organ|harpsichord|guitar|harp|string|wind|piano and violin|violin and piano|cello and piano)\s+(?=(?:sonata|sonatina|concerto|quartet|quintet|trio|sextet|octet|suite|partita)\b)/i;
 var KEY = /\bin\s+([a-h])(?:[\s-]?(flat|sharp|♭|♯))?\s+(major|minor)\b/i;
 var CATALOGUE_TEXT = /\b(?:op(?:us|\.)?\s*\d+[a-z]?(?:\s*,?\s*no\.?\s*\d+)?|(?:BWV|HWV|RV|WoO|TWV|K(?:V|\.)?|D\.?|Hob\.?\s*[IVXL]+[a-z]?:?)\s*\d+[a-z]?)/gi;
-var tidyCatalogue = (value) => clean(value).replace(/^op(?:us|\.)?\s*/i, "Op. ").replace(/\s*,?\s*no\.?\s*(\d)/i, " No. $1");
+var tidyCatalogue = (value) => clean2(value).replace(/^op(?:us|\.)?\s*/i, "Op. ").replace(/\s*,?\s*no\.?\s*(\d)/i, " No. $1");
 function workFieldsFromTitle(title) {
-  const text4 = clean(title);
+  const text4 = clean2(title);
   const fields = {};
   const key = text4.match(KEY);
   if (key)
@@ -36959,7 +37707,7 @@ function workFieldsFromTitle(title) {
   const form2 = text4.match(MULTI_MOVEMENT);
   if (form2) fields.form = form2[1].toLowerCase();
   const nickname = text4.match(/["“„«]([^"”»]+)["”»]/);
-  if (nickname) fields.nickname = clean(nickname[1]);
+  if (nickname) fields.nickname = clean2(nickname[1]);
   const instrument = text4.match(INSTRUMENT);
   if (instrument)
     fields.instrumentation = instrument[1].toLowerCase().split(/\s+and\s+/).map((name) => name[0].toUpperCase() + name.slice(1));
@@ -37067,7 +37815,7 @@ var fail = (message) => {
   throw new EditorV2Error(message);
 };
 var PAGE = 100;
-var ROLES = [
+var ROLES2 = [
   "composer",
   "soloist",
   "performer",
@@ -37302,7 +38050,7 @@ function creditSections(c, target) {
       submitLabel: "Add credit",
       fields: [
         { key: "contributor", label: "Person or ensemble", type: "lookup", lookup: "contributors", value: "", placeholder: "Search people and ensembles", required: true },
-        { key: "role", label: "Role", type: "select", value: "performer", options: ROLES.map((role) => ({ value: role, label: roleLabel(role) })) },
+        { key: "role", label: "Role", type: "select", value: "performer", options: ROLES2.map((role) => ({ value: role, label: roleLabel(role) })) },
         { key: "instrument", label: "Instrument or voice", type: "text", value: "", placeholder: "Optional" }
       ]
     }
@@ -39703,664 +40451,6 @@ async function writeTags(filePath, values) {
   return changed;
 }
 
-// src/resolver.js
-var DEFAULT_KNOWN_NAMES = {
-  "\u0421\u0435\u0440\u0433\u0435\u0439 \u0421\u0435\u0440\u0433\u0435\u0435\u0432\u0438\u0447 \u041F\u0440\u043E\u043A\u043E\u0444\u044C\u0435\u0432": "Sergei Prokofiev",
-  "\u041F\u0451\u0442\u0440 \u0418\u043B\u044C\u0438\u0447 \u0427\u0430\u0439\u043A\u043E\u0432\u0441\u043A\u0438\u0439": "Pyotr Tchaikovsky",
-  "\u041F\u0435\u0442\u0440 \u0418\u043B\u044C\u0438\u0447 \u0427\u0430\u0439\u043A\u043E\u0432\u0441\u043A\u0438\u0439": "Pyotr Tchaikovsky",
-  "\u0414\u043C\u0438\u0442\u0440\u0438\u0439 \u0414\u043C\u0438\u0442\u0440\u0438\u0435\u0432\u0438\u0447 \u0428\u043E\u0441\u0442\u0430\u043A\u043E\u0432\u0438\u0447": "Dmitri Shostakovich",
-  "\u041C\u043E\u0434\u0435\u0441\u0442 \u041F\u0435\u0442\u0440\u043E\u0432\u0438\u0447 \u041C\u0443\u0441\u043E\u0440\u0433\u0441\u043A\u0438\u0439": "Modest Mussorgsky",
-  "\u041D\u0438\u043A\u043E\u043B\u0430\u0439 \u0410\u043D\u0434\u0440\u0435\u0435\u0432\u0438\u0447 \u0420\u0438\u043C\u0441\u043A\u0438\u0439-\u041A\u043E\u0440\u0441\u0430\u043A\u043E\u0432": "Nikolai Rimsky-Korsakov",
-  "\u0418\u0433\u043E\u0440\u044C \u0424\u0451\u0434\u043E\u0440\u043E\u0432\u0438\u0447 \u0421\u0442\u0440\u0430\u0432\u0438\u043D\u0441\u043A\u0438\u0439": "Igor Stravinsky",
-  "\u0418\u0433\u043E\u0440\u044C \u0424\u0435\u0434\u043E\u0440\u043E\u0432\u0438\u0447 \u0421\u0442\u0440\u0430\u0432\u0438\u043D\u0441\u043A\u0438\u0439": "Igor Stravinsky",
-  "\u0421\u0435\u0440\u0433\u0435\u0439 \u0412\u0430\u0441\u0438\u043B\u044C\u0435\u0432\u0438\u0447 \u0420\u0430\u0445\u043C\u0430\u043D\u0438\u043D\u043E\u0432": "Sergei Rachmaninoff",
-  "\u041C\u0438\u0445\u0430\u0438\u043B \u0418\u0432\u0430\u043D\u043E\u0432\u0438\u0447 \u0413\u043B\u0438\u043D\u043A\u0430": "Mikhail Glinka",
-  "\u0410\u043B\u0435\u043A\u0441\u0430\u043D\u0434\u0440 \u041F\u043E\u0440\u0444\u0438\u0440\u044C\u0435\u0432\u0438\u0447 \u0411\u043E\u0440\u043E\u0434\u0438\u043D": "Alexander Borodin",
-  "Fryderyk Chopin": "Fr\xE9d\xE9ric Chopin",
-  "Fryderyk Franciszek Chopin": "Fr\xE9d\xE9ric Chopin",
-  "\u0424\u0440\u0438\u0434\u0435\u0440\u0438\u043A \u0428\u043E\u043F\u0435\u043D": "Fr\xE9d\xE9ric Chopin",
-  "\u0424\u0440\u0438\u0434\u0435\u0440\u0438\u043A \u0424\u0440\u0430\u043D\u0446\u0438\u0448\u0435\u043A \u0428\u043E\u043F\u0435\u043D": "Fr\xE9d\xE9ric Chopin",
-  "\u0418\u043E\u0433\u0430\u043D\u043D \u0421\u0435\u0431\u0430\u0441\u0442\u044C\u044F\u043D \u0411\u0430\u0445": "Johann Sebastian Bach",
-  "\u05D4\u05EA\u05D6\u05DE\u05D5\u05E8\u05EA \u05D4\u05E4\u05D9\u05DC\u05D4\u05E8\u05DE\u05D5\u05E0\u05D9\u05EA \u05D4\u05D9\u05E9\u05E8\u05D0\u05DC\u05D9\u05EA": "Israel Philharmonic Orchestra"
-};
-var DEFAULT_NON_CLASSICAL_ARTISTS = [
-  "28503ab7-8bf2-4666-a7bd-2644bfc7cb1d",
-  // Dream Theater
-  "bc641be9-ca36-4c61-9394-5230433f6646",
-  // Liquid Tension Experiment
-  "72eabb1a-4d2c-4de6-90f2-671b2cada42b",
-  // Caravan Palace
-  "6f45f514-a46b-4153-808b-731fccd3da74",
-  // Abstract Orchestra
-  "0aef8ffd-942e-4e03-bf4a-1749ddebc00a"
-  // Evan Marien
-];
-var DEFAULT_CLASSICAL_GENRES = [
-  "baroque",
-  "renaissance",
-  "medieval",
-  "early music",
-  "romanticism",
-  "opera",
-  "operetta",
-  "chamber music",
-  "art song",
-  "lied",
-  "choral",
-  "orchestral",
-  "symphony",
-  "concerto",
-  "sonata",
-  "oratorio",
-  "mass",
-  "requiem",
-  "string quartet",
-  "impressionism",
-  "neoclassicism",
-  "minimalism",
-  "serialism",
-  "twelve-tone",
-  "gregorian chant",
-  "sacred choral music"
-];
-var DEFAULT_NON_CLASSICAL_GENRES = [
-  "rock",
-  "pop",
-  "metal",
-  "punk",
-  "grunge",
-  "emo",
-  "indie",
-  "hip hop",
-  "hiphop",
-  "rap",
-  "trap",
-  "drill",
-  "grime",
-  "phonk",
-  "r&b",
-  "rnb",
-  "soul",
-  "funk",
-  "disco",
-  "gospel",
-  "blues",
-  "jazz",
-  "swing",
-  "country",
-  "folk",
-  "bluegrass",
-  "americana",
-  "singer songwriter",
-  "reggae",
-  "dancehall",
-  "reggaeton",
-  "ska",
-  "afrobeats",
-  "electronic",
-  "electro",
-  "edm",
-  "dance",
-  "house",
-  "techno",
-  "trance",
-  "dubstep",
-  "drum and bass",
-  "breakbeat",
-  "hyperpop",
-  "synthwave",
-  "darkwave",
-  "shoegaze",
-  "lo fi"
-];
-var HARD_NON_CLASSICAL_GENRES = [
-  "christmas",
-  "holiday",
-  "soundtrack",
-  "film score",
-  "film soundtrack",
-  "cinematic",
-  "video game",
-  "game music",
-  "musical",
-  "musicals",
-  "show tunes",
-  "broadway",
-  "crossover",
-  "easy listening",
-  "children's music",
-  "lullaby",
-  "new age",
-  "lounge",
-  "bossa nova",
-  "trailer music"
-];
-var NON_CLASSICAL_RELEASE_TYPES = ["soundtrack", "spokenword", "audiobook", "audio drama", "interview", "dj-mix", "mixtape/street"];
-var CLASSICAL_WORK_TYPES = [
-  "aria",
-  "ballet",
-  "cantata",
-  "concerto",
-  "\xE9tude",
-  "etude",
-  "incidental music",
-  "madrigal",
-  "mass",
-  "motet",
-  "opera",
-  "operetta",
-  "oratorio",
-  "overture",
-  "partita",
-  "quartet",
-  "sonata",
-  "song-cycle",
-  "suite",
-  "symphonic poem",
-  "symphony",
-  "zarzuela",
-  "variations",
-  "prelude",
-  "chorale",
-  "chanson"
-];
-var NON_CLASSICAL_WORK_TYPES = ["soundtrack", "musical", "play", "audio drama", "beijing opera"];
-var EARLY_COMPOSER_YEAR = 1900;
-var DEFAULT_COMPOSER_RELATIONS = ["composer", "writer"];
-var DEFAULT_ORDER = [
-  "composers",
-  "arrangers",
-  "soloists",
-  "ensembles",
-  "conductors",
-  "credited"
-];
-var ROLES2 = DEFAULT_ORDER;
-var LYRICIST_RELATIONS = /* @__PURE__ */ new Set(["lyricist", "librettist"]);
-var ARRANGER_RELATIONS = /* @__PURE__ */ new Set([
-  "arranger",
-  "instrument arranger",
-  "orchestrator",
-  "vocal arranger"
-]);
-var PERFORMER_RELATIONS = /* @__PURE__ */ new Set(["instrument", "vocal", "performer"]);
-var ENSEMBLE_ARTIST_TYPES = /* @__PURE__ */ new Set(["orchestra", "choir", "group"]);
-var PERFORMER_ROLE_RELATIONS = /* @__PURE__ */ new Set([
-  ...PERFORMER_RELATIONS,
-  "conductor",
-  "performing orchestra",
-  "chorus master"
-]);
-var GROUP_VOCAL_ATTRIBUTES = /* @__PURE__ */ new Set(["choir vocals", "background vocals"]);
-var WORK_PARTS_RELATION = "parts";
-var MAX_PARENT_WORK_DEPTH = 3;
-var lowerSet = (values) => new Set((values || []).map((a) => String(a).toLowerCase()));
-function isSoloistRelation(rel) {
-  const attributes = lowerSet(rel.attributes);
-  if (attributes.has("solo")) return true;
-  return rel.type === "vocal" && [...attributes].some((a) => !GROUP_VOCAL_ATTRIBUTES.has(a));
-}
-var unique = (values) => [...new Set(values.filter(Boolean))];
-function isPlaceholder(name) {
-  const text4 = String(name || "").trim();
-  return text4.startsWith("[") && text4.endsWith("]");
-}
-function isLatin(text4) {
-  for (const ch of String(text4 || "")) {
-    if (new RegExp("\\p{L}", "u").test(ch) && !new RegExp("\\p{Script=Latin}", "u").test(ch)) return false;
-  }
-  return true;
-}
-var CLASSICAL_WORD = /(^|\s)classical(\s|$)/;
-function normGenre(name) {
-  return String(name || "").toLowerCase().replaceAll("-", " ").split(/\s+/).filter(Boolean).join(" ");
-}
-function genreNames(entity) {
-  const names = new Set((entity?.genres || []).map((g) => normGenre(g?.name)));
-  names.delete("");
-  return names;
-}
-var escapeRegex = (text4) => text4.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-function addPerson(people, person) {
-  if (person && people.every((p) => p.id !== person.id)) people.push(person);
-}
-var emptyCredits = () => ({
-  composers: [],
-  lyricists: [],
-  arrangers: [],
-  soloists: [],
-  ensembles: [],
-  conductors: [],
-  credited: [],
-  work: null
-});
-var ClassicalResolver = class _ClassicalResolver {
-  static RECORDING_INC = "artist-credits+artist-rels+work-rels+genres";
-  static RELEASE_GROUP_INC = "genres";
-  static WORK_INC = "artist-rels+work-rels";
-  static ARTIST_INC = "aliases+genres";
-  static MEMBERSHIP_INC = "artist-rels";
-  static MIN_CREDITED_LINEUP = 3;
-  // `mb` is { get(entityType, id, inc, { ttl }) -> Promise<object|null> }.
-  constructor(mb, {
-    log: log2 = () => {
-    },
-    knownNames = DEFAULT_KNOWN_NAMES,
-    nonClassicalArtists = DEFAULT_NON_CLASSICAL_ARTISTS,
-    classicalGenres = DEFAULT_CLASSICAL_GENRES,
-    nonClassicalGenres = DEFAULT_NON_CLASSICAL_GENRES,
-    composerRelations = DEFAULT_COMPOSER_RELATIONS,
-    checkArtistGenres = true,
-    separator = " \u2014 ",
-    listSeparator = " / ",
-    order = DEFAULT_ORDER,
-    maxSoloists = 4,
-    maxArtistSoloists = 4,
-    trackArtistFallback = false,
-    requireEvidence = true,
-    recordingTtlMs
-  } = {}) {
-    this.mb = mb;
-    this.log = log2;
-    this.knownNames = { ...knownNames };
-    this.nonClassicalArtists = new Set(nonClassicalArtists);
-    this.classicalGenres = new Set(classicalGenres.map(normGenre));
-    const terms = [...new Set(nonClassicalGenres.map(normGenre))].filter(Boolean).sort((a, b) => b.length - a.length);
-    this.nonClassicalRe = terms.length ? new RegExp(`(?<![\\p{L}\\p{N}_])(?:${terms.map(escapeRegex).join("|")})(?![\\p{L}\\p{N}_])`, "u") : null;
-    this.composerRelations = new Set(composerRelations);
-    this.checkArtistGenres = checkArtistGenres;
-    this.separator = separator;
-    this.listSeparator = listSeparator;
-    this.order = [...order];
-    this.maxSoloists = maxSoloists;
-    this.maxArtistSoloists = maxArtistSoloists;
-    this.trackArtistFallback = trackArtistFallback;
-    this.requireEvidence = requireEvidence;
-    const hard = HARD_NON_CLASSICAL_GENRES.map(normGenre).sort((a, b) => b.length - a.length);
-    this.hardNonClassicalRe = new RegExp(`(?<![\\p{L}\\p{N}_])(?:${hard.map(escapeRegex).join("|")})(?![\\p{L}\\p{N}_])`, "u");
-    this.recordingTtlMs = recordingTtlMs;
-    this.skipReason = null;
-  }
-  // -- fetching -----------------------------------------------------------
-  getRecording(id) {
-    return this.mb.get("recording", id, _ClassicalResolver.RECORDING_INC, { ttl: this.recordingTtlMs });
-  }
-  getWork(id) {
-    return id ? this.mb.get("work", id, _ClassicalResolver.WORK_INC) : null;
-  }
-  getArtist(id) {
-    return id ? this.mb.get("artist", id, _ClassicalResolver.ARTIST_INC) : null;
-  }
-  getReleaseGroup(id) {
-    return id ? this.mb.get("release-group", id, _ClassicalResolver.RELEASE_GROUP_INC) : null;
-  }
-  // -- genres -------------------------------------------------------------
-  isHardNonClassicalGenre(name) {
-    return this.hardNonClassicalRe.test(name);
-  }
-  isClassicalGenre(name) {
-    if (this.isHardNonClassicalGenre(name)) return false;
-    return this.classicalGenres.has(name) || CLASSICAL_WORD.test(name);
-  }
-  isNonClassicalGenre(name) {
-    return this.isHardNonClassicalGenre(name) || Boolean(this.nonClassicalRe && this.nonClassicalRe.test(name));
-  }
-  // true (classical), false (not classical) or null (no signal). A
-  // classical genre wins over "pop" or "rock" on the same entity, but not
-  // over Christmas, soundtrack or crossover genres.
-  classifyGenres(genres) {
-    const list = [...genres];
-    if (list.some((g) => this.isHardNonClassicalGenre(g))) return false;
-    if (list.some((g) => this.isClassicalGenre(g))) return true;
-    if (list.some((g) => this.isNonClassicalGenre(g))) return false;
-    return null;
-  }
-  async isNonClassicalArtist(artist) {
-    const id = artist?.id;
-    if (this.nonClassicalArtists.has(id)) return true;
-    if (!this.checkArtistGenres || !id) return false;
-    const data = await this.getArtist(id) || {};
-    const genres = data.genres || [];
-    if (!genres.length) return false;
-    if (this.classifyGenres(genreNames(data)) === true) return false;
-    const top = Math.max(...genres.map((g) => g.count || 0));
-    const topNames = genreNames({ genres: genres.filter((g) => (g.count || 0) === top) });
-    return [...topNames].some((g) => this.isNonClassicalGenre(g));
-  }
-  // -- names --------------------------------------------------------------
-  static bestEnglishAlias(aliases) {
-    const candidates2 = (aliases || []).filter(
-      (a) => String(a.locale || "").replaceAll("-", "_").split("_")[0] === "en" && a.name && a.type !== "Search hint" && !a.ended
-    );
-    if (!candidates2.length) return null;
-    const key = (a) => [a.primary ? 0 : 1, a.type == null || a.type === "Artist name" ? 0 : 1];
-    return [...candidates2].sort((x, y) => {
-      const [a, b] = [key(x), key(y)];
-      return a[0] - b[0] || a[1] - b[1];
-    })[0];
-  }
-  static pickEnglishAlias(aliases) {
-    return _ClassicalResolver.bestEnglishAlias(aliases)?.name ?? null;
-  }
-  async englishName(artist) {
-    return (await this.englishNames(artist))[0];
-  }
-  async englishNames(artist) {
-    if (!artist) return [null, null];
-    const id = artist.id;
-    const name = artist.name || "";
-    const sortName = artist["sort-name"] || artist.sort_name || "";
-    const override = [id, name, sortName].filter((key) => key && Object.hasOwn(this.knownNames, key)).map((key) => this.knownNames[key])[0];
-    if (!name && !override) return [null, null];
-    let aliases = artist.aliases;
-    if (aliases == null) aliases = (await this.getArtist(id) || {}).aliases || [];
-    const alias = _ClassicalResolver.bestEnglishAlias(aliases);
-    const aliasSort = alias ? alias["sort-name"] : null;
-    if (override) return [override, aliasSort || sortName || null];
-    if (alias && (alias.primary || !isLatin(name))) return [alias.name, aliasSort || sortName || null];
-    if (isLatin(name)) return [name, sortName || null];
-    if (sortName && sortName.includes(",") && isLatin(sortName)) {
-      const [surname2, rest] = sortName.split(/,(.*)/s).map((s) => (s || "").trim());
-      const given = rest ? rest.split(/\s+/)[0] : "";
-      return [`${given} ${surname2}`.trim(), sortName];
-    }
-    return [name, sortName || null];
-  }
-  async person(artist) {
-    const [name, sortName] = await this.englishNames(artist);
-    if (!name) return null;
-    return { id: artist.id || name, name, sortName: sortName || name };
-  }
-  // -- credits ------------------------------------------------------------
-  async collectWorkCredits(workId, credits3, depth = 0, seen = /* @__PURE__ */ new Set()) {
-    if (!workId || seen.has(workId)) return;
-    seen.add(workId);
-    const work = await this.getWork(workId);
-    if (!work) return;
-    if (credits3.work == null) credits3.work = work;
-    let foundComposer = false;
-    const parents = [];
-    for (const rel of work.relations || []) {
-      const type = rel.type;
-      if (rel["target-type"] === "work" || "work" in rel) {
-        if (type === WORK_PARTS_RELATION && rel.direction === "backward") parents.push(rel.work?.id);
-        continue;
-      }
-      const artist = rel.artist;
-      if (!artist) continue;
-      if (this.composerRelations.has(type)) {
-        addPerson(credits3.composers, await this.person(artist));
-        foundComposer = true;
-      } else if (LYRICIST_RELATIONS.has(type)) {
-        addPerson(credits3.lyricists, await this.person(artist));
-      } else if (ARRANGER_RELATIONS.has(type)) {
-        addPerson(credits3.arrangers, await this.person(artist));
-      }
-    }
-    if (!foundComposer && depth < MAX_PARENT_WORK_DEPTH) {
-      for (const parentId of parents) await this.collectWorkCredits(parentId, credits3, depth + 1, seen);
-    }
-  }
-  async workCredits(recording) {
-    const credits3 = emptyCredits();
-    for (const rel of recording.relations || []) {
-      if (rel.type !== "performance") continue;
-      await this.collectWorkCredits(rel.work?.id, credits3);
-    }
-    return credits3;
-  }
-  async isMemberOf(artistId, ensembleIds) {
-    const data = await this.mb.get("artist", artistId, _ClassicalResolver.MEMBERSHIP_INC) || {};
-    return (data.relations || []).some(
-      (rel) => rel.type === "member of band" && (rel.direction ?? "forward") === "forward" && ensembleIds.has(rel.artist?.id)
-    );
-  }
-  async artistType(artist) {
-    let type = artist?.type;
-    if (type == null && artist?.id) type = (await this.getArtist(artist.id) || {}).type;
-    return String(type || "").toLowerCase();
-  }
-  async addPerformers(recording, credits3) {
-    const markedSoloists = [];
-    const individuals = [];
-    const voiceOnly = /* @__PURE__ */ new Set();
-    const wanted = /* @__PURE__ */ new Set(["conductor", "performing orchestra", ...PERFORMER_RELATIONS, ...ARRANGER_RELATIONS]);
-    for (const rel of recording.relations || []) {
-      const type = rel.type;
-      const artist = rel.artist;
-      if (!artist || !wanted.has(type)) continue;
-      const person = await this.person(artist);
-      if (type === "conductor") addPerson(credits3.conductors, person);
-      else if (ARRANGER_RELATIONS.has(type)) addPerson(credits3.arrangers, person);
-      else if (type === "performing orchestra" || ENSEMBLE_ARTIST_TYPES.has(await this.artistType(artist)))
-        addPerson(credits3.ensembles, person);
-      else if (isSoloistRelation(rel)) {
-        addPerson(markedSoloists, person);
-        if (person && !lowerSet(rel.attributes).has("solo")) voiceOnly.add(person.id);
-      } else addPerson(individuals, person);
-    }
-    const creditedIds = /* @__PURE__ */ new Set();
-    for (const credit of recording["artist-credit"] || []) {
-      const artist = credit.artist || {};
-      creditedIds.add(artist.id);
-      if (ENSEMBLE_ARTIST_TYPES.has(await this.artistType(artist)))
-        addPerson(credits3.ensembles, await this.person(artist));
-    }
-    const ensembleIds = new Set(credits3.ensembles.map((p) => p.id));
-    const isMember = async (person) => ensembleIds.size > 0 && await this.isMemberOf(person.id, ensembleIds);
-    const keptSoloists = [];
-    for (const p of markedSoloists) if (!voiceOnly.has(p.id) || !await isMember(p)) keptSoloists.push(p);
-    const creditedIndividuals = individuals.filter((p) => creditedIds.has(p.id));
-    let creditedMembers = /* @__PURE__ */ new Set();
-    for (const p of creditedIndividuals) if (await isMember(p)) creditedMembers.add(p.id);
-    if (creditedMembers.size < _ClassicalResolver.MIN_CREDITED_LINEUP) creditedMembers = /* @__PURE__ */ new Set();
-    for (const p of creditedIndividuals) if (!creditedMembers.has(p.id)) addPerson(keptSoloists, p);
-    const others = individuals.filter((p) => !creditedIds.has(p.id));
-    for (const p of keptSoloists) addPerson(credits3.soloists, p);
-    if (!credits3.ensembles.length && others.length <= this.maxSoloists) {
-      for (const p of others) addPerson(credits3.soloists, p);
-    } else if (others.length) {
-      this.log(`left out ${others.length} individual performer(s) as ensemble members`);
-    }
-    const sparse = !(recording.relations || []).some((rel) => PERFORMER_ROLE_RELATIONS.has(rel.type));
-    const placed = new Set(
-      [credits3.composers, credits3.arrangers, credits3.soloists, credits3.ensembles, credits3.conductors].flat().map((p) => p.id)
-    );
-    for (const credit of recording["artist-credit"] || []) {
-      const artist = credit.artist || {};
-      const person = await this.person(artist);
-      if (person && creditedMembers.has(person.id)) continue;
-      addPerson(credits3.credited, person);
-      if (sparse && !credits3.ensembles.length && person && !placed.has(person.id) && await this.artistType(artist) === "person")
-        addPerson(credits3.soloists, person);
-    }
-  }
-  async composersFromTrackArtist(recording, trackArtistIds, credits3) {
-    const recordingIds = new Set((recording["artist-credit"] || []).map((c) => c.artist?.id));
-    for (const id of unique(trackArtistIds || [])) {
-      if (recordingIds.has(id) || this.nonClassicalArtists.has(id)) continue;
-      const artist = await this.getArtist(id);
-      if (!artist || String(artist.type || "").toLowerCase() !== "person") continue;
-      if (await this.isNonClassicalArtist({ id })) continue;
-      const person = await this.person(artist);
-      if (person) addPerson(credits3.composers, person);
-    }
-  }
-  static orderByBilling(recording, albumArtistIds, credits3) {
-    const billing = [...albumArtistIds || [], ...(recording["artist-credit"] || []).map((c) => c.artist?.id)];
-    const rank = /* @__PURE__ */ new Map();
-    billing.forEach((id, position) => {
-      if (!rank.has(id)) rank.set(id, position);
-    });
-    for (const role of ["soloists", "ensembles", "conductors"]) {
-      const people = credits3[role];
-      const sorted = people.map((p, i) => [rank.has(p.id) ? rank.get(p.id) : billing.length, i, p]).sort((a, b) => a[0] - b[0] || a[1] - b[1]).map(([, , p]) => p);
-      credits3[role] = sorted;
-    }
-  }
-  // -- evidence -----------------------------------------------------------
-  // An artist known only for classical music: their most-voted genres are
-  // classical, and none of them isn't.
-  async isClassicalArtist(id) {
-    const data = await this.getArtist(id) || {};
-    const genres = data.genres || [];
-    if (!genres.length) return false;
-    const top = Math.max(...genres.map((g) => g.count || 0));
-    const names = [...genreNames({ genres: genres.filter((g) => (g.count || 0) === top) })];
-    return names.some((g) => this.isClassicalGenre(g)) && !names.some((g) => this.isNonClassicalGenre(g));
-  }
-  async isEarlyComposer(id) {
-    const year = Number(String((await this.getArtist(id) || {})["life-span"]?.begin || "").slice(0, 4));
-    return year > 0 && year < EARLY_COMPOSER_YEAR;
-  }
-  // The types of the recorded Work and the Work it belongs to.
-  async workTypes(credits3) {
-    const work = credits3.work;
-    if (!work) return [];
-    const types = [work.type];
-    const parent = (work.relations || []).find((rel) => rel.type === "parts" && rel.direction === "backward" && rel.work?.id);
-    if (parent) types.push((await this.getWork(parent.work.id) || {}).type);
-    return types.filter(Boolean).map((t) => String(t).toLowerCase());
-  }
-  // Why this recording is classical, or null when nothing says so.
-  async classicalEvidence(recording, credits3, workTypes) {
-    if (workTypes.some((t) => CLASSICAL_WORK_TYPES.includes(t))) return "work type";
-    for (const p of credits3.composers) {
-      if (p.id === p.name) continue;
-      if (await this.isEarlyComposer(p.id)) return "composer's dates";
-      if (await this.isClassicalArtist(p.id)) return "composer's genres";
-    }
-    for (const credit of recording["artist-credit"] || [])
-      if (credit.artist?.id && await this.isClassicalArtist(credit.artist.id)) return "performer's genres";
-    return null;
-  }
-  // -- entry point --------------------------------------------------------
-  // Returns the classical fields for a recording, or null to leave it alone.
-  // `skipReason` says why: "no composer", "non-classical", or null when
-  // MusicBrainz couldn't be reached.
-  // `confirmed`: an admin said it's classical, so missing evidence doesn't
-  // keep it from being tagged (signs that it isn't classical still do).
-  async resolve(recordingId, { trackArtistIds = [], albumArtistIds = [], releaseGroupId = null, confirmed = false } = {}) {
-    this.skipReason = null;
-    if (!recordingId) return null;
-    const recording = await this.getRecording(recordingId);
-    if (!recording) {
-      this.skipReason = this.mb.lastResult === "missing" ? "not on MusicBrainz" : "unreachable";
-      return null;
-    }
-    for (const credit of recording["artist-credit"] || []) {
-      if (this.nonClassicalArtists.has(credit.artist?.id)) {
-        this.skipReason = "non-classical";
-        return null;
-      }
-    }
-    const needAlbum = this.requireEvidence || this.classifyGenres(genreNames(recording)) == null;
-    const releaseGroup = releaseGroupId && needAlbum ? await this.getReleaseGroup(releaseGroupId) || {} : {};
-    const albumTypes = (releaseGroup["secondary-types"] || []).map((t) => String(t).toLowerCase());
-    if (this.requireEvidence && albumTypes.some((t) => NON_CLASSICAL_RELEASE_TYPES.includes(t))) {
-      this.skipReason = "non-classical";
-      return null;
-    }
-    let verdict = this.classifyGenres(genreNames(recording));
-    const albumVerdict = this.classifyGenres(genreNames(releaseGroup));
-    if (this.requireEvidence && albumVerdict === false && [...genreNames(releaseGroup)].some((g) => this.isHardNonClassicalGenre(g)))
-      verdict = false;
-    if (verdict == null) verdict = albumVerdict;
-    if (verdict === false) {
-      this.skipReason = "non-classical";
-      return null;
-    }
-    const credits3 = await this.workCredits(recording);
-    if (!credits3.composers.length && this.trackArtistFallback)
-      await this.composersFromTrackArtist(recording, trackArtistIds, credits3);
-    if (!credits3.composers.length) {
-      this.skipReason = "no composer";
-      return null;
-    }
-    if (verdict == null) {
-      const performers = (recording["artist-credit"] || []).map((c) => c.artist || {});
-      const composers = credits3.composers.filter((p) => p.id !== p.name).map((p) => ({ id: p.id, name: p.name }));
-      for (const artist of [...performers, ...composers]) {
-        if (await this.isNonClassicalArtist(artist)) {
-          this.skipReason = "non-classical";
-          return null;
-        }
-      }
-    }
-    if (this.requireEvidence) {
-      const types = await this.workTypes(credits3);
-      if (types.some((t) => NON_CLASSICAL_WORK_TYPES.includes(t))) {
-        this.skipReason = "non-classical";
-        return null;
-      }
-      if (!confirmed && verdict !== true && !await this.classicalEvidence(recording, credits3, types)) {
-        this.skipReason = "not clearly classical";
-        return null;
-      }
-    }
-    await this.addPerformers(recording, credits3);
-    _ClassicalResolver.orderByBilling(recording, albumArtistIds, credits3);
-    const fields = this.buildFields(credits3);
-    fields.recording = recording;
-    return fields;
-  }
-  static dropPlaceholders(people, keepIfAlone) {
-    const real = people.filter((p) => !isPlaceholder(p.name));
-    return real.length || !keepIfAlone ? real : people;
-  }
-  buildFields(credits3) {
-    credits3.composers = _ClassicalResolver.dropPlaceholders(credits3.composers, true);
-    credits3.arrangers = _ClassicalResolver.dropPlaceholders(credits3.arrangers, false);
-    const roles2 = {
-      composers: credits3.composers,
-      arrangers: credits3.arrangers,
-      soloists: credits3.soloists,
-      ensembles: credits3.ensembles,
-      conductors: credits3.conductors,
-      credited: credits3.credited
-    };
-    let hidden = /* @__PURE__ */ new Set();
-    if (this.maxArtistSoloists && credits3.ensembles.length && credits3.soloists.length > this.maxArtistSoloists) {
-      const creditedIds = new Set(credits3.credited.map((p) => p.id));
-      let headline = credits3.soloists.filter((p) => creditedIds.has(p.id));
-      if (!(headline.length > 0 && headline.length <= this.maxArtistSoloists)) headline = [];
-      const keep = new Set(headline.map((p) => p.id));
-      hidden = new Set(credits3.soloists.map((p) => p.id).filter((id) => !keep.has(id)));
-    }
-    const parts = [];
-    for (const role of this.order) for (const p of roles2[role] || []) if (!hidden.has(p.id)) addPerson(parts, p);
-    const names = unique(parts.map((p) => p.name));
-    const sortNames = unique(parts.map((p) => p.sortName));
-    const joined = (people) => people.map((p) => p.name).join(this.listSeparator) || null;
-    const work = credits3.work || null;
-    return {
-      artist: names.join(this.separator),
-      artists: names,
-      artistSort: sortNames.join(this.separator),
-      artistsSort: sortNames,
-      composers: credits3.composers.map((p) => p.name),
-      composersIds: credits3.composers.map((p) => p.id),
-      composerSort: credits3.composers.map((p) => p.sortName).join(", "),
-      lyricists: credits3.lyricists.map((p) => p.name),
-      arrangers: credits3.arrangers.map((p) => p.name),
-      classicalComposers: joined(credits3.composers),
-      classicalArrangers: joined(credits3.arrangers),
-      classicalSoloists: joined(credits3.soloists),
-      classicalEnsembles: joined(credits3.ensembles),
-      classicalConductors: joined(credits3.conductors),
-      people: {
-        composers: credits3.composers,
-        arrangers: credits3.arrangers,
-        soloists: credits3.soloists,
-        ensembles: credits3.ensembles,
-        conductors: credits3.conductors
-      },
-      work: work ? work.title : null,
-      workId: work ? work.id : null
-    };
-  }
-};
-
 // src/model/runtime.js
 function englishTitle(work, fallback = work.title) {
   const alias = ClassicalResolver.bestEnglishAlias(work.aliases);
@@ -40782,10 +40872,90 @@ async function cancelModelScan(ctx, actor3) {
   }
 }
 
+// src/model/classification-report.js
+import path8 from "node:path";
+async function openModelReadOnly(folder) {
+  const { DatabaseSync } = await import("node:sqlite");
+  return new DatabaseSync(path8.join(folder, "classical.sqlite"), { readOnly: true });
+}
+var describe = (signal) => `${signal.signal}${signal.value ? ` "${signal.value}"` : ""} +${signal.points}`;
+function classificationReport(db, { albumId = null, all = false } = {}) {
+  const albumPins = new Map(
+    db.prepare(
+      `SELECT m.album_ref,c.state FROM metadata_target m JOIN classification c ON c.target_id=m.id
+         WHERE m.album_ref IS NOT NULL AND c.pinned=1`
+    ).all().map((row) => [JSON.parse(row.album_ref)[1], row.state])
+  );
+  const rows = db.prepare(
+    `SELECT t.id,t.core_id,t.instance_id,t.evidence,c.state,c.pinned,c.score
+       FROM track_link t LEFT JOIN classification c ON c.target_id=t.id
+       WHERE t.state='active' ${albumId == null ? "" : "AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?"}
+       ORDER BY json_extract(t.evidence,'$.albumId'),json_extract(t.evidence,'$.hints.discNumber'),json_extract(t.evidence,'$.hints.trackNumber'),t.id`
+  ).all(...albumId == null ? [] : [String(albumId)]);
+  const tracks = [];
+  const summary = { tracks: 0, stored: {}, next: {}, changes: 0, pinned: 0, albumPinned: 0 };
+  for (const row of rows) {
+    const evidence2 = JSON.parse(row.evidence);
+    const { albumOverride, ...hints } = evidence2.hints || {};
+    const album = evidence2.albumId == null ? null : String(evidence2.albumId);
+    const albumPin = album == null ? null : albumPins.get(album) ?? null;
+    const automatic = classificationEvidence(hints);
+    const source = row.pinned ? "track pin" : albumPin ? "album pin" : "automatic";
+    const next = row.pinned ? row.state : albumPin || automatic.decision;
+    const stored = row.state || "unclassified";
+    const entry = {
+      trackId: String(row.core_id),
+      albumId: album,
+      album: hints.album || "",
+      title: hints.title || path8.basename(evidence2.path || ""),
+      artist: hints.artist || "",
+      genres: hints.genres || [],
+      composer: hints.composer || [],
+      work: hints.work || "",
+      stored,
+      source,
+      storedScore: row.score,
+      score: automatic.score,
+      automatic: automatic.decision,
+      reason: automatic.reason,
+      evidence: automatic.signals.map(describe),
+      next,
+      changes: next !== stored
+    };
+    summary.tracks++;
+    summary.stored[stored] = (summary.stored[stored] || 0) + 1;
+    summary.next[next] = (summary.next[next] || 0) + 1;
+    if (entry.changes) summary.changes++;
+    if (source === "track pin") summary.pinned++;
+    if (source === "album pin") summary.albumPinned++;
+    if (all || stored !== "not_classical" || next !== "not_classical" || source !== "automatic") tracks.push(entry);
+  }
+  return { tracks, summary };
+}
+async function albumClassificationSummary(ctx, albumId) {
+  const folder = path8.join(ctx.dataFolder, "model");
+  let db;
+  try {
+    db = await openModelReadOnly(folder);
+  } catch {
+    return "No classical model yet. Run Scan classical model (read only) first.";
+  }
+  try {
+    const { tracks, summary } = classificationReport(db, { albumId, all: true });
+    if (!summary.tracks) return "This album has no indexed tracks. Run Scan classical model (read only) first.";
+    const counts = Object.entries(summary.stored).map(([state, n]) => `${n} ${state.replace("_", " ")}`).join(", ");
+    const flagged = tracks.filter((t) => t.stored !== "not_classical" || t.changes || t.source !== "automatic").map((t) => `${t.title.slice(0, 40)}: ${t.stored}${t.source === "automatic" ? "" : ` (${t.source})`}${t.changes ? ` \u2192 ${t.next}` : ""}, score ${t.score}`);
+    const message = `Read only. ${summary.tracks} tracks: ${counts}.${summary.changes ? ` ${summary.changes} change on the next scan.` : ""} ${flagged.join("; ")}`;
+    return message.length > 500 ? `${message.slice(0, 440)}\u2026 Full report: node scripts/model-admin.mjs classification` : message;
+  } finally {
+    db.close();
+  }
+}
+
 // src/store.js
 import { createHash as createHash3, randomUUID as randomUUID8 } from "node:crypto";
 import fs5 from "node:fs/promises";
-import path8 from "node:path";
+import path9 from "node:path";
 var sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 async function readJson(file, fallback) {
   try {
@@ -40795,7 +40965,7 @@ async function readJson(file, fallback) {
   }
 }
 async function writeJson(file, value) {
-  await fs5.mkdir(path8.dirname(file), { recursive: true });
+  await fs5.mkdir(path9.dirname(file), { recursive: true });
   const temp = `${file}.${process.pid}.${randomUUID8()}.tmp`;
   await fs5.writeFile(temp, JSON.stringify(value));
   await fs5.rename(temp, file);
@@ -40840,14 +41010,14 @@ async function withLock(dir, staleMs, run, { waitMs = 3e4 } = {}) {
         await lock.release();
       }
     }
-    if (Date.now() > until) throw new Error(`Timed out waiting for ${path8.basename(dir)}`);
+    if (Date.now() > until) throw new Error(`Timed out waiting for ${path9.basename(dir)}`);
     await sleep(50 + Math.random() * 100);
   }
 }
 var Throttle = class {
   constructor(folder, intervalMs) {
-    this.lockDir = path8.join(folder, "mb-throttle.lock");
-    this.stateFile = path8.join(folder, "mb-throttle.json");
+    this.lockDir = path9.join(folder, "mb-throttle.lock");
+    this.stateFile = path9.join(folder, "mb-throttle.json");
     this.intervalMs = intervalMs;
   }
   async run(dispatch) {
@@ -40871,7 +41041,7 @@ var FileCache = class {
   }
   file(key) {
     const hash = createHash3("sha1").update(key).digest("hex");
-    return path8.join(this.folder, hash.slice(0, 2), `${hash}.json`);
+    return path9.join(this.folder, hash.slice(0, 2), `${hash}.json`);
   }
   async get(key, ttlMs) {
     const entry = await readJson(this.file(key), null);
@@ -40884,16 +41054,16 @@ var FileCache = class {
   }
 };
 async function pruneCache(folder, maxAgeMs) {
-  const stamp = path8.join(folder, ".pruned");
+  const stamp = path9.join(folder, ".pruned");
   const last = (await fs5.stat(stamp).catch(() => null))?.mtimeMs ?? 0;
   if (Date.now() - last < 24 * 60 * 6e4) return 0;
   await fs5.mkdir(folder, { recursive: true });
   await fs5.writeFile(stamp, "");
   let removed = 0;
   for (const dir of await fs5.readdir(folder).catch(() => [])) {
-    const sub = path8.join(folder, dir);
+    const sub = path9.join(folder, dir);
     for (const name of await fs5.readdir(sub).catch(() => [])) {
-      const file = path8.join(sub, name);
+      const file = path9.join(sub, name);
       const stat = await fs5.stat(file).catch(() => null);
       if (stat && Date.now() - stat.mtimeMs > maxAgeMs) {
         await fs5.rm(file, { force: true });
@@ -40905,7 +41075,7 @@ async function pruneCache(folder, maxAgeMs) {
 }
 
 // src/compare.js
-import path9 from "node:path";
+import path10 from "node:path";
 var playlistName = (composer, work) => `Recordings: ${composer}: ${work}`.slice(0, 200);
 async function evidence(ctx, track) {
   let tags = null;
@@ -40971,7 +41141,7 @@ async function compareRecordings(ctx, user, selected) {
     diagnostics.push({ workId: id, playlistId, recordings: items });
     lines2.push(`Completed "${playlistName(info.composer, info.work)}": ${items.length} owned recordings`);
   }
-  await writeJson(path9.join(ctx.dataFolder, `comparison-${user.id}.json`), { version: 1, ambiguous, comparisons: diagnostics });
+  await writeJson(path10.join(ctx.dataFolder, `comparison-${user.id}.json`), { version: 1, ambiguous, comparisons: diagnostics });
   if (ambiguous) lines2.push(`${ambiguous} files have ambiguous work IDs and need review`);
   return summarize(lines2);
 }
@@ -40989,10 +41159,10 @@ function summarize(lines2) {
 }
 
 // src/mb.js
-import path10 from "node:path";
+import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.9" : "dev";
+var VERSION = true ? "1.0.10" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js
@@ -41012,7 +41182,7 @@ var MusicBrainz = class {
     this.userAgent = `AurralClassical/${VERSION} ( ${REPOSITORY} )`;
     this.fetch = fetchImpl;
     this.log = log2;
-    this.cache = new FileCache(path10.join(dataFolder, "mb-cache"));
+    this.cache = new FileCache(path11.join(dataFolder, "mb-cache"));
     const isPublic = this.base === PUBLIC_MB;
     this.throttle = new Throttle(dataFolder, intervalMs ?? (isPublic ? 1e3 : 0));
     this.maxRetries = maxRetries;
@@ -41121,7 +41291,7 @@ function parseOrder(value) {
   const roles2 = [];
   for (const word of raw.toLowerCase().split(/[\s,;>|/]+/).filter(Boolean)) {
     const role = ROLE_ALIASES[word];
-    if (!role) throw new Error(`Name order: "${word}" isn't a role. Use ${ROLES2.slice(0, 5).join(", ")}.`);
+    if (!role) throw new Error(`Name order: "${word}" isn't a role. Use ${ROLES.slice(0, 5).join(", ")}.`);
     if (!roles2.includes(role)) roles2.push(role);
   }
   if (!roles2.includes("credited")) roles2.push("credited");
@@ -41230,7 +41400,7 @@ var isSucceeded = (state) => /Completed/i.test(state) && /Succeeded/i.test(state
 // src/source.js
 import { randomUUID as randomUUID10 } from "node:crypto";
 import fs6 from "node:fs/promises";
-import path11 from "node:path";
+import path12 from "node:path";
 var LENGTH_TOLERANCE_MS = 2e3;
 var SEARCH_BUDGET_MS = 5e4;
 var SEARCH_TIMEOUT_MS = 12e3;
@@ -41567,7 +41737,7 @@ async function searchAlbum(ctx, album) {
     }
   }));
 }
-var downloadsDir = (ctx) => path11.join(ctx.dataFolder, "downloads");
+var downloadsDir = (ctx) => path12.join(ctx.dataFolder, "downloads");
 async function startDownload(ctx, result, kind) {
   const data = result?.data;
   if (!data?.username || !Array.isArray(data.files) || !data.files.length) throw new Error("The result has no files to download");
@@ -41582,7 +41752,7 @@ async function startDownload(ctx, result, kind) {
   const slskd = slskdFor(ctx);
   await slskd.enqueue(data.username, data.files.map((f) => ({ filename: f.filename, size: f.size })));
   const id = randomUUID10();
-  await writeJson(path11.join(downloadsDir(ctx), `${id}.json`), { kind, key, username: data.username, files: data.files, startedAt: Date.now() });
+  await writeJson(path12.join(downloadsDir(ctx), `${id}.json`), { kind, key, username: data.username, files: data.files, startedAt: Date.now() });
   return { pending: id };
 }
 var downloadKey = (username, files) => `${username}\0${files.map((f) => f.filename).sort().join("\0")}`;
@@ -41592,9 +41762,9 @@ async function findDownload(ctx, key) {
   const dir = downloadsDir(ctx);
   for (const name of await fs6.readdir(dir).catch(() => [])) {
     if (!name.endsWith(".json")) continue;
-    const record = await readJson(path11.join(dir, name), null);
+    const record = await readJson(path12.join(dir, name), null);
     if (!record || Date.now() - (record.startedAt || 0) > KEEP_DOWNLOADS_MS) {
-      await fs6.rm(path11.join(dir, name), { force: true });
+      await fs6.rm(path12.join(dir, name), { force: true });
       continue;
     }
     if (record.key === key && !record.failed) return name.replace(/\.json$/, "");
@@ -41603,7 +41773,7 @@ async function findDownload(ctx, key) {
 }
 async function locate(downloadFolder, file) {
   const base = remoteBase(file.filename);
-  const direct = path11.join(downloadFolder, remoteBase(remoteDir(file.filename)), base);
+  const direct = path12.join(downloadFolder, remoteBase(remoteDir(file.filename)), base);
   const stat = await fs6.stat(direct).catch(() => null);
   if (stat?.isFile()) return direct;
   let seen = 0;
@@ -41611,7 +41781,7 @@ async function locate(downloadFolder, file) {
     if (depth > 4) return null;
     for (const entry of await fs6.readdir(dir, { withFileTypes: true }).catch(() => [])) {
       if (++seen > 5e4) return null;
-      const full = path11.join(dir, entry.name);
+      const full = path12.join(dir, entry.name);
       if (entry.isDirectory()) {
         const found = await walk(full, depth + 1);
         if (found) return found;
@@ -41625,7 +41795,7 @@ async function locate(downloadFolder, file) {
   return walk(downloadFolder, 0);
 }
 async function downloadStatus(ctx, id, directory) {
-  const record = await readJson(path11.join(downloadsDir(ctx), `${id}.json`), null);
+  const record = await readJson(path12.join(downloadsDir(ctx), `${id}.json`), null);
   if (!record) throw new Error("This download is unknown to the plugin");
   const slskd = slskdFor(ctx);
   const transfers = await slskd.downloads(record.username);
@@ -41644,7 +41814,7 @@ async function downloadStatus(ctx, id, directory) {
     }
   }
   const failed = states.find((state) => FAILED_STATES.test(state));
-  if (failed) await writeJson(path11.join(downloadsDir(ctx), `${id}.json`), { ...record, failed: true });
+  if (failed) await writeJson(path12.join(downloadsDir(ctx), `${id}.json`), { ...record, failed: true });
   if (failed) throw new Error(`slskd: ${remoteBase(record.files[states.indexOf(failed)].filename)} ${failed.replace(/^Completed,\s*/, "").toLowerCase()}`);
   if (!states.every(isSucceeded)) return { done: false };
   return finishDownload(ctx, id, record, directory);
@@ -41676,10 +41846,10 @@ async function finishDownload(ctx, id, record, directory) {
 var formatBytes = (bytes) => bytes >= 1024 ** 3 ? `${(bytes / 1024 ** 3).toFixed(1)} GB` : `${Math.max(1, Math.round(bytes / 1024 ** 2))} MB`;
 async function freeBytes(ctx, dir) {
   if (ctx.freeBytes) return ctx.freeBytes(dir);
-  for (let at = dir; ; at = path11.dirname(at)) {
+  for (let at = dir; ; at = path12.dirname(at)) {
     const stats = await fs6.statfs(at).catch(() => null);
     if (stats) return stats.bavail * stats.bsize;
-    if (path11.dirname(at) === at) return Infinity;
+    if (path12.dirname(at) === at) return Infinity;
   }
 }
 var link = (ctx, local, target) => (ctx.linkFile ?? fs6.link)(local, target);
@@ -41701,7 +41871,7 @@ async function moveIntoPlace(ctx, id, record, directory) {
     const local = await locate(downloadFolder, file);
     if (!local) throw new Error(`Couldn't find ${remoteBase(file.filename)} in slskd's download folder`);
     const name = `${String(file.disc || 1).padStart(2, "0")}-${String(i + 1).padStart(3, "0")} ${remoteBase(file.filename)}`.replace(/[\\/]/g, "_");
-    const target = path11.join(directory, record.kind === "album" ? name : remoteBase(file.filename));
+    const target = path12.join(directory, record.kind === "album" ? name : remoteBase(file.filename));
     files.push({ local, target, file, size: (await fs6.stat(local)).size });
   }
   await fs6.mkdir(directory, { recursive: true });
@@ -41747,11 +41917,11 @@ async function moveIntoPlace(ctx, id, record, directory) {
       await writeTags(target, { title: [file.title], artist: [file.artist].filter(Boolean), recordingMbid: [file.recordingId] });
       tagged++;
     } catch (error) {
-      ctx.log(`Couldn't tag ${path11.basename(target)}: ${error.message}`);
+      ctx.log(`Couldn't tag ${path12.basename(target)}: ${error.message}`);
     }
   }
   ctx.log(`Download ${id}: ${files.length} file(s) ${linked ? "linked" : "copied"}, ${tagged} identified and tagged`);
-  return record.kind === "album" ? { done: true } : { done: true, path: path11.basename(files[0].target) };
+  return record.kind === "album" ? { done: true } : { done: true, path: path12.basename(files[0].target) };
 }
 
 // src/tagger.js
@@ -41759,9 +41929,9 @@ import { randomUUID as randomUUID11 } from "node:crypto";
 
 // src/model/write-guard.js
 import fs7 from "node:fs/promises";
-import path12 from "node:path";
+import path13 from "node:path";
 async function modelAllowsTagging(ctx, realPath) {
-  const filename = path12.join(ctx.dataFolder, "model", "classical.sqlite");
+  const filename = path13.join(ctx.dataFolder, "model", "classical.sqlite");
   try {
     await fs7.access(filename);
   } catch (error) {
@@ -41790,7 +41960,7 @@ async function modelAllowsTagging(ctx, realPath) {
 
 // src/tagger.js
 import fs8 from "node:fs/promises";
-import path13 from "node:path";
+import path14 from "node:path";
 
 // src/aurral.js
 var Aurral = class {
@@ -41836,16 +42006,16 @@ var Aurral = class {
 // src/tagger.js
 var LOCK_STALE_MS = 2 * 6e4;
 var SAVE_EVERY_MS = 3e4;
-var queueDir = (ctx) => path13.join(ctx.dataFolder, "queue");
-var processedFile = (ctx) => path13.join(ctx.dataFolder, "processed.json");
-var indexFile = (ctx) => path13.join(ctx.dataFolder, "library-index.json");
-var originalsFile = (ctx) => path13.join(ctx.dataFolder, "originals.json");
-var excludedFile = (ctx) => path13.join(ctx.dataFolder, "excluded.json");
+var queueDir = (ctx) => path14.join(ctx.dataFolder, "queue");
+var processedFile = (ctx) => path14.join(ctx.dataFolder, "processed.json");
+var indexFile = (ctx) => path14.join(ctx.dataFolder, "library-index.json");
+var originalsFile = (ctx) => path14.join(ctx.dataFolder, "originals.json");
+var excludedFile = (ctx) => path14.join(ctx.dataFolder, "excluded.json");
 var TAG_FIELDS = ["artist", "albumArtist", "composer", "work", "workId"];
 var TAGGING_VERSION = 2;
 var outdated = (record) => record && (record.status === "tagged" || record.status === "unchanged") && (record.v ?? 1) < TAGGING_VERSION;
-var lockDir = (ctx) => path13.join(ctx.dataFolder, "tagging.lock");
-var yieldFile = (ctx) => path13.join(ctx.dataFolder, "tagging.yield");
+var lockDir = (ctx) => path14.join(ctx.dataFolder, "tagging.lock");
+var yieldFile = (ctx) => path14.join(ctx.dataFolder, "tagging.yield");
 var YIELD_FRESH_MS = 10 * 6e4;
 var PRIORITY_WAIT_MS = 5 * 6e4;
 var ACTION_CLAIM_MS = 2 * 6e4;
@@ -41855,14 +42025,14 @@ async function enqueue(ctx, filePaths, { force = false, source = null } = {}) {
   for (const filePath of filePaths) {
     if (!filePath) continue;
     const id = `${Date.now().toString().padStart(15, "0")}-${randomUUID11()}`;
-    await writeJson(path13.join(queueDir(ctx), `${id}.json`), { path: filePath, force, source, at: Date.now() });
+    await writeJson(path14.join(queueDir(ctx), `${id}.json`), { path: filePath, force, source, at: Date.now() });
     ids.push(id);
   }
   return ids;
 }
 async function queuedEntries(ctx) {
   const names = (await fs8.readdir(queueDir(ctx)).catch(() => [])).filter((n) => n.endsWith(".json")).sort();
-  return names.map((name) => ({ name, file: path13.join(queueDir(ctx), name) }));
+  return names.map((name) => ({ name, file: path14.join(queueDir(ctx), name) }));
 }
 var queueLength = async (ctx) => (await queuedEntries(ctx)).length;
 async function allowedPath(ctx, filePath) {
@@ -41872,8 +42042,8 @@ async function allowedPath(ctx, filePath) {
     if (!root) continue;
     const base = await fs8.realpath(root).catch(() => null);
     if (!base) continue;
-    const relative = path13.relative(base, real);
-    if (relative && !relative.startsWith("..") && !path13.isAbsolute(relative)) return real;
+    const relative = path14.relative(base, real);
+    if (relative && !relative.startsWith("..") && !path14.isAbsolute(relative)) return real;
   }
   return null;
 }
@@ -42074,7 +42244,7 @@ var Session = class {
     });
     if (changed.length) {
       this.changedFiles++;
-      ctx.log(`Tagged ${path13.basename(real)}: ${fields.artist}`);
+      ctx.log(`Tagged ${path14.basename(real)}: ${fields.artist}`);
     }
     return true;
   }
@@ -42116,7 +42286,7 @@ var Session = class {
     this.stats.skipped["classical tags removed"]--;
     if (changed.length) {
       this.changedFiles++;
-      ctx.log(`Removed classical tags from ${path13.basename(real)}`);
+      ctx.log(`Removed classical tags from ${path14.basename(real)}`);
     }
     return changed.length ? original && mode !== "clear" ? "restored" : "cleared" : "unchanged";
   }
@@ -42184,7 +42354,7 @@ var Session = class {
           return;
         }
         if (entry.name.startsWith(".")) continue;
-        const full = path13.join(dir, entry.name);
+        const full = path14.join(dir, entry.name);
         if (entry.isDirectory()) await walk(full);
         else if (entry.isFile() && isAudioPath(full)) {
           seen.add(full);
@@ -42238,7 +42408,7 @@ async function openState(ctx, priority) {
   return state;
 }
 async function withTagging(ctx, work, { priority = false } = {}) {
-  const key = path13.resolve(ctx.dataFolder);
+  const key = path14.resolve(ctx.dataFolder);
   let entry;
   for (; ; ) {
     entry = held.get(key);
@@ -42524,6 +42694,11 @@ var index_default = {
         )
       };
     },
+    async "classical-classification-report"(input) {
+      if (input.user?.role !== "admin")
+        throw new Error("Classical diagnostics require a host admin");
+      return { message: await albumClassificationSummary(makeContext(input), input.album?.id) };
+    },
     async "classical-model-cancel"(input) {
       await cancelModelScan(makeContext(input), input.user);
       return {
@@ -42625,7 +42800,7 @@ var index_default = {
     if (remainingMs <= 0) return;
     const stats = await runScheduled(ctx, remainingMs);
     if (stats) log(`Scheduled tagging: ${describeStats(stats)}`);
-    await pruneCache(path14.join(ctx.dataFolder, "mb-cache"), TTL.default).catch(
+    await pruneCache(path15.join(ctx.dataFolder, "mb-cache"), TTL.default).catch(
       () => {
       }
     );

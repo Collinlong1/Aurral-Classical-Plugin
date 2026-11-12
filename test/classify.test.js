@@ -46,7 +46,7 @@ test("title, WORK and album text count as classical evidence; no evidence is not
     1,
   );
   // A later, clearer scan closes the earlier review item.
-  classify(c, links[4].id, { title: "Track 3 — Allegro", composer: ["Someone"], composerDistinct: true });
+  classify(c, links[4].id, { title: "Piano Sonata No. 11 in A major, K. 331: I. Andante grazioso", composer: ["Someone"], composerDistinct: true });
   assert.equal(
     c.db.prepare("SELECT count(*) AS n FROM review_item WHERE kind='classification' AND status='open'").get().n,
     0,

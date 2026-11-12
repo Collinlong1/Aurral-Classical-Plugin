@@ -2,15 +2,30 @@
 import path from "node:path";
 import { openCatalogue } from "../src/model/catalogue.js";
 import { restoreDatabase } from "../src/model/database.js";
+import { classificationReport, formatReport, openModelReadOnly } from "../src/model/classification-report.js";
 
 const [command, folder, file, flag] = process.argv.slice(2);
-if (
+if (command === "classification" && folder) {
+  // Read-only dry run: opens the model database read-only, writes nothing.
+  const args = process.argv.slice(4);
+  const albumAt = args.indexOf("--album");
+  const db = await openModelReadOnly(path.resolve(folder));
+  try {
+    const report = classificationReport(db, {
+      albumId: albumAt >= 0 ? args[albumAt + 1] : null,
+      all: args.includes("--all"),
+    });
+    console.log(args.includes("--json") ? JSON.stringify(report, null, 2) : formatReport(report));
+  } finally {
+    db.close();
+  }
+} else if (
   !folder ||
   !["status", "backup", "restore"].includes(command) ||
   (command !== "status" && !file)
 ) {
   console.error(
-    "Usage: node scripts/model-admin.mjs status MODEL_FOLDER | backup MODEL_FOLDER DESTINATION | restore MODEL_FOLDER BACKUP --offline",
+    "Usage: node scripts/model-admin.mjs status MODEL_FOLDER | backup MODEL_FOLDER DESTINATION | restore MODEL_FOLDER BACKUP --offline | classification MODEL_FOLDER [--album ID] [--all] [--json]",
   );
   process.exitCode = 1;
 } else if (command === "restore") {

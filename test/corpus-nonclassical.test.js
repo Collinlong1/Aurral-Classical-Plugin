@@ -32,8 +32,9 @@ const baseline = JSON.parse(fs.readFileSync(baselineFile, "utf8"));
 test("non-classical corpus: fixtures are complete and in scope", () => {
   assert.deepEqual(checkFixtures(fixtures), []);
   const tracks = fixtures.flatMap((album) => album.tracks);
-  assert.ok(fixtures.length >= 20 && fixtures.length <= 30, `${fixtures.length} albums`);
-  assert.ok(tracks.length >= 100 && tracks.length <= 150, `${tracks.length} tracks`);
+  // At least the v0.1 scope (20 albums, 100 tracks); later releases add more.
+  assert.ok(fixtures.length >= 20, `${fixtures.length} albums`);
+  assert.ok(tracks.length >= 100, `${tracks.length} tracks`);
   const families = new Set(fixtures.map((album) => album.family));
   for (const family of ["pop", "rock", "hip-hop", "jazz", "electronic", "film-score", "game-score", "soundtrack-mixed", "crossover", "classical-mistagged"])
     assert.ok(families.has(family), `no ${family} album`);
@@ -76,6 +77,53 @@ test("non-classical corpus: album and track pins survive a retag and rescans", (
     assert.deepEqual([album.pinned.afterRetag, album.pinned.afterRescan], [album.pinned.want, album.pinned.want], album.id);
 });
 
+test("non-classical corpus: the read-only report matches the pipeline and writes nothing", () => {
+  assert.equal(results.reportReadOnly, true);
+  const byTitle = new Map(results.report.tracks.map((t) => [`${t.albumId}|${t.title}`, t]));
+  assert.equal(results.report.summary.tracks, results.tracks.length);
+  for (const track of results.tracks) {
+    const entry = byTitle.get(`${track.album}|${track.title}`);
+    assert.ok(entry, track.key);
+    // After the final rescan, the stored state is what the report predicts.
+    assert.equal(entry.stored, track.pin ? track.pin.afterRescan : track.state, track.key);
+    assert.equal(entry.changes, false, track.key);
+    assert.equal(entry.source, track.pin ? (fixtures.find((a) => a.id === track.album).pins.tracks?.[track.key.split("-").pop()] ? "track pin" : "album pin") : "automatic", track.key);
+  }
+  assert.equal(results.report.summary.pinned, 3);
+});
+
+test("non-classical corpus: the report flags a stale classical decision as a dry run", async (t) => {
+  // A library scanned by the old rules: Get Lucky stored as classical. The
+  // report must show it changing to not_classical, from a read-only database.
+  const { DatabaseSync } = await import("node:sqlite");
+  const { classificationReport } = await import("../src/model/classification-report.js");
+  const root = await fsp.mkdtemp(path.join(os.tmpdir(), "aurral-classical-dryrun-"));
+  t.after(() => fsp.rm(root, { recursive: true, force: true }));
+  const { openCatalogue } = await import("../src/model/catalogue.js");
+  const { reconcile } = await import("../src/model/reconcile.js");
+  const c = await openCatalogue(path.join(root, "model"));
+  const hints = { title: "Get Lucky", album: "Random Access Memories", artist: "Daft Punk", work: "Get Lucky", genres: ["Electronic"], composer: ["Pharrell Williams"], composerDistinct: true };
+  const [link] = reconcile(c, { version: 1, complete: true, instanceId: "i", epoch: "e", generation: 1, tracks: [{ coreId: "1", fileId: "1", albumId: "ram", path: "/library/1.flac", size: 1, durationMs: 1, hints }] });
+  c.db.prepare("INSERT INTO classification VALUES (?,?,0,5,?,1,?)").run(link.id, "classical", JSON.stringify(hints), Date.now());
+  c.close();
+  const db = new DatabaseSync(path.join(root, "model", "classical.sqlite"), { readOnly: true });
+  try {
+    const [entry] = classificationReport(db).tracks;
+    assert.deepEqual([entry.stored, entry.next, entry.changes], ["classical", "not_classical", true]);
+    assert.match(entry.reason, /Electronic genre/);
+  } finally {
+    db.close();
+  }
+  // The admin album action gives the same answer, and refuses non-admins.
+  const { default: plugin } = await import("../src/index.js");
+  const action = plugin.actions["classical-classification-report"];
+  const input = { dataFolder: root, libraryFolder: root, settings: {}, album: { id: "ram" } };
+  const { message } = await action({ ...input, user: { id: 1, role: "admin" } });
+  assert.match(message, /Read only\. 1 tracks: 1 classical\. 1 change on the next scan\. Get Lucky: classical → not_classical/);
+  assert.ok(message.length <= 500);
+  await assert.rejects(action({ ...input, user: { id: 2, role: "user" } }), /admin/);
+});
+
 test("non-classical corpus: the acquisition check can see a classical recording", async (t) => {
   // A positive control, so "no acquisition behaviour" is a real result.
   const root = await fsp.mkdtemp(path.join(os.tmpdir(), "aurral-classical-acquisition-"));
@@ -115,14 +163,11 @@ test("non-classical corpus: every known failure has a written explanation", () =
   assert.deepEqual(missing.map((track) => track.key), []);
 });
 
-// The v0.1 acceptance bar. Reported, not enforced, until a classifier change
-// is separately approved; the baseline above stops it getting worse.
-test(
-  "non-classical corpus: v0.1 acceptance, zero false classical positives",
-  { todo: "known false positives are listed in nonclassical-baseline.json and NONCLASSICAL_CORPUS_REPORT.md" },
-  () => {
-    const m = metrics(results.tracks);
-    assert.equal(m.falsePositives, 0, `${m.falsePositives} false classical positives`);
-    assert.equal(m.leaks, 0, `${m.leaks} tracks given classical behaviour`);
-  },
-);
+// The v0.1 acceptance bar: no clearly non-classical track is classical or
+// gets classical behaviour, and no expected-classical track is lost.
+test("non-classical corpus: v0.1 acceptance, zero false classical positives or negatives", () => {
+  const m = metrics(results.tracks);
+  assert.equal(m.falsePositives, 0, `${m.falsePositives} false classical positives`);
+  assert.equal(m.leaks, 0, `${m.leaks} tracks given classical behaviour`);
+  assert.equal(m.falseNegatives, 0, `${m.falseNegatives} classical tracks classified not classical`);
+});
