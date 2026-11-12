@@ -84,6 +84,7 @@ test("album works follow the album, and movement titles drop the work's name", a
       },
     });
   const hammerklavier = "Piano Sonata No. 29 in B-flat major, Op. 106";
+  const standalone = "Danzón no. 2";
   const links = reconcile(
     c,
     snapshot([
@@ -93,6 +94,7 @@ test("album works follow the album, and movement titles drop the work's name", a
       on(4, 1, 4, hammerklavier, `${hammerklavier} - "Hammerklavier": Adagio sostenuto`),
       on(5, 1, 1, "Piano Sonata No. 8", "Piano Sonata No. 8: Grave", { recordingMbid: "pathetique-1" }),
       on(6, 1, 2, "Piano Sonata No. 8", "Piano Sonata No. 8: Rondo", { recordingMbid: "pathetique-2" }),
+      on(7, 1, 5, "", standalone, { composer: ["Arturo Márquez"], genres: ["Classical"] }),
     ]),
   );
   links.forEach((link) => classify(c, link.id, link.hints));
@@ -102,22 +104,26 @@ test("album works follow the album, and movement titles drop the work's name", a
     providerMatches: new Map([
       [links[4].id, { workId: "pathetique", work: pathetique, movement: `${pathetique}: I. Grave – Allegro di molto e con brio`, composers: [] }],
       [links[5].id, { workId: "pathetique", work: pathetique, movement: `${pathetique}: III. Rondo. Allegro`, composers: [] }],
+      [links[6].id, { workId: "danzon-2", work: standalone, standalone: true, composers: ["Arturo Márquez"] }],
     ]),
   });
   autoMatchTaggedWorks(c, { actor: "model-scan" });
   const album = renderAlbumPresentation(c, "cycle-album");
   assert.deepEqual(
     album.groups.map((group) => group.title),
-    [pathetique, hammerklavier, "Piano Sonata No. 1"],
+    [pathetique, hammerklavier, standalone, "Piano Sonata No. 1"],
   );
   assert.deepEqual(
     album.groups.map((group) => group.items.map((item) => item.title)),
     [
       ["I. Grave – Allegro di molto e con brio", "III. Rondo. Allegro"],
       ["Allegro", "Adagio sostenuto"],
+      [standalone],
       ["I. Allegro", "II. Adagio"],
     ],
   );
+  assert.equal(album.groups[2].movementCount, 1, "a whole piece occupies one part in the host album view");
+  assert.equal(c.db.prepare("SELECT count(*) AS n FROM relation WHERE kind='movement' AND source_id=?").get(album.groups[2].workId).n, 0);
 
   // Fields the title states fill in; an admin's value is never replaced.
   const hammerklavierWork = album.groups[1].workId;

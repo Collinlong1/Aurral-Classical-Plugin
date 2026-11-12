@@ -256,8 +256,7 @@ try {
     .getByRole("button", { name: "Play whole work", exact: true })
     .click();
   await ordinary.waitForFunction(() =>
-    // The work page's own player shows just the part.
-    ["I. Allegro", "II. Adagio", "III. Finale"].includes(
+    ["Fixture Sonata: I. Allegro", "Fixture Sonata: II. Adagio", "Fixture Sonata: III. Finale"].includes(
       document.querySelector(".global-player__title")?.textContent || "",
     ),
   );
@@ -298,12 +297,51 @@ try {
       path: `${process.env.EDITOR_SCREENSHOT_DIR}/phase4-work-page.png`,
       fullPage: true,
     });
+  fixture("phase4-bounds");
+  for (const viewport of [{ width: 1280, height: 900 }, { width: 390, height: 844 }]) {
+    for (const action of ["Play", "Play next", "Add to queue"]) {
+      const menuContext = await browser.newContext({
+        viewport,
+        extraHTTPHeaders: { "X-Api-Key": "fixture-one-synthetic-key-0000000000000000" },
+      });
+      try {
+        const menuPage = await menuContext.newPage();
+        await menuPage.goto(`${url}/album/${phase4.albumId}`);
+        await menuPage.getByRole("button", { name: "By work", exact: true }).waitFor();
+        const presentation = await (await menuPage.request.get(`${url}/api/plugins/album-presentation/${phase4.albumId}`)).json();
+        const firstGroup = presentation.groups[0];
+        const item = firstGroup.items[0];
+        const row = menuPage.getByRole("list", { name: /works$/ }).getByRole("listitem").first();
+        await row.getByRole("button", { name: `${item.title} options`, exact: true }).click();
+        await menuPage.getByRole("menuitem", { name: action, exact: true }).click();
+        await menuPage.waitForFunction((id) => {
+          const saved = JSON.parse(localStorage.getItem("aurral.player.queue.v1") || "null");
+          return saved?.tracks.some((track) => track.id === id);
+        }, item.id);
+        const saved = await menuPage.evaluate(() => JSON.parse(localStorage.getItem("aurral.player.queue.v1")));
+        const queued = saved.tracks.find((track) => track.id === item.id);
+        assert.equal(queued.segmentStartMs, 100, `${action} keeps the segment start`);
+        assert.equal(queued.segmentEndMs, 1500, `${action} keeps the segment end`);
+        assert.equal(queued.libraryTrackId, item.trackId);
+        assert.equal(queued.libraryAlbumId, item.albumId);
+        assert.equal(queued.title, `Fixture Sonata: ${item.title}`);
+        assert.ok(queued.src.includes(item.streamPath));
+        if (action === "Play") {
+          assert.equal(saved.source.type, "plugin-work");
+          assert.equal(saved.source.id, firstGroup.id);
+          assert.deepEqual(saved.tracks.map((track) => track.id), firstGroup.items.map((entry) => entry.id));
+        }
+      } finally {
+        await menuContext.close();
+      }
+    }
+  }
   await secondUser.close();
   await regular.close();
   fixture("remember", JSON.stringify({ work, recording }));
   assert.deepEqual(errors, []);
   console.log(
-    "PASS: browser editor plus Phase 4 work grouping, stock toggle, work page, incomplete movement and isolated user state",
+    "PASS: browser editor, work grouping, full player titles, bounded row-menu playback at desktop/mobile widths, stock toggle, work page, incomplete movement and isolated user state",
   );
 } catch (error) {
   if (process.env.EDITOR_SCREENSHOT_DIR) {

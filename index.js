@@ -38001,6 +38001,25 @@ function mergeWork(catalogue, keep, drop, actor3) {
   catalogue.audit("work.merge", drop, { into: keep }, actor3);
   return true;
 }
+function verifiedIdentities(catalogue, entity, kind) {
+  return new Set(
+    catalogue.db.prepare("SELECT provider,record_id FROM external_identity WHERE entity_id=? AND record_kind=? AND provider!='embedded-tags' AND state='active'").all(entity, kind).map((row) => JSON.stringify([row.provider, row.record_id]))
+  );
+}
+var distinctIdentities = (a, b) => a.size > 0 && b.size > 0 && ![...a].some((id) => b.has(id));
+function compatibleAutoWorks(catalogue, a, b) {
+  if (distinctIdentities(verifiedIdentities(catalogue, a, "work"), verifiedIdentities(catalogue, b, "work"))) return false;
+  const composers = (work) => {
+    const identities = /* @__PURE__ */ new Map();
+    for (const { contributor_id: person } of catalogue.db.prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer'").all(work)) {
+      const name = words(resolvedName(catalogue, person, "name"));
+      identities.set(name, /* @__PURE__ */ new Set([...identities.get(name) || [], ...verifiedIdentities(catalogue, person, "artist")]));
+    }
+    return identities;
+  };
+  const other = composers(b);
+  return ![...composers(a)].some(([name, ids]) => distinctIdentities(ids, other.get(name) || /* @__PURE__ */ new Set()));
+}
 function mergeDuplicateAutoWorks(catalogue, { actor: actor3 = null } = {}) {
   return transaction(catalogue.db, () => {
     let index = catalogueIndex(catalogue);
@@ -38013,7 +38032,8 @@ function mergeDuplicateAutoWorks(catalogue, { actor: actor3 = null } = {}) {
       const keep = ids.find((id) => !auto(id)) || ids[0];
       if (ids.filter((id) => !auto(id)).length > 1) continue;
       for (const id of ids.filter((id2) => id2 !== keep))
-        if (mergeWork(catalogue, keep, id, actor3)) works++;
+        if (!compatibleAutoWorks(catalogue, keep, id)) continue;
+        else if (mergeWork(catalogue, keep, id, actor3)) works++;
         else catalogue.review("identity", id, { reason: "duplicate-work", keep });
     }
     return { people, works };
@@ -39404,7 +39424,8 @@ function scopeIds(c, scope) {
       `SELECT DISTINCT r.work_id FROM segment s JOIN realization_item i ON i.segment_id=s.id
              JOIN realization r ON r.id=i.realization_id WHERE s.track_link_id IN (${marks})`
     ).all(...tracks).map((row) => row.work_id) : [];
-    return [.../* @__PURE__ */ new Set([albumId, `album:${albumId}`, ...tracks, ...works, ...work ? [work] : []])];
+    const workIds = [.../* @__PURE__ */ new Set([...works, ...work ? [work] : []])];
+    return [.../* @__PURE__ */ new Set([albumId, `album:${albumId}`, ...tracks, ...workIds.flatMap((id) => scopeIds(c, id))])];
   }
   return [
     scope,
@@ -40382,7 +40403,9 @@ function pieceGroups(c, album, following) {
     const work = workTag.split(/\s*:\s*/)[0];
     const split = splitTitle(trackTitle2(evidence2));
     const fullHead = work || split.head;
-    const tail = work ? movementTitle({ title: trackTitle2(evidence2), work: workTag }, work) : split.tail;
+    const ownTail = work ? movementTitle({ title: trackTitle2(evidence2) }, work) : split.tail;
+    const taggedTail = work ? movementTitle({ title: trackTitle2(evidence2), work: workTag }, work) : ownTail;
+    const tail = words2(ownTail).endsWith(` ${words2(taggedTail)}`) ? taggedTail : ownTail;
     const head = fullHead.replace(ACT, "");
     const heading = head || tail;
     const composer = composersOf(evidence2.hints || {}).join(", ");
@@ -40450,12 +40473,12 @@ function renderAlbumPresentation(c, albumId) {
       )?.name || "",
       items: run.map((row) => queueItem(metadata, row)),
       missing: index ? [] : movements.filter((movement) => !present.has(movement.id)),
-      movementCount: movements.length,
+      movementCount: Math.max(1, movements.length),
       first: albumPosition(run[0])
     }));
   });
   const groups = [...works, ...pieceGroups(c, album, following)].sort((a, b) => a.first - b.first).map(({ first, ...group }) => group);
-  if (!groups.some((group) => group.items.length > 1)) return null;
+  if (!groups.some((group) => group.workId || group.items.length > 1)) return null;
   return { version: 1, albumId: album, supportsToggle: true, groups };
 }
 function renderWork(c, workId, user) {
@@ -41729,7 +41752,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.12" : "dev";
+var VERSION = true ? "1.0.13" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js

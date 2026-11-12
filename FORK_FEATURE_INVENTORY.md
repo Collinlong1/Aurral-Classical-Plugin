@@ -1,5 +1,9 @@
 # Phase 4 inventory addendum
 
+The v0.1 review fixes preserve verified identities during automatic duplicate-work repair, include movement edits in album revision scopes, and route generic core playback menus through bounded plugin queue items. Album and resource-page player titles both include the work and part. Manifest 1.0.13 retains the standalone-work hotfix and the latest mixed-metadata and scan checkpoint changes from `1019fd5`.
+
+The standalone-work presentation hotfix reports whole works as one album-view part and retains the work view for matched single-track works. It changes only plugin presentation and its bundle; core and storage contracts are unchanged.
+
 Phase 4 adds generic fork hooks for opt-in album presentation, authenticated regular-user resource pages and bounded native queue segments. Classical grouping/work content and user state remain plugin-owned. Main, upstream and preservation branches remain untouched; the review snapshots remain separate and unmerged. See `PHASE_4_REPORT.md` and the Phase 4 section in `UPSTREAM_DELTA.md`.
 
 # Phase 3 scan throughput correction

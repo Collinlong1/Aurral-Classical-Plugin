@@ -1,5 +1,9 @@
 # Phase 4 — grouping, playback and work page
 
+Review corrections on plugin `1019fd5` / companion core `f3cea93c`: duplicate-work repair preserves differing provider work/composer identities across rescans; album edit tokens include canonical movement labels; core menu playback uses bounded plugin items and full work/part player titles. The standalone-work album hotfix below is carried forward onto these latest sources. No new storage migration or media writes are introduced.
+
+Standalone-work correction: a work without canonical movement rows contributes one whole part to album presentation. Matched single-track works keep their work view and page links; an album of unassigned single pieces still uses the native view. This uses the existing host contract and existing catalogue attachments, with no migration or rematching required.
+
 Phase 4 was explicitly authorized on November 10, 2026 (America/Chicago). This review implementation completes the v0.1 grouping/work-page slice on the existing `aurral-classical` branches. It does not begin v0.2 library search, richer v0.3 entity pages, Discover, automatic matching, or tag-writing expansion.
 
 After Phase 4, the user explicitly authorized beginning automatic work matching. The plugin now has a first conservative, read-only import rule for explicit embedded `WORK` + composer + release order evidence. Completed model scans apply it automatically. The explicit album action additionally accepts a shared structured classical title prefix with Roman/numbered movement suffixes when composer, album, classical classification and unique release order agree. It creates multi-movement realizations for the documented allowlist, stays idempotent, excludes collection-like étude/prelude/song sets and never writes media. Broader provider-parent matching, collection construction and review workflows remain later work.

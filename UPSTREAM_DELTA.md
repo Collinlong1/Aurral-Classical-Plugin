@@ -4,6 +4,10 @@ Plugin-only matching, classification and album-presentation changes (see `MESSY_
 
 # Phase 4 delta
 
+The core playback correction shares queue conversion between album and resource pages, keeps native track/album references and segment ranges on menu Play/Play next/Add to queue/radio, and retains full player titles. Other track-menu actions remain native. It adds no API or schema fields; all verified-identity guards, album revision scopes and Requiem grouping decisions remain plugin-owned.
+
+The standalone-work presentation correction adds no core delta: plugin groups now report at least one part, including whole works without movement rows, and matched single-track works retain the existing work-view links.
+
 Post-Phase-4 plugin-only work adds complete-index search guidance to recording attachment and begins conservative automatic work construction from explicit embedded metadata. Completed scans and an album action can create safe multi-movement realizations in plugin storage without media writes or provider requests. This adds no core code, API, database or UI hook beyond the already implemented Phase 4 contracts.
 
 D04 album presentation and the bounded local portion of D05 are now implemented on the fork review source. D04 is opt-in and failure-safe: core validates native references and renders a generic work grouping; the plugin owns classification, work/realization identity, grouping, ordering and missing-item decisions. D05 adds optional queue segment boundaries to native entries, persistence, start/end enforcement and range-aware controls. Bounded entries are not exported through the existing range-unaware remote queue.

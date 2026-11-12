@@ -948,6 +948,30 @@ export function mergeWork(catalogue, keep, drop, actor) {
   return true;
 }
 
+function verifiedIdentities(catalogue, entity, kind) {
+  return new Set(
+    catalogue.db
+      .prepare("SELECT provider,record_id FROM external_identity WHERE entity_id=? AND record_kind=? AND provider!='embedded-tags' AND state='active'")
+      .all(entity, kind)
+      .map((row) => JSON.stringify([row.provider, row.record_id])),
+  );
+}
+const distinctIdentities = (a, b) => a.size > 0 && b.size > 0 && ![...a].some((id) => b.has(id));
+function compatibleAutoWorks(catalogue, a, b) {
+  // Matching names cannot override distinct verified work or composer identities.
+  if (distinctIdentities(verifiedIdentities(catalogue, a, "work"), verifiedIdentities(catalogue, b, "work"))) return false;
+  const composers = (work) => {
+    const identities = new Map();
+    for (const { contributor_id: person } of catalogue.db.prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer'").all(work)) {
+      const name = words(resolvedName(catalogue, person, "name"));
+      identities.set(name, new Set([...(identities.get(name) || []), ...verifiedIdentities(catalogue, person, "artist")]));
+    }
+    return identities;
+  };
+  const other = composers(b);
+  return ![...composers(a)].some(([name, ids]) => distinctIdentities(ids, other.get(name) || new Set()));
+}
+
 // Repairs catalogues built by the per-album grouping rule: same-named composers
 // and same works that were created once per album. Only auto-created entities
 // without manual edits are merged; anything else is left for review.
@@ -967,7 +991,8 @@ export function mergeDuplicateAutoWorks(catalogue, { actor = null } = {}) {
       const keep = ids.find((id) => !auto(id)) || ids[0];
       if (ids.filter((id) => !auto(id)).length > 1) continue;
       for (const id of ids.filter((id) => id !== keep))
-        if (mergeWork(catalogue, keep, id, actor)) works++;
+        if (!compatibleAutoWorks(catalogue, keep, id)) continue;
+        else if (mergeWork(catalogue, keep, id, actor)) works++;
         else catalogue.review("identity", id, { reason: "duplicate-work", keep });
     }
     return { people, works };

@@ -166,7 +166,9 @@ function pieceGroups(c, album, following) {
     const work = workTag.split(/\s*:\s*/)[0];
     const split = splitTitle(trackTitle(evidence));
     const fullHead = work || split.head;
-    const tail = work ? movementTitle({ title: trackTitle(evidence), work: workTag }, work) : split.tail;
+    const ownTail = work ? movementTitle({ title: trackTitle(evidence) }, work) : split.tail;
+    const taggedTail = work ? movementTitle({ title: trackTitle(evidence), work: workTag }, work) : ownTail;
+    const tail = words(ownTail).endsWith(` ${words(taggedTail)}`) ? taggedTail : ownTail;
     // An opera is one work across its acts: "La traviata, Act II" heads as
     // "La traviata", the way Apple Music Classical shows it.
     const head = fullHead.replace(ACT, "");
@@ -249,7 +251,7 @@ export function renderAlbumPresentation(c, albumId) {
         )?.name || "",
       items: run.map((row) => queueItem(metadata, row)),
       missing: index ? [] : movements.filter((movement) => !present.has(movement.id)),
-      movementCount: movements.length,
+      movementCount: Math.max(1, movements.length),
       first: albumPosition(run[0]),
     }));
   });
@@ -257,9 +259,8 @@ export function renderAlbumPresentation(c, albumId) {
   const groups = [...works, ...pieceGroups(c, album, following)]
     .sort((a, b) => a.first - b.first)
     .map(({ first, ...group }) => group);
-  // A view by work helps once some block holds several tracks, a work or a
-  // set such as "12 Études, Op. 10"; an album of lone pieces lists as is.
-  if (!groups.some((group) => group.items.length > 1)) return null;
+  // Matched works have work pages even when each work occupies one track.
+  if (!groups.some((group) => group.workId || group.items.length > 1)) return null;
   return { version: 1, albumId: album, supportsToggle: true, groups };
 }
 

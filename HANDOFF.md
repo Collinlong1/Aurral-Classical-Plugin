@@ -1,3 +1,11 @@
+# Review fixes on the latest Claude source
+
+Based on plugin `1019fd5` and its companion core `f3cea93c`, preserving the mixed-artist/title parser and chunked scan checkpoint changes. Automatic duplicate-work repair now respects distinct verified work and composer identities on later scans. Album revision tokens cover both chosen/attached works and their movement labels, rejecting stale assignments and unassignments with 409. The previously tested standalone-work presentation hotfix is integrated with the new composer/title parsing; manifest 1.0.13 includes it. Already mismerged catalogue entries are not automatically split.
+
+Companion core fixes row-menu playback to retain plugin item identity, work source and segment bounds, and shows full work-and-part titles on album and work-page playback. Chromium covers Play/Play next/Add to queue at desktop and phone widths, along with existing editor, permissions, per-user state and restart/media checks. The Requiem grouping investigation is separate; see `REQUIEM_GROUPING_REPORT.md`.
+
+Validation: all 262 plugin tests and both corpus gates pass, plus the final 23 manifest/editor tests after the version/bundle refresh. Both identity and stale-album regressions fail on the previous source. Companion core `ece9ead0aab0e28947bd6ac3d03208209cae86b8` passes 57 focused queue/plugin tests, required checks (zero type errors; unsafe-any 1236 unchanged) and the frontend production build. Disposable Chromium checks the editor and all three row-menu actions at desktop/phone widths; restart/media-hash checks and admin/two-user exact-file smoke pass before and after restart. Integration CI pins that core commit; remote CI and live-instance deployment have not been run.
+
 # Fix: the plugin turned itself off when the editor was open during a scan
 
 November 12, 2026, at the user's request. Reproduced with a host simulator that follows core's rules (256 MB heap, 15 s page calls, broken-call counting) on 12,800 tagged files: on a rescan, an editor read waited more than 15 s. Causes and fixes:
@@ -11,6 +19,12 @@ Result in the simulator: scans 29.5 → 18.5 s (rescan 17.2 → 7.6 s); slowest 
 # Messy metadata matching (optional quality workstream, plugin only)
 
 The user asked to work from *Aurral Classical — Messy Metadata Matching* (November 12, 2026). New `src/model/credits.js` reads a composer from a mixed artist field ("Bedřich Smetana; Vienna Philharmonic") when no composer tag exists: high confidence only when the album/track title, catalogue system or a known library composer corroborates it; medium-confidence names never create works and open an `auto_match` review (`uncertain-composer`). Classification, matching and the album page share it. Title parsing handles comma-separated movements and colon-before-quote headings; the classifier knows WWV/BuxWV/SWV/TrV and comma-anchored L./M./S./FP; neighbouring pieces join when one heading is the other cut at a comma. Apple corpus: messy 113 → 150/204 exact (false joins 167 → 155), store 153 → 157, work-tags 191 unchanged; no album lost exact grouping; non-classical corpus unchanged (0 false positives). The Apple gate now also blocks new false joins. Audit, explained differences and what was not done (MusicBrainz candidate scoring) are in `MESSY_MATCHING_REPORT.md`; `node scripts/corpus-apple-audit.mjs` reproduces it. 259 tests pass. Manifest 1.0.11. No core, schema, tagger or media change.
+
+# Standalone-work album presentation hotfix
+
+The v0.1 standalone matcher can create valid works with no canonical movement rows. Album presentation now counts such a whole piece as one part, satisfying the existing core contract, and retains the work view when matched works each occupy one track. This fixes the transition from a visible work view to a rejected/absent view after Auto-match. Source and bundle changes are plugin-only; existing attachments need no rescan or rematch. Originally tested against 1.0.10, this hotfix is now integrated into 1.0.13.
+
+Initial validation against 1.0.10: both regression assertions failed before their fixes; all 253 plugin tests passed, including the unchanged Apple and non-classical corpus gates. The rebuilt bundle's real album handler passed the pinned core album-response schema. Revealing previously hidden single-track albums also preserves their own part titles when a WORK suffix names something different. A guarded three-replacement patch of the old bundle matched that rebuilt bundle byte for byte. The separate timeout was not diagnosed by this presentation fix; the later Claude checkpoint and host changes above address its reproduced causes.
 
 # v0.1 classification accuracy fix (plugin only)
 

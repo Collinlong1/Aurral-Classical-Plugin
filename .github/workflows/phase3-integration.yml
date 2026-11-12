@@ -21,7 +21,7 @@ jobs:
         with:
           repository: Collinlong1/aurral
           # Final core aurral-classical head for the v0.1 bug-fix pass.
-          ref: f3cea93ca910f87ad7c1db3c16b3a4eeda967cd2
+          ref: ece9ead0aab0e28947bd6ac3d03208209cae86b8
           path: core
       - uses: actions/setup-node@v4
         with:

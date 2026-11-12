@@ -187,6 +187,17 @@ if (action === "prepare") {
   await fs.writeFile("/config/editor-browser-result.json", process.argv[3]);
 } else if (action === "phase4") {
   console.log(await fs.readFile("/config/phase4-fixture.json", "utf8"));
+} else if (action === "phase4-bounds") {
+  const fixture = JSON.parse(await fs.readFile("/config/phase4-fixture.json", "utf8"));
+  const c = await openCatalogue("/config/plugin-data/aurral-classical/model");
+  try {
+    c.db.prepare(`UPDATE segment SET start_ms=100,end_ms=1500,kind='range'
+      WHERE id IN (SELECT i.segment_id FROM realization_item i JOIN realization r ON r.id=i.realization_id WHERE r.work_id=?)`).run(fixture.work);
+    c.db.prepare(`UPDATE recording_content SET start_ms=100,end_ms=1500
+      WHERE performance_work_id IN (SELECT id FROM relation WHERE kind='performance_work' AND target_id=?)`).run(fixture.work);
+  } finally {
+    c.close();
+  }
 } else if (action === "phase4-reset") {
   const fixture = JSON.parse(
     await fs.readFile("/config/phase4-fixture.json", "utf8"),
@@ -283,5 +294,5 @@ if (action === "prepare") {
   );
 } else
   throw new Error(
-    "Expected prepare, refresh, remember, phase4, phase4-reset or check",
+    "Expected prepare, refresh, remember, phase4, phase4-bounds, phase4-reset or check",
   );

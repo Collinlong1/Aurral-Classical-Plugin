@@ -9,6 +9,7 @@ import { reconcile, classify } from "../src/model/reconcile.js";
 import { autoMatchTaggedWorks, repairMergedIdentities } from "../src/model/auto-match.js";
 import { mutateEditor as mutateRaw } from "../src/model/editor.js";
 import { tempFolders } from "./helpers.js";
+import { renderAlbumPresentation } from "../src/model/presentation.js";
 
 const titles = ["I. Allegro con brio", "II. Andante con moto", "III. Allegro", "IV. Allegro"];
 async function setup(t) {
@@ -386,8 +387,17 @@ test("#6 stale tokens and tokens for another page can't write", async (t) => {
   const chosen = await s.ok("choose-album-work", { albumId: "A", work }, "album:A");
   const page = await s.read({ selection: chosen.selection });
   const assign = section(page.view, "assign");
-  const first = await raw(page.revision, "assign-album", { ...assign.arguments, mapping: assign.fields[0].value });
+  const movement = assign.fields[0].value[0];
+  await s.ok("save-entity", { target: movement, title: "Renamed in another tab" }, movement);
+  assert.equal((await raw(page.revision, "assign-album", { ...assign.arguments, mapping: assign.fields[0].value })).status, 409,
+    "a chosen work's movement labels belong to the album token");
+  const refreshed = await s.read({ selection: chosen.selection });
+  const first = await raw(refreshed.revision, "assign-album", { ...assign.arguments, mapping: assign.fields[0].value });
   assert.equal(first.ok, true, first.message);
+  const attached = await s.read({ selection: "album:A" });
+  await s.ok("save-entity", { target: movement, title: "Renamed after attachment" }, movement);
+  assert.equal((await raw(attached.revision, "unassign-album", { albumId: "A", work })).status, 409,
+    "attached works' movement labels belong to the album token too");
   await s.ok("unassign-album", { albumId: "A", work }, "album:A");
   assert.equal((await raw(page.revision, "assign-album", { ...assign.arguments, mapping: assign.fields[0].value })).status, 409);
   // A rescan that changes nothing leaves an open album page valid.
@@ -469,6 +479,12 @@ test("#5 a whole piece on one track becomes a work; a lone movement does not", a
   assert.equal(new Metadata(s.c).resolve(work, "title").value, "Danse macabre, Op. 40");
   assert.equal(s.c.db.prepare("SELECT count(*) AS n FROM relation WHERE kind='movement' AND source_id=?").get(work).n, 0);
   assert.deepEqual(workOfTrack(s, piece), [work]);
+  const presentation = renderAlbumPresentation(s.c, "C");
+  assert.ok(presentation, "a matched whole work keeps its album's work view");
+  assert.equal(presentation.groups[0].workId, work);
+  assert.equal(presentation.groups[0].movementCount, 1);
+  assert.equal(autoMatchTaggedWorks(s.c, { albumId: "C" }).created, 0);
+  assert.deepEqual(renderAlbumPresentation(s.c, "C"), presentation);
 });
 
 test("#8 tag-made and MusicBrainz-identified albums of one work share it", async (t) => {
@@ -499,6 +515,14 @@ test("#20 MusicBrainz composer IDs keep same-named composers apart", async (t) =
     .map((r) => r.record_id);
   assert.deepEqual(people, ["mb-artist-1", "mb-artist-2"]);
   assert.equal(liveWorks(s).length, 2);
+  const original = liveWorks(s).sort();
+  for (let pass = 0; pass < 2; pass++) {
+    autoMatchTaggedWorks(s.c, { actor: "model-scan" });
+    assert.deepEqual(liveWorks(s).sort(), original, "later scans must preserve distinct verified works");
+  }
+  s.c.db.prepare("DELETE FROM external_identity WHERE provider='musicbrainz' AND record_kind='work'").run();
+  autoMatchTaggedWorks(s.c, { actor: "model-scan" });
+  assert.deepEqual(liveWorks(s).sort(), original, "different verified composers also protect works without provider work IDs");
 });
 
 test("#16 a moved-file review can be settled by linking the right file", async (t) => {

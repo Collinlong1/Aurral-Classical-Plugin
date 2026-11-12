@@ -66,7 +66,8 @@ function scopeIds(c, scope) {
           .all(...tracks)
           .map((row) => row.work_id)
       : [];
-    return [...new Set([albumId, `album:${albumId}`, ...tracks, ...works, ...(work ? [work] : [])])];
+    const workIds = [...new Set([...works, ...(work ? [work] : [])])];
+    return [...new Set([albumId, `album:${albumId}`, ...tracks, ...workIds.flatMap((id) => scopeIds(c, id))])];
   }
   return [
     scope,
