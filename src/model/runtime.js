@@ -62,7 +62,7 @@ export async function modelStatus(ctx) {
         catalogue.db
           .prepare(
             `SELECT id,state,CASE WHEN state IN ('retry','failed') THEN error ELSE NULL END AS error,
-          json_array_length(input,'$.files') AS total,
+          coalesce(json_extract(input,'$.total'),json_array_length(input,'$.files')) AS total,
           coalesce(json_extract(progress,'$.cursor'),0) AS processed,
           coalesce(json_extract(progress,'$.errorCount'),0) AS skipped,
           lease_until AS leaseUntil
@@ -71,7 +71,7 @@ export async function modelStatus(ctx) {
           .get() || null,
       now: Date.now(),
       jobs: catalogue.db
-        .prepare("SELECT state,count(*) AS count FROM model_job GROUP BY state")
+        .prepare("SELECT state,count(*) AS count FROM model_job WHERE type!='scan_chunk' GROUP BY state")
         .all(),
     };
   } finally {
@@ -168,6 +168,7 @@ export async function enqueueModelScan(ctx, actor, { system = false } = {}) {
       )
       .get();
     if (pending) return pending.id;
+    new ModelJobs(catalogue).compactFinished();
     const latest = catalogue.db
       .prepare(
         "SELECT id,state,created_at FROM model_job WHERE key='library_scan' ORDER BY created_at DESC,rowid DESC LIMIT 1",
@@ -332,7 +333,25 @@ export async function runModelJobs(
         throw new Error("Unknown model job type");
       const input = job.input;
       let cursor = job.progress.cursor || 0;
-      const collected = job.progress.collected || [];
+      // Evidence read so far: saved chunk by chunk (older scans kept it all
+      // in progress.collected; that is saved again as the first chunk).
+      let chunks = job.progress.chunks || 0;
+      const legacy = job.progress.collected || [];
+      const collected = [...legacy, ...jobs.chunks(job.id, chunks)];
+      let saved = legacy.length ? 0 : collected.length;
+      const save = (extra = {}) => {
+        const items = collected.slice(saved);
+        const ok = jobs.checkpoint(
+          job,
+          { cursor, chunks: chunks + (items.length && !extra.done ? 1 : 0), errors, errorCount, total: input.files.length },
+          { leaseMs: 60_000, chunk: { seq: chunks, items }, ...extra },
+        );
+        if (ok && items.length && !extra.done) {
+          chunks++;
+          saved = collected.length;
+        }
+        return ok;
+      };
       const errors = job.progress.errors || [];
       let errorCount = job.progress.errorCount || 0;
       const root = await fs.realpath(ctx.libraryFolder);
@@ -392,23 +411,12 @@ export async function runModelJobs(
           // answers between files instead of waiting behind the whole scan.
           await new Promise((resolve) => setImmediate(resolve));
         }
-        if (
-          !jobs.checkpoint(
-            job,
-            { cursor, collected, errors, errorCount },
-            { leaseMs: 60_000 },
-          )
-        )
-          return;
+        if (!save()) return;
         if (cancelled) break;
       }
       const done = cursor === input.files.length;
-      const committed = jobs.checkpoint(
-        job,
-        { cursor, collected, errors, errorCount },
-        {
+      const committed = save({
           done,
-          leaseMs: 60_000,
           commit: done
             ? () => {
                 const rows = reconcile(catalogue, {
@@ -479,8 +487,7 @@ export async function runModelJobs(
                 autoMatchTaggedWorks(catalogue, { actor: "model-scan" });
               }
             : undefined,
-        },
-      );
+      });
       if (committed && !done) jobs.yield(job);
     } catch (error) {
       jobs.fail(job, error.message);

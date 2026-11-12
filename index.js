@@ -40595,7 +40595,7 @@ import path7 from "node:path";
 
 // src/model/jobs.js
 import { randomUUID as randomUUID5 } from "node:crypto";
-var ModelJobs = class {
+var ModelJobs = class _ModelJobs {
   constructor(catalogue) {
     this.db = catalogue.db;
   }
@@ -40644,7 +40644,36 @@ var ModelJobs = class {
       progress: JSON.parse(row.progress)
     };
   }
-  checkpoint(job, progress, { done = false, now = Date.now(), leaseMs = 3e4, commit } = {}) {
+  // Evidence a scan has read, saved a chunk at a time with each checkpoint
+  // so a checkpoint never rewrites everything read so far. Chunks are
+  // model_job rows of their own (no schema change), never claimed: they are
+  // born 'done'.
+  static chunkKey = (id) => `scan-chunk:${id}`;
+  chunks(id, count) {
+    return this.db.prepare("SELECT input FROM model_job WHERE key=? ORDER BY id LIMIT ?").all(_ModelJobs.chunkKey(id), count).flatMap((row) => JSON.parse(row.input));
+  }
+  // A finished or cancelled scan keeps only its summary: the file list and
+  // the evidence it read are already in the catalogue, and keeping them made
+  // every scan add tens of megabytes that integrity checks then had to read.
+  compactFinished() {
+    for (const row of this.db.prepare(
+      `SELECT id,state FROM model_job WHERE type='library_scan' AND state IN ('done','cancelled')
+         AND (length(input)>4096 OR length(progress)>65536 OR EXISTS(SELECT 1 FROM model_job c WHERE c.key='scan-chunk:'||model_job.id))`
+    ).all())
+      transaction(this.db, () => this.#compact(row.id));
+  }
+  #compact(id) {
+    this.db.prepare("DELETE FROM model_job WHERE key=?").run(_ModelJobs.chunkKey(id));
+    this.db.prepare(
+      `UPDATE model_job SET
+          input=json_object('instanceId',json_extract(input,'$.instanceId'),'epoch',json_extract(input,'$.epoch'),
+            'generation',json_extract(input,'$.generation'),'total',coalesce(json_extract(input,'$.total'),json_array_length(input,'$.files'))),
+          progress=json_object('cursor',coalesce(json_extract(progress,'$.cursor'),0),'errorCount',coalesce(json_extract(progress,'$.errorCount'),0),
+            'errors',json(coalesce(json_extract(progress,'$.errors'),'[]')))
+         WHERE id=?`
+    ).run(id);
+  }
+  checkpoint(job, progress, { done = false, now = Date.now(), leaseMs = 3e4, commit, chunk = null } = {}) {
     return transaction(this.db, () => {
       const row = this.db.prepare(
         "SELECT state,owner,generation,lease_until,cancel_requested FROM model_job WHERE id=?"
@@ -40653,9 +40682,15 @@ var ModelJobs = class {
         throw new Error("Stale job lease");
       if (row.cancel_requested) {
         this.db.prepare("UPDATE model_job SET state='cancelled' WHERE id=?").run(job.id);
+        this.#compact(job.id);
         return false;
       }
       if (commit) commit();
+      if (chunk?.items.length && !done)
+        this.db.prepare(
+          `INSERT INTO model_job(id,type,key,input,state,max_attempts,created_at)
+             VALUES (?,'scan_chunk',?,?,'done',1,?)`
+        ).run(`${job.id}#${String(chunk.seq).padStart(6, "0")}`, _ModelJobs.chunkKey(job.id), JSON.stringify(chunk.items), now);
       this.db.prepare(
         "UPDATE model_job SET progress=?,state=?,lease_until=?,error=NULL WHERE id=?"
       ).run(
@@ -40664,6 +40699,7 @@ var ModelJobs = class {
         now + leaseMs,
         job.id
       );
+      if (done) this.#compact(job.id);
       return true;
     });
   }
@@ -40981,14 +41017,14 @@ async function modelStatus(ctx) {
       ...catalogue.diagnostics(),
       scan: catalogue.db.prepare(
         `SELECT id,state,CASE WHEN state IN ('retry','failed') THEN error ELSE NULL END AS error,
-          json_array_length(input,'$.files') AS total,
+          coalesce(json_extract(input,'$.total'),json_array_length(input,'$.files')) AS total,
           coalesce(json_extract(progress,'$.cursor'),0) AS processed,
           coalesce(json_extract(progress,'$.errorCount'),0) AS skipped,
           lease_until AS leaseUntil
           FROM model_job WHERE type='library_scan' ORDER BY created_at DESC,rowid DESC LIMIT 1`
       ).get() || null,
       now: Date.now(),
-      jobs: catalogue.db.prepare("SELECT state,count(*) AS count FROM model_job GROUP BY state").all()
+      jobs: catalogue.db.prepare("SELECT state,count(*) AS count FROM model_job WHERE type!='scan_chunk' GROUP BY state").all()
     };
   } finally {
     catalogue.close();
@@ -41058,6 +41094,7 @@ async function enqueueModelScan(ctx, actor3, { system = false } = {}) {
       "SELECT id FROM model_job WHERE key='library_scan' AND state IN ('queued','running','retry') LIMIT 1"
     ).get();
     if (pending) return pending.id;
+    new ModelJobs(catalogue).compactFinished();
     const latest = catalogue.db.prepare(
       "SELECT id,state,created_at FROM model_job WHERE key='library_scan' ORDER BY created_at DESC,rowid DESC LIMIT 1"
     ).get();
@@ -41184,7 +41221,23 @@ async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 200, checkpointMs
         throw new Error("Unknown model job type");
       const input = job.input;
       let cursor = job.progress.cursor || 0;
-      const collected = job.progress.collected || [];
+      let chunks = job.progress.chunks || 0;
+      const legacy = job.progress.collected || [];
+      const collected = [...legacy, ...jobs.chunks(job.id, chunks)];
+      let saved = legacy.length ? 0 : collected.length;
+      const save = (extra = {}) => {
+        const items = collected.slice(saved);
+        const ok = jobs.checkpoint(
+          job,
+          { cursor, chunks: chunks + (items.length && !extra.done ? 1 : 0), errors, errorCount, total: input.files.length },
+          { leaseMs: 6e4, chunk: { seq: chunks, items }, ...extra }
+        );
+        if (ok && items.length && !extra.done) {
+          chunks++;
+          saved = collected.length;
+        }
+        return ok;
+      };
       const errors = job.progress.errors || [];
       let errorCount = job.progress.errorCount || 0;
       const root = await fs4.realpath(ctx.libraryFolder);
@@ -41229,75 +41282,65 @@ async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 200, checkpointMs
           }
           await new Promise((resolve) => setImmediate(resolve));
         }
-        if (!jobs.checkpoint(
-          job,
-          { cursor, collected, errors, errorCount },
-          { leaseMs: 6e4 }
-        ))
-          return;
+        if (!save()) return;
         if (cancelled) break;
       }
       const done = cursor === input.files.length;
-      const committed = jobs.checkpoint(
-        job,
-        { cursor, collected, errors, errorCount },
-        {
-          done,
-          leaseMs: 6e4,
-          commit: done ? () => {
-            const rows = reconcile(catalogue, {
-              version: 1,
-              complete: true,
-              instanceId: input.instanceId,
-              epoch: input.epoch,
-              generation: input.generation,
-              tracks: collected
-            });
-            const albums2 = /* @__PURE__ */ new Map();
-            for (const row of rows) {
-              const albumTarget = row.albumId == null ? null : catalogue.albumTarget(input.instanceId, row.albumId);
-              const albumPin = albumTarget && catalogue.db.prepare(
-                "SELECT state,pinned FROM classification WHERE target_id=?"
-              ).get(albumTarget);
-              const inherited = albumPin?.pinned ? albumPin.state : null;
-              const state = classify(
-                catalogue,
-                row.id,
-                {
-                  ...row.hints,
-                  ...inherited && { albumOverride: inherited }
-                },
-                { inherited }
-              );
-              if (row.albumId != null) {
-                if (!albums2.has(row.albumId)) albums2.set(row.albumId, []);
-                albums2.get(row.albumId).push(state);
-              }
+      const committed = save({
+        done,
+        commit: done ? () => {
+          const rows = reconcile(catalogue, {
+            version: 1,
+            complete: true,
+            instanceId: input.instanceId,
+            epoch: input.epoch,
+            generation: input.generation,
+            tracks: collected
+          });
+          const albums2 = /* @__PURE__ */ new Map();
+          for (const row of rows) {
+            const albumTarget = row.albumId == null ? null : catalogue.albumTarget(input.instanceId, row.albumId);
+            const albumPin = albumTarget && catalogue.db.prepare(
+              "SELECT state,pinned FROM classification WHERE target_id=?"
+            ).get(albumTarget);
+            const inherited = albumPin?.pinned ? albumPin.state : null;
+            const state = classify(
+              catalogue,
+              row.id,
+              {
+                ...row.hints,
+                ...inherited && { albumOverride: inherited }
+              },
+              { inherited }
+            );
+            if (row.albumId != null) {
+              if (!albums2.has(row.albumId)) albums2.set(row.albumId, []);
+              albums2.get(row.albumId).push(state);
             }
-            for (const [albumId, states] of albums2) {
-              const target = catalogue.albumTarget(
-                input.instanceId,
-                albumId
-              );
-              const state = states.every((s) => s === "classical") ? "classical" : states.every((s) => s === "not_classical") ? "not_classical" : "unsure";
-              const prior = catalogue.db.prepare(
-                "SELECT pinned FROM classification WHERE target_id=?"
-              ).get(target);
-              if (!prior?.pinned)
-                catalogue.db.prepare(
-                  `INSERT INTO classification VALUES (?,?,0,0,?,1,?)
+          }
+          for (const [albumId, states] of albums2) {
+            const target = catalogue.albumTarget(
+              input.instanceId,
+              albumId
+            );
+            const state = states.every((s) => s === "classical") ? "classical" : states.every((s) => s === "not_classical") ? "not_classical" : "unsure";
+            const prior = catalogue.db.prepare(
+              "SELECT pinned FROM classification WHERE target_id=?"
+            ).get(target);
+            if (!prior?.pinned)
+              catalogue.db.prepare(
+                `INSERT INTO classification VALUES (?,?,0,0,?,1,?)
             ON CONFLICT(target_id) DO UPDATE SET state=excluded.state,evidence=excluded.evidence,updated_at=excluded.updated_at`
-                ).run(
-                  target,
-                  state,
-                  JSON.stringify({ trackStates: states }),
-                  Date.now()
-                );
-            }
-            autoMatchTaggedWorks(catalogue, { actor: "model-scan" });
-          } : void 0
-        }
-      );
+              ).run(
+                target,
+                state,
+                JSON.stringify({ trackStates: states }),
+                Date.now()
+              );
+          }
+          autoMatchTaggedWorks(catalogue, { actor: "model-scan" });
+        } : void 0
+      });
       if (committed && !done) jobs.yield(job);
     } catch (error) {
       jobs.fail(job, error.message);
@@ -41686,7 +41729,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.11" : "dev";
+var VERSION = true ? "1.0.12" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js

@@ -65,10 +65,46 @@ export class ModelJobs {
       }
     );
   }
+  // Evidence a scan has read, saved a chunk at a time with each checkpoint
+  // so a checkpoint never rewrites everything read so far. Chunks are
+  // model_job rows of their own (no schema change), never claimed: they are
+  // born 'done'.
+  static chunkKey = (id) => `scan-chunk:${id}`;
+  chunks(id, count) {
+    return this.db
+      .prepare("SELECT input FROM model_job WHERE key=? ORDER BY id LIMIT ?")
+      .all(ModelJobs.chunkKey(id), count)
+      .flatMap((row) => JSON.parse(row.input));
+  }
+  // A finished or cancelled scan keeps only its summary: the file list and
+  // the evidence it read are already in the catalogue, and keeping them made
+  // every scan add tens of megabytes that integrity checks then had to read.
+  compactFinished() {
+    for (const row of this.db
+      .prepare(
+        `SELECT id,state FROM model_job WHERE type='library_scan' AND state IN ('done','cancelled')
+         AND (length(input)>4096 OR length(progress)>65536 OR EXISTS(SELECT 1 FROM model_job c WHERE c.key='scan-chunk:'||model_job.id))`,
+      )
+      .all())
+      transaction(this.db, () => this.#compact(row.id));
+  }
+  #compact(id) {
+    this.db.prepare("DELETE FROM model_job WHERE key=?").run(ModelJobs.chunkKey(id));
+    this.db
+      .prepare(
+        `UPDATE model_job SET
+          input=json_object('instanceId',json_extract(input,'$.instanceId'),'epoch',json_extract(input,'$.epoch'),
+            'generation',json_extract(input,'$.generation'),'total',coalesce(json_extract(input,'$.total'),json_array_length(input,'$.files'))),
+          progress=json_object('cursor',coalesce(json_extract(progress,'$.cursor'),0),'errorCount',coalesce(json_extract(progress,'$.errorCount'),0),
+            'errors',json(coalesce(json_extract(progress,'$.errors'),'[]')))
+         WHERE id=?`,
+      )
+      .run(id);
+  }
   checkpoint(
     job,
     progress,
-    { done = false, now = Date.now(), leaseMs = 30_000, commit } = {},
+    { done = false, now = Date.now(), leaseMs = 30_000, commit, chunk = null } = {},
   ) {
     return transaction(this.db, () => {
       // Do not parse the full library snapshot and collected evidence at every checkpoint.
@@ -89,10 +125,18 @@ export class ModelJobs {
         this.db
           .prepare("UPDATE model_job SET state='cancelled' WHERE id=?")
           .run(job.id);
+        this.#compact(job.id);
         return false;
       }
       // Commit callback is synchronous SQL only, covered by the same fence/transaction.
       if (commit) commit();
+      if (chunk?.items.length && !done)
+        this.db
+          .prepare(
+            `INSERT INTO model_job(id,type,key,input,state,max_attempts,created_at)
+             VALUES (?,'scan_chunk',?,?,'done',1,?)`,
+          )
+          .run(`${job.id}#${String(chunk.seq).padStart(6, "0")}`, ModelJobs.chunkKey(job.id), JSON.stringify(chunk.items), now);
       this.db
         .prepare(
           "UPDATE model_job SET progress=?,state=?,lease_until=?,error=NULL WHERE id=?",
@@ -103,6 +147,7 @@ export class ModelJobs {
           now + leaseMs,
           job.id,
         );
+      if (done) this.#compact(job.id);
       return true;
     });
   }
