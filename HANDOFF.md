@@ -1,3 +1,14 @@
+# Integration against the upstream-synced core
+
+Manifest 1.0.16. November 12, 2026: core `aurral-classical` merged fork `main`, now level with upstream lklynet/aurral through #1828 (core `f444c96`; backup `aurral-classical-backup-2026-11-12`). Integration CI now pins that core. Running the full workflow against it found two plugin-side issues, both fixed:
+
+- **Album group order was random on a tie.** When two recordings start on the same track (a complete one and a fragment), their blocks were ordered by realization id, a random UUID, so the order could flip between installs and the fixture check passed or failed by chance (it passed on the old core and failed on the new one with identical plugin code). `compareAlbumGroups` now puts the longer block first, then orders by id. A unit test with ids in the wrong order covers it, and the Phase 4 model test now asserts the order.
+- **Fixture seed import.** Upstream moved `hashPassword` from `backend/middleware/` to `backend/services/`; `dev/seed.mjs` tries the new path, then the old one.
+
+`dev/editor-browser.mjs` accepts `CHROMIUM_PATH` for a preinstalled browser (CI unchanged).
+
+Validation: 270 plugin tests on Node 22.23 and 26.12; bundle rebuilt. Against core `55e7fa1` (code identical to `f444c96`): Compose smoke (admin and two users), editor fixtures, Chromium editor/work-view/row-menu workflow at desktop and phone widths, fixture checks before and after restart, and smoke after restart all pass. Containers and volumes were removed. Remote CI has not run; no live install accessed.
+
 # Fix: first request after a restart timed out on the integrity check
 
 Manifest 1.0.15. Opening the database ran a full `PRAGMA integrity_check` and `foreign_key_check` once per process, on whichever request came first; seconds on a large library, paid by each of core's two plugin workers after a restart, so first requests timed out. Opening no longer checks. Migrations and backups check as before; a library scan checks once per process before it writes, and fails the scan if the check fails. Regression test opens a never-opened copy of a broken database (as after a restart): the page call succeeded only with the fix, and the scan rejects. 269 plugin tests pass. Fixes Collinlong1/Aurral-Classical-Plugin#9. The user's crash logs were not available, so this fixes the known startup timeout, not a confirmed root cause.
