@@ -14,9 +14,9 @@ Everything here changes the classical catalogue only. Audio files are never writ
 ## Common tasks
 
 **Group an album.** Albums tab → open the album.
-- **Create a work from this album** creates the work with one movement per track, in album order, and assigns the tracks. The title and composer are suggested from tags.
+- **Create a work from this album** creates the work with one movement per track you keep, in album order, and assigns them. Choose **Skip** for tracks that aren't part of the work; tracks marked Not classical start as Skip and stay Not classical. The title and composer are suggested from tags.
 - **Assign to an existing work:** search for the work, press Continue, check each track's suggested movement (or Skip), then **Assign tracks**. Tracks you assign are sent to Classical.
-- **Unassign** (under *Works on this album*) removes the album's tracks from a work without touching the work or the audio.
+- **Unassign** (under *Works on this album*) removes the album's tracks from a work without touching the work or the audio. It removes the per-track recordings too, and clears any pick of that album's recording. Rescans won't put the album back into that work; assign it again by hand to rematch.
 
 **Send to / Remove from Classical.** On an album or a track. These manual choices beat automatic detection and survive rescans. On a track, **Use automatic detection** returns it to the detector.
 
@@ -28,7 +28,7 @@ Everything here changes the classical catalogue only. Audio files are never writ
 - **Recordings** lists every owned performance with movement coverage.
 - **Add a broadcast recording** covers radio or concert recordings that aren't on an album.
 
-**Duplicates.** On a work, composer or performer, **Merge with another …** moves recordings, credits, favourites and picks into the entry you keep, then removes this one. Works merge when their movements line up by title or number. An unused entry can be deleted.
+**Duplicates.** On a work, composer or performer, **Merge with another …** moves recordings, credits, favourites, picks and MusicBrainz/tag identities into the entry you keep, then removes this one. A user who liked either work keeps the like; where both works had a pick, the kept work's pick wins. Works merge when their movements line up by title or number. An unused entry can be deleted.
 
 **Review.** The Review tab lists:
 - unsure classifications, with Send to Classical / Not classical;

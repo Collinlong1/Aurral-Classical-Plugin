@@ -1002,7 +1002,8 @@ function apply(c, input, who) {
         )
         .get(selection, item);
       if (!owned) fail("Attachment does not belong to this recording");
-      c.db.prepare("DELETE FROM realization_item WHERE id=?").run(item);
+      // The recording itself was made by hand and stays.
+      c.detachItem(item);
       break;
     }
     default:

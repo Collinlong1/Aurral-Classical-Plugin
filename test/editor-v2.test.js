@@ -6,6 +6,7 @@ import { readEditor, mutateEditor } from "../src/model/editor.js";
 import { openCatalogue } from "../src/model/catalogue.js";
 import { Metadata } from "../src/model/metadata.js";
 import { reconcile, classify } from "../src/model/reconcile.js";
+import { autoMatchTaggedWorks, repairMergedIdentities } from "../src/model/auto-match.js";
 import { tempFolders } from "./helpers.js";
 
 const titles = ["I. Allegro con brio", "II. Andante con moto", "III. Allegro", "IV. Allegro"];
@@ -178,6 +179,124 @@ test("duplicate works merge, and unused works can be deleted", async (t) => {
   assert.ok(del.confirm);
   await s.ok(del.command, del.arguments, empty);
   assert.equal((await s.read({ tab: "works" })).list.items.length, 1);
+});
+
+// ---- v0.1 data-integrity regressions -----------------------------------------
+
+const createFrom = (s, album, title) =>
+  s.ok("create-work-from-album", { albumId: album, tracks: s.trackIds(album), title, composer: "", composerName: "Ludwig van Beethoven" }, `album:${album}`);
+const realizationOf = (s, work) => s.c.db.prepare("SELECT id FROM realization WHERE work_id=?").get(work)?.id;
+const live = (s, id) => s.c.db.prepare("SELECT deleted_at FROM entity WHERE id=?").get(id).deleted_at == null;
+const workOfTrack = (s, track) =>
+  s.c.db
+    .prepare("SELECT r.work_id FROM segment g JOIN realization_item i ON i.segment_id=g.id JOIN realization r ON r.id=i.realization_id WHERE g.track_link_id=?")
+    .all(track)
+    .map((row) => row.work_id);
+
+test("#1 unassign removes the whole attachment, so the album can be matched again", async (t) => {
+  const s = await setup(t);
+  const work = (await createFrom(s, "A", "Symphony No. 5 in C minor, Op. 67")).selection;
+  const realization = realizationOf(s, work);
+  const recordings = s.c.db.prepare("SELECT source_id FROM relation WHERE kind='recording_performance'").all().map((r) => r.source_id);
+  s.c.db.prepare("INSERT INTO user_work_state VALUES (2,?,1,?,1)").run(work, realization);
+  s.c.db.prepare("INSERT INTO admin_work_pick VALUES (?,?,1,1)").run(work, realization);
+  await s.ok("unassign-album", { albumId: "A", work }, "album:A");
+  for (const table of ["segment", "segment_content", "recording_content", "realization", "admin_work_pick"])
+    assert.equal(s.c.db.prepare(`SELECT count(*) AS n FROM ${table}`).get().n, 0, `${table} left behind`);
+  assert.equal(s.c.db.prepare("SELECT count(*) AS n FROM relation WHERE kind IN ('performance_work','recording_performance')").get().n, 0);
+  assert.ok(recordings.every((id) => !live(s, id)), "per-track recordings are removed");
+  assert.deepEqual({ ...s.c.db.prepare("SELECT favourite,picked_realization_id FROM user_work_state WHERE user_id=2").get() }, { favourite: 1, picked_realization_id: null });
+  assert.ok(live(s, work), "the work stays");
+  // The movement is no longer "in use", and the album shows as unassigned.
+  const movement = s.c.db.prepare("SELECT target_id FROM relation WHERE kind='movement' AND source_id=? ORDER BY position").get(work).target_id;
+  const album = (await s.read({ selection: "album:A" })).view;
+  assert.ok(section(album, "new-work"));
+  // A rescan respects the unassign: no re-attachment, no duplicate work.
+  assert.equal(autoMatchTaggedWorks(s.c, { albumId: "A", allowStructuredTitles: true }).created, 0);
+  assert.ok(s.trackIds("A").every((track) => !workOfTrack(s, track).length));
+  assert.equal(s.c.db.prepare("SELECT count(*) AS n FROM entity WHERE kind='work' AND deleted_at IS NULL").get().n, 1);
+  // Rematch: the admin assigns the album again, then a later rescan extends it normally.
+  const chosen = await s.ok("choose-album-work", { albumId: "A", work }, "album:A");
+  const assign = section((await s.read({ selection: chosen.selection })).view, "assign");
+  assert.deepEqual(assign.arguments.tracks, s.trackIds("A"), "every track is offered again");
+  await s.ok("assign-album", { ...assign.arguments, mapping: assign.fields[0].value }, chosen.selection);
+  assert.ok(s.trackIds("A").every((track) => workOfTrack(s, track).join() === work));
+  assert.equal(s.c.db.prepare("SELECT count(*) AS n FROM realization WHERE work_id=?").get(work).n, 1);
+  // Unassigning again lets an admin delete a movement it no longer covers.
+  await s.ok("unassign-album", { albumId: "A", work }, "album:A");
+  await s.ok("delete-movement", { work, movement }, work);
+  // And with nothing attached the work itself can be deleted.
+  await s.ok("delete-entity", { target: work }, work);
+});
+
+test("#2/#3 merging keeps provider identities and every user's favourites and picks", async (t) => {
+  const s = await setup(t);
+  const a = (await createFrom(s, "A", "Symphony No. 5")).selection;
+  const b = (await createFrom(s, "B", "Symphony No. 5 (dup)")).selection;
+  const [ra, rb] = [realizationOf(s, a), realizationOf(s, b)];
+  assert.equal(s.c.externalIdentity(b, "musicbrainz", "work", "mb-sym5"), true);
+  const bMovement = s.c.db.prepare("SELECT target_id FROM relation WHERE kind='movement' AND source_id=? AND position=1").get(b).target_id;
+  s.c.externalIdentity(bMovement, "musicbrainz", "work", "mb-sym5-i");
+  const state = s.c.db.prepare("INSERT INTO user_work_state VALUES (?,?,?,?,?)");
+  state.run(2, b, 1, null, 5); // favourite only on the dropped work
+  state.run(3, a, 0, null, 5); // row on both; the pick lives on the dropped work
+  state.run(3, b, 1, rb, 6);
+  state.run(4, a, 1, ra, 7); // the kept work's own pick wins
+  state.run(4, b, 0, rb, 8);
+  await s.ok("merge-entity", { target: b, into: a, confirm: true }, b);
+  const row = (user) => ({ ...s.c.db.prepare("SELECT favourite,picked_realization_id AS pick FROM user_work_state WHERE user_id=? AND work_id=?").get(user, a) });
+  assert.deepEqual(row(2), { favourite: 1, pick: null });
+  assert.deepEqual(row(3), { favourite: 1, pick: rb });
+  assert.deepEqual(row(4), { favourite: 1, pick: ra });
+  assert.equal(s.c.db.prepare("SELECT count(*) AS n FROM user_work_state WHERE work_id=?").get(b).n, 0);
+  const owner = (record) => s.c.db.prepare("SELECT entity_id FROM external_identity WHERE record_id=? AND state='active'").get(record)?.entity_id;
+  assert.equal(owner("mb-sym5"), a);
+  const aMovement = s.c.db.prepare("SELECT target_id FROM relation WHERE kind='movement' AND source_id=? AND position=1").get(a).target_id;
+  assert.equal(owner("mb-sym5-i"), aMovement);
+  // Post-merge matching by MusicBrainz finds the kept work, not the deleted one.
+  // Free album B without an admin Unassign (which rescans would honour).
+  for (const track of s.trackIds("B"))
+    for (const { id } of s.c.db.prepare("SELECT i.id FROM realization_item i JOIN segment g ON g.id=i.segment_id WHERE g.track_link_id=?").all(track))
+      s.c.detachItem(id, { dropRecording: true });
+  const providerMatches = new Map(s.trackIds("B").map((track) => [track, { workId: "mb-sym5", work: "Symphony No. 5", aliases: [], composers: ["Ludwig van Beethoven"] }]));
+  assert.equal(autoMatchTaggedWorks(s.c, { albumId: "B", providerMatches }).created, 1);
+  assert.ok(s.trackIds("B").every((track) => workOfTrack(s, track).join() === a));
+  // Catalogues merged before this fix: identities left on the deleted work move over.
+  s.c.db.prepare("UPDATE external_identity SET entity_id=? WHERE record_id='mb-sym5'").run(b);
+  assert.equal(repairMergedIdentities(s.c), 1);
+  assert.equal(owner("mb-sym5"), a);
+});
+
+test("#2 merging people moves their provider identities too", async (t) => {
+  const s = await setup(t);
+  const keep = (await s.ok("create-contributor", { name: "Carlos Kleiber", kind: "person" })).selection;
+  const drop = (await s.ok("create-contributor", { name: "C. Kleiber", kind: "person" })).selection;
+  s.c.externalIdentity(drop, "musicbrainz", "artist", "mb-kleiber");
+  await s.ok("merge-entity", { target: drop, into: keep, confirm: true }, drop);
+  assert.equal(s.c.db.prepare("SELECT entity_id FROM external_identity WHERE record_id='mb-kleiber'").get().entity_id, keep);
+});
+
+test("#15 tracks marked Not classical are skipped when creating a work, and Skip works per track", async (t) => {
+  const s = await setup(t);
+  const tracks = s.trackIds("A");
+  await s.ok("set-classification", { tracks: [tracks[3]], state: "not_classical" }, "album:A");
+  const form = section((await s.read({ selection: "album:A" })).view, "new-work");
+  const include = form.fields.find((f) => f.key === "include");
+  assert.equal(include.type, "mapping");
+  assert.deepEqual(include.value, ["include", "include", "include", ""]);
+  // Without per-track choices (older hosts), the removed track is still left out.
+  const { include: _skip, ...legacy } = form.arguments;
+  const work = (await s.ok("create-work-from-album", { ...legacy, title: "Symphony No. 5", composer: "", composerName: "Ludwig van Beethoven" }, "album:A")).selection;
+  assert.equal(s.c.db.prepare("SELECT count(*) AS n FROM relation WHERE kind='movement' AND source_id=?").get(work).n, 3);
+  assert.deepEqual(workOfTrack(s, tracks[3]), []);
+  assert.deepEqual({ ...s.c.db.prepare("SELECT state,pinned FROM classification WHERE target_id=?").get(tracks[3]) }, { state: "not_classical", pinned: 1 });
+  // An explicit Skip leaves out a classical track as well.
+  const b = s.trackIds("B");
+  const second = (await s.ok("create-work-from-album", { albumId: "B", tracks: b, include: ["include", "", "include", "include"], title: "Symphony No. 5 B", composer: "", composerName: "" }, "album:B")).selection;
+  assert.equal(s.c.db.prepare("SELECT count(*) AS n FROM relation WHERE kind='movement' AND source_id=?").get(second).n, 3);
+  assert.deepEqual(workOfTrack(s, b[1]), []);
+  assert.equal((await s.mutate("create-work-from-album", { albumId: "B", tracks: [b[1]], include: [""], title: "Nothing", composer: "", composerName: "" }, "album:B")).ok, false);
+  assert.equal((await s.mutate("create-work-from-album", { albumId: "B", tracks: [b[1]], include: [], title: "Nothing", composer: "", composerName: "" }, "album:B")).ok, false);
 });
 
 test("v1 hosts still get the v1 editor", async (t) => {

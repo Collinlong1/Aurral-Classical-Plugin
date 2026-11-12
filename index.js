@@ -35759,6 +35759,51 @@ var Catalogue = class {
       return id;
     });
   }
+  // Remove one track attachment and everything that existed only for it: the
+  // segment and its content links, an emptied realization (and picks of it)
+  // and, with dropRecording, a per-track recording and its emptied performance.
+  // Leaving any of these behind kept the track "attached" for auto-match and
+  // kept the work and movement "in use".
+  detachItem(itemId, { dropRecording = false } = {}) {
+    return transaction(this.db, () => {
+      const db = this.db;
+      const item = db.prepare("SELECT * FROM realization_item WHERE id=?").get(itemId);
+      if (!item) return false;
+      db.prepare("DELETE FROM realization_item WHERE id=?").run(itemId);
+      const now = Date.now();
+      if (!db.prepare("SELECT 1 FROM realization_item WHERE segment_id=?").get(item.segment_id)) {
+        const contents = db.prepare(
+          `SELECT c.id,c.recording_id,c.performance_work_id FROM segment_content s
+             JOIN recording_content c ON c.id=s.content_id WHERE s.segment_id=?`
+        ).all(item.segment_id);
+        db.prepare("DELETE FROM segment_content WHERE segment_id=?").run(item.segment_id);
+        db.prepare("DELETE FROM segment WHERE id=?").run(item.segment_id);
+        for (const content of contents) {
+          if (db.prepare("SELECT 1 FROM segment_content WHERE content_id=?").get(content.id)) continue;
+          db.prepare("DELETE FROM recording_content WHERE id=?").run(content.id);
+          if (!dropRecording || db.prepare("SELECT 1 FROM recording_content WHERE recording_id=?").get(content.recording_id))
+            continue;
+          db.prepare("DELETE FROM relation WHERE kind='recording_performance' AND source_id=?").run(content.recording_id);
+          db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=? AND deleted_at IS NULL").run(now, now, content.recording_id);
+        }
+      }
+      if (!db.prepare("SELECT 1 FROM realization_item WHERE realization_id=?").get(item.realization_id)) {
+        const realization = db.prepare("SELECT * FROM realization WHERE id=?").get(item.realization_id);
+        db.prepare("UPDATE user_work_state SET picked_realization_id=NULL,updated_at=? WHERE picked_realization_id=?").run(now, realization.id);
+        db.prepare("DELETE FROM admin_work_pick WHERE realization_id=?").run(realization.id);
+        db.prepare("DELETE FROM realization WHERE id=?").run(realization.id);
+        const pw = db.prepare("SELECT * FROM relation WHERE id=?").get(realization.performance_work_id);
+        if (dropRecording && pw && !db.prepare("SELECT 1 FROM realization WHERE performance_work_id=?").get(pw.id) && !db.prepare("SELECT 1 FROM recording_content WHERE performance_work_id=?").get(pw.id) && !db.prepare("SELECT 1 FROM relation WHERE kind='recording_performance' AND target_id=?").get(pw.source_id)) {
+          db.prepare("DELETE FROM relation WHERE id=?").run(pw.id);
+          if (!db.prepare("SELECT 1 FROM relation WHERE source_id=? OR target_id=?").get(pw.source_id, pw.source_id)) {
+            db.prepare("DELETE FROM credit WHERE target_id=?").run(pw.source_id);
+            db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=? AND deleted_at IS NULL").run(now, now, pw.source_id);
+          }
+        }
+      }
+      return true;
+    });
+  }
   alias(entity, text4, { language = null, kind = "alternate", assertionId = null } = {}) {
     this.entity(entity);
     if (typeof text4 !== "string" || !text4.trim())
@@ -36454,7 +36499,7 @@ function proposedWork(work, title, allowStructuredTitles) {
 function candidates(catalogue, albumId = null, allowStructuredTitles = false, providerMatches = /* @__PURE__ */ new Map()) {
   const rows = catalogue.db.prepare(
     `SELECT t.id,t.instance_id,t.evidence,
-        EXISTS(SELECT 1 FROM segment s WHERE s.track_link_id=t.id) AS attached
+        EXISTS(SELECT 1 FROM segment s JOIN realization_item i ON i.segment_id=s.id WHERE s.track_link_id=t.id) AS attached
        FROM track_link t
        JOIN classification c ON c.target_id=t.id AND c.state='classical'
        WHERE t.state='active'
@@ -36524,8 +36569,9 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
 }
 function existingIdentity(catalogue, recordKind, recordId) {
   return catalogue.db.prepare(
-    `SELECT entity_id FROM external_identity
-       WHERE provider='embedded-tags' AND record_kind=? AND record_id=? AND state='active'`
+    `SELECT x.entity_id FROM external_identity x JOIN entity e ON e.id=x.entity_id
+       WHERE x.provider='embedded-tags' AND x.record_kind=? AND x.record_id=?
+       AND x.state='active' AND e.deleted_at IS NULL`
   ).get(recordKind, recordId)?.entity_id;
 }
 var words = (value) => normalized(value).replace(/[^\p{L}\p{N}]+/gu, " ").trim();
@@ -36723,6 +36769,12 @@ function extendRealization(catalogue, group, actor3) {
     return added > 0;
   });
 }
+function unassignedByAdmin(catalogue, work, albumId) {
+  return catalogue.db.prepare(
+    `SELECT action FROM audit_event WHERE target_id=? AND action IN ('editor.unassign-album','editor.assign-album')
+         AND CAST(json_extract(data,'$.values.albumId') AS TEXT)=? ORDER BY id DESC LIMIT 1`
+  ).get(work, String(albumId))?.action === "editor.unassign-album";
+}
 function createGroup(catalogue, group, actor3, index) {
   if (group.tracks.some((track) => track.attached))
     return extendRealization(catalogue, group, actor3);
@@ -36741,12 +36793,14 @@ function createGroup(catalogue, group, actor3, index) {
     }));
     const key = group.providerWorkId ? JSON.stringify(["musicbrainz", group.providerWorkId]) : workKey(group.work, group.composers);
     const providerWork = group.providerWorkId && catalogue.db.prepare(
-      `SELECT entity_id FROM external_identity WHERE provider='musicbrainz'
-           AND record_kind='work' AND record_id=? AND state='active'`
+      `SELECT x.entity_id FROM external_identity x JOIN entity e ON e.id=x.entity_id
+           WHERE x.provider='musicbrainz' AND x.record_kind='work' AND x.record_id=?
+           AND x.state='active' AND e.deleted_at IS NULL`
     ).get(group.providerWorkId)?.entity_id;
     const known = providerWork ? [providerWork] : index.works.get(workKey(group.work, group.composers)) || [];
     let work = known.length === 1 ? known[0] : null;
     let movements = null;
+    if (work && unassignedByAdmin(catalogue, work, group.albumId)) return false;
     if (work) {
       const existing = workMovements(catalogue, work);
       movements = existing.length ? mapToMovements(existing, ordered) : null;
@@ -36848,6 +36902,37 @@ var hasManualEdits = (catalogue, ids) => ids.some(
     "SELECT 1 FROM assertion WHERE target_id=? AND source='manual' LIMIT 1"
   ).get(id)
 );
+function transferIdentities(db, keep, drop) {
+  for (const row of db.prepare("SELECT * FROM external_identity WHERE entity_id=?").all(drop)) {
+    const same2 = db.prepare("SELECT state FROM external_identity WHERE entity_id=? AND provider=? AND record_kind=? AND record_id=?").get(keep, row.provider, row.record_kind, row.record_id);
+    if (same2) {
+      if (row.state === "active" && same2.state !== "active")
+        db.prepare("UPDATE external_identity SET state='active' WHERE entity_id=? AND provider=? AND record_kind=? AND record_id=?").run(keep, row.provider, row.record_kind, row.record_id);
+      db.prepare("DELETE FROM external_identity WHERE entity_id=? AND provider=? AND record_kind=? AND record_id=?").run(drop, row.provider, row.record_kind, row.record_id);
+    } else
+      db.prepare("UPDATE external_identity SET entity_id=? WHERE entity_id=? AND provider=? AND record_kind=? AND record_id=?").run(keep, drop, row.provider, row.record_kind, row.record_id);
+  }
+}
+function repairMergedIdentities(catalogue) {
+  const db = catalogue.db;
+  const intoOf = db.prepare(
+    `SELECT json_extract(data,'$.into') AS into_id FROM audit_event
+     WHERE action IN ('work.merge','person.merge') AND target_id=? ORDER BY id DESC LIMIT 1`
+  );
+  const live = db.prepare("SELECT deleted_at FROM entity WHERE id=?");
+  let repaired = 0;
+  for (const { entity_id: drop } of db.prepare(
+    `SELECT DISTINCT x.entity_id FROM external_identity x JOIN entity e ON e.id=x.entity_id
+       WHERE e.deleted_at IS NOT NULL`
+  ).all()) {
+    let keep = drop;
+    for (let hops = 0; hops < 20 && keep && live.get(keep)?.deleted_at != null; hops++) keep = intoOf.get(keep)?.into_id;
+    if (!keep || keep === drop || !live.get(keep) || live.get(keep).deleted_at != null) continue;
+    transaction(db, () => transferIdentities(db, keep, drop));
+    repaired++;
+  }
+  return repaired;
+}
 function mergeContributor(catalogue, keep, drop, actor3) {
   for (const credit of catalogue.db.prepare("SELECT * FROM credit WHERE contributor_id=?").all(drop)) {
     const duplicate = catalogue.db.prepare(
@@ -36858,7 +36943,7 @@ function mergeContributor(catalogue, keep, drop, actor3) {
     else
       catalogue.db.prepare("UPDATE credit SET contributor_id=? WHERE id=?").run(keep, credit.id);
   }
-  catalogue.db.prepare("UPDATE external_identity SET entity_id=? WHERE entity_id=? AND provider='embedded-tags'").run(keep, drop);
+  transferIdentities(catalogue.db, keep, drop);
   catalogue.db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), drop);
   catalogue.audit("person.merge", drop, { into: keep }, actor3);
 }
@@ -36873,17 +36958,7 @@ function mergeDuplicateComposers(catalogue, index, actor3) {
     const drop = auto.filter((id) => id !== keep);
     if (ids.filter((id) => !auto.includes(id)).length > 1) continue;
     for (const id of drop) {
-      for (const credit of catalogue.db.prepare("SELECT * FROM credit WHERE contributor_id=?").all(id)) {
-        const duplicate = catalogue.db.prepare(
-          "SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?"
-        ).get(credit.target_id, keep, credit.role, credit.instrument);
-        if (duplicate)
-          catalogue.db.prepare("DELETE FROM credit WHERE id=?").run(credit.id);
-        else
-          catalogue.db.prepare("UPDATE credit SET contributor_id=? WHERE id=?").run(keep, credit.id);
-      }
-      catalogue.db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), id);
-      catalogue.audit("person.merge", id, { into: keep }, actor3);
+      mergeContributor(catalogue, keep, id, actor3);
       merged++;
     }
     index.people.set(name, [keep]);
@@ -36909,6 +36984,7 @@ function mergeWork(catalogue, keep, drop, actor3) {
   for (const [from, to] of map) {
     db.prepare("UPDATE realization_item SET movement_id=? WHERE movement_id=?").run(to, from);
     db.prepare("UPDATE recording_content SET movement_id=? WHERE movement_id=?").run(to, from);
+    transferIdentities(db, to, from);
     db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), from);
   }
   db.prepare("DELETE FROM relation WHERE kind='movement' AND source_id=?").run(drop);
@@ -36917,11 +36993,23 @@ function mergeWork(catalogue, keep, drop, actor3) {
       db.prepare("DELETE FROM credit WHERE id=?").run(credit.id);
     else db.prepare("UPDATE credit SET target_id=? WHERE id=?").run(keep, credit.id);
   }
-  db.prepare("UPDATE OR IGNORE user_work_state SET work_id=? WHERE work_id=?").run(keep, drop);
-  db.prepare("DELETE FROM user_work_state WHERE work_id=?").run(drop);
+  for (const state of db.prepare("SELECT * FROM user_work_state WHERE work_id=?").all(drop)) {
+    const kept = db.prepare("SELECT * FROM user_work_state WHERE user_id=? AND work_id=?").get(state.user_id, keep);
+    if (!kept) db.prepare("UPDATE user_work_state SET work_id=? WHERE user_id=? AND work_id=?").run(keep, state.user_id, drop);
+    else {
+      db.prepare("UPDATE user_work_state SET favourite=?,picked_realization_id=?,updated_at=? WHERE user_id=? AND work_id=?").run(
+        kept.favourite || state.favourite ? 1 : 0,
+        kept.picked_realization_id || state.picked_realization_id,
+        Math.max(kept.updated_at, state.updated_at),
+        state.user_id,
+        keep
+      );
+      db.prepare("DELETE FROM user_work_state WHERE user_id=? AND work_id=?").run(state.user_id, drop);
+    }
+  }
   db.prepare("UPDATE OR IGNORE admin_work_pick SET work_id=? WHERE work_id=?").run(keep, drop);
   db.prepare("DELETE FROM admin_work_pick WHERE work_id=?").run(drop);
-  db.prepare("UPDATE external_identity SET entity_id=? WHERE entity_id=? AND provider='embedded-tags'").run(keep, drop);
+  transferIdentities(db, keep, drop);
   db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), drop);
   catalogue.audit("work.merge", drop, { into: keep }, actor3);
   return true;
@@ -37041,6 +37129,7 @@ function autoMatchTaggedWorks(catalogue, {
     allowStructuredTitles,
     providerMatches
   );
+  repairMergedIdentities(catalogue);
   mergeDuplicateAutoWorks(catalogue, { actor: actor3 });
   if (albumId == null) {
     repairWorkTitles(catalogue);
@@ -37660,8 +37749,10 @@ function albumView(c, albumId, chosenWork) {
       ] : []
     });
   } else if (unassigned.length) {
-    const guess = guessWork(unassigned);
-    const composer = unassigned.map((track) => track.evidence.hints?.composer?.[0]).find(Boolean) || "";
+    const excluded = (track) => classification(c, track.id).state === "not_classical";
+    const kept = unassigned.filter((track) => !excluded(track));
+    const guess = guessWork(kept);
+    const composer = kept.map((track) => track.evidence.hints?.composer?.[0]).find(Boolean) || "";
     sections.push(
       {
         type: "form",
@@ -37677,12 +37768,23 @@ function albumView(c, albumId, chosenWork) {
         type: "form",
         id: "new-work",
         title: "Create a work from this album",
-        note: "Creates the work with one movement per selected track, in album order, and assigns them.",
+        note: "Creates the work with one movement per track you keep, in album order, and assigns them. Choose Skip for tracks that aren't part of it.",
         command: "create-work-from-album",
         arguments: { albumId, tracks: unassigned.map((track) => track.id) },
         submitLabel: "Create and assign",
         fields: [
           { key: "title", label: "Work title", type: "text", value: guess, required: true },
+          {
+            key: "include",
+            label: "Track",
+            type: "mapping",
+            value: unassigned.map((track) => excluded(track) ? "" : "include"),
+            rows: unassigned.map((track, index) => ({ label: `${track.evidence.hints?.trackNumber || index + 1}. ${track.title}`, detail: track.artist || void 0 })),
+            options: [
+              { value: "include", label: "Add as a movement" },
+              { value: "", label: "Skip" }
+            ]
+          },
           { key: "composer", label: "Composer", type: "lookup", lookup: "composers", value: "", valueLabel: "", placeholder: composer ? `Search, for example \u201C${composer}\u201D` : "Search composers" },
           { key: "composerName", label: "Or a new composer", type: "text", value: composer, help: "Used when no composer is chosen above." }
         ]
@@ -37966,7 +38068,7 @@ var V2_COMMANDS = {
   "choose-album-work": ["albumId", "work"],
   "assign-album": ["albumId", "work", "tracks", "mapping"],
   "unassign-album": ["albumId", "work"],
-  "create-work-from-album": ["albumId", "tracks", "title", "composer", "composerName"],
+  "create-work-from-album": ["albumId", "tracks", "include", "title", "composer", "composerName"],
   "resolve-review": ["id"]
 };
 function createWork(c, m, who, { title, composer, movements }) {
@@ -38137,13 +38239,19 @@ function applyV2(c, request, who) {
            JOIN track_link t ON t.id=s.track_link_id WHERE r.work_id=? AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?`
       ).all(work, albumId);
       if (!items.length) fail("No tracks from this album are in that work");
-      for (const item of items) c.db.prepare("DELETE FROM realization_item WHERE id=?").run(item.id);
+      for (const item of items) c.detachItem(item.id, { dropRecording: true });
       return { selection: `album:${albumId}`, message: `Unassigned ${items.length} track${items.length === 1 ? "" : "s"}.` };
     }
     case "create-work-from-album": {
       const albumId = str(v.albumId, "album", { max: 200 });
-      const tracks = Array.isArray(v.tracks) ? v.tracks : [];
-      if (!tracks.length) fail("This album has no unassigned tracks");
+      const offered = Array.isArray(v.tracks) ? v.tracks : [];
+      if (!offered.length) fail("This album has no unassigned tracks");
+      if (v.include !== void 0 && (!Array.isArray(v.include) || v.include.length !== offered.length))
+        fail("Every track needs a choice");
+      const tracks = offered.filter(
+        (track, index) => v.include !== void 0 ? v.include[index] === "include" : classification(c, track).state !== "not_classical"
+      );
+      if (!tracks.length) fail("Choose at least one track for the work");
       const title = str(v.title, "work title", { max: 2e3 }).trim();
       let composer = str(v.composer ?? "", "composer", { optional: true, max: 200 });
       const composerName = str(v.composerName ?? "", "composer name", { optional: true, max: 500 }).trim();
@@ -38986,7 +39094,7 @@ function apply(c, input, who) {
         JOIN relation rp ON rp.target_id=pw.source_id AND rp.kind='recording_performance' WHERE rp.source_id=? AND i.id=?`
       ).get(selection, item);
       if (!owned) fail2("Attachment does not belong to this recording");
-      c.db.prepare("DELETE FROM realization_item WHERE id=?").run(item);
+      c.detachItem(item);
       break;
     }
     default:

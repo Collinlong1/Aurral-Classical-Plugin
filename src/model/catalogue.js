@@ -401,6 +401,59 @@ export class Catalogue {
       return id;
     });
   }
+  // Remove one track attachment and everything that existed only for it: the
+  // segment and its content links, an emptied realization (and picks of it)
+  // and, with dropRecording, a per-track recording and its emptied performance.
+  // Leaving any of these behind kept the track "attached" for auto-match and
+  // kept the work and movement "in use".
+  detachItem(itemId, { dropRecording = false } = {}) {
+    return transaction(this.db, () => {
+      const db = this.db;
+      const item = db.prepare("SELECT * FROM realization_item WHERE id=?").get(itemId);
+      if (!item) return false;
+      db.prepare("DELETE FROM realization_item WHERE id=?").run(itemId);
+      const now = Date.now();
+      if (!db.prepare("SELECT 1 FROM realization_item WHERE segment_id=?").get(item.segment_id)) {
+        const contents = db
+          .prepare(
+            `SELECT c.id,c.recording_id,c.performance_work_id FROM segment_content s
+             JOIN recording_content c ON c.id=s.content_id WHERE s.segment_id=?`,
+          )
+          .all(item.segment_id);
+        db.prepare("DELETE FROM segment_content WHERE segment_id=?").run(item.segment_id);
+        db.prepare("DELETE FROM segment WHERE id=?").run(item.segment_id);
+        for (const content of contents) {
+          if (db.prepare("SELECT 1 FROM segment_content WHERE content_id=?").get(content.id)) continue;
+          db.prepare("DELETE FROM recording_content WHERE id=?").run(content.id);
+          if (!dropRecording || db.prepare("SELECT 1 FROM recording_content WHERE recording_id=?").get(content.recording_id))
+            continue;
+          db.prepare("DELETE FROM relation WHERE kind='recording_performance' AND source_id=?").run(content.recording_id);
+          db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=? AND deleted_at IS NULL").run(now, now, content.recording_id);
+        }
+      }
+      if (!db.prepare("SELECT 1 FROM realization_item WHERE realization_id=?").get(item.realization_id)) {
+        const realization = db.prepare("SELECT * FROM realization WHERE id=?").get(item.realization_id);
+        db.prepare("UPDATE user_work_state SET picked_realization_id=NULL,updated_at=? WHERE picked_realization_id=?").run(now, realization.id);
+        db.prepare("DELETE FROM admin_work_pick WHERE realization_id=?").run(realization.id);
+        db.prepare("DELETE FROM realization WHERE id=?").run(realization.id);
+        const pw = db.prepare("SELECT * FROM relation WHERE id=?").get(realization.performance_work_id);
+        if (
+          dropRecording &&
+          pw &&
+          !db.prepare("SELECT 1 FROM realization WHERE performance_work_id=?").get(pw.id) &&
+          !db.prepare("SELECT 1 FROM recording_content WHERE performance_work_id=?").get(pw.id) &&
+          !db.prepare("SELECT 1 FROM relation WHERE kind='recording_performance' AND target_id=?").get(pw.source_id)
+        ) {
+          db.prepare("DELETE FROM relation WHERE id=?").run(pw.id);
+          if (!db.prepare("SELECT 1 FROM relation WHERE source_id=? OR target_id=?").get(pw.source_id, pw.source_id)) {
+            db.prepare("DELETE FROM credit WHERE target_id=?").run(pw.source_id);
+            db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=? AND deleted_at IS NULL").run(now, now, pw.source_id);
+          }
+        }
+      }
+      return true;
+    });
+  }
   alias(
     entity,
     text,

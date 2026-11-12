@@ -727,8 +727,11 @@ function albumView(c, albumId, chosenWork) {
         : [],
     });
   } else if (unassigned.length) {
-    const guess = guessWork(unassigned);
-    const composer = unassigned.map((track) => track.evidence.hints?.composer?.[0]).find(Boolean) || "";
+    // Tracks marked Not classical start as Skip and never seed the guesses.
+    const excluded = (track) => classification(c, track.id).state === "not_classical";
+    const kept = unassigned.filter((track) => !excluded(track));
+    const guess = guessWork(kept);
+    const composer = kept.map((track) => track.evidence.hints?.composer?.[0]).find(Boolean) || "";
     sections.push(
       {
         type: "form",
@@ -744,12 +747,23 @@ function albumView(c, albumId, chosenWork) {
         type: "form",
         id: "new-work",
         title: "Create a work from this album",
-        note: "Creates the work with one movement per selected track, in album order, and assigns them.",
+        note: "Creates the work with one movement per track you keep, in album order, and assigns them. Choose Skip for tracks that aren't part of it.",
         command: "create-work-from-album",
         arguments: { albumId, tracks: unassigned.map((track) => track.id) },
         submitLabel: "Create and assign",
         fields: [
           { key: "title", label: "Work title", type: "text", value: guess, required: true },
+          {
+            key: "include",
+            label: "Track",
+            type: "mapping",
+            value: unassigned.map((track) => (excluded(track) ? "" : "include")),
+            rows: unassigned.map((track, index) => ({ label: `${track.evidence.hints?.trackNumber || index + 1}. ${track.title}`, detail: track.artist || undefined })),
+            options: [
+              { value: "include", label: "Add as a movement" },
+              { value: "", label: "Skip" },
+            ],
+          },
           { key: "composer", label: "Composer", type: "lookup", lookup: "composers", value: "", valueLabel: "", placeholder: composer ? `Search, for example “${composer}”` : "Search composers" },
           { key: "composerName", label: "Or a new composer", type: "text", value: composer, help: "Used when no composer is chosen above." },
         ],
@@ -1082,7 +1096,7 @@ export const V2_COMMANDS = {
   "choose-album-work": ["albumId", "work"],
   "assign-album": ["albumId", "work", "tracks", "mapping"],
   "unassign-album": ["albumId", "work"],
-  "create-work-from-album": ["albumId", "tracks", "title", "composer", "composerName"],
+  "create-work-from-album": ["albumId", "tracks", "include", "title", "composer", "composerName"],
   "resolve-review": ["id"],
 };
 
@@ -1267,13 +1281,22 @@ export function applyV2(c, request, who) {
         )
         .all(work, albumId);
       if (!items.length) fail("No tracks from this album are in that work");
-      for (const item of items) c.db.prepare("DELETE FROM realization_item WHERE id=?").run(item.id);
+      // Each track's recording was made for it; nothing of the attachment stays.
+      for (const item of items) c.detachItem(item.id, { dropRecording: true });
       return { selection: `album:${albumId}`, message: `Unassigned ${items.length} track${items.length === 1 ? "" : "s"}.` };
     }
     case "create-work-from-album": {
       const albumId = str(v.albumId, "album", { max: 200 });
-      const tracks = Array.isArray(v.tracks) ? v.tracks : [];
-      if (!tracks.length) fail("This album has no unassigned tracks");
+      const offered = Array.isArray(v.tracks) ? v.tracks : [];
+      if (!offered.length) fail("This album has no unassigned tracks");
+      // Skip leaves a track out. Without a choice per track, tracks marked
+      // Not classical are left out rather than pulled back into Classical.
+      if (v.include !== undefined && (!Array.isArray(v.include) || v.include.length !== offered.length))
+        fail("Every track needs a choice");
+      const tracks = offered.filter((track, index) =>
+        v.include !== undefined ? v.include[index] === "include" : classification(c, track).state !== "not_classical",
+      );
+      if (!tracks.length) fail("Choose at least one track for the work");
       const title = str(v.title, "work title", { max: 2000 }).trim();
       let composer = str(v.composer ?? "", "composer", { optional: true, max: 200 });
       const composerName = str(v.composerName ?? "", "composer name", { optional: true, max: 500 }).trim();
