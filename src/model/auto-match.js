@@ -30,6 +30,18 @@ export function splitTitle(title) {
   return match ? { head: clean(match[1]), tail: clean(match[2]) } : { head: "", tail: clean(title) };
 }
 
+// A track that is a whole piece: its WORK tag names the work with no
+// movement part, and its title is that work with nothing after it but
+// details such as "(Live)". A lone movement on a compilation never is.
+function standalonePiece(hints, workTitle) {
+  const tagged = clean(hints.work);
+  const title = clean(hints.title);
+  if (!tagged || tagged.includes(":") || isCollectionLike(tagged) || title.includes(":")) return false;
+  const head = words(workTitle);
+  const text = words(title);
+  return text === head || (text.startsWith(`${head} `) && splitTitle(title).head === "" && !MOVEMENT_PREFIX.test(stripWorkPrefix(title, workTitle)));
+}
+
 function proposedWork(work, title, allowStructuredTitles) {
   const tagged = clean(work);
   if (tagged && !isCollectionLike(tagged)) {
@@ -84,8 +96,11 @@ function candidates(
               : clean(provider.work),
           evidence: "musicbrainz-parent",
           identity: provider.workId,
+          ...(provider.standalone && { standalone: true }),
         }
       : proposedWork(hints.work, hints.title, allowStructuredTitles);
+    if (proposal && !provider && proposal.evidence === "work-tag" && standalonePiece(hints, proposal.title))
+      proposal.standalone = true;
     const composers = [
       ...new Set(
         (hints.composer?.length ? hints.composer : provider?.composers || [])
@@ -108,6 +123,8 @@ function candidates(
       proposal.identity || workKey(proposal.title, composers),
       composers.map(normalized).sort(),
       proposal.evidence,
+      // Appended only for whole pieces, so earlier groups keep their keys.
+      ...(proposal.standalone ? ["standalone"] : []),
     ]);
     if (!groups.has(key))
       groups.set(key, {
@@ -115,9 +132,12 @@ function candidates(
         work: proposal.title,
         titles: new Map(),
         evidence: proposal.evidence,
+        standalone: !!proposal.standalone,
         providerWorkId: proposal.identity || null,
+        localTitle: provider && local ? local.title : null,
         providerAliases: provider?.aliases || [],
         composers,
+        composerIds: provider?.composerIds || {},
         albumId: String(row.evidence.albumId),
         album: clean(hints.album),
         tracks: [],
@@ -135,8 +155,9 @@ function candidates(
   return [...groups.values()].filter((group) => {
     // The title most of the work's tracks use, so one typo doesn't name it.
     group.work = [...group.titles].sort((a, b) => b[1] - a[1])[0][0];
-    if (group.tracks.length < 2 || group.tracks.every((track) => track.attached))
-      return false;
+    if (group.tracks.every((track) => track.attached)) return false;
+    // Whole pieces are one track each; anything else needs two movements.
+    if (group.standalone ? group.tracks.length !== 1 : group.tracks.length < 2) return false;
     const positions = group.tracks.map(
       (track) => `${track.discNumber}:${track.trackNumber}`,
     );
@@ -266,10 +287,36 @@ function composerNames(catalogue, work) {
     .filter((name) => typeof name === "string" && name.trim());
 }
 
+// Live works an admin is probably about to duplicate: the same title or
+// catalogue number under the same composers (any composer when none is given).
+export function similarWorks(catalogue, title, composers = []) {
+  const subject = (key) => JSON.parse(key)[1];
+  const wanted = workKey(title, composers);
+  const named = composers.map(words).filter(Boolean).length > 0;
+  const people = (key) => JSON.parse(key)[0].join("|");
+  // The title with its key and catalogue number dropped, so "Symphony No.5"
+  // and "Symphony No. 5 in C minor, Op. 67" read alike.
+  const bare = (text) =>
+    words(text).replace(KEY_PHRASE, " ").replace(new RegExp(CATALOGUE.source, "g"), " ").replace(/\s+/g, " ").trim();
+  return catalogue.db
+    .prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL ORDER BY created_at,id")
+    .all()
+    .map((row) => row.id)
+    .filter((id) => {
+      const existing = resolvedName(catalogue, id, "title");
+      if (typeof existing !== "string" || !existing.trim()) return false;
+      const key = workKey(existing, composerNames(catalogue, id));
+      if (named && people(key) !== people(wanted)) return false;
+      if (named ? key === wanted : subject(key) === subject(wanted)) return true;
+      return bare(existing) !== "" && bare(existing) === bare(title);
+    });
+}
+
 // Index existing works and composers once per pass, so manual works the admin
 // created also absorb matching albums.
 export function catalogueIndex(catalogue) {
   const works = new Map(),
+    aliases = new Map(),
     people = new Map();
   for (const { id } of catalogue.db
     .prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL")
@@ -279,6 +326,12 @@ export function catalogueIndex(catalogue) {
     if (typeof title !== "string" || !composers.length) continue;
     const key = workKey(title, composers);
     works.set(key, [...(works.get(key) || []), id]);
+    // Other names of the work (MusicBrainz aliases), for lookups only.
+    const other = resolvedName(catalogue, id, "aliases");
+    for (const alias of Array.isArray(other) ? other : []) {
+      const aliasKey = workKey(String(alias), composers);
+      if (aliasKey !== key) aliases.set(aliasKey, [...new Set([...(aliases.get(aliasKey) || []), id])]);
+    }
   }
   for (const { id } of catalogue.db
     .prepare(
@@ -292,11 +345,35 @@ export function catalogueIndex(catalogue) {
     if (typeof name !== "string" || !words(name)) continue;
     people.set(words(name), [...(people.get(words(name)) || []), id]);
   }
-  return { works, people };
+  return { works, aliases, people };
 }
 
-function composerEntity(catalogue, metadata, index, name) {
+const artistIdOf = (catalogue, person) =>
+  catalogue.db
+    .prepare("SELECT record_id FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='artist' AND state='active'")
+    .get(person)?.record_id;
+function composerEntity(catalogue, metadata, index, name, mbid = null) {
   const key = words(name);
+  if (mbid) {
+    // A verified MusicBrainz composer wins over any name match.
+    const known = catalogue.db
+      .prepare(
+        `SELECT x.entity_id FROM external_identity x JOIN entity e ON e.id=x.entity_id
+         WHERE x.provider='musicbrainz' AND x.record_kind='artist' AND x.record_id=? AND x.state='active' AND e.deleted_at IS NULL`,
+      )
+      .get(mbid)?.entity_id;
+    if (known) return known;
+    // The one person with this name gains the ID, unless they carry another.
+    const sameName = index.people.get(key) || [];
+    const named = sameName.filter((id) => !artistIdOf(catalogue, id));
+    const person = named.length === 1 ? named[0] : catalogue.createEntity("person", { roles: ["composer"] });
+    if (person !== named[0]) {
+      metadata.derived(person, "name", name);
+      index.people.set(key, [...sameName, person]);
+    }
+    catalogue.externalIdentity(person, "musicbrainz", "artist", mbid, { evidence: { source: "work-composer" } });
+    return person;
+  }
   const existing = index.people.get(key) || [];
   // Reuse a composer only when exactly one person has this name; two
   // same-named composers stay separate until an admin resolves them.
@@ -479,9 +556,41 @@ function createGroup(catalogue, group, actor, index) {
            AND x.state='active' AND e.deleted_at IS NULL`,
         )
         .get(group.providerWorkId)?.entity_id;
+    // A same-titled work by a same-named but differently verified composer
+    // is someone else's work.
+    const otherComposer = (id) =>
+      catalogue.db
+        .prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer'")
+        .all(id)
+        .some(({ contributor_id: person }) => {
+          const mbid = group.composerIds?.[resolvedName(catalogue, person, "name")];
+          const held = artistIdOf(catalogue, person);
+          return mbid && held && held !== mbid;
+        });
+    // An unrecorded MusicBrainz work can still be one the tags already made:
+    // look it up under the tags' title and MusicBrainz's aliases too.
+    const titles = [
+      group.work,
+      ...(group.providerWorkId ? [group.localTitle, ...(group.providerAliases || [])] : []),
+    ].filter(Boolean);
     const known = providerWork
       ? [providerWork]
-      : index.works.get(workKey(group.work, group.composers)) || [];
+      : [
+          ...new Set(
+            titles.flatMap((title) => {
+              const key = workKey(title, group.composers);
+              return [...(index.works.get(key) || []), ...(index.aliases?.get(key) || [])];
+            }),
+          ),
+        ].filter(
+          (id) =>
+            !otherComposer(id) &&
+            // A work already tied to a different MusicBrainz work is another piece.
+            !(group.providerWorkId &&
+              catalogue.db
+                .prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='work' AND state='active' AND record_id!=?")
+                .get(id, group.providerWorkId)),
+        );
     // Several works fit: an admin picks one. Creating another would only add
     // a third copy for the next album to land on.
     if (known.length > 1) {
@@ -512,9 +621,20 @@ function createGroup(catalogue, group, actor, index) {
         });
         return false;
       }
+      // Record the identity on the work the tags made, so tag and MusicBrainz
+      // matches of this piece keep landing on one work.
+      if (group.providerWorkId) catalogue.externalIdentity(work, "musicbrainz", "work", group.providerWorkId, { evidence: { source: "parent-work" } });
     } else {
       // Same for a composer name several people share.
-      const ambiguous = group.composers.filter((name) => (index.people.get(words(name)) || []).length > 1);
+      const ambiguous = group.composers.filter((name) => {
+        const sameName = index.people.get(words(name)) || [];
+        const mbid = group.composerIds?.[name];
+        if (!mbid) return sameName.length > 1;
+        // A verified ID settles it when someone holds it, or when at most one
+        // same-named person could still be them (no other ID).
+        if (sameName.some((id) => artistIdOf(catalogue, id) === mbid)) return false;
+        return sameName.filter((id) => !artistIdOf(catalogue, id)).length > 1;
+      });
       if (ambiguous.length) {
         catalogue.review("auto_match", ordered[0].id, {
           reason: "ambiguous-composer",
@@ -530,7 +650,7 @@ function createGroup(catalogue, group, actor, index) {
       group.composers.forEach((name, i) =>
         catalogue.credit(
           work,
-          composerEntity(catalogue, metadata, index, name),
+          composerEntity(catalogue, metadata, index, name, group.composerIds?.[name]),
           "composer",
           { position: i + 1 },
         ),
@@ -547,6 +667,8 @@ function createGroup(catalogue, group, actor, index) {
         );
       index.works.set(workKey(group.work, group.composers), [work]);
     }
+    // A whole piece has no movements; its one track realizes the work.
+    if (group.standalone && !workMovements(catalogue, work).length) movements = [null];
     if (!movements)
       movements = ordered.map((track, i) => {
         const movement = catalogue.createEntity("movement");

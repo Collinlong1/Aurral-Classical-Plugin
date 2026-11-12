@@ -206,19 +206,20 @@ try {
   const phase4 = JSON.parse(fixture("phase4"));
   await ordinary.goto(`${url}/album/${phase4.albumId}`);
   await ordinary
-    .getByRole("button", { name: "By Work", exact: true })
+    .getByRole("button", { name: "By work", exact: true })
     .waitFor();
+  // Works head their rows as Apple Music Classical does: composer, then title.
   await ordinary
-    .getByRole("heading", { name: "Fixture Sonata", exact: true })
+    .locator(".classical-presentation__work-title", { hasText: /^Fixture Sonata$/ })
     .first()
     .waitFor();
   assert.equal(
-    await ordinary.getByText(/Missing: II\. Adagio/).count(),
+    await ordinary.getByText(/Missing:? II\. Adagio/).count(),
     1,
     "incomplete recording names its missing movement",
   );
   // Every album track is in a work here, so By Work has no "Other tracks".
-  assert.equal(await ordinary.getByRole("heading", { name: "Other tracks" }).count(), 0);
+  assert.equal(await ordinary.getByText("Other tracks", { exact: true }).count(), 0);
   if (process.env.EDITOR_SCREENSHOT_DIR)
     await ordinary.screenshot({
       path: `${process.env.EDITOR_SCREENSHOT_DIR}/phase4-by-work.png`,
@@ -229,11 +230,12 @@ try {
     .first()
     .click();
   await ordinary.waitForFunction(
-    () => document.querySelector(".global-player__title")?.textContent === "III. Finale",
+    // The player names the work as well: "Fixture Sonata: III. Finale".
+    () => document.querySelector(".global-player__title")?.textContent === "Fixture Sonata: III. Finale",
   );
-  await ordinary.getByRole("button", { name: "By Track", exact: true }).click();
+  await ordinary.getByRole("button", { name: "By track", exact: true }).click();
   await ordinary.getByRole("list", { name: /tracks$/ }).waitFor();
-  await ordinary.getByRole("button", { name: "By Work", exact: true }).click();
+  await ordinary.getByRole("button", { name: "By work", exact: true }).click();
   await ordinary
     .getByRole("link", { name: "Fixture Sonata", exact: true })
     .first()
@@ -254,6 +256,7 @@ try {
     .getByRole("button", { name: "Play whole work", exact: true })
     .click();
   await ordinary.waitForFunction(() =>
+    // The work page's own player shows just the part.
     ["I. Allegro", "II. Adagio", "III. Finale"].includes(
       document.querySelector(".global-player__title")?.textContent || "",
     ),

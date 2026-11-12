@@ -152,7 +152,7 @@ export class Metadata {
             "UPDATE assertion SET state=? WHERE target_id=? AND provider=? AND record_id=? AND state!='superseded'",
           )
           .run(state, target, provider, recordId);
-        this.catalogue.review("provider_state", target, {
+        this.catalogue.reviewEntry("provider_state", target, `${provider}:${recordId}`, {
           provider,
           recordId,
           state,
@@ -172,7 +172,7 @@ export class Metadata {
                 "UPDATE assertion SET state='stale' WHERE target_id=? AND field=? AND provider=? AND record_id=? AND state!='superseded'",
               )
               .run(target, field, provider, recordId);
-            this.catalogue.review("provider_omission", target, {
+            this.catalogue.reviewEntry("provider_omission", target, `${provider}:${recordId}:${field}`, {
               provider,
               recordId,
               field,
@@ -194,6 +194,25 @@ export class Metadata {
         state,
       });
       return result;
+    });
+  }
+  // Settle a provider conflict by pinning one provider's own value, keeping
+  // its provenance rather than copying it into a manual edit.
+  pinAssertion(target, field, assertionId, { actor } = {}) {
+    if (!actor) throw new Error("Pinning requires host actor attribution");
+    return transaction(this.db, () => {
+      const row = this.db
+        .prepare("SELECT 1 FROM assertion WHERE id=? AND target_id=? AND field=? AND state='active'")
+        .get(assertionId, target, field);
+      if (!row) throw new Error("That value is no longer current; reload the review");
+      this.db
+        .prepare(
+          `INSERT INTO pinned_override VALUES (?,?,?,?,?)
+        ON CONFLICT(target_id,field) DO UPDATE SET assertion_id=excluded.assertion_id,actor=excluded.actor,updated_at=excluded.updated_at`,
+        )
+        .run(target, field, assertionId, actor, Date.now());
+      this.catalogue.audit("metadata.pin", target, { field, assertionId }, actor);
+      return this.resolve(target, field);
     });
   }
   useProvider(target, field, { actor } = {}) {
@@ -251,13 +270,16 @@ export class Metadata {
         providers[0] ||
         rows.find((r) => r.source === "manual") ||
         rows.find((r) => r.source === "derived");
+    // A pinned field is settled; its providers disagreeing needs no review.
     if (
+      !pin &&
       providers.length > 1 &&
       providers.some((r) => r.value !== providers[0].value)
     )
-      this.catalogue.review("provider_conflict", target, {
+      this.catalogue.reviewEntry("provider_conflict", target, field, {
         field,
         assertions: providers.map((r) => r.id),
+        values: providers.map((r) => ({ provider: r.provider, recordId: r.record_id, value: JSON.parse(r.value) })),
       });
     if (!chosen)
       return {

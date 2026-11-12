@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { openCatalogue } from "../src/model/catalogue.js";
 import { Metadata } from "../src/model/metadata.js";
 import { classify } from "../src/model/reconcile.js";
+import { migrations } from "../src/model/schema.js";
 import assert from "node:assert/strict";
 await fs.access("/config/fixture-seeded");
 const action = process.argv[2],
@@ -231,7 +232,8 @@ if (action === "prepare") {
         .prepare("SELECT 1 FROM review_item WHERE kind='provider_conflict'")
         .get(),
     );
-    assert.equal(c.db.prepare("PRAGMA user_version").get().user_version, 2);
+    // Every schema migration applied, whichever is the latest.
+    assert.equal(c.db.prepare("PRAGMA user_version").get().user_version, migrations.at(-1).version);
     const adminPick = c.db
       .prepare("SELECT realization_id FROM admin_work_pick WHERE work_id=?")
       .get(phase4Saved.work)?.realization_id;
@@ -260,10 +262,12 @@ if (action === "prepare") {
   const presentation = await request(
     `/plugins/album-presentation/${phase4Saved.albumId}`,
   );
-  assert.equal(
-    presentation.groups.filter((group) => group.workId === phase4Saved.work)
-      .length,
-    2,
+  // Groups follow album order: the complete recording is one block, and the
+  // incomplete one (I and III, with II elsewhere between them) is two.
+  const groups = presentation.groups.filter((group) => group.workId === phase4Saved.work);
+  assert.deepEqual(
+    groups.map((group) => group.items.map((item) => item.title)),
+    [["I. Allegro", "II. Adagio", "III. Finale"], ["I. Allegro"], ["III. Finale"]],
   );
   const workPage = await request(
     `/plugins/aurral-classical/resources/work/${phase4Saved.work}`,

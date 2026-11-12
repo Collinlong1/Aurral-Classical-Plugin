@@ -11,7 +11,8 @@ const kinds = new Set([
   "recording",
   "release",
 ]);
-const roles = new Set([
+// Credit roles, shared with both editors so they only offer what saves.
+export const CREDIT_ROLES = [
   "composer",
   "soloist",
   "performer",
@@ -20,7 +21,11 @@ const roles = new Set([
   "ensemble",
   "choir",
   "arranger",
-]);
+  "lyricist",
+];
+const roles = new Set(CREDIT_ROLES);
+export const PERSON_ROLES = new Set(["composer", "soloist", "conductor", "arranger", "lyricist"]);
+export const ENSEMBLE_ROLES = new Set(["orchestra", "ensemble", "choir"]);
 const relations = {
   movement: [["work"], ["movement"]],
   collection_member: [["collection"], ["work", "collection"]],
@@ -62,6 +67,17 @@ export class Catalogue {
       ON CONFLICT(kind,target_id) WHERE status='open' DO UPDATE SET evidence=excluded.evidence`,
       )
       .run(randomUUID(), kind, target, json(evidence), Date.now());
+  }
+  // One open review per entry can carry several findings (each conflicting
+  // field, each omitted field): add this one under its key instead of
+  // replacing the ones already waiting.
+  reviewEntry(kind, target, key, entry) {
+    const open = this.db
+      .prepare("SELECT evidence FROM review_item WHERE kind=? AND target_id=? AND status='open'")
+      .get(kind, target);
+    const prior = open ? JSON.parse(open.evidence) : {};
+    const entries = { ...(prior.entries || {}), [key]: entry };
+    this.review(kind, target, { ...entry, entries });
   }
   entity(id, expected) {
     const row = parse(
@@ -158,10 +174,8 @@ export class Catalogue {
       if (
         !roles.has(role) ||
         !positive(position) ||
-        (["composer", "soloist", "conductor", "arranger"].includes(role) &&
-          person.kind !== "person") ||
-        (["orchestra", "ensemble", "choir"].includes(role) &&
-          person.kind !== "ensemble")
+        (PERSON_ROLES.has(role) && person.kind !== "person") ||
+        (ENSEMBLE_ROLES.has(role) && person.kind !== "ensemble")
       )
         throw new Error("Invalid role/contributor");
       if (assertionId) {

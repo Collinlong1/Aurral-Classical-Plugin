@@ -14,6 +14,10 @@ using the same rules, so beets no longer needs to touch these files.
   the same movement played by different performers.
 * **slskd download source.** Finds classical tracks and albums on Soulseek
   through your slskd, only in folders that line up with the exact release.
+* **Classical catalogue.** Works, movements, composers and recordings built from
+  a read-only scan of your Library: albums grouped **By work**, work pages with
+  favourites and picks, and an admin editor and review queue. Needs the
+  Aurral Classical fork of Aurral (see below).
 
 ## Install
 
@@ -233,12 +237,41 @@ Bump `version` in `manifest.json`, run `npm run build`, and push to `main`.
 The release workflow tests, builds, and publishes `aurral-classical.zip`,
 which Aurral installs and updates from.
 
-## Classical data model (Phase 2 review)
+## Classical catalogue
 
-The backend model uses independent plugin SQLite storage and requires Node 22.16+. See [MODEL_V1.md](MODEL_V1.md) for admin scans, provenance/pins and backup/restore, and [PHASE_2_REPORT.md](PHASE_2_REPORT.md) for validation. Manual editing, grouping and work pages remain later phases. This is review source, not a tagged production release.
+The catalogue lives in the plugin's own SQLite database (`model/` in the data
+folder) and needs Node 22.16+. It never writes to your audio files, so the
+Library can be mounted read only. The editor, album **By work** view and work
+pages need the matching Aurral Classical fork, which adds generic admin-form
+and album-presentation hooks; a stock Aurral shows none of them.
 
-## Manual editor (Phase 3 review)
+**Scans.** **Scan classical model (read only)** (album menu, admin) indexes the
+Library in resumable batches; the plugin schedule also rescans every 6 hours
+and after downloads. A download that arrives during a scan, or while the host
+can't be reached, still gets a fresh scan later. Files the tag reader rejects
+keep the tags an earlier scan read.
 
-The Phase 3 fork adds an admin form bridge. Open **Settings → Plugins → Aurral Classical → Pages → Open Classical metadata editor** to create provider-free works/broadcasts, reorder movements, attach owned audio and manage pinned metadata. See [EDITOR_GUIDE.md](EDITOR_GUIDE.md) and [PHASE_3_REPORT.md](PHASE_3_REPORT.md). Edits stay in the plugin database and work with read-only media. Stock hosts without the bridge have no editor entry. No production release/deployment is implied by this source branch.
+**Automatic grouping.** After a scan, tracks marked classical are grouped into
+works when their tags agree: an explicit `WORK` tag, a composer and a clean
+album order. A single track counts as a whole work only when its `WORK` tag
+and title name the same piece with no movement part. **Auto-match classical
+works (read only)** on an album also accepts structured titles such as
+"Symphony No. 5: I. Allegro" and MusicBrainz work IDs, including standalone
+works. MusicBrainz IDs and the tags' own titles are reconciled into one work,
+and MusicBrainz composer IDs keep same-named composers apart. When more than
+one work or composer could fit, nothing is created: the album goes to the
+review queue.
 
-Recording attachment uses the editor's page-level **Search items** box, which searches the complete indexed library and retains the selected recording. Completed read-only model scans apply a conservative automatic work pass based on explicit `WORK`, composer and release-order tags. An album's **Auto-match classical works (read only)** action additionally recognizes structured movement titles and resolves saved MusicBrainz recording/work identities to their parent work. It changes only plugin metadata and works with read-only media; ambiguous and collection-like sets remain for review.
+**Editor.** Settings → Plugins → Aurral Classical → Pages → **Classical
+metadata editor** (admins). Group albums into works (with Skip per track),
+edit works, movements and credits, merge duplicates, and work through the
+review queue. Manual choices (Send to / Remove from Classical, Unassign,
+pinned fields) survive rescans. Stale tabs can't overwrite newer edits. See
+[EDITOR_GUIDE.md](EDITOR_GUIDE.md).
+
+**Known limits.** Some catalogue systems aren't recognized yet (for example
+Ravel's M. numbers), so such works need a WORK tag in a known form or a
+MusicBrainz match. Recordings left behind by unassigns made before v0.1 stay
+until removed by hand. Compare recordings by work identity and the richer
+review screens are planned for v0.2. Reports for each phase are in
+`PHASE_*_REPORT.md`; [MODEL_V1.md](MODEL_V1.md) covers backup and restore.

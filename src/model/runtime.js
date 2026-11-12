@@ -113,7 +113,14 @@ export const canReadHostLibrary = (ctx) =>
 // Called from download events: cheap, never scans inside the 10 second event window.
 export async function requestModelSync(ctx) {
   await fs.mkdir(modelFolder(ctx), { recursive: true });
-  await fs.writeFile(syncFlag(ctx), String(Date.now()));
+  // Unique per request, so a request made while a scan starts is never
+  // mistaken for the one that scan already covers.
+  await fs.writeFile(syncFlag(ctx), `${Date.now()}:${randomUUID()}`);
+}
+const readSyncFlag = (ctx) => fs.readFile(syncFlag(ctx), "utf8").catch(() => null);
+// Only a fresh snapshot answers a request, and only the request it saw.
+async function clearSyncFlag(ctx, seen) {
+  if (seen != null && (await readSyncFlag(ctx)) === seen) await fs.rm(syncFlag(ctx), { force: true });
 }
 
 // True when a download asked for a sync or the last completed scan is stale.
@@ -149,7 +156,9 @@ export async function enqueueModelScan(ctx, actor, { system = false } = {}) {
     throw new Error(
       "Classical model scans require the host's user-operations capability or plugin API access",
     );
-  await fs.rm(syncFlag(ctx), { force: true });
+  // A pending or resumed scan uses an older snapshot, and fetching a new one
+  // can fail: the request stays until a fresh snapshot is actually queued.
+  const requested = await readSyncFlag(ctx);
   const catalogue = await openCatalogue(modelFolder(ctx));
   try {
     // Resume an existing scan without requesting another full host snapshot.
@@ -161,10 +170,13 @@ export async function enqueueModelScan(ctx, actor, { system = false } = {}) {
     if (pending) return pending.id;
     const latest = catalogue.db
       .prepare(
-        "SELECT id,state FROM model_job WHERE key='library_scan' ORDER BY created_at DESC,rowid DESC LIMIT 1",
+        "SELECT id,state,created_at FROM model_job WHERE key='library_scan' ORDER BY created_at DESC,rowid DESC LIMIT 1",
       )
       .get();
-    if (latest?.state === "failed") {
+    // A failed scan resumes from its saved snapshot, unless the library was
+    // asked to sync after that snapshot was taken.
+    const requestedAt = Number(String(requested ?? "").split(":")[0]) || 0;
+    if (latest?.state === "failed" && !(requestedAt > latest.created_at)) {
       catalogue.db
         .prepare(
           `UPDATE model_job SET state='queued',owner=NULL,lease_until=0,attempt=0,
@@ -213,13 +225,15 @@ export async function enqueueModelScan(ctx, actor, { system = false } = {}) {
         }),
     );
     const jobs = new ModelJobs(catalogue);
-    return jobs.enqueue("library_scan", "library_scan", {
+    const id = jobs.enqueue("library_scan", "library_scan", {
       actor: system ? "system" : String(actor.id),
       instanceId: instance.id,
       epoch: ctx.settings.libraryEpoch || "initial",
       generation: instance.generation + 1,
       files,
     });
+    await clearSyncFlag(ctx, requested);
+    return id;
   } finally {
     catalogue.close();
   }
@@ -497,7 +511,7 @@ export async function autoMatchWorks(ctx, actor, albumId = null) {
          JOIN classification c ON c.target_id=t.id AND c.state='classical'
          WHERE t.state='active'
          AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?
-         AND NOT EXISTS(SELECT 1 FROM segment s WHERE s.track_link_id=t.id)`,
+         AND NOT EXISTS(SELECT 1 FROM segment s JOIN realization_item i ON i.segment_id=s.id WHERE s.track_link_id=t.id)`,
       )
       .all(String(albumId));
     for (const row of rows) {
@@ -517,16 +531,22 @@ export async function autoMatchWorks(ctx, actor, albumId = null) {
         const inc = "aliases+artist-rels+work-rels";
         const leaf = await ctx.mb.get("work", workId, inc);
         const parent = leaf && (await topWork(ctx.mb, leaf, 0, inc));
-        if (
-          !parent?.id ||
-          parent.id === leaf.id ||
-          isCollectionLike(parent.title)
-        )
+        // A work with no parent is a whole piece only when the track's own
+        // title reads as one, not as a movement of something MusicBrainz
+        // hasn't linked up.
+        const standalone =
+          parent?.id === leaf.id &&
+          !(leaf.relations || []).some((rel) => rel.type === "parts" && rel.direction === "backward") &&
+          !isCollectionLike(leaf.title) &&
+          !String(hints.title || "").includes(":") &&
+          !/^(?:[IVXLCDM]+|\d+)[.)]\s/i.test(String(hints.title || "").trim());
+        if (!parent?.id || (parent.id === leaf.id && !standalone) || isCollectionLike(parent.title))
           continue;
         providerMatches.set(row.id, {
           workId: parent.id,
           work: englishTitle(parent),
-          movement: englishTitle(leaf, null),
+          movement: standalone ? null : englishTitle(leaf, null),
+          ...(standalone && { standalone: true }),
           aliases: [
             ...new Set(
               (parent.aliases || [])
@@ -536,6 +556,12 @@ export async function autoMatchWorks(ctx, actor, albumId = null) {
             ),
           ].slice(0, 20),
           composers,
+          // MusicBrainz's own composer IDs tell same-named people apart.
+          composerIds: Object.fromEntries(
+            [...(parent.relations || []), ...(leaf.relations || [])]
+              .filter((rel) => rel.type === "composer" && rel.artist?.id && rel.artist?.name)
+              .map((rel) => [rel.artist.name, rel.artist.id]),
+          ),
         });
       } catch (error) {
         ctx.log(`Classical work identification skipped: ${error.message}`);

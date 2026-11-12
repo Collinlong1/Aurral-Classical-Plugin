@@ -1,6 +1,7 @@
 // Classical metadata editor, rendered by the host's admin pages v2.
 // Everything here reads and writes the plugin catalogue only; audio is never touched.
 import path from "node:path";
+import { CREDIT_ROLES } from "./catalogue.js";
 import { Metadata } from "./metadata.js";
 import { classify } from "./reconcile.js";
 import { searchText, matchesSearch, ownedTracks } from "./editor-search.js";
@@ -10,6 +11,7 @@ import {
   mergeWork,
   movementParts,
   movementTitle,
+  similarWorks,
   workMovements,
 } from "./auto-match.js";
 
@@ -22,20 +24,19 @@ export class EditorV2Error extends Error {
 const fail = (message) => {
   throw new EditorV2Error(message);
 };
+// Creating a work that probably exists already asks for confirmation first.
+export function warnDuplicate(c, title, composers, createAnyway) {
+  if (createAnyway === true) return;
+  const similar = similarWorks(c, title, composers);
+  if (!similar.length) return;
+  const names = similar.slice(0, 3).map((id) => `“${labelOf(c, id) || "Untitled work"}”`).join(", ");
+  throw new EditorV2Error(`A similar work already exists: ${names}. Assign to it instead, or tick “Create anyway”.`, 409);
+}
+const CREATE_ANYWAY = { key: "createAnyway", label: "Create anyway", type: "checkbox", value: false, help: "Only if no existing work is the same piece." };
 const PAGE = 100;
-const ROLES = [
-  "composer",
-  "soloist",
-  "performer",
-  "conductor",
-  "orchestra",
-  "ensemble",
-  "choir",
-  "arranger",
-  "lyricist",
-];
+const ROLES = CREDIT_ROLES;
 const roleLabel = (role) => role[0].toUpperCase() + role.slice(1);
-const PROVIDERS = { musicbrainz: "MusicBrainz", "open-opus": "Open Opus" };
+const PROVIDERS = { musicbrainz: "MusicBrainz", openopus: "Open Opus", "open-opus": "Open Opus" };
 const providerName = (provider) => PROVIDERS[provider] || provider || "Provider";
 const FIELDS = {
   work: [
@@ -484,6 +485,7 @@ function contributorView(c, entity) {
         fields: [
           { key: "title", label: "Title", type: "text", value: "", required: true },
           { key: "movements", label: "Movements", type: "lines", value: [], placeholder: "One per line (optional)" },
+          CREATE_ANYWAY,
         ],
       },
     );
@@ -740,6 +742,21 @@ function albumView(c, albumId, chosenWork) {
     const kept = unassigned.filter((track) => !excluded(track));
     const guess = guessWork(kept);
     const composer = kept.map((track) => track.evidence.hints?.composer?.[0]).find(Boolean) || "";
+    const likely = guess ? similarWorks(c, guess, composer ? [composer] : []).slice(0, 5) : [];
+    if (likely.length)
+      sections.push({
+        type: "rows",
+        id: "likely-works",
+        title: "This work may already exist",
+        note: "Assign the album to one of these instead of creating another copy.",
+        rows: likely.map((work) => ({
+          id: work,
+          label: entityLabel(c, work, "work"),
+          detail: composerNames(c, work).join(", ") || undefined,
+          selection: work,
+          actions: [action("Assign here", "choose-album-work", { albumId, work })],
+        })),
+      });
     sections.push(
       {
         type: "form",
@@ -774,6 +791,7 @@ function albumView(c, albumId, chosenWork) {
           },
           { key: "composer", label: "Composer", type: "lookup", lookup: "composers", value: "", valueLabel: "", placeholder: composer ? `Search, for example “${composer}”` : "Search composers" },
           { key: "composerName", label: "Or a new composer", type: "text", value: composer, help: "Used when no composer is chosen above." },
+          CREATE_ANYWAY,
         ],
       },
     );
@@ -855,8 +873,42 @@ function reviewView(c, id) {
   if (evidence?.albumId != null) actions.push(open("Open album", `album:${evidence.albumId}`));
   if (entity) actions.push(open("Open entry", review.target_id));
   if (review.evidence.keep) actions.push(open("Open the other work", review.evidence.keep));
+  // Minimum fixes for reviews that otherwise block their entry.
+  const live = (id) => typeof id === "string" && c.db.prepare("SELECT kind FROM entity WHERE id=? AND deleted_at IS NULL").get(id);
+  if (review.kind === "identity" && review.evidence.reason === "duplicate-work" && entity && live(review.evidence.keep))
+    actions.unshift(
+      action("Merge into the other work", "merge-entity", { target: review.target_id, into: review.evidence.keep, confirm: true }, {
+        tone: "danger",
+        confirm: "Move this work's recordings, credits, favourites and picks into the other work, then remove this one?",
+      }),
+    );
+  if (review.kind === "identity" && review.evidence.reason === "same-name-composers" && entity) {
+    const name = searchText(String(review.evidence.name || labelOf(c, review.target_id) || ""));
+    for (const other of entities(c, ["person"]).filter((p) => p.id !== review.target_id && searchText(p.label) === name).slice(0, 5))
+      actions.unshift(
+        action(`Same person: merge into “${other.label}”`.slice(0, 100), "merge-entity", { target: review.target_id, into: other.id, confirm: true }, {
+          tone: "danger",
+          confirm: "Move every credit to the other entry, then remove this one?",
+        }),
+      );
+  }
+  const conflicts = review.kind === "provider_conflict" ? review.evidence.entries || { [review.evidence.field]: review.evidence } : {};
+  for (const [field, entry] of Object.entries(conflicts))
+    (entry.values || []).forEach((value, index) =>
+      actions.unshift(
+        action(`${field}: use ${providerName(value.provider)} “${display(value.value)}”`.slice(0, 100), "choose-provider-value", {
+          id,
+          field,
+          assertion: entry.assertions[index],
+        }),
+      ),
+    );
+  if (review.kind === "track_link" && track)
+    (review.evidence.candidates || []).slice(0, 5).forEach((candidate, index) =>
+      actions.unshift(action(`Link to ${path.basename(candidate.path || "")}`.slice(0, 100), "relink-track", { id, candidate: String(index) })),
+    );
   for (const candidate of (Array.isArray(review.evidence.candidates) ? review.evidence.candidates : []).slice(0, 5))
-    if (c.db.prepare("SELECT 1 FROM entity WHERE id=? AND deleted_at IS NULL").get(candidate))
+    if (typeof candidate === "string" && c.db.prepare("SELECT 1 FROM entity WHERE id=? AND deleted_at IS NULL").get(candidate))
       actions.push(open(`Open “${labelOf(c, candidate) || "candidate"}”`.slice(0, 100), candidate));
   actions.push(action("Dismiss", "resolve-review", { id }));
   const items = [];
@@ -868,6 +920,10 @@ function reviewView(c, id) {
       { label: "Composer tag", value: (evidence.hints?.composer || []).join(", ") || "None" },
     );
   if (review.evidence.reason) items.push({ label: "Reason", value: String(review.evidence.reason).replace(/-/g, " ") });
+  for (const [field, entry] of Object.entries(conflicts))
+    items.push({ label: `Conflicting ${field}`, value: (entry.values || []).map((value) => `${providerName(value.provider)}: ${display(value.value)}`).join(" · ").slice(0, 500) || "Values differ" });
+  for (const entry of Object.values(review.kind === "provider_omission" ? review.evidence.entries || {} : {}))
+    items.push({ label: "No longer provided", value: `${entry.field} (${providerName(entry.provider)})` });
   return {
     crumbs: [],
     title: label,
@@ -892,6 +948,7 @@ function newView(kind) {
           { key: "title", label: "Title", type: "text", value: "", required: true },
           { key: "composer", label: "Composer", type: "lookup", lookup: "composers", value: "", placeholder: "Search composers" },
           { key: "movements", label: "Movements", type: "lines", value: [], placeholder: "One per line (optional)" },
+          CREATE_ANYWAY,
         ],
       },
     },
@@ -1107,8 +1164,10 @@ export const V2_COMMANDS = {
   "choose-album-work": ["albumId", "work"],
   "assign-album": ["albumId", "work", "tracks", "mapping"],
   "unassign-album": ["albumId", "work"],
-  "create-work-from-album": ["albumId", "tracks", "include", "title", "composer", "composerName"],
+  "create-work-from-album": ["albumId", "tracks", "include", "title", "composer", "composerName", "createAnyway"],
   "resolve-review": ["id"],
+  "choose-provider-value": ["id", "field", "assertion"],
+  "relink-track": ["id", "candidate"],
 };
 
 function createWork(c, m, who, { title, composer, movements }) {
@@ -1314,6 +1373,7 @@ export function applyV2(c, request, who) {
       const title = str(v.title, "work title", { max: 2000 }).trim();
       let composer = str(v.composer ?? "", "composer", { optional: true, max: 200 });
       const composerName = str(v.composerName ?? "", "composer name", { optional: true, max: 500 }).trim();
+      warnDuplicate(c, title, composer ? [labelOf(c, composer)].filter(Boolean) : composerName ? [composerName] : [], v.createAnyway);
       if (composer) c.entity(composer, "person");
       else if (composerName) {
         const existing = entities(c, ["person"]).filter((person) => searchText(person.label) === searchText(composerName) && isComposer(c, person));
@@ -1334,6 +1394,37 @@ export function applyV2(c, request, who) {
       const movements = workMovements(c, work).map((movement) => movement.id);
       assignTracks(c, m, who, work, tracks, movements);
       return { selection: work, message: `Created “${title}” with ${movements.length} movements.` };
+    }
+    case "choose-provider-value": {
+      const id = str(v.id, "review item", { max: 200 });
+      const review = c.db.prepare("SELECT * FROM review_item WHERE id=? AND kind='provider_conflict' AND status='open'").get(id);
+      if (!review) fail("This review item is already resolved");
+      const field = str(v.field, "field", { max: 80 });
+      const evidence = JSON.parse(review.evidence);
+      const entries = { ...(evidence.entries || { [evidence.field]: evidence }) };
+      if (!entries[field]?.assertions?.includes(v.assertion)) fail("That value isn't part of this conflict");
+      m.pinAssertion(review.target_id, field, v.assertion, { actor: who });
+      delete entries[field];
+      const rest = Object.values(entries);
+      if (rest.length) c.db.prepare("UPDATE review_item SET evidence=? WHERE id=?").run(JSON.stringify({ ...rest[0], entries }), id);
+      else c.db.prepare("UPDATE review_item SET status='resolved' WHERE id=?").run(id);
+      return { selection: rest.length ? `review:${id}` : "", message: "Value chosen and pinned.", ...(rest.length ? {} : { tab: "review" }) };
+    }
+    case "relink-track": {
+      const id = str(v.id, "review item", { max: 200 });
+      const review = c.db.prepare("SELECT * FROM review_item WHERE id=? AND kind='track_link' AND status='open'").get(id);
+      if (!review) fail("This review item is already resolved");
+      const candidate = (JSON.parse(review.evidence).candidates || [])[Number(v.candidate)];
+      if (!candidate) fail("Choose one of the listed files");
+      const link = c.db.prepare("SELECT * FROM track_link WHERE id=? AND state='review'").get(review.target_id);
+      if (!link) fail("This track is no longer waiting for review");
+      if (c.db.prepare("SELECT 1 FROM track_link WHERE instance_id=? AND core_id=? AND file_id=? AND state='active'").get(link.instance_id, candidate.coreId, candidate.fileId))
+        fail("That file is already linked to another track. Rescan, then review again.");
+      c.db
+        .prepare("UPDATE track_link SET core_id=?,file_id=?,state='active',evidence=?,revision=revision+1,updated_at=? WHERE id=?")
+        .run(candidate.coreId, candidate.fileId, JSON.stringify(candidate), Date.now(), link.id);
+      c.db.prepare("UPDATE review_item SET status='resolved' WHERE id=?").run(id);
+      return { selection: `track:${link.id}`, message: "Linked to the moved file; its works and picks are kept." };
     }
     case "resolve-review": {
       const id = str(v.id, "review item", { max: 200 });

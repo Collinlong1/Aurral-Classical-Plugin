@@ -7,6 +7,7 @@ import plugin from "../src/index.js";
 import {
   modelStatus,
   modelSyncDue,
+  requestModelSync,
   enqueueModelScan,
   runModelJobs,
   SYNC_INTERVAL_MS,
@@ -137,4 +138,52 @@ test("a scan whose process died reports as interrupted, then resumes", async (t)
   );
   const result = await plugin.actions["classical-model-scan"](input);
   assert.match(result.message, /done; processed 2\/2/);
+});
+
+test("#10 a sync request survives a failed snapshot, a pending scan and a resumed failed scan", async (t) => {
+  const { ctx, snapshots } = await library(t);
+  const admin = { id: 1, role: "admin" };
+  const fetch = ctx.fetch;
+  // 1. The host snapshot fails: the request stays.
+  await requestModelSync(ctx);
+  ctx.fetch = async () => {
+    throw new Error("host unavailable");
+  };
+  await assert.rejects(enqueueModelScan(ctx, admin), /host unavailable/);
+  assert.equal(await modelSyncDue(ctx), true);
+  ctx.fetch = fetch;
+  // 2. A scan is already pending with an older snapshot: the request outlives it.
+  await enqueueModelScan(ctx, admin);
+  assert.equal(snapshots(), 1, "that enqueue answered the first request");
+  await requestModelSync(ctx);
+  await enqueueModelScan(ctx, admin); // resumes the pending scan
+  assert.equal(snapshots(), 1);
+  await runModelJobs(ctx, { budgetMs: 60_000 });
+  assert.equal(await modelSyncDue(ctx), true, "a fresh snapshot is still owed");
+  await enqueueModelScan(ctx, admin);
+  assert.equal(snapshots(), 2);
+  await runModelJobs(ctx, { budgetMs: 60_000 });
+  assert.equal(await modelSyncDue(ctx), false);
+  // 3. The latest scan failed, then a download asked for a sync: take a fresh
+  // snapshot rather than resuming the failed scan's older one.
+  const c = await openCatalogue(path.join(ctx.dataFolder, "model"));
+  try {
+    c.db.prepare("UPDATE model_job SET state='failed',created_at=? WHERE id=(SELECT id FROM model_job ORDER BY created_at DESC LIMIT 1)").run(Date.now() - 1000);
+  } finally {
+    c.close();
+  }
+  await requestModelSync(ctx);
+  await enqueueModelScan(ctx, admin);
+  assert.equal(snapshots(), 3);
+  assert.equal(await modelSyncDue(ctx), false);
+  // An explicit Scan with no newer request still resumes a failed scan.
+  await runModelJobs(ctx, { budgetMs: 60_000 });
+  const c2 = await openCatalogue(path.join(ctx.dataFolder, "model"));
+  try {
+    c2.db.prepare("UPDATE model_job SET state='failed' WHERE id=(SELECT id FROM model_job ORDER BY created_at DESC LIMIT 1)").run();
+  } finally {
+    c2.close();
+  }
+  await enqueueModelScan(ctx, admin);
+  assert.equal(snapshots(), 3);
 });

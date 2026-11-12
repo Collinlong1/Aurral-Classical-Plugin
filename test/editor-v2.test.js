@@ -7,6 +7,7 @@ import { openCatalogue } from "../src/model/catalogue.js";
 import { Metadata } from "../src/model/metadata.js";
 import { reconcile, classify } from "../src/model/reconcile.js";
 import { autoMatchTaggedWorks, repairMergedIdentities } from "../src/model/auto-match.js";
+import { mutateEditor as mutateRaw } from "../src/model/editor.js";
 import { tempFolders } from "./helpers.js";
 
 const titles = ["I. Allegro con brio", "II. Andante con moto", "III. Allegro", "IV. Allegro"];
@@ -55,7 +56,7 @@ async function setup(t) {
   };
   const trackIds = (album) =>
     c.db.prepare("SELECT id FROM track_link WHERE json_extract(evidence,'$.albumId')=? ORDER BY core_id").all(album).map((r) => r.id);
-  return { c, read, mutate, ok, trackIds };
+  return { c, read, mutate, ok, trackIds, input };
 }
 const section = (view, id) => view.sections.find((s) => s.id === id);
 
@@ -303,7 +304,7 @@ test("#7 an ambiguous match queues a review and creates no work or composer", as
   const s = await setup(t);
   // Two same-key works already exist (say, an admin kept them apart on purpose).
   const first = (await s.ok("create-work", { title: "Symphony No. 5 in C minor, Op. 67", composer: "", movements: titles })).selection;
-  const second = (await s.ok("create-work", { title: "Symphony No. 5 in C minor, Op. 67", composer: "", movements: titles })).selection;
+  const second = (await s.ok("create-work", { title: "Symphony No. 5 in C minor, Op. 67", composer: "", movements: titles, createAnyway: true })).selection;
   const beethoven = (await s.ok("create-contributor", { name: "Ludwig van Beethoven", kind: "person" })).selection;
   for (const work of [first, second]) await s.ok("add-credit", { target: work, contributor: beethoven, role: "composer", instrument: "" }, work);
   const count = (kind) => s.c.db.prepare("SELECT count(*) AS n FROM entity WHERE kind=? AND deleted_at IS NULL").get(kind).n;
@@ -339,6 +340,182 @@ test("#7 a composer name several people share queues a review instead of adding 
   assert.equal(s.c.db.prepare("SELECT count(*) AS n FROM entity WHERE kind='person' AND deleted_at IS NULL").get().n, people);
   const review = s.c.db.prepare("SELECT evidence FROM review_item WHERE kind='auto_match' AND status='open'").get();
   assert.equal(JSON.parse(review.evidence).reason, "ambiguous-composer");
+});
+
+// Matching reads track hints straight from the catalogue; these set them.
+const setHints = (s, track, hints) => {
+  const row = s.c.db.prepare("SELECT evidence FROM track_link WHERE id=?").get(track);
+  const evidence = JSON.parse(row.evidence);
+  Object.assign(evidence.hints, hints);
+  s.c.db.prepare("UPDATE track_link SET evidence=? WHERE id=?").run(JSON.stringify(evidence), track);
+};
+const liveWorks = (s) => s.c.db.prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL").all().map((r) => r.id);
+
+test("#11 every role the editor offers saves, Lyricist included, and wrong kinds explain themselves", async (t) => {
+  const s = await setup(t);
+  const work = (await s.ok("create-work", { title: "Lieder", composer: "", movements: [] })).selection;
+  const poet = (await s.ok("create-contributor", { name: "Wilhelm Müller", kind: "person" })).selection;
+  const choir = (await s.ok("create-contributor", { name: "RIAS Kammerchor", kind: "ensemble" })).selection;
+  const form = section((await s.read({ selection: work })).view, "add-credit");
+  const roles = form.fields.find((f) => f.key === "role").options.map((o) => o.value);
+  assert.ok(roles.includes("lyricist"));
+  for (const role of roles) {
+    const who = ["orchestra", "ensemble", "choir"].includes(role) ? choir : poet;
+    const saved = await s.mutate("add-credit", { target: work, contributor: who, role, instrument: "" }, work);
+    assert.equal(saved.ok, true, `${role}: ${saved.message}`);
+  }
+  const wrong = await s.mutate("add-credit", { target: work, contributor: choir, role: "lyricist", instrument: "x" }, work);
+  assert.equal(wrong.ok, false);
+  assert.match(wrong.message, /ensemble can't be credited as lyricist/);
+});
+
+test("#6 stale tokens and tokens for another page can't write", async (t) => {
+  const s = await setup(t);
+  const a = (await s.ok("create-work", { title: "Sonata A", composer: "", movements: [] })).selection;
+  const b = (await s.ok("create-work", { title: "Sonata B", composer: "", movements: [] })).selection;
+  const raw = (revision, command, values) =>
+    mutateRaw({ ...s.input, mutation: { revision, command, values } });
+  const save = (revision, target, title) => raw(revision, "save-entity", { target, title });
+  // A token for work A (or for a blank page) can't edit work B.
+  const tokenA = (await s.read({ selection: a })).revision;
+  assert.equal((await save(tokenA, b, "Hijacked")).status, 409);
+  assert.equal((await save((await s.read()).revision, b, "Hijacked")).status, 409);
+  assert.equal((await save(`${a}|0:0:0:0:0:0`, a, "Forged")).status, 409);
+  // Two tabs on one album: the second assign is rejected, not merged in.
+  const work = (await s.ok("create-work", { title: "Symphony No. 5 in C minor, Op. 67", composer: "", movements: titles })).selection;
+  const chosen = await s.ok("choose-album-work", { albumId: "A", work }, "album:A");
+  const page = await s.read({ selection: chosen.selection });
+  const assign = section(page.view, "assign");
+  const first = await raw(page.revision, "assign-album", { ...assign.arguments, mapping: assign.fields[0].value });
+  assert.equal(first.ok, true, first.message);
+  await s.ok("unassign-album", { albumId: "A", work }, "album:A");
+  assert.equal((await raw(page.revision, "assign-album", { ...assign.arguments, mapping: assign.fields[0].value })).status, 409);
+  // A rescan that changes nothing leaves an open album page valid.
+  const before = (await s.read({ selection: "album:A" })).revision;
+  for (const track of s.trackIds("A")) classify(s.c, track, JSON.parse(s.c.db.prepare("SELECT evidence FROM track_link WHERE id=?").get(track).evidence).hints);
+  assert.equal((await s.read({ selection: "album:A" })).revision, before);
+  // Classification changes on an album page make its token stale too.
+  const album = (await s.read({ selection: "album:A" })).revision;
+  await s.ok("set-classification", { tracks: [s.trackIds("A")[0]], state: "not_classical" }, "album:A");
+  assert.equal((await raw(album, "set-classification", { tracks: [s.trackIds("A")[1]], state: "not_classical" })).status, 409);
+});
+
+test("#21/#16 every conflicting provider field is kept and can be settled from the review", async (t) => {
+  const s = await setup(t);
+  const work = (await s.ok("create-work", { title: "Quartet", composer: "", movements: [] })).selection;
+  const m = new Metadata(s.c);
+  m.refresh(work, "musicbrainz", "mb-q", { nickname: "Emperor", key: "C major" });
+  m.refresh(work, "openopus", "oo-q", { nickname: "Kaiser", key: "C minor" });
+  m.resolve(work, "nickname");
+  m.resolve(work, "key");
+  const review = s.c.db.prepare("SELECT * FROM review_item WHERE kind='provider_conflict' AND status='open'").get();
+  assert.deepEqual(Object.keys(JSON.parse(review.evidence).entries).sort(), ["key", "nickname"]);
+  const view = (await s.read({ selection: `review:${review.id}` })).view;
+  assert.ok(section(view, "evidence").items.some((i) => i.label === "Conflicting key" && /C minor/.test(i.value)));
+  const choose = (pattern) => view.actions.find((a) => a.command === "choose-provider-value" && pattern.test(a.label));
+  await s.ok("choose-provider-value", choose(/key: use Open Opus/).arguments, `review:${review.id}`);
+  assert.equal(m.resolve(work, "key").value, "C minor");
+  assert.equal(m.resolve(work, "key").pinned, true);
+  assert.equal(s.c.db.prepare("SELECT status FROM review_item WHERE id=?").get(review.id).status, "open", "nickname still waits");
+  await s.ok("choose-provider-value", choose(/nickname: use MusicBrainz/).arguments, `review:${review.id}`);
+  assert.equal(m.resolve(work, "nickname").value, "Emperor");
+  assert.equal(s.c.db.prepare("SELECT status FROM review_item WHERE id=?").get(review.id).status, "resolved");
+});
+
+test("#16 duplicate-work and same-name reviews offer the merge that settles them", async (t) => {
+  const s = await setup(t);
+  const a = (await s.ok("create-work", { title: "Sketch", composer: "", movements: [] })).selection;
+  const b = (await s.ok("create-work", { title: "Sketch", composer: "", movements: [], createAnyway: true })).selection;
+  s.c.review("identity", b, { reason: "duplicate-work", keep: a });
+  let review = s.c.db.prepare("SELECT id FROM review_item WHERE target_id=?").get(b).id;
+  let merge = (await s.read({ selection: `review:${review}` })).view.actions.find((x) => x.command === "merge-entity");
+  assert.deepEqual(merge.arguments, { target: b, into: a, confirm: true });
+  await s.ok("merge-entity", merge.arguments, `review:${review}`);
+  assert.deepEqual(liveWorks(s), [a]);
+  const p1 = (await s.ok("create-contributor", { name: "Johann Strauss", kind: "person" })).selection;
+  const p2 = (await s.ok("create-contributor", { name: "Johann Strauss", kind: "person" })).selection;
+  s.c.review("identity", p2, { reason: "same-name-composers", name: "Johann Strauss" });
+  review = s.c.db.prepare("SELECT id FROM review_item WHERE target_id=?").get(p2).id;
+  merge = (await s.read({ selection: `review:${review}` })).view.actions.find((x) => x.command === "merge-entity");
+  assert.deepEqual(merge.arguments, { target: p2, into: p1, confirm: true });
+});
+
+test("#22 creating a work that already exists asks first, and the album page points to it", async (t) => {
+  const s = await setup(t);
+  const work = (await s.ok("create-work-from-album", { albumId: "A", tracks: s.trackIds("A"), title: "Symphony No. 5 in C minor, Op. 67", composer: "", composerName: "Ludwig van Beethoven" }, "album:A")).selection;
+  const album = (await s.read({ selection: "album:B" })).view;
+  assert.deepEqual(section(album, "likely-works").rows.map((r) => r.id), [work]);
+  assert.ok(section(album, "new-work").fields.some((f) => f.key === "createAnyway"));
+  const values = { albumId: "B", tracks: s.trackIds("B"), title: "Symphony No.5, Op. 67", composer: "", composerName: "Ludwig van Beethoven" };
+  const refused = await s.mutate("create-work-from-album", values, "album:B");
+  assert.equal(refused.ok, false);
+  assert.match(refused.message, /similar work already exists: “Symphony No. 5 in C minor, Op. 67”/);
+  assert.equal((await s.mutate("create-work", { title: "Symphony no. 5 in C minor, op. 67", composer: "", movements: [] })).ok, false);
+  assert.deepEqual(liveWorks(s), [work]);
+  assert.equal((await s.mutate("create-work-from-album", { ...values, createAnyway: true }, "album:B")).ok, true);
+});
+
+test("#5 a whole piece on one track becomes a work; a lone movement does not", async (t) => {
+  const s = await setup(t);
+  const [piece] = s.trackIds("C");
+  setHints(s, piece, { title: "Danse macabre, Op. 40", work: "Danse macabre, Op. 40", composer: ["Camille Saint-Saëns"], genres: ["Classical"] });
+  classify(s.c, piece, {}, { manual: "classical", actor: "1" });
+  // Album B with one track left: a movement of a larger work, not a whole piece.
+  for (const track of s.trackIds("B").slice(1)) s.c.db.prepare("UPDATE track_link SET state='missing' WHERE id=?").run(track);
+  setHints(s, s.trackIds("B")[0], { work: "Symphony No. 5 in C minor, Op. 67" });
+  assert.equal(autoMatchTaggedWorks(s.c, { albumId: "C" }).created, 1);
+  assert.equal(autoMatchTaggedWorks(s.c, { albumId: "B" }).created, 0);
+  const [work] = liveWorks(s);
+  assert.equal(new Metadata(s.c).resolve(work, "title").value, "Danse macabre, Op. 40");
+  assert.equal(s.c.db.prepare("SELECT count(*) AS n FROM relation WHERE kind='movement' AND source_id=?").get(work).n, 0);
+  assert.deepEqual(workOfTrack(s, piece), [work]);
+});
+
+test("#8 tag-made and MusicBrainz-identified albums of one work share it", async (t) => {
+  const s = await setup(t);
+  for (const track of s.trackIds("A")) setHints(s, track, { work: "Symphony No. 5 in C minor, Op. 67" });
+  assert.equal(autoMatchTaggedWorks(s.c, { albumId: "A" }).created, 1);
+  const [work] = liveWorks(s);
+  // Album B is identified through MusicBrainz under its catalogue title and an alias.
+  const providerMatches = new Map(
+    s.trackIds("B").map((track) => [track, { workId: "mb-sym5", work: "Symphony no. 5 in C minor, op. 67", aliases: ["Schicksalssinfonie"], composers: ["Ludwig van Beethoven"] }]),
+  );
+  assert.equal(autoMatchTaggedWorks(s.c, { albumId: "B", providerMatches }).created, 1);
+  assert.deepEqual(liveWorks(s), [work]);
+  assert.equal(s.c.db.prepare("SELECT entity_id FROM external_identity WHERE record_id='mb-sym5'").get().entity_id, work);
+  assert.ok(s.trackIds("B").every((track) => workOfTrack(s, track).join() === work));
+});
+
+test("#20 MusicBrainz composer IDs keep same-named composers apart", async (t) => {
+  const s = await setup(t);
+  const mb = (album, workId, composerId, title) =>
+    new Map(s.trackIds(album).map((track) => [track, { workId, work: title, aliases: [], composers: ["Ludwig van Beethoven"], composerIds: { "Ludwig van Beethoven": composerId } }]));
+  autoMatchTaggedWorks(s.c, { albumId: "A", providerMatches: mb("A", "mb-w1", "mb-artist-1", "Symphony No. 5 in C minor, Op. 67") });
+  // Same name, different verified person, same-looking title: kept apart.
+  autoMatchTaggedWorks(s.c, { albumId: "B", providerMatches: mb("B", "mb-w2", "mb-artist-2", "Symphony No. 5 in C minor, Op. 67") });
+  const people = s.c.db
+    .prepare("SELECT x.record_id FROM entity e JOIN external_identity x ON x.entity_id=e.id WHERE e.kind='person' AND e.deleted_at IS NULL AND x.record_kind='artist' ORDER BY x.record_id")
+    .all()
+    .map((r) => r.record_id);
+  assert.deepEqual(people, ["mb-artist-1", "mb-artist-2"]);
+  assert.equal(liveWorks(s).length, 2);
+});
+
+test("#16 a moved-file review can be settled by linking the right file", async (t) => {
+  const s = await setup(t);
+  const work = (await createFrom(s, "A", "Symphony No. 5 in C minor, Op. 67")).selection;
+  const [old] = s.trackIds("A");
+  const candidate = { ...JSON.parse(s.c.db.prepare("SELECT evidence FROM track_link WHERE id=?").get(old).evidence), coreId: "A-0-moved", fileId: "A-0-moved", path: "/library/A/moved.flac" };
+  s.c.db.prepare("UPDATE track_link SET state='review' WHERE id=?").run(old);
+  s.c.review("track_link", old, { epochChanged: false, candidates: [candidate, { ...candidate, coreId: "other", fileId: "other", path: "/library/A/copy.flac" }], reused: [] });
+  const review = s.c.db.prepare("SELECT id FROM review_item WHERE kind='track_link'").get().id;
+  const view = (await s.read({ selection: `review:${review}` })).view;
+  const link = view.actions.find((a) => a.label === "Link to moved.flac");
+  await s.ok(link.command, link.arguments, `review:${review}`);
+  const row = s.c.db.prepare("SELECT core_id,state FROM track_link WHERE id=?").get(old);
+  assert.deepEqual({ ...row }, { core_id: "A-0-moved", state: "active" });
+  assert.deepEqual(workOfTrack(s, old), [work], "the link keeps its work");
+  assert.equal(s.c.db.prepare("SELECT status FROM review_item WHERE id=?").get(review).status, "resolved");
 });
 
 test("v1 hosts still get the v1 editor", async (t) => {

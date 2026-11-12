@@ -31,7 +31,17 @@ async function setup(t) {
   const mutate = async (command, values, options = {}) =>
     mutateEditor({
       ...input,
-      mutation: { revision: (await read()).revision, command, values },
+      // Forms sit on the page of the entry they edit; the token comes from there.
+      mutation: {
+        revision: (
+          await read(
+            values.target || values.work || values.recording ||
+              (values.track && command === "attach-found-track" ? `track:${values.track}` : ""),
+          )
+        ).revision,
+        command,
+        values,
+      },
       ...options,
     });
   const create = async (command, values) => {
@@ -43,7 +53,7 @@ async function setup(t) {
   const work = (
     composer = "",
     movements = "I. First\nII. Second\nIII. Third",
-  ) => create("create-work", { title: "Private sonata", composer, movements });
+  ) => create("create-work", { title: "Private sonata", composer, movements, createAnyway: true }); // fixtures reuse one title
   const broadcast = (work) =>
     create("create-broadcast", {
       work,

@@ -1,10 +1,11 @@
 import path from "node:path";
-import { openCatalogue } from "./catalogue.js";
+import { createHash } from "node:crypto";
+import { openCatalogue, CREDIT_ROLES, PERSON_ROLES, ENSEMBLE_ROLES } from "./catalogue.js";
 import { Metadata } from "./metadata.js";
 import { transaction } from "./database.js";
 import { classify } from "./reconcile.js";
 import { searchText, matchesSearch, ownedTracks } from "./editor-search.js";
-import { renderV2, lookupV2, applyV2, V2_COMMANDS, EditorV2Error } from "./editor-v2.js";
+import { renderV2, lookupV2, applyV2, V2_COMMANDS, EditorV2Error, warnDuplicate } from "./editor-v2.js";
 
 class EditorError extends Error {
   constructor(message, status = 400) {
@@ -37,39 +38,89 @@ function text(value, label, { optional = false, max = 10000 } = {}) {
     fail(`Enter a valid ${label}`);
   return value;
 }
-// Optimistic concurrency is scoped to the entry being edited (and its
-// movements), so a library scan or an edit to another entry never blocks a
-// save. The scope travels inside the revision token.
-function revision(c, scope = "") {
-  if (!scope || scope.startsWith("new:")) return "catalogue:new";
-  const target = scope.startsWith("track:")
-    ? scope.slice(6)
-    : scope.startsWith("review:")
-      ? scope.slice(7)
-      : scope;
-  const ids = [
-    target,
+// Optimistic concurrency is scoped to what the open page shows (an entry and
+// its movements, an album's tracks and works, a review and its subject), so a
+// scan or an edit elsewhere never blocks a save. The scope travels inside the
+// revision token; a write may only touch entries inside that scope.
+function scopeIds(c, scope) {
+  if (!scope || scope.startsWith("new:")) return [];
+  if (scope.startsWith("track:")) return [scope.slice(6)];
+  if (scope.startsWith("review:")) {
+    const id = scope.slice(7);
+    const review = c.db.prepare("SELECT target_id FROM review_item WHERE id=?").get(id);
+    return review ? [id, review.target_id, ...scopeIds(c, review.target_id)] : [id];
+  }
+  if (scope.startsWith("album:")) {
+    const [albumId, work] = scope.slice(6).split("@");
+    const tracks = c.db
+      .prepare("SELECT id FROM track_link WHERE CAST(json_extract(evidence,'$.albumId') AS TEXT)=?")
+      .all(albumId)
+      .map((row) => row.id);
+    const marks = tracks.map(() => "?").join(",");
+    const works = tracks.length
+      ? c.db
+          .prepare(
+            `SELECT DISTINCT r.work_id FROM segment s JOIN realization_item i ON i.segment_id=s.id
+             JOIN realization r ON r.id=i.realization_id WHERE s.track_link_id IN (${marks})`,
+          )
+          .all(...tracks)
+          .map((row) => row.work_id)
+      : [];
+    return [...new Set([albumId, `album:${albumId}`, ...tracks, ...works, ...(work ? [work] : [])])];
+  }
+  return [
+    scope,
     ...c.db
       .prepare("SELECT target_id FROM relation WHERE kind='movement' AND source_id=?")
-      .all(target)
+      .all(scope)
       .map((r) => r.target_id),
   ];
+}
+function revision(c, scope = "") {
+  const ids = scopeIds(c, scope);
+  if (!ids.length) return "catalogue:new";
   const marks = ids.map(() => "?").join(",");
-  const audit = c.db
-    .prepare(`SELECT coalesce(max(id),0) AS n FROM audit_event WHERE target_id IN (${marks})`)
-    .get(...ids).n;
-  const assertion = c.db
-    .prepare(`SELECT coalesce(max(rowid),0) AS n FROM assertion WHERE target_id IN (${marks})`)
-    .get(...ids).n;
-  const relation = c.db
-    .prepare("SELECT count(*) AS n FROM relation WHERE kind='movement' AND source_id=?")
-    .get(target).n;
-  return `${scope}|${audit}:${assertion}:${relation}`;
+  const stamp = c.db
+    .prepare(
+      `SELECT
+        (SELECT coalesce(max(id),0) FROM audit_event WHERE target_id IN (${marks})) AS n0,
+        (SELECT coalesce(max(rowid),0) FROM assertion WHERE target_id IN (${marks})) AS n1,
+        (SELECT count(*) FROM relation WHERE kind='movement' AND source_id IN (${marks})) AS n2,
+        (SELECT coalesce(group_concat(target_id||state||pinned),'') FROM (SELECT target_id,state,pinned FROM classification WHERE target_id IN (${marks}) ORDER BY target_id)) AS n3,
+        (SELECT count(*) FROM segment s JOIN realization_item i ON i.segment_id=s.id WHERE s.track_link_id IN (${marks})) AS n4,
+        (SELECT count(*) FROM review_item WHERE status='open' AND (id IN (${marks}) OR target_id IN (${marks}))) AS n5`,
+    )
+    .get(...Array(7).fill(ids).flat());
+  // Classification states are long; a short digest keeps the token small.
+  const digest = createHash("sha256").update(String(stamp.n3)).digest("hex").slice(0, 12);
+  return `${scope}|${[stamp.n0, stamp.n1, stamp.n2, digest, stamp.n4, stamp.n5].join(":")}`;
 }
 const revisionScope = (token) =>
   typeof token === "string" && token.includes("|")
     ? token.slice(0, token.lastIndexOf("|"))
     : "";
+// The entries a write changes. References it only points at (the entry a
+// merge keeps, a contributor being credited, a track being attached) are
+// checked by the command itself.
+const TOUCHED_KEYS = ["target", "work", "recording", "albumId", "id"];
+const NAVIGATION = new Set(["open", "choose-album-work"]);
+function checkRevision(c, request) {
+  const scope = revisionScope(request.revision);
+  if (request.revision !== revision(c, scope))
+    throw new EditorError(
+      "This catalogue changed. Reload before saving so newer edits are preserved.",
+      409,
+    );
+  if (NAVIGATION.has(request.command)) return;
+  const allowed = new Set(scopeIds(c, scope));
+  const touched = [
+    ...TOUCHED_KEYS.filter((key) => typeof request.values[key] === "string" && request.values[key])
+      .map((key) => (key === "albumId" ? `album:${request.values[key]}` : request.values[key])),
+    ...(Array.isArray(request.values.tracks) ? request.values.tracks.filter((t) => typeof t === "string") : []),
+  ];
+  if (touched.some((id) => !allowed.has(id)))
+    throw new EditorError("This page is out of date for that entry. Reload it and try again.", 409);
+}
 const normalized = searchText;
 const validDate = (value) =>
   /^\d{4}(-(0[1-9]|1[0-2])(-(0[1-9]|[12]\d|3[01]))?)?$/.test(value) &&
@@ -198,6 +249,7 @@ function render(c, input) {
           { options: composerOptions },
         ),
         field("movements", "Movement titles (one per line)", "", "textarea"),
+        field("createAnyway", "Create even if a similar work exists", false, "checkbox"),
       ],
       "Create work",
       "External catalogue IDs are optional. These changes are saved in your classical catalogue; your audio files are read only.",
@@ -264,16 +316,7 @@ function render(c, input) {
                 { options: contributors.map((e) => option(e.id, e.label)) },
               ),
               field("role", "Role", "performer", "select", {
-                options: [
-                  "composer",
-                  "soloist",
-                  "performer",
-                  "conductor",
-                  "orchestra",
-                  "ensemble",
-                  "choir",
-                  "arranger",
-                ].map((s) => option(s, s)),
+                options: CREDIT_ROLES.map((s) => option(s, s)),
               }),
               field("instrument", "Instrument or vocal range"),
             ],
@@ -676,11 +719,6 @@ function apply(c, input, who) {
     Array.isArray(request.values)
   )
     fail("Invalid editor request");
-  if (request.revision !== revision(c, revisionScope(request.revision)))
-    throw new EditorError(
-      "This catalogue changed. Reload before saving so newer edits are preserved.",
-      409,
-    );
   if (Object.hasOwn(V2_COMMANDS, request.command)) {
     const keys = V2_COMMANDS[request.command];
     if (keys && Object.keys(request.values).some((key) => !keys.includes(key)))
@@ -700,7 +738,7 @@ function apply(c, input, who) {
   const allowed = {
     "create-composer": ["name"],
     "create-contributor": ["name", "kind"],
-    "create-work": ["title", "composer", "movements"],
+    "create-work": ["title", "composer", "movements", "createAnyway"],
     "edit-field": ["target", "field", "value", "blank", "pin"],
     "use-provider": ["target", "field"],
     "add-movement": ["work", "title"],
@@ -775,6 +813,10 @@ function apply(c, input, who) {
           .get(selection, contributor, role, instrument)
       )
         fail("That role credit already exists");
+      const who = c.entity(contributor, ["person", "ensemble"]);
+      if (!CREDIT_ROLES.includes(role)) fail("Choose a role from the list");
+      if (PERSON_ROLES.has(role) && who.kind !== "person") fail(`An ensemble can't be credited as ${role}; choose a person or another role`);
+      if (ENSEMBLE_ROLES.has(role) && who.kind !== "ensemble") fail(`Only an ensemble can be credited as ${role}`);
       const position = c.db
         .prepare(
           "SELECT coalesce(max(position),0)+1 AS n FROM credit WHERE target_id=?",
@@ -815,6 +857,7 @@ function apply(c, input, who) {
         .filter(Boolean);
       if (movements.length > 100)
         fail("Create no more than 100 movements at a time");
+      warnDuplicate(c, title, composer ? [m.resolve(composer, "name").value].filter(Boolean) : [], v.createAnyway);
       selection = c.createEntity("work");
       manual(selection, "title", title);
       if (composer) c.credit(selection, composer, "composer");
@@ -1039,7 +1082,12 @@ export async function mutateEditor(input) {
     c = await openCatalogue(path.join(input.dataFolder, "model"));
   try {
     try {
-      return transaction(c.db, () => apply(c, input, who));
+      return transaction(c.db, () => {
+        const request = input.mutation;
+        if (request && typeof request === "object" && request.values && typeof request.values === "object")
+          checkRevision(c, request);
+        return apply(c, input, who);
+      });
     } catch (error) {
       if (error instanceof EditorError || error instanceof EditorV2Error)
         return { ok: false, status: error.status, message: error.message.slice(0, 500) };

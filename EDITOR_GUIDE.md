@@ -30,12 +30,21 @@ Everything here changes the classical catalogue only. Audio files are never writ
 
 **Duplicates.** On a work, composer or performer, **Merge with another …** moves recordings, credits, favourites, picks and MusicBrainz/tag identities into the entry you keep, then removes this one. A user who liked either work keeps the like; where both works had a pick, the kept work's pick wins. Works merge when their movements line up by title or number. An unused entry can be deleted.
 
-**Review.** The Review tab lists:
-- unsure classifications, with Send to Classical / Not classical;
-- albums whose tracks didn't line up with a work;
-- possible duplicates.
+**Review.** The Review tab lists what needs a decision, with the action that settles it:
+- unsure classifications: **Send to Classical** / **Not classical**;
+- albums whose tracks didn't line up with a work, or that several works or composers could fit: **Open album** and an **Open** link per candidate. Assigning the album resolves the item;
+- possible duplicate works: **Merge into the other work**;
+- composers who share a name: **Same person: merge into …**;
+- MusicBrainz and Open Opus disagreeing on a field: one **use … value** action per value, for every conflicting field. The value you choose is pinned;
+- a moved file that could match more than one new file: **Link to …** the right file. It keeps its works and picks.
 
 Dismiss items you've checked.
+
+**Creating a work that already exists.** If a work with the same title or catalogue number (and composer) is already in the catalogue, the album page lists it under *This work may already exist* with **Assign here**. Creating it anyway asks you to tick **Create anyway**.
+
+**Credits.** Roles: composer, soloist, performer, conductor, orchestra, ensemble, choir, arranger and lyricist. Orchestra, ensemble and choir need an ensemble; the others except performer need a person.
+
+**Two tabs.** If the entry or album changed since you opened it (in another tab, by another admin, or by a scan that changed it), saving asks you to reload instead of overwriting the newer edit. A page also can't be used to change a different entry than the one it shows.
 
 ## Scans
 

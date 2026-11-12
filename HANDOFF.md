@@ -1,3 +1,21 @@
+# v0.1 bug-fix scope — remaining fixes and final integration
+
+Same day, at the user's request (“Continue with all of the fixes”). All 16 scope items now have fixes and regression tests. Plugin-only runtime changes; core source unchanged. Schema unchanged (still migration 3).
+
+- **#11** Lyricist is a model role (person only); both editors use one shared role list and explain wrong contributor kinds.
+- **#6** Revision tokens now cover what the page shows (entry + movements; album tracks, attached works, classification state and attachments; review + subject). Writes whose targets fall outside the token's scope are rejected (409), closing the hole where an empty-page token skipped stale checks. A no-change rescan doesn't stale an album page.
+- **#10** Sync requests are cleared only after a fresh snapshot is queued, and only if no newer request arrived; a failed snapshot, a pending older scan or a resumed failed scan no longer drops them. A request newer than a failed scan takes a fresh snapshot instead of resuming.
+- **#21** Provider conflicts, omissions and state reviews keep every field/record in one review (`entries`) instead of overwriting; pinned fields no longer re-raise conflicts. Provider label `openopus` now shows as Open Opus.
+- **#16** Review actions: merge into the other work (duplicate-work), merge same-name people, choose a provider value per conflicting field (`choose-provider-value`, pins that assertion), link a moved file to a candidate (`relink-track`).
+- **#22** `similarWorks` finds likely duplicates (same key, or same bare title ignoring key/catalogue). Create work / Create from album refuse with a 409 listing them unless **Create anyway**; album pages list *This work may already exist* with **Assign here**.
+- **#20** MusicBrainz parent/leaf `composer` relations travel as `composerIds`; matching reuses the person holding that artist ID, gives the ID to the only unverified same-named person, queues review when several could be them, and won't reuse a same-titled work by a differently verified composer.
+- **#5** Single-track works: tag rule (WORK tag naming the work, no movement part, title is that work) and MusicBrainz rule (parentless, non-collection work whose track title isn't a movement). Created with no movements; existing group keys unchanged. Corpus output identical.
+- **#8** Reusing a work for a MusicBrainz-identified album records the MusicBrainz ID on it; lookups also try the tags' title and MusicBrainz aliases (an alias index used only for lookups); works tied to another MusicBrainz ID are excluded. The explicit auto-match's unattached-track query had the #1 leftover-segment bug and is fixed.
+- **#4** Integration CI now pins core `10cd64083bd8d69af85c8356124664b5abf1306f` (final `aurral-classical` head; the old pin `45da13b` predated five core commits). Run locally without Docker (no daemon here) by mapping the Compose paths to disposable directories under Node 26.12 with the preinstalled Chromium: core `pnpm check` (0 type errors, unsafe-any 1236 = baseline) and `pnpm build`, smoke (admin + two users, exact-file streaming, zero acquisition), editor fixtures, full Chromium editor + Phase 4 work view, restart, persistence/media-hash check and smoke again all passed. Fixing it needed only test updates for intentional core UI changes (“By work”/“By track” labels, work titles as links, “Missing …”, player naming the work on the album page) and two stale checks (schema version now read from the latest migration; album-ordered groups split a non-contiguous recording). Remote CI not observed from here.
+- **#12** README gains a current Classical catalogue section replacing the Phase 2/3 review notes; EDITOR_GUIDE covers review actions, Create anyway, roles and stale tabs.
+
+Validation: 234/234 plugin tests (10 new regressions, each failing on the previous source), both corpora, Phase 1 comparison smoke. Not done: read-only scan of the real library (no production access is authorized; the user must run it). Noted, not changed: the work page player shows only the part title, while the album page shows “Work: part”.
+
 # v0.1 bug-fix scope — matching fixes #7 and #9
 
 Same day, at the user's request (“Keep going with #7 and #9”). Plugin-only; core, schema and media unchanged.
