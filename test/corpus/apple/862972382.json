@@ -1,0 +1,246 @@
+{
+ "id": "862972382",
+ "category": "piano recital",
+ "title": "Motherland",
+ "artist": "Khatia Buniatishvili",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Cantata, BWV 208: No. 9, Schafe können sicher weiden (Arr. for Piano)",
+   "durationMs": 294746,
+   "artist": "Khatia Buniatishvili",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Was mir behagt, ist nur die muntre Jagd, BWV 208 · “Hunting Cantata”",
+    "part": "No. 9, Schafe können sicher weiden (Arr. for Piano)",
+    "performers": "Khatia Buniatishvili"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "The Seasons, Op. 37b: No. 10, October \"Autumn Song\"",
+   "durationMs": 295370,
+   "artist": "Khatia Buniatishvili",
+   "apple": {
+    "block": 2,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Seasons, Op. 37a, Op. 37b, TH 135",
+    "part": "No. 10, October \"Autumn Song\"",
+    "performers": "Khatia Buniatishvili"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Lied ohne Worte in F-Sharp Minor, Op. 67 No. 2",
+   "durationMs": 108422,
+   "artist": "Khatia Buniatishvili",
+   "apple": {
+    "block": 3,
+    "composer": "Felix Mendelssohn",
+    "work": "Songs without Words, Book VI, Op. 67",
+    "part": "Lied ohne Worte in F-Sharp Minor, Op. 67 No. 2",
+    "performers": "Khatia Buniatishvili"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Suite bergamasque, L. 75: III. Clair de lune",
+   "durationMs": 337999,
+   "artist": "Khatia Buniatishvili",
+   "apple": {
+    "block": 4,
+    "composer": "Claude Debussy",
+    "work": "Suite bergamasque, CD 82, L. 75",
+    "part": "III. Clair de lune",
+    "performers": "Khatia Buniatishvili"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Tune from the Film \"When Almonds Blossomed\"",
+   "durationMs": 130904,
+   "artist": "Khatia Buniatishvili",
+   "apple": {
+    "block": 5,
+    "composer": "Giya Kancheli",
+    "work": "33 Miniatures, “Compillation from the movie themes”",
+    "part": "Tune from the Film \"When Almonds Blossomed\"",
+    "performers": "Khatia Buniatishvili"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Musica ricercata: No. 7 in B-Flat Major. Cantabile, molto legato",
+   "durationMs": 174005,
+   "artist": "Khatia Buniatishvili",
+   "apple": {
+    "block": 6,
+    "composer": "György Ligeti",
+    "work": "Musica ricercata",
+    "part": "No. 7 in B-Flat Major. Cantabile, molto legato",
+    "performers": "Khatia Buniatishvili"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "3 Intermezzi, Op. 117: No. 2 in B-Flat Minor",
+   "durationMs": 314804,
+   "artist": "Khatia Buniatishvili",
+   "apple": {
+    "block": 7,
+    "composer": "Johannes Brahms",
+    "work": "3 Intermezzi, Op. 117",
+    "part": "No. 2 in B-Flat Minor",
+    "performers": "Khatia Buniatishvili"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Wiegenlied, S. 198",
+   "durationMs": 193823,
+   "artist": "Khatia Buniatishvili",
+   "apple": {
+    "block": 8,
+    "composer": "Franz Liszt",
+    "work": "Wiegenlied, S. 198 · “Cradle Song”",
+    "part": "Wiegenlied, S. 198",
+    "performers": "Khatia Buniatishvili"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Slavonic Dances, Op. 72: No. 2 \"Dumka\" in E Minor (for Four Hands)",
+   "durationMs": 202854,
+   "artist": "Khatia Buniatishvili & Gvantsa Buniatishvili",
+   "apple": {
+    "block": 9,
+    "composer": "Antonín Dvořák",
+    "work": "Slavonic Dances Set I, B 83, Op. 46 · “Slovanské tance Set I”",
+    "part": "No. 2 \"Dumka\" in E Minor (for Four Hands)",
+    "performers": "Khatia Buniatishvili, Gvantsa Buniatishvili"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Pavane pour une infante défunte, M. 19",
+   "durationMs": 360017,
+   "artist": "Khatia Buniatishvili",
+   "apple": {
+    "block": 10,
+    "composer": "Maurice Ravel",
+    "work": "Pavane pour une infante défunte, M. 19, M. 19a · “Pavane for a Dead Princess”",
+    "part": "Pavane pour une infante défunte, M. 19",
+    "performers": "Khatia Buniatishvili"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Études, Op. 25: No. 7 in C-Sharp Minor",
+   "durationMs": 283943,
+   "artist": "Khatia Buniatishvili",
+   "apple": {
+    "block": 11,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 25",
+    "part": "No. 7 in C-Sharp Minor",
+    "performers": "Khatia Buniatishvili"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "3 Pieces, Op. 2: No. 1, Étude in C-Sharp Minor",
+   "durationMs": 148698,
+   "artist": "Khatia Buniatishvili",
+   "apple": {
+    "block": 12,
+    "composer": "Alexander Scriabin",
+    "work": "3 Pieces, Op. 2",
+    "part": "No. 1, Étude in C-Sharp Minor",
+    "performers": "Khatia Buniatishvili"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Sonata in E Major, K. 380",
+   "durationMs": 176142,
+   "artist": "Khatia Buniatishvili",
+   "apple": {
+    "block": 13,
+    "composer": "Domenico Scarlatti",
+    "work": "Keyboard Sonata in E Major, K. 380, Kk 380 · “Cortège”",
+    "part": "Sonata in E Major, K. 380",
+    "performers": "Khatia Buniatishvili"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Lyric Pieces, Op. 57: No. 6 in E Minor \"Homesickness\"",
+   "durationMs": 228805,
+   "artist": "Khatia Buniatishvili",
+   "apple": {
+    "block": 14,
+    "composer": "Edvard Grieg",
+    "work": "Lyric Pieces, Book VI, Op. 57",
+    "part": "No. 6 in E Minor \"Homesickness\"",
+    "performers": "Khatia Buniatishvili"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Vagiorko mai / Don't You Love Me?",
+   "durationMs": 161244,
+   "artist": "Khatia Buniatishvili",
+   "apple": {
+    "block": 15,
+    "composer": "Vagiorko mai / Don't You Love Me?",
+    "work": "Vagiorko mai / Don't You Love Me?",
+    "part": "Vagiorko mai / Don't You Love Me?",
+    "performers": "Khatia Buniatishvili"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Suite in G Minor, HWV 439: Menuet (Arr. by Wilhelm Kempff)",
+   "durationMs": 235700,
+   "artist": "Khatia Buniatishvili",
+   "apple": {
+    "block": 16,
+    "composer": "George Frideric Handel",
+    "work": "Suite No. 6 in G Minor, HWV 439",
+    "part": "IV. Menuet (Arr. by Wilhelm Kempff)",
+    "performers": "Khatia Buniatishvili"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Für Alina",
+   "durationMs": 303451,
+   "artist": "Khatia Buniatishvili",
+   "apple": {
+    "block": 17,
+    "composer": "Arvo Pärt",
+    "work": "Für Alina",
+    "part": "Für Alina",
+    "performers": "Khatia Buniatishvili"
+   }
+  }
+ ]
+}

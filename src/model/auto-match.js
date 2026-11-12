@@ -53,15 +53,17 @@ function candidates(
   allowStructuredTitles = false,
   providerMatches = new Map(),
 ) {
+  // One album's match reads only that album's tracks, through its index.
   const rows = catalogue.db
     .prepare(
       `SELECT t.id,t.instance_id,t.evidence,
         EXISTS(SELECT 1 FROM segment s WHERE s.track_link_id=t.id) AS attached
        FROM track_link t
        JOIN classification c ON c.target_id=t.id AND c.state='classical'
-       WHERE t.state='active'`,
+       WHERE t.state='active'
+       ${albumId == null ? "" : "AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?"}`,
     )
-    .all()
+    .all(...(albumId == null ? [] : [String(albumId)]))
     .map((row) => ({ ...row, evidence: JSON.parse(row.evidence) }))
     .filter(
       (row) =>
@@ -227,13 +229,16 @@ export function stripWorkPrefix(title, workTitle) {
   }
   const workWords = words(workTitle);
   const workCatalogue = catalogueNumber(workTitle).toLowerCase();
+  // "Iberia, T. 105 / Book 4" names "Iberia, B. 47": same name before the comma.
+  const workName = words(String(workTitle).split(",")[0]);
   for (const match of separators) {
     const head = text.slice(0, match.index);
     const tail = tailAt(match);
     const headWords = words(head);
     const namesWork =
       (workWords && (headWords === workWords || headWords.startsWith(`${workWords} `) || workWords.startsWith(`${headWords} `))) ||
-      (workCatalogue && catalogueNumber(head).toLowerCase() === workCatalogue);
+      (workCatalogue && catalogueNumber(head).toLowerCase() === workCatalogue) ||
+      (workName.length >= 4 && words(head.split(",")[0]) === workName);
     if (!tail || !namesWork) continue;
     return clean(tail.match(NICKNAME)?.[1] ?? tail);
   }
@@ -836,13 +841,16 @@ export function autoMatchTaggedWorks(
     providerMatches,
   );
   mergeDuplicateAutoWorks(catalogue, { actor });
-  repairWorkTitles(catalogue);
-  repairMovementTitles(catalogue);
-  const metadata = new Metadata(catalogue);
-  for (const { id } of catalogue.db
-    .prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL")
-    .all())
-    deriveWorkFields(catalogue, id, metadata);
+  // Catalogue-wide repairs belong to the library pass, not to each album.
+  if (albumId == null) {
+    repairWorkTitles(catalogue);
+    repairMovementTitles(catalogue);
+    const metadata = new Metadata(catalogue);
+    for (const { id } of catalogue.db
+      .prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL")
+      .all())
+      deriveWorkFields(catalogue, id, metadata);
+  }
   const index = catalogueIndex(catalogue);
   let created = 0;
   for (const group of groups)

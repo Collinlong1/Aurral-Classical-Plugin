@@ -1,0 +1,148 @@
+{
+ "id": "1452380844",
+ "category": "song",
+ "title": "Strauss, R.: Four Last Songs; 6 Orchestral Songs",
+ "artist": "Jessye Norman, Gewandhausorchester Leipzig & Kurt Masur",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Vier letzte Lieder: I. Frühling",
+   "durationMs": 225707,
+   "artist": "Jessye Norman, Gewandhausorchester Leipzig & Kurt Masur",
+   "apple": {
+    "block": 1,
+    "composer": "Richard Strauss",
+    "work": "Vier letzte Lieder, AV 150, Op. 150, TrV 296 · “Four Last Songs”",
+    "part": "I. Frühling",
+    "performers": "Kurt Masur, Gewandhausorchester Leipzig, Jessye Norman"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Vier letzte Lieder: II. September",
+   "durationMs": 332000,
+   "artist": "Jessye Norman, Gewandhausorchester Leipzig & Kurt Masur",
+   "apple": {
+    "block": 1,
+    "composer": "Richard Strauss",
+    "work": "Vier letzte Lieder, AV 150, Op. 150, TrV 296 · “Four Last Songs”",
+    "part": "II. September",
+    "performers": "Jessye Norman, Gewandhausorchester Leipzig, Kurt Masur"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Vier letzte Lieder: III. Beim Schlafengehen",
+   "durationMs": 369560,
+   "artist": "Jessye Norman, Gewandhausorchester Leipzig & Kurt Masur",
+   "apple": {
+    "block": 1,
+    "composer": "Richard Strauss",
+    "work": "Vier letzte Lieder, AV 150, Op. 150, TrV 296 · “Four Last Songs”",
+    "part": "III. Beim Schlafengehen",
+    "performers": "Kurt Masur, Gewandhausorchester Leipzig, Jessye Norman"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Vier letzte Lieder: IV. Im Abendrot",
+   "durationMs": 598973,
+   "artist": "Jessye Norman, Gewandhausorchester Leipzig & Kurt Masur",
+   "apple": {
+    "block": 1,
+    "composer": "Richard Strauss",
+    "work": "Vier letzte Lieder, AV 150, Op. 150, TrV 296 · “Four Last Songs”",
+    "part": "IV. Im Abendrot",
+    "performers": "Kurt Masur, Gewandhausorchester Leipzig, Jessye Norman"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Caecilie, Op. 27, No. 2",
+   "durationMs": 139133,
+   "artist": "Jessye Norman, Gewandhausorchester Leipzig & Kurt Masur",
+   "apple": {
+    "block": 2,
+    "composer": "Richard Strauss",
+    "work": "4 Lieder, Op. 27, TrV 170",
+    "part": "Caecilie, Op. 27, No. 2",
+    "performers": "Kurt Masur, Gewandhausorchester Leipzig, Jessye Norman"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Morgen, Op. 27, No. 4",
+   "durationMs": 239227,
+   "artist": "Jessye Norman, Gewandhausorchester Leipzig & Kurt Masur",
+   "apple": {
+    "block": 2,
+    "composer": "Richard Strauss",
+    "work": "4 Lieder, Op. 27, TrV 170",
+    "part": "Morgen, Op. 27, No. 4",
+    "performers": "Kurt Masur, Gewandhausorchester Leipzig, Jessye Norman"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Wiegenlied, Op. 41, No. 1",
+   "durationMs": 315133,
+   "artist": "Jessye Norman, Gewandhausorchester Leipzig & Kurt Masur",
+   "apple": {
+    "block": 3,
+    "composer": "Richard Strauss",
+    "work": "Wiegenlied, AV 41, TrV 59 · “Die Ähren nur noch nicken”",
+    "part": "Wiegenlied, Op. 41, No. 1",
+    "performers": "Gewandhausorchester Leipzig, Kurt Masur, Jessye Norman"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Ruhe, meine Seele, Op. 27, No. 1",
+   "durationMs": 270745,
+   "artist": "Jessye Norman, Gewandhausorchester Leipzig & Kurt Masur",
+   "apple": {
+    "block": 4,
+    "composer": "Richard Strauss",
+    "work": "4 Lieder, Op. 27, TrV 170",
+    "part": "Ruhe, meine Seele, Op. 27, No. 1",
+    "performers": "Kurt Masur, Gewandhausorchester Leipzig, Jessye Norman"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Meinem Kinde, Op. 37, No. 3",
+   "durationMs": 165000,
+   "artist": "Jessye Norman, Gewandhausorchester Leipzig & Kurt Masur",
+   "apple": {
+    "block": 5,
+    "composer": "Richard Strauss",
+    "work": "6 Lieder, Op. 37, TrV 187",
+    "part": "Meinem Kinde, Op. 37, No. 3",
+    "performers": "Gewandhausorchester Leipzig, Kurt Masur, Jessye Norman"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Zueignung, Op. 10, No. 1",
+   "durationMs": 109933,
+   "artist": "Jessye Norman, Gewandhausorchester Leipzig & Kurt Masur",
+   "apple": {
+    "block": 6,
+    "composer": "Richard Strauss",
+    "work": "8 Lieder aus 'Letzte Blätter', Op. 10, TrV 141 · “8 Songs from \"Last Pages\"”",
+    "part": "Zueignung, Op. 10, No. 1",
+    "performers": "Kurt Masur, Gewandhausorchester Leipzig, Jessye Norman"
+   }
+  }
+ ]
+}

@@ -1,7 +1,8 @@
 import path from "node:path";
 import { openCatalogue } from "./catalogue.js";
 import { transaction } from "./database.js";
-import { splitTitle } from "./auto-match.js";
+import { movementTitle, splitTitle } from "./auto-match.js";
+import { catalogueNumber } from "../works.js";
 
 const text = (value, fallback) =>
   typeof value === "string" && value.trim() ? value.trim() : fallback;
@@ -127,10 +128,12 @@ const albumPosition = (row) => {
   return (Number(hints.discNumber) || 1) * 10000 + (Number(hints.trackNumber) || 9999);
 };
 
+const ACT = /,\s*(?:act|akt|atto|acte|part|teil|scene|szene)\s+[ivxlc\d]+\b.*$/i;
+
 // Classical tracks outside every work become pieces, as Apple Music
 // Classical shows a recital: neighbouring tracks of one set share a block
 // headed by the set ("Études, Book 1"), and a lone piece heads itself.
-function pieceGroups(c, album) {
+function pieceGroups(c, album, following) {
   const rows = c.db
     .prepare(
       `SELECT t.id AS track_link_id,t.core_id,t.file_id,t.evidence FROM track_link t
@@ -143,7 +146,15 @@ function pieceGroups(c, album) {
   const pieces = [];
   for (const row of rows) {
     const evidence = evidenceOf(row);
-    const { head, tail } = splitTitle(trackTitle(evidence));
+    // A WORK tag names the work outright; otherwise the title's head does.
+    const workTag = text(evidence.hints?.work, "");
+    const work = workTag.split(/\s*:\s*/)[0];
+    const split = splitTitle(trackTitle(evidence));
+    const fullHead = work || split.head;
+    const tail = work ? movementTitle({ title: trackTitle(evidence), work: workTag }, work) : split.tail;
+    // An opera is one work across its acts: "La traviata, Act II" heads as
+    // "La traviata", the way Apple Music Classical shows it.
+    const head = fullHead.replace(ACT, "");
     const heading = head || tail;
     const composer = (evidence.hints?.composer || []).join(", ");
     const last = pieces.at(-1);
@@ -161,7 +172,13 @@ function pieceGroups(c, album) {
       endMs: null,
       position: albumPosition(row),
     };
-    if (head && last?.title === heading && last.composer === composer && last.next === item.position - 1)
+    // Neighbours of one work share a block, even spelled differently
+    // ("Theme by Paganini, Op. 43" and "Theme of Paganini, Op. 43").
+    const sameWork =
+      last &&
+      (last.title === heading ||
+        (catalogueNumber(heading) && catalogueNumber(heading).toLowerCase() === catalogueNumber(last.title).toLowerCase()));
+    if (head && sameWork && last.composer === composer && following.get(last.next) === item.position)
       last.items.push(item);
     else
       pieces.push({ id: item.id, workId: null, title: heading, composer, items: [item], missing: [] });
@@ -180,36 +197,57 @@ export function renderAlbumPresentation(c, albumId) {
   const album = String(albumId);
   // Filter in SQL: this runs on every album page view.
   const allRows = realizationRows(c, null, null, album);
-  if (!allRows.length) return null;
   const grouped = new Map();
   for (const row of allRows) {
     const group = grouped.get(row.realization_id) || [];
     group.push(row);
     grouped.set(row.realization_id, group);
   }
-  const works = [...grouped.entries()].map(([realizationId, rows]) => {
+  // A work's tracks share a block only while they sit together on the
+  // album; a work that returns later gets another block there, as Apple
+  // Music Classical shows Iberia twice on a recital.
+  const positions = c.db
+    .prepare(
+      `SELECT evidence FROM track_link WHERE state='active'
+       AND CAST(json_extract(evidence,'$.albumId') AS TEXT)=?`,
+    )
+    .all(album)
+    .map(albumPosition)
+    .sort((a, b) => a - b)
+    .filter((position, index, all) => position !== all[index - 1]);
+  const following = new Map(positions.map((position, index) => [position, positions[index + 1]]));
+  const works = [...grouped.entries()].flatMap(([realizationId, rows]) => {
     const workId = rows[0].work_id;
     const movements = workMovements(c, metadata, workId);
     const present = new Set(rows.map((row) => row.movement_id).filter(Boolean));
-    return {
-      id: realizationId,
+    const runs = [];
+    for (const row of [...rows].sort((a, b) => albumPosition(a) - albumPosition(b))) {
+      const run = runs.at(-1);
+      const last = run && albumPosition(run.at(-1));
+      if (run && (last === albumPosition(row) || following.get(last) === albumPosition(row))) run.push(row);
+      else runs.push([row]);
+    }
+    return runs.map((run, index) => ({
+      id: index ? `${realizationId}:${index}` : realizationId,
       workId,
       title: entityValue(metadata, workId, "title", "Untitled work"),
       composer:
         credits(c, metadata, workId).find(
           (credit) => credit.role === "composer",
         )?.name || "",
-      items: rows.map((row) => queueItem(metadata, row)),
-      missing: movements.filter((movement) => !present.has(movement.id)),
+      items: run.map((row) => queueItem(metadata, row)),
+      missing: index ? [] : movements.filter((movement) => !present.has(movement.id)),
       movementCount: movements.length,
-      first: Math.min(...rows.map(albumPosition)),
-    };
+      first: albumPosition(run[0]),
+    }));
   });
-  if (!works.some((group) => group.movementCount > 1)) return null;
   // Works and pieces follow the album: by each one's first disc and track.
-  const groups = [...works, ...pieceGroups(c, album)]
+  const groups = [...works, ...pieceGroups(c, album, following)]
     .sort((a, b) => a.first - b.first)
     .map(({ first, ...group }) => group);
+  // A view by work helps once some block holds several tracks, a work or a
+  // set such as "12 Études, Op. 10"; an album of lone pieces lists as is.
+  if (!groups.some((group) => group.items.length > 1)) return null;
   return { version: 1, albumId: album, supportsToggle: true, groups };
 }
 

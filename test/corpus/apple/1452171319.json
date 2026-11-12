@@ -1,0 +1,260 @@
+{
+ "id": "1452171319",
+ "category": "orchestral",
+ "title": "Debussy: La mer / Stravinsky: The Firebird (Live at Walt Disney Concert Hall, Los Angeles / 2013)",
+ "artist": "Los Angeles Philharmonic & Gustavo Dudamel",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "La Mer, L. 109: I. From Dawn till Noon on the Sea (Live)",
+   "durationMs": 592100,
+   "artist": "Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 1,
+    "composer": "Claude Debussy",
+    "work": "La mer, CD 111, L. 109 · “The Sea”",
+    "part": "I. From Dawn till Noon on the Sea",
+    "performers": "Gustavo Dudamel, Los Angeles Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "La Mer, L. 109: II. Play of the Waves (Live)",
+   "durationMs": 433940,
+   "artist": "Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 1,
+    "composer": "Claude Debussy",
+    "work": "La mer, CD 111, L. 109 · “The Sea”",
+    "part": "II. Play of the Waves",
+    "performers": "Gustavo Dudamel, Los Angeles Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "La Mer, L. 109: III. Dialogue of the Wind and the Sea (Live)",
+   "durationMs": 538868,
+   "artist": "Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 1,
+    "composer": "Claude Debussy",
+    "work": "La mer, CD 111, L. 109 · “The Sea”",
+    "part": "III. Dialogue of the Wind and the Sea",
+    "performers": "Gustavo Dudamel, Los Angeles Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "The Firebird: Introduction (Live)",
+   "durationMs": 167560,
+   "artist": "Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 2,
+    "composer": "Igor Stravinsky",
+    "work": "L'Oiseau de feu, K 010, K 10 · “The Firebird”",
+    "part": "Introduction",
+    "performers": "Los Angeles Philharmonic, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "The Firebird: Tableau I. Kastchei's Enchanted Garden (Live)",
+   "durationMs": 118938,
+   "artist": "Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 2,
+    "composer": "Igor Stravinsky",
+    "work": "L'Oiseau de feu, K 010, K 10 · “The Firebird”",
+    "part": "Tableau I: Kastchei's Enchanted Garden",
+    "performers": "Gustavo Dudamel, Los Angeles Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "The Firebird: Tableau I. Appearance of the Firebird, Pursued by Ivan Tsarevich (Live)",
+   "durationMs": 142429,
+   "artist": "Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 2,
+    "composer": "Igor Stravinsky",
+    "work": "L'Oiseau de feu, K 010, K 10 · “The Firebird”",
+    "part": "Tableau I: Appearance of the Firebird, Pursued by Ivan Tsarevich",
+    "performers": "Gustavo Dudamel, Los Angeles Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "The Firebird: Tableau I. Dance of the Firebird (Live)",
+   "durationMs": 91450,
+   "artist": "Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 2,
+    "composer": "Igor Stravinsky",
+    "work": "L'Oiseau de feu, K 010, K 10 · “The Firebird”",
+    "part": "Tableau I: Dance of the Firebird",
+    "performers": "Los Angeles Philharmonic, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "The Firebird: Tableau I. Capture of the Firebird by Ivan Tsarevitch (Live)",
+   "durationMs": 434796,
+   "artist": "Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 2,
+    "composer": "Igor Stravinsky",
+    "work": "L'Oiseau de feu, K 010, K 10 · “The Firebird”",
+    "part": "Tableau I: Capture of the Firebird by Ivan Tsarevitch",
+    "performers": "Los Angeles Philharmonic, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "The Firebird: Tableau I. The Firebird's Entreaties, Appearance of the Thirteen Enchanted Princesses (Live)",
+   "durationMs": 152233,
+   "artist": "Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 2,
+    "composer": "Igor Stravinsky",
+    "work": "L'Oiseau de feu, K 010, K 10 · “The Firebird”",
+    "part": "Tableau I: The Firebird's Entreaties, Appearance of the Thirteen Enchanted Princesses",
+    "performers": "Gustavo Dudamel, Los Angeles Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "The Firebird: Tableau I. The Princesses Game with the Golden Apples (Live)",
+   "durationMs": 144145,
+   "artist": "Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 2,
+    "composer": "Igor Stravinsky",
+    "work": "L'Oiseau de feu, K 010, K 10 · “The Firebird”",
+    "part": "Tableau I: The Princesses Game with the Golden Apples",
+    "performers": "Gustavo Dudamel, Los Angeles Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "The Firebird: Tableau I. Sudden Appearance of Ivan Tsarevitch (Live)",
+   "durationMs": 89720,
+   "artist": "Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 2,
+    "composer": "Igor Stravinsky",
+    "work": "L'Oiseau de feu, K 010, K 10 · “The Firebird”",
+    "part": "Tableau I: Sudden Appearance of Ivan Tsarevitch",
+    "performers": "Gustavo Dudamel, Los Angeles Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "The Firebird: Tableau I. Round Dance of the Princesses (Live)",
+   "durationMs": 296793,
+   "artist": "Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 2,
+    "composer": "Igor Stravinsky",
+    "work": "L'Oiseau de feu, K 010, K 10 · “The Firebird”",
+    "part": "Tableau I: Round Dance of the Princesses",
+    "performers": "Los Angeles Philharmonic, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "The Firebird: Tableau I. Sunrise, Ivan Tsarevitch Enters Kastchei's Palace (Live)",
+   "durationMs": 92966,
+   "artist": "Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 2,
+    "composer": "Igor Stravinsky",
+    "work": "L'Oiseau de feu, K 010, K 10 · “The Firebird”",
+    "part": "Tableau I: Sunrise, Ivan Tsarevitch Enters Kastchei's Palace",
+    "performers": "Los Angeles Philharmonic, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "The Firebird: Tableau I. Magic Carillon, Appearance of Kastchei's Monsters, and the Capture of Ivan Tsarevitch - Appearance of the Firebird (Live)",
+   "durationMs": 343500,
+   "artist": "Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 2,
+    "composer": "Igor Stravinsky",
+    "work": "L'Oiseau de feu, K 010, K 10 · “The Firebird”",
+    "part": "Tableau I: Magic Carillon, Appearance of Kastchei's Monsters, and the Capture of Ivan Tsarevitch - Appearance of the Firebird",
+    "performers": "Gustavo Dudamel, Los Angeles Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "The Firebird: Tableau I. Dance of Kastchei's Court, Bewitched by the Firebird (Live)",
+   "durationMs": 45257,
+   "artist": "Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 2,
+    "composer": "Igor Stravinsky",
+    "work": "L'Oiseau de feu, K 010, K 10 · “The Firebird”",
+    "part": "Tableau I: Dance of Kastchei's Court, Bewitched by the Firebird",
+    "performers": "Los Angeles Philharmonic, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "The Firebird: Tableau I. Infernal Dance of Kastchei's Subjects (Live)",
+   "durationMs": 277228,
+   "artist": "Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 2,
+    "composer": "Igor Stravinsky",
+    "work": "L'Oiseau de feu, K 010, K 10 · “The Firebird”",
+    "part": "Tableau I: Infernal Dance of Kastchei's Subjects",
+    "performers": "Los Angeles Philharmonic, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "The Firebird: Tableau I. The Firebird's Lullaby - Kastchei's Death - Darkness (Live)",
+   "durationMs": 348907,
+   "artist": "Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 2,
+    "composer": "Igor Stravinsky",
+    "work": "L'Oiseau de feu, K 010, K 10 · “The Firebird”",
+    "part": "Tableau I: The Firebird's Lullaby - Kastchei's Death - Darkness",
+    "performers": "Gustavo Dudamel, Los Angeles Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "The Firebird: Tableau II. The Palace and Creatures of Kastchei Disappear. The Petrified Knights Come to Life. General Rejoicing. (Live)",
+   "durationMs": 241558,
+   "artist": "Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 2,
+    "composer": "Igor Stravinsky",
+    "work": "L'Oiseau de feu, K 010, K 10 · “The Firebird”",
+    "part": "Tableau II: The Palace and Creatures of Kastchei Disappear. The Petrified Knights Come to Life. General Rejoicing.",
+    "performers": "Gustavo Dudamel, Los Angeles Philharmonic"
+   }
+  }
+ ]
+}

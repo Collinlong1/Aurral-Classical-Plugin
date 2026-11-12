@@ -1,0 +1,316 @@
+{
+ "id": "642211702",
+ "category": "solo instrument",
+ "title": "Satie: Gymnopedies",
+ "artist": "Håkon Austbø & Vladimir Sirenki",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Sarabande No. 1",
+   "durationMs": 333480,
+   "artist": "Bergen Philharmonic Orchestra & Vladimir Sirenki",
+   "apple": {
+    "block": 1,
+    "composer": "Erik Satie",
+    "work": "Trois sarabandes",
+    "part": "Sarabande No. 1",
+    "performers": "Bergen Philharmonic Orchestra, Vladimir Sirenki, Håkon Austbö"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Sarabande No. 2",
+   "durationMs": 300173,
+   "artist": "Bergen Philharmonic Orchestra & Vladimir Sirenki",
+   "apple": {
+    "block": 1,
+    "composer": "Erik Satie",
+    "work": "Trois sarabandes",
+    "part": "Sarabande No. 2",
+    "performers": "Bergen Philharmonic Orchestra, Vladimir Sirenki"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Sarabande No. 3",
+   "durationMs": 254053,
+   "artist": "Bergen Philharmonic Orchestra & Vladimir Sirenki",
+   "apple": {
+    "block": 1,
+    "composer": "Erik Satie",
+    "work": "Trois sarabandes",
+    "part": "Sarabande No. 3",
+    "performers": "Bergen Philharmonic Orchestra, Vladimir Sirenki, Håkon Austbö"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "3 Gymnopédies: I: Lent et douloureux",
+   "durationMs": 220240,
+   "artist": "Bergen Philharmonic Orchestra & Vladimir Sirenki",
+   "apple": {
+    "block": 2,
+    "composer": "Erik Satie",
+    "work": "Gymnopédies",
+    "part": "I: Lent et douloureux",
+    "performers": "Vladimir Sirenki, Bergen Philharmonic Orchestra, Håkon Austbö"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "3 Gymnopédies : II. Lent et triste",
+   "durationMs": 197480,
+   "artist": "Bergen Philharmonic Orchestra & Vladimir Sirenki",
+   "apple": {
+    "block": 2,
+    "composer": "Erik Satie",
+    "work": "Gymnopédies",
+    "part": "II. Lent et triste",
+    "performers": "Bergen Philharmonic Orchestra, Vladimir Sirenki, Håkon Austbö"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "3 Gymnopédies : III. Lent et grave",
+   "durationMs": 173280,
+   "artist": "Bergen Philharmonic Orchestra & Vladimir Sirenki",
+   "apple": {
+    "block": 2,
+    "composer": "Erik Satie",
+    "work": "Gymnopédies",
+    "part": "III. Lent et grave",
+    "performers": "Bergen Philharmonic Orchestra, Vladimir Sirenki, Håkon Austbø"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Gnossiennes: I. Lent",
+   "durationMs": 246920,
+   "artist": "Bergen Philharmonic Orchestra & Vladimir Sirenki",
+   "apple": {
+    "block": 3,
+    "composer": "Erik Satie",
+    "work": "Gnossiennes",
+    "part": "I. Lent",
+    "performers": "Bergen Philharmonic Orchestra, Vladimir Sirenki, Håkon Austbö"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Gnossiennes: II. Avec Étonnement",
+   "durationMs": 120346,
+   "artist": "Bergen Philharmonic Orchestra & Vladimir Sirenki",
+   "apple": {
+    "block": 3,
+    "composer": "Erik Satie",
+    "work": "Gnossiennes",
+    "part": "II. Avec Étonnement",
+    "performers": "Bergen Philharmonic Orchestra, Vladimir Sirenki, Håkon Austbö"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Gnossiennes: III. Lent",
+   "durationMs": 206106,
+   "artist": "Bergen Philharmonic Orchestra & Vladimir Sirenki",
+   "apple": {
+    "block": 3,
+    "composer": "Erik Satie",
+    "work": "Gnossiennes",
+    "part": "III. Lent",
+    "performers": "Bergen Philharmonic Orchestra, Vladimir Sirenki, Håkon Austbö"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Gnossiennes: IV. Lent",
+   "durationMs": 170880,
+   "artist": "Bergen Philharmonic Orchestra & Vladimir Sirenki",
+   "apple": {
+    "block": 3,
+    "composer": "Erik Satie",
+    "work": "Gnossiennes",
+    "part": "IV. Lent",
+    "performers": "Bergen Philharmonic Orchestra, Vladimir Sirenki, Håkon Austbö"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Gnossiennes: V. Modéré",
+   "durationMs": 170853,
+   "artist": "Bergen Philharmonic Orchestra & Vladimir Sirenki",
+   "apple": {
+    "block": 3,
+    "composer": "Erik Satie",
+    "work": "Gnossiennes",
+    "part": "V. Modéré",
+    "performers": "Bergen Philharmonic Orchestra, Vladimir Sirenki, Håkon Austbö"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Gnossiennes: VI.  Avec conviction et avec une tristesse rigoureuse",
+   "durationMs": 93440,
+   "artist": "Bergen Philharmonic Orchestra & Vladimir Sirenki",
+   "apple": {
+    "block": 3,
+    "composer": "Erik Satie",
+    "work": "Gnossiennes",
+    "part": "VI.  Avec conviction et avec une tristesse rigoureuse",
+    "performers": "Bergen Philharmonic Orchestra, Vladimir Sirenki, Håkon Austbö"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Prelude No. 3, \"Prelude Du Nazareen #1\"",
+   "durationMs": 282680,
+   "artist": "Bergen Philharmonic Orchestra & Vladimir Sirenki",
+   "apple": {
+    "block": 4,
+    "composer": "Satie",
+    "work": "Satie",
+    "part": "Prelude No. 3, \"Prelude Du Nazareen #1\"",
+    "performers": "Bergen Philharmonic Orchestra, Vladimir Sirenki, Håkon Austbö"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Prelude No. 4, \"Prelude Du Nazareen #2\"",
+   "durationMs": 185946,
+   "artist": "Bergen Philharmonic Orchestra & Vladimir Sirenki",
+   "apple": {
+    "block": 4,
+    "composer": "Satie",
+    "work": "Satie",
+    "part": "Prelude No. 4, \"Prelude Du Nazareen #2\"",
+    "performers": "Bergen Philharmonic Orchestra, Vladimir Sirenki, Håkon Austbö"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Prélude de la Porte héroïque du Ciel",
+   "durationMs": 224920,
+   "artist": "Bergen Philharmonic Orchestra & Vladimir Sirenki",
+   "apple": {
+    "block": 5,
+    "composer": "Erik Satie",
+    "work": "Prélude de La Porte héroïque du ciel, “Prelude to 'The Heroic Gate of Heaven'”",
+    "part": "Prélude de la Porte héroïque du Ciel",
+    "performers": "Bergen Philharmonic Orchestra, Vladimir Sirenki, Håkon Austbö"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Pieces froides : No. 1. Airs a faire fuir: I. D'une maniere particuliere",
+   "durationMs": 179106,
+   "artist": "Bergen Philharmonic Orchestra & Vladimir Sirenki",
+   "apple": {
+    "block": 6,
+    "composer": "Erik Satie",
+    "work": "Pièces froides, “Cold Pieces”",
+    "part": "No. 1. Airs a faire fuir: I. D'une maniere particuliere",
+    "performers": "Bergen Philharmonic Orchestra, Vladimir Sirenki, Håkon Austbö"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Pieces Froides No. 1, Airs A Faire Fuir: II. Modestement",
+   "durationMs": 102653,
+   "artist": "Bergen Philharmonic Orchestra & Vladimir Sirenki",
+   "apple": {
+    "block": 6,
+    "composer": "Erik Satie",
+    "work": "Pièces froides, “Cold Pieces”",
+    "part": "II. Modestement",
+    "performers": "Bergen Philharmonic Orchestra, Vladimir Sirenki, Håkon Austbö"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Pieces Froides No. 1, Airs A Faire Fuir: III. S'inviter",
+   "durationMs": 102653,
+   "artist": "Bergen Philharmonic Orchestra & Vladimir Sirenki",
+   "apple": {
+    "block": 6,
+    "composer": "Erik Satie",
+    "work": "Pièces froides, “Cold Pieces”",
+    "part": "III. S'inviter",
+    "performers": "Bergen Philharmonic Orchestra, Vladimir Sirenki, Håkon Austbö"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "Pieces Froides No 2 (Danses De Travers): I. En Y Regardant Par Deux Fois",
+   "durationMs": 182840,
+   "artist": "Bergen Philharmonic Orchestra & Vladimir Sirenki",
+   "apple": {
+    "block": 6,
+    "composer": "Erik Satie",
+    "work": "Pièces froides, “Cold Pieces”",
+    "part": "I. En Y Regardant Par Deux Fois",
+    "performers": "Bergen Philharmonic Orchestra, Vladimir Sirenki, Håkon Austbö"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "Pieces Froides No. 2 (Danses De Travers): II. Passer",
+   "durationMs": 54120,
+   "artist": "Bergen Philharmonic Orchestra & Vladimir Sirenki",
+   "apple": {
+    "block": 6,
+    "composer": "Erik Satie",
+    "work": "Pièces froides, “Cold Pieces”",
+    "part": "II. Passer",
+    "performers": "Bergen Philharmonic Orchestra, Vladimir Sirenki, Håkon Austbö"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "Pieces froides: No. 2 (Danses de travers): III. Encore",
+   "durationMs": 46240,
+   "artist": "Bergen Philharmonic Orchestra & Vladimir Sirenki",
+   "apple": {
+    "block": 6,
+    "composer": "Erik Satie",
+    "work": "Pièces froides, “Cold Pieces”",
+    "part": "No. 2 (Danses de travers): III. Encore",
+    "performers": "Bergen Philharmonic Orchestra, Vladimir Sirenki, Håkon Austbö"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "Petite Overture A Danser",
+   "durationMs": 82280,
+   "artist": "Bergen Philharmonic Orchestra & Vladimir Sirenki",
+   "apple": {
+    "block": 6,
+    "composer": "Erik Satie",
+    "work": "Pièces froides, “Cold Pieces”",
+    "part": "Petite Overture A Danser",
+    "performers": "Bergen Philharmonic Orchestra, Vladimir Sirenki, Håkon Austbö"
+   }
+  }
+ ]
+}

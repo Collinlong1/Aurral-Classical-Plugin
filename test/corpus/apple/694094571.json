@@ -1,0 +1,176 @@
+{
+ "id": "694094571",
+ "category": "concerto",
+ "title": "Bach: Violin Concertos",
+ "artist": "Itzhak Perlman",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Violin Concerto in E, BWV 1042: I. Allegro",
+   "durationMs": 542200,
+   "artist": "Daniel Barenboim, English Chamber Orchestra & Itzhak Perlman",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Violin Concerto No. 2 in E Major, BWV 1042",
+    "part": "I. Allegro",
+    "performers": "Daniel Barenboim, English Chamber Orchestra, Itzhak Perlman"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Violin Concerto in E, BWV 1042: II. Adagio",
+   "durationMs": 491800,
+   "artist": "Daniel Barenboim, English Chamber Orchestra & Itzhak Perlman",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Violin Concerto No. 2 in E Major, BWV 1042",
+    "part": "II. Adagio",
+    "performers": "Daniel Barenboim, Itzhak Perlman, English Chamber Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Violin Concerto in E, BWV 1042: III. Allegro assai",
+   "durationMs": 195667,
+   "artist": "Daniel Barenboim, English Chamber Orchestra & Itzhak Perlman",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Violin Concerto No. 2 in E Major, BWV 1042",
+    "part": "III. Allegro assai",
+    "performers": "Daniel Barenboim, English Chamber Orchestra, Itzhak Perlman"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Violin Concerto in G Minor, BWV 1056: I. [Allegro]",
+   "durationMs": 218093,
+   "artist": "Daniel Barenboim, English Chamber Orchestra & Itzhak Perlman",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Tritt auf die Glaubensbahn, BWV 152 · “Step Upon The Path of Faith”",
+    "part": "I. Allegro moderato",
+    "performers": "English Chamber Orchestra, Daniel Barenboim, Itzhak Perlman"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Violin Concerto in G Minor, BWV 1056: II. Largo",
+   "durationMs": 255067,
+   "artist": "Daniel Barenboim, English Chamber Orchestra & Itzhak Perlman",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Concerto for Oboe, Strings & Continuo in G Minor, BWV 1056R",
+    "part": "II. Largo",
+    "performers": "Daniel Barenboim, English Chamber Orchestra, Itzhak Perlman"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Violin Concerto in G Minor, BWV 1056: III. Presto",
+   "durationMs": 198867,
+   "artist": "Daniel Barenboim, English Chamber Orchestra & Itzhak Perlman",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "Keyboard Concerto No. 5 in F Minor, BWV 1056",
+    "part": "III. Presto",
+    "performers": "Daniel Barenboim, English Chamber Orchestra, Itzhak Perlman"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Violin Concerto in a Minor, BWV 1041: I. [Allegro]",
+   "durationMs": 252307,
+   "artist": "Daniel Barenboim, English Chamber Orchestra & Itzhak Perlman",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Violin Concerto No. 1 in A Minor, BWV 1041",
+    "part": "I. [Untitled]",
+    "performers": "English Chamber Orchestra, Itzhak Perlman, Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Violin Concerto in a Minor, BWV 1041: II. Andante",
+   "durationMs": 465093,
+   "artist": "Daniel Barenboim, English Chamber Orchestra & Itzhak Perlman",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Violin Concerto No. 1 in A Minor, BWV 1041",
+    "part": "II. Andante",
+    "performers": "Daniel Barenboim, English Chamber Orchestra, Itzhak Perlman"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Violin Concerto in a Minor, BWV 1041: III. Allegro assai",
+   "durationMs": 254000,
+   "artist": "Daniel Barenboim, English Chamber Orchestra & Itzhak Perlman",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Violin Concerto No. 1 in A Minor, BWV 1041",
+    "part": "III. Allegro assai",
+    "performers": "Daniel Barenboim, English Chamber Orchestra, Itzhak Perlman"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Double Violin Concerto in D Minor, BWV 1043: I. Vivace",
+   "durationMs": 240467,
+   "artist": "Daniel Barenboim, English Chamber Orchestra, Itzhak Perlman & Pinchas Zukerman",
+   "apple": {
+    "block": 6,
+    "composer": "Johann Sebastian Bach",
+    "work": "Double Violin Concerto in D Minor, BWV 1043",
+    "part": "I. Vivace",
+    "performers": "Itzhak Perlman, English Chamber Orchestra, Pinchas Zukerman, Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Double Violin Concerto in D Minor, BWV 1043: II. Largo ma non tanto",
+   "durationMs": 453907,
+   "artist": "Daniel Barenboim, English Chamber Orchestra, Itzhak Perlman & Pinchas Zukerman",
+   "apple": {
+    "block": 6,
+    "composer": "Johann Sebastian Bach",
+    "work": "Double Violin Concerto in D Minor, BWV 1043",
+    "part": "II. Largo ma non tanto",
+    "performers": "Daniel Barenboim, English Chamber Orchestra, Itzhak Perlman, Pinchas Zukerman"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Double Violin Concerto in D Minor, BWV 1043: III. Allegro",
+   "durationMs": 309627,
+   "artist": "Daniel Barenboim, English Chamber Orchestra, Itzhak Perlman & Pinchas Zukerman",
+   "apple": {
+    "block": 6,
+    "composer": "Johann Sebastian Bach",
+    "work": "Double Violin Concerto in D Minor, BWV 1043",
+    "part": "III. Allegro",
+    "performers": "English Chamber Orchestra, Itzhak Perlman, Daniel Barenboim, Pinchas Zukerman"
+   }
+  }
+ ]
+}

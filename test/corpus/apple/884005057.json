@@ -1,0 +1,372 @@
+{
+ "id": "884005057",
+ "category": "compilation",
+ "title": "Classical Piano Favorites",
+ "artist": "Dmitriy Lukyanov",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Well Tempered Clavier Book Two, Fugue No. 2 in C Minor, BWV 871",
+   "durationMs": 146077,
+   "artist": "Dmitriy Lukyanov",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Prelude & Fugue No. 2 in C Minor, BWV 871 · “The Well-tempered Clavier, Book 2”",
+    "part": "Well Tempered Clavier Book Two, Fugue No. 2 in C Minor, BWV 871",
+    "performers": "Dmitriy Lukyanov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Well Tempered Clavier Book One, Prelude No. 1 in C Major, BWV 846: Andante",
+   "durationMs": 77636,
+   "artist": "Dmitriy Lukyanov",
+   "apple": {
+    "block": 2,
+    "composer": "J. S. Bach: Well Tempered Clavier Book One, Prelude No. 1 in C Major, BWV 846",
+    "work": "J. S. Bach: Well Tempered Clavier Book One, Prelude No. 1 in C Major, BWV 846",
+    "part": "Andante",
+    "performers": "Dmitriy Lukyanov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Bagatelle No. 25 in A Minor, WoO 59 \"Für Elise\"",
+   "durationMs": 173335,
+   "artist": "Dmitriy Lukyanov",
+   "apple": {
+    "block": 3,
+    "composer": "Ludwig van Beethoven",
+    "work": "Bagatelle in A Minor, WoO 59 · “Für Elise”",
+    "part": "Bagatelle No. 25 in A Minor, WoO 59 \"Für Elise\"",
+    "performers": "Dmitriy Lukyanov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Sonata No. 14 Op. 27 in C-Sharp Minor, WoO 47 \"Moonlight\": I. Adagio sostenuto",
+   "durationMs": 316220,
+   "artist": "Dmitriy Lukyanov",
+   "apple": {
+    "block": 4,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 14 in C-Sharp Minor, Op. 27/2 · “Moonlight Sonata”",
+    "part": "I. Adagio sostenuto",
+    "performers": "Dmitriy Lukyanov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Etude No. 2 in F Minor Op. 25 \"Bees\": Presto",
+   "durationMs": 86192,
+   "artist": "Dmitriy Lukyanov",
+   "apple": {
+    "block": 5,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 25",
+    "part": "Presto",
+    "performers": "Dmitriy Lukyanov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Etude No. 3 in E Major, Op. 10 \"Tristesse\": Lento ma non troppo",
+   "durationMs": 265333,
+   "artist": "Dmitriy Lukyanov",
+   "apple": {
+    "block": 6,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 10",
+    "part": "Lento ma non troppo",
+    "performers": "Dmitriy Lukyanov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Minute Waltz, Op. 64 No. 1 in D-Flat Major",
+   "durationMs": 119029,
+   "artist": "Dmitriy Lukyanov",
+   "apple": {
+    "block": 7,
+    "composer": "Frédéric Chopin",
+    "work": "Waltz No. 6 in D-Flat Major, B. 164/1, Op. 64/1 · “Minute”",
+    "part": "Minute Waltz, Op. 64 No. 1 in D-Flat Major",
+    "performers": "Dmitriy Lukyanov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Nocturne No. 20 Op. Posth. in C-Sharp Minor",
+   "durationMs": 248988,
+   "artist": "Dmitriy Lukyanov",
+   "apple": {
+    "block": 8,
+    "composer": "Chopin",
+    "work": "Chopin",
+    "part": "Nocturne No. 20 Op. Posth. in C-Sharp Minor",
+    "performers": "Dmitriy Lukyanov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Etude Op.10 No.12 in C Minor \"Revolutionary\": Allegro con fuoco",
+   "durationMs": 160141,
+   "artist": "Dmitriy Lukyanov",
+   "apple": {
+    "block": 9,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 10",
+    "part": "Allegro con fuoco",
+    "performers": "Dmitriy Lukyanov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Waltz Op. 64 No. 2 in C-Sharp Minor: Tempo guisto, Piu mosso, piu lento",
+   "durationMs": 209305,
+   "artist": "Dmitriy Lukyanov",
+   "apple": {
+    "block": 10,
+    "composer": "Frédéric Chopin",
+    "work": "Waltz No. 7 in C-Sharp Minor, B. 164/2, Op. 64/2",
+    "part": "Tempo guisto, Piu mosso, piu lento",
+    "performers": "Dmitriy Lukyanov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Piano Sonata No.10 in C Major, K. 330/300h: I. Allegro moderato",
+   "durationMs": 277177,
+   "artist": "Dmitriy Lukyanov",
+   "apple": {
+    "block": 11,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Sonata No. 10 in C Major, K. 330, K. 300h, KV 330, KV 300h",
+    "part": "I. Allegro moderato",
+    "performers": "Dmitriy Lukyanov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Prelude No.2 in A Minor, Op.11: Allegretto",
+   "durationMs": 129057,
+   "artist": "Dmitriy Lukyanov",
+   "apple": {
+    "block": 12,
+    "composer": "Alexander Scriabin",
+    "work": "24 Preludes, Op. 11",
+    "part": "Allegretto",
+    "performers": "Dmitriy Lukyanov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Prelude No. 5 in D Major, Op.11: Andante cantabile",
+   "durationMs": 118182,
+   "artist": "Dmitriy Lukyanov",
+   "apple": {
+    "block": 12,
+    "composer": "Alexander Scriabin",
+    "work": "24 Preludes, Op. 11",
+    "part": "Andante cantabile",
+    "performers": "Dmitriy Lukyanov"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 14,
+   "title": "Ballade No.1 in G Minor, Op. 23",
+   "durationMs": 588310,
+   "artist": "Dmitriy Lukyanov",
+   "apple": {
+    "block": 13,
+    "composer": "Frédéric Chopin",
+    "work": "Ballade No. 1 in G Minor, B. 66, Op. 23 · “Polish Ballade”",
+    "part": "Ballade No.1 in G Minor, Op. 23",
+    "performers": "Dmitriy Lukyanov"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 15,
+   "title": "Fantasie-Impromptu in C-Sharp Minor, Op. 66: Allegro agitato",
+   "durationMs": 358847,
+   "artist": "Dmitriy Lukyanov",
+   "apple": {
+    "block": 14,
+    "composer": "Frédéric Chopin",
+    "work": "Fantaisie-Impromptu in C-Sharp Minor, B. 87, Op. 66 · “Mme d'Este”",
+    "part": "Allegro agitato",
+    "performers": "Dmitriy Lukyanov"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 16,
+   "title": "Nocturne No. 2 in E-Flat Major, Op.9: Andante",
+   "durationMs": 229720,
+   "artist": "Dmitriy Lukyanov",
+   "apple": {
+    "block": 15,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 2 in E-Flat Major, B. 54/2, Op. 9/2 · “Murmures de la Seine 2”",
+    "part": "Andante",
+    "performers": "Dmitriy Lukyanov"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 17,
+   "title": "Waltz No. 2 in B Minor, Op. 69: Moderato",
+   "durationMs": 165094,
+   "artist": "Dmitriy Lukyanov",
+   "apple": {
+    "block": 16,
+    "composer": "Frédéric Chopin",
+    "work": "Waltz No. 13 in D-Flat Major, B. 40, Op. 70/3",
+    "part": "Moderato",
+    "performers": "Dmitriy Lukyanov"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 18,
+   "title": "Waltz No. 2 in E Minor: Allegretto",
+   "durationMs": 91684,
+   "artist": "Dmitriy Lukyanov",
+   "apple": {
+    "block": 17,
+    "composer": "A. Griboyedov: Waltz No. 2 in E Minor",
+    "work": "A. Griboyedov: Waltz No. 2 in E Minor",
+    "part": "Allegretto",
+    "performers": "Dmitriy Lukyanov"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 19,
+   "title": "Polonaise in A Minor. Moderato tristamente",
+   "durationMs": 271366,
+   "artist": "Dmitriy Lukyanov",
+   "apple": {
+    "block": 18,
+    "composer": "Polonaise in A Minor. Moderato tristamente",
+    "work": "Polonaise in A Minor. Moderato tristamente",
+    "part": "Polonaise in A Minor. Moderato tristamente",
+    "performers": "Dmitriy Lukyanov"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 20,
+   "title": "Italian Polka in D Minor, Tn II/21",
+   "durationMs": 75964,
+   "artist": "Dmitriy Lukyanov",
+   "apple": {
+    "block": 19,
+    "composer": "Rachmaninoff",
+    "work": "Rachmaninoff",
+    "part": "Italian Polka in D Minor, Tn II/21",
+    "performers": "Dmitriy Lukyanov"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 21,
+   "title": "Mazurka Op. 39 Childrens Album in D Minor, Th 141: 10. Allegro non troppo",
+   "durationMs": 85881,
+   "artist": "Dmitriy Lukyanov",
+   "apple": {
+    "block": 20,
+    "composer": "P. I. Tchaikovsky: Mazurka Op. 39 Childrens Album in D Minor, Th 141",
+    "work": "P. I. Tchaikovsky: Mazurka Op. 39 Childrens Album in D Minor, Th 141",
+    "part": "10. Allegro non troppo",
+    "performers": "Dmitriy Lukyanov"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 22,
+   "title": "Neapolitan Song Op. 39 Childrens Album in E-Flat Major, Th 141: 18. Andante grazioso",
+   "durationMs": 64273,
+   "artist": "Dmitriy Lukyanov",
+   "apple": {
+    "block": 21,
+    "composer": "P. I. Tchaikovsky: Neapolitan Song Op. 39 Childrens Album in E-Flat Major, Th 141",
+    "work": "P. I. Tchaikovsky: Neapolitan Song Op. 39 Childrens Album in E-Flat Major, Th 141",
+    "part": "18. Andante grazioso",
+    "performers": "Dmitriy Lukyanov"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 23,
+   "title": "The New Doll, Op. 39 Children Album in B-Flat Major, Th 141. 9: Allegro",
+   "durationMs": 40749,
+   "artist": "Dmitriy Lukyanov",
+   "apple": {
+    "block": 22,
+    "composer": "P. I. Tchaikovsky: The New Doll, Op. 39 Children Album in B-Flat Major, Th 141. 9",
+    "work": "P. I. Tchaikovsky: The New Doll, Op. 39 Children Album in B-Flat Major, Th 141. 9",
+    "part": "Allegro",
+    "performers": "Dmitriy Lukyanov"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 24,
+   "title": "Sentimental Waltz, Op. 51 in F Minor, Th 143: 6. Tempo Di Valse",
+   "durationMs": 249618,
+   "artist": "Dmitriy Lukyanov",
+   "apple": {
+    "block": 23,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "Six morceaux in A-Flat Major, Op. 51, TH 143",
+    "part": "6. Tempo Di Valse",
+    "performers": "Dmitriy Lukyanov"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 25,
+   "title": "Sweet Dream, Op. 39 Children Album in C Major, Th 141. 21: Moderato",
+   "durationMs": 110181,
+   "artist": "Dmitriy Lukyanov",
+   "apple": {
+    "block": 24,
+    "composer": "P. I. Tchaikovsky: Sweet Dream, Op. 39 Children Album in C Major, Th 141. 21",
+    "work": "P. I. Tchaikovsky: Sweet Dream, Op. 39 Children Album in C Major, Th 141. 21",
+    "part": "Moderato",
+    "performers": "Dmitriy Lukyanov"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 26,
+   "title": "Waltz Op. 39 Children Album in E-Flat Major, Th 141. 8: Allegro assai",
+   "durationMs": 79848,
+   "artist": "Dmitriy Lukyanov",
+   "apple": {
+    "block": 25,
+    "composer": "P. I. Tchaikovsky: Waltz Op. 39 Children Album in E-Flat Major, Th 141. 8",
+    "work": "P. I. Tchaikovsky: Waltz Op. 39 Children Album in E-Flat Major, Th 141. 8",
+    "part": "Allegro assai",
+    "performers": "Dmitriy Lukyanov"
+   }
+  }
+ ]
+}

@@ -1,0 +1,218 @@
+{
+ "id": "1535767041",
+ "category": "symphony",
+ "title": "Mozart: Symphonies Nos. 38-41",
+ "artist": "Scottish Chamber Orchestra & Sir Charles Mackerras",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Symphony No. 38 in D Major, K. 504 \"Prague\": I. Adagio - Allegro",
+   "durationMs": 1063667,
+   "artist": "Scottish Chamber Orchestra & Sir Charles Mackerras",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Symphony No. 38 in D Major, K. 504, KV 504 · “Prague Symphony”",
+    "part": "I. Adagio - Allegro",
+    "performers": "Scottish Chamber Orchestra, Sir Charles Mackerras"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Symphony No. 38 in D Major, K. 504 \"Prague\": II. Andante",
+   "durationMs": 678125,
+   "artist": "Scottish Chamber Orchestra & Sir Charles Mackerras",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Symphony No. 38 in D Major, K. 504, KV 504 · “Prague Symphony”",
+    "part": "II. Andante",
+    "performers": "Scottish Chamber Orchestra, Sir Charles Mackerras"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Symphony No. 38 in D Major, K. 504 \"Prague\": III. Finale. Presto",
+   "durationMs": 455792,
+   "artist": "Scottish Chamber Orchestra & Sir Charles Mackerras",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Symphony No. 38 in D Major, K. 504, KV 504 · “Prague Symphony”",
+    "part": "III. Finale. Presto",
+    "performers": "Sir Charles Mackerras, Scottish Chamber Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Symphony No. 39 in E-Flat Major, K. 543: I. Adagio - Allegro",
+   "durationMs": 600250,
+   "artist": "Scottish Chamber Orchestra & Sir Charles Mackerras",
+   "apple": {
+    "block": 2,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Symphony No. 39 in E-Flat Major, K. 543, KV 543",
+    "part": "I. Adagio - Allegro",
+    "performers": "Sir Charles Mackerras, Scottish Chamber Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Symphony No. 39 in E-Flat Major, K. 543: II. Andante con moto",
+   "durationMs": 482083,
+   "artist": "Scottish Chamber Orchestra & Sir Charles Mackerras",
+   "apple": {
+    "block": 2,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Symphony No. 39 in E-Flat Major, K. 543, KV 543",
+    "part": "II. Andante con moto",
+    "performers": "Sir Charles Mackerras, Scottish Chamber Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Symphony No. 39 in E-Flat Major, K. 543: III. Menuetto. Allegretto - Trio",
+   "durationMs": 261667,
+   "artist": "Scottish Chamber Orchestra & Sir Charles Mackerras",
+   "apple": {
+    "block": 2,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Symphony No. 39 in E-Flat Major, K. 543, KV 543",
+    "part": "III. Menuetto. Allegretto - Trio",
+    "performers": "Scottish Chamber Orchestra, Sir Charles Mackerras"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Symphony No. 39 in E-Flat Major, K. 543: IV. Finale. Allegro",
+   "durationMs": 469667,
+   "artist": "Scottish Chamber Orchestra & Sir Charles Mackerras",
+   "apple": {
+    "block": 2,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Symphony No. 39 in E-Flat Major, K. 543, KV 543",
+    "part": "IV. Finale. Allegro",
+    "performers": "Sir Charles Mackerras, Scottish Chamber Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 1,
+   "title": "Symphony No. 40 in G Minor, K. 550: I. Molto allegro",
+   "durationMs": 425958,
+   "artist": "Scottish Chamber Orchestra & Sir Charles Mackerras",
+   "apple": {
+    "block": 3,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Symphony No. 40 in G Minor, K. 550, KV 550",
+    "part": "I. Molto allegro",
+    "performers": "Scottish Chamber Orchestra, Sir Charles Mackerras"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 2,
+   "title": "Symphony No. 40 in G Minor, K. 550: II. Andante",
+   "durationMs": 805250,
+   "artist": "Scottish Chamber Orchestra & Sir Charles Mackerras",
+   "apple": {
+    "block": 3,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Symphony No. 40 in G Minor, K. 550, KV 550",
+    "part": "II. Andante",
+    "performers": "Scottish Chamber Orchestra, Sir Charles Mackerras"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 3,
+   "title": "Symphony No. 40 in G Minor, K. 550: III. Menuetto. Allegretto",
+   "durationMs": 243417,
+   "artist": "Scottish Chamber Orchestra & Sir Charles Mackerras",
+   "apple": {
+    "block": 3,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Symphony No. 40 in G Minor, K. 550, KV 550",
+    "part": "III. Menuetto. Allegretto",
+    "performers": "Scottish Chamber Orchestra, Sir Charles Mackerras"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 4,
+   "title": "Symphony No. 40 in G Minor, K. 550: IV. Finale. Allegro assai",
+   "durationMs": 555917,
+   "artist": "Scottish Chamber Orchestra & Sir Charles Mackerras",
+   "apple": {
+    "block": 3,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Symphony No. 40 in G Minor, K. 550, KV 550",
+    "part": "IV. Finale. Allegro assai",
+    "performers": "Sir Charles Mackerras, Scottish Chamber Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 5,
+   "title": "Symphony No. 41 in C Major, K. 551 \"Jupiter\": I. Allegro vivace",
+   "durationMs": 699375,
+   "artist": "Scottish Chamber Orchestra & Sir Charles Mackerras",
+   "apple": {
+    "block": 4,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Symphony No. 41 in C Major, K. 551, KV 551 · “Jupiter Symphony”",
+    "part": "I. Allegro vivace",
+    "performers": "Sir Charles Mackerras, Scottish Chamber Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 6,
+   "title": "Symphony No. 41 in C Major, K. 551 \"Jupiter\": II. Andante cantabile",
+   "durationMs": 627125,
+   "artist": "Scottish Chamber Orchestra & Sir Charles Mackerras",
+   "apple": {
+    "block": 4,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Symphony No. 41 in C Major, K. 551, KV 551 · “Jupiter Symphony”",
+    "part": "II. Andante cantabile",
+    "performers": "Scottish Chamber Orchestra, Sir Charles Mackerras"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 7,
+   "title": "Symphony No. 41 in C Major, K. 551 \"Jupiter\": III. Menuetto. Allegretto",
+   "durationMs": 303333,
+   "artist": "Scottish Chamber Orchestra & Sir Charles Mackerras",
+   "apple": {
+    "block": 4,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Symphony No. 41 in C Major, K. 551, KV 551 · “Jupiter Symphony”",
+    "part": "III. Menuetto. Allegretto",
+    "performers": "Scottish Chamber Orchestra, Sir Charles Mackerras"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 8,
+   "title": "Symphony No. 41 in C Major, K. 551 \"Jupiter\": IV. Molto allegro",
+   "durationMs": 690250,
+   "artist": "Scottish Chamber Orchestra & Sir Charles Mackerras",
+   "apple": {
+    "block": 4,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Symphony No. 41 in C Major, K. 551, KV 551 · “Jupiter Symphony”",
+    "part": "IV. Molto allegro",
+    "performers": "Scottish Chamber Orchestra, Sir Charles Mackerras"
+   }
+  }
+ ]
+}

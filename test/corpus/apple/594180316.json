@@ -1,0 +1,274 @@
+{
+ "id": "594180316",
+ "category": "solo instrument",
+ "title": "Chopin: Nocturnes",
+ "artist": "Arthur Rubinstein",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Nocturnes, Op. 9: No. 1 in B-Flat Minor",
+   "durationMs": 326379,
+   "artist": "Arthur Rubinstein",
+   "apple": {
+    "block": 1,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 1 in B-Flat Minor, B. 54/1, Op. 9/1 · “Murmures de la Seine 1”",
+    "part": "No. 1 in B-Flat Minor",
+    "performers": "Arthur Rubinstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Nocturnes, Op. 9: No. 2 in E-Flat Major",
+   "durationMs": 270137,
+   "artist": "Arthur Rubinstein",
+   "apple": {
+    "block": 2,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 2 in E-Flat Major, B. 54/2, Op. 9/2 · “Murmures de la Seine 2”",
+    "part": "No. 2 in E-Flat Major",
+    "performers": "Arthur Rubinstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Nocturnes, Op. 9: No. 3 in B Major",
+   "durationMs": 411990,
+   "artist": "Arthur Rubinstein",
+   "apple": {
+    "block": 3,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 3 in B Major, B. 54/3, Op. 9/3 · “Murmures de la Seine 3”",
+    "part": "No. 3 in B Major",
+    "performers": "Arthur Rubinstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Nocturnes, Op. 15: No. 1 in F Major",
+   "durationMs": 263568,
+   "artist": "Arthur Rubinstein",
+   "apple": {
+    "block": 4,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 4 in F Major, B. 55/1, Op. 15/1 · “Les zéphyrs 1”",
+    "part": "No. 1 in F Major",
+    "performers": "Arthur Rubinstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Nocturnes, Op. 15: No. 2 in F-Sharp Major",
+   "durationMs": 239369,
+   "artist": "Arthur Rubinstein",
+   "apple": {
+    "block": 5,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 5 in F-Sharp Major, B. 55/2, Op. 15/2 · “Les zéphyrs 2”",
+    "part": "No. 2 in F-Sharp Major",
+    "performers": "Arthur Rubinstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Nocturnes, Op. 15: No. 3 in G Minor",
+   "durationMs": 306832,
+   "artist": "Arthur Rubinstein",
+   "apple": {
+    "block": 6,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 6 in G Minor, B. 79, Op. 15/3 · “Les zéphyrs 3”",
+    "part": "No. 3 in G Minor",
+    "performers": "Arthur Rubinstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Nocturnes, Op. 27: No. 1 in C-Sharp Minor",
+   "durationMs": 341925,
+   "artist": "Arthur Rubinstein",
+   "apple": {
+    "block": 7,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 7 in C-Sharp Minor, B. 91, Op. 27/1 · “Les plaintives 1”",
+    "part": "No. 1 in C-Sharp Minor",
+    "performers": "Arthur Rubinstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Nocturnes, Op. 27: No. 2 in D-Flat Major",
+   "durationMs": 380464,
+   "artist": "Arthur Rubinstein",
+   "apple": {
+    "block": 8,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 8 in D-Flat Major, B. 96, Op. 27/2 · “Les plaintives 2”",
+    "part": "No. 2 in D-Flat Major",
+    "performers": "Arthur Rubinstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Nocturnes, Op. 32: No. 1 in B Major",
+   "durationMs": 285721,
+   "artist": "Arthur Rubinstein",
+   "apple": {
+    "block": 9,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 9 in B Major, B. 106/1, Op. 32/1 · “Il lamento e la consolazione 1”",
+    "part": "No. 1 in B Major",
+    "performers": "Arthur Rubinstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Nocturnes, Op. 32: No. 2 in A-Flat Major",
+   "durationMs": 351039,
+   "artist": "Arthur Rubinstein",
+   "apple": {
+    "block": 10,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 10 in A-Flat Major, B. 106/2, Op. 32/2 · “Il lamento e la consolazione 2”",
+    "part": "No. 2 in A-Flat Major",
+    "performers": "Arthur Rubinstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Nocturnes, Op. 37: No. 1 in G Minor",
+   "durationMs": 382327,
+   "artist": "Arthur Rubinstein",
+   "apple": {
+    "block": 11,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 11 in G Minor, B. 119, Op. 37/1",
+    "part": "No. 1 in G Minor",
+    "performers": "Arthur Rubinstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Nocturnes, Op. 37: No. 2 in G Major",
+   "durationMs": 416548,
+   "artist": "Arthur Rubinstein",
+   "apple": {
+    "block": 12,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 12 in G Major, B. 127, Op. 37/2",
+    "part": "No. 2 in G Major",
+    "performers": "Arthur Rubinstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Nocturnes, Op. 48: No. 1 in C Minor",
+   "durationMs": 355396,
+   "artist": "Arthur Rubinstein",
+   "apple": {
+    "block": 13,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 13 in C Minor, B. 142/1, Op. 48/1",
+    "part": "No. 1 in C Minor",
+    "performers": "Arthur Rubinstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Nocturnes, Op. 48: No. 2 in F-Sharp Minor",
+   "durationMs": 443893,
+   "artist": "Arthur Rubinstein",
+   "apple": {
+    "block": 14,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 14 in F-Sharp Minor, B. 142/2, Op. 48/2",
+    "part": "No. 2 in F-Sharp Minor",
+    "performers": "Arthur Rubinstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Nocturnes, Op. 55: No. 1 in F Minor",
+   "durationMs": 341507,
+   "artist": "Arthur Rubinstein",
+   "apple": {
+    "block": 15,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 15 in F Minor, B. 152/1, Op. 55/1",
+    "part": "No. 1 in F Minor",
+    "performers": "Arthur Rubinstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Nocturnes, Op. 55: No. 2 in E-Flat Major",
+   "durationMs": 350582,
+   "artist": "Arthur Rubinstein",
+   "apple": {
+    "block": 16,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 16 in E-Flat Major, B. 152/2, Op. 55/2",
+    "part": "No. 2 in E-Flat Major",
+    "performers": "Arthur Rubinstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Nocturnes, Op. 62: No. 1 in B Major",
+   "durationMs": 413567,
+   "artist": "Arthur Rubinstein",
+   "apple": {
+    "block": 17,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 17 in B Major, B. 161/1, Op. 62/1",
+    "part": "No. 1 in B Major",
+    "performers": "Arthur Rubinstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Nocturnes, Op. 62: No. 2 in E Major",
+   "durationMs": 321599,
+   "artist": "Arthur Rubinstein",
+   "apple": {
+    "block": 18,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 18 in E Major, B. 161/2, Op. 62/2",
+    "part": "No. 2 in E Major",
+    "performers": "Arthur Rubinstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "Nocturne No. 19 in E Minor, Op. 72 No. 1",
+   "durationMs": 283946,
+   "artist": "Arthur Rubinstein",
+   "apple": {
+    "block": 19,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 19 in E Minor, B. 19, Op. 72/1",
+    "part": "Nocturne No. 19 in E Minor, Op. 72 No. 1",
+    "performers": "Arthur Rubinstein"
+   }
+  }
+ ]
+}

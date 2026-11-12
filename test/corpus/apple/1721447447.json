@@ -1,0 +1,288 @@
+{
+ "id": "1721447447",
+ "category": "piano recital",
+ "title": "Martha Argerich Recital Teatro Colón 1965 (Live)",
+ "artist": "Martha Argerich",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Partita Nº 2 en Do menor BWV 826 : Sinfonia (Buenos Aires 16/07/1965 - Restauración 2023)",
+   "durationMs": 271488,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Sinfonia No. 2 in C Minor, BWV 788 · “3-Part Inventions”",
+    "part": "Sinfonia (Buenos Aires 16/07/1965 - Restauración 2023)",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Partita Nº 2 en Do menor BWV 826 : Allemande (Buenos Aires 16/07/1965 - Restauración 2023)",
+   "durationMs": 260327,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 2 for Keyboard in C Minor, BWV 826 · “German Suite”",
+    "part": "Allemande (Buenos Aires 16/07/1965 - Restauración 2023)",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Partita Nº 2 en Do menor BWV 826 : Courante (Buenos Aires 16/07/1965 - Restauración 2023)",
+   "durationMs": 136132,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 2 for Keyboard in C Minor, BWV 826 · “German Suite”",
+    "part": "Courante (Buenos Aires 16/07/1965 - Restauración 2023)",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Partita Nº 2 en Do menor BWV 826 : Sarabande (Buenos Aires 16/07/1965 - Restauración 2023)",
+   "durationMs": 185215,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 2 for Keyboard in C Minor, BWV 826 · “German Suite”",
+    "part": "Sarabande (Buenos Aires 16/07/1965 - Restauración 2023)",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Partita Nº 2 en Do menor BWV 826: Rondeau (Buenos Aires 16/07/1965 - Restauración 2023)",
+   "durationMs": 83367,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 2 for Keyboard in C Minor, BWV 826 · “German Suite”",
+    "part": "Rondeau (Buenos Aires 16/07/1965 - Restauración 2023)",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Partita Nº 2 en Do menor BWV 826: Capriccio (Buenos Aires 16/07/1965 - Restauración 2023)",
+   "durationMs": 214408,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 2 for Keyboard in C Minor, BWV 826 · “German Suite”",
+    "part": "Capriccio (Buenos Aires 16/07/1965 - Restauración 2023)",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Sonata Nº 7 en Re Mayor, Op. 10 Nº 3 : I Presto (Buenos Aires 16/07/1965 - Restauración 2023)",
+   "durationMs": 424814,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 3,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 7 in D Major, Op. 10/3",
+    "part": "I Presto (Buenos Aires 16/07/1965 - Restauración 2023)",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Sonata Nº 7 en Re Mayor, Op. 10 Nº 3 : II Largo e Mesto (Buenos Aires 16/07/1965 - Restauración 2023)",
+   "durationMs": 525142,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 3,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 7 in D Major, Op. 10/3",
+    "part": "II Largo e Mesto (Buenos Aires 16/07/1965 - Restauración 2023)",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Sonata Nº 7 en Re Mayor, Op. 10 Nº 3 : III Menuetto. Allegro (Buenos Aires 16/07/1965 - Restauración 2023)",
+   "durationMs": 136994,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 3,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 7 in D Major, Op. 10/3",
+    "part": "III Menuetto. Allegro (Buenos Aires 16/07/1965 - Restauración 2023)",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Sonata Nº 7 en Re Mayor, Op. 10 Nº 3 : IV. Rondo. Allegro (Buenos Aires 16/07/1965 - Restauración 2023)",
+   "durationMs": 213391,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 3,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 7 in D Major, Op. 10/3",
+    "part": "IV. Rondo. Allegro (Buenos Aires 16/07/1965 - Restauración 2023)",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 1,
+   "title": "Scherzo No. 3 en Do Sostenido Menor Op. 39 (Buenos Aires 16/07/1965 - Restauración 2023)",
+   "durationMs": 426330,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 4,
+    "composer": "Frédéric Chopin",
+    "work": "Scherzo No. 3 in C-Sharp Minor, B. 125, Op. 39",
+    "part": "Scherzo No. 3 en Do Sostenido Menor Op. 39 (Buenos Aires 16/07/1965 - Restauración 2023)",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 2,
+   "title": "Mazurka Nº 36 en La Menor, Op. 59, No. 1 (Buenos Aires 16/07/1965 - Restauración 2023)",
+   "durationMs": 218546,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 5,
+    "composer": "Frédéric Chopin",
+    "work": "Mazurka No. 36 in A Minor, B. 157/1, Op. 59/1",
+    "part": "Mazurka Nº 36 en La Menor, Op. 59, No. 1 (Buenos Aires 16/07/1965 - Restauración 2023)",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 3,
+   "title": "Mazurka Nº 37 en La Bemol Mayor, Op. 59, No. 2 (Buenos Aires 16/07/1965 - Restauración 2023)",
+   "durationMs": 150891,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 6,
+    "composer": "Frédéric Chopin",
+    "work": "Mazurka No. 37 in A-Flat Major, B. 157/2, Op. 59/2",
+    "part": "Mazurka Nº 37 en La Bemol Mayor, Op. 59, No. 2 (Buenos Aires 16/07/1965 - Restauración 2023)",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 4,
+   "title": "Mazurka en Fa Sostenido Menor, Op. 59, No. 3 (Buenos Aires 16/07/1965 - Restauración 2023)",
+   "durationMs": 210427,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 7,
+    "composer": "Frédéric Chopin",
+    "work": "Mazurka No. 38 in F-Sharp Minor, B. 157/3, Op. 59/3",
+    "part": "Mazurka en Fa Sostenido Menor, Op. 59, No. 3 (Buenos Aires 16/07/1965 - Restauración 2023)",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 5,
+   "title": "Sonata Nº 7 en Si Bemol Mayor Op. 83: I Allegro inquieto (Buenos Aires 16/07/1965 - Restauración 2023)",
+   "durationMs": 449270,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 8,
+    "composer": "Sergei Prokofiev",
+    "work": "Piano Sonata No. 7 in B-Flat Major, Op. 83 · “Stalingrad Sonata”",
+    "part": "I Allegro inquieto (Buenos Aires 16/07/1965 - Restauración 2023)",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 6,
+   "title": "Sonata Nº 7 en Si Bemol Mayor Op. 83: II Andante caloroso (Buenos Aires 16/07/1965 - Restauración 2023)",
+   "durationMs": 317188,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 8,
+    "composer": "Sergei Prokofiev",
+    "work": "Piano Sonata No. 7 in B-Flat Major, Op. 83 · “Stalingrad Sonata”",
+    "part": "II Andante caloroso (Buenos Aires 16/07/1965 - Restauración 2023)",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 7,
+   "title": "Sonata Nº 7 en Si Bemol Mayor Op. 83: III Precipitato (Buenos Aires 16/07/1965 - Restauración 2023)",
+   "durationMs": 205728,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 8,
+    "composer": "Sergei Prokofiev",
+    "work": "Piano Sonata No. 7 in B-Flat Major, Op. 83 · “Stalingrad Sonata”",
+    "part": "III Precipitato (Buenos Aires 16/07/1965 - Restauración 2023)",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 8,
+   "title": "Estudio en Do Sostenido Menor Op. 10 Nº 4 (Buenos Aires 16/07/1965 - Restauración 2023)",
+   "durationMs": 177501,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 9,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 10",
+    "part": "Estudio en Do Sostenido Menor Op. 10 Nº 4 (Buenos Aires 16/07/1965 - Restauración 2023)",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 9,
+   "title": "Nocturno en Fa Mayor Op. 15, Nº 1 (Buenos Aires 16/07/1965 - Restauración 2023)",
+   "durationMs": 299381,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 10,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 4 in F Major, B. 55/1, Op. 15/1 · “Les zéphyrs 1”",
+    "part": "Nocturno en Fa Mayor Op. 15, Nº 1 (Buenos Aires 16/07/1965 - Restauración 2023)",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 10,
+   "title": "Mazurka en Do Mayor Op. 24 Nº 2 (Buenos Aires 16/07/1965 - Restauración 2023)",
+   "durationMs": 118116,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 11,
+    "composer": "Frédéric Chopin",
+    "work": "Mazurka No. 15 in C Major, B. 89/2, Op. 24/2",
+    "part": "Mazurka en Do Mayor Op. 24 Nº 2 (Buenos Aires 16/07/1965 - Restauración 2023)",
+    "performers": "Martha Argerich"
+   }
+  }
+ ]
+}

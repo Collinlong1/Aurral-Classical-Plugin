@@ -1,0 +1,120 @@
+{
+ "id": "1613578929",
+ "category": "piano recital",
+ "title": "Hélène Grimaud Plays Rachmaninov",
+ "artist": "Hélène Grimaud",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Piano Concerto No. 2 in C Minor, Op. 18: I. Moderato",
+   "durationMs": 692413,
+   "artist": "Vladimir Ashkenazy, Philharmonia Orchestra & Hélène Grimaud",
+   "apple": {
+    "block": 1,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Piano Concerto No. 2 in C Minor, Op. 18",
+    "part": "I. Moderato",
+    "performers": "Philharmonia Orchestra, Vladimir Ashkenazy, Hélène Grimaud"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Piano Concerto No. 2 in C Minor, Op. 18: II. Adagio sostenuto",
+   "durationMs": 716507,
+   "artist": "Vladimir Ashkenazy, Philharmonia Orchestra & Hélène Grimaud",
+   "apple": {
+    "block": 1,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Piano Concerto No. 2 in C Minor, Op. 18",
+    "part": "II. Adagio sostenuto",
+    "performers": "Hélène Grimaud, Philharmonia Orchestra, Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Piano Concerto No. 2 in C Minor, Op. 18: III. Allegro scherzando",
+   "durationMs": 708827,
+   "artist": "Vladimir Ashkenazy, Philharmonia Orchestra & Hélène Grimaud",
+   "apple": {
+    "block": 1,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Piano Concerto No. 2 in C Minor, Op. 18",
+    "part": "III. Allegro scherzando",
+    "performers": "Vladimir Ashkenazy, Hélène Grimaud, Philharmonia Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Variations on a Theme of Corelli, Op. 42",
+   "durationMs": 1056733,
+   "artist": "Hélène Grimaud",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Variations on a Theme of Corelli in D Minor, Op. 42",
+    "part": "Variations on a Theme of Corelli, Op. 42",
+    "performers": "Hélène Grimaud"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "8 Études-tableaux, Op. 33: No. 1 in F Minor",
+   "durationMs": 186360,
+   "artist": "Hélène Grimaud",
+   "apple": {
+    "block": 3,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Études-tableaux, Op. 33",
+    "part": "No. 1 in F Minor",
+    "performers": "Hélène Grimaud"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "8 Études-tableaux, Op. 33: No. 2 in C Major",
+   "durationMs": 177773,
+   "artist": "Hélène Grimaud",
+   "apple": {
+    "block": 3,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Études-tableaux, Op. 33",
+    "part": "No. 2 in C Major",
+    "performers": "Hélène Grimaud"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "8 Études-tableaux, Op. 33: No. 8 in C-Sharp Minor",
+   "durationMs": 168227,
+   "artist": "Hélène Grimaud",
+   "apple": {
+    "block": 3,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Études-tableaux, Op. 33",
+    "part": "No. 8 in C-Sharp Minor",
+    "performers": "Hélène Grimaud"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "13 Preludes, Op. 32: No. 12 in G-Sharp Minor",
+   "durationMs": 174307,
+   "artist": "Hélène Grimaud",
+   "apple": {
+    "block": 4,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 12 in G-Sharp Minor, Op. 32/12",
+    "part": "No. 12 in G-Sharp Minor",
+    "performers": "Hélène Grimaud"
+   }
+  }
+ ]
+}

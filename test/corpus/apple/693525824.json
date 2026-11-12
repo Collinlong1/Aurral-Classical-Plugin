@@ -1,0 +1,442 @@
+{
+ "id": "693525824",
+ "category": "compilation",
+ "title": "The Very Best of Mozart",
+ "artist": "Various Artists",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Symphony No. 40 in G Minor, K. 550: I. Molto allegro",
+   "durationMs": 435429,
+   "artist": "Yehudi Menuhin & Sinfonia Varsovia",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Symphony No. 40 in G Minor, K. 550, KV 550",
+    "part": "I. Molto allegro",
+    "performers": "Yehudi Menuhin, Sinfonia Varsovia"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Missa in C Minor, K. 427: Et incarnatus est",
+   "durationMs": 526333,
+   "artist": "Collegium Cartusianum, Peter Neumann & Barbara Schlick",
+   "apple": {
+    "block": 2,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Mass in C Minor, K. 427, K. 417a, KV 427, KV 417a · “The Great Mass”",
+    "part": "Et incarnatus est",
+    "performers": "Barbara Schlick, Peter Neumann, Collegium Cartusianum"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Piano Concerto No. 21 in C Major, K. 467: II. Andante.",
+   "durationMs": 472653,
+   "artist": "Jean-Bernard Pommier & Sinfonia Varsovia",
+   "apple": {
+    "block": 3,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Concerto No. 21 in C Major, K. 467, KV 467 · “Elvira Madigan”",
+    "part": "II. Andante.",
+    "performers": "Jean-Bernard Pommier, Sinfonia Varsovia"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Don Giovanni K. 527: Ouvertura",
+   "durationMs": 311773,
+   "artist": "London Classical Players & Sir Roger Norrington",
+   "apple": {
+    "block": 4,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "Ouvertura",
+    "performers": "London Classical Players, Sir Roger Norrington"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Don Giovanni K. 527: Fin ch'han dal vino",
+   "durationMs": 100173,
+   "artist": "London Classical Players, Sir Roger Norrington & Andreas Schmidt",
+   "apple": {
+    "block": 4,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "Fin ch'han dal vino",
+    "performers": "Sir Roger Norrington, Andreas Schmidt, London Classical Players"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Don Giovanni K.5 27: Duettino: Là ci darem la mano (Giovanni / Zerlina)",
+   "durationMs": 160293,
+   "artist": "London Classical Players, Sir Roger Norrington, Andreas Schmidt & Nancy Argenta",
+   "apple": {
+    "block": 4,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "Duettino: Là ci darem la mano (Giovanni / Zerlina)",
+    "performers": "Sir Roger Norrington, London Classical Players, Nancy Argenta, Andreas Schmidt"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Violin Concerto No. 5 in A Major, K. 219 'Turkish': III. Rondeau (Tempo di menuetto - Allegro)",
+   "durationMs": 514067,
+   "artist": "Christian Tetzlaff & The Deutsche Kammerphilharmonie Bremen",
+   "apple": {
+    "block": 5,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Violin Concerto No. 5 in A Major, K. 219, KV 219 · “Turkish”",
+    "part": "III. Rondeau (Tempo di menuetto - Allegro)",
+    "performers": "The Deutsche Kammerphilharmonie Bremen, Christian Tetzlaff"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Le nozze di Figaro, K. 492: Overture",
+   "durationMs": 236933,
+   "artist": "Riccardo Muti & Vienna Philharmonic",
+   "apple": {
+    "block": 6,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Le Nozze di Figaro, K. 492, KV 492 · “The Marriage of Figaro”",
+    "part": "Overture",
+    "performers": "Vienna Philharmonic, Riccardo Muti"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Le nozze di Figaro, K. 492, Act 2: Voi che sapete (Cherubino)",
+   "durationMs": 175893,
+   "artist": "Ann Murray, Riccardo Muti & Vienna Philharmonic",
+   "apple": {
+    "block": 6,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Le Nozze di Figaro, K. 492, KV 492 · “The Marriage of Figaro”",
+    "part": "Voi che sapete (Cherubino)",
+    "performers": "Vienna Philharmonic, Riccardo Muti, Ann Murray"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Le nozze di Figaro, K. 492, Act I: Non più andrai (Figaro)",
+   "durationMs": 220840,
+   "artist": "Claudio Desderi, Bernard Haitink & London Philharmonic Orchestra",
+   "apple": {
+    "block": 7,
+    "composer": "W. A. Mozart: Le nozze di Figaro, K. 492, Act I",
+    "work": "W. A. Mozart: Le nozze di Figaro, K. 492, Act I",
+    "part": "Non più andrai (Figaro)",
+    "performers": "Vienna Philharmonic, Sir Thomas Allen, Riccardo Muti"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Le nozze di Figaro, K. 492, Act II: Porgi, amor",
+   "durationMs": 200053,
+   "artist": "Ivor Bolton, Véronique Gens & Orchestra of the Age of Enlightenment",
+   "apple": {
+    "block": 8,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Le Nozze di Figaro, K. 492, KV 492 · “The Marriage of Figaro”",
+    "part": "Porgi, amor",
+    "performers": "Ivor Bolton, Orchestra of the Age of Enlightenment, Véronique Gens"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Requiem in D Minor, K. 626: Requiem aeternam",
+   "durationMs": 251853,
+   "artist": "Michel Corboz, Efrat Ben Nun, Ensemble Vocal de Lausanne & Orchestre de Chambre de Genève",
+   "apple": {
+    "block": 9,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Requiem in D Minor, K. 626, KV 626",
+    "part": "Requiem aeternam",
+    "performers": "Ensemble Vocal de Lausanne, Orchestre de Chambre de Genève, Michel Corboz, Elisabeth Graf"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Requiem in D Minor, K. 626: Kyrie eleison",
+   "durationMs": 142693,
+   "artist": "Michel Corboz, Ensemble Vocal de Lausanne & Orchestre de Chambre de Genève",
+   "apple": {
+    "block": 9,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Requiem in D Minor, K. 626, KV 626",
+    "part": "Kyrie eleison",
+    "performers": "Michel Corboz, Orchestre de Chambre de Genève, Ensemble Vocal de Lausanne"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Requiem in D Minor, K. 626: Lacrimosa",
+   "durationMs": 196947,
+   "artist": "Michel Corboz, Ensemble Vocal de Lausanne & Orchestre de Chambre de Genève",
+   "apple": {
+    "block": 9,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Requiem in D Minor, K. 626, KV 626",
+    "part": "Lacrimosa",
+    "performers": "Michel Corboz, Orchestre de Chambre de Genève, Ensemble Vocal de Lausanne"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Symphony No. 41 in C Major, K. 551 'Jupiter': IV. Molto allegro",
+   "durationMs": 503987,
+   "artist": "Yehudi Menuhin & Sinfonia Varsovia",
+   "apple": {
+    "block": 10,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Symphony No. 41 in C Major, K. 551, KV 551 · “Jupiter Symphony”",
+    "part": "IV. Molto allegro",
+    "performers": "Sinfonia Varsovia, Yehudi Menuhin"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 1,
+   "title": "Symphony No. 25 in G Minor, K. 183: Allegro con brio",
+   "durationMs": 485230,
+   "artist": "English Chamber Orchestra & Jeffrey Tate",
+   "apple": {
+    "block": 11,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Symphony No. 25 in G Minor, K. 183, K. 173dB, KV 183, KV 173dB",
+    "part": "Allegro con brio",
+    "performers": "Jeffrey Tate, English Chamber Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 2,
+   "title": "Die Zauberflöte, K. 620, Act II: Der Hölle Rache (Königin)",
+   "durationMs": 170653,
+   "artist": "Bavarian Radio Symphony Orchestra, Edita Gruberová & Bernard Haitink",
+   "apple": {
+    "block": 12,
+    "composer": "W. A. Mozart: Die Zauberflöte, K. 620, Act II",
+    "work": "W. A. Mozart: Die Zauberflöte, K. 620, Act II",
+    "part": "Der Hölle Rache (Königin)",
+    "performers": "Bavarian Radio Symphony Orchestra, Bernard Haitink, Edita Gruberová, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 3,
+   "title": "Die Zauberflöte, Act I: Der Vogelfänger bin ich ja (Papageno)",
+   "durationMs": 116413,
+   "artist": "London Classical Players, Sir Roger Norrington & Andreas Schmidt",
+   "apple": {
+    "block": 13,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Die Zauberflöte, K. 620, KV 620 · “The Magic Flute”",
+    "part": "Der Vogelfänger bin ich ja (Papageno)",
+    "performers": "Sir Roger Norrington, London Classical Players, Andreas Schmidt"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 4,
+   "title": "Die Zauberflöte, K. 620, Act II: O Isis und Osiris (Sarastro/Priester)",
+   "durationMs": 136307,
+   "artist": "London Classical Players, Sir Roger Norrington, Schütz Choir of London & Wolfgang Riedelbauch",
+   "apple": {
+    "block": 13,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Die Zauberflöte, K. 620, KV 620 · “The Magic Flute”",
+    "part": "O Isis und Osiris (Sarastro/Priester)",
+    "performers": "Wolfgang Riedelbauch, Schütz Choir of London, Sir Roger Norrington, London Classical Players"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 5,
+   "title": "Die Zauberflöte, K. 620, Act I: O zittre nicht, mein lieber Sohn (Königin der Nacht)",
+   "durationMs": 259320,
+   "artist": "Nancy Argenta, London Classical Players & Sir Roger Norrington",
+   "apple": {
+    "block": 13,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Die Zauberflöte, K. 620, KV 620 · “The Magic Flute”",
+    "part": "O zittre nicht, mein lieber Sohn (Königin der Nacht)",
+    "performers": "London Classical Players, Sir Roger Norrington, Nancy Argenta"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 6,
+   "title": "Die Zauberflöte, K. 620, Act II: Pa-pa-pa ... (Papageno/Papagena)",
+   "durationMs": 144480,
+   "artist": "London Classical Players, Sir Roger Norrington, Andreas Schmidt & Catherine Pierard",
+   "apple": {
+    "block": 14,
+    "composer": "W. A. Mozart: Die Zauberflöte, K. 620, Act II",
+    "work": "W. A. Mozart: Die Zauberflöte, K. 620, Act II",
+    "part": "Pa-pa-pa ... (Papageno/Papagena)",
+    "performers": "London Classical Players, Sir Roger Norrington, Andreas Schmidt, Catherine Pierard"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 7,
+   "title": "Piano Sonata No. 11 in A Major, K. 331: III. Rondo alla turca",
+   "durationMs": 224960,
+   "artist": "Jean-Bernard Pommier",
+   "apple": {
+    "block": 15,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Sonata No. 11 in A Major, K. 331, K. 300i, KV 331, KV 300i · “Alla Turca”",
+    "part": "III. Rondo alla turca",
+    "performers": "Jean-Bernard Pommier"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 8,
+   "title": "Clarinet Quintet in A Major K. 581: II. Larghetto",
+   "durationMs": 388027,
+   "artist": "Cherubini Quartet & Michel Portal",
+   "apple": {
+    "block": 16,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Clarinet Quintet in A Major, K. 581, KV 581 · “Stadler”",
+    "part": "II. Larghetto",
+    "performers": "Cherubini Quartet, Michel Portal"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 9,
+   "title": "Ave verum corpus in D Major, K. 618",
+   "durationMs": 160720,
+   "artist": "Coppola E Il Suo Sestetto, London Classical Players & Sir Roger Norrington",
+   "apple": {
+    "block": 17,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Ave verum Corpus in D Major, K. 618, KV 618",
+    "part": "Ave verum corpus in D Major, K. 618",
+    "performers": "Coppola E Il Suo Sestetto, Sir Roger Norrington, London Classical Players, The Schütz Consort, Schütz Choir of London"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 10,
+   "title": "String Quartet No. 14 in G Major, K. 387: IV. Molto allegro",
+   "durationMs": 463120,
+   "artist": "Smithson String Quartet",
+   "apple": {
+    "block": 18,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "String Quartet No. 14 in G Major, K. 387, KV 387 · “Haydn Quartet No. 1: Spring”",
+    "part": "IV. Molto allegro",
+    "performers": "Smithson String Quartet"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 11,
+   "title": "Serenade No. 13 in G Major, K. 525 'Eine kleine Nachtmusik': I. Allegro",
+   "durationMs": 340773,
+   "artist": "London Chamber Orchestra & Christopher Warren-Green",
+   "apple": {
+    "block": 19,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Serenade No. 13 in G Major, K. 525, KV 525 · “Eine kleine Nachtmusik (A Little Night Music)”",
+    "part": "I. Allegro",
+    "performers": "Christopher Warren-Green, London Chamber Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 12,
+   "title": "Das Butterbrot",
+   "durationMs": 74387,
+   "artist": "Emile Naoumoff",
+   "apple": {
+    "block": 20,
+    "composer": "L. Mozart: Das Butterbrot",
+    "work": "L. Mozart: Das Butterbrot",
+    "part": "Das Butterbrot",
+    "performers": "Emile Naoumoff"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 13,
+   "title": "Horn Concerto No. 4 in E-Flat Major, K. 495: III. Rondo (Allegro vivace)",
+   "durationMs": 233800,
+   "artist": "Timothy Brown, Sigiswald Kuijken & Orchestra of the Age of Enlightenment",
+   "apple": {
+    "block": 21,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Horn Concerto No. 4 in E-Flat Major, K. 495, KV 495",
+    "part": "III. Rondo (Allegro vivace)",
+    "performers": "Sigiswald Kuijken, Orchestra of the Age of Enlightenment, Timothy Brown"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 14,
+   "title": "Die Entführung aus dem Serail, K. 384: Overture",
+   "durationMs": 342747,
+   "artist": "Academy of St Martin in the Fields & Neville Marriner",
+   "apple": {
+    "block": 22,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Die Entführung aus dem Serail, K. 384, KV 384 · “The Abduction from the Seraglio”",
+    "part": "Overture",
+    "performers": "Academy of St Martin in the Fields, Neville Marriner"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 15,
+   "title": "Flute & Harp Concerto in C Major, K. 299: II. Andantino",
+   "durationMs": 551840,
+   "artist": "Samuel Coles, English Chamber Orchestra, Yehudi Menuhin & Naoko Yoshino",
+   "apple": {
+    "block": 23,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Flute & Harp Concerto in C Major, K. 299, K. 297c, KV 299, KV 297c",
+    "part": "II. Andantino",
+    "performers": "Samuel Coles, English Chamber Orchestra, Yehudi Menuhin, Naoko Yoshino"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 16,
+   "title": "Mass No. 16 in C Major, K. 317 'Coronation': Gloria",
+   "durationMs": 263733,
+   "artist": "Collegium Cartusianum, Cologne Chamber Choir, Patrizia Kwella, Peter Neumann, Christoph Prégardien, Franz-Josef Selig & Ulla Groenewold",
+   "apple": {
+    "block": 24,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Mass in C Major, K. 317, KV 317 · “Coronation Mass”",
+    "part": "Gloria",
+    "performers": "Peter Neumann, Collegium Cartusianum, Christoph Prégardien, Ulla Groenewold, Cologne Chamber Choir, Franz-Josef Selig, Patrizia Kwella"
+   }
+  }
+ ]
+}

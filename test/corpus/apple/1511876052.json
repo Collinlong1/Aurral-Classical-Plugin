@@ -1,0 +1,400 @@
+{
+ "id": "1511876052",
+ "category": "compilation",
+ "title": "Classical Music for Studying",
+ "artist": "Various Artists",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Serenade No. 13 in G Major, K. 525 \"Eine kleine Nachtmusik\" : II. Romanze: Andante (with Pavel Bubelnikov)",
+   "durationMs": 411187,
+   "artist": "St. Petersburg Musical Theatre \"Zazerkalye\" Chamber Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Serenade No. 13 in G Major, K. 525, KV 525 · “Eine kleine Nachtmusik (A Little Night Music)”",
+    "part": "II. Romanze: Andante (with Pavel Bubelnikov)",
+    "performers": "Slovak Philharmonic Orchestra, Zdenek Kosler"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "The Four Seasons - Violin Concerto in F Major, RV 293, “Autumn” : I. Allegro (with Pavel Popov & Stanislav Gorkovenko)",
+   "durationMs": 347973,
+   "artist": "Saint Petersburg Radio and TV Symphony Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Antonio Vivaldi",
+    "work": "Violin Concerto in F Major, Op. 8/3, RV 293 · “Autumn from The Four Seasons”",
+    "part": "I. Allegro (with Pavel Popov & Stanislav Gorkovenko)",
+    "performers": "Saint Petersburg Radio and TV Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Serenade for Strings in C Major, Op. 48 : II. Valse (with Alexander Titov)",
+   "durationMs": 224470,
+   "artist": "New Classical Orchestra Saint Petersburg",
+   "apple": {
+    "block": 3,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "Serenade for Strings in C Major, Op. 48, TH 48",
+    "part": "II. Valse (with Alexander Titov)",
+    "performers": "New Classical Orchestra Saint Petersburg, Alexander Titov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Divertimento in F major, K.138/125c : II. Andante (with Alexander Titov)",
+   "durationMs": 398472,
+   "artist": "Orchestra New Philharmony Saint Petersburg",
+   "apple": {
+    "block": 4,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Divertimento No. 3 in F Major, K. 138, KV 138",
+    "part": "II. Andante (with Alexander Titov)",
+    "performers": "Orchestra New Philharmony Saint Petersburg, Alexander Titov, St. Petersburg New Philharmonia"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Holberg Suite, Op. 40 : 2. Sarabande (with Saulius Sondeckis)",
+   "durationMs": 234040,
+   "artist": "Lithuanian Chamber Orchestra",
+   "apple": {
+    "block": 5,
+    "composer": "Edvard Grieg",
+    "work": "Holberg Suite, Op. 40 · “Fra Holbergs Tid”",
+    "part": "2. Sarabande (with Saulius Sondeckis)",
+    "performers": "Lithuanian Chamber Orchestra, Saulius Sondeckis"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Viola Concerto, TWV 51:G9 : I. Largo (with Hartmut Rohde & Georg Mais)",
+   "durationMs": 178493,
+   "artist": "Lithuanian Chamber Orchestra",
+   "apple": {
+    "block": 6,
+    "composer": "Georg Philipp Telemann",
+    "work": "Concerto in G Minor, TWV 42:g2",
+    "part": "I. Largo (with Hartmut Rohde & Georg Mais)",
+    "performers": "Lithuanian Chamber Orchestra, Hartmut Rohde"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Symphony No. 36 in C Major, K. 425 : II. Andante Con Moto (with Vakhtang Kakhidze)",
+   "durationMs": 598093,
+   "artist": "Tbilisi Symphony Orchestra",
+   "apple": {
+    "block": 7,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Symphony No. 36 in C Major, K. 425, KV 425 · “Linz”",
+    "part": "II. Andante Con Moto (with Vakhtang Kakhidze)",
+    "performers": "Tbilisi Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Kinderszenen, Op. 15 : 7. Träumerei",
+   "durationMs": 161173,
+   "artist": "Jurgis Karnavichius",
+   "apple": {
+    "block": 8,
+    "composer": "Robert Schumann",
+    "work": "Kinderszenen, Op. 15 · “Scenes from Childhood”",
+    "part": "7. Träumerei",
+    "performers": "Jurgis Karnavichius"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Carnival of the Animals : XIII. the Swan (with Stanislav Gorkovenko, Vladimir Shakin, Pavel Jegorov & Alexei Massarsky)",
+   "durationMs": 184581,
+   "artist": "Saint Petersburg Radio and TV Symphony Orchestra",
+   "apple": {
+    "block": 9,
+    "composer": "Camille Saint-Saëns",
+    "work": "Le carnaval des animaux, R. 125 · “The Carnival of the Animals”",
+    "part": "XIII. the Swan (with Stanislav Gorkovenko, Vladimir Shakin, Pavel Jegorov & Alexei Massarsky)",
+    "performers": "Saint Petersburg Radio and TV Symphony Orchestra, Stanislav Gorkovenko, St. Petersburg Radio Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "The Four Seasons - Violin Concerto in E Major, RV 269, “Spring” : I. Allegro (with Pavel Popov & Stanislav Gorkovenko)",
+   "durationMs": 194600,
+   "artist": "Saint Petersburg Radio and TV Symphony Orchestra",
+   "apple": {
+    "block": 10,
+    "composer": "Antonio Vivaldi",
+    "work": "Violin Concerto in E Major, Op. 8/1, RV 269 · “Spring from The Four Seasons”",
+    "part": "I. Allegro (with Pavel Popov & Stanislav Gorkovenko)",
+    "performers": "Saint Petersburg Radio and TV Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Suite Bergamasque, L. 75 : No. 3, Clair De Lune",
+   "durationMs": 242693,
+   "artist": "Natalia Stolarska & Bogdan Kutakowski",
+   "apple": {
+    "block": 11,
+    "composer": "Claude Debussy",
+    "work": "Suite bergamasque, CD 82, L. 75",
+    "part": "No. 3, Clair De Lune",
+    "performers": "Bogdan Kutakowski, Natalia Stolarska"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Symphony No. 2 in E Minor, Op. 27 : III. Adagio (with Jahni Mardjani)",
+   "durationMs": 944940,
+   "artist": "Tbilisi Symphony Orchestra",
+   "apple": {
+    "block": 12,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Symphony No. 2 in E Minor, Op. 27",
+    "part": "III. Adagio (with Jahni Mardjani)",
+    "performers": "Tbilisi Symphony Orchestra, Georgian SIMI Festival Orchestra, Jahni Mardjani"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "24 Préludes, Op. 28 : No. 15, Sostenuto in D-Flat Major",
+   "durationMs": 349160,
+   "artist": "Ketevan Badridze",
+   "apple": {
+    "block": 13,
+    "composer": "Frédéric Chopin",
+    "work": "24 Préludes, C. 166-189, Op. 28",
+    "part": "No. 15, Sostenuto in D-Flat Major",
+    "performers": "Ketevan Badridze"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Piano Concerto No. 1 in C Major, Op. 15 : II. Largo (with Eliso Bolkvadze & Djansug Kakhidze)",
+   "durationMs": 641133,
+   "artist": "Tbilisi Symphony Orchestra",
+   "apple": {
+    "block": 14,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Concerto No. 1 in C Major, Op. 15",
+    "part": "II. Largo (with Eliso Bolkvadze & Djansug Kakhidze)",
+    "performers": "Tbilisi Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Andante in C Major, K.315/285e (with Valentinas Gelgotas & Saulius Sondeckis)",
+   "durationMs": 392000,
+   "artist": "Lithuanian Chamber Orchestra",
+   "apple": {
+    "block": 15,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Andante for Flute and Orchestra in C Major, K. 315, K. 285e, KV 315, KV 285e",
+    "part": "Andante in C Major, K.315/285e (with Valentinas Gelgotas & Saulius Sondeckis)",
+    "performers": "Lithuanian Chamber Orchestra, Valentinas Gelgotas, Saulius Sondeckis"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Variations on a Rococo Theme, Op. 33 : Var. III. Andante Sostenuto (with Stanislav Gorkovenko)",
+   "durationMs": 247573,
+   "artist": "Saint Petersburg Radio and TV Symphony Orchestra & Sergei Roldugin",
+   "apple": {
+    "block": 16,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "Variations on a Rococo Theme in A Major, Op. 33, Op. 33b, TH 57, TH 57b",
+    "part": "Var. III. Andante Sostenuto (with Stanislav Gorkovenko)",
+    "performers": "Sergei Roldugin, Saint Petersburg Radio and TV Symphony Orchestra, Stanislav Gorkovenko, St. Petersburg Radio Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Peer Gynt Suite No. 2, Op. 55 : IV. Solveig's Song (with Djansug Kakhidze)",
+   "durationMs": 353573,
+   "artist": "Tbilisi Symphony Orchestra",
+   "apple": {
+    "block": 17,
+    "composer": "Edvard Grieg",
+    "work": "Peer Gynt Suite No. 2, Op. 55",
+    "part": "IV. Solveig's Song (with Djansug Kakhidze)",
+    "performers": "Tbilisi Symphony Orchestra, Jansug Kakhidze"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Suite No. 3 in D Major, BWV 1068 : II. Air",
+   "durationMs": 304960,
+   "artist": "Capriccio Quintet",
+   "apple": {
+    "block": 18,
+    "composer": "Johann Sebastian Bach",
+    "work": "Orchestral Suite No. 3 in D Major, BWV 1068",
+    "part": "II. Air",
+    "performers": "Capriccio Quintet, Johann Sebastian Bach"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "Concerto grosso in D Major, No. 1, Op. 6 : IV. Allegro (with Alexander Titov)",
+   "durationMs": 135850,
+   "artist": "New Classical Orchestra Saint Petersburg",
+   "apple": {
+    "block": 19,
+    "composer": "Arcangelo Corelli",
+    "work": "Concerto Grosso No. 1 in D Major, Op. 6/1",
+    "part": "IV. Allegro (with Alexander Titov)",
+    "performers": "New Classical Orchestra Saint Petersburg"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "Liebesträume, S. 541 : No. 3, Oh Lieb, so lang du lieben kannst in a-Flat Major",
+   "durationMs": 354307,
+   "artist": "Aldona Dvarionaité",
+   "apple": {
+    "block": 20,
+    "composer": "Franz Liszt",
+    "work": "Liebesträume, S. 541",
+    "part": "No. 3, Oh Lieb, so lang du lieben kannst in a-Flat Major",
+    "performers": "Aldona Dvarionaité"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "Piano Concerto No. 21 in C Major, K. 467 : II. Andante (with Tamara Sanikidze & Vakhtang Kakhidze)",
+   "durationMs": 467173,
+   "artist": "Tbilisi Symphony Orchestra",
+   "apple": {
+    "block": 21,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Concerto No. 21 in C Major, K. 467, KV 467 · “Elvira Madigan”",
+    "part": "II. Andante (with Tamara Sanikidze & Vakhtang Kakhidze)",
+    "performers": "Tbilisi Symphony Orchestra, Jansug Kakhidze, Andrea Popova"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "Concerto for Guitar and Strings in D Major, RV 93 : II. Largo (with Marcos Tsessos & Vladimir Altschuler)",
+   "durationMs": 369136,
+   "artist": "Chamber Orchestra of the Saint Petersburg Philharmony",
+   "apple": {
+    "block": 22,
+    "composer": "Antonio Vivaldi",
+    "work": "Chamber Concerto in D Major, RV 93 · “Concerto for Lute, 2 Violins and Continuo”",
+    "part": "II. Largo (with Marcos Tsessos & Vladimir Altschuler)",
+    "performers": "Chamber Orchestra of the Saint Petersburg Philharmony, Vladimir Altschuler, St Petersburg Chamber Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 23,
+   "title": "Viola Concerto, TWV 51:G9 : IV. Presto (with Hartmut Rohde & Georg Mais)",
+   "durationMs": 204627,
+   "artist": "Lithuanian Chamber Orchestra",
+   "apple": {
+    "block": 23,
+    "composer": "Georg Philipp Telemann",
+    "work": "Concerto in B Minor, TWV 42:h2",
+    "part": "IV. Presto (with Hartmut Rohde & Georg Mais)",
+    "performers": "Lithuanian Chamber Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 24,
+   "title": "Waltzes, Op. 69 : No. 1 Lento in a-Flat Major (with Aldona Dvarionaité)",
+   "durationMs": 245917,
+   "artist": "Aldona Dvarionaité",
+   "apple": {
+    "block": 24,
+    "composer": "Frédéric Chopin",
+    "work": "Waltz No. 13 in D-Flat Major, B. 40, Op. 70/3",
+    "part": "No. 1 Lento in a-Flat Major (with Aldona Dvarionaité)",
+    "performers": "Aldona Dvarionaité"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 25,
+   "title": "The Seasons, Op. 37a : No. 6 June: Barcarolle",
+   "durationMs": 303080,
+   "artist": "Andrei Ivanovich",
+   "apple": {
+    "block": 25,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Seasons, Op. 37a, Op. 37b, TH 135",
+    "part": "No. 6 June: Barcarolle",
+    "performers": "Andrei Ivanovich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 26,
+   "title": "Symphony No. 36 in C Major, K. 425 : III. Menuetto (with Vakhtang Kakhidze)",
+   "durationMs": 223800,
+   "artist": "Tbilisi Symphony Orchestra",
+   "apple": {
+    "block": 26,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Symphony No. 36 in C Major, K. 425, KV 425 · “Linz”",
+    "part": "III. Menuetto (with Vakhtang Kakhidze)",
+    "performers": "Tbilisi Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 27,
+   "title": "Nocturnes, Op. 27 : No. 2, Lento Sostenuto in D-Flat Major",
+   "durationMs": 371973,
+   "artist": "Andrei Ivanovich",
+   "apple": {
+    "block": 27,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 8 in D-Flat Major, B. 96, Op. 27/2 · “Les plaintives 2”",
+    "part": "No. 2, Lento Sostenuto in D-Flat Major",
+    "performers": "Andrei Ivanovich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 28,
+   "title": "14 Romances, Op. 34 : No. 14, Vocalise (with Pavel Bubelnikov)",
+   "durationMs": 399160,
+   "artist": "Saint Petersburg Orchestra of the State Hermitage Museum Camerata",
+   "apple": {
+    "block": 28,
+    "composer": "Sergei Rachmaninoff",
+    "work": "14 Romances, Op. 34 · “14 Songs”",
+    "part": "No. 14, Vocalise (with Pavel Bubelnikov)",
+    "performers": "Saint Petersburg Orchestra of the State Hermitage Museum Camerata"
+   }
+  }
+ ]
+}

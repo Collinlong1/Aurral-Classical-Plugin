@@ -1,0 +1,344 @@
+{
+ "id": "1452652043",
+ "category": "symphony",
+ "title": "Haydn: The London Symphonies - Nos. 93, 94, 97, 99 & 101",
+ "artist": "Royal Concertgebouw Orchestra & Sir Colin Davis",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Symphony in D, H.I No. 93: I. Adagio - Allegro Assai",
+   "durationMs": 471000,
+   "artist": "Royal Concertgebouw Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 93 in D Major, Hob. I/93",
+    "part": "I. Adagio - Allegro Assai",
+    "performers": "Sir Colin Davis, Royal Concertgebouw Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Symphony in D, H.I No. 93: II. Largo Cantabile",
+   "durationMs": 295000,
+   "artist": "Royal Concertgebouw Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 93 in D Major, Hob. I/93",
+    "part": "II. Largo Cantabile",
+    "performers": "Royal Concertgebouw Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Symphony in D, H.I No. 93: III. Menuetto - Allegro",
+   "durationMs": 247000,
+   "artist": "Royal Concertgebouw Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 93 in D Major, Hob. I/93",
+    "part": "III. Menuetto - Allegro",
+    "performers": "Sir Colin Davis, Royal Concertgebouw Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Symphony in D, H.I No. 93: IV. Finale - Presto Ma Non Troppo",
+   "durationMs": 315000,
+   "artist": "Royal Concertgebouw Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 93 in D Major, Hob. I/93",
+    "part": "IV. Finale - Presto Ma Non Troppo",
+    "performers": "Sir Colin Davis, Royal Concertgebouw Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Symphony in E-Flat, H.I No. 99: I. Adagio - Vivace Assai",
+   "durationMs": 530000,
+   "artist": "Royal Concertgebouw Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 2,
+    "composer": "J. Haydn: Symphony in E-Flat, H.I No. 99",
+    "work": "J. Haydn: Symphony in E-Flat, H.I No. 99",
+    "part": "I. Adagio - Vivace Assai",
+    "performers": "Sir Colin Davis, Royal Concertgebouw Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Symphony in E-Flat, H.I No. 99: II. Adagio",
+   "durationMs": 551000,
+   "artist": "Royal Concertgebouw Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 2,
+    "composer": "J. Haydn: Symphony in E-Flat, H.I No. 99",
+    "work": "J. Haydn: Symphony in E-Flat, H.I No. 99",
+    "part": "II. Adagio",
+    "performers": "Sir Colin Davis, Royal Concertgebouw Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Symphony in E-Flat, H.I No. 99: III. Menuetto - Allegretto",
+   "durationMs": 357000,
+   "artist": "Royal Concertgebouw Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 2,
+    "composer": "J. Haydn: Symphony in E-Flat, H.I No. 99",
+    "work": "J. Haydn: Symphony in E-Flat, H.I No. 99",
+    "part": "III. Menuetto - Allegretto",
+    "performers": "Royal Concertgebouw Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Symphony in E-Flat, H.I No. 99: IV. Finale - Vivace",
+   "durationMs": 259000,
+   "artist": "Royal Concertgebouw Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 3,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 99 in E-Flat Major, Hob. I/99",
+    "part": "IV. Finale - Vivace",
+    "performers": "Royal Concertgebouw Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Symphony in G, H.I No. 100 - \"Military\": I. Adagio - Allegro",
+   "durationMs": 490000,
+   "artist": "Royal Concertgebouw Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 4,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 100 in G Major, Hob. I/100 · “Military”",
+    "part": "I. Adagio - Allegro",
+    "performers": "Sir Colin Davis, Royal Concertgebouw Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Symphony in G, H.I No. 100 - \"Military\": II. Allegretto",
+   "durationMs": 370000,
+   "artist": "Royal Concertgebouw Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 4,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 100 in G Major, Hob. I/100 · “Military”",
+    "part": "II. Allegretto",
+    "performers": "Royal Concertgebouw Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Symphony in G, H.I No. 100 - \"Military\": III. Menuet - Moderato",
+   "durationMs": 305493,
+   "artist": "Royal Concertgebouw Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 4,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 100 in G Major, Hob. I/100 · “Military”",
+    "part": "III. Menuet - Moderato",
+    "performers": "Sir Colin Davis, Royal Concertgebouw Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Symphony in G, H.I No. 100 - \"Military\": 4. Finale - Presto",
+   "durationMs": 316507,
+   "artist": "Royal Concertgebouw Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 4,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 100 in G Major, Hob. I/100 · “Military”",
+    "part": "4. Finale - Presto",
+    "performers": "Sir Colin Davis, Royal Concertgebouw Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 1,
+   "title": "Symphony in G, H.I No. 94 - \"Surprise\": I. Adagio - Vivace Assai",
+   "durationMs": 509000,
+   "artist": "Royal Concertgebouw Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 5,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 94 in G Major, Hob. I/94 · “Surprise”",
+    "part": "I. Adagio - Vivace Assai",
+    "performers": "Royal Concertgebouw Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 2,
+   "title": "Symphony in G, H.I No. 94 - \"Surprise\": II. Andante",
+   "durationMs": 374000,
+   "artist": "Royal Concertgebouw Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 5,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 94 in G Major, Hob. I/94 · “Surprise”",
+    "part": "II. Andante",
+    "performers": "Royal Concertgebouw Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 3,
+   "title": "Symphony in G, H.I No. 94 - \"Surprise\": III. Menuet - Allegro Molto",
+   "durationMs": 291000,
+   "artist": "Royal Concertgebouw Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 5,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 94 in G Major, Hob. I/94 · “Surprise”",
+    "part": "III. Menuet - Allegro Molto",
+    "performers": "Royal Concertgebouw Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 4,
+   "title": "Symphony in G, H.I No. 94 - \"Surprise\": IV. Finale - Allegro Di Molto",
+   "durationMs": 241000,
+   "artist": "Royal Concertgebouw Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 5,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 94 in G Major, Hob. I/94 · “Surprise”",
+    "part": "IV. Finale - Allegro Di Molto",
+    "performers": "Royal Concertgebouw Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 5,
+   "title": "Symphony in C, H.I No. 97: I. Adagio - Vivace",
+   "durationMs": 515000,
+   "artist": "Royal Concertgebouw Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 6,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 97 in C Major, Hob. I/97",
+    "part": "I. Adagio - Vivace",
+    "performers": "Sir Colin Davis, Royal Concertgebouw Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 6,
+   "title": "Symphony in C, H.I No. 97: II. Adagio Ma Non Troppo",
+   "durationMs": 445000,
+   "artist": "Royal Concertgebouw Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 6,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 97 in C Major, Hob. I/97",
+    "part": "II. Adagio Ma Non Troppo",
+    "performers": "Sir Colin Davis, Royal Concertgebouw Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 7,
+   "title": "Symphony in C, H.I No. 97: III. Menuetto - Allegretto",
+   "durationMs": 246000,
+   "artist": "Royal Concertgebouw Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 6,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 97 in C Major, Hob. I/97",
+    "part": "III. Menuetto - Allegretto",
+    "performers": "Sir Colin Davis, Royal Concertgebouw Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 8,
+   "title": "Symphony in C, H.I No. 97: IV. Finale - Presto Assai",
+   "durationMs": 328000,
+   "artist": "Royal Concertgebouw Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 6,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 97 in C Major, Hob. I/97",
+    "part": "IV. Finale - Presto Assai",
+    "performers": "Sir Colin Davis, Royal Concertgebouw Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 9,
+   "title": "Symphony in D, H.I No. 101 - \"The Clock\": I. Adagio - Presto",
+   "durationMs": 474000,
+   "artist": "Royal Concertgebouw Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 7,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 101 in D Major, Hob. I/101 · “The Clock”",
+    "part": "I. Adagio - Presto",
+    "performers": "Sir Colin Davis, Royal Concertgebouw Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 10,
+   "title": "Symphony in D, H.I No. 101 - \"The Clock\": II. Andante",
+   "durationMs": 415000,
+   "artist": "Royal Concertgebouw Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 7,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 101 in D Major, Hob. I/101 · “The Clock”",
+    "part": "II. Andante",
+    "performers": "Sir Colin Davis, Royal Concertgebouw Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 11,
+   "title": "Symphony in D, H.I No. 101 - \"The Clock\": III. Menuet - Allegretto - Trio",
+   "durationMs": 436000,
+   "artist": "Royal Concertgebouw Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 7,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 101 in D Major, Hob. I/101 · “The Clock”",
+    "part": "III. Menuet - Allegretto - Trio",
+    "performers": "Sir Colin Davis, Royal Concertgebouw Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 12,
+   "title": "Symphony in D, H.I No. 101 - \"The Clock\": IV. Finale - Vivace",
+   "durationMs": 284000,
+   "artist": "Royal Concertgebouw Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 7,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 101 in D Major, Hob. I/101 · “The Clock”",
+    "part": "IV. Finale - Vivace",
+    "performers": "Sir Colin Davis, Royal Concertgebouw Orchestra"
+   }
+  }
+ ]
+}

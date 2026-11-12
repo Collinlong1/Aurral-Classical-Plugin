@@ -1,0 +1,736 @@
+{
+ "id": "1452972792",
+ "category": "baroque early",
+ "title": "Bach: Brandenburg Concertos - Orchestral Suites - Violin Concertos",
+ "artist": "Academy of St Martin in the Fields & Neville Marriner",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Brandenburg Concerto No. 1 in F Major, BWV 1046: I. Allegro",
+   "durationMs": 236000,
+   "artist": "Carl Pini, Neville Marriner & Academy of St Martin in the Fields",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 1 in F Major, BWV 1046",
+    "part": "I. Allegro",
+    "performers": "Carl Pini, Neville Marriner, Academy of St Martin in the Fields"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Brandenburg Concerto No. 1 in F Major, BWV 1046: II. Adagio",
+   "durationMs": 244800,
+   "artist": "Carl Pini, Neville Marriner & Academy of St Martin in the Fields",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 1 in F Major, BWV 1046",
+    "part": "II. Adagio",
+    "performers": "Neville Marriner, Carl Pini, Academy of St Martin in the Fields"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Brandenburg Concerto No. 1 in F Major, BWV 1046: III. Allegro",
+   "durationMs": 254200,
+   "artist": "Carl Pini, Neville Marriner & Academy of St Martin in the Fields",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 1 in F Major, BWV 1046",
+    "part": "III. Allegro",
+    "performers": "Academy of St Martin in the Fields, Neville Marriner, Carl Pini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Brandenburg Concerto No. 1 in F Major, BWV 1046: IV. Menuet - Trio - Polonaise",
+   "durationMs": 446000,
+   "artist": "Carl Pini, Neville Marriner & Academy of St Martin in the Fields",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 1 in F Major, BWV 1046",
+    "part": "IV. Menuet - Trio - Polonaise",
+    "performers": "Carl Pini, Academy of St Martin in the Fields, Neville Marriner"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Brandenburg Concerto No. 2 in F Major, BWV 1047: I. Allegro",
+   "durationMs": 306000,
+   "artist": "Henryk Szeryng, Neville Marriner, Academy of St Martin in the Fields, Michala Petri, Heinz Holliger & André Bernard",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 2 in F Major, BWV 1047",
+    "part": "I. Allegro",
+    "performers": "Henryk Szeryng, André Bernard, Heinz Holliger, Michala Petri, Neville Marriner, Academy of St Martin in the Fields"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Brandenburg Concerto No. 2 in F Major, BWV 1047: II. Andante",
+   "durationMs": 216000,
+   "artist": "Henryk Szeryng, Neville Marriner, Academy of St Martin in the Fields, Michala Petri & Heinz Holliger",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 2 in F Major, BWV 1047",
+    "part": "II. Andante",
+    "performers": "Henryk Szeryng, Academy of St Martin in the Fields, Neville Marriner, Heinz Holliger, Michala Petri"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Brandenburg Concerto No. 2 in F Major, BWV 1047: III. Allegro assai",
+   "durationMs": 174000,
+   "artist": "Henryk Szeryng, Neville Marriner, Academy of St Martin in the Fields, Michala Petri, Heinz Holliger & André Bernard",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 2 in F Major, BWV 1047",
+    "part": "III. Allegro assai",
+    "performers": "Henryk Szeryng, André Bernard, Heinz Holliger, Michala Petri, Academy of St Martin in the Fields, Neville Marriner"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Brandenburg Concerto No. 3 in G Major, BWV 1048: I. Allegro",
+   "durationMs": 368000,
+   "artist": "Academy of St Martin in the Fields & Neville Marriner",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 3 in G Major, BWV 1048",
+    "part": "I. Allegro",
+    "performers": "Academy of St Martin in the Fields, Neville Marriner"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Brandenburg Concerto No. 3 in G Major, BWV 1048: II. Adagio",
+   "durationMs": 103000,
+   "artist": "Academy of St Martin in the Fields & Neville Marriner",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 3 in G Major, BWV 1048",
+    "part": "II. Adagio",
+    "performers": "Neville Marriner, Academy of St Martin in the Fields"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Brandenburg Concerto No. 3 in G Major, BWV 1048: III. Allegro",
+   "durationMs": 335000,
+   "artist": "Academy of St Martin in the Fields & Neville Marriner",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 3 in G Major, BWV 1048",
+    "part": "III. Allegro",
+    "performers": "Academy of St Martin in the Fields, Neville Marriner"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Brandenburg Concerto No. 4 in G Major, BWV 1049: I. Allegro",
+   "durationMs": 446000,
+   "artist": "Henryk Szeryng, Neville Marriner, Academy of St Martin in the Fields, Michala Petri & Elisabeth Selin",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 4 in G Major, BWV 1049",
+    "part": "I. Allegro",
+    "performers": "Henryk Szeryng, Michala Petri, Academy of St Martin in the Fields, Elisabeth Selin, Neville Marriner"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Brandenburg Concerto No. 4 in G Major, BWV 1049: II. Andante",
+   "durationMs": 223307,
+   "artist": "Henryk Szeryng, Neville Marriner, Academy of St Martin in the Fields, Michala Petri & Elisabeth Selin",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 4 in G Major, BWV 1049",
+    "part": "II. Andante",
+    "performers": "Michala Petri, Henryk Szeryng, Elisabeth Selin, Neville Marriner, Academy of St Martin in the Fields"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Brandenburg Concerto No. 4 in G Major, BWV 1049 III. Presto",
+   "durationMs": 298693,
+   "artist": "Henryk Szeryng, Neville Marriner, Academy of St Martin in the Fields, Michala Petri & Elisabeth Selin",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 4 in G Major, BWV 1049",
+    "part": "III. Presto",
+    "performers": "Michala Petri, Academy of St Martin in the Fields, Elisabeth Selin, Neville Marriner, Henryk Szeryng"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Brandenburg Concerto No. 6 in B-Flat Major, BWV 1051: I. [No tempo marked]",
+   "durationMs": 387000,
+   "artist": "Academy of St Martin in the Fields & Neville Marriner",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 6 in B-Flat Major, BWV 1051",
+    "part": "I. [No tempo marked]",
+    "performers": "Neville Marriner, Academy of St Martin in the Fields"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Brandenburg Concerto No. 6 in B-Flat Major, BWV 1051: II. Adagio ma non tanto",
+   "durationMs": 249000,
+   "artist": "Academy of St Martin in the Fields & Neville Marriner",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 6 in B-Flat Major, BWV 1051",
+    "part": "II. Adagio ma non tanto",
+    "performers": "Neville Marriner, Academy of St Martin in the Fields"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Brandenburg Concerto No. 6 in B-Flat Major, BWV 1051: III. Allegro",
+   "durationMs": 365000,
+   "artist": "Academy of St Martin in the Fields & Neville Marriner",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 6 in B-Flat Major, BWV 1051",
+    "part": "III. Allegro",
+    "performers": "Neville Marriner, Academy of St Martin in the Fields"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 1,
+   "title": "Brandenburg Concerto No. 5 in D Major, BWV 1050: I. Allegro",
+   "durationMs": 616667,
+   "artist": "Neville Marriner",
+   "apple": {
+    "block": 6,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 5 in D Major, BWV 1050",
+    "part": "I. Allegro",
+    "performers": "Neville Marriner"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 2,
+   "title": "Brandenburg Concerto No. 5 in D Major, BWV 1050: II. Affetuoso",
+   "durationMs": 340333,
+   "artist": "Neville Marriner",
+   "apple": {
+    "block": 6,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 5 in D Major, BWV 1050",
+    "part": "II. Affetuoso",
+    "performers": "Neville Marriner"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 3,
+   "title": "Brandenburg Concerto No. 5 in D Major, BWV 1050: III. Allegro",
+   "durationMs": 317000,
+   "artist": "Neville Marriner",
+   "apple": {
+    "block": 6,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 5 in D Major, BWV 1050",
+    "part": "III. Allegro",
+    "performers": "Neville Marriner"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 4,
+   "title": "Suite No. 1 in C Major, BWV 1066: I. Ouverture",
+   "durationMs": 383147,
+   "artist": "Neville Marriner",
+   "apple": {
+    "block": 7,
+    "composer": "Johann Sebastian Bach",
+    "work": "Orchestral Suite No. 1 in C Major, BWV 1066",
+    "part": "I. Ouverture",
+    "performers": "Neville Marriner, Academy of St Martin in the Fields"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 5,
+   "title": "Suite No. 1 in C Major, BWV 1066: II. Courante",
+   "durationMs": 129013,
+   "artist": "Neville Marriner",
+   "apple": {
+    "block": 7,
+    "composer": "Johann Sebastian Bach",
+    "work": "Orchestral Suite No. 1 in C Major, BWV 1066",
+    "part": "II. Courante",
+    "performers": "Neville Marriner"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 6,
+   "title": "Suite No. 1 in C Major, BWV 1066: III. Gavotte I-II",
+   "durationMs": 191653,
+   "artist": "Neville Marriner",
+   "apple": {
+    "block": 7,
+    "composer": "Johann Sebastian Bach",
+    "work": "Orchestral Suite No. 1 in C Major, BWV 1066",
+    "part": "III. Gavotte I-II",
+    "performers": "Neville Marriner, Academy of St Martin in the Fields"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 7,
+   "title": "Suite No. 1 in C Major, BWV 1066: IV. Forlane",
+   "durationMs": 119573,
+   "artist": "Neville Marriner",
+   "apple": {
+    "block": 7,
+    "composer": "Johann Sebastian Bach",
+    "work": "Orchestral Suite No. 1 in C Major, BWV 1066",
+    "part": "IV. Forlane",
+    "performers": "Neville Marriner"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 8,
+   "title": "Suite No. 1 in C Major, BWV 1066: V. Menuet I-II",
+   "durationMs": 157840,
+   "artist": "Neville Marriner",
+   "apple": {
+    "block": 7,
+    "composer": "Johann Sebastian Bach",
+    "work": "Orchestral Suite No. 1 in C Major, BWV 1066",
+    "part": "V. Menuet I-II",
+    "performers": "Neville Marriner"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 9,
+   "title": "Suite No. 1 in C Major, BWV 1066: VI. Bourrée I-II",
+   "durationMs": 154773,
+   "artist": "Neville Marriner",
+   "apple": {
+    "block": 7,
+    "composer": "Johann Sebastian Bach",
+    "work": "Orchestral Suite No. 1 in C Major, BWV 1066",
+    "part": "VI. Bourrée I-II",
+    "performers": "Neville Marriner"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 10,
+   "title": "Suite No. 1 in C Major, BWV 1066: VII. Passepied I-II",
+   "durationMs": 145000,
+   "artist": "Neville Marriner",
+   "apple": {
+    "block": 7,
+    "composer": "Johann Sebastian Bach",
+    "work": "Orchestral Suite No. 1 in C Major, BWV 1066",
+    "part": "VII. Passepied I-II",
+    "performers": "Neville Marriner"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 11,
+   "title": "Suite No. 2 in B Minor, BWV 1067: I. Ouverture",
+   "durationMs": 442360,
+   "artist": "Neville Marriner",
+   "apple": {
+    "block": 8,
+    "composer": "Johann Sebastian Bach",
+    "work": "Orchestral Suite No. 2 in B Minor, BWV 1067",
+    "part": "I. Ouverture",
+    "performers": "Neville Marriner"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 12,
+   "title": "Suite No. 2 in B Minor, BWV 1067: II. Rondeau",
+   "durationMs": 111520,
+   "artist": "Neville Marriner",
+   "apple": {
+    "block": 8,
+    "composer": "Johann Sebastian Bach",
+    "work": "Orchestral Suite No. 2 in B Minor, BWV 1067",
+    "part": "II. Rondeau",
+    "performers": "Neville Marriner"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 13,
+   "title": "Suite No. 2 in B Minor, BWV 1067: III. Sarabande",
+   "durationMs": 175827,
+   "artist": "Neville Marriner",
+   "apple": {
+    "block": 8,
+    "composer": "Johann Sebastian Bach",
+    "work": "Orchestral Suite No. 2 in B Minor, BWV 1067",
+    "part": "III. Sarabande",
+    "performers": "Neville Marriner"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 14,
+   "title": "Suite No. 2 in B Minor, BWV 1067: IV. Bourrée I-II",
+   "durationMs": 114187,
+   "artist": "Neville Marriner",
+   "apple": {
+    "block": 8,
+    "composer": "Johann Sebastian Bach",
+    "work": "Orchestral Suite No. 2 in B Minor, BWV 1067",
+    "part": "IV. Bourrée I-II",
+    "performers": "Neville Marriner"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 15,
+   "title": "Suite No. 2 in B Minor, BWV 1067: V. Polonaise",
+   "durationMs": 178013,
+   "artist": "Neville Marriner",
+   "apple": {
+    "block": 8,
+    "composer": "Johann Sebastian Bach",
+    "work": "Orchestral Suite No. 2 in B Minor, BWV 1067",
+    "part": "V. Polonaise",
+    "performers": "Neville Marriner, William Bennett, Academy of St Martin in the Fields"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 16,
+   "title": "Suite No. 2 in B Minor, BWV 1067: VI. Menuet",
+   "durationMs": 76293,
+   "artist": "Neville Marriner",
+   "apple": {
+    "block": 8,
+    "composer": "Johann Sebastian Bach",
+    "work": "Orchestral Suite No. 2 in B Minor, BWV 1067",
+    "part": "VI. Menuet",
+    "performers": "Neville Marriner"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 17,
+   "title": "Suite No. 2 in B Minor, BWV 1067: VII. Badinerie",
+   "durationMs": 89800,
+   "artist": "Neville Marriner",
+   "apple": {
+    "block": 8,
+    "composer": "Johann Sebastian Bach",
+    "work": "Orchestral Suite No. 2 in B Minor, BWV 1067",
+    "part": "VII. Badinerie",
+    "performers": "Neville Marriner"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 18,
+   "title": "Violin Concerto No. 1 in A Minor, BWV 1041: I. Allegro moderato",
+   "durationMs": 248000,
+   "artist": "Henryk Szeryng",
+   "apple": {
+    "block": 9,
+    "composer": "Johann Sebastian Bach",
+    "work": "Violin Concerto No. 1 in A Minor, BWV 1041",
+    "part": "I. Allegro moderato",
+    "performers": "Henryk Szeryng"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 19,
+   "title": "Violin Concerto No. 1 in A Minor, BWV 1041: II. Andante",
+   "durationMs": 388333,
+   "artist": "Henryk Szeryng",
+   "apple": {
+    "block": 9,
+    "composer": "Johann Sebastian Bach",
+    "work": "Violin Concerto No. 1 in A Minor, BWV 1041",
+    "part": "II. Andante",
+    "performers": "Henryk Szeryng"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 20,
+   "title": "Violin Concerto No. 1 in A Minor, BWV 1041: III. Allegro assai",
+   "durationMs": 257667,
+   "artist": "Henryk Szeryng",
+   "apple": {
+    "block": 9,
+    "composer": "Johann Sebastian Bach",
+    "work": "Violin Concerto No. 1 in A Minor, BWV 1041",
+    "part": "III. Allegro assai",
+    "performers": "Henryk Szeryng"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 1,
+   "title": "Suite No. 3 in D Major, BWV 1068: I. Ouverture",
+   "durationMs": 469760,
+   "artist": "Academy of St Martin in the Fields & Neville Marriner",
+   "apple": {
+    "block": 10,
+    "composer": "Johann Sebastian Bach",
+    "work": "Orchestral Suite No. 3 in D Major, BWV 1068",
+    "part": "I. Ouverture",
+    "performers": "Academy of St Martin in the Fields, Neville Marriner"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 2,
+   "title": "Suite No. 3 in D Major, BWV 1068: II. Air",
+   "durationMs": 432507,
+   "artist": "Academy of St Martin in the Fields & Neville Marriner",
+   "apple": {
+    "block": 10,
+    "composer": "Johann Sebastian Bach",
+    "work": "Orchestral Suite No. 3 in D Major, BWV 1068",
+    "part": "II. Air",
+    "performers": "Neville Marriner, Academy of St Martin in the Fields"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 3,
+   "title": "Suite No. 3 in D Major, BWV 1068: III. Gavotte I-II",
+   "durationMs": 217280,
+   "artist": "Academy of St Martin in the Fields & Neville Marriner",
+   "apple": {
+    "block": 10,
+    "composer": "Johann Sebastian Bach",
+    "work": "Orchestral Suite No. 3 in D Major, BWV 1068",
+    "part": "III. Gavotte I-II",
+    "performers": "Academy of St Martin in the Fields, Neville Marriner"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 4,
+   "title": "Suite No. 3 in D Major, BWV 1068: IV. Bourrée",
+   "durationMs": 76040,
+   "artist": "Neville Marriner & Academy of St Martin in the Fields",
+   "apple": {
+    "block": 10,
+    "composer": "Johann Sebastian Bach",
+    "work": "Orchestral Suite No. 3 in D Major, BWV 1068",
+    "part": "IV. Bourrée",
+    "performers": "Neville Marriner, Academy of St Martin in the Fields"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 5,
+   "title": "Suite No. 3 in D Major, BWV 1068: V. Gigue",
+   "durationMs": 169413,
+   "artist": "Academy of St Martin in the Fields & Neville Marriner",
+   "apple": {
+    "block": 10,
+    "composer": "Johann Sebastian Bach",
+    "work": "Orchestral Suite No. 3 in D Major, BWV 1068",
+    "part": "V. Gigue",
+    "performers": "Academy of St Martin in the Fields, Neville Marriner"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 6,
+   "title": "Suite No. 4 in D Major, BWV 1069: I. Ouverture",
+   "durationMs": 539693,
+   "artist": "Neville Marriner & Academy of St Martin in the Fields",
+   "apple": {
+    "block": 11,
+    "composer": "Johann Sebastian Bach",
+    "work": "Orchestral Suite No. 4 in D Major, BWV 1069",
+    "part": "I. Ouverture",
+    "performers": "Neville Marriner, Academy of St Martin in the Fields"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 7,
+   "title": "Suite No. 4 in D Major, BWV 1069: II. Bourrée I-II",
+   "durationMs": 188987,
+   "artist": "Academy of St Martin in the Fields & Neville Marriner",
+   "apple": {
+    "block": 11,
+    "composer": "Johann Sebastian Bach",
+    "work": "Orchestral Suite No. 4 in D Major, BWV 1069",
+    "part": "II. Bourrée I-II",
+    "performers": "Neville Marriner, Academy of St Martin in the Fields"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 8,
+   "title": "Suite No. 4 in D Major, BWV 1069: III. Gavotte",
+   "durationMs": 132853,
+   "artist": "Academy of St Martin in the Fields & Neville Marriner",
+   "apple": {
+    "block": 11,
+    "composer": "Johann Sebastian Bach",
+    "work": "Orchestral Suite No. 4 in D Major, BWV 1069",
+    "part": "III. Gavotte",
+    "performers": "Neville Marriner, Academy of St Martin in the Fields"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 9,
+   "title": "Suite No. 4 in D Major, BWV 1069: IV. Menuet I-II",
+   "durationMs": 187173,
+   "artist": "Academy of St Martin in the Fields & Neville Marriner",
+   "apple": {
+    "block": 11,
+    "composer": "Johann Sebastian Bach",
+    "work": "Orchestral Suite No. 4 in D Major, BWV 1069",
+    "part": "IV. Menuet I-II",
+    "performers": "Academy of St Martin in the Fields, Neville Marriner"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 10,
+   "title": "Suite No. 4 in D Major, BWV 1069: V. Réjouissance",
+   "durationMs": 190293,
+   "artist": "Academy of St Martin in the Fields & Neville Marriner",
+   "apple": {
+    "block": 11,
+    "composer": "Johann Sebastian Bach",
+    "work": "Orchestral Suite No. 4 in D Major, BWV 1069",
+    "part": "V. Réjouissance",
+    "performers": "Academy of St Martin in the Fields, Neville Marriner"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 11,
+   "title": "Violin Concerto No. 2 in E Major, BWV 1042: I. Allegro",
+   "durationMs": 502720,
+   "artist": "Henryk Szeryng, Neville Marriner & Academy of St Martin in the Fields",
+   "apple": {
+    "block": 12,
+    "composer": "Johann Sebastian Bach",
+    "work": "Violin Concerto No. 2 in E Major, BWV 1042",
+    "part": "I. Allegro",
+    "performers": "Academy of St Martin in the Fields, Neville Marriner, Henryk Szeryng"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 12,
+   "title": "Violin Concerto No. 2 in E Major, BWV 1042: II. Adagio",
+   "durationMs": 401973,
+   "artist": "Henryk Szeryng, Neville Marriner & Academy of St Martin in the Fields",
+   "apple": {
+    "block": 12,
+    "composer": "Johann Sebastian Bach",
+    "work": "Violin Concerto No. 2 in E Major, BWV 1042",
+    "part": "II. Adagio",
+    "performers": "Neville Marriner, Henryk Szeryng, Academy of St Martin in the Fields"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 13,
+   "title": "Violin Concerto No. 2 in E Major, BWV 1042: III. Allegro assai",
+   "durationMs": 183307,
+   "artist": "Henryk Szeryng, Neville Marriner & Academy of St Martin in the Fields",
+   "apple": {
+    "block": 12,
+    "composer": "Johann Sebastian Bach",
+    "work": "Violin Concerto No. 2 in E Major, BWV 1042",
+    "part": "III. Allegro assai",
+    "performers": "Henryk Szeryng, Academy of St Martin in the Fields, Neville Marriner"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 14,
+   "title": "Concerto for 2 Violins, Strings, and Continuo in D Minor, BWV 1043: I. Vivace",
+   "durationMs": 237413,
+   "artist": "Henryk Szeryng, Neville Marriner, Academy of St Martin in the Fields & Maurice Hasson",
+   "apple": {
+    "block": 13,
+    "composer": "Johann Sebastian Bach",
+    "work": "Double Violin Concerto in D Minor, BWV 1043",
+    "part": "I. Vivace",
+    "performers": "Henryk Szeryng, Neville Marriner, Maurice Hasson, Academy of St Martin in the Fields"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 15,
+   "title": "Concerto for 2 Violins, Strings, and Continuo in D Minor, BWV 1043: II. Largo ma non tanto",
+   "durationMs": 390440,
+   "artist": "Henryk Szeryng, Neville Marriner, Academy of St Martin in the Fields & Maurice Hasson",
+   "apple": {
+    "block": 13,
+    "composer": "Johann Sebastian Bach",
+    "work": "Double Violin Concerto in D Minor, BWV 1043",
+    "part": "II. Largo ma non tanto",
+    "performers": "Academy of St Martin in the Fields, Neville Marriner, Maurice Hasson, Henryk Szeryng"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 16,
+   "title": "Concerto for 2 Violins, Strings, and Continuo in D Minor, BWV 1043: III. Allegro",
+   "durationMs": 312147,
+   "artist": "Henryk Szeryng, Neville Marriner, Academy of St Martin in the Fields & Maurice Hasson",
+   "apple": {
+    "block": 13,
+    "composer": "Johann Sebastian Bach",
+    "work": "Double Violin Concerto in D Minor, BWV 1043",
+    "part": "III. Allegro",
+    "performers": "Academy of St Martin in the Fields, Neville Marriner, Maurice Hasson, Henryk Szeryng"
+   }
+  }
+ ]
+}

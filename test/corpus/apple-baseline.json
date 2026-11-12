@@ -1,0 +1,2456 @@
+{
+ "store": {
+  "3320129": {
+   "grouping": false,
+   "parts": 1
+  },
+  "29766404": {
+   "grouping": false,
+   "parts": 1
+  },
+  "79577274": {
+   "grouping": true,
+   "parts": 0.071
+  },
+  "79794604": {
+   "grouping": true,
+   "parts": 1
+  },
+  "80454658": {
+   "grouping": false,
+   "parts": 1
+  },
+  "81256727": {
+   "grouping": false,
+   "parts": 1
+  },
+  "159368810": {
+   "grouping": true,
+   "parts": 0.486
+  },
+  "199992897": {
+   "grouping": false,
+   "parts": 0.4
+  },
+  "201439672": {
+   "grouping": true,
+   "parts": 0.875
+  },
+  "211475181": {
+   "grouping": true,
+   "parts": 1
+  },
+  "212230185": {
+   "grouping": false,
+   "parts": 0.98
+  },
+  "213922261": {
+   "grouping": true,
+   "parts": 1
+  },
+  "258372736": {
+   "grouping": true,
+   "parts": 1
+  },
+  "258630580": {
+   "grouping": false,
+   "parts": 1
+  },
+  "261819749": {
+   "grouping": true,
+   "parts": 1
+  },
+  "263084597": {
+   "grouping": true,
+   "parts": 1
+  },
+  "269682146": {
+   "grouping": true,
+   "parts": 1
+  },
+  "315883779": {
+   "grouping": false,
+   "parts": 1
+  },
+  "336433016": {
+   "grouping": true,
+   "parts": 1
+  },
+  "337682979": {
+   "grouping": false,
+   "parts": 1
+  },
+  "381515547": {
+   "grouping": true,
+   "parts": 1
+  },
+  "385237884": {
+   "grouping": false,
+   "parts": 1
+  },
+  "394267684": {
+   "grouping": true,
+   "parts": 1
+  },
+  "394314313": {
+   "grouping": true,
+   "parts": 1
+  },
+  "402785270": {
+   "grouping": true,
+   "parts": 0.077
+  },
+  "416955662": {
+   "grouping": true,
+   "parts": 0
+  },
+  "445272543": {
+   "grouping": true,
+   "parts": 0.425
+  },
+  "468905969": {
+   "grouping": true,
+   "parts": 0.25
+  },
+  "476935391": {
+   "grouping": true,
+   "parts": 0.091
+  },
+  "476956688": {
+   "grouping": false,
+   "parts": 0.913
+  },
+  "557321019": {
+   "grouping": true,
+   "parts": 0.836
+  },
+  "594180316": {
+   "grouping": false,
+   "parts": 1
+  },
+  "642211702": {
+   "grouping": false,
+   "parts": 1
+  },
+  "654915375": {
+   "grouping": false,
+   "parts": 1
+  },
+  "656137428": {
+   "grouping": false,
+   "parts": 1
+  },
+  "687738815": {
+   "grouping": true,
+   "parts": 0.867
+  },
+  "692508728": {
+   "grouping": true,
+   "parts": 1
+  },
+  "693191707": {
+   "grouping": true,
+   "parts": 1
+  },
+  "693394415": {
+   "grouping": true,
+   "parts": 1
+  },
+  "693525824": {
+   "grouping": false,
+   "parts": 1
+  },
+  "693711974": {
+   "grouping": true,
+   "parts": 1
+  },
+  "694083664": {
+   "grouping": true,
+   "parts": 1
+  },
+  "694094571": {
+   "grouping": false,
+   "parts": 0.167
+  },
+  "697023017": {
+   "grouping": false,
+   "parts": 1
+  },
+  "697655461": {
+   "grouping": true,
+   "parts": 1
+  },
+  "705088047": {
+   "grouping": false,
+   "parts": 1
+  },
+  "734587111": {
+   "grouping": true,
+   "parts": 1
+  },
+  "752033492": {
+   "grouping": true,
+   "parts": 1
+  },
+  "769116904": {
+   "grouping": true,
+   "parts": 0.917
+  },
+  "818752952": {
+   "grouping": false,
+   "parts": 1
+  },
+  "862972382": {
+   "grouping": true,
+   "parts": 0.412
+  },
+  "881667897": {
+   "grouping": true,
+   "parts": 0.947
+  },
+  "884005057": {
+   "grouping": true,
+   "parts": 1
+  },
+  "890309051": {
+   "grouping": true,
+   "parts": 0.897
+  },
+  "891755766": {
+   "grouping": true,
+   "parts": 0.667
+  },
+  "892617556": {
+   "grouping": true,
+   "parts": 0.105
+  },
+  "905584086": {
+   "grouping": true,
+   "parts": 1
+  },
+  "916325650": {
+   "grouping": false,
+   "parts": 1
+  },
+  "968866036": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1019792522": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1025522626": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1025522996": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1057242816": {
+   "grouping": true,
+   "parts": 0.2
+  },
+  "1083994403": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1152447059": {
+   "grouping": false,
+   "parts": 0.977
+  },
+  "1199073413": {
+   "grouping": true,
+   "parts": 0.833
+  },
+  "1223538364": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1237310422": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1258232804": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1272287210": {
+   "grouping": true,
+   "parts": 0.583
+  },
+  "1276358812": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1336462326": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1379983926": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1387028718": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1387816964": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1394259413": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1396495581": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1396525989": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1396710815": {
+   "grouping": true,
+   "parts": 0
+  },
+  "1399372548": {
+   "grouping": true,
+   "parts": 0.133
+  },
+  "1423671462": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1424730779": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1428811891": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1433430907": {
+   "grouping": true,
+   "parts": 0.907
+  },
+  "1436855407": {
+   "grouping": true,
+   "parts": 0
+  },
+  "1439275980": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1440734550": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1440743651": {
+   "grouping": true,
+   "parts": 0.889
+  },
+  "1440744386": {
+   "grouping": false,
+   "parts": 0.091
+  },
+  "1440758223": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1440761454": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1440764542": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1440764800": {
+   "grouping": false,
+   "parts": 0.974
+  },
+  "1440771553": {
+   "grouping": true,
+   "parts": 0
+  },
+  "1440779332": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1440789518": {
+   "grouping": true,
+   "parts": 0.889
+  },
+  "1440800912": {
+   "grouping": true,
+   "parts": 0.733
+  },
+  "1448631706": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1452133133": {
+   "grouping": true,
+   "parts": 0.25
+  },
+  "1452135051": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1452135651": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452138157": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452138402": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452145443": {
+   "grouping": true,
+   "parts": 0.048
+  },
+  "1452145547": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452151425": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452153781": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452156896": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452156898": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452159322": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452164711": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452166308": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452171319": {
+   "grouping": true,
+   "parts": 0
+  },
+  "1452173615": {
+   "grouping": true,
+   "parts": 0.067
+  },
+  "1452178572": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452184807": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452194647": {
+   "grouping": true,
+   "parts": 0.99
+  },
+  "1452196841": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452201256": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452206586": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452208608": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452214965": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1452215425": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452218731": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452220174": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452226734": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452233586": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452238911": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452244715": {
+   "grouping": true,
+   "parts": 0.231
+  },
+  "1452249346": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452252399": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452255504": {
+   "grouping": true,
+   "parts": 0.895
+  },
+  "1452264917": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1452271107": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452282369": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452290014": {
+   "grouping": true,
+   "parts": 0.75
+  },
+  "1452304508": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1452313974": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452326250": {
+   "grouping": true,
+   "parts": 0.867
+  },
+  "1452341842": {
+   "grouping": true,
+   "parts": 0.76
+  },
+  "1452373339": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452380844": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1452512388": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452515343": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452521804": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1452529948": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452530324": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452534005": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1452548501": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452556367": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452577166": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452579811": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452579983": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1452627720": {
+   "grouping": false,
+   "parts": 0.824
+  },
+  "1452652043": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452663367": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452669078": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452675328": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452677075": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452755388": {
+   "grouping": false,
+   "parts": 0.914
+  },
+  "1452886617": {
+   "grouping": false,
+   "parts": 0.99
+  },
+  "1452972792": {
+   "grouping": false,
+   "parts": 0.769
+  },
+  "1467953807": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1467965079": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1481992380": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1499326494": {
+   "grouping": true,
+   "parts": 0
+  },
+  "1511876052": {
+   "grouping": true,
+   "parts": 0.036
+  },
+  "1513030530": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1519083775": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1525560577": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1534420439": {
+   "grouping": true,
+   "parts": 0
+  },
+  "1535767041": {
+   "grouping": true,
+   "parts": 0.467
+  },
+  "1539025329": {
+   "grouping": true,
+   "parts": 0.778
+  },
+  "1543281438": {
+   "grouping": true,
+   "parts": 0.417
+  },
+  "1545393655": {
+   "grouping": true,
+   "parts": 0.563
+  },
+  "1580358563": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1592763567": {
+   "grouping": true,
+   "parts": 0.967
+  },
+  "1608042390": {
+   "grouping": true,
+   "parts": 0.029
+  },
+  "1613578929": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1630346272": {
+   "grouping": true,
+   "parts": 0
+  },
+  "1639252048": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1640004922": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1648305509": {
+   "grouping": true,
+   "parts": 0.028
+  },
+  "1650387312": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1671919893": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1681767929": {
+   "grouping": true,
+   "parts": 0.75
+  },
+  "1683561964": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1686454298": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1689033997": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1691120087": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1694676611": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1701280027": {
+   "grouping": false,
+   "parts": 0.56
+  },
+  "1712082457": {
+   "grouping": false,
+   "parts": 0.889
+  },
+  "1721447447": {
+   "grouping": false,
+   "parts": 0.45
+  },
+  "1724466223": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1727580320": {
+   "grouping": true,
+   "parts": 0.944
+  },
+  "1730778868": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1751268500": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1753211021": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1779059876": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1804679810": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1834399557": {
+   "grouping": true,
+   "parts": 0.594
+  },
+  "1855288176": {
+   "grouping": true,
+   "parts": 0.875
+  },
+  "6805467344": {
+   "grouping": true,
+   "parts": 0.778
+  }
+ },
+ "work-tags": {
+  "3320129": {
+   "grouping": true,
+   "parts": 1
+  },
+  "29766404": {
+   "grouping": true,
+   "parts": 1
+  },
+  "79577274": {
+   "grouping": true,
+   "parts": 1
+  },
+  "79794604": {
+   "grouping": true,
+   "parts": 1
+  },
+  "80454658": {
+   "grouping": true,
+   "parts": 1
+  },
+  "81256727": {
+   "grouping": true,
+   "parts": 1
+  },
+  "159368810": {
+   "grouping": true,
+   "parts": 1
+  },
+  "199992897": {
+   "grouping": true,
+   "parts": 0.8
+  },
+  "201439672": {
+   "grouping": true,
+   "parts": 0.875
+  },
+  "211475181": {
+   "grouping": false,
+   "parts": 1
+  },
+  "212230185": {
+   "grouping": true,
+   "parts": 0.9
+  },
+  "213922261": {
+   "grouping": true,
+   "parts": 1
+  },
+  "258372736": {
+   "grouping": true,
+   "parts": 1
+  },
+  "258630580": {
+   "grouping": true,
+   "parts": 1
+  },
+  "261819749": {
+   "grouping": true,
+   "parts": 1
+  },
+  "263084597": {
+   "grouping": true,
+   "parts": 1
+  },
+  "269682146": {
+   "grouping": true,
+   "parts": 1
+  },
+  "315883779": {
+   "grouping": true,
+   "parts": 0.957
+  },
+  "336433016": {
+   "grouping": true,
+   "parts": 1
+  },
+  "337682979": {
+   "grouping": true,
+   "parts": 1
+  },
+  "381515547": {
+   "grouping": true,
+   "parts": 1
+  },
+  "385237884": {
+   "grouping": true,
+   "parts": 0.958
+  },
+  "394267684": {
+   "grouping": true,
+   "parts": 1
+  },
+  "394314313": {
+   "grouping": true,
+   "parts": 1
+  },
+  "402785270": {
+   "grouping": true,
+   "parts": 0.385
+  },
+  "416955662": {
+   "grouping": true,
+   "parts": 1
+  },
+  "445272543": {
+   "grouping": true,
+   "parts": 1
+  },
+  "468905969": {
+   "grouping": true,
+   "parts": 1
+  },
+  "476935391": {
+   "grouping": true,
+   "parts": 0.091
+  },
+  "476956688": {
+   "grouping": true,
+   "parts": 0.957
+  },
+  "557321019": {
+   "grouping": false,
+   "parts": 0.94
+  },
+  "594180316": {
+   "grouping": false,
+   "parts": 0.632
+  },
+  "642211702": {
+   "grouping": true,
+   "parts": 0.909
+  },
+  "654915375": {
+   "grouping": true,
+   "parts": 1
+  },
+  "656137428": {
+   "grouping": true,
+   "parts": 1
+  },
+  "687738815": {
+   "grouping": true,
+   "parts": 0.933
+  },
+  "692508728": {
+   "grouping": true,
+   "parts": 0.9
+  },
+  "693191707": {
+   "grouping": true,
+   "parts": 1
+  },
+  "693394415": {
+   "grouping": true,
+   "parts": 1
+  },
+  "693525824": {
+   "grouping": true,
+   "parts": 0.903
+  },
+  "693711974": {
+   "grouping": true,
+   "parts": 1
+  },
+  "694083664": {
+   "grouping": true,
+   "parts": 0.868
+  },
+  "694094571": {
+   "grouping": true,
+   "parts": 0.25
+  },
+  "697023017": {
+   "grouping": true,
+   "parts": 1
+  },
+  "697655461": {
+   "grouping": true,
+   "parts": 1
+  },
+  "705088047": {
+   "grouping": true,
+   "parts": 1
+  },
+  "734587111": {
+   "grouping": true,
+   "parts": 0
+  },
+  "752033492": {
+   "grouping": true,
+   "parts": 0
+  },
+  "769116904": {
+   "grouping": true,
+   "parts": 0.917
+  },
+  "818752952": {
+   "grouping": true,
+   "parts": 0.954
+  },
+  "862972382": {
+   "grouping": true,
+   "parts": 1
+  },
+  "881667897": {
+   "grouping": true,
+   "parts": 1
+  },
+  "884005057": {
+   "grouping": true,
+   "parts": 0.808
+  },
+  "890309051": {
+   "grouping": true,
+   "parts": 1
+  },
+  "891755766": {
+   "grouping": true,
+   "parts": 0.667
+  },
+  "892617556": {
+   "grouping": true,
+   "parts": 1
+  },
+  "905584086": {
+   "grouping": true,
+   "parts": 1
+  },
+  "916325650": {
+   "grouping": true,
+   "parts": 1
+  },
+  "968866036": {
+   "grouping": true,
+   "parts": 0.889
+  },
+  "1019792522": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1025522626": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1025522996": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1057242816": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1083994403": {
+   "grouping": true,
+   "parts": 0.818
+  },
+  "1152447059": {
+   "grouping": true,
+   "parts": 0.909
+  },
+  "1199073413": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1223538364": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1237310422": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1258232804": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1272287210": {
+   "grouping": true,
+   "parts": 0.583
+  },
+  "1276358812": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1336462326": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1379983926": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1387028718": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1387816964": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1394259413": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1396495581": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1396525989": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1396710815": {
+   "grouping": true,
+   "parts": 0
+  },
+  "1399372548": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1423671462": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1424730779": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1428811891": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1433430907": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1436855407": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1439275980": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1440734550": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1440743651": {
+   "grouping": true,
+   "parts": 0.889
+  },
+  "1440744386": {
+   "grouping": true,
+   "parts": 0
+  },
+  "1440758223": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1440761454": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1440764542": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1440764800": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1440771553": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1440779332": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1440789518": {
+   "grouping": true,
+   "parts": 0.889
+  },
+  "1440800912": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1448631706": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452133133": {
+   "grouping": true,
+   "parts": 0.25
+  },
+  "1452135051": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452135651": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452138157": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452138402": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452145443": {
+   "grouping": true,
+   "parts": 0.048
+  },
+  "1452145547": {
+   "grouping": true,
+   "parts": 0.958
+  },
+  "1452151425": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1452153781": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452156896": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452156898": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452159322": {
+   "grouping": true,
+   "parts": 0.941
+  },
+  "1452164711": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452166308": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452171319": {
+   "grouping": true,
+   "parts": 0.833
+  },
+  "1452173615": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452178572": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452184807": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452194647": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1452196841": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452201256": {
+   "grouping": true,
+   "parts": 0.2
+  },
+  "1452206586": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452208608": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452214965": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452215425": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452218731": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452220174": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452226734": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1452233586": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1452238911": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452244715": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452249346": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452252399": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452255504": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452264917": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452271107": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452282369": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452290014": {
+   "grouping": true,
+   "parts": 0.75
+  },
+  "1452304508": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452313974": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452326250": {
+   "grouping": false,
+   "parts": 0.933
+  },
+  "1452341842": {
+   "grouping": true,
+   "parts": 0.76
+  },
+  "1452373339": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452380844": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452512388": {
+   "grouping": true,
+   "parts": 0.75
+  },
+  "1452515343": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452521804": {
+   "grouping": true,
+   "parts": 0.955
+  },
+  "1452529948": {
+   "grouping": true,
+   "parts": 0.938
+  },
+  "1452530324": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452534005": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452548501": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452556367": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452577166": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452579811": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452579983": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452627720": {
+   "grouping": true,
+   "parts": 0.412
+  },
+  "1452652043": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452663367": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452669078": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452675328": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452677075": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452755388": {
+   "grouping": true,
+   "parts": 0.943
+  },
+  "1452886617": {
+   "grouping": true,
+   "parts": 0.832
+  },
+  "1452972792": {
+   "grouping": true,
+   "parts": 0.788
+  },
+  "1467953807": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1467965079": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1481992380": {
+   "grouping": true,
+   "parts": 0.979
+  },
+  "1499326494": {
+   "grouping": true,
+   "parts": 0
+  },
+  "1511876052": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1513030530": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1519083775": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1525560577": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1534420439": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1535767041": {
+   "grouping": true,
+   "parts": 0.467
+  },
+  "1539025329": {
+   "grouping": true,
+   "parts": 0.778
+  },
+  "1543281438": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1545393655": {
+   "grouping": true,
+   "parts": 0.563
+  },
+  "1580358563": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1592763567": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1608042390": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1613578929": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1630346272": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1639252048": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1640004922": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1648305509": {
+   "grouping": false,
+   "parts": 0.521
+  },
+  "1650387312": {
+   "grouping": true,
+   "parts": 0
+  },
+  "1671919893": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1681767929": {
+   "grouping": true,
+   "parts": 0.75
+  },
+  "1683561964": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1686454298": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1689033997": {
+   "grouping": true,
+   "parts": 0
+  },
+  "1691120087": {
+   "grouping": true,
+   "parts": 0.973
+  },
+  "1694676611": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1701280027": {
+   "grouping": true,
+   "parts": 0.96
+  },
+  "1712082457": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1721447447": {
+   "grouping": false,
+   "parts": 0.8
+  },
+  "1724466223": {
+   "grouping": false,
+   "parts": 0.857
+  },
+  "1727580320": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1730778868": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1751268500": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1753211021": {
+   "grouping": true,
+   "parts": 0.966
+  },
+  "1779059876": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1804679810": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1834399557": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1855288176": {
+   "grouping": true,
+   "parts": 0.813
+  },
+  "6805467344": {
+   "grouping": true,
+   "parts": 1
+  }
+ },
+ "messy": {
+  "3320129": {
+   "grouping": false,
+   "parts": 1
+  },
+  "29766404": {
+   "grouping": false,
+   "parts": 1
+  },
+  "79577274": {
+   "grouping": false,
+   "parts": 0
+  },
+  "79794604": {
+   "grouping": true,
+   "parts": 1
+  },
+  "80454658": {
+   "grouping": false,
+   "parts": 1
+  },
+  "81256727": {
+   "grouping": false,
+   "parts": 0
+  },
+  "159368810": {
+   "grouping": false,
+   "parts": 0.343
+  },
+  "199992897": {
+   "grouping": false,
+   "parts": 0.4
+  },
+  "201439672": {
+   "grouping": false,
+   "parts": 1
+  },
+  "211475181": {
+   "grouping": true,
+   "parts": 1
+  },
+  "212230185": {
+   "grouping": false,
+   "parts": 0.7
+  },
+  "213922261": {
+   "grouping": true,
+   "parts": 1
+  },
+  "258372736": {
+   "grouping": false,
+   "parts": 0.971
+  },
+  "258630580": {
+   "grouping": false,
+   "parts": 1
+  },
+  "261819749": {
+   "grouping": true,
+   "parts": 1
+  },
+  "263084597": {
+   "grouping": false,
+   "parts": 0.346
+  },
+  "269682146": {
+   "grouping": false,
+   "parts": 0
+  },
+  "315883779": {
+   "grouping": false,
+   "parts": 1
+  },
+  "336433016": {
+   "grouping": false,
+   "parts": 0
+  },
+  "337682979": {
+   "grouping": false,
+   "parts": 0.55
+  },
+  "381515547": {
+   "grouping": true,
+   "parts": 1
+  },
+  "385237884": {
+   "grouping": false,
+   "parts": 0.833
+  },
+  "394267684": {
+   "grouping": false,
+   "parts": 1
+  },
+  "394314313": {
+   "grouping": true,
+   "parts": 1
+  },
+  "402785270": {
+   "grouping": false,
+   "parts": 0.077
+  },
+  "416955662": {
+   "grouping": false,
+   "parts": 0
+  },
+  "445272543": {
+   "grouping": true,
+   "parts": 0.425
+  },
+  "468905969": {
+   "grouping": true,
+   "parts": 0.25
+  },
+  "476935391": {
+   "grouping": false,
+   "parts": 0.091
+  },
+  "476956688": {
+   "grouping": false,
+   "parts": 0.913
+  },
+  "557321019": {
+   "grouping": true,
+   "parts": 1
+  },
+  "594180316": {
+   "grouping": false,
+   "parts": 1
+  },
+  "642211702": {
+   "grouping": false,
+   "parts": 0.318
+  },
+  "654915375": {
+   "grouping": false,
+   "parts": 1
+  },
+  "656137428": {
+   "grouping": false,
+   "parts": 1
+  },
+  "687738815": {
+   "grouping": true,
+   "parts": 0.867
+  },
+  "692508728": {
+   "grouping": true,
+   "parts": 1
+  },
+  "693191707": {
+   "grouping": true,
+   "parts": 1
+  },
+  "693394415": {
+   "grouping": true,
+   "parts": 1
+  },
+  "693525824": {
+   "grouping": false,
+   "parts": 0.613
+  },
+  "693711974": {
+   "grouping": true,
+   "parts": 1
+  },
+  "694083664": {
+   "grouping": false,
+   "parts": 0
+  },
+  "694094571": {
+   "grouping": false,
+   "parts": 0.833
+  },
+  "697023017": {
+   "grouping": false,
+   "parts": 0.846
+  },
+  "697655461": {
+   "grouping": false,
+   "parts": 0.167
+  },
+  "705088047": {
+   "grouping": false,
+   "parts": 1
+  },
+  "734587111": {
+   "grouping": false,
+   "parts": 0.736
+  },
+  "752033492": {
+   "grouping": false,
+   "parts": 0
+  },
+  "769116904": {
+   "grouping": false,
+   "parts": 0.417
+  },
+  "818752952": {
+   "grouping": false,
+   "parts": 0.046
+  },
+  "862972382": {
+   "grouping": true,
+   "parts": 0.412
+  },
+  "881667897": {
+   "grouping": false,
+   "parts": 0
+  },
+  "884005057": {
+   "grouping": false,
+   "parts": 0.923
+  },
+  "890309051": {
+   "grouping": false,
+   "parts": 0
+  },
+  "891755766": {
+   "grouping": true,
+   "parts": 1
+  },
+  "892617556": {
+   "grouping": true,
+   "parts": 0.105
+  },
+  "905584086": {
+   "grouping": true,
+   "parts": 1
+  },
+  "916325650": {
+   "grouping": false,
+   "parts": 0
+  },
+  "968866036": {
+   "grouping": false,
+   "parts": 0.722
+  },
+  "1019792522": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1025522626": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1025522996": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1057242816": {
+   "grouping": true,
+   "parts": 0.2
+  },
+  "1083994403": {
+   "grouping": true,
+   "parts": 0.636
+  },
+  "1152447059": {
+   "grouping": false,
+   "parts": 0.227
+  },
+  "1199073413": {
+   "grouping": true,
+   "parts": 0.833
+  },
+  "1223538364": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1237310422": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1258232804": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1272287210": {
+   "grouping": true,
+   "parts": 0.583
+  },
+  "1276358812": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1336462326": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1379983926": {
+   "grouping": false,
+   "parts": 0.856
+  },
+  "1387028718": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1387816964": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1394259413": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1396495581": {
+   "grouping": false,
+   "parts": 0.143
+  },
+  "1396525989": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1396710815": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1399372548": {
+   "grouping": true,
+   "parts": 0.133
+  },
+  "1423671462": {
+   "grouping": false,
+   "parts": 0.059
+  },
+  "1424730779": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1428811891": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1433430907": {
+   "grouping": true,
+   "parts": 0.907
+  },
+  "1436855407": {
+   "grouping": true,
+   "parts": 0
+  },
+  "1439275980": {
+   "grouping": true,
+   "parts": 0.818
+  },
+  "1440734550": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1440743651": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1440744386": {
+   "grouping": false,
+   "parts": 0.136
+  },
+  "1440758223": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1440761454": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1440764542": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1440764800": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1440771553": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1440779332": {
+   "grouping": false,
+   "parts": 0.652
+  },
+  "1440789518": {
+   "grouping": false,
+   "parts": 0.556
+  },
+  "1440800912": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1448631706": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1452133133": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452135051": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1452135651": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452138157": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452138402": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1452145443": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452145547": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1452151425": {
+   "grouping": false,
+   "parts": 0.986
+  },
+  "1452153781": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1452156896": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1452156898": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452159322": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1452164711": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1452166308": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1452171319": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1452173615": {
+   "grouping": true,
+   "parts": 0.067
+  },
+  "1452178572": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452184807": {
+   "grouping": false,
+   "parts": 0.6
+  },
+  "1452194647": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452196841": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452201256": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452206586": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452208608": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452214965": {
+   "grouping": false,
+   "parts": 0.2
+  },
+  "1452215425": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452218731": {
+   "grouping": true,
+   "parts": 0.875
+  },
+  "1452220174": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452226734": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452233586": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452238911": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1452244715": {
+   "grouping": true,
+   "parts": 0.231
+  },
+  "1452249346": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452252399": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452255504": {
+   "grouping": false,
+   "parts": 0.263
+  },
+  "1452264917": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1452271107": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452282369": {
+   "grouping": true,
+   "parts": 0.2
+  },
+  "1452290014": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452304508": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1452313974": {
+   "grouping": false,
+   "parts": 0.059
+  },
+  "1452326250": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452341842": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452373339": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1452380844": {
+   "grouping": false,
+   "parts": 0.6
+  },
+  "1452512388": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452515343": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452521804": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1452529948": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1452530324": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452534005": {
+   "grouping": false,
+   "parts": 0.114
+  },
+  "1452548501": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1452556367": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452577166": {
+   "grouping": true,
+   "parts": 0
+  },
+  "1452579811": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1452579983": {
+   "grouping": false,
+   "parts": 0.882
+  },
+  "1452627720": {
+   "grouping": false,
+   "parts": 0.824
+  },
+  "1452652043": {
+   "grouping": false,
+   "parts": 0.5
+  },
+  "1452663367": {
+   "grouping": false,
+   "parts": 0.333
+  },
+  "1452669078": {
+   "grouping": false,
+   "parts": 0.6
+  },
+  "1452675328": {
+   "grouping": true,
+   "parts": 0.972
+  },
+  "1452677075": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1452755388": {
+   "grouping": false,
+   "parts": 0.957
+  },
+  "1452886617": {
+   "grouping": false,
+   "parts": 0.475
+  },
+  "1452972792": {
+   "grouping": false,
+   "parts": 0.981
+  },
+  "1467953807": {
+   "grouping": true,
+   "parts": 0.9
+  },
+  "1467965079": {
+   "grouping": false,
+   "parts": 0.167
+  },
+  "1481992380": {
+   "grouping": false,
+   "parts": 0.511
+  },
+  "1499326494": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1511876052": {
+   "grouping": true,
+   "parts": 0.036
+  },
+  "1513030530": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1519083775": {
+   "grouping": false,
+   "parts": 0.25
+  },
+  "1525560577": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1534420439": {
+   "grouping": true,
+   "parts": 0
+  },
+  "1535767041": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1539025329": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1543281438": {
+   "grouping": true,
+   "parts": 0.417
+  },
+  "1545393655": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1580358563": {
+   "grouping": true,
+   "parts": 0.905
+  },
+  "1592763567": {
+   "grouping": true,
+   "parts": 0.967
+  },
+  "1608042390": {
+   "grouping": false,
+   "parts": 0.912
+  },
+  "1613578929": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1630346272": {
+   "grouping": true,
+   "parts": 0
+  },
+  "1639252048": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1640004922": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1648305509": {
+   "grouping": false,
+   "parts": 1
+  },
+  "1650387312": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1671919893": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1681767929": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1683561964": {
+   "grouping": false,
+   "parts": 0.095
+  },
+  "1686454298": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1689033997": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1691120087": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1694676611": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1701280027": {
+   "grouping": false,
+   "parts": 0.56
+  },
+  "1712082457": {
+   "grouping": false,
+   "parts": 0.889
+  },
+  "1721447447": {
+   "grouping": false,
+   "parts": 0.75
+  },
+  "1724466223": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1727580320": {
+   "grouping": true,
+   "parts": 0.667
+  },
+  "1730778868": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1751268500": {
+   "grouping": true,
+   "parts": 1
+  },
+  "1753211021": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1779059876": {
+   "grouping": false,
+   "parts": 0.242
+  },
+  "1804679810": {
+   "grouping": false,
+   "parts": 0
+  },
+  "1834399557": {
+   "grouping": true,
+   "parts": 0.594
+  },
+  "1855288176": {
+   "grouping": true,
+   "parts": 1
+  },
+  "6805467344": {
+   "grouping": true,
+   "parts": 0.778
+  }
+ }
+}

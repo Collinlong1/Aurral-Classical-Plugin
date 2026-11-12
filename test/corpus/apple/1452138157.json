@@ -1,0 +1,64 @@
+{
+ "id": "1452138157",
+ "category": "chamber",
+ "title": "Schubert: String Quintet, D. 956",
+ "artist": "Emerson String Quartet & Mstislav Rostropovich",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "String Quintet in C, D. 956: I. Allegro ma non troppo",
+   "durationMs": 1156000,
+   "artist": "Emerson String Quartet & Mstislav Rostropovich",
+   "apple": {
+    "block": 1,
+    "composer": "Franz Schubert",
+    "work": "String Quintet in C Major, D 956, Op. posth163, Op. 163",
+    "part": "I. Allegro ma non troppo",
+    "performers": "Emerson String Quartet, Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "String Quintet in C, D. 956: II. Adagio",
+   "durationMs": 890000,
+   "artist": "Emerson String Quartet & Mstislav Rostropovich",
+   "apple": {
+    "block": 1,
+    "composer": "Franz Schubert",
+    "work": "String Quintet in C Major, D 956, Op. posth163, Op. 163",
+    "part": "II. Adagio",
+    "performers": "Mstislav Rostropovich, Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "String Quintet in C, D. 956: III. Scherzo (Presto) - Trio (Andante sostenuto)",
+   "durationMs": 602000,
+   "artist": "Emerson String Quartet & Mstislav Rostropovich",
+   "apple": {
+    "block": 1,
+    "composer": "Franz Schubert",
+    "work": "String Quintet in C Major, D 956, Op. posth163, Op. 163",
+    "part": "III. Scherzo (Presto) - Trio (Andante sostenuto)",
+    "performers": "Mstislav Rostropovich, Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "String Quintet in C, D. 956: IV. Allegretto",
+   "durationMs": 563000,
+   "artist": "Emerson String Quartet & Mstislav Rostropovich",
+   "apple": {
+    "block": 1,
+    "composer": "Franz Schubert",
+    "work": "String Quintet in C Major, D 956, Op. posth163, Op. 163",
+    "part": "IV. Allegretto",
+    "performers": "Mstislav Rostropovich, Emerson String Quartet"
+   }
+  }
+ ]
+}

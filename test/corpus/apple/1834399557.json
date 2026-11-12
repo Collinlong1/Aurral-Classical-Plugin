@@ -1,0 +1,456 @@
+{
+ "id": "1834399557",
+ "category": "piano recital",
+ "title": "Piano Book 2",
+ "artist": "Lang Lang",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "24 Preludes, Op. 28: No. 4 in E Minor. Largo",
+   "durationMs": 115160,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 1,
+    "composer": "Frédéric Chopin",
+    "work": "24 Préludes, C. 166-189, Op. 28",
+    "part": "No. 4 in E Minor. Largo",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Lieder ohne Worte V, Op. 62: VI. Allegretto grazioso, MWV U161 \"Spring Song\"",
+   "durationMs": 154613,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 2,
+    "composer": "Felix Mendelssohn",
+    "work": "Songs without Words, Book V, Op. 62",
+    "part": "VI. Allegretto grazioso, MWV U161 \"Spring Song\"",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Consolations, S. 172: No. 2 in E Major. Un poco più mosso",
+   "durationMs": 207067,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 3,
+    "composer": "Franz Liszt",
+    "work": "Tröstungen, S. 172 · “6 Consolations”",
+    "part": "No. 2 in E Major. Un poco più mosso",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Spring",
+   "durationMs": 175787,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 4,
+    "composer": "Joe Hisaishi",
+    "work": "Spring",
+    "part": "Spring",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Rondo in D Major, K. 485",
+   "durationMs": 305613,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 5,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Rondo in D Major, K. 485, KV 485",
+    "part": "Rondo in D Major, K. 485",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Rondo a capriccio, Op. 129 \"Rage over a Lost Penny\"",
+   "durationMs": 391093,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 6,
+    "composer": "Ludwig van Beethoven",
+    "work": "Rondo a capriccio, Op. 129 · “Rondo in the Hungarian style, almost a caprice”",
+    "part": "Rondo a capriccio, Op. 129 \"Rage over a Lost Penny\"",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Gymnopédie No. 1",
+   "durationMs": 299107,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 7,
+    "composer": "Erik Satie",
+    "work": "Gymnopédies",
+    "part": "Gymnopédie No. 1",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "4 Impromptus, Op. 90, D. 899: No. 3 in G-Flat Major. Andante",
+   "durationMs": 352960,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 8,
+    "composer": "Franz Schubert",
+    "work": "4 Impromptus, D 899, Op. 90",
+    "part": "No. 3 in G-Flat Major. Andante",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Rhapsody on a Theme of Paganini, Op. 43: Var. 18. Andante cantabile (Arr. Korepanova for Solo Piano)",
+   "durationMs": 182000,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 9,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Var. 18. Andante cantabile (Arr. Korepanova for Solo Piano)",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Sadness and Sorrow (From \"Naruto\") [Arr. Telleria for Solo Piano]",
+   "durationMs": 169040,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 10,
+    "composer": "MUSASHI PROJECT",
+    "work": "MUSASHI PROJECT",
+    "part": "Sadness and Sorrow (From \"Naruto\") [Arr. Telleria for Solo Piano]",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "13 Pieces for Piano, Op. 76: No. 2, Etude",
+   "durationMs": 77053,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 11,
+    "composer": "Jean Sibelius",
+    "work": "13 Pieces, Op. 76",
+    "part": "No. 2, Etude",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Minuet in G Minor, HWV 434 No. 4 (Arr. Kempff for Piano)",
+   "durationMs": 280853,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 12,
+    "composer": "George Frideric Handel",
+    "work": "Suite No. 1 in B-Flat Major, HWV 434",
+    "part": "Minuet in G Minor, HWV 434 No. 4 (Arr. Kempff for Piano)",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Prelude in C Minor, BWV 999 \"Pour la lute\"",
+   "durationMs": 73373,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 13,
+    "composer": "Johann Sebastian Bach",
+    "work": "Prelude in C Minor, BWV 999",
+    "part": "Prelude in C Minor, BWV 999 \"Pour la lute\"",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Rush E (2024 Version)",
+   "durationMs": 178853,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 14,
+    "composer": "Andrew Wrangell",
+    "work": "Andrew Wrangell",
+    "part": "Rush E (2024 Version)",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Mia & Sebastian's Theme (From \"La La Land\") [Arr. Kerber for Solo Piano]",
+   "durationMs": 195733,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 15,
+    "composer": "Justin Hurwitz",
+    "work": "LaLa Land",
+    "part": "Mia & Sebastian's Theme (From \"La La Land\") [Arr. Kerber for Solo Piano]",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Nocturne No. 2 in E-Flat Major, Op. 9 No. 2",
+   "durationMs": 282520,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 16,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 2 in E-Flat Major, B. 54/2, Op. 9/2 · “Murmures de la Seine 2”",
+    "part": "Nocturne No. 2 in E-Flat Major, Op. 9 No. 2",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Carnaval, Op. 9: XII. Chopin. Agitato",
+   "durationMs": 95920,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 17,
+    "composer": "Robert Schumann",
+    "work": "Carnaval, Op. 9",
+    "part": "XII. Chopin. Agitato",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "25 Études faciles et progressives, Op. 100: No. 2, L'Arabesque. Allegro scherzando",
+   "durationMs": 54667,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 18,
+    "composer": "Friedrich Burgmüller",
+    "work": "L'arabesque. Allegro scherzando in A Minor, Op. 100/2",
+    "part": "No. 2, L'Arabesque. Allegro scherzando",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "Fly",
+   "durationMs": 254960,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 19,
+    "composer": "Ludovico Einaudi",
+    "work": "Fly, “In volo”",
+    "part": "Fly",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "Main Theme (From \"Black Myth: Wukong\") [Arr. Leung for Solo Piano]",
+   "durationMs": 111907,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 20,
+    "composer": "Jinyan Zhai: Main Theme (From \"Black Myth",
+    "work": "Jinyan Zhai: Main Theme (From \"Black Myth",
+    "part": "Wukong\") [Arr. Leung for Solo Piano]",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "Fantaisie-Impromptu in C-Sharp Minor, Op. 66",
+   "durationMs": 354240,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 21,
+    "composer": "Frédéric Chopin",
+    "work": "Fantaisie-Impromptu in C-Sharp Minor, B. 87, Op. 66 · “Mme d'Este”",
+    "part": "Fantaisie-Impromptu in C-Sharp Minor, Op. 66",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "To Zanarkand (From \"Final Fantasy X\")",
+   "durationMs": 170733,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 22,
+    "composer": "Uematsu",
+    "work": "Uematsu",
+    "part": "To Zanarkand (From \"Final Fantasy X\")",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 23,
+   "title": "Comptine d’un autre été: L’après-midi (From \"Le Fabuleux Destin d'Amélie Poulain\")",
+   "durationMs": 128400,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 23,
+    "composer": "Yann Tiersen",
+    "work": "Comptine d'un autre été : L'après-midi",
+    "part": "L’après-midi (From \"Le Fabuleux Destin d'Amélie Poulain\")",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 24,
+   "title": "Cinema Paradiso (Arr. Kerber for Solo Piano)",
+   "durationMs": 241280,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 24,
+    "composer": "Ennio Morricone",
+    "work": "Cinema Paradiso",
+    "part": "Cinema Paradiso (Arr. Kerber for Solo Piano)",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 25,
+   "title": "Morceaux de fantaisie, Op. 3: No. 2, Prelude in C-Sharp Minor",
+   "durationMs": 292827,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 25,
+    "composer": "Sergei Rachmaninoff",
+    "work": "5 Morceaux de fantaisie, Op. 3 · “5 Fantasy Pieces”",
+    "part": "No. 2, Prelude in C-Sharp Minor",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 26,
+   "title": "Die Ruinen von Athen, Op. 113: No. 4, Turkish March (Arr. Rubinstein for Solo Piano)",
+   "durationMs": 131747,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 26,
+    "composer": "Ludwig van Beethoven",
+    "work": "Die Ruinen von Athen, Op. 113 · “The Ruins of Athens”",
+    "part": "No. 4, Turkish March (Arr. Rubinstein for Solo Piano)",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 27,
+   "title": "ICARUS (Version for Piano 4 Hands)",
+   "durationMs": 198907,
+   "artist": "Lang Lang & Tony Ann",
+   "apple": {
+    "block": 27,
+    "composer": "Tony Ann",
+    "work": "ICARUS",
+    "part": "ICARUS (Version for Piano 4 Hands)",
+    "performers": "Tony Ann, Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 28,
+   "title": "Lovers' Oath (From \"Genshin Impact\") [Version for Solo Piano]",
+   "durationMs": 137640,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 28,
+    "composer": "Y. Chen",
+    "work": "Y. Chen",
+    "part": "Lovers' Oath (From \"Genshin Impact\") [Version for Solo Piano]",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 29,
+   "title": "Brejeiro (Tango Brasileiro)",
+   "durationMs": 125787,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 29,
+    "composer": "Ernesto Nazareth",
+    "work": "Brejeiro",
+    "part": "Brejeiro (Tango Brasileiro)",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 30,
+   "title": "2 Arabesques, CD 74: No. 1 in E Major. Andantino con moto",
+   "durationMs": 271453,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 30,
+    "composer": "Claude Debussy",
+    "work": "Deux arabesques, CD 74, L. 66 · “Two Arabesques”",
+    "part": "No. 1 in E Major. Andantino con moto",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 31,
+   "title": "I'm Confessin (That I Love You) [Performed on Piano]",
+   "durationMs": 168027,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 31,
+    "composer": "Ellis Reynolds",
+    "work": "Ellis Reynolds",
+    "part": "I'm Confessin (That I Love You) [Performed on Piano]",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 32,
+   "title": "O Holy Night (Arr. Hamilton for Solo Piano)",
+   "durationMs": 224093,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 32,
+    "composer": "A. Adam",
+    "work": "A. Adam",
+    "part": "O Holy Night (Arr. Hamilton for Solo Piano)",
+    "performers": "Lang Lang"
+   }
+  }
+ ]
+}

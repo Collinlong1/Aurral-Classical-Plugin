@@ -1,0 +1,64 @@
+{
+ "id": "1025522626",
+ "category": "concerto",
+ "title": "Tchaikovsky: Violin Concerto & Sérénade mélancolique",
+ "artist": "Itzhak Perlman",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Violin Concerto in D Major, Op. 35: I. Allegro moderato",
+   "durationMs": 1159280,
+   "artist": "Itzhak Perlman, The Philadelphia Orchestra & Eugene Ormandy",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "Violin Concerto in D Major, Op. 35, TH 59",
+    "part": "I. Allegro moderato",
+    "performers": "The Philadelphia Orchestra, Eugene Ormandy, Itzhak Perlman"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Violin Concerto in D Major, Op. 35: II. Canzonetta (Andante)",
+   "durationMs": 422133,
+   "artist": "Itzhak Perlman, The Philadelphia Orchestra & Eugene Ormandy",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "Violin Concerto in D Major, Op. 35, TH 59",
+    "part": "II. Canzonetta (Andante)",
+    "performers": "The Philadelphia Orchestra, Eugene Ormandy, Itzhak Perlman"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Violin Concerto in D Major, Op. 35: III. Finale (Allegro vivacissimo)",
+   "durationMs": 669560,
+   "artist": "Itzhak Perlman, The Philadelphia Orchestra & Eugene Ormandy",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "Violin Concerto in D Major, Op. 35, TH 59",
+    "part": "III. Finale (Allegro vivacissimo)",
+    "performers": "The Philadelphia Orchestra, Itzhak Perlman, Eugene Ormandy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Sérénade mélancholique, Op. 26",
+   "durationMs": 558545,
+   "artist": "Itzhak Perlman, The Philadelphia Orchestra & Eugene Ormandy",
+   "apple": {
+    "block": 2,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "Sérénade mélancolique in B-Flat Minor, Op. 26, TH 56 · “Melancholy Serenade”",
+    "part": "Sérénade mélancholique, Op. 26",
+    "performers": "Itzhak Perlman, Eugene Ormandy, The Philadelphia Orchestra"
+   }
+  }
+ ]
+}

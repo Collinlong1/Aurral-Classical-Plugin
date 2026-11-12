@@ -3,6 +3,9 @@
 //   node scripts/corpus.mjs <album id>      print one album
 //   node scripts/corpus.mjs --audio <dir>   also write silent, tagged FLAC
 //                                           files with real lengths (ffmpeg)
+//   node scripts/corpus.mjs --apple         score the real releases in
+//                                           test/corpus/apple against Apple Music
+//                                           Classical; --update-baseline saves it
 //   node scripts/corpus.mjs --serve-musicbrainz <port>
 //                                           answer MusicBrainz lookups from the
 //                                           corpus; set the plugin's MusicBrainz
@@ -13,16 +16,42 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { albums } from "../test/corpus/albums.js";
 import { runCorpus, layout } from "../test/corpus/run.js";
+import { appleFixtures, baselineFile, scoreApple, summary, toAlbum } from "../test/corpus/apple.js";
 
 const args = process.argv.slice(2);
 const audioAt = args.indexOf("--audio");
 const audio = audioAt >= 0 ? path.resolve(args.splice(audioAt, 2)[1] || "") : null;
 const serveAt = args.indexOf("--serve-musicbrainz");
 const servePort = serveAt >= 0 ? Number(args.splice(serveAt, 2)[1]) : null;
+const flag = (name) => (args.includes(name) ? (args.splice(args.indexOf(name), 1), true) : false);
+const apple = flag("--apple");
+const updateBaseline = flag("--update-baseline");
 const chosen = args.length ? albums.filter((album) => args.includes(album.id)) : albums;
 
-const results = await runCorpus(chosen);
-for (const album of chosen) console.log(`${layout(album, results.get(album.id))}\n`);
+if (apple) {
+  const fixtures = appleFixtures().filter((fixture) => !args.length || args.includes(fixture.id));
+  const results = await scoreApple(fixtures);
+  // One album's layout per style, to see what a score means.
+  if (args.length)
+    for (const style of Object.keys(results)) {
+      const shown = fixtures.map((fixture) => toAlbum(fixture, style));
+      const presentations = await runCorpus(shown);
+      for (const album of shown) console.log(`[${style}] ${layout(album, presentations.get(album.id))}\n`);
+    }
+  for (const [style, scores] of Object.entries(results)) {
+    const misses = fixtures.filter((fixture) => !scores[fixture.id].grouping);
+    if (!args.length && misses.length)
+      console.log(`${style} blocks differ: ${misses.map((fixture) => `${fixture.id} ${fixture.title}`).join("\n  ")}\n`);
+  }
+  console.log(summary(results).join("\n"));
+  if (updateBaseline) {
+    await fs.writeFile(baselineFile, `${JSON.stringify(results, null, 1)}\n`);
+    console.log(`Saved ${baselineFile}`);
+  }
+} else {
+  const results = await runCorpus(chosen);
+  for (const album of chosen) console.log(`${layout(album, results.get(album.id))}\n`);
+}
 
 if (audio) {
   for (const album of chosen) {

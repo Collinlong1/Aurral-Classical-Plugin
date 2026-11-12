@@ -1,0 +1,960 @@
+{
+ "id": "1499326494",
+ "category": "choral sacred",
+ "title": "Bach: St. Matthew Passion",
+ "artist": "The Choir of King's College, Cambridge, Academy of Ancient Music & Sir Stephen Cleobury",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "St. Matthew Passion, BWV 244, Pt. 1: No. 1. Kommt. ihr Töchter. helft mir klagen",
+   "durationMs": 418320,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & The Choir of King's College, Cambridge",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 1. Kommt. ihr Töchter. helft mir klagen",
+    "performers": "Sir Stephen Cleobury, Academy of Ancient Music, The Choir of King's College, Cambridge"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "St. Matthew Passion, BWV 244, Pt. 1: No. 2. Da Jesus diese Rede vollendet hatte",
+   "durationMs": 37760,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music, James Gilchrist & Matthew Rose",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 2. Da Jesus diese Rede vollendet hatte",
+    "performers": "Matthew Rose, Academy of Ancient Music, James Gilchrist, Sir Stephen Cleobury"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "St. Matthew Passion, BWV 244, Pt. 1: No. 3. Herzliebster Jesu. was hast du verbrochen",
+   "durationMs": 39880,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & The Choir of King's College, Cambridge",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 3. Herzliebster Jesu. was hast du verbrochen",
+    "performers": "Academy of Ancient Music, The Choir of King's College, Cambridge, Sir Stephen Cleobury"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "St. Matthew Passion, BWV 244, Pt. 1: No. 4. Da versammleten sich die Hohenpriester",
+   "durationMs": 183813,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music, The Choir of King's College, Cambridge, James Gilchrist & Matthew Rose",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 4. Da versammleten sich die Hohenpriester",
+    "performers": "The Choir of King's College, Cambridge, James Gilchrist, Sir Stephen Cleobury, Matthew Rose, Academy of Ancient Music"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "St. Matthew Passion, BWV 244, Pt. 1: No. 5. Du lieber Heiland du",
+   "durationMs": 51600,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & David Allsopp",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 5. Du lieber Heiland du",
+    "performers": "David Allsopp, Sir Stephen Cleobury, Academy of Ancient Music"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "St. Matthew Passion, BWV 244, Pt. 1: No. 6. Buß und Reu",
+   "durationMs": 249880,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & David Allsopp",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 6. Buß und Reu",
+    "performers": "Academy of Ancient Music, David Allsopp, Sir Stephen Cleobury"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "St. Matthew Passion, BWV 244, Pt. 1: No. 7. Da ging hin der Zwölfen einer",
+   "durationMs": 39573,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & James Gilchrist",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 7. Da ging hin der Zwölfen einer",
+    "performers": "Academy of Ancient Music, Sir Stephen Cleobury, James Gilchrist"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "St. Matthew Passion, BWV 244, Pt. 1: No. 8. Blute nur. du liebes Herz",
+   "durationMs": 276560,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & Sophie Bevan",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 8. Blute nur. du liebes Herz",
+    "performers": "Sophie Bevan, Sir Stephen Cleobury, Academy of Ancient Music"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "St. Matthew Passion, BWV 244, Pt. 1: No. 9. Aber am ersten Tage der süßen Brot",
+   "durationMs": 133867,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music, The Choir of King's College, Cambridge, James Gilchrist & Matthew Rose",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 9. Aber am ersten Tage der süßen Brot",
+    "performers": "Academy of Ancient Music, Sir Stephen Cleobury, James Gilchrist, The Choir of King's College, Cambridge, Matthew Rose"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "St. Matthew Passion, BWV 244, Pt. 1: No. 10. Ich bins. ich sollte büßen",
+   "durationMs": 45080,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & The Choir of King's College, Cambridge",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 10. Ich bins. ich sollte büßen",
+    "performers": "Sir Stephen Cleobury, The Choir of King's College, Cambridge, Academy of Ancient Music"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "St. Matthew Passion, BWV 244, Pt. 1: No. 11. Er antwortete und sprach",
+   "durationMs": 180547,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music, James Gilchrist & Matthew Rose",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 11. Er antwortete und sprach",
+    "performers": "James Gilchrist, Academy of Ancient Music, Sir Stephen Cleobury, Matthew Rose"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "St. Matthew Passion, BWV 244, Pt. 1: No. 12. Wiewohl mein Herz in Tränen schwimmt",
+   "durationMs": 86533,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & Sophie Bevan",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 12. Wiewohl mein Herz in Tränen schwimmt",
+    "performers": "Sir Stephen Cleobury, Academy of Ancient Music, Sophie Bevan"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "St. Matthew Passion, BWV 244, Pt. 1: No. 13. Ich will dir mein Herze schenken",
+   "durationMs": 225920,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & Sophie Bevan",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 13. Ich will dir mein Herze schenken",
+    "performers": "Sophie Bevan, Sir Stephen Cleobury, Academy of Ancient Music"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "St. Matthew Passion, BWV 244, Pt. 1: No. 14. Und da sie den Lobgesang gesprochen hatten",
+   "durationMs": 65320,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music, James Gilchrist & Matthew Rose",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 14. Und da sie den Lobgesang gesprochen hatten",
+    "performers": "James Gilchrist, Academy of Ancient Music, Matthew Rose, Sir Stephen Cleobury"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "St. Matthew Passion, BWV 244, Pt. 1: No. 15. Erkenne mich. mein Hüter",
+   "durationMs": 54760,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & The Choir of King's College, Cambridge",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 15. Erkenne mich. mein Hüter",
+    "performers": "Academy of Ancient Music, The Choir of King's College, Cambridge, Sir Stephen Cleobury"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "St. Matthew Passion, BWV 244, Pt. 1: No. 16. Petrus aber antwortete und sprach zu ihm",
+   "durationMs": 66013,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music, James Gilchrist & Matthew Rose",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 16. Petrus aber antwortete und sprach zu ihm",
+    "performers": "James Gilchrist, Matthew Rose, Sir Stephen Cleobury, Academy of Ancient Music"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "St. Matthew Passion, BWV 244, Pt. 1: No. 17. Ich will hier bei dir stehen",
+   "durationMs": 56787,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & The Choir of King's College, Cambridge",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 17. Ich will hier bei dir stehen",
+    "performers": "Sir Stephen Cleobury, The Choir of King's College, Cambridge, Academy of Ancient Music"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "St. Matthew Passion, BWV 244, Pt. 1: No. 18. Da kam Jesus mit ihnen zu einem Hofe",
+   "durationMs": 96400,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music, James Gilchrist & Matthew Rose",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 18. Da kam Jesus mit ihnen zu einem Hofe",
+    "performers": "Academy of Ancient Music, Sir Stephen Cleobury, James Gilchrist, Matthew Rose"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "St. Matthew Passion, BWV 244, Pt. 1: No. 19. O Schmerz! Hier zittert das gequälte Herz",
+   "durationMs": 121147,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music, The Choir of King's College, Cambridge & Mark le Brocq",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 19. O Schmerz! Hier zittert das gequälte Herz",
+    "performers": "The Choir of King's College, Cambridge, Academy of Ancient Music, Mark le Brocq, Sir Stephen Cleobury"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "St. Matthew Passion, BWV 244, Pt. 1: No. 20. Ich will bei meinem Jesu wachen",
+   "durationMs": 304347,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music, The Choir of King's College, Cambridge & Mark le Brocq",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 20. Ich will bei meinem Jesu wachen",
+    "performers": "Mark le Brocq, Academy of Ancient Music, The Choir of King's College, Cambridge, Sir Stephen Cleobury"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "St. Matthew Passion, BWV 244, Pt. 1: No. 21. Und ging hin ein wenig",
+   "durationMs": 40973,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music, James Gilchrist & Matthew Rose",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 21. Und ging hin ein wenig",
+    "performers": "James Gilchrist, Matthew Rose, Academy of Ancient Music, Sir Stephen Cleobury"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "St. Matthew Passion, BWV 244, Pt. 1: No. 22. Der Heiland fällt vor seinem Vater nieder",
+   "durationMs": 56427,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & William Gaunt",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 22. Der Heiland fällt vor seinem Vater nieder",
+    "performers": "Sir Stephen Cleobury, William Gaunt, Academy of Ancient Music"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 23,
+   "title": "St. Matthew Passion, BWV 244, Pt. 1: No. 23. Gerne will ich mich bequemen",
+   "durationMs": 248307,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & William Gaunt",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 23. Gerne will ich mich bequemen",
+    "performers": "Academy of Ancient Music, Sir Stephen Cleobury, William Gaunt"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 24,
+   "title": "St. Matthew Passion, BWV 244, Pt. 1: No. 24. Und er kam zu seinen Jüngern",
+   "durationMs": 70200,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music, James Gilchrist & Matthew Rose",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 24. Und er kam zu seinen Jüngern",
+    "performers": "Matthew Rose, Sir Stephen Cleobury, Academy of Ancient Music, James Gilchrist"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 25,
+   "title": "St. Matthew Passion, BWV 244, Pt. 1: No. 25. Was mein Gott will. das g'scheh allzeit",
+   "durationMs": 60387,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & The Choir of King's College, Cambridge",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 25. Was mein Gott will. das g'scheh allzeit",
+    "performers": "Academy of Ancient Music, Sir Stephen Cleobury, The Choir of King's College, Cambridge"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 26,
+   "title": "St. Matthew Passion, BWV 244, Pt. 1: No. 26. Und er kam und fand sie aber schlafend",
+   "durationMs": 139547,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music, James Gilchrist & Matthew Rose",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 26. Und er kam und fand sie aber schlafend",
+    "performers": "Sir Stephen Cleobury, Academy of Ancient Music, James Gilchrist, Matthew Rose"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 27,
+   "title": "St. Matthew Passion, BWV 244, Pt. 1: No. 27. So ist mein Jesus nun gefangen",
+   "durationMs": 272387,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music, The Choir of King's College, Cambridge, Sophie Bevan & David Allsopp",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 27. So ist mein Jesus nun gefangen",
+    "performers": "David Allsopp, Sir Stephen Cleobury, Academy of Ancient Music, The Choir of King's College, Cambridge, Sophie Bevan"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 28,
+   "title": "St. Matthew Passion, BWV 244, Pt. 1: No. 28. Und siehe. einer aus denen",
+   "durationMs": 130867,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music, James Gilchrist & Matthew Rose",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 28. Und siehe. einer aus denen",
+    "performers": "James Gilchrist, Academy of Ancient Music, Sir Stephen Cleobury, Matthew Rose"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 29,
+   "title": "St. Matthew Passion, BWV 244, Pt. 1: No. 29. O Mensch. bewein dein Sünde groß",
+   "durationMs": 372480,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & The Choir of King's College, Cambridge",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 29. O Mensch. bewein dein Sünde groß",
+    "performers": "Sir Stephen Cleobury, Academy of Ancient Music, The Choir of King's College, Cambridge"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 1,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 30, Ach, nun ist mein Jesus hin",
+   "durationMs": 230653,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music, The Choir of King's College, Cambridge & David Allsopp",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 30, Ach, nun ist mein Jesus hin",
+    "performers": "David Allsopp, Sir Stephen Cleobury, Academy of Ancient Music, The Choir of King's College, Cambridge"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 2,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 31. Die aber Jesum gegriffen hatten",
+   "durationMs": 68080,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & James Gilchrist",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 31. Die aber Jesum gegriffen hatten",
+    "performers": "James Gilchrist, Academy of Ancient Music, Sir Stephen Cleobury"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 3,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 32. Mir hat die Welt trüglich gericht'",
+   "durationMs": 40827,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & The Choir of King's College, Cambridge",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 32. Mir hat die Welt trüglich gericht'",
+    "performers": "Academy of Ancient Music, The Choir of King's College, Cambridge, Sir Stephen Cleobury"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 4,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 33. Und wiewohl viel falsche Zeugen herzutraten",
+   "durationMs": 78733,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & James Gilchrist",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 33. Und wiewohl viel falsche Zeugen herzutraten",
+    "performers": "Sir Stephen Cleobury, Academy of Ancient Music, James Gilchrist"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 5,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 34. Mein Jesus schweigt",
+   "durationMs": 64773,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & Mark le Brocq",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 34. Mein Jesus schweigt",
+    "performers": "Mark le Brocq, Academy of Ancient Music, Sir Stephen Cleobury"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 6,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 35. Geduld! Wenn mich falsche Zungen stechen",
+   "durationMs": 212520,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & Mark le Brocq",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 35. Geduld! Wenn mich falsche Zungen stechen",
+    "performers": "Sir Stephen Cleobury, Academy of Ancient Music, Mark le Brocq"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 7,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 36. Und der Hohepriester antwortete",
+   "durationMs": 123627,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music, The Choir of King's College, Cambridge, James Gilchrist & Matthew Rose",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 36. Und der Hohepriester antwortete",
+    "performers": "Academy of Ancient Music, James Gilchrist, Sir Stephen Cleobury, The Choir of King's College, Cambridge, Matthew Rose"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 8,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 37. Wer hat dich so geschlagen",
+   "durationMs": 44213,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & The Choir of King's College, Cambridge",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 37. Wer hat dich so geschlagen",
+    "performers": "Sir Stephen Cleobury, The Choir of King's College, Cambridge, Academy of Ancient Music"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 9,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 38. Petrus aber saß draußen im Palast",
+   "durationMs": 151000,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music, The Choir of King's College, Cambridge & James Gilchrist",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 38. Petrus aber saß draußen im Palast",
+    "performers": "Sir Stephen Cleobury, The Choir of King's College, Cambridge, Academy of Ancient Music, James Gilchrist"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 10,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 39. Erbarme dich. mein Gott",
+   "durationMs": 380853,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & David Allsopp",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 39. Erbarme dich. mein Gott",
+    "performers": "Academy of Ancient Music, David Allsopp, Sir Stephen Cleobury"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 11,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 40. Bin ich gleich von dir gewichen",
+   "durationMs": 57320,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & The Choir of King's College, Cambridge",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 40. Bin ich gleich von dir gewichen",
+    "performers": "Academy of Ancient Music, Sir Stephen Cleobury, The Choir of King's College, Cambridge"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 12,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 41. Des Morgens aber hielten alle Hohepriester",
+   "durationMs": 115720,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music, The Choir of King's College, Cambridge & James Gilchrist",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 41. Des Morgens aber hielten alle Hohepriester",
+    "performers": "James Gilchrist, The Choir of King's College, Cambridge, Sir Stephen Cleobury, Academy of Ancient Music"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 13,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 42. Gebt mir meinen Jesum wieder",
+   "durationMs": 172013,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & William Gaunt",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 42. Gebt mir meinen Jesum wieder",
+    "performers": "Academy of Ancient Music, William Gaunt, Sir Stephen Cleobury"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 14,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 43. Sie hielten aber einen Rat",
+   "durationMs": 123453,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music, James Gilchrist & Matthew Rose",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 43. Sie hielten aber einen Rat",
+    "performers": "Matthew Rose, Sir Stephen Cleobury, Academy of Ancient Music, James Gilchrist"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 15,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 44. Befiehl du deine Wege",
+   "durationMs": 55947,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & The Choir of King's College, Cambridge",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 44. Befiehl du deine Wege",
+    "performers": "Sir Stephen Cleobury, Academy of Ancient Music, The Choir of King's College, Cambridge"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 16,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 45. Auf das Fest aber hatte der Landpfleger Gewohnheit",
+   "durationMs": 148787,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music, The Choir of King's College, Cambridge & James Gilchrist",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 45. Auf das Fest aber hatte der Landpfleger Gewohnheit",
+    "performers": "Sir Stephen Cleobury, James Gilchrist, Academy of Ancient Music, The Choir of King's College, Cambridge"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 17,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 46. Wie wunderbarlich ist doch diese Strafe",
+   "durationMs": 39480,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & The Choir of King's College, Cambridge",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 46. Wie wunderbarlich ist doch diese Strafe",
+    "performers": "Sir Stephen Cleobury, The Choir of King's College, Cambridge, Academy of Ancient Music"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 18,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 47. Der Landpfleger sagte",
+   "durationMs": 14787,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & James Gilchrist",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 47. Der Landpfleger sagte",
+    "performers": "James Gilchrist, Sir Stephen Cleobury, Academy of Ancient Music, David Allsopp"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 19,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 48. Er hat uns allen wohlgetan",
+   "durationMs": 70547,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & Sophie Bevan",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 48. Er hat uns allen wohlgetan",
+    "performers": "Academy of Ancient Music, Sir Stephen Cleobury, Sophie Bevan"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 20,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 49. Aus Liebe will mein Heiland sterben",
+   "durationMs": 307280,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & Sophie Bevan",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 49. Aus Liebe will mein Heiland sterben",
+    "performers": "Sir Stephen Cleobury, Sophie Bevan, Academy of Ancient Music"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 21,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 50. Sie schrieen aber noch mehr",
+   "durationMs": 124080,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music, The Choir of King's College, Cambridge & James Gilchrist",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 50. Sie schrieen aber noch mehr",
+    "performers": "Academy of Ancient Music, James Gilchrist, Sir Stephen Cleobury, The Choir of King's College, Cambridge"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 22,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 51. Erbarm es Gott",
+   "durationMs": 58227,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & David Allsopp",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 51. Erbarm es Gott",
+    "performers": "David Allsopp, Sir Stephen Cleobury, Academy of Ancient Music"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 23,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 52. Können Tränen meiner Wangen",
+   "durationMs": 396133,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & David Allsopp",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 52. Können Tränen meiner Wangen",
+    "performers": "Academy of Ancient Music, David Allsopp, Sir Stephen Cleobury"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 24,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 53. Da nahmen die Kriegsknechte des Landpflegers",
+   "durationMs": 75333,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music, The Choir of King's College, Cambridge & James Gilchrist",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 53. Da nahmen die Kriegsknechte des Landpflegers",
+    "performers": "The Choir of King's College, Cambridge, James Gilchrist, Sir Stephen Cleobury, Academy of Ancient Music"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 25,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 54. O Haupt voll Blut und Wunden",
+   "durationMs": 117773,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & The Choir of King's College, Cambridge",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 54. O Haupt voll Blut und Wunden",
+    "performers": "Sir Stephen Cleobury, Academy of Ancient Music, The Choir of King's College, Cambridge"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 26,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 55. Und da sie ihn verspottet hatten",
+   "durationMs": 69587,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & James Gilchrist",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 55. Und da sie ihn verspottet hatten",
+    "performers": "Sir Stephen Cleobury, James Gilchrist, Academy of Ancient Music"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 27,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 56. Ja freilich will in uns das Fleisch und Blut",
+   "durationMs": 40453,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & William Gaunt",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 56. Ja freilich will in uns das Fleisch und Blut",
+    "performers": "Academy of Ancient Music, William Gaunt, Sir Stephen Cleobury"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 28,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 57. Komm. süßes Kreuz. so will ich sagen",
+   "durationMs": 313213,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & William Gaunt",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 57. Komm. süßes Kreuz. so will ich sagen",
+    "performers": "Academy of Ancient Music, Sir Stephen Cleobury, William Gaunt"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 29,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 58. Und da sie an die Stätte kamen",
+   "durationMs": 223373,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music, The Choir of King's College, Cambridge & James Gilchrist",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 58. Und da sie an die Stätte kamen",
+    "performers": "James Gilchrist, The Choir of King's College, Cambridge, Sir Stephen Cleobury, Academy of Ancient Music"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 30,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 59. Ach Golgatha. unselges Golgatha",
+   "durationMs": 84667,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & David Allsopp",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 59. Ach Golgatha. unselges Golgatha",
+    "performers": "Academy of Ancient Music, David Allsopp, Sir Stephen Cleobury"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 31,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 60. Sehet. Jesus hat die Hand",
+   "durationMs": 209667,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music, The Choir of King's College, Cambridge & David Allsopp",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 60. Sehet. Jesus hat die Hand",
+    "performers": "David Allsopp, Sir Stephen Cleobury, The Choir of King's College, Cambridge, Academy of Ancient Music"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 32,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 61. Und von der sechsten Stunde an",
+   "durationMs": 142027,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music, The Choir of King's College, Cambridge & James Gilchrist",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 61. Und von der sechsten Stunde an",
+    "performers": "Academy of Ancient Music, The Choir of King's College, Cambridge, James Gilchrist, Sir Stephen Cleobury"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 33,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 62. Wenn ich einmal soll scheiden",
+   "durationMs": 66320,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & The Choir of King's College, Cambridge",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 62. Wenn ich einmal soll scheiden",
+    "performers": "Sir Stephen Cleobury, Academy of Ancient Music, The Choir of King's College, Cambridge"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 34,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 63. Und siehe da. der Vorhang im Tempel zerriß",
+   "durationMs": 162267,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music, The Choir of King's College, Cambridge & James Gilchrist",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 63. Und siehe da. der Vorhang im Tempel zerriß",
+    "performers": "Academy of Ancient Music, James Gilchrist, The Choir of King's College, Cambridge, Sir Stephen Cleobury"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 35,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 64. Am Abend. da es kühle war",
+   "durationMs": 108973,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & William Gaunt",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 64. Am Abend. da es kühle war",
+    "performers": "Sir Stephen Cleobury, Academy of Ancient Music, William Gaunt"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 36,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 65. Mache dich. mein Herze. rein",
+   "durationMs": 402453,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & William Gaunt",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 65. Mache dich. mein Herze. rein",
+    "performers": "Sir Stephen Cleobury, William Gaunt, Academy of Ancient Music"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 37,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 66. Und Joseph nahm den Leib",
+   "durationMs": 169360,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music, The Choir of King's College, Cambridge & James Gilchrist",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 66. Und Joseph nahm den Leib",
+    "performers": "Academy of Ancient Music, Sir Stephen Cleobury, James Gilchrist, The Choir of King's College, Cambridge"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 38,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 67. Nun ist der Herr zur Ruh gebracht",
+   "durationMs": 102893,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & The Choir of King's College, Cambridge",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 67. Nun ist der Herr zur Ruh gebracht",
+    "performers": "The Choir of King's College, Cambridge, Sir Stephen Cleobury, Academy of Ancient Music"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 39,
+   "title": "St. Matthew Passion, BWV 244, Pt. 2: No. 68. Wir setzen uns mit Tränen nieder",
+   "durationMs": 323093,
+   "artist": "Sir Stephen Cleobury, Academy of Ancient Music & The Choir of King's College, Cambridge",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Matthew Passion, BWV 244",
+    "part": "No. 68. Wir setzen uns mit Tränen nieder",
+    "performers": "Academy of Ancient Music, The Choir of King's College, Cambridge, Sir Stephen Cleobury"
+   }
+  }
+ ]
+}

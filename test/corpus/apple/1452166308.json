@@ -1,0 +1,204 @@
+{
+ "id": "1452166308",
+ "category": "song",
+ "title": "Mahler: Lieder",
+ "artist": "Anne Sofie von Otter, Thomas Quasthoff, Pierre Boulez, Violeta Urmana & Vienna Philharmonic",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Lieder eines fahrenden Gesellen: Wenn mein Schatz Hochzeit macht",
+   "durationMs": 252000,
+   "artist": "Thomas Quasthoff, Vienna Philharmonic & Pierre Boulez",
+   "apple": {
+    "block": 1,
+    "composer": "Gustav Mahler",
+    "work": "Lieder eines fahrenden Gesellen, “Song of a Wayfarer”",
+    "part": "Wenn mein Schatz Hochzeit macht",
+    "performers": "Vienna Philharmonic, Thomas Quasthoff, Pierre Boulez"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Lieder eines fahrenden Gesellen: Ging heut' morgen übers Feld",
+   "durationMs": 233000,
+   "artist": "Thomas Quasthoff, Vienna Philharmonic & Pierre Boulez",
+   "apple": {
+    "block": 1,
+    "composer": "Gustav Mahler",
+    "work": "Lieder eines fahrenden Gesellen, “Song of a Wayfarer”",
+    "part": "Ging heut' morgen übers Feld",
+    "performers": "Pierre Boulez, Thomas Quasthoff, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Lieder eines fahrenden Gesellen: Ich hab' ein glühend Messer",
+   "durationMs": 189000,
+   "artist": "Thomas Quasthoff, Vienna Philharmonic & Pierre Boulez",
+   "apple": {
+    "block": 1,
+    "composer": "Gustav Mahler",
+    "work": "Lieder eines fahrenden Gesellen, “Song of a Wayfarer”",
+    "part": "Ich hab' ein glühend Messer",
+    "performers": "Pierre Boulez, Thomas Quasthoff, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Lieder eines fahrenden Gesellen: Die zwei blauen Augen von meinem Schatz",
+   "durationMs": 337000,
+   "artist": "Thomas Quasthoff, Vienna Philharmonic & Pierre Boulez",
+   "apple": {
+    "block": 1,
+    "composer": "Gustav Mahler",
+    "work": "Lieder eines fahrenden Gesellen, “Song of a Wayfarer”",
+    "part": "Die zwei blauen Augen von meinem Schatz",
+    "performers": "Vienna Philharmonic, Thomas Quasthoff, Pierre Boulez"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Rückert-Lieder: Blicke mir nicht in die Lieder",
+   "durationMs": 78000,
+   "artist": "Violeta Urmana, Vienna Philharmonic & Pierre Boulez",
+   "apple": {
+    "block": 2,
+    "composer": "Gustav Mahler",
+    "work": "5 Rückert-Lieder, Op. 44",
+    "part": "Blicke mir nicht in die Lieder",
+    "performers": "Vienna Philharmonic, Pierre Boulez, Violeta Urmana"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Rückert-Lieder: Ich atmet' einen linden Duft",
+   "durationMs": 157000,
+   "artist": "Violeta Urmana, Vienna Philharmonic & Pierre Boulez",
+   "apple": {
+    "block": 2,
+    "composer": "Gustav Mahler",
+    "work": "5 Rückert-Lieder, Op. 44",
+    "part": "Ich atmet' einen linden Duft",
+    "performers": "Violeta Urmana, Pierre Boulez, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Rückert-Lieder: Liebst du um Schönheit",
+   "durationMs": 165000,
+   "artist": "Violeta Urmana, Vienna Philharmonic & Pierre Boulez",
+   "apple": {
+    "block": 2,
+    "composer": "Gustav Mahler",
+    "work": "5 Rückert-Lieder, Op. 44",
+    "part": "Liebst du um Schönheit",
+    "performers": "Pierre Boulez, Violeta Urmana, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Rückert-Lieder: Ich bin der Welt abhanden gekommen",
+   "durationMs": 422000,
+   "artist": "Violeta Urmana, Vienna Philharmonic & Pierre Boulez",
+   "apple": {
+    "block": 2,
+    "composer": "Gustav Mahler",
+    "work": "5 Rückert-Lieder, Op. 44",
+    "part": "Ich bin der Welt abhanden gekommen",
+    "performers": "Pierre Boulez, Violeta Urmana, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Rückert-Lieder: Um Mitternacht",
+   "durationMs": 354000,
+   "artist": "Violeta Urmana, Vienna Philharmonic & Pierre Boulez",
+   "apple": {
+    "block": 2,
+    "composer": "Gustav Mahler",
+    "work": "5 Rückert-Lieder, Op. 44",
+    "part": "Um Mitternacht",
+    "performers": "Pierre Boulez, Violeta Urmana, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Kindertotenlieder: Nun will die Sonn' so hell aufgeh'n",
+   "durationMs": 344000,
+   "artist": "Anne Sofie von Otter, Vienna Philharmonic & Pierre Boulez",
+   "apple": {
+    "block": 3,
+    "composer": "Gustav Mahler",
+    "work": "Kindertotenlieder, “Songs on the Death of Children”",
+    "part": "Nun will die Sonn' so hell aufgeh'n",
+    "performers": "Anne Sofie von Otter, Pierre Boulez, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Kindertotenlieder: Nun seh' ich wohl, warum so dunkle Flammen",
+   "durationMs": 291000,
+   "artist": "Anne Sofie von Otter, Vienna Philharmonic & Pierre Boulez",
+   "apple": {
+    "block": 3,
+    "composer": "Gustav Mahler",
+    "work": "Kindertotenlieder, “Songs on the Death of Children”",
+    "part": "Nun seh' ich wohl, warum so dunkle Flammen",
+    "performers": "Vienna Philharmonic, Pierre Boulez, Anne Sofie von Otter"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Kindertotenlieder: Wenn dein Mütterlein",
+   "durationMs": 297000,
+   "artist": "Anne Sofie von Otter, Vienna Philharmonic & Pierre Boulez",
+   "apple": {
+    "block": 3,
+    "composer": "Gustav Mahler",
+    "work": "Kindertotenlieder, “Songs on the Death of Children”",
+    "part": "Wenn dein Mütterlein",
+    "performers": "Pierre Boulez, Anne Sofie von Otter, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Kindertotenlieder: Oft denk' ich, sie sind nur ausgegangen",
+   "durationMs": 181000,
+   "artist": "Anne Sofie von Otter, Vienna Philharmonic & Pierre Boulez",
+   "apple": {
+    "block": 3,
+    "composer": "Gustav Mahler",
+    "work": "Kindertotenlieder, “Songs on the Death of Children”",
+    "part": "Oft denk' ich, sie sind nur ausgegangen",
+    "performers": "Pierre Boulez, Vienna Philharmonic, Anne Sofie von Otter"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Kindertotenlieder: in diesem Wetter",
+   "durationMs": 368000,
+   "artist": "Anne Sofie von Otter, Vienna Philharmonic & Pierre Boulez",
+   "apple": {
+    "block": 3,
+    "composer": "Gustav Mahler",
+    "work": "Kindertotenlieder, “Songs on the Death of Children”",
+    "part": "in diesem Wetter",
+    "performers": "Pierre Boulez, Anne Sofie von Otter, Vienna Philharmonic"
+   }
+  }
+ ]
+}

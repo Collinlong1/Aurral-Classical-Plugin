@@ -292,7 +292,12 @@ test("explicit embedded work metadata creates an idempotent read-only work reali
     album.groups[0].items.map((item) => item.title),
     ["I. Allegro", "II. Adagio"],
   );
-  assert.equal(renderAlbumPresentation(c, "etudes-album"), null);
+  // A set of études is not one work, but its neighbouring pieces share a
+  // block headed by the set, as Apple Music Classical shows them.
+  assert.deepEqual(
+    renderAlbumPresentation(c, "etudes-album").groups.map((group) => [group.workId, group.title, group.items.map((item) => item.title)]),
+    [[null, "Transcendental Études", ["No. 1", "No. 2"]]],
+  );
   assert.equal(
     c.db
       .prepare("SELECT count(*) AS n FROM audit_event WHERE action='work.auto_match'")

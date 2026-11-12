@@ -1,0 +1,344 @@
+{
+ "id": "752033492",
+ "category": "orchestral",
+ "title": "Tchaikovsky: The Nutcracker",
+ "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "The Nutcracker, Op. 71: Miniature Overture",
+   "durationMs": 191310,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Nutcracker, Op. 71, TH 14",
+    "part": "Miniature Overture",
+    "performers": "Sir Simon Rattle, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "The Nutcracker, Op. 71, Act I: No. 1, The Decoration of the Christmas Tree",
+   "durationMs": 227581,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Nutcracker, Op. 71, TH 14",
+    "part": "No. 1, The Decoration of the Christmas Tree",
+    "performers": "Sir Simon Rattle, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "The Nutcracker, Op. 71, Act I: No. 2, March",
+   "durationMs": 145446,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Nutcracker, Op. 71, TH 14",
+    "part": "No. 2, March",
+    "performers": "Berlin Philharmonic Orchestra, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "The Nutcracker, Op. 71, Act I: No. 3, Children's Galop and Entry of the Parents",
+   "durationMs": 136347,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Nutcracker, Op. 71, TH 14",
+    "part": "No. 3, Children's Galop and Entry of the Parents",
+    "performers": "Sir Simon Rattle, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "The Nutcracker, Op. 71, Act I: No. 4, Arrival of Drosselmeyer",
+   "durationMs": 327973,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Nutcracker, Op. 71, TH 14",
+    "part": "No. 4, Arrival of Drosselmeyer",
+    "performers": "Sir Simon Rattle, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "The Nutcracker, Op. 71, Act I: No. 5, Grandfather's Dance",
+   "durationMs": 374547,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Nutcracker, Op. 71, TH 14",
+    "part": "No. 5, Grandfather's Dance",
+    "performers": "Berlin Philharmonic Orchestra, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "The Nutcracker, Op. 71, Act I: No. 6, Clara and the Nutcracker",
+   "durationMs": 378874,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Nutcracker, Op. 71, TH 14",
+    "part": "No. 6, Clara and the Nutcracker",
+    "performers": "Sir Simon Rattle, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "The Nutcracker, Op. 71, Act I: No. 7, The Battle",
+   "durationMs": 206966,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Nutcracker, Op. 71, TH 14",
+    "part": "No. 7, The Battle",
+    "performers": "Berlin Philharmonic Orchestra, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "The Nutcracker, Op. 71, Act I: No. 8, In the Pine Forest",
+   "durationMs": 238707,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Nutcracker, Op. 71, TH 14",
+    "part": "No. 8, In the Pine Forest",
+    "performers": "Sir Simon Rattle, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "The Nutcracker, Op. 71, Act I: No. 9, Waltz of the Snowflakes",
+   "durationMs": 409641,
+   "artist": "Berlin Philharmonic Orchestra, LIBERA & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Nutcracker, Op. 71, TH 14",
+    "part": "No. 9, Waltz of the Snowflakes",
+    "performers": "Berlin Philharmonic Orchestra, LIBERA, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "The Nutcracker, Op. 71, Act II: No. 10, The Kingdom of Sweets",
+   "durationMs": 230001,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Nutcracker, Op. 71, TH 14",
+    "part": "No. 10, The Kingdom of Sweets",
+    "performers": "Berlin Philharmonic Orchestra, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "The Nutcracker, Op. 71, Act II: No. 11, Clara and the Prince",
+   "durationMs": 297986,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Nutcracker, Op. 71, TH 14",
+    "part": "No. 11, Clara and the Prince",
+    "performers": "Sir Simon Rattle, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "The Nutcracker, Op. 71, Act II: No. 12a, Divertissement. Chocolate (Spanish Dance)",
+   "durationMs": 72907,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Nutcracker, Op. 71, TH 14",
+    "part": "No. 12a, Divertissement. Chocolate (Spanish Dance)",
+    "performers": "Sir Simon Rattle, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "The Nutcracker, Op. 71, Act II:  No. 12b, Divertissement. Coffee (Arabian Dance)",
+   "durationMs": 233893,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Nutcracker, Op. 71, TH 14",
+    "part": "No. 12b, Divertissement. Coffee (Arabian Dance)",
+    "performers": "Berlin Philharmonic Orchestra, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "The Nutcracker, Op. 71, Act II: No. 12c, Divertissement. Tea (Chinese Dance)",
+   "durationMs": 72267,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Nutcracker, Op. 71, TH 14",
+    "part": "No. 12c, Divertissement. Tea (Chinese Dance)",
+    "performers": "Berlin Philharmonic Orchestra, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "The Nutcracker, Op. 71, Act II: No. 12d,  Divertissement. Trepak (Russian Dance)",
+   "durationMs": 69120,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Nutcracker, Op. 71, TH 14",
+    "part": "No. 12d, Divertissement. Trepak (Russian Dance)",
+    "performers": "Sir Simon Rattle, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "The Nutcracker, Op. 71, Act II: No. 12e, Divertissement. Dance of the Reed Pipes",
+   "durationMs": 149040,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Nutcracker, Op. 71, TH 14",
+    "part": "No. 12e, Divertissement. Dance of the Reed Pipes",
+    "performers": "Sir Simon Rattle, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "The Nutcracker, Op. 71, Act II: No. 12f, Divertissement. Mother Gigogne",
+   "durationMs": 152987,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Nutcracker, Op. 71, TH 14",
+    "part": "No. 12f, Divertissement. Mother Gigogne",
+    "performers": "Berlin Philharmonic Orchestra, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "The Nutcracker, Op. 71, Act II: No. 13, Waltz of the Flowers",
+   "durationMs": 415800,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Nutcracker, Op. 71, TH 14",
+    "part": "No. 13, Waltz of the Flowers",
+    "performers": "Sir Simon Rattle, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "The Nutcracker, Op. 71, Act II: No. 14, Pas de deux",
+   "durationMs": 306533,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Nutcracker, Op. 71, TH 14",
+    "part": "No. 14, Pas de deux",
+    "performers": "Berlin Philharmonic Orchestra, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "The Nutcracker, Op. 71, Act II: Variation I. Tarantella",
+   "durationMs": 39120,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Nutcracker, Op. 71, TH 14",
+    "part": "Variation I. Tarantella",
+    "performers": "Sir Simon Rattle, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "The Nutcracker, Op. 71, Act II: Variation II. Dance of the Sugar Plum Fairy",
+   "durationMs": 144813,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Nutcracker, Op. 71, TH 14",
+    "part": "Variation II. Dance of the Sugar Plum Fairy",
+    "performers": "Berlin Philharmonic Orchestra, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 23,
+   "title": "The Nutcracker, Op. 71, Act II: Coda",
+   "durationMs": 81293,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Nutcracker, Op. 71, TH 14",
+    "part": "Coda",
+    "performers": "Berlin Philharmonic Orchestra, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 24,
+   "title": "The Nutcracker, Op. 71, Act II: No. 15, Final Waltz and Apotheosis",
+   "durationMs": 291249,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Nutcracker, Op. 71, TH 14",
+    "part": "No. 15, Final Waltz and Apotheosis",
+    "performers": "Sir Simon Rattle, Berlin Philharmonic Orchestra"
+   }
+  }
+ ]
+}

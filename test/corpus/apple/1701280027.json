@@ -1,0 +1,358 @@
+{
+ "id": "1701280027",
+ "category": "compilation",
+ "title": "Beautiful Classical Piano Music",
+ "artist": "Various Artists",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Sonnet in C Major",
+   "durationMs": 85000,
+   "artist": "Sergey Bryukhno",
+   "apple": {
+    "block": 1,
+    "composer": "Bryukhno",
+    "work": "Bryukhno",
+    "part": "Sonnet in C Major",
+    "performers": "Sergey Bryukhno"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Gymnopédie No. 1",
+   "durationMs": 156000,
+   "artist": "Katya Kramer-Lapin",
+   "apple": {
+    "block": 2,
+    "composer": "Erik Satie",
+    "work": "Gymnopédies",
+    "part": "Gymnopédie No. 1",
+    "performers": "Katya Kramer-Lapin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Menuet in G Major (From Notebook for Anna Magdalena Bach, Klavierbüchlein von 1725, BWV Anh. 114) [Transcr. by Katya Kramer-Lapin]",
+   "durationMs": 108318,
+   "artist": "Katya Kramer-Lapin",
+   "apple": {
+    "block": 3,
+    "composer": "Christian Petzold",
+    "work": "Minuet in G Major, “Formerly attributed to J.S. Bach as BWV Anh 114”",
+    "part": "Menuet in G Major (From Notebook for Anna Magdalena Bach, Klavierbüchlein von 1725, BWV Anh. 114) [Transcr. by Katya Kramer-Lapin]",
+    "performers": "Katya Kramer-Lapin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "The Well-Tempered Clavier: Book 1, BWV 846-869: I. Prelude in C Major, BWV 846",
+   "durationMs": 125000,
+   "artist": "Katya Kramer-Lapin",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "Prelude & Fugue No. 1 in C Major, BWV 846 · “The Well-tempered Clavier, Book 1”",
+    "part": "Book 1, BWV 846-869: I. Prelude in C Major, BWV 846",
+    "performers": "Katya Kramer-Lapin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Variations on an Original Theme, Op. 36 \"Enigma\": Var. IX. Adagio \"Nimrod\" (Version for Piano)",
+   "durationMs": 205005,
+   "artist": "Katya Kramer-Lapin",
+   "apple": {
+    "block": 5,
+    "composer": "Sir Edward Elgar",
+    "work": "Enigma Variations, Op. 36",
+    "part": "Var. IX. Adagio \"Nimrod\" (Version for Piano)",
+    "performers": "Katya Kramer-Lapin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Hope",
+   "durationMs": 103762,
+   "artist": "Katya Kramer-Lapin",
+   "apple": {
+    "block": 6,
+    "composer": "Bryukhno",
+    "work": "Bryukhno",
+    "part": "Hope",
+    "performers": "Katya Kramer-Lapin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Rhapsody on a Theme of Paganini, Op. 43: Variation No. 18. Andante cantabile (Transcr. for Piano Solo by Michael R. Loveridge)",
+   "durationMs": 192641,
+   "artist": "Katya Kramer-Lapin",
+   "apple": {
+    "block": 7,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Variation No. 18. Andante cantabile (Transcr. for Piano Solo by Michael R. Loveridge)",
+    "performers": "Katya Kramer-Lapin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Suite Bergamasque, L. 75: Clair de Lune",
+   "durationMs": 313000,
+   "artist": "Katya Kramer-Lapin",
+   "apple": {
+    "block": 8,
+    "composer": "Claude Debussy",
+    "work": "Suite bergamasque, CD 82, L. 75",
+    "part": "Clair de Lune",
+    "performers": "Katya Kramer-Lapin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Orchestral Suite No. 3 in D Major, BWV 1068: II. Air (Transcr. for Piano by Alexander Siloti)",
+   "durationMs": 305832,
+   "artist": "Katya Kramer-Lapin",
+   "apple": {
+    "block": 9,
+    "composer": "Johann Sebastian Bach",
+    "work": "Orchestral Suite No. 3 in D Major, BWV 1068",
+    "part": "II. Air (Transcr. for Piano by Alexander Siloti)",
+    "performers": "Katya Kramer-Lapin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Bagatelle No. 25 in A Minor, WoO 59 \"Für Elise\"",
+   "durationMs": 199008,
+   "artist": "Katya Kramer-Lapin",
+   "apple": {
+    "block": 10,
+    "composer": "Ludwig van Beethoven",
+    "work": "Bagatelle in A Minor, WoO 59 · “Für Elise”",
+    "part": "Bagatelle No. 25 in A Minor, WoO 59 \"Für Elise\"",
+    "performers": "Katya Kramer-Lapin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Goldberg Variations, BWV 988: Aria",
+   "durationMs": 328000,
+   "artist": "Katya Kramer-Lapin",
+   "apple": {
+    "block": 11,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Aria",
+    "performers": "Katya Kramer-Lapin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Peer Gynt Suite No. 1, Op. 46: I. Morning Mood (Arr. for 2 Pianos)",
+   "durationMs": 219455,
+   "artist": "Vyacheslav Gryaznov & Katya Kramer-Lapin",
+   "apple": {
+    "block": 12,
+    "composer": "Edvard Grieg",
+    "work": "Peer Gynt Suite No. 1, Op. 46",
+    "part": "I. Morning Mood (Arr. for 2 Pianos)",
+    "performers": "Katya Kramer-Lapin, Vyacheslav Gryaznov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "3 Nocturnes, Op. 9: No. 2 in E-Flat Major",
+   "durationMs": 262413,
+   "artist": "Misha Fomin",
+   "apple": {
+    "block": 13,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 2 in E-Flat Major, B. 54/2, Op. 9/2 · “Murmures de la Seine 2”",
+    "part": "No. 2 in E-Flat Major",
+    "performers": "Misha Fomin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Emily",
+   "durationMs": 180221,
+   "artist": "Katya Kramer-Lapin",
+   "apple": {
+    "block": 14,
+    "composer": "Polina Nazaykinskaya",
+    "work": "Polina Nazaykinskaya",
+    "part": "Emily",
+    "performers": "Katya Kramer-Lapin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Deep Focus",
+   "durationMs": 87981,
+   "artist": "Sergey Bryukhno",
+   "apple": {
+    "block": 15,
+    "composer": "Bryukhno",
+    "work": "Bryukhno",
+    "part": "Deep Focus",
+    "performers": "Sergey Bryukhno"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Turn the Volume Down and Sleep",
+   "durationMs": 99078,
+   "artist": "Sergey Bryukhno",
+   "apple": {
+    "block": 15,
+    "composer": "Bryukhno",
+    "work": "Bryukhno",
+    "part": "Turn the Volume Down and Sleep",
+    "performers": "Sergey Bryukhno"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "When the Stars Are Shining",
+   "durationMs": 85742,
+   "artist": "Sergey Bryukhno",
+   "apple": {
+    "block": 15,
+    "composer": "Bryukhno",
+    "work": "Bryukhno",
+    "part": "When the Stars Are Shining",
+    "performers": "Sergey Bryukhno"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Let Go of the Past and Sleep Calm",
+   "durationMs": 105349,
+   "artist": "Sergey Bryukhno",
+   "apple": {
+    "block": 15,
+    "composer": "Bryukhno",
+    "work": "Bryukhno",
+    "part": "Let Go of the Past and Sleep Calm",
+    "performers": "Sergey Bryukhno"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "Sì dolce è'l tormento, SV 332 (Transcr. for Piano by Vyacheslav Gryaznov)",
+   "durationMs": 168662,
+   "artist": "Katya Kramer-Lapin",
+   "apple": {
+    "block": 16,
+    "composer": "Claudio Monteverdi",
+    "work": "Si dolce è'l tormento, M ix119, SV 332",
+    "part": "Sì dolce è'l tormento, SV 332 (Transcr. for Piano by Vyacheslav Gryaznov)",
+    "performers": "Katya Kramer-Lapin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "Prelude B Minor, BWV 855a (Transcr. by Alexander Siloti)",
+   "durationMs": 182021,
+   "artist": "Katya Kramer-Lapin",
+   "apple": {
+    "block": 17,
+    "composer": "Johann Sebastian Bach",
+    "work": "Prelude & Fugue No. 10, Variant of BWV855, BWV 855a · “The Well-tempered Clavier, Book 1”",
+    "part": "Prelude B Minor, BWV 855a (Transcr. by Alexander Siloti)",
+    "performers": "Katya Kramer-Lapin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "Romance in E-Flat Major (Version for Piano)",
+   "durationMs": 189991,
+   "artist": "Katya Kramer-Lapin",
+   "apple": {
+    "block": 18,
+    "composer": "Bryukhno",
+    "work": "Bryukhno",
+    "part": "Romance in E-Flat Major (Version for Piano)",
+    "performers": "Katya Kramer-Lapin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "Jeux D'eau",
+   "durationMs": 323987,
+   "artist": "Misha Fomin",
+   "apple": {
+    "block": 19,
+    "composer": "Maurice Ravel",
+    "work": "Jeux d'eau in E Major, M. 30 · “Fountains”",
+    "part": "Jeux D'eau",
+    "performers": "Misha Fomin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 23,
+   "title": "Piano Sonata No. 14 in C-Sharp Minor, Op. 27 No. 2 \"Moonlight Sonata\": I. Adagio sostenuto",
+   "durationMs": 343000,
+   "artist": "Katya Kramer-Lapin",
+   "apple": {
+    "block": 20,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 14 in C-Sharp Minor, Op. 27/2 · “Moonlight Sonata”",
+    "part": "I. Adagio sostenuto",
+    "performers": "Katya Kramer-Lapin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 24,
+   "title": "The Nutcracker Suite, Op. 71a: II. Dance of the Sugar Plum Fairy (Arr. for Piano)",
+   "durationMs": 127250,
+   "artist": "Maria Nemtsova",
+   "apple": {
+    "block": 21,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Nutcracker Suite, Op. 71a, TH 35",
+    "part": "II. Dance of the Sugar Plum Fairy (Arr. for Piano)",
+    "performers": "Maria Nemtsova"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 25,
+   "title": "The Nutcracker, Op. 71, TH 14: No. 13, Waltz of the Flowers (Arr. for Piano by Vyacheslav Gryaznov)",
+   "durationMs": 470911,
+   "artist": "Katya Kramer-Lapin",
+   "apple": {
+    "block": 21,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Nutcracker Suite, Op. 71a, TH 35",
+    "part": "No. 13, Waltz of the Flowers (Arr. for Piano by Vyacheslav Gryaznov)",
+    "performers": "Katya Kramer-Lapin"
+   }
+  }
+ ]
+}

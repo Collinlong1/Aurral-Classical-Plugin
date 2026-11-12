@@ -1,0 +1,134 @@
+{
+ "id": "213922261",
+ "category": "chamber",
+ "title": "Dvořák: American Quartet - Mendelssohn: String Quartet No. 2",
+ "artist": "St. Petersburg String Quartet",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "String Quartet No. 2 in A Minor, Op. 13: I. Adagio - Allegro Vivace",
+   "durationMs": 485120,
+   "artist": "St. Petersburg String Quartet",
+   "apple": {
+    "block": 1,
+    "composer": "Felix Mendelssohn",
+    "work": "String Quartet No. 2 in A Minor, Op. 13",
+    "part": "I. Adagio - Allegro Vivace",
+    "performers": "St. Petersburg String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "String Quartet No. 2 in A Minor, Op. 13: II. Adagio Non Lento",
+   "durationMs": 468360,
+   "artist": "St. Petersburg String Quartet",
+   "apple": {
+    "block": 1,
+    "composer": "Felix Mendelssohn",
+    "work": "String Quartet No. 2 in A Minor, Op. 13",
+    "part": "II. Adagio Non Lento",
+    "performers": "St. Petersburg String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "String Quartet No. 2 in A Minor, Op. 13: III. Intermezzo - Allegretto con Moto",
+   "durationMs": 284493,
+   "artist": "St. Petersburg String Quartet",
+   "apple": {
+    "block": 1,
+    "composer": "Felix Mendelssohn",
+    "work": "String Quartet No. 2 in A Minor, Op. 13",
+    "part": "III. Intermezzo - Allegretto con Moto",
+    "performers": "St. Petersburg String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "String Quartet No. 2 in A Minor, Op. 13: IV. Presto",
+   "durationMs": 582693,
+   "artist": "St. Petersburg String Quartet",
+   "apple": {
+    "block": 1,
+    "composer": "Felix Mendelssohn",
+    "work": "String Quartet No. 2 in A Minor, Op. 13",
+    "part": "IV. Presto",
+    "performers": "St. Petersburg String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "String Quartet No. 12 in F Major, Op. 96 (B. 179) \"American\": I. Allegro Ma Non Troppo",
+   "durationMs": 599333,
+   "artist": "St. Petersburg String Quartet",
+   "apple": {
+    "block": 2,
+    "composer": "Antonín Dvořák",
+    "work": "String Quartet No. 12 in F Major, B 179, Op. 96 · “American”",
+    "part": "I. Allegro Ma Non Troppo",
+    "performers": "St. Petersburg String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "String Quartet No. 12 in F Major, Op. 96 (B. 179) \"American\": II. Lento",
+   "durationMs": 476427,
+   "artist": "St. Petersburg String Quartet",
+   "apple": {
+    "block": 2,
+    "composer": "Antonín Dvořák",
+    "work": "String Quartet No. 12 in F Major, B 179, Op. 96 · “American”",
+    "part": "II. Lento",
+    "performers": "St. Petersburg String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "String Quartet No. 12 in F Major, Op. 96 (B. 179) \"American\": III. Molto Vivace",
+   "durationMs": 231013,
+   "artist": "St. Petersburg String Quartet",
+   "apple": {
+    "block": 2,
+    "composer": "Antonín Dvořák",
+    "work": "String Quartet No. 12 in F Major, B 179, Op. 96 · “American”",
+    "part": "III. Molto Vivace",
+    "performers": "St. Petersburg String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "String Quartet No. 12 in F Major, Op. 96 (B. 179) \"American\": IV. Finale - Vivace Ma Non Troppo",
+   "durationMs": 341960,
+   "artist": "St. Petersburg String Quartet",
+   "apple": {
+    "block": 2,
+    "composer": "Antonín Dvořák",
+    "work": "String Quartet No. 12 in F Major, B 179, Op. 96 · “American”",
+    "part": "IV. Finale - Vivace Ma Non Troppo",
+    "performers": "St. Petersburg String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Andante Cantabile (from String Quartet No. 1)",
+   "durationMs": 387867,
+   "artist": "St. Petersburg String Quartet",
+   "apple": {
+    "block": 3,
+    "composer": "Antonín Dvořák",
+    "work": "Andante cantabile, B 427",
+    "part": "Andante Cantabile (from String Quartet No. 1)",
+    "performers": "St. Petersburg String Quartet"
+   }
+  }
+ ]
+}

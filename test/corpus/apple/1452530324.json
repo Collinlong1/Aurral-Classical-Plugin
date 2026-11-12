@@ -1,0 +1,176 @@
+{
+ "id": "1452530324",
+ "category": "symphony",
+ "title": "Haydn Symphonies",
+ "artist": "Vienna Philharmonic & Leonard Bernstein",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Symphony No. 88 in G Major: I. Adagio - Allegro",
+   "durationMs": 559440,
+   "artist": "Vienna Philharmonic & Leonard Bernstein",
+   "apple": {
+    "block": 1,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 88 in G Major, Hob. I/88 · “Letter V”",
+    "part": "I. Adagio - Allegro",
+    "performers": "Vienna Philharmonic, Leonard Bernstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Symphony No. 88 in G Major: II. Largo",
+   "durationMs": 440000,
+   "artist": "Vienna Philharmonic & Leonard Bernstein",
+   "apple": {
+    "block": 1,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 88 in G Major, Hob. I/88 · “Letter V”",
+    "part": "II. Largo",
+    "performers": "Vienna Philharmonic, Leonard Bernstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Symphony No. 88 in G Major: III. Menuetto (Allegretto)",
+   "durationMs": 263454,
+   "artist": "Vienna Philharmonic & Leonard Bernstein",
+   "apple": {
+    "block": 1,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 88 in G Major, Hob. I/88 · “Letter V”",
+    "part": "III. Menuetto (Allegretto)",
+    "performers": "Leonard Bernstein, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Symphony No. 88 in G Major: IV. Finale (Allegro con spirito)",
+   "durationMs": 207507,
+   "artist": "Vienna Philharmonic & Leonard Bernstein",
+   "apple": {
+    "block": 1,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 88 in G Major, Hob. I/88 · “Letter V”",
+    "part": "IV. Finale (Allegro con spirito)",
+    "performers": "Vienna Philharmonic, Leonard Bernstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Symphony No. 92 in G Major, \"Oxford\": I. Adagio - Allegro spiritoso",
+   "durationMs": 490963,
+   "artist": "Vienna Philharmonic & Leonard Bernstein",
+   "apple": {
+    "block": 2,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 92 in G Major, Hob. I/92 · “Oxford Symphony”",
+    "part": "I. Adagio - Allegro spiritoso",
+    "performers": "Vienna Philharmonic, Leonard Bernstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Symphony No. 92 in G Major, \"Oxford\": II. Adagio",
+   "durationMs": 479000,
+   "artist": "Vienna Philharmonic & Leonard Bernstein",
+   "apple": {
+    "block": 2,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 92 in G Major, Hob. I/92 · “Oxford Symphony”",
+    "part": "II. Adagio",
+    "performers": "Leonard Bernstein, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Symphony No. 92 in G Major, \"Oxford\": III. Menuet (Allegretto)",
+   "durationMs": 376000,
+   "artist": "Vienna Philharmonic & Leonard Bernstein",
+   "apple": {
+    "block": 2,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 92 in G Major, Hob. I/92 · “Oxford Symphony”",
+    "part": "III. Menuet (Allegretto)",
+    "performers": "Leonard Bernstein, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Symphony No. 92 in G Major, \"Oxford\": IV. Presto",
+   "durationMs": 341000,
+   "artist": "Vienna Philharmonic & Leonard Bernstein",
+   "apple": {
+    "block": 2,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 92 in G Major, Hob. I/92 · “Oxford Symphony”",
+    "part": "IV. Presto",
+    "performers": "Vienna Philharmonic, Leonard Bernstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Symphony No. 94 in G Major, \"Surprise\": I. Adagio - Vivace assai",
+   "durationMs": 557000,
+   "artist": "Vienna Philharmonic & Leonard Bernstein",
+   "apple": {
+    "block": 3,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 94 in G Major, Hob. I/94 · “Surprise”",
+    "part": "I. Adagio - Vivace assai",
+    "performers": "Leonard Bernstein, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Symphony No. 94 in G Major, \"Surprise\": II. Andante",
+   "durationMs": 392975,
+   "artist": "Vienna Philharmonic & Leonard Bernstein",
+   "apple": {
+    "block": 3,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 94 in G Major, Hob. I/94 · “Surprise”",
+    "part": "II. Andante",
+    "performers": "Leonard Bernstein, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Symphony No. 94 in G Major, \"Surprise\": III. Menuet (Allegro molto)",
+   "durationMs": 328493,
+   "artist": "Vienna Philharmonic & Leonard Bernstein",
+   "apple": {
+    "block": 3,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 94 in G Major, Hob. I/94 · “Surprise”",
+    "part": "III. Menuet (Allegro molto)",
+    "performers": "Vienna Philharmonic, Leonard Bernstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Symphony No. 94 in G Major, \"Surprise\": IV. Finale (Allegro di molto)",
+   "durationMs": 225507,
+   "artist": "Vienna Philharmonic & Leonard Bernstein",
+   "apple": {
+    "block": 3,
+    "composer": "Franz Joseph Haydn",
+    "work": "Symphony No. 94 in G Major, Hob. I/94 · “Surprise”",
+    "part": "IV. Finale (Allegro di molto)",
+    "performers": "Leonard Bernstein, Vienna Philharmonic"
+   }
+  }
+ ]
+}

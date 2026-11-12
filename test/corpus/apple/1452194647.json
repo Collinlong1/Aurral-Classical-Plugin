@@ -1,0 +1,1436 @@
+{
+ "id": "1452194647",
+ "category": "beethoven sonatas",
+ "title": "Beethoven: Piano Sonatas",
+ "artist": "Daniel Barenboim",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Piano Sonata No. 1 in F Minor, Op. 2 No. 1: I. Allegro",
+   "durationMs": 226440,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 1,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 1 in F Minor, Op. 2/1",
+    "part": "I. Allegro",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Piano Sonata No. 1 in F Minor, Op. 2 No. 1: II. Adagio",
+   "durationMs": 317467,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 1,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 1 in F Minor, Op. 2/1",
+    "part": "II. Adagio",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Piano Sonata No. 1 in F Minor, Op. 2 No. 1: III. Menuetto (Allegretto)",
+   "durationMs": 216893,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 1,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 1 in F Minor, Op. 2/1",
+    "part": "III. Menuetto (Allegretto)",
+    "performers": "Daniel Barenboim, Dubravka Tomšič"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Piano Sonata No. 1 in F Minor, Op. 2 No. 1: IV. Prestissimo",
+   "durationMs": 297440,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 1,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 1 in F Minor, Op. 2/1",
+    "part": "IV. Prestissimo",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Piano Sonata No. 2 in A, Op. 2 No. 2: I. Allegro Vivace",
+   "durationMs": 439667,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 2,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 2 in A Major, Op. 2/2",
+    "part": "I. Allegro Vivace",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Piano Sonata No. 2 in A, Op. 2 No. 2: II. Largo Appassionato",
+   "durationMs": 436333,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 2,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 2 in A Major, Op. 2/2",
+    "part": "II. Largo Appassionato",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Piano Sonata No. 2 in A, Op. 2 No. 2: III. Scherzo (Allegretto)",
+   "durationMs": 200333,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 2,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 2 in A Major, Op. 2/2",
+    "part": "III. Scherzo (Allegretto)",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Piano Sonata No. 2 in A, Op. 2 No. 2: IV. Rondo (Grazioso)",
+   "durationMs": 377800,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 2,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 2 in A Major, Op. 2/2",
+    "part": "IV. Rondo (Grazioso)",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Piano Sonata No. 3 in C, Op. 2 No. 3: I. Allegro Con Brio",
+   "durationMs": 623507,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 3,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 3 in C Major, Op. 2/3",
+    "part": "I. Allegro Con Brio",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Piano Sonata No. 3 in C, Op. 2 No. 3: II. Adagio",
+   "durationMs": 511827,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 3,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 3 in C Major, Op. 2/3",
+    "part": "II. Adagio",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Piano Sonata No. 3 in C, Op. 2 No. 3: III. Scherzo (Allegro)",
+   "durationMs": 167507,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 3,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 3 in C Major, Op. 2/3",
+    "part": "III. Scherzo (Allegro)",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Piano Sonata No. 3 in C, Op. 2 No. 3: IV. Allegro Assai",
+   "durationMs": 311000,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 3,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 3 in C Major, Op. 2/3",
+    "part": "IV. Allegro Assai",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 1,
+   "title": "Piano Sonata No. 5 in C Minor, Op. 10 No. 1: I. Allegro Molto e Con Brio",
+   "durationMs": 353600,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 4,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 5 in C Minor, Op. 10/1",
+    "part": "I. Allegro Molto e Con Brio",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 2,
+   "title": "Piano Sonata No. 5 in C Minor, Op. 10 No. 1: II. Adagio Molto",
+   "durationMs": 507800,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 4,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 5 in C Minor, Op. 10/1",
+    "part": "II. Adagio Molto",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 3,
+   "title": "Piano Sonata No. 5 in C Minor, Op. 10 No. 1: III. Finale (Prestissimo)",
+   "durationMs": 286133,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 4,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 5 in C Minor, Op. 10/1",
+    "part": "III. Finale (Prestissimo)",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 4,
+   "title": "Piano Sonata No. 6 in F, Op. 10 No. 2: I. Allegro",
+   "durationMs": 366493,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 5,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 6 in F Major, Op. 10/2",
+    "part": "I. Allegro",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 5,
+   "title": "Piano Sonata No. 6 in F, Op. 10 No. 2: II. Allegretto",
+   "durationMs": 244333,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 5,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 6 in F Major, Op. 10/2",
+    "part": "II. Allegretto",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 6,
+   "title": "Piano Sonata No. 6 in F, Op. 10 No. 2: III. Presto",
+   "durationMs": 130400,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 5,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 6 in F Major, Op. 10/2",
+    "part": "III. Presto",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 7,
+   "title": "Piano Sonata No. 7 in D, Op. 10 No. 3: I. Presto",
+   "durationMs": 428467,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 6,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 7 in D Major, Op. 10/3",
+    "part": "I. Presto",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 8,
+   "title": "Piano Sonata No. 7 in D, Op. 10 No. 3: II. Largo e Mesto",
+   "durationMs": 603200,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 6,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 7 in D Major, Op. 10/3",
+    "part": "II. Largo e Mesto",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 9,
+   "title": "Piano Sonata No. 7 in D, Op. 10 No. 3: III. Menuetto (Allegro)",
+   "durationMs": 172133,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 6,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 7 in D Major, Op. 10/3",
+    "part": "III. Menuetto (Allegro)",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 10,
+   "title": "Piano Sonata No. 7 in D, Op. 10 No. 3: IV. Rondo (Allegro)",
+   "durationMs": 247040,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 6,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 7 in D Major, Op. 10/3",
+    "part": "IV. Rondo (Allegro)",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 11,
+   "title": "Piano Sonata No. 8 in C Minor, Op. 13 -\"Pathétique\": I. Grave - Allegro Di Molto e Con Brio",
+   "durationMs": 569400,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 7,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 8 in C Minor, Op. 13 · “Pathétique”",
+    "part": "I. Grave - Allegro Di Molto e Con Brio",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 12,
+   "title": "Piano Sonata No. 8 in C Minor, Op. 13 -\"Pathétique\": II. Adagio Cantabile",
+   "durationMs": 320467,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 7,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 8 in C Minor, Op. 13 · “Pathétique”",
+    "part": "II. Adagio Cantabile",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 13,
+   "title": "Piano Sonata No. 8 in C Minor, Op. 13 -\"Pathétique\": III. Rondo (Allegro)",
+   "durationMs": 288267,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 7,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 8 in C Minor, Op. 13 · “Pathétique”",
+    "part": "III. Rondo (Allegro)",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 1,
+   "title": "Piano Sonata No. 4 in E-Flat, Op. 7: I. Allegro Molto e Con Brio",
+   "durationMs": 479640,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 8,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 4 in E-Flat Major, Op. 7 · “Grand Sonata”",
+    "part": "I. Allegro Molto e Con Brio",
+    "performers": "Daniel Barenboim, Dubravka Tomšič"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 2,
+   "title": "Piano Sonata No. 4 in E-Flat, Op. 7: II. Largo, Con Gran Espressione",
+   "durationMs": 570493,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 8,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 4 in E-Flat Major, Op. 7 · “Grand Sonata”",
+    "part": "II. Largo, Con Gran Espressione",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 3,
+   "title": "Piano Sonata No. 4 in E-Flat, Op. 7: III. Allegro",
+   "durationMs": 290507,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 8,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 4 in E-Flat Major, Op. 7 · “Grand Sonata”",
+    "part": "III. Allegro",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 4,
+   "title": "Piano Sonata No. 4 in E-Flat, Op. 7: IV. Rondo (Poco Allegretto e Grazioso)",
+   "durationMs": 435693,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 8,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 4 in E-Flat Major, Op. 7 · “Grand Sonata”",
+    "part": "IV. Rondo (Poco Allegretto e Grazioso)",
+    "performers": "Daniel Barenboim, Dubravka Tomšič"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 5,
+   "title": "Piano Sonata No. 9 in E, Op. 14 No. 1: I. Allegro",
+   "durationMs": 409733,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 9,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 9 in E Major, Op. 14/1",
+    "part": "I. Allegro",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 6,
+   "title": "Piano Sonata No. 9 in E, Op. 14 No. 1: II. Allegretto",
+   "durationMs": 256867,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 9,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 9 in E Major, Op. 14/1",
+    "part": "II. Allegretto",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 7,
+   "title": "Piano Sonata No. 9 in E, Op. 14 No. 1: III. Rondo (Allegro Comodo)",
+   "durationMs": 206107,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 9,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 9 in E Major, Op. 14/1",
+    "part": "III. Rondo (Allegro Comodo)",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 8,
+   "title": "Piano Sonata No. 10 in G, Op. 14 No. 2: I. Allegro",
+   "durationMs": 433000,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 10,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 10 in G Major, Op. 14/2",
+    "part": "I. Allegro",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 9,
+   "title": "Piano Sonata No. 10 in G, Op. 14 No. 2: II. Andante",
+   "durationMs": 312107,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 10,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 10 in G Major, Op. 14/2",
+    "part": "II. Andante",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 10,
+   "title": "Piano Sonata No. 10 in G, Op. 14 No. 2: III. Scherzo (Allegro Assai)",
+   "durationMs": 205493,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 10,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 10 in G Major, Op. 14/2",
+    "part": "III. Scherzo (Allegro Assai)",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 11,
+   "title": "Piano Sonata No. 13 in E-Flat, Op. 27 No. 1: I. Andante - Allegro - Tempo I",
+   "durationMs": 336307,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 11,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 13 in E-Flat Major, Op. 27/1 · “Quasi una fantasia”",
+    "part": "I. Andante - Allegro - Tempo I",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 12,
+   "title": "Piano Sonata No. 13 in E-Flat, Op. 27 No. 1: II. Allegro Molto e Vivace",
+   "durationMs": 127360,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 11,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 13 in E-Flat Major, Op. 27/1 · “Quasi una fantasia”",
+    "part": "II. Allegro Molto e Vivace",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 13,
+   "title": "Piano Sonata No. 13 in E-Flat, Op. 27 No. 1: III. Adagio Con Espressione",
+   "durationMs": 192067,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 11,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 13 in E-Flat Major, Op. 27/1 · “Quasi una fantasia”",
+    "part": "III. Adagio Con Espressione",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 14,
+   "title": "Piano Sonata No. 13 in E-Flat, Op. 27 No. 1: IV. Allegro Vivace - Tempo I - Presto",
+   "durationMs": 340200,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 11,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 13 in E-Flat Major, Op. 27/1 · “Quasi una fantasia”",
+    "part": "IV. Allegro Vivace - Tempo I - Presto",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 1,
+   "title": "Piano Sonata No. 11 in B-Flat, Op. 22: I. Allegro Con Brio",
+   "durationMs": 450587,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 12,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 11 in B-Flat Major, Op. 22",
+    "part": "I. Allegro Con Brio",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 2,
+   "title": "Piano Sonata No. 11 in B-Flat, Op. 22: II. Adagio Con Molto Espressione",
+   "durationMs": 558840,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 12,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 11 in B-Flat Major, Op. 22",
+    "part": "II. Adagio Con Molto Espressione",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 3,
+   "title": "Piano Sonata No. 11 in B-Flat, Op. 22: III. Menuetto",
+   "durationMs": 214480,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 12,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 11 in B-Flat Major, Op. 22",
+    "part": "III. Menuetto",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 4,
+   "title": "Piano Sonata No. 11 in B-Flat, Op. 22: IV. Rondo (Allegretto)",
+   "durationMs": 371107,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 12,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 11 in B-Flat Major, Op. 22",
+    "part": "IV. Rondo (Allegretto)",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 5,
+   "title": "Piano Sonata No. 12 in A-Flat, Op. 26: I. Andante Con Variazioni",
+   "durationMs": 532680,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 13,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 12 in A-Flat Major, Op. 26 · “Funeral March Sonata”",
+    "part": "I. Andante Con Variazioni",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 6,
+   "title": "Piano Sonata No. 12 in A-Flat, Op. 26: II. Scherzo (Allegro Molto)",
+   "durationMs": 163515,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 13,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 12 in A-Flat Major, Op. 26 · “Funeral March Sonata”",
+    "part": "II. Scherzo (Allegro Molto)",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 7,
+   "title": "Piano Sonata No. 12 in A-Flat, Op. 26: III. Marcia Funebre Sulla Morte D'un Eroe",
+   "durationMs": 381027,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 13,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 12 in A-Flat Major, Op. 26 · “Funeral March Sonata”",
+    "part": "III. Marcia Funebre Sulla Morte D'un Eroe",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 8,
+   "title": "Piano Sonata No. 12 in A-Flat, Op. 26: IV. Allegro",
+   "durationMs": 170067,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 13,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 12 in A-Flat Major, Op. 26 · “Funeral March Sonata”",
+    "part": "IV. Allegro",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 9,
+   "title": "Piano Sonata No. 14 in C-Sharp Minor, Op. 27 No. 2 -\"Moonlight\": I. Adagio Sostenuto",
+   "durationMs": 403333,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 14,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 14 in C-Sharp Minor, Op. 27/2 · “Moonlight Sonata”",
+    "part": "I. Adagio Sostenuto",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 10,
+   "title": "Piano Sonata No. 14 in C-Sharp Minor, Op. 27 No. 2 -\"Moonlight\": II. Allegretto",
+   "durationMs": 132933,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 14,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 14 in C-Sharp Minor, Op. 27/2 · “Moonlight Sonata”",
+    "part": "II. Allegretto",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 11,
+   "title": "Piano Sonata No. 14 in C-Sharp Minor, Op. 27 No. 2 -\"Moonlight\": III. Presto",
+   "durationMs": 461400,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 14,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 14 in C-Sharp Minor, Op. 27/2 · “Moonlight Sonata”",
+    "part": "III. Presto",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 12,
+   "title": "Piano Sonata No. 27 in E Minor, Op. 90: I. Mit Lebhaftigkeit Und Durchaus Mit Empfindung Und Ausdruck",
+   "durationMs": 379467,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 15,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 27 in E Minor, Op. 90",
+    "part": "I. Mit Lebhaftigkeit Und Durchaus Mit Empfindung Und Ausdruck",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 13,
+   "title": "Piano Sonata No. 27 in E Minor, Op. 90: II. Nicht Zu Geschwind Und Sehr Singbar Vorgetragen",
+   "durationMs": 492533,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 15,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 27 in E Minor, Op. 90",
+    "part": "II. Nicht Zu Geschwind Und Sehr Singbar Vorgetragen",
+    "performers": "Daniel Barenboim, Dubravka Tomšič"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 1,
+   "title": "Piano Sonata No. 15 in D, Op. 28 -\"Pastorale\": I. Allegro",
+   "durationMs": 676920,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 16,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 15 in D Major, Op. 28 · “Pastoral”",
+    "part": "I. Allegro",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 2,
+   "title": "Piano Sonata No. 15 in D, Op. 28 -\"Pastorale\": II. Andante",
+   "durationMs": 461213,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 16,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 15 in D Major, Op. 28 · “Pastoral”",
+    "part": "II. Andante",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 3,
+   "title": "Piano Sonata No. 15 in D, Op. 28 -\"Pastorale\": III. Scherzo (Allegro Assai)",
+   "durationMs": 153933,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 16,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 15 in D Major, Op. 28 · “Pastoral”",
+    "part": "III. Scherzo (Allegro Assai)",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 4,
+   "title": "Piano Sonata No. 15 in D, Op. 28 -\"Pastorale\": IV. Rondo (Allegro Ma Non Troppo)",
+   "durationMs": 326107,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 16,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 15 in D Major, Op. 28 · “Pastoral”",
+    "part": "IV. Rondo (Allegro Ma Non Troppo)",
+    "performers": "Daniel Barenboim, Dubravka Tomšič"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 5,
+   "title": "Piano Sonata No. 16 in G, Op. 31 No. 1: I. Allegro Vivace",
+   "durationMs": 393773,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 17,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 16 in G Major, Op. 31/1",
+    "part": "I. Allegro Vivace",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 6,
+   "title": "Piano Sonata No. 16 in G, Op. 31 No. 1: II. Adagio Grazioso",
+   "durationMs": 705027,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 17,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 16 in G Major, Op. 31/1",
+    "part": "II. Adagio Grazioso",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 7,
+   "title": "Piano Sonata No. 16 in G, Op. 31 No. 1: III. Rondo (Allegretto)",
+   "durationMs": 371200,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 17,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 16 in G Major, Op. 31/1",
+    "part": "III. Rondo (Allegretto)",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 8,
+   "title": "Piano Sonata No. 17 in D Minor, Op. 31 No. 2 -\"Tempest\": I. Largo - Allegro",
+   "durationMs": 527760,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 18,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 17 in D Minor, Op. 31/2 · “The Tempest”",
+    "part": "I. Largo - Allegro",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 9,
+   "title": "Piano Sonata No. 17 in D Minor, Op. 31 No. 2 -\"Tempest\": II. Adagio",
+   "durationMs": 523600,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 18,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 17 in D Minor, Op. 31/2 · “The Tempest”",
+    "part": "II. Adagio",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 10,
+   "title": "Piano Sonata No. 17 in D Minor, Op. 31 No. 2 -\"Tempest\": III. Allegretto",
+   "durationMs": 417000,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 18,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 17 in D Minor, Op. 31/2 · “The Tempest”",
+    "part": "III. Allegretto",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 1,
+   "title": "Piano Sonata No. 18 in E-Flat, Op. 31 No. 3 -\"The Hunt\": I. Allegro",
+   "durationMs": 524467,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 19,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 18 in E-Flat Major, Op. 31/3 · “The Hunt”",
+    "part": "I. Allegro",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 2,
+   "title": "Piano Sonata No. 18 in E-Flat, Op. 31 No. 3 -\"The Hunt\": II. Scherzo (Allegretto Vivace)",
+   "durationMs": 319867,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 19,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 18 in E-Flat Major, Op. 31/3 · “The Hunt”",
+    "part": "II. Scherzo (Allegretto Vivace)",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 3,
+   "title": "Piano Sonata No. 18 in E-Flat, Op. 31 No. 3 -\"The Hunt\": III. Menuetto (Moderato e Grazioso)",
+   "durationMs": 268067,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 19,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 18 in E-Flat Major, Op. 31/3 · “The Hunt”",
+    "part": "III. Menuetto (Moderato e Grazioso)",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 4,
+   "title": "Piano Sonata No. 18 in E-Flat, Op. 31 No. 3 -\"The Hunt\": IV. Presto Con Fuoco",
+   "durationMs": 281267,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 19,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 18 in E-Flat Major, Op. 31/3 · “The Hunt”",
+    "part": "IV. Presto Con Fuoco",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 5,
+   "title": "Piano Sonata No. 19 in G Minor, Op. 49 No. 1: I. Andante",
+   "durationMs": 285440,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 20,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 19 in G Minor, Op. 49/1",
+    "part": "I. Andante",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 6,
+   "title": "Piano Sonata No. 19 in G Minor, Op. 49 No. 1: II. Rondo (Allegro)",
+   "durationMs": 194200,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 20,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 19 in G Minor, Op. 49/1",
+    "part": "II. Rondo (Allegro)",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 7,
+   "title": "Piano Sonata No. 20 in G, Op. 49 No. 2: I. Allegro Ma Non Troppo",
+   "durationMs": 284507,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 21,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 20 in G Major, Op. 49/2",
+    "part": "I. Allegro Ma Non Troppo",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 8,
+   "title": "Piano Sonata No. 20 in G, Op. 49 No. 2: II. Tempo Di Menuetto",
+   "durationMs": 224627,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 21,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 20 in G Major, Op. 49/2",
+    "part": "II. Tempo Di Menuetto",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 9,
+   "title": "Piano Sonata No. 21 in C, Op. 53 -\"Waldstein\": I. Allegro Con Brio",
+   "durationMs": 691827,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 22,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 21 in C Major, Op. 53 · “Waldstein Sonata”",
+    "part": "I. Allegro Con Brio",
+    "performers": "Daniel Barenboim, Dubravka Tomšič"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 10,
+   "title": "Piano Sonata No. 21 in C, Op. 53 -\"Waldstein\": II. Introduzione (Adagio Molto)",
+   "durationMs": 278867,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 22,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 21 in C Major, Op. 53 · “Waldstein Sonata”",
+    "part": "II. Introduzione (Adagio Molto)",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 11,
+   "title": "Piano Sonata No. 21 in C, Op. 53 -\"Waldstein\": III. Rondo (Allegretto Moderato - Prestissimo)",
+   "durationMs": 681467,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 22,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 21 in C Major, Op. 53 · “Waldstein Sonata”",
+    "part": "III. Rondo (Allegretto Moderato - Prestissimo)",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 7,
+   "number": 1,
+   "title": "Piano Sonata No. 22 in F, Op. 54: I. in Tempo D'un Menuetto",
+   "durationMs": 359013,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 23,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 22 in F Major, Op. 54",
+    "part": "I. in Tempo D'un Menuetto",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 7,
+   "number": 2,
+   "title": "Piano Sonata No. 22 in F, Op. 54: II. Allegretto",
+   "durationMs": 361493,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 23,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 22 in F Major, Op. 54",
+    "part": "II. Allegretto",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 7,
+   "number": 3,
+   "title": "Piano Sonata No. 23 in F Minor, Op. 57 -\"Appassionata\": I. Allegro Assai",
+   "durationMs": 639600,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 24,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 23 in F Minor, Op. 57 · “Appassionata”",
+    "part": "I. Allegro Assai",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 7,
+   "number": 4,
+   "title": "Piano Sonata No. 23 in F Minor, Op. 57 -\"Appassionata\": II. Andante Con Moto",
+   "durationMs": 454893,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 24,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 23 in F Minor, Op. 57 · “Appassionata”",
+    "part": "II. Andante Con Moto",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 7,
+   "number": 5,
+   "title": "Piano Sonata No. 23 in F Minor, Op. 57 -\"Appassionata\": III. Allegro Ma Non Troppo",
+   "durationMs": 499507,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 24,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 23 in F Minor, Op. 57 · “Appassionata”",
+    "part": "III. Allegro Ma Non Troppo",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 7,
+   "number": 6,
+   "title": "Piano Sonata No. 24 in F-Sharp, Op. 78 \"For Therese\": I. Adagio Cantabile - Allegro Ma Non Troppo",
+   "durationMs": 414000,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 25,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 24 in F-Sharp Major, Op. 78",
+    "part": "I. Adagio Cantabile - Allegro Ma Non Troppo",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 7,
+   "number": 7,
+   "title": "Piano Sonata No. 24 in F-Sharp, Op. 78 \"For Therese\": II. Allegro Vivace",
+   "durationMs": 186960,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 25,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 24 in F-Sharp Major, Op. 78",
+    "part": "II. Allegro Vivace",
+    "performers": "Daniel Barenboim, Dubravka Tomšič"
+   }
+  },
+  {
+   "disc": 7,
+   "number": 8,
+   "title": "Piano Sonata No. 25 in G, Op. 79: I. Presto Alla Tedesca",
+   "durationMs": 278040,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 26,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 25 in G Major, Op. 79 · “Cuckoo”",
+    "part": "I. Presto Alla Tedesca",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 7,
+   "number": 9,
+   "title": "Piano Sonata No. 25 in G, Op. 79: II. Andante",
+   "durationMs": 155427,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 26,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 25 in G Major, Op. 79 · “Cuckoo”",
+    "part": "II. Andante",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 7,
+   "number": 10,
+   "title": "Piano Sonata No. 25 in G, Op. 79: III. Vivace",
+   "durationMs": 133667,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 26,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 25 in G Major, Op. 79 · “Cuckoo”",
+    "part": "III. Vivace",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 7,
+   "number": 11,
+   "title": "Piano Sonata No. 26 in E-Flat, Op. 81a -\"Les adieux\": I. Das Lebewohl (Adagio - Allegro)",
+   "durationMs": 469907,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 27,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 26 in E-Flat Major, Op. 81a · “Les adieux”",
+    "part": "I. Das Lebewohl (Adagio - Allegro)",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 7,
+   "number": 12,
+   "title": "Piano Sonata No. 26 in E-Flat, Op. 81a -\"Les adieux\": II. Abwesendheit (Andante Espressivo)",
+   "durationMs": 279627,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 27,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 26 in E-Flat Major, Op. 81a · “Les adieux”",
+    "part": "II. Abwesendheit (Andante Espressivo)",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 7,
+   "number": 13,
+   "title": "Piano Sonata No. 26 in E-Flat, Op. 81a -\"Les adieux\": III. Das Wiedersehn (Vivacissimamente)",
+   "durationMs": 376173,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 27,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 26 in E-Flat Major, Op. 81a · “Les adieux”",
+    "part": "III. Das Wiedersehn (Vivacissimamente)",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 8,
+   "number": 1,
+   "title": "Piano Sonata No. 28 in A, Op. 101: I. Etwas Lebhaft Und Mit Der Innigsten Empfindung (Allegretto Ma Non Troppo)",
+   "durationMs": 271493,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 28,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 28 in A Major, Op. 101",
+    "part": "I. Etwas Lebhaft Und Mit Der Innigsten Empfindung (Allegretto Ma Non Troppo)",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 8,
+   "number": 2,
+   "title": "Piano Sonata No. 28 in A, Op. 101: II. Lebhaft, Marschmäßig (Vivace Alla Marcia)",
+   "durationMs": 355333,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 28,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 28 in A Major, Op. 101",
+    "part": "II. Lebhaft, Marschmäßig (Vivace Alla Marcia)",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 8,
+   "number": 3,
+   "title": "Piano Sonata No. 28 in A, Op. 101: III. Langsam Und Sehnsuchtsvoll (Adagio Ma Non Troppo, Con Affetto)",
+   "durationMs": 212933,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 28,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 28 in A Major, Op. 101",
+    "part": "III. Langsam Und Sehnsuchtsvoll (Adagio Ma Non Troppo, Con Affetto)",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 8,
+   "number": 4,
+   "title": "Piano Sonata No. 28 in A, Op. 101: IV. Geschwind, Doch Nicht Zu Sehr Und Mit Entschlossen- Heit (Allegro)",
+   "durationMs": 447240,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 28,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 28 in A Major, Op. 101",
+    "part": "IV. Geschwind, Doch Nicht Zu Sehr Und Mit Entschlossen- Heit (Allegro)",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 8,
+   "number": 5,
+   "title": "Piano Sonata No. 29 in B-Flat, Op. 106 -\"Hammerklavier\": I. Allegro",
+   "durationMs": 783907,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 29,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 29 in B-Flat Major, Op. 106 · “Hammerklavier”",
+    "part": "I. Allegro",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 8,
+   "number": 6,
+   "title": "Piano Sonata No. 29 in B-Flat, Op. 106 -\"Hammerklavier\": II. Scherzo (Assai Vivace - Presto - Prestissimo - Tempo I)",
+   "durationMs": 181827,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 29,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 29 in B-Flat Major, Op. 106 · “Hammerklavier”",
+    "part": "II. Scherzo (Assai Vivace - Presto - Prestissimo - Tempo I)",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 8,
+   "number": 7,
+   "title": "Piano Sonata No. 29 in B-Flat, Op. 106 -\"Hammerklavier\": III. Adagio Sostenuto",
+   "durationMs": 1310267,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 29,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 29 in B-Flat Major, Op. 106 · “Hammerklavier”",
+    "part": "III. Adagio Sostenuto",
+    "performers": "Daniel Barenboim, Dubravka Tomšič"
+   }
+  },
+  {
+   "disc": 8,
+   "number": 8,
+   "title": "Piano Sonata No. 29 in B-Flat, Op. 106 -\"Hammerklavier\": IV. Largo - Allegro Risoluto",
+   "durationMs": 742000,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 29,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 29 in B-Flat Major, Op. 106 · “Hammerklavier”",
+    "part": "IV. Largo - Allegro Risoluto",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 9,
+   "number": 1,
+   "title": "Piano Sonata No. 30 in E, Op. 109: I. Vivace, Ma Non Troppo - Adagio Espressivo - Tempo I",
+   "durationMs": 261160,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 30,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 30 in E Major, Op. 109",
+    "part": "I. Vivace, Ma Non Troppo - Adagio Espressivo - Tempo I",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 9,
+   "number": 2,
+   "title": "Piano Sonata No. 30 in E, Op. 109: II. Prestissimo",
+   "durationMs": 161853,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 30,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 30 in E Major, Op. 109",
+    "part": "II. Prestissimo",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 9,
+   "number": 3,
+   "title": "Piano Sonata No. 30 in E, Op. 109: III. Gesangvoll, Mit Innigster Empfindung (Andante Molto Cantabile Ed Espressivo)",
+   "durationMs": 914653,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 30,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 30 in E Major, Op. 109",
+    "part": "III. Gesangvoll, Mit Innigster Empfindung (Andante Molto Cantabile Ed Espressivo)",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 9,
+   "number": 4,
+   "title": "Piano Sonata No. 31 in A-Flat, Op. 110: I. Moderato Cantabile Molto Espressivo",
+   "durationMs": 453853,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 31,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 31 in A-Flat Major, Op. 110",
+    "part": "I. Moderato Cantabile Molto Espressivo",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 9,
+   "number": 5,
+   "title": "Piano Sonata No. 31 in A-Flat, Op. 110: II. Allegro Molto",
+   "durationMs": 140880,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 31,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 31 in A-Flat Major, Op. 110",
+    "part": "II. Allegro Molto",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 9,
+   "number": 6,
+   "title": "Piano Sonata No. 31 in A-Flat, Op. 110: III. Adagio Ma Non Troppo - Fuga (Allegro Ma Non Troppo)",
+   "durationMs": 727960,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 31,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 31 in A-Flat Major, Op. 110",
+    "part": "III. Adagio Ma Non Troppo - Fuga (Allegro Ma Non Troppo)",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 9,
+   "number": 7,
+   "title": "Piano Sonata No. 32 in C Minor, Op. 111: I. Maestoso - Allegro Con Brio Ed Appassionato",
+   "durationMs": 601880,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 32,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 32 in C Minor, Op. 111",
+    "part": "I. Maestoso - Allegro Con Brio Ed Appassionato",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 9,
+   "number": 8,
+   "title": "Piano Sonata No. 32 in C Minor, Op. 111: II. Arietta (Adagio Molto Semplice e Cantabile)",
+   "durationMs": 1227800,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 32,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 32 in C Minor, Op. 111",
+    "part": "II. Arietta (Adagio Molto Semplice e Cantabile)",
+    "performers": "Daniel Barenboim"
+   }
+  }
+ ]
+}

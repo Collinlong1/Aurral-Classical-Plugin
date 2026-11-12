@@ -1,0 +1,918 @@
+{
+ "id": "818752952",
+ "category": "opera",
+ "title": "Bizet: Carmen",
+ "artist": "Berlin Philharmonic Orchestra, Chor des Deutschen Staatsoper, Jonas Kaufmann, Magdalena Kožená & Sir Simon Rattle",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Carmen: Prélude",
+   "durationMs": 199695,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Prélude",
+    "performers": "Berlin Philharmonic Orchestra, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Carmen, Act 1: \"Sur la place, chacun passe, chacun vient, chacun va\" (Moralès, Dragons)",
+   "durationMs": 120840,
+   "artist": "Andrè Schuen, Berlin Philharmonic Orchestra, Chor des Deutschen Staatsoper & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Sur la place, chacun passe, chacun vient, chacun va\" (Moralès, Dragons)",
+    "performers": "Andrè Schuen, Berlin Philharmonic Orchestra, Chor des Deutschen Staatsoper, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Carmen, Act 1: \"Regardez donc cette petite qui semble vouloir nous parler\" (Moralès, Micaëla, Dragons)",
+   "durationMs": 242773,
+   "artist": "Andrè Schuen, Berlin Philharmonic Orchestra, Chor des Deutschen Staatsoper, Genia Kühmeier & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Regardez donc cette petite qui semble vouloir nous parler\" (Moralès, Micaëla, Dragons)",
+    "performers": "Sir Simon Rattle, Andrè Schuen, Berlin Philharmonic Orchestra, Genia Kühmeier, Chor des Deutschen Staatsoper"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Carmen, Act 1:\"Avec la garde montante, nous arrivons, nous voilà!\" (Enfants)",
+   "durationMs": 283320,
+   "artist": "Berlin Philharmonic Orchestra, Sir Simon Rattle, Chor des Deutschen Staatsoper Berlin & Kinderchor der Deutschen Staatsoper Berlin",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Carmen, Act 1:\"Avec la garde montante, nous arrivons, nous voilà!\" (Enfants)",
+    "performers": "Sir Simon Rattle, Kinderchor der Deutschen Staatsoper Berlin, Berlin Philharmonic Orchestra, Chor des Deutschen Staatsoper Berlin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Carmen, Act 1: \"La cloche a sonné; nous, des ouvrières\" (Jeunes gens)",
+   "durationMs": 241107,
+   "artist": "Berlin Philharmonic Orchestra, Chor des Deutschen Staatsoper & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"La cloche a sonné; nous, des ouvrières\" (Jeunes gens)",
+    "performers": "Berlin Philharmonic Orchestra, Sir Simon Rattle, Chor des Deutschen Staatsoper"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Carmen, Act 1: \"Mais nous ne voyons pas la Carmencita!\"  \"Quand je vous aimerai?\" (Jeunes gens, Dragons, Cigarières, Carmen)",
+   "durationMs": 69187,
+   "artist": "Berlin Philharmonic Orchestra, Chor des Deutschen Staatsoper, Eberhard Friedrich, Magdalena Kožená, Sir Simon Rattle, Vinzenz Weissenburger & Kinderchor der Deutschen Staatsoper Berlin",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Mais nous ne voyons pas la Carmencita!\"  \"Quand je vous aimerai?\" (Jeunes gens, Dragons, Cigarières, Carmen)",
+    "performers": "Berlin Philharmonic Orchestra, Vinzenz Weissenburger, Chor des Deutschen Staatsoper, Eberhard Friedrich, Sir Simon Rattle, Kinderchor der Deutschen Staatsoper Berlin, Magdalena Kožená"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Carmen, Act 1: \"L'amour est un oiseau rebelle\" (Carmen, Cigarières, Jeunes gens, Dragons)",
+   "durationMs": 258920,
+   "artist": "Berlin Philharmonic Orchestra, Chor des Deutschen Staatsoper, Eberhard Friedrich, Magdalena Kožená, Sir Simon Rattle, Vinzenz Weissenburger & Kinderchor der Deutschen Staatsoper Berlin",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"L'amour est un oiseau rebelle\" (Carmen, Cigarières, Jeunes gens, Dragons)",
+    "performers": "Berlin Philharmonic Orchestra, Vinzenz Weissenburger, Eberhard Friedrich, Chor des Deutschen Staatsoper, Sir Simon Rattle, Magdalena Kožená"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Carmen, Act 1: \"Carmen! sur tes pas nous nous pressons tous!\" (Jeunes gens, Cigarières)",
+   "durationMs": 118640,
+   "artist": "Berlin Philharmonic Orchestra, Chor des Deutschen Staatsoper, Sir Simon Rattle & Vinzenz Weissenburger",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Carmen! sur tes pas nous nous pressons tous!\" (Jeunes gens, Cigarières)",
+    "performers": "Vinzenz Weissenburger, Sir Simon Rattle, Chor des Deutschen Staatsoper, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Carmen, Act 1: \"Que est-ce-que ca veut dire, ces façons-là? (Don José, Micaëla)",
+   "durationMs": 17107,
+   "artist": "Berlin Philharmonic Orchestra, Jonas Kaufmann & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Que est-ce-que ca veut dire, ces façons-là? (Don José, Micaëla)",
+    "performers": "Sir Simon Rattle, Jonas Kaufmann, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Carmen, Act 1:\"Parle-moi de ma mère\" (Don José, Micaëla)",
+   "durationMs": 576147,
+   "artist": "Berlin Philharmonic Orchestra, Genia Kühmeier, Jonas Kaufmann & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Carmen, Act 1:\"Parle-moi de ma mère\" (Don José, Micaëla)",
+    "performers": "Genia Kühmeier, Berlin Philharmonic Orchestra, Jonas Kaufmann, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Carmen, Act 1: \"Attends un peu\" (Don José, Micaëla)",
+   "durationMs": 43253,
+   "artist": "Berlin Philharmonic Orchestra, Genia Kühmeier, Jonas Kaufmann & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Attends un peu\" (Don José, Micaëla)",
+    "performers": "Jonas Kaufmann, Genia Kühmeier, Sir Simon Rattle, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Carmen, Act 1: \"Au secours!\" (Zuniga, Cigarières)",
+   "durationMs": 179573,
+   "artist": "Berlin Philharmonic Orchestra, Chor des Deutschen Staatsoper, Christian Van Horn & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Au secours!\" (Zuniga, Cigarières)",
+    "performers": "Chor des Deutschen Staatsoper, Berlin Philharmonic Orchestra, Christian Van Horn, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Carmen, Act 1: \"Eh bien, José? Qu'est-ce qui c'est passé?\" (Zuniga, Don José)",
+   "durationMs": 13413,
+   "artist": "Berlin Philharmonic Orchestra, Christian Van Horn, Jonas Kaufmann & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Eh bien, José? Qu'est-ce qui c'est passé?\" (Zuniga, Don José)",
+    "performers": "Jonas Kaufmann, Berlin Philharmonic Orchestra, Christian Van Horn, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Carmen, Act 1: \"Avez-vous quelque chose à répondre?\" - \"Tra la, la, la, coupe-moi\" (Zuniga, Carmen)",
+   "durationMs": 186320,
+   "artist": "Berlin Philharmonic Orchestra, Christian Van Horn, Magdalena Kožená & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Avez-vous quelque chose à répondre?\" - \"Tra la, la, la, coupe-moi\" (Zuniga, Carmen)",
+    "performers": "Magdalena Kožená, Berlin Philharmonic Orchestra, Christian Van Horn, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Carmen, Act 1: \"Laissez-moi échapper\" (Carmen, Don José)",
+   "durationMs": 29947,
+   "artist": "Berlin Philharmonic Orchestra, Jonas Kaufmann, Magdalena Kožená & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Laissez-moi échapper\" (Carmen, Don José)",
+    "performers": "Magdalena Kožená, Berlin Philharmonic Orchestra, Jonas Kaufmann, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Carmen, Act 1: \"Près des remparts de Séville\" (Carmen, Don José)",
+   "durationMs": 272173,
+   "artist": "Berlin Philharmonic Orchestra, Jonas Kaufmann, Magdalena Kožená & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Près des remparts de Séville\" (Carmen, Don José)",
+    "performers": "Sir Simon Rattle, Magdalena Kožená, Berlin Philharmonic Orchestra, Jonas Kaufmann"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Carmen, Act 1: \"Voice l'ordre, partez\" (Zuniga, Carmen)",
+   "durationMs": 143093,
+   "artist": "Berlin Philharmonic Orchestra, Christian Van Horn, Magdalena Kožená & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Voice l'ordre, partez\" (Zuniga, Carmen)",
+    "performers": "Magdalena Kožená, Berlin Philharmonic Orchestra, Christian Van Horn, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Carmen, Act 2: Entreacte",
+   "durationMs": 100587,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Entreacte",
+    "performers": "Sir Simon Rattle, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "Carmen, Act 2: \"Les tringles des sistres tintaient avec un éclat métallique\" (Carmen, Frasquita, Mercédès)",
+   "durationMs": 274147,
+   "artist": "Berlin Philharmonic Orchestra, Christina Landshammer, Magdalena Kožená, Rachel Frenkel & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Les tringles des sistres tintaient avec un éclat métallique\" (Carmen, Frasquita, Mercédès)",
+    "performers": "Magdalena Kožená, Rachel Frenkel, Sir Simon Rattle, Berlin Philharmonic Orchestra, Christina Landshammer"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "Carmen, Act 2:\"Vivat! vivat le Torero!\" (Amis d'Escamillo, Zuniga, Carmen, Frasquita, Mercédès, Moralès)",
+   "durationMs": 76093,
+   "artist": "Andrè Schuen, Berlin Philharmonic Orchestra, Christina Landshammer, Kostas Smoriginas, Magdalena Kožená, Rachel Frenkel, Simone Del Savio & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Carmen, Act 2:\"Vivat! vivat le Torero!\" (Amis d'Escamillo, Zuniga, Carmen, Frasquita, Mercédès, Moralès)",
+    "performers": "Kostas Smoriginas, Andrè Schuen, Berlin Philharmonic Orchestra, Simone Del Savio, Sir Simon Rattle, Christina Landshammer, Rachel Frenkel, Magdalena Kožená"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "Carmen, Act 2: \"Votre toast, je peux vouz le rendre\"/ \"Toréador, en garde!\" (Escamillo, Carmen, Frasquita, Mercédès, Moralès, Zuniga)",
+   "durationMs": 302293,
+   "artist": "Andrè Schuen, Berlin Philharmonic Orchestra, Christian Van Horn, Christina Landshammer, Kostas Smoriginas, Magdalena Kožená, Rachel Frenkel & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Votre toast, je peux vouz le rendre\"/ \"Toréador, en garde!\" (Escamillo, Carmen, Frasquita, Mercédès, Moralès, Zuniga)",
+    "performers": "Rachel Frenkel, Christina Landshammer, Magdalena Kožená, Kostas Smoriginas, Christian Van Horn, Sir Simon Rattle, Andrè Schuen, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "Carmen, Act 2: \"Dis-moi ton nom\" (Escamillo, Carmen)",
+   "durationMs": 42120,
+   "artist": "Berlin Philharmonic Orchestra, Kostas Smoriginas, Magdalena Kožená & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Dis-moi ton nom\" (Escamillo, Carmen)",
+    "performers": "Sir Simon Rattle, Magdalena Kožená, Kostas Smoriginas, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 23,
+   "title": "Carmen, Act 2: \"Toréador, en garde\" (Amis d'Escamillo)",
+   "durationMs": 70920,
+   "artist": "Berlin Philharmonic Orchestra, Kostas Smoriginas & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Toréador, en garde\" (Amis d'Escamillo)",
+    "performers": "Berlin Philharmonic Orchestra, Kostas Smoriginas, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 24,
+   "title": "Carmen, Act 2: \"Eh bien monsieur, quelles nouvelles\" (Frasquita, Dancairo, Mercédès, Remendado)",
+   "durationMs": 18107,
+   "artist": "Berlin Philharmonic Orchestra, Christina Landshammer, Jean-Paul Fouchécourt, Rachel Frenkel, Simone Del Savio & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Eh bien monsieur, quelles nouvelles\" (Frasquita, Dancairo, Mercédès, Remendado)",
+    "performers": "Simone Del Savio, Berlin Philharmonic Orchestra, Christina Landshammer, Jean-Paul Fouchécourt, Sir Simon Rattle, Rachel Frenkel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 25,
+   "title": "Carmen, Act 2: \"Nous avons en tête une affaire\" (Dancaïro, Frasquita, Mercédès, Remendado, Carmen)",
+   "durationMs": 290293,
+   "artist": "Berlin Philharmonic Orchestra, Christina Landshammer, Jean-Paul Fouchécourt, Magdalena Kožená, Rachel Frenkel, Simone Del Savio & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Nous avons en tête une affaire\" (Dancaïro, Frasquita, Mercédès, Remendado, Carmen)",
+    "performers": "Rachel Frenkel, Simone Del Savio, Christina Landshammer, Jean-Paul Fouchécourt, Berlin Philharmonic Orchestra, Magdalena Kožená, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 26,
+   "title": "Carmen, Act 2: \"Partez sans moi, j'irai vous rejoindre demain\" (Carmen, Frasquita, Mércèdes, Remendado, Dancairo, Don José)",
+   "durationMs": 89733,
+   "artist": "Berlin Philharmonic Orchestra, Christina Landshammer, Jean-Paul Fouchécourt, Jonas Kaufmann, Magdalena Kožená, Rachel Frenkel, Simone Del Savio & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Partez sans moi, j'irai vous rejoindre demain\" (Carmen, Frasquita, Mércèdes, Remendado, Dancairo, Don José)",
+    "performers": "Christina Landshammer, Magdalena Kožená, Jonas Kaufmann, Berlin Philharmonic Orchestra, Rachel Frenkel, Sir Simon Rattle, Simone Del Savio, Jean-Paul Fouchécourt"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 27,
+   "title": "Carmen, Act 2: \"Enfin, te voilà!\" (Carmen, Don José)",
+   "durationMs": 36043,
+   "artist": "Berlin Philharmonic Orchestra, Jonas Kaufmann, Magdalena Kožená & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Enfin, te voilà!\" (Carmen, Don José)",
+    "performers": "Jonas Kaufmann, Sir Simon Rattle, Berlin Philharmonic Orchestra, Magdalena Kožená"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 28,
+   "title": "Carmen, Act 2: \"Je vais danser en votre honneur\" (Carmen)",
+   "durationMs": 34118,
+   "artist": "Berlin Philharmonic Orchestra, Magdalena Kožená & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Je vais danser en votre honneur\" (Carmen)",
+    "performers": "Berlin Philharmonic Orchestra, Sir Simon Rattle, Magdalena Kožená"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 29,
+   "title": "Carmen, Act 2: \"La-la-la-la\" / \"Attends un peu, Carmen\" (Carmen, Don José)",
+   "durationMs": 132187,
+   "artist": "Berlin Philharmonic Orchestra, Jonas Kaufmann, Magdalena Kožená & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"La-la-la-la\" / \"Attends un peu, Carmen\" (Carmen, Don José)",
+    "performers": "Sir Simon Rattle, Berlin Philharmonic Orchestra, Jonas Kaufmann, Magdalena Kožená"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 30,
+   "title": "Carmen, Act 2: \"Au quartier! pour l'appel?\" (Carmen, Don José)",
+   "durationMs": 171107,
+   "artist": "Berlin Philharmonic Orchestra, Jonas Kaufmann, Magdalena Kožená & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Au quartier! pour l'appel?\" (Carmen, Don José)",
+    "performers": "Sir Simon Rattle, Berlin Philharmonic Orchestra, Magdalena Kožená, Jonas Kaufmann"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 31,
+   "title": "Carmen, Act 2: \"La fleur que tu m'avais jetée\" (Don José)",
+   "durationMs": 265733,
+   "artist": "Berlin Philharmonic Orchestra, Jonas Kaufmann & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"La fleur que tu m'avais jetée\" (Don José)",
+    "performers": "Sir Simon Rattle, Jonas Kaufmann, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 32,
+   "title": "Carmen, Act 2: \"Non! tu ne m'aimes pas!\" (Carmen, Don José)",
+   "durationMs": 168027,
+   "artist": "Berlin Philharmonic Orchestra, Jonas Kaufmann, Magdalena Kožená & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Non! tu ne m'aimes pas!\" (Carmen, Don José)",
+    "performers": "Magdalena Kožená, Berlin Philharmonic Orchestra, Jonas Kaufmann, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 33,
+   "title": "Carmen, Act 2: \"Non! Je ne veux plus t'écouter!\" (Don José, Carmen)",
+   "durationMs": 68680,
+   "artist": "Berlin Philharmonic Orchestra, Jonas Kaufmann, Magdalena Kožená & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Non! Je ne veux plus t'écouter!\" (Don José, Carmen)",
+    "performers": "Berlin Philharmonic Orchestra, Jonas Kaufmann, Sir Simon Rattle, Magdalena Kožená"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 34,
+   "title": "Carmen, Act 2: \"Holà! Carmen! holà! holà!\" (Zuniga, Don José, Carmen)",
+   "durationMs": 82493,
+   "artist": "Berlin Philharmonic Orchestra, Christian Van Horn, Jonas Kaufmann, Magdalena Kožená & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Holà! Carmen! holà! holà!\" (Zuniga, Don José, Carmen)",
+    "performers": "Berlin Philharmonic Orchestra, Jonas Kaufmann, Magdalena Kožená, Christian Van Horn, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 35,
+   "title": "Carmen, Act 2: \"Bel officier, l'amour vous joue en ce moment un assez vilain tour!\" (Carmen, Remendado, Dancaïro, Bohémiens, Zuniga)",
+   "durationMs": 73040,
+   "artist": "Berlin Philharmonic Orchestra, Chor des Deutschen Staatsoper, Christian Van Horn, Jean-Paul Fouchécourt, Magdalena Kožená, Simone Del Savio & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Bel officier, l'amour vous joue en ce moment un assez vilain tour!\" (Carmen, Remendado, Dancaïro, Bohémiens, Zuniga)",
+    "performers": "Magdalena Kožená, Chor des Deutschen Staatsoper, Simone Del Savio, Berlin Philharmonic Orchestra, Sir Simon Rattle, Christian Van Horn, Jean-Paul Fouchécourt"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 36,
+   "title": "Carmen, Act 2: \"Plus tard!\" / \"La guerre, c'est la guerre!\" (Zuniga, Dancaïro, Remendado, Bohémiens, Carmen, Don José, Frasquita, Mercédès, Bohémiens)",
+   "durationMs": 150867,
+   "artist": "Berlin Philharmonic Orchestra, Chor des Deutschen Staatsoper, Christian Van Horn, Christina Landshammer, Eberhard Friedrich, Jean-Paul Fouchécourt, Jonas Kaufmann, Magdalena Kožená, Rachel Frenkel, Simone Del Savio & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Plus tard!\" / \"La guerre, c'est la guerre!\" (Zuniga, Dancaïro, Remendado, Bohémiens, Carmen, Don José, Frasquita, Mercédès, Bohémiens)",
+    "performers": "Jonas Kaufmann, Sir Simon Rattle, Eberhard Friedrich, Magdalena Kožená, Chor des Deutschen Staatsoper, Rachel Frenkel, Simone Del Savio, Jean-Paul Fouchécourt, Christian Van Horn, Berlin Philharmonic Orchestra, Christina Landshammer"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 37,
+   "title": "Carmen, Act 3: Entr'acte",
+   "durationMs": 159160,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Entr'acte",
+    "performers": "Berlin Philharmonic Orchestra, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 38,
+   "title": "Carmen, Act 3: \"Écoute, écoute, compagnon, écoute!\" (Bohémiens)",
+   "durationMs": 160227,
+   "artist": "Berlin Philharmonic Orchestra, Chor des Deutschen Staatsoper & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Écoute, écoute, compagnon, écoute!\" (Bohémiens)",
+    "performers": "Sir Simon Rattle, Chor des Deutschen Staatsoper, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 39,
+   "title": "Carmen, Act 3: \"Notre métier est bien\" (Carmen, Don José, Frasquita, Mercédès, Dancaïro, Remendado, Bohémiens et Bohémiennes)",
+   "durationMs": 99160,
+   "artist": "Berlin Philharmonic Orchestra, Chor des Deutschen Staatsoper, Christina Landshammer, Eberhard Friedrich, Jean-Paul Fouchécourt, Jonas Kaufmann, Magdalena Kožená, Rachel Frenkel, Simone Del Savio & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Notre métier est bien\" (Carmen, Don José, Frasquita, Mercédès, Dancaïro, Remendado, Bohémiens et Bohémiennes)",
+    "performers": "Berlin Philharmonic Orchestra, Simone Del Savio, Eberhard Friedrich, Christina Landshammer, Jonas Kaufmann, Magdalena Kožená, Rachel Frenkel, Sir Simon Rattle, Jean-Paul Fouchécourt, Chor des Deutschen Staatsoper"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 40,
+   "title": "Carmen, Act 3: \"À quoi tu penses?\" (Carmen, Don José)",
+   "durationMs": 38040,
+   "artist": "Berlin Philharmonic Orchestra, Jonas Kaufmann, Magdalena Kožená & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"À quoi tu penses?\" (Carmen, Don José)",
+    "performers": "Magdalena Kožená, Sir Simon Rattle, Jonas Kaufmann, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 41,
+   "title": "Carmen, Act 3: \"Mêlons! Coupons!\" (Frasquita, Mercédès)",
+   "durationMs": 186933,
+   "artist": "Berlin Philharmonic Orchestra, Christina Landshammer, Rachel Frenkel & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Mêlons! Coupons!\" (Frasquita, Mercédès)",
+    "performers": "Rachel Frenkel, Christina Landshammer, Sir Simon Rattle, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 42,
+   "title": "Carmen, Act 3: \"Voyons que j'essaie à mon tour\" (Carmen)",
+   "durationMs": 62493,
+   "artist": "Berlin Philharmonic Orchestra, Magdalena Kožená & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Voyons que j'essaie à mon tour\" (Carmen)",
+    "performers": "Magdalena Kožená, Berlin Philharmonic Orchestra, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 43,
+   "title": "Carmen, Act 3: \"En vain pour éviter\" (Carmen)",
+   "durationMs": 129200,
+   "artist": "Berlin Philharmonic Orchestra, Magdalena Kožená & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"En vain pour éviter\" (Carmen)",
+    "performers": "Magdalena Kožená, Sir Simon Rattle, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 44,
+   "title": "Carmen, Act 3: \"La mort\" / \"Parlez encor, parlez mes belles\" (Carmen, Frasquita, Mercédès)",
+   "durationMs": 51640,
+   "artist": "Berlin Philharmonic Orchestra, Christina Landshammer, Magdalena Kožená, Rachel Frenkel & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"La mort\" / \"Parlez encor, parlez mes belles\" (Carmen, Frasquita, Mercédès)",
+    "performers": "Christina Landshammer, Rachel Frenkel, Sir Simon Rattle, Berlin Philharmonic Orchestra, Magdalena Kožená"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 45,
+   "title": "Carmen, Act 3: \"Eh bien?\" - \"Eh bien, c'est plus compliqué que prévu!\" (Carmen, Frasquita, Mércèdes, Dancaïro, Remendado)",
+   "durationMs": 27640,
+   "artist": "Berlin Philharmonic Orchestra, Christina Landshammer, Magdalena Kožená, Rachel Frenkel, Simone Del Savio & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Eh bien?\" - \"Eh bien, c'est plus compliqué que prévu!\" (Carmen, Frasquita, Mércèdes, Dancaïro, Remendado)",
+    "performers": "Simone Del Savio, Sir Simon Rattle, Christina Landshammer, Magdalena Kožená, Rachel Frenkel, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 46,
+   "title": "Carmen, Act 3: \"Quant au douanier\" (Carmen, Frasquita, Mercédès, Dancaïro, Remendado, Bohémiens et Bohémiennes)",
+   "durationMs": 184760,
+   "artist": "Berlin Philharmonic Orchestra, Chor des Deutschen Staatsoper, Christina Landshammer, Eberhard Friedrich, Jean-Paul Fouchécourt, Magdalena Kožená, Rachel Frenkel, Simone Del Savio & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Quant au douanier\" (Carmen, Frasquita, Mercédès, Dancaïro, Remendado, Bohémiens et Bohémiennes)",
+    "performers": "Christina Landshammer, Chor des Deutschen Staatsoper, Berlin Philharmonic Orchestra, Jean-Paul Fouchécourt, Simone Del Savio, Eberhard Friedrich, Rachel Frenkel, Sir Simon Rattle, Magdalena Kožená"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 47,
+   "title": "Carmen, Act 3: \"Je dis que rien ne m'épouvante\" (Micaëla)",
+   "durationMs": 327413,
+   "artist": "Berlin Philharmonic Orchestra, Genia Kühmeier & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Je dis que rien ne m'épouvante\" (Micaëla)",
+    "performers": "Genia Kühmeier, Sir Simon Rattle, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 48,
+   "title": "Carmen, Act 3: \"Qui êtes-vous, répondez!\" (Don José, Escamillo)",
+   "durationMs": 6653,
+   "artist": "Berlin Philharmonic Orchestra, Jonas Kaufmann, Kostas Smoriginas & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Qui êtes-vous, répondez!\" (Don José, Escamillo)",
+    "performers": "Sir Simon Rattle, Jonas Kaufmann, Berlin Philharmonic Orchestra, Kostas Smoriginas"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 49,
+   "title": "Carmen, Act 3: \"Je suis Escamillo, Torero de Grenade!\" (Escamillo, Don José)",
+   "durationMs": 59347,
+   "artist": "Berlin Philharmonic Orchestra, Jonas Kaufmann, Kostas Smoriginas & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Je suis Escamillo, Torero de Grenade!\" (Escamillo, Don José)",
+    "performers": "Berlin Philharmonic Orchestra, Kostas Smoriginas, Sir Simon Rattle, Jonas Kaufmann"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 50,
+   "title": "Carmen, Act 3: \"Elle avait pour amant\" (Escamillo, Don José)",
+   "durationMs": 36587,
+   "artist": "Berlin Philharmonic Orchestra, Jonas Kaufmann, Kostas Smoriginas & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Elle avait pour amant\" (Escamillo, Don José)",
+    "performers": "Kostas Smoriginas, Berlin Philharmonic Orchestra, Jonas Kaufmann, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 51,
+   "title": "Carmen, Act 3: \"Mais pour nous enlever nos filles de Bohème\" (Don José, Escamillo)",
+   "durationMs": 48240,
+   "artist": "Berlin Philharmonic Orchestra, Jonas Kaufmann, Kostas Smoriginas & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Mais pour nous enlever nos filles de Bohème\" (Don José, Escamillo)",
+    "performers": "Jonas Kaufmann, Kostas Smoriginas, Berlin Philharmonic Orchestra, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 52,
+   "title": "Carmen, Act 3: \"Enfin ma colère\" - \"Quelle maladresse\" (Don José, Escamillo)",
+   "durationMs": 77800,
+   "artist": "Berlin Philharmonic Orchestra, Jonas Kaufmann, Kostas Smoriginas & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Enfin ma colère\" - \"Quelle maladresse\" (Don José, Escamillo)",
+    "performers": "Jonas Kaufmann, Kostas Smoriginas, Sir Simon Rattle, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 53,
+   "title": "Carmen, Act 3: Tout beau!\" (Escamillo, Don José)",
+   "durationMs": 82520,
+   "artist": "Berlin Philharmonic Orchestra, Jonas Kaufmann, Kostas Smoriginas & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Tout beau!\" (Escamillo, Don José)",
+    "performers": "Sir Simon Rattle, Jonas Kaufmann, Kostas Smoriginas, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 54,
+   "title": "Carmen, Act 3: \"Holá! holá! José!\" (Carmen, Escamillo, Don José, Dancaïro)",
+   "durationMs": 152040,
+   "artist": "Berlin Philharmonic Orchestra, Jonas Kaufmann, Kostas Smoriginas, Magdalena Kožená, Simone Del Savio & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Holá! holá! José!\" (Carmen, Escamillo, Don José, Dancaïro)",
+    "performers": "Kostas Smoriginas, Berlin Philharmonic Orchestra, Simone Del Savio, Jonas Kaufmann, Sir Simon Rattle, Magdalena Kožená"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 55,
+   "title": "Carmen, Act 3: \"Prends garde à toi Carmen\" (Don José, Dancaïro, Bohémiens et Bohémiennes, Remendado, Carmen, Micaëla, Frasquita, Mercédès)",
+   "durationMs": 36507,
+   "artist": "Andrè Schuen, Berlin Philharmonic Orchestra, Chor des Deutschen Staatsoper, Christina Landshammer, Eberhard Friedrich, Genia Kühmeier, Jean-Paul Fouchécourt, Jonas Kaufmann, Magdalena Kožená, Rachel Frenkel, Simone Del Savio & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Prends garde à toi Carmen\" (Don José, Dancaïro, Bohémiens et Bohémiennes, Remendado, Carmen, Micaëla, Frasquita, Mercédès)",
+    "performers": "Jean-Paul Fouchécourt, Christina Landshammer, Andrè Schuen, Berlin Philharmonic Orchestra, Rachel Frenkel, Chor des Deutschen Staatsoper, Sir Simon Rattle, Eberhard Friedrich, Magdalena Kožená, Genia Kühmeier, Simone Del Savio, Jonas Kaufmann"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 56,
+   "title": "Carmen, Act 3: \"Moi! Je viens te chercher!\" (Micaëla)",
+   "durationMs": 66493,
+   "artist": "Berlin Philharmonic Orchestra, Genia Kühmeier & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Moi! Je viens te chercher!\" (Micaëla)",
+    "performers": "Berlin Philharmonic Orchestra, Genia Kühmeier, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 57,
+   "title": "Carmen, Act 3: \"Va-t'en\" - \"Tu me dis de la suivre!\" (Carmen, Don José)",
+   "durationMs": 193093,
+   "artist": "Berlin Philharmonic Orchestra, Jonas Kaufmann, Magdalena Kožená & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Va-t'en\" - \"Tu me dis de la suivre!\" (Carmen, Don José)",
+    "performers": "Magdalena Kožená, Berlin Philharmonic Orchestra, Jonas Kaufmann, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 58,
+   "title": "Carmen, Act 3: \"Toréador, en garde!\" (Escamillo)",
+   "durationMs": 58627,
+   "artist": "Berlin Philharmonic Orchestra, Kostas Smoriginas & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Toréador, en garde!\" (Escamillo)",
+    "performers": "Sir Simon Rattle, Kostas Smoriginas, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 59,
+   "title": "Carmen, Act 4: Entr'acte",
+   "durationMs": 141040,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Entr'acte",
+    "performers": "Berlin Philharmonic Orchestra, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 60,
+   "title": "Carmen, Act 4: \"A deux cuartos!\" (Marchands, Marchandes, Zuniga, Une marchande, Un bohemien)",
+   "durationMs": 126787,
+   "artist": "Berlin Philharmonic Orchestra, Chor des Deutschen Staatsoper, Christian Van Horn, Eberhard Friedrich & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"A deux cuartos!\" (Marchands, Marchandes, Zuniga, Une marchande, Un bohemien)",
+    "performers": "Christian Van Horn, Sir Simon Rattle, Berlin Philharmonic Orchestra, Eberhard Friedrich, Chor des Deutschen Staatsoper"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 61,
+   "title": "Carmen, Act 4: \"Les voici! Voici la quadrille!\" (Churs, Enfants)",
+   "durationMs": 225587,
+   "artist": "Berlin Philharmonic Orchestra, Sir Simon Rattle, Vinzenz Weissenburger, Chor des Deutschen Staatsoper Berlin & Kinderchor der Deutschen Staatsoper Berlin",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Les voici! Voici la quadrille!\" (Churs, Enfants)",
+    "performers": "Berlin Philharmonic Orchestra, Sir Simon Rattle, Kinderchor der Deutschen Staatsoper Berlin, Vinzenz Weissenburger, Chor des Deutschen Staatsoper Berlin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 62,
+   "title": "Carmen, Act 4: \"Si tu m'aimes, Carmen\" (Escamillo, Carmen)",
+   "durationMs": 83467,
+   "artist": "Berlin Philharmonic Orchestra, Kostas Smoriginas, Magdalena Kožená & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Si tu m'aimes, Carmen\" (Escamillo, Carmen)",
+    "performers": "Sir Simon Rattle, Berlin Philharmonic Orchestra, Kostas Smoriginas, Magdalena Kožená"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 63,
+   "title": "Carmen, Act 4: \"Carmen, un bon conseil\" (Frasquita, Carmen, Mercédès)",
+   "durationMs": 118107,
+   "artist": "Berlin Philharmonic Orchestra, Christina Landshammer, Magdalena Kožená & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Carmen, un bon conseil\" (Frasquita, Carmen, Mercédès)",
+    "performers": "Sir Simon Rattle, Magdalena Kožená, Berlin Philharmonic Orchestra, Christina Landshammer"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 64,
+   "title": "Carmen, Act 4: \"C'est toi\" - \"C'est moi\" (Carmen, Don José)",
+   "durationMs": 243840,
+   "artist": "Berlin Philharmonic Orchestra, Jonas Kaufmann, Magdalena Kožená & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"C'est toi\" - \"C'est moi\" (Carmen, Don José)",
+    "performers": "Magdalena Kožená, Sir Simon Rattle, Berlin Philharmonic Orchestra, Jonas Kaufmann"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 65,
+   "title": "Carmen, Act 4: \"Tu m'aimes donc plus\" (Don José, Carmen, Chorus)",
+   "durationMs": 354929,
+   "artist": "Berlin Philharmonic Orchestra, Chor des Deutschen Staatsoper, Jonas Kaufmann, Magdalena Kožená & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Tu m'aimes donc plus\" (Don José, Carmen, Chorus)",
+    "performers": "Jonas Kaufmann, Magdalena Kožená, Sir Simon Rattle, Chor des Deutschen Staatsoper, Berlin Philharmonic Orchestra"
+   }
+  }
+ ]
+}

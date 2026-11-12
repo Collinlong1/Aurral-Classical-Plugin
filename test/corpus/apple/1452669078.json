@@ -1,0 +1,78 @@
+{
+ "id": "1452669078",
+ "category": "choral sacred",
+ "title": "Arvo Pärt: Tabula Rasa",
+ "artist": "Gidon Kremer, Keith Jarrett & The 12 Cellists of the Berlin Philharmonic Orchestra",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Fratres (For Violin and Piano)",
+   "durationMs": 693879,
+   "artist": "Gidon Kremer & Keith Jarrett",
+   "apple": {
+    "block": 1,
+    "composer": "Arvo Pärt",
+    "work": "Fratres",
+    "part": "Fratres (For Violin and Piano)",
+    "performers": "Keith Jarrett, Gidon Kremer"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Cantus in Memory of Benjamin Britten",
+   "durationMs": 308638,
+   "artist": "Staatsorchester Stuttgart & Dennis Russell Davies",
+   "apple": {
+    "block": 2,
+    "composer": "Arvo Pärt",
+    "work": "Cantus in memoriam Benjamin Britten",
+    "part": "Cantus in Memory of Benjamin Britten",
+    "performers": "Dennis Russell Davies, Staatsorchester Stuttgart"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Fratres (For 12 Celli)",
+   "durationMs": 719422,
+   "artist": "The 12 Cellists of the Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Arvo Pärt",
+    "work": "Fratres",
+    "part": "Fratres (For 12 Celli)",
+    "performers": "The 12 Cellists of the Berlin Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Tabula Rasa: I. Ludus (Live from Bonn, 1977)",
+   "durationMs": 576369,
+   "artist": "Gidon Kremer, Saulius Sondeckis, Lithuanian Chamber Orchestra, Tatjana Grindenko & Alfred Schnittke",
+   "apple": {
+    "block": 4,
+    "composer": "Arvo Pärt",
+    "work": "Tabula Rasa",
+    "part": "I. Ludus (Live from Bonn, 1977)",
+    "performers": "Alfred Schnittke, Tatjana Grindenko, Saulius Sondeckis, Gidon Kremer, Lithuanian Chamber Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Tabula Rasa: II. Silentium (Live from Bonn, 1977)",
+   "durationMs": 1010586,
+   "artist": "Gidon Kremer, Saulius Sondeckis, Lithuanian Chamber Orchestra, Tatjana Grindenko & Alfred Schnittke",
+   "apple": {
+    "block": 4,
+    "composer": "Arvo Pärt",
+    "work": "Tabula Rasa",
+    "part": "II. Silentium (Live from Bonn, 1977)",
+    "performers": "Saulius Sondeckis, Gidon Kremer, Lithuanian Chamber Orchestra, Alfred Schnittke, Tatjana Grindenko"
+   }
+  }
+ ]
+}

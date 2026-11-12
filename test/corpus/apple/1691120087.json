@@ -1,0 +1,526 @@
+{
+ "id": "1691120087",
+ "category": "variations",
+ "title": "Rachmaninoff: The Piano Concertos & Paganini Rhapsody",
+ "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Piano Concerto No. 2 in C Minor, Op. 18: I. Moderato",
+   "durationMs": 660627,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 1,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Piano Concerto No. 2 in C Minor, Op. 18",
+    "part": "I. Moderato",
+    "performers": "Yuja Wang, Los Angeles Philharmonic, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Piano Concerto No. 2 in C Minor, Op. 18: II. Adagio sostenuto",
+   "durationMs": 663693,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 1,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Piano Concerto No. 2 in C Minor, Op. 18",
+    "part": "II. Adagio sostenuto",
+    "performers": "Los Angeles Philharmonic, Yuja Wang, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Piano Concerto No. 2 in C Minor, Op. 18: III. Allegro scherzando",
+   "durationMs": 659440,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 1,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Piano Concerto No. 2 in C Minor, Op. 18",
+    "part": "III. Allegro scherzando",
+    "performers": "Los Angeles Philharmonic, Gustavo Dudamel, Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Piano Concerto No. 1 in F-Sharp Minor, Op. 1 (1917 Final Version): I. Vivace - Moderato",
+   "durationMs": 749533,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Piano Concerto No. 1 in F-Sharp Minor, Op. 1",
+    "part": "I. Vivace - Moderato",
+    "performers": "Gustavo Dudamel, Yuja Wang, Los Angeles Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Piano Concerto No. 1 in F-Sharp Minor, Op. 1 (1917 Final Version): II. Andante",
+   "durationMs": 348120,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Piano Concerto No. 1 in F-Sharp Minor, Op. 1",
+    "part": "II. Andante",
+    "performers": "Los Angeles Philharmonic, Gustavo Dudamel, Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Piano Concerto No. 1 in F-Sharp Minor, Op. 1 (1917 Final Version): III. Allegro vivace",
+   "durationMs": 455000,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Piano Concerto No. 1 in F-Sharp Minor, Op. 1",
+    "part": "III. Allegro vivace",
+    "performers": "Los Angeles Philharmonic, Yuja Wang, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Piano Concerto No. 4 in G Minor, Op. 40 (1941 3rd Version): I. Allegro vivace",
+   "durationMs": 542107,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 3,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Piano Concerto No. 4 in G Minor, Op. 40",
+    "part": "I. Allegro vivace",
+    "performers": "Gustavo Dudamel, Yuja Wang, Los Angeles Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Piano Concerto No. 4 in G Minor, Op. 40 (1941 3rd Version): II. Largo",
+   "durationMs": 379747,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 3,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Piano Concerto No. 4 in G Minor, Op. 40",
+    "part": "II. Largo",
+    "performers": "Los Angeles Philharmonic, Yuja Wang, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Piano Concerto No. 4 in G Minor, Op. 40 (1941 3rd Version): III. Allegro vivace",
+   "durationMs": 536027,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 3,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Piano Concerto No. 4 in G Minor, Op. 40",
+    "part": "III. Allegro vivace",
+    "performers": "Gustavo Dudamel, Los Angeles Philharmonic, Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Rhapsody on a Theme of Paganini, Op. 43: Introduction. Allegro vivace - Var. 1. Precedente",
+   "durationMs": 27427,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 4,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Introduction. Allegro vivace - Var. 1. Precedente",
+    "performers": "Gustavo Dudamel, Los Angeles Philharmonic, Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Rhapsody on a Theme of Paganini, Op. 43: Tema. L'istesso tempo",
+   "durationMs": 19000,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 4,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Tema. L'istesso tempo",
+    "performers": "Los Angeles Philharmonic, Yuja Wang, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Rhapsody on a Theme of Paganini, Op. 43: Var. 2. L'istesso tempo",
+   "durationMs": 18933,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 4,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Var. 2. L'istesso tempo",
+    "performers": "Los Angeles Philharmonic, Gustavo Dudamel, Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Rhapsody on a Theme of Paganini, Op. 43: Var. 3. L'istesso tempo",
+   "durationMs": 24827,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 4,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Var. 3. L'istesso tempo",
+    "performers": "Yuja Wang, Los Angeles Philharmonic, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Rhapsody on a Theme of Paganini, Op. 43: Var. 4. Più vivo",
+   "durationMs": 28773,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 4,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Var. 4. Più vivo",
+    "performers": "Gustavo Dudamel, Los Angeles Philharmonic, Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Rhapsody on a Theme of Paganini, Op. 43: Var. 5. Tempo precedente",
+   "durationMs": 28453,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 4,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Var. 5. Tempo precedente",
+    "performers": "Yuja Wang, Los Angeles Philharmonic, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Rhapsody on a Theme of Paganini, Op. 43: Var. 6. L'istesso tempo",
+   "durationMs": 69000,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 4,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Var. 6. L'istesso tempo",
+    "performers": "Yuja Wang, Gustavo Dudamel, Los Angeles Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Rhapsody on a Theme of Paganini, Op. 43: Var. 7. Meno mosso, a tempo moderato",
+   "durationMs": 70200,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 4,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Var. 7. Meno mosso, a tempo moderato",
+    "performers": "Yuja Wang, Gustavo Dudamel, Los Angeles Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Rhapsody on a Theme of Paganini, Op. 43: Var. 8. Tempo I",
+   "durationMs": 35013,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 4,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Var. 8. Tempo I",
+    "performers": "Gustavo Dudamel, Los Angeles Philharmonic, Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "Rhapsody on a Theme of Paganini, Op. 43: Var. 9. L'istesso tempo",
+   "durationMs": 32627,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 4,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Var. 9. L'istesso tempo",
+    "performers": "Gustavo Dudamel, Yuja Wang, Los Angeles Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "Rhapsody on a Theme of Paganini, Op. 43: Var. 10. L'istesso tempo",
+   "durationMs": 52453,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 4,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Var. 10. L'istesso tempo",
+    "performers": "Los Angeles Philharmonic, Yuja Wang, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "Rhapsody on a Theme of Paganini, Op. 43: Var. 11. Moderato",
+   "durationMs": 85813,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 4,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Var. 11. Moderato",
+    "performers": "Los Angeles Philharmonic, Yuja Wang, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "Rhapsody on a Theme of Paganini, Op. 43: Var. 12. Tempo di minuetto",
+   "durationMs": 88320,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 4,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Var. 12. Tempo di minuetto",
+    "performers": "Los Angeles Philharmonic, Gustavo Dudamel, Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 23,
+   "title": "Rhapsody on a Theme of Paganini, Op. 43: Var. 13. Allegro",
+   "durationMs": 29973,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 4,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Var. 13. Allegro",
+    "performers": "Los Angeles Philharmonic, Gustavo Dudamel, Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 24,
+   "title": "Rhapsody on a Theme of Paganini, Op. 43: Var. 14. L'istesso tempo",
+   "durationMs": 45080,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 4,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Var. 14. L'istesso tempo",
+    "performers": "Los Angeles Philharmonic, Yuja Wang, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 25,
+   "title": "Rhapsody on a Theme of Paganini, Op. 43: Var. 15. Più vivo scherzando",
+   "durationMs": 70427,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 4,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Var. 15. Più vivo scherzando",
+    "performers": "Gustavo Dudamel, Los Angeles Philharmonic, Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 26,
+   "title": "Rhapsody on a Theme of Paganini, Op. 43: Var. 16. Allegretto",
+   "durationMs": 100893,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 4,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Var. 16. Allegretto",
+    "performers": "Gustavo Dudamel, Los Angeles Philharmonic, Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 27,
+   "title": "Rhapsody on a Theme of Paganini, Op. 43: Var. 17. Allegretto",
+   "durationMs": 101747,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 4,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Var. 17. Allegretto",
+    "performers": "Yuja Wang, Los Angeles Philharmonic, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 28,
+   "title": "Rhapsody on a Theme of Paganini, Op. 43: Var. 18. Andante cantabile",
+   "durationMs": 166640,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 4,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Var. 18. Andante cantabile",
+    "performers": "Yuja Wang, Los Angeles Philharmonic, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 29,
+   "title": "Rhapsody on a Theme of Paganini, Op. 43: Var. 19. A tempo vivace",
+   "durationMs": 32147,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 4,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Var. 19. A tempo vivace",
+    "performers": "Los Angeles Philharmonic, Yuja Wang, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 30,
+   "title": "Rhapsody on a Theme of Paganini, Op. 43: Var. 20. Un poco più vivo",
+   "durationMs": 35987,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 4,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Var. 20. Un poco più vivo",
+    "performers": "Los Angeles Philharmonic, Yuja Wang, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 31,
+   "title": "Rhapsody on a Theme of Paganini, Op. 43: Var. 21. Un poco più vivo",
+   "durationMs": 25493,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 4,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Var. 21. Un poco più vivo",
+    "performers": "Yuja Wang, Gustavo Dudamel, Los Angeles Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 32,
+   "title": "Rhapsody on a Theme of Paganini, Op. 43: Var. 22. Marziale. Un poco più vivo. Alla breve",
+   "durationMs": 101720,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 4,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Var. 22. Marziale. Un poco più vivo. Alla breve",
+    "performers": "Los Angeles Philharmonic, Gustavo Dudamel, Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 33,
+   "title": "Rhapsody on a Theme of Paganini, Op. 43: Var. 23. L'istesso tempo",
+   "durationMs": 52773,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 4,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Var. 23. L'istesso tempo",
+    "performers": "Los Angeles Philharmonic, Gustavo Dudamel, Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 34,
+   "title": "Rhapsody on a Theme of Paganini, Op. 43: Var. 24. A tempo un poco meno mosso",
+   "durationMs": 76507,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 4,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Var. 24. A tempo un poco meno mosso",
+    "performers": "Yuja Wang, Los Angeles Philharmonic, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 35,
+   "title": "Piano Concerto No. 3 in D Minor, Op. 30: I. Allegro ma non tanto",
+   "durationMs": 983453,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 5,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Piano Concerto No. 3 in D Minor, Op. 30",
+    "part": "I. Allegro ma non tanto",
+    "performers": "Los Angeles Philharmonic, Yuja Wang, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 36,
+   "title": "Piano Concerto No. 3 in D Minor, Op. 30: II. Intermezzo. Adagio",
+   "durationMs": 616133,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 5,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Piano Concerto No. 3 in D Minor, Op. 30",
+    "part": "II. Intermezzo. Adagio",
+    "performers": "Los Angeles Philharmonic, Yuja Wang, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 37,
+   "title": "Piano Concerto No. 3 in D Minor, Op. 30: III. Finale. Alla breve",
+   "durationMs": 866933,
+   "artist": "Yuja Wang, Los Angeles Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 5,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Piano Concerto No. 3 in D Minor, Op. 30",
+    "part": "III. Finale. Alla breve",
+    "performers": "Gustavo Dudamel, Yuja Wang, Los Angeles Philharmonic"
+   }
+  }
+ ]
+}

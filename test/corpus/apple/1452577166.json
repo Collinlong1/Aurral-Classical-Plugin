@@ -1,0 +1,120 @@
+{
+ "id": "1452577166",
+ "category": "chamber",
+ "title": "Dvorak: String Quartet No. 12 \"American\" & Smetana: String Quartet No. 1 \"From My Life\"",
+ "artist": "Emerson String Quartet",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "String Quartet No. 12 in F Major, Op. 96 - \"American\", B. 179: I. Allegro ma non troppo",
+   "durationMs": 542333,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 1,
+    "composer": "Antonín Dvořák",
+    "work": "String Quartet No. 12 in F Major, B 179, Op. 96 · “American”",
+    "part": "I. Allegro ma non troppo",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "String Quartet No. 12 in F Major, Op. 96 - \"American\", B. 179: II. Lento",
+   "durationMs": 462333,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 1,
+    "composer": "Antonín Dvořák",
+    "work": "String Quartet No. 12 in F Major, B 179, Op. 96 · “American”",
+    "part": "II. Lento",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "String Quartet No. 12 in F Major, Op. 96 - \"American\", B. 179: III. Molto vivace",
+   "durationMs": 215667,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 1,
+    "composer": "Antonín Dvořák",
+    "work": "String Quartet No. 12 in F Major, B 179, Op. 96 · “American”",
+    "part": "III. Molto vivace",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "String Quartet No. 12 in F Major, Op. 96 - \"American\", B. 179: IV. Finale (Vivace ma non troppo)",
+   "durationMs": 311667,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 1,
+    "composer": "Antonín Dvořák",
+    "work": "String Quartet No. 12 in F Major, B 179, Op. 96 · “American”",
+    "part": "IV. Finale (Vivace ma non troppo)",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "String Quartet No. 1 in E Minor - \"From my Life\": I. Allegro vivo appassionato",
+   "durationMs": 391160,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 2,
+    "composer": "Bedřich Smetana",
+    "work": "String Quartet No. 1 in E Minor, JB 1:105, T 116 · “Z mého života”",
+    "part": "I. Allegro vivo appassionato",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "String Quartet No. 1 in E Minor - \"From my Life\": II. Allegro moderato alla Polka",
+   "durationMs": 317827,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 2,
+    "composer": "Bedřich Smetana",
+    "work": "String Quartet No. 1 in E Minor, JB 1:105, T 116 · “Z mého života”",
+    "part": "II. Allegro moderato alla Polka",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "String Quartet No. 1 in E Minor - \"From my Life\": III. Largo sostenuto",
+   "durationMs": 509827,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 2,
+    "composer": "Bedřich Smetana",
+    "work": "String Quartet No. 1 in E Minor, JB 1:105, T 116 · “Z mého života”",
+    "part": "III. Largo sostenuto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "String Quartet No. 1 in E Minor - \"From my Life\": IV. Vivace",
+   "durationMs": 327667,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 2,
+    "composer": "Bedřich Smetana",
+    "work": "String Quartet No. 1 in E Minor, JB 1:105, T 116 · “Z mého života”",
+    "part": "IV. Vivace",
+    "performers": "Emerson String Quartet"
+   }
+  }
+ ]
+}

@@ -1,0 +1,162 @@
+{
+ "id": "1083994403",
+ "category": "variations",
+ "title": "Rachmaninoff: Corelli Variations & Six Moments Musicaux",
+ "artist": "Martin Jones",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Variations on a Theme of Corelli, Op. 42",
+   "durationMs": 1005000,
+   "artist": "Martin Jones",
+   "apple": {
+    "block": 1,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Variations on a Theme of Corelli in D Minor, Op. 42",
+    "part": "Variations on a Theme of Corelli, Op. 42",
+    "performers": "Martin Jones"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Moments Musicaux, Op. 16: I. Andantino",
+   "durationMs": 460000,
+   "artist": "Martin Jones",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Moments musicaux, Op. 16",
+    "part": "I. Andantino",
+    "performers": "Martin Jones"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Moments Musicaux, Op. 16: II. Allegro",
+   "durationMs": 175000,
+   "artist": "Martin Jones",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Moments musicaux, Op. 16",
+    "part": "II. Allegro",
+    "performers": "Martin Jones"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Moments Musicaux, Op. 16: III. Andante cantabile",
+   "durationMs": 279000,
+   "artist": "Martin Jones",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Moments musicaux, Op. 16",
+    "part": "III. Andante cantabile",
+    "performers": "Martin Jones"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Moments Musicaux, Op. 16: IV. Presto",
+   "durationMs": 172000,
+   "artist": "Martin Jones",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Moments musicaux, Op. 16",
+    "part": "IV. Presto",
+    "performers": "Martin Jones"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Moments Musicaux, Op. 16: V. Adagio sostenuto",
+   "durationMs": 238000,
+   "artist": "Martin Jones",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Moments musicaux, Op. 16",
+    "part": "V. Adagio sostenuto",
+    "performers": "Martin Jones"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Moments Musicaux, Op. 16: VI. Maestoso",
+   "durationMs": 299000,
+   "artist": "Martin Jones",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Moments musicaux, Op. 16",
+    "part": "VI. Maestoso",
+    "performers": "Martin Jones"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Lilacs No. 5, Op. 21: Siren",
+   "durationMs": 159000,
+   "artist": "Martin Jones",
+   "apple": {
+    "block": 3,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Lilacs, Op. 21/5 · “Siren'”",
+    "part": "Siren",
+    "performers": "Martin Jones"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Daises No. 3, Op. 38: Margaritki",
+   "durationMs": 171000,
+   "artist": "Martin Jones",
+   "apple": {
+    "block": 4,
+    "composer": "Sergei Rachmaninoff",
+    "work": "6 Songs, Op. 38",
+    "part": "Margaritki",
+    "performers": "Martin Jones"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Kreisler, Op. 32: Liebesleid",
+   "durationMs": 254000,
+   "artist": "Martin Jones",
+   "apple": {
+    "block": 5,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Kreisler: Liebesleid, TNiii 5/1",
+    "part": "Liebesleid",
+    "performers": "Martin Jones"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Kreisler, Op. 32: Liebesfreud",
+   "durationMs": 378000,
+   "artist": "Martin Jones",
+   "apple": {
+    "block": 6,
+    "composer": "Fritz Kreisler",
+    "work": "Kreisler: Liebesfreud, TNiii 5/2",
+    "part": "Liebesfreud",
+    "performers": "Martin Jones"
+   }
+  }
+ ]
+}

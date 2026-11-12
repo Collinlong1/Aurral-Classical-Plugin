@@ -1,0 +1,554 @@
+{
+ "id": "1448631706",
+ "category": "baroque early",
+ "title": "Josquin Masses: Missa Malheur me bat & Missa Fortuna desparata",
+ "artist": "The Tallis Scholars & Peter Phillips",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Missa Malheur me bat: 1. Kyrie I",
+   "durationMs": 54614,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 1,
+    "composer": "Josquin des Prez",
+    "work": "Missa sine nomine, NJE (12.2)",
+    "part": "1. Kyrie I",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Missa Malheur me bat: 2. Christe",
+   "durationMs": 93393,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 2,
+    "composer": "Josquin des Prez",
+    "work": "Missa Gaudeamus, NJE 4.2",
+    "part": "2. Christe",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Missa Malheur me bat: 3. Kyrie II",
+   "durationMs": 67005,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 3,
+    "composer": "Josquin des Prez",
+    "work": "Missa Hercules dux Ferrariae, NJE 11.1",
+    "part": "3. Kyrie II",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Missa Malheur me bat: 4. Gloria in excelsis Deo",
+   "durationMs": 93812,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 4,
+    "composer": "Josquin des Prez",
+    "work": "Missa Ave maris stella, NJE 3.1",
+    "part": "4. Gloria in excelsis Deo",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Missa Malheur me bat: 5. Gratias agimus tibi",
+   "durationMs": 110567,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 5,
+    "composer": "Josquin des Prez",
+    "work": "Missa Malheur me bat, NJE 9.1",
+    "part": "5. Gratias agimus tibi",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Missa Malheur me bat: 6. Qui tollis peccata mundi, miserere",
+   "durationMs": 72499,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 6,
+    "composer": "Josquin des Prez",
+    "work": "Missa Ave maris stella, NJE 3.1",
+    "part": "6. Qui tollis peccata mundi, miserere",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Missa Malheur me bat: 7. Quoniam tu solus sanctus",
+   "durationMs": 82958,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 7,
+    "composer": "Josquin des Prez",
+    "work": "Missa Malheur me bat, NJE 9.1",
+    "part": "7. Quoniam tu solus sanctus",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Missa Malheur me bat: 8. Credo in unum Deum",
+   "durationMs": 83557,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 8,
+    "composer": "Josquin des Prez",
+    "work": "Missa Ave maris stella, NJE 3.1",
+    "part": "8. Credo in unum Deum",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Missa Malheur me bat: 9. Et ex Patre natum",
+   "durationMs": 125751,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 9,
+    "composer": "Josquin des Prez",
+    "work": "Missa Malheur me bat, NJE 9.1",
+    "part": "9. Et ex Patre natum",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Missa Malheur me bat: 10. Et incarnatus est de Spiritu Sancto",
+   "durationMs": 164238,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 9,
+    "composer": "Josquin des Prez",
+    "work": "Missa Malheur me bat, NJE 9.1",
+    "part": "10. Et incarnatus est de Spiritu Sancto",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Missa Malheur me bat: 11. Et in Spiritum Sanctum",
+   "durationMs": 130205,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 10,
+    "composer": "Josquin des Prez",
+    "work": "Missa Faisant regretz, NJE 8.1",
+    "part": "11. Et in Spiritum Sanctum",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Missa Malheur me bat: 12. Sanctus",
+   "durationMs": 74369,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 11,
+    "composer": "Josquin des Prez",
+    "work": "Missa Malheur me bat, NJE 9.1",
+    "part": "12. Sanctus",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Missa Malheur me bat: 13. Dominus Deus Sabaoth",
+   "durationMs": 92235,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 11,
+    "composer": "Josquin des Prez",
+    "work": "Missa Malheur me bat, NJE 9.1",
+    "part": "13. Dominus Deus Sabaoth",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Missa Malheur me bat: 14. Pleni sunt caeli",
+   "durationMs": 127855,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 12,
+    "composer": "Josquin des Prez",
+    "work": "Missa Ave maris stella, NJE 3.1",
+    "part": "14. Pleni sunt caeli",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Missa Malheur me bat: 15. Hosanna I",
+   "durationMs": 125631,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 13,
+    "composer": "Josquin des Prez",
+    "work": "Missa Faisant regretz, NJE 8.1",
+    "part": "15. Hosanna I",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Missa Malheur me bat: 16. Benedictus",
+   "durationMs": 89382,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 13,
+    "composer": "Josquin des Prez",
+    "work": "Missa Faisant regretz, NJE 8.1",
+    "part": "16. Benedictus",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Missa Malheur me bat: 17. Hosanna II",
+   "durationMs": 127125,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 14,
+    "composer": "Josquin des Prez",
+    "work": "Missa Ave maris stella, NJE 3.1",
+    "part": "17. Hosanna II",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Missa Malheur me bat: 18. Agnus Dei I",
+   "durationMs": 253945,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 15,
+    "composer": "Josquin des Prez",
+    "work": "Missa Malheur me bat, NJE 9.1",
+    "part": "18. Agnus Dei I",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "Missa Malheur me bat: 19. Agnus Dei II",
+   "durationMs": 141023,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 15,
+    "composer": "Josquin des Prez",
+    "work": "Missa Malheur me bat, NJE 9.1",
+    "part": "19. Agnus Dei II",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "Missa Malheur me bat: 20. Agnus Dei III",
+   "durationMs": 268204,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 15,
+    "composer": "Josquin des Prez",
+    "work": "Missa Malheur me bat, NJE 9.1",
+    "part": "20. Agnus Dei III",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "Missa Fortuna desperata: 1. Kyrie I",
+   "durationMs": 55027,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 16,
+    "composer": "Josquin des Prez",
+    "work": "Missa Faisant regretz, NJE 8.1",
+    "part": "1. Kyrie I",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "Missa Fortuna desperata: 2. Christe",
+   "durationMs": 81794,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 17,
+    "composer": "Josquin des Prez",
+    "work": "Missa Hercules dux Ferrariae, NJE 11.1",
+    "part": "2. Christe",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 23,
+   "title": "Missa Fortuna desperata: 3. Kyrie II",
+   "durationMs": 61400,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 18,
+    "composer": "Josquin des Prez",
+    "work": "Missa Faisant regretz, NJE 8.1",
+    "part": "3. Kyrie II",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 24,
+   "title": "Missa Fortuna desperata: 4. Gloria in excelsis Deo",
+   "durationMs": 78942,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 19,
+    "composer": "Josquin des Prez",
+    "work": "Missa Ave maris stella, NJE 3.1",
+    "part": "4. Gloria in excelsis Deo",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 25,
+   "title": "Missa Fortuna desperata: 5. Gratias agimus tibi",
+   "durationMs": 128787,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 20,
+    "composer": "Josquin des Prez",
+    "work": "Missa Malheur me bat, NJE 9.1",
+    "part": "5. Gratias agimus tibi",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 26,
+   "title": "Missa Fortuna desperata: 6. Qui tollis peccata mundi, miserere",
+   "durationMs": 110491,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 21,
+    "composer": "Josquin des Prez",
+    "work": "Missa Ave maris stella, NJE 3.1",
+    "part": "6. Qui tollis peccata mundi, miserere",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 27,
+   "title": "Missa Fortuna desperata: 7. Quoniam tu solus sanctus",
+   "durationMs": 124617,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 22,
+    "composer": "Josquin des Prez",
+    "work": "Missa Malheur me bat, NJE 9.1",
+    "part": "7. Quoniam tu solus sanctus",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 28,
+   "title": "Missa Fortuna desperata: 8. Credo in unum Deum",
+   "durationMs": 107028,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 23,
+    "composer": "Josquin des Prez",
+    "work": "Missa Ave maris stella, NJE 3.1",
+    "part": "8. Credo in unum Deum",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 29,
+   "title": "Missa Fortuna desperata: 9. Et ex Patre natum",
+   "durationMs": 145803,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 24,
+    "composer": "Josquin des Prez",
+    "work": "Missa Malheur me bat, NJE 9.1",
+    "part": "9. Et ex Patre natum",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 30,
+   "title": "Missa Fortuna desperata: 10. Et incarnatus est de Spiritu Sancto",
+   "durationMs": 141855,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 24,
+    "composer": "Josquin des Prez",
+    "work": "Missa Malheur me bat, NJE 9.1",
+    "part": "10. Et incarnatus est de Spiritu Sancto",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 31,
+   "title": "Missa Fortuna desperata: 11. Et in Spiritum Sanctum",
+   "durationMs": 146590,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 25,
+    "composer": "Josquin des Prez",
+    "work": "Missa Faisant regretz, NJE 8.1",
+    "part": "11. Et in Spiritum Sanctum",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 32,
+   "title": "Missa Fortuna desperata: 12. Sanctus",
+   "durationMs": 99881,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 26,
+    "composer": "Josquin des Prez",
+    "work": "Missa Malheur me bat, NJE 9.1",
+    "part": "12. Sanctus",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 33,
+   "title": "Missa Fortuna desperata: 13. Dominus Deus Sabaoth",
+   "durationMs": 78438,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 26,
+    "composer": "Josquin des Prez",
+    "work": "Missa Malheur me bat, NJE 9.1",
+    "part": "13. Dominus Deus Sabaoth",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 34,
+   "title": "Missa Fortuna desperata: 14. Pleni sunt caeli",
+   "durationMs": 129409,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 27,
+    "composer": "Josquin des Prez",
+    "work": "Missa Ave maris stella, NJE 3.1",
+    "part": "14. Pleni sunt caeli",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 35,
+   "title": "Missa Fortuna desperata: 15. Hosanna I",
+   "durationMs": 70103,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 28,
+    "composer": "Josquin des Prez",
+    "work": "Missa Faisant regretz, NJE 8.1",
+    "part": "15. Hosanna I",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 36,
+   "title": "Missa Fortuna desperata: 16. Benedictus",
+   "durationMs": 116835,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 28,
+    "composer": "Josquin des Prez",
+    "work": "Missa Faisant regretz, NJE 8.1",
+    "part": "16. Benedictus",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 37,
+   "title": "Missa Fortuna desperata: 17. Hosanna II",
+   "durationMs": 74681,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 28,
+    "composer": "Josquin des Prez",
+    "work": "Missa Faisant regretz, NJE 8.1",
+    "part": "17. Hosanna II",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 38,
+   "title": "Missa Fortuna desperata: 18. Agnus Dei I",
+   "durationMs": 179915,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 29,
+    "composer": "Josquin des Prez",
+    "work": "Missa Malheur me bat, NJE 9.1",
+    "part": "18. Agnus Dei I",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 39,
+   "title": "Missa Fortuna desperata: 19. Agnus Dei II",
+   "durationMs": 211263,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 29,
+    "composer": "Josquin des Prez",
+    "work": "Missa Malheur me bat, NJE 9.1",
+    "part": "19. Agnus Dei II",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  }
+ ]
+}

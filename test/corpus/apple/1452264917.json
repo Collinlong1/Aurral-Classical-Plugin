@@ -1,0 +1,134 @@
+{
+ "id": "1452264917",
+ "category": "chamber",
+ "title": "Schubert: String Quintet - Schoenberg: Verklärte Nacht",
+ "artist": "Janine Jansen, Boris Brovtsyn, Amihai Grosz, Maxim Rysanov, Torleif Thedéen & Jens Peter Maintz",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Verklärte Nacht, Op. 4: I. Sehr langsam (bar 1)",
+   "durationMs": 401373,
+   "artist": "Janine Jansen, Boris Brovtsyn, Amihai Grosz, Maxim Rysanov, Torleif Thedéen & Jens Peter Maintz",
+   "apple": {
+    "block": 1,
+    "composer": "Arnold Schoenberg",
+    "work": "Verklärte Nacht, Op. 4 · “Transfigured Night”",
+    "part": "I. Sehr langsam (bar 1)",
+    "performers": "Torleif Thedéen, Jens Peter Maintz, Maxim Rysanov, Boris Brovtsyn, Janine Jansen, Amihai Grosz"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Verklärte Nacht, Op. 4: II. Breiter (bar 200)",
+   "durationMs": 387747,
+   "artist": "Janine Jansen, Boris Brovtsyn, Amihai Grosz, Maxim Rysanov, Torleif Thedéen & Jens Peter Maintz",
+   "apple": {
+    "block": 1,
+    "composer": "Arnold Schoenberg",
+    "work": "Verklärte Nacht, Op. 4 · “Transfigured Night”",
+    "part": "II. Breiter (bar 200)",
+    "performers": "Boris Brovtsyn, Torleif Thedéen, Amihai Grosz, Jens Peter Maintz, Maxim Rysanov, Janine Jansen"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Verklärte Nacht, Op. 4: III. Schwer betont (bar 201)",
+   "durationMs": 155947,
+   "artist": "Janine Jansen, Boris Brovtsyn, Amihai Grosz, Maxim Rysanov, Torleif Thedéen & Jens Peter Maintz",
+   "apple": {
+    "block": 1,
+    "composer": "Arnold Schoenberg",
+    "work": "Verklärte Nacht, Op. 4 · “Transfigured Night”",
+    "part": "III. Schwer betont (bar 201)",
+    "performers": "Janine Jansen, Torleif Thedéen, Jens Peter Maintz, Maxim Rysanov, Amihai Grosz, Boris Brovtsyn"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Verklärte Nacht, Op. IV. IV. Sehr breit und langsam (bar 229)",
+   "durationMs": 580813,
+   "artist": "Janine Jansen, Boris Brovtsyn, Amihai Grosz, Maxim Rysanov, Torleif Thedéen & Jens Peter Maintz",
+   "apple": {
+    "block": 1,
+    "composer": "Arnold Schoenberg",
+    "work": "Verklärte Nacht, Op. 4 · “Transfigured Night”",
+    "part": "Verklärte Nacht, Op. IV. IV. Sehr breit und langsam (bar 229)",
+    "performers": "Amihai Grosz, Janine Jansen, Boris Brovtsyn, Jens Peter Maintz, Maxim Rysanov, Torleif Thedéen"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Verklärte Nacht, Op. 4: V. Sehr ruhig (bar 370)",
+   "durationMs": 272840,
+   "artist": "Janine Jansen, Boris Brovtsyn, Amihai Grosz, Maxim Rysanov, Torleif Thedéen & Jens Peter Maintz",
+   "apple": {
+    "block": 1,
+    "composer": "Arnold Schoenberg",
+    "work": "Verklärte Nacht, Op. 4 · “Transfigured Night”",
+    "part": "V. Sehr ruhig (bar 370)",
+    "performers": "Torleif Thedéen, Jens Peter Maintz, Maxim Rysanov, Janine Jansen, Amihai Grosz, Boris Brovtsyn"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "String Quintet in C Major, D. 956: I. Allegro ma non troppo",
+   "durationMs": 1178987,
+   "artist": "Janine Jansen, Boris Brovtsyn, Amihai Grosz, Torleif Thedéen & Jens Peter Maintz",
+   "apple": {
+    "block": 2,
+    "composer": "Franz Schubert",
+    "work": "String Quintet in C Major, D 956, Op. posth163, Op. 163",
+    "part": "I. Allegro ma non troppo",
+    "performers": "Janine Jansen, Jens Peter Maintz, Torleif Thedéen, Amihai Grosz, Boris Brovtsyn"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "String Quintet in C Major, D. 956: II. Adagio",
+   "durationMs": 849200,
+   "artist": "Janine Jansen, Boris Brovtsyn, Amihai Grosz, Torleif Thedéen & Jens Peter Maintz",
+   "apple": {
+    "block": 2,
+    "composer": "Franz Schubert",
+    "work": "String Quintet in C Major, D 956, Op. posth163, Op. 163",
+    "part": "II. Adagio",
+    "performers": "Torleif Thedéen, Boris Brovtsyn, Janine Jansen, Amihai Grosz, Jens Peter Maintz"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "String Quintet in C Major, D. 956: III. Scherzo (Presto) - Trio [Andante sostenuto]",
+   "durationMs": 574080,
+   "artist": "Janine Jansen, Boris Brovtsyn, Amihai Grosz, Torleif Thedéen & Jens Peter Maintz",
+   "apple": {
+    "block": 2,
+    "composer": "Franz Schubert",
+    "work": "String Quintet in C Major, D 956, Op. posth163, Op. 163",
+    "part": "III. Scherzo (Presto) - Trio [Andante sostenuto]",
+    "performers": "Jens Peter Maintz, Boris Brovtsyn, Torleif Thedéen, Janine Jansen, Amihai Grosz"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "String Quintet in C Major, D. 956: IV. Allegretto",
+   "durationMs": 588947,
+   "artist": "Janine Jansen, Boris Brovtsyn, Amihai Grosz, Torleif Thedéen & Jens Peter Maintz",
+   "apple": {
+    "block": 2,
+    "composer": "Franz Schubert",
+    "work": "String Quintet in C Major, D 956, Op. posth163, Op. 163",
+    "part": "IV. Allegretto",
+    "performers": "Janine Jansen, Boris Brovtsyn, Torleif Thedéen, Jens Peter Maintz, Amihai Grosz"
+   }
+  }
+ ]
+}

@@ -36457,8 +36457,9 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
         EXISTS(SELECT 1 FROM segment s WHERE s.track_link_id=t.id) AS attached
        FROM track_link t
        JOIN classification c ON c.target_id=t.id AND c.state='classical'
-       WHERE t.state='active'`
-  ).all().map((row) => ({ ...row, evidence: JSON.parse(row.evidence) })).filter(
+       WHERE t.state='active'
+       ${albumId == null ? "" : "AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?"}`
+  ).all(...albumId == null ? [] : [String(albumId)]).map((row) => ({ ...row, evidence: JSON.parse(row.evidence) })).filter(
     (row) => row.evidence.albumId != null && (albumId == null || String(row.evidence.albumId) === String(albumId))
   );
   const groups = /* @__PURE__ */ new Map();
@@ -36578,11 +36579,12 @@ function stripWorkPrefix(title, workTitle) {
   }
   const workWords = words(workTitle);
   const workCatalogue = catalogueNumber(workTitle).toLowerCase();
+  const workName = words(String(workTitle).split(",")[0]);
   for (const match2 of separators) {
     const head = text4.slice(0, match2.index);
     const tail = tailAt(match2);
     const headWords = words(head);
-    const namesWork = workWords && (headWords === workWords || headWords.startsWith(`${workWords} `) || workWords.startsWith(`${headWords} `)) || workCatalogue && catalogueNumber(head).toLowerCase() === workCatalogue;
+    const namesWork = workWords && (headWords === workWords || headWords.startsWith(`${workWords} `) || workWords.startsWith(`${headWords} `)) || workCatalogue && catalogueNumber(head).toLowerCase() === workCatalogue || workName.length >= 4 && words(head.split(",")[0]) === workName;
     if (!tail || !namesWork) continue;
     return clean(tail.match(NICKNAME)?.[1] ?? tail);
   }
@@ -37040,11 +37042,13 @@ function autoMatchTaggedWorks(catalogue, {
     providerMatches
   );
   mergeDuplicateAutoWorks(catalogue, { actor: actor3 });
-  repairWorkTitles(catalogue);
-  repairMovementTitles(catalogue);
-  const metadata = new Metadata(catalogue);
-  for (const { id } of catalogue.db.prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL").all())
-    deriveWorkFields(catalogue, id, metadata);
+  if (albumId == null) {
+    repairWorkTitles(catalogue);
+    repairMovementTitles(catalogue);
+    const metadata = new Metadata(catalogue);
+    for (const { id } of catalogue.db.prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL").all())
+      deriveWorkFields(catalogue, id, metadata);
+  }
   const index = catalogueIndex(catalogue);
   let created = 0;
   for (const group of groups)
@@ -39124,7 +39128,8 @@ var albumPosition = (row) => {
   const hints = evidenceOf(row).hints || {};
   return (Number(hints.discNumber) || 1) * 1e4 + (Number(hints.trackNumber) || 9999);
 };
-function pieceGroups(c, album) {
+var ACT = /,\s*(?:act|akt|atto|acte|part|teil|scene|szene)\s+[ivxlc\d]+\b.*$/i;
+function pieceGroups(c, album, following) {
   const rows = c.db.prepare(
     `SELECT t.id AS track_link_id,t.core_id,t.file_id,t.evidence FROM track_link t
        JOIN classification c ON c.target_id=t.id AND c.state='classical'
@@ -39134,7 +39139,12 @@ function pieceGroups(c, album) {
   const pieces = [];
   for (const row of rows) {
     const evidence2 = evidenceOf(row);
-    const { head, tail } = splitTitle(trackTitle2(evidence2));
+    const workTag = text2(evidence2.hints?.work, "");
+    const work = workTag.split(/\s*:\s*/)[0];
+    const split = splitTitle(trackTitle2(evidence2));
+    const fullHead = work || split.head;
+    const tail = work ? movementTitle({ title: trackTitle2(evidence2), work: workTag }, work) : split.tail;
+    const head = fullHead.replace(ACT, "");
     const heading = head || tail;
     const composer = (evidence2.hints?.composer || []).join(", ");
     const last = pieces.at(-1);
@@ -39152,7 +39162,8 @@ function pieceGroups(c, album) {
       endMs: null,
       position: albumPosition(row)
     };
-    if (head && last?.title === heading && last.composer === composer && last.next === item.position - 1)
+    const sameWork = last && (last.title === heading || catalogueNumber(heading) && catalogueNumber(heading).toLowerCase() === catalogueNumber(last.title).toLowerCase());
+    if (head && sameWork && last.composer === composer && following.get(last.next) === item.position)
       last.items.push(item);
     else
       pieces.push({ id: item.id, workId: null, title: heading, composer, items: [item], missing: [] });
@@ -39169,32 +39180,43 @@ function renderAlbumPresentation(c, albumId) {
   const metadata = new DisplayValues(c);
   const album = String(albumId);
   const allRows = realizationRows(c, null, null, album);
-  if (!allRows.length) return null;
   const grouped = /* @__PURE__ */ new Map();
   for (const row of allRows) {
     const group = grouped.get(row.realization_id) || [];
     group.push(row);
     grouped.set(row.realization_id, group);
   }
-  const works = [...grouped.entries()].map(([realizationId, rows]) => {
+  const positions = c.db.prepare(
+    `SELECT evidence FROM track_link WHERE state='active'
+       AND CAST(json_extract(evidence,'$.albumId') AS TEXT)=?`
+  ).all(album).map(albumPosition).sort((a, b) => a - b).filter((position, index, all) => position !== all[index - 1]);
+  const following = new Map(positions.map((position, index) => [position, positions[index + 1]]));
+  const works = [...grouped.entries()].flatMap(([realizationId, rows]) => {
     const workId = rows[0].work_id;
     const movements = workMovements2(c, metadata, workId);
     const present = new Set(rows.map((row) => row.movement_id).filter(Boolean));
-    return {
-      id: realizationId,
+    const runs = [];
+    for (const row of [...rows].sort((a, b) => albumPosition(a) - albumPosition(b))) {
+      const run = runs.at(-1);
+      const last = run && albumPosition(run.at(-1));
+      if (run && (last === albumPosition(row) || following.get(last) === albumPosition(row))) run.push(row);
+      else runs.push([row]);
+    }
+    return runs.map((run, index) => ({
+      id: index ? `${realizationId}:${index}` : realizationId,
       workId,
       title: entityValue(metadata, workId, "title", "Untitled work"),
       composer: credits2(c, metadata, workId).find(
         (credit) => credit.role === "composer"
       )?.name || "",
-      items: rows.map((row) => queueItem(metadata, row)),
-      missing: movements.filter((movement) => !present.has(movement.id)),
+      items: run.map((row) => queueItem(metadata, row)),
+      missing: index ? [] : movements.filter((movement) => !present.has(movement.id)),
       movementCount: movements.length,
-      first: Math.min(...rows.map(albumPosition))
-    };
+      first: albumPosition(run[0])
+    }));
   });
-  if (!works.some((group) => group.movementCount > 1)) return null;
-  const groups = [...works, ...pieceGroups(c, album)].sort((a, b) => a.first - b.first).map(({ first, ...group }) => group);
+  const groups = [...works, ...pieceGroups(c, album, following)].sort((a, b) => a.first - b.first).map(({ first, ...group }) => group);
+  if (!groups.some((group) => group.items.length > 1)) return null;
   return { version: 1, albumId: album, supportsToggle: true, groups };
 }
 function renderWork(c, workId, user) {
@@ -40970,7 +40992,7 @@ function summarize(lines2) {
 import path10 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.8" : "dev";
+var VERSION = true ? "1.0.9" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js

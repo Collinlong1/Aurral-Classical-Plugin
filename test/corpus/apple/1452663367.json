@@ -1,0 +1,92 @@
+{
+ "id": "1452663367",
+ "category": "song",
+ "title": "R. Strauss: Four Last Songs & Orchestral Works",
+ "artist": "Gundula Janowitz, Herbert von Karajan & Berlin Philharmonic Orchestra",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Tod und Verklärung, Op. 24, TrV 158",
+   "durationMs": 1628997,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 1,
+    "composer": "Richard Strauss",
+    "work": "Tod und Verklärung, Op. 24, TrV 158 · “Death and Transfiguration”",
+    "part": "Tod und Verklärung, Op. 24, TrV 158",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Metamorphosen, TrV 290",
+   "durationMs": 1658247,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 2,
+    "composer": "Richard Strauss",
+    "work": "Metamorphosen, AV 142, TrV 290",
+    "part": "Metamorphosen, TrV 290",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Vier letzte Lieder, TrV 296: I. Frühling",
+   "durationMs": 244403,
+   "artist": "Gundula Janowitz, Herbert von Karajan & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Richard Strauss",
+    "work": "Vier letzte Lieder, AV 150, Op. 150, TrV 296 · “Four Last Songs”",
+    "part": "I. Frühling",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan, Gundula Janowitz"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Vier letzte Lieder, TrV 296: II. September",
+   "durationMs": 292760,
+   "artist": "Gundula Janowitz, Herbert von Karajan & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Richard Strauss",
+    "work": "Vier letzte Lieder, AV 150, Op. 150, TrV 296 · “Four Last Songs”",
+    "part": "II. September",
+    "performers": "Gundula Janowitz, Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Vier letzte Lieder, TrV 296: III. Beim Schlafengehen",
+   "durationMs": 378555,
+   "artist": "Gundula Janowitz, Herbert von Karajan & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Richard Strauss",
+    "work": "Vier letzte Lieder, AV 150, Op. 150, TrV 296 · “Four Last Songs”",
+    "part": "III. Beim Schlafengehen",
+    "performers": "Gundula Janowitz, Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Vier letzte Lieder, TrV 296: IV. Im Abendrot",
+   "durationMs": 426874,
+   "artist": "Gundula Janowitz, Herbert von Karajan & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Richard Strauss",
+    "work": "Vier letzte Lieder, AV 150, Op. 150, TrV 296 · “Four Last Songs”",
+    "part": "IV. Im Abendrot",
+    "performers": "Gundula Janowitz, Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  }
+ ]
+}

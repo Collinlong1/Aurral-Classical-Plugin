@@ -178,6 +178,64 @@ export const recital = album("wang-vienna-recital", {
   },
 });
 
+// The same recital as Picard tags it from MusicBrainz: lower-case "no.",
+// "/" between levels, and MusicBrainz nesting each Iberia piece under its
+// book and then "Iberia, B. 47". Tracks 1 and 8 are the same work, apart.
+const scriabin3mb = "Piano Sonata no. 3 in F-sharp minor, op. 23";
+const huntMb = "Piano Sonata no. 18 in E-flat major, op. 31 no. 3 “The Hunt”";
+export const recitalPicard = album("wang-vienna-recital-picard", {
+  title: "The Vienna Recital (MusicBrainz tags)",
+  artist: "Yuja Wang",
+  kind: "recital tagged by Picard: one work twice, apart",
+  tracks: [
+    [1, 1, "Iberia, T. 105 / Book 4: no. 10, Málaga", secs(296), { composer: ["Isaac Albéniz"], recordingMbid: "wang-malaga" }],
+    [1, 2, `${scriabin3mb}: I. Drammatico`, secs(395), { composer: ["Alexander Scriabin"] }],
+    [1, 3, `${scriabin3mb}: II. Allegretto`, secs(170), { composer: ["Alexander Scriabin"] }],
+    [1, 4, `${scriabin3mb}: III. Andante`, secs(279), { composer: ["Alexander Scriabin"] }],
+    [1, 5, `${scriabin3mb}: IV. Presto con fuoco`, secs(354), { composer: ["Alexander Scriabin"] }],
+    [1, 6, "24 Jazz Preludes, op. 53: no. 11", secs(161), { composer: ["Nikolai Kapustin"] }],
+    [1, 7, "24 Jazz Preludes, op. 53: no. 10", secs(109), { composer: ["Nikolai Kapustin"] }],
+    [1, 8, "Iberia, T. 105 / Book 3: no. 9, Lavapiés", secs(346), { composer: ["Isaac Albéniz"], recordingMbid: "wang-lavapies" }],
+    [1, 9, `${huntMb}: I. Allegro`, secs(377), { composer: ["Ludwig van Beethoven"] }],
+    [1, 10, `${huntMb}: II. Scherzo. Allegretto vivace`, secs(207), { composer: ["Ludwig van Beethoven"] }],
+    [1, 11, `${huntMb}: III. Menuetto. Moderato e grazioso`, secs(182), { composer: ["Ludwig van Beethoven"] }],
+    [1, 12, `${huntMb}: IV. Presto con fuoco`, secs(226), { composer: ["Ludwig van Beethoven"] }],
+    [1, 13, "Études pour piano, premier livre: no. 6. Automne à Varsovie", secs(292), { composer: ["György Ligeti"] }],
+    [1, 14, "Études pour piano, deuxième livre: no. 13. L’Escalier du diable", secs(301), { composer: ["György Ligeti"] }],
+    [1, 15, "Études: no. 6", secs(167), { composer: ["Philip Glass"] }],
+    [1, 16, "Danzón no. 2", secs(225), { composer: ["Arturo Márquez"] }],
+    [1, 17, "3 Intermezzi, op. 117: no. 3 in C-sharp minor: Andante con moto", secs(405), { composer: ["Johannes Brahms"] }],
+    [1, 18, "Orfeo ed Euridice, Wq. 30: Melodie (arr. Sgambati)", secs(185), { composer: ["Christoph Willibald Gluck"] }],
+  ],
+  musicbrainz: {
+    recordings: { "wang-malaga": "mb-malaga", "wang-lavapies": "mb-lavapies" },
+    works: {
+      "mb-iberia": { title: "Iberia, B. 47" },
+      "mb-iberia-3": { title: "Iberia, B. 47: Book 3", parent: "mb-iberia" },
+      "mb-iberia-4": { title: "Iberia, B. 47: Book 4", parent: "mb-iberia" },
+      "mb-lavapies": { title: "Iberia, B. 47: Book 3: no. 9. Lavapiés", parent: "mb-iberia-3" },
+      "mb-malaga": { title: "Iberia, B. 47: Book 4: no. 10. Málaga", parent: "mb-iberia-4" },
+    },
+  },
+  expect: {
+    groups: [
+      ["Iberia, B. 47", ["no. 10, Málaga"]],
+      // Both sonatas join the works the store-tagged copy created: one work,
+      // one title and one set of movement names across the library.
+      [scriabin3, ["I. Drammatico", "II. Allegretto", "III. Andante", "IV. Presto con fuoco"]],
+      ["24 Jazz Preludes, op. 53", ["no. 11", "no. 10"]],
+      ["Iberia, B. 47", ["no. 9, Lavapiés"]],
+      [hunt, ["I. Allegro", "II. Scherzo. Allegretto vivace", "III. Minuet. Moderato e grazioso - Trio", "IV. Presto con fuoco"]],
+      ["Études pour piano, premier livre", ["no. 6. Automne à Varsovie"]],
+      ["Études pour piano, deuxième livre", ["no. 13. L’Escalier du diable"]],
+      ["Études", ["no. 6"]],
+      ["Danzón no. 2", ["Danzón no. 2"]],
+      ["3 Intermezzi, op. 117", ["no. 3 in C-sharp minor: Andante con moto"]],
+      ["Orfeo ed Euridice, Wq. 30", ["Melodie (arr. Sgambati)"]],
+    ],
+  },
+});
+
 // Not on MusicBrainz: a small label's own tags, " - " before the movement.
 export const cello = album("bach-cello-suites-indie", {
   title: "Bach: Cello Suites Nos. 1 & 2",
@@ -286,4 +344,4 @@ export const pop = album("indie-pop", {
   expect: null,
 });
 
-export const albums = [levit, lugansky, recital, cello, symphonies, seventh, songCycle, compilation, pop];
+export const albums = [levit, lugansky, recital, recitalPicard, cello, symphonies, seventh, songCycle, compilation, pop];

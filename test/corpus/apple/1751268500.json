@@ -1,0 +1,92 @@
+{
+ "id": "1751268500",
+ "category": "concerto",
+ "title": "Grieg and Clara Schumann Piano Concertos",
+ "artist": "Alexandra Dariescu, Philharmonia Orchestra & Tianyi Lu",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Piano Concerto in A Minor, Op. 7: I. Allegro maestoso",
+   "durationMs": 378800,
+   "artist": "Alexandra Dariescu, Tianyi Lu & Philharmonia Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Clara Schumann",
+    "work": "Piano Concerto in A Minor, Op. 7",
+    "part": "I. Allegro maestoso",
+    "performers": "Tianyi Lu, Alexandra Dariescu, Philharmonia Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Piano Concerto in A Minor, Op. 7: II. Romanze. Andante non troppo con grazia",
+   "durationMs": 302107,
+   "artist": "Alexandra Dariescu, Tianyi Lu & Philharmonia Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Clara Schumann",
+    "work": "Piano Concerto in A Minor, Op. 7",
+    "part": "II. Romanze. Andante non troppo con grazia",
+    "performers": "Alexandra Dariescu, Tianyi Lu, Philharmonia Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Piano Concerto in A Minor, Op. 7: III. Allegro non troppo",
+   "durationMs": 660640,
+   "artist": "Alexandra Dariescu, Tianyi Lu & Philharmonia Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Clara Schumann",
+    "work": "Piano Concerto in A Minor, Op. 7",
+    "part": "III. Allegro non troppo",
+    "performers": "Philharmonia Orchestra, Alexandra Dariescu, Tianyi Lu"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Piano Concerto in A Minor, Op. 16: I. Allegro molto moderato",
+   "durationMs": 769213,
+   "artist": "Alexandra Dariescu, Tianyi Lu & Philharmonia Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Edvard Grieg",
+    "work": "Piano Concerto in A Minor, Op. 16",
+    "part": "I. Allegro molto moderato",
+    "performers": "Tianyi Lu, Alexandra Dariescu, Philharmonia Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Piano Concerto in A Minor, Op. 16: II. Adagio",
+   "durationMs": 374453,
+   "artist": "Alexandra Dariescu, Tianyi Lu & Philharmonia Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Edvard Grieg",
+    "work": "Piano Concerto in A Minor, Op. 16",
+    "part": "II. Adagio",
+    "performers": "Philharmonia Orchestra, Tianyi Lu, Alexandra Dariescu"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Piano Concerto in A Minor, Op. 16: III. Allegro moderato molto e marcato",
+   "durationMs": 620427,
+   "artist": "Alexandra Dariescu, Tianyi Lu & Philharmonia Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Edvard Grieg",
+    "work": "Piano Concerto in A Minor, Op. 16",
+    "part": "III. Allegro moderato molto e marcato",
+    "performers": "Tianyi Lu, Philharmonia Orchestra, Alexandra Dariescu"
+   }
+  }
+ ]
+}

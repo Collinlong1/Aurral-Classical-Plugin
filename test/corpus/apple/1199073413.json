@@ -1,0 +1,92 @@
+{
+ "id": "1199073413",
+ "category": "piano recital",
+ "title": "Rachmaninoff: Piano Concertos Nos. 2 & 3",
+ "artist": "Khatia Buniatishvili, Czech Philharmonic & Paavo Järvi",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Piano Concerto No. 2 in C Minor, Op. 18: I. Moderato",
+   "durationMs": 599653,
+   "artist": "Khatia Buniatishvili, Paavo Järvi & Czech Philharmonic",
+   "apple": {
+    "block": 1,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Piano Concerto No. 2 in C Minor, Op. 18",
+    "part": "I. Moderato",
+    "performers": "Czech Philharmonic, Khatia Buniatishvili, Paavo Järvi"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Piano Concerto No. 2 in C Minor, Op. 18: II. Adagio sostenuto",
+   "durationMs": 655080,
+   "artist": "Khatia Buniatishvili, Paavo Järvi & Czech Philharmonic",
+   "apple": {
+    "block": 1,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Piano Concerto No. 2 in C Minor, Op. 18",
+    "part": "II. Adagio sostenuto",
+    "performers": "Czech Philharmonic, Khatia Buniatishvili, Paavo Järvi"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Piano Concerto No. 2 in C Minor, Op. 18: III. Allegro scherzando",
+   "durationMs": 643693,
+   "artist": "Khatia Buniatishvili, Paavo Järvi & Czech Philharmonic",
+   "apple": {
+    "block": 1,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Piano Concerto No. 2 in C Minor, Op. 18",
+    "part": "III. Allegro scherzando",
+    "performers": "Paavo Järvi, Czech Philharmonic, Khatia Buniatishvili"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Piano Concerto No. 3 in D Minor, Op. 30: I. Allegro ma non tanto",
+   "durationMs": 968160,
+   "artist": "Khatia Buniatishvili, Paavo Järvi & Czech Philharmonic",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Piano Concerto No. 3 in D Minor, Op. 30",
+    "part": "I. Allegro ma non tanto",
+    "performers": "Khatia Buniatishvili, Czech Philharmonic, Paavo Järvi"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Piano Concerto No. 3 in D Minor, Op. 30: II. Intermezzo. Adagio",
+   "durationMs": 576640,
+   "artist": "Khatia Buniatishvili, Paavo Järvi & Czech Philharmonic",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Piano Concerto No. 3 in D Minor, Op. 30",
+    "part": "II. Intermezzo. Adagio - attaca subito",
+    "performers": "Czech Philharmonic, Khatia Buniatishvili, Paavo Järvi"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Piano Concerto No. 3 in D Minor, Op. 30: III. Finale. Alla breve",
+   "durationMs": 786973,
+   "artist": "Khatia Buniatishvili, Paavo Järvi & Czech Philharmonic",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Piano Concerto No. 3 in D Minor, Op. 30",
+    "part": "III. Finale. Alla breve",
+    "performers": "Paavo Järvi, Khatia Buniatishvili, Czech Philharmonic"
+   }
+  }
+ ]
+}

@@ -1,0 +1,64 @@
+{
+ "id": "1452579811",
+ "category": "symphony",
+ "title": "Tchaikovsky: Symphony No. 6 \"Pathetique\"",
+ "artist": "New York Philharmonic & Leonard Bernstein",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Symphony No. 6 in B Minor, Op. 74, TH. 30: I. Adagio - Allegro non troppo - Andante - Moderato mosso - Andante - Moderato assai - Allegro vivo - Andante come prima - Andante mosso",
+   "durationMs": 1356440,
+   "artist": "New York Philharmonic & Leonard Bernstein",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "Symphony No. 6 in B Minor, Op. 74, TH 30 · “Pathétique”",
+    "part": "I. Adagio - Allegro non troppo - Andante - Moderato mosso - Andante - Moderato assai - Allegro vivo - Andante come prima - Andante mosso",
+    "performers": "New York Philharmonic, Leonard Bernstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Symphony No. 6 in B Minor, Op. 74, TH. 30: II. Allegro con grazia",
+   "durationMs": 519000,
+   "artist": "New York Philharmonic & Leonard Bernstein",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "Symphony No. 6 in B Minor, Op. 74, TH 30 · “Pathétique”",
+    "part": "II. Allegro con grazia",
+    "performers": "New York Philharmonic, Leonard Bernstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Symphony No. 6 in B Minor, Op. 74, TH. 30: III. Allegro molto vivace",
+   "durationMs": 599000,
+   "artist": "New York Philharmonic & Leonard Bernstein",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "Symphony No. 6 in B Minor, Op. 74, TH 30 · “Pathétique”",
+    "part": "III. Allegro molto vivace",
+    "performers": "New York Philharmonic, Leonard Bernstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Symphony No. 6 in B Minor, Op. 74, TH. 30: IV. Finale: Adagio lamentoso - Andante",
+   "durationMs": 1038493,
+   "artist": "New York Philharmonic & Leonard Bernstein",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "Symphony No. 6 in B Minor, Op. 74, TH 30 · “Pathétique”",
+    "part": "IV. Finale: Adagio lamentoso - Andante",
+    "performers": "Leonard Bernstein, New York Philharmonic"
+   }
+  }
+ ]
+}

@@ -1,0 +1,358 @@
+{
+ "id": "1452373339",
+ "category": "solo instrument",
+ "title": "Debussy: Préludes, Books 1 & 2",
+ "artist": "Pierre-Laurent Aimard",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Préludes, Book 1: I. Danseuses de Delphes",
+   "durationMs": 184373,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 1,
+    "composer": "Claude Debussy",
+    "work": "Préludes, Book I, CD 125, L. 117",
+    "part": "I. Danseuses de Delphes",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Préludes, Book 1: II. Voiles",
+   "durationMs": 220293,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 1,
+    "composer": "Claude Debussy",
+    "work": "Préludes, Book I, CD 125, L. 117",
+    "part": "II. Voiles",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Préludes, Book 1: III. Le vent dans la plaine",
+   "durationMs": 133067,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 1,
+    "composer": "Claude Debussy",
+    "work": "Préludes, Book I, CD 125, L. 117",
+    "part": "III. Le vent dans la plaine",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Préludes, Book 1: IV. Les sons et les parfums tournent dans l'air du soir",
+   "durationMs": 217040,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 1,
+    "composer": "Claude Debussy",
+    "work": "Préludes, Book I, CD 125, L. 117",
+    "part": "IV. Les sons et les parfums tournent dans l'air du soir",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Préludes, Book 1: V. Les collines d'Anacapri",
+   "durationMs": 183253,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 1,
+    "composer": "Claude Debussy",
+    "work": "Préludes, Book I, CD 125, L. 117",
+    "part": "V. Les collines d'Anacapri",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Préludes, Book 1: VI. Des pas sur la neige",
+   "durationMs": 258560,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 1,
+    "composer": "Claude Debussy",
+    "work": "Préludes, Book I, CD 125, L. 117",
+    "part": "VI. Des pas sur la neige",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Préludes, Book 1: VII. Ce qu'a vu le vent d'ouest",
+   "durationMs": 227080,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 1,
+    "composer": "Claude Debussy",
+    "work": "Préludes, Book I, CD 125, L. 117",
+    "part": "VII. Ce qu'a vu le vent d'ouest",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Préludes, Book 1: VIII. La fille aux cheveux de lin",
+   "durationMs": 141053,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 1,
+    "composer": "Claude Debussy",
+    "work": "Préludes, Book I, CD 125, L. 117",
+    "part": "VIII. La fille aux cheveux de lin",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Préludes, Book 1: IX. La sérénade interrompue",
+   "durationMs": 168360,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 1,
+    "composer": "Claude Debussy",
+    "work": "Préludes, Book I, CD 125, L. 117",
+    "part": "IX. La sérénade interrompue",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Préludes, Book 1: X. La cathédrale engloutie",
+   "durationMs": 339107,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 1,
+    "composer": "Claude Debussy",
+    "work": "Préludes, Book I, CD 125, L. 117",
+    "part": "X. La cathédrale engloutie",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Préludes, Book 1: XI. La danse de Puck",
+   "durationMs": 175227,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 1,
+    "composer": "Claude Debussy",
+    "work": "Préludes, Book I, CD 125, L. 117",
+    "part": "XI. La danse de Puck",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Préludes, Book 1: XII. Minstrels",
+   "durationMs": 147840,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 1,
+    "composer": "Claude Debussy",
+    "work": "Préludes, Book I, CD 125, L. 117",
+    "part": "XII. Minstrels",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Préludes, Book 2: I. Brouillards",
+   "durationMs": 148800,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 2,
+    "composer": "Claude Debussy",
+    "work": "Préludes, Book II, CD 131, L. 123",
+    "part": "I. Brouillards",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Préludes, Book 2: II. Feuilles mortes",
+   "durationMs": 211133,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 2,
+    "composer": "Claude Debussy",
+    "work": "Préludes, Book II, CD 131, L. 123",
+    "part": "II. Feuilles mortes",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Préludes, Book 2: III. La puerta del vino",
+   "durationMs": 229867,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 2,
+    "composer": "Claude Debussy",
+    "work": "Préludes, Book II, CD 131, L. 123",
+    "part": "III. La puerta del vino",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Préludes, Book 2: IV. \"Les fées sont d'exquises danseuses\"",
+   "durationMs": 200360,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 2,
+    "composer": "Claude Debussy",
+    "work": "Préludes, Book II, CD 131, L. 123",
+    "part": "IV. \"Les fées sont d'exquises danseuses\"",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Préludes, Book 2: V. Bruyères",
+   "durationMs": 172667,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 2,
+    "composer": "Claude Debussy",
+    "work": "Préludes, Book II, CD 131, L. 123",
+    "part": "V. Bruyères",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Préludes, Book 2: VI. \"General Lavine\" Eccentric",
+   "durationMs": 152773,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 2,
+    "composer": "Claude Debussy",
+    "work": "Préludes, Book II, CD 131, L. 123",
+    "part": "VI. \"General Lavine\" Eccentric",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "Préludes, Book 2: VII. La terrasse des audiences du clair de lune",
+   "durationMs": 284400,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 2,
+    "composer": "Claude Debussy",
+    "work": "Préludes, Book II, CD 131, L. 123",
+    "part": "VII. La terrasse des audiences du clair de lune",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "Préludes, Book 2: VIII. Ondine",
+   "durationMs": 209027,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 2,
+    "composer": "Claude Debussy",
+    "work": "Préludes, Book II, CD 131, L. 123",
+    "part": "VIII. Ondine",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "Préludes, Book 2: IX. Hommage à S. Pickwick, Esq., P. P. M. P. C.",
+   "durationMs": 158720,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 2,
+    "composer": "Claude Debussy",
+    "work": "Préludes, Book II, CD 131, L. 123",
+    "part": "IX. Hommage à S. Pickwick, Esq., P. P. M. P. C.",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "Préludes, Book 2: X. Canope",
+   "durationMs": 151960,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 2,
+    "composer": "Claude Debussy",
+    "work": "Préludes, Book II, CD 131, L. 123",
+    "part": "X. Canope",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 23,
+   "title": "Préludes, Book 2: XI. Les tierces alternées",
+   "durationMs": 195267,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 2,
+    "composer": "Claude Debussy",
+    "work": "Préludes, Book II, CD 131, L. 123",
+    "part": "XI. Les tierces alternées",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 24,
+   "title": "Préludes, Book 2: XII. Feux d'artifice",
+   "durationMs": 284080,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 2,
+    "composer": "Claude Debussy",
+    "work": "Préludes, Book II, CD 131, L. 123",
+    "part": "XII. Feux d'artifice",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 25,
+   "title": "Suite bergamasque, L. 75: III. Clair de lune",
+   "durationMs": 313800,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 3,
+    "composer": "Claude Debussy",
+    "work": "Suite bergamasque, CD 82, L. 75",
+    "part": "III. Clair de lune",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  }
+ ]
+}

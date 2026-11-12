@@ -1,0 +1,260 @@
+{
+ "id": "6805467344",
+ "category": "piano recital",
+ "title": "Continuum II",
+ "artist": "Víkingur Ólafsson",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Keyboard Concerto No. 1 in D Major, BWV 972 (After Vivaldi, RV 230): II. Larghetto",
+   "durationMs": 155952,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Concerto for Solo Keyboard No. 1 in D Major, BWV 972",
+    "part": "II. Larghetto",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Prelude in D Minor, BWV 926",
+   "durationMs": 48286,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Prelude No. 3 in D Minor, BWV 926",
+    "part": "Prelude in D Minor, BWV 926",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Prelude in D Major, BWV 925",
+   "durationMs": 57184,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Prelude No. 2 in D Major, BWV 925",
+    "part": "Prelude in D Major, BWV 925",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Air on the G String (Arr. Ólafsson for Piano from Orchestral Suite No. 3, BWV 1068)",
+   "durationMs": 219084,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "Orchestral Suite No. 3 in D Major, BWV 1068",
+    "part": "Air on the G String (Arr. Ólafsson for Piano from Orchestral Suite No. 3, BWV 1068)",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Drum fahrt nur immer hin, ihr Eitelkeiten, BWV 123/VI (Performed on Piano)",
+   "durationMs": 81716,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Liebster Immanuel, Herzog der Frommen, BWV 123",
+    "part": "Drum fahrt nur immer hin, ihr Eitelkeiten, BWV 123/VI (Performed on Piano)",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Wie schön leuchtet der Morgenstern, BWV 436 (Performed on Piano)",
+   "durationMs": 76996,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 6,
+    "composer": "Johann Sebastian Bach",
+    "work": "Wie schön leuchtet der Morgenstern, BWV 1 · “How Brightly Shines the Morning Star”",
+    "part": "Wie schön leuchtet der Morgenstern, BWV 436 (Performed on Piano)",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Erbarm dich mein, o Herre Gott, BWV 721 (Performed on Piano)",
+   "durationMs": 337828,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 7,
+    "composer": "Johann Sebastian Bach",
+    "work": "Erbarm dich mein, o Herre Gott, BWV 721",
+    "part": "Erbarm dich mein, o Herre Gott, BWV 721 (Performed on Piano)",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Prelude in C Major, BWV 924a",
+   "durationMs": 86590,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 8,
+    "composer": "Johann Sebastian Bach",
+    "work": "Prelude No. 1 in C Major, BWV 924a · “Variant of BWV924”",
+    "part": "Prelude in C Major, BWV 924a",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Violin Sonata No. 5 in F Minor, BWV 1018: III. Adagio (Arr. Ólafsson for Piano & Strings)",
+   "durationMs": 289663,
+   "artist": "Víkingur Ólafsson, Siggi String Quartet & Xun Yang",
+   "apple": {
+    "block": 9,
+    "composer": "Johann Sebastian Bach",
+    "work": "Violin Sonata No. 5 in F Minor, BWV 1018",
+    "part": "III. Adagio (Arr. Ólafsson for Piano & Strings)",
+    "performers": "Víkingur Ólafsson, Siggi String Quartet, Xun Yang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Prelude in F Major, BWV 928",
+   "durationMs": 61191,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 10,
+    "composer": "Johann Sebastian Bach",
+    "work": "Prelude No. 5 in F Major, BWV 928",
+    "part": "Prelude in F Major, BWV 928",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Prelude in G Minor, BWV 930",
+   "durationMs": 71699,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 11,
+    "composer": "Johann Sebastian Bach",
+    "work": "Prelude No. 7 in G Minor, BWV 930",
+    "part": "Prelude in G Minor, BWV 930",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Prelude in F Major, BWV 927",
+   "durationMs": 38445,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 12,
+    "composer": "Johann Sebastian Bach",
+    "work": "Prelude No. 4 in F Major, BWV 927",
+    "part": "Prelude in F Major, BWV 927",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Keyboard Concerto in F Minor, BWV 1056: II. Largo",
+   "durationMs": 211797,
+   "artist": "Víkingur Ólafsson, Siggi String Quartet & Xun Yang",
+   "apple": {
+    "block": 13,
+    "composer": "Johann Sebastian Bach",
+    "work": "Keyboard Concerto No. 5 in F Minor, BWV 1056",
+    "part": "II. Largo",
+    "performers": "Siggi String Quartet, Víkingur Ólafsson, Xun Yang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Welt, ade! ich bin dein müde, BWV 27/VI (Performed on Piano)",
+   "durationMs": 87949,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 14,
+    "composer": "Johann Sebastian Bach",
+    "work": "Wer weiss wie nahe mir mein Ende, BWV 27 · “Who Knows How Near my Ending?”",
+    "part": "Welt, ade! ich bin dein müde, BWV 27/VI (Performed on Piano)",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Nun ruhen alle Wälder, BWV 392 (Performed on Piano)",
+   "durationMs": 66056,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 15,
+    "composer": "Johann Sebastian Bach",
+    "work": "Nun ruhen alle Wälder, BWV 392",
+    "part": "Nun ruhen alle Wälder, BWV 392 (Performed on Piano)",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Ob bei uns der Sünden viel, BWV 38/VI (Performed on Piano)",
+   "durationMs": 72338,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 16,
+    "composer": "Johann Sebastian Bach",
+    "work": "Aus tiefer Not schrei ich zu dir, BWV 38 · “From Deep Affliction I Cry Out To You”",
+    "part": "Ob bei uns der Sünden viel, BWV 38/VI (Performed on Piano)",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "O Ewigkeit, du Donnerwort, Cantata BWV 60: Es ist genug, BWV 60/V (Performed on Piano)",
+   "durationMs": 87820,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 17,
+    "composer": "Johann Sebastian Bach",
+    "work": "O Ewigkeit, du Donnerwort, BWV 60 · “O Eternity, You Thunderous Word”",
+    "part": "Es ist genug, BWV 60/V (Performed on Piano)",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Air on the G String (Arr. Ólafsson for Piano from Orchestral Suite No. 3, BWV 1068) [Upright Version]",
+   "durationMs": 212209,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 18,
+    "composer": "Johann Sebastian Bach",
+    "work": "Orchestral Suite No. 3 in D Major, BWV 1068",
+    "part": "Air on the G String (Arr. Ólafsson for Piano from Orchestral Suite No. 3, BWV 1068) [Upright Version]",
+    "performers": "Víkingur Ólafsson"
+   }
+  }
+ ]
+}

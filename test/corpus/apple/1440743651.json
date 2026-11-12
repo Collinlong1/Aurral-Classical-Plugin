@@ -1,0 +1,134 @@
+{
+ "id": "1440743651",
+ "category": "beethoven sonatas",
+ "title": "Beethoven: Piano Sonatas (Moonlight, Pathétique & Appassionata)",
+ "artist": "Daniel Barenboim",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Piano Sonata No. 14 in C-Sharp Minor, Op. 27 No. 2 \"Moonlight\": I. Adagio sostenuto",
+   "durationMs": 400200,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 1,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 14 in C-Sharp Minor, Op. 27/2 · “Moonlight Sonata”",
+    "part": "I. Adagio sostenuto",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Piano Sonata No. 14 in C-Sharp Minor, Op. 27 No. 2 \"Moonlight\": II. Allegretto",
+   "durationMs": 132679,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 1,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 14 in C-Sharp Minor, Op. 27/2 · “Moonlight Sonata”",
+    "part": "II. Allegretto",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Piano Sonata No. 14 in C-Sharp Minor, Op. 27 No. 2 \"Moonlight\": III. Presto",
+   "durationMs": 462533,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 1,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 14 in C-Sharp Minor, Op. 27/2 · “Moonlight Sonata”",
+    "part": "III. Presto",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Piano Sonata No. 8 in C Minor, Op. 13 \"Pathétique\": I. Grave - Allegro di molto e con brio",
+   "durationMs": 575000,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 2,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 8 in C Minor, Op. 13 · “Pathétique”",
+    "part": "I. Grave - Allegro di molto e con brio",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Piano Sonata No. 8 in C Minor, Op. 13 \"Pathétique\": II. Adagio cantabile",
+   "durationMs": 323107,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 2,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 8 in C Minor, Op. 13 · “Pathétique”",
+    "part": "II. Adagio cantabile",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Piano Sonata No. 8 in C Minor, Op. 13 \"Pathétique\": III. Rondo (Allegro)",
+   "durationMs": 290893,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 2,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 8 in C Minor, Op. 13 · “Pathétique”",
+    "part": "III. Rondo (Allegro)",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Piano Sonata No. 23 in F Minor, Op. 57 \"Appassionata\": I. Allegro assai",
+   "durationMs": 640907,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 3,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 23 in F Minor, Op. 57 · “Appassionata”",
+    "part": "I. Allegro assai",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Piano Sonata No. 23 in F Minor, Op. 57 \"Appassionata\": II. Andante con moto",
+   "durationMs": 459105,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 3,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 23 in F Minor, Op. 57 · “Appassionata”",
+    "part": "II. Andante con moto",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Piano Sonata No. 23 in F Minor, Op. 57 \"Appassionata\": III. Allegro ma non troppo",
+   "durationMs": 493960,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 3,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 23 in F Minor, Op. 57 · “Appassionata”",
+    "part": "III. Allegro ma non troppo",
+    "performers": "Daniel Barenboim"
+   }
+  }
+ ]
+}

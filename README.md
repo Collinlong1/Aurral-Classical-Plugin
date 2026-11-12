@@ -210,6 +210,19 @@ npm run corpus -- --audio ../corpus-music       # write silent FLAC files with t
 npm run corpus -- --serve-musicbrainz 5099      # answer MusicBrainz lookups from the corpus
 ```
 
+`test/corpus/apple/` holds about 200 real releases: the store's track titles,
+numbers and lengths, with Apple Music Classical's grouping (composer, work and
+part for every track) as the answer key. Each runs in three tag styles (store
+download, iTunes work tags, a careless rip), and `apple-baseline.json` records
+which ones group like Apple today; `npm test` fails if any of those stop.
+
+```bash
+npm run corpus -- --apple                       # score every release; list the ones that differ
+npm run corpus -- --apple <apple album id>      # show one release in each tag style
+npm run corpus -- --apple --update-baseline     # save an improvement
+NODE_USE_ENV_PROXY=1 node scripts/corpus-apple.mjs fetch   # add albums listed in apple-albums.json
+```
+
 For a real Aurral, put the generated folder in Aurral's library folder, set
 the plugin's MusicBrainz mirror to `http://localhost:5099`, then run the model
 scan and "Auto-match classical works". Add an album here for every new case.

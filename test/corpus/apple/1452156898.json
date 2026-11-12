@@ -1,0 +1,260 @@
+{
+ "id": "1452156898",
+ "category": "symphony",
+ "title": "Brahms: The Symphonies",
+ "artist": "Chicago Symphony Orchestra & Sir Georg Solti",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Symphony No. 1 in C Minor, Op. 68: I. Un poco Sostenuto: Allegro: meno Allegro",
+   "durationMs": 1006707,
+   "artist": "Chicago Symphony Orchestra & Sir Georg Solti",
+   "apple": {
+    "block": 1,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 1 in C Minor, Op. 68",
+    "part": "I. Un poco Sostenuto: Allegro: meno Allegro",
+    "performers": "Chicago Symphony Orchestra, Sir Georg Solti"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Symphony No. 1 in C Minor, Op. 68: II. Andante Sostenuto",
+   "durationMs": 588627,
+   "artist": "Chicago Symphony Orchestra & Sir Georg Solti",
+   "apple": {
+    "block": 1,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 1 in C Minor, Op. 68",
+    "part": "II. Andante Sostenuto",
+    "performers": "Sir Georg Solti, Chicago Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Symphony No. 1 in C Minor, Op. 68: III. un poco Allegretto e Grazioso",
+   "durationMs": 280027,
+   "artist": "Chicago Symphony Orchestra & Sir Georg Solti",
+   "apple": {
+    "block": 1,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 1 in C Minor, Op. 68",
+    "part": "III. un poco Allegretto e Grazioso",
+    "performers": "Chicago Symphony Orchestra, Sir Georg Solti"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Symphony No. 1 in C Minor, Op. 68: IV. Adagio: Piu Andante: Allegro non Troppo, Ma con brio: Piu Allegro",
+   "durationMs": 1050733,
+   "artist": "Chicago Symphony Orchestra & Sir Georg Solti",
+   "apple": {
+    "block": 1,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 1 in C Minor, Op. 68",
+    "part": "IV. Adagio: Piu Andante: Allegro non Troppo, Ma con brio: Piu Allegro",
+    "performers": "Chicago Symphony Orchestra, Sir Georg Solti"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 1,
+   "title": "Symphony No. 2 in D, Op. 73: I. Allegro non Troppo",
+   "durationMs": 1242840,
+   "artist": "Chicago Symphony Orchestra & Sir Georg Solti",
+   "apple": {
+    "block": 2,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 2 in D Major, Op. 73",
+    "part": "I. Allegro non Troppo",
+    "performers": "Chicago Symphony Orchestra, Sir Georg Solti"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 2,
+   "title": "Symphony No. 2 in D, Op. 73: II. Adagio non troppo: l'istesso Tempo, Ma Grazioso",
+   "durationMs": 629200,
+   "artist": "Chicago Symphony Orchestra & Sir Georg Solti",
+   "apple": {
+    "block": 2,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 2 in D Major, Op. 73",
+    "part": "II. Adagio non troppo: l'istesso Tempo, Ma Grazioso",
+    "performers": "Chicago Symphony Orchestra, Sir Georg Solti"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 3,
+   "title": "Symphony No. 2 in D, Op. 73: III. Allegretto Grazioso (Quasi Andantino): Presto Ma non Assai",
+   "durationMs": 327800,
+   "artist": "Chicago Symphony Orchestra & Sir Georg Solti",
+   "apple": {
+    "block": 2,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 2 in D Major, Op. 73",
+    "part": "III. Allegretto Grazioso (Quasi Andantino): Presto Ma non Assai",
+    "performers": "Sir Georg Solti, Chicago Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 4,
+   "title": "Symphony No. 2 in D, Op. 73: IV. Allegro con Spirito",
+   "durationMs": 521000,
+   "artist": "Chicago Symphony Orchestra & Sir Georg Solti",
+   "apple": {
+    "block": 2,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 2 in D Major, Op. 73",
+    "part": "IV. Allegro con Spirito",
+    "performers": "Sir Georg Solti, Chicago Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 5,
+   "title": "Tragic Overture, Op. 81",
+   "durationMs": 806693,
+   "artist": "Chicago Symphony Orchestra & Sir Georg Solti",
+   "apple": {
+    "block": 3,
+    "composer": "Johannes Brahms",
+    "work": "Tragic Overture in D Minor, Op. 81",
+    "part": "Tragic Overture, Op. 81",
+    "performers": "Chicago Symphony Orchestra, Sir Georg Solti"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 1,
+   "title": "Symphony No. 3 in F, Op. 90: I. Allegro con brio: un poco Sostenuto: Tempo I",
+   "durationMs": 832173,
+   "artist": "Chicago Symphony Orchestra & Sir Georg Solti",
+   "apple": {
+    "block": 4,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 3 in F Major, Op. 90",
+    "part": "I. Allegro con brio: un poco Sostenuto: Tempo I",
+    "performers": "Chicago Symphony Orchestra, Sir Georg Solti"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 2,
+   "title": "Symphony No. 3 in F, Op. 90: II. Andante",
+   "durationMs": 581973,
+   "artist": "Chicago Symphony Orchestra & Sir Georg Solti",
+   "apple": {
+    "block": 4,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 3 in F Major, Op. 90",
+    "part": "II. Andante",
+    "performers": "Sir Georg Solti, Chicago Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 3,
+   "title": "Symphony No. 3 in F, Op. 90: III. Poco Allegretto",
+   "durationMs": 385973,
+   "artist": "Chicago Symphony Orchestra & Sir Georg Solti",
+   "apple": {
+    "block": 4,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 3 in F Major, Op. 90",
+    "part": "III. Poco Allegretto",
+    "performers": "Chicago Symphony Orchestra, Sir Georg Solti"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 4,
+   "title": "Symphony No. 3 in F, Op. 90: IV. Allegro",
+   "durationMs": 530867,
+   "artist": "Chicago Symphony Orchestra & Sir Georg Solti",
+   "apple": {
+    "block": 4,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 3 in F Major, Op. 90",
+    "part": "IV. Allegro",
+    "performers": "Chicago Symphony Orchestra, Sir Georg Solti"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 5,
+   "title": "Academic Festival Overture, Op. 80",
+   "durationMs": 634867,
+   "artist": "Chicago Symphony Orchestra & Sir Georg Solti",
+   "apple": {
+    "block": 5,
+    "composer": "Johannes Brahms",
+    "work": "Academic Festival Overture in C Minor, Op. 80",
+    "part": "Academic Festival Overture, Op. 80",
+    "performers": "Sir Georg Solti, Chicago Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 1,
+   "title": "Symphony No. 4 in E Minor, Op. 98: I. Allegro non Troppo",
+   "durationMs": 760560,
+   "artist": "Chicago Symphony Orchestra & Sir Georg Solti",
+   "apple": {
+    "block": 6,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 4 in E Minor, Op. 98",
+    "part": "I. Allegro non Troppo",
+    "performers": "Sir Georg Solti, Chicago Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 2,
+   "title": "Symphony No. 4 in E Minor, Op. 98: II. Andante Moderato",
+   "durationMs": 772627,
+   "artist": "Chicago Symphony Orchestra & Sir Georg Solti",
+   "apple": {
+    "block": 6,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 4 in E Minor, Op. 98",
+    "part": "II. Andante Moderato",
+    "performers": "Sir Georg Solti, Chicago Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 3,
+   "title": "Symphony No. 4 in E Minor, Op. 98: III. Allegro Giocoso: poco meno Presto: Tempo I",
+   "durationMs": 372800,
+   "artist": "Chicago Symphony Orchestra & Sir Georg Solti",
+   "apple": {
+    "block": 6,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 4 in E Minor, Op. 98",
+    "part": "III. Allegro Giocoso: poco meno Presto: Tempo I",
+    "performers": "Sir Georg Solti, Chicago Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 4,
+   "title": "Symphony No. 4 in E Minor, Op. 98: IV. Allegro Energico e Passionato: più Allegro",
+   "durationMs": 618133,
+   "artist": "Chicago Symphony Orchestra & Sir Georg Solti",
+   "apple": {
+    "block": 6,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 4 in E Minor, Op. 98",
+    "part": "IV. Allegro Energico e Passionato: più Allegro",
+    "performers": "Sir Georg Solti, Chicago Symphony Orchestra"
+   }
+  }
+ ]
+}

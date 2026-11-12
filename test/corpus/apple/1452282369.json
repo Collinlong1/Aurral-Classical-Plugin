@@ -1,0 +1,78 @@
+{
+ "id": "1452282369",
+ "category": "symphony",
+ "title": "Dvorák: Symphony No. 9, Othello Overture",
+ "artist": "Berlin Philharmonic Orchestra & Claudio Abbado",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Othello Overture, Op. 93",
+   "durationMs": 819427,
+   "artist": "Claudio Abbado & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Antonín Dvořák",
+    "work": "Othello, B 174, Op. 93",
+    "part": "Othello Overture, Op. 93",
+    "performers": "Berlin Philharmonic Orchestra, Claudio Abbado"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Symphony No. 9 in E Minor, Op. 95 - \"From the New World\": I. Adagio - Allegro molto",
+   "durationMs": 730964,
+   "artist": "Claudio Abbado & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Antonín Dvořák",
+    "work": "Symphony No. 9 in E Minor, B 178, Op. 95 · “From the New World”",
+    "part": "I. Adagio - Allegro molto",
+    "performers": "Berlin Philharmonic Orchestra, Claudio Abbado"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Symphony No. 9 in E Minor, Op. 95 - \"From the New World\": II. Largo",
+   "durationMs": 800000,
+   "artist": "Berlin Philharmonic Orchestra & Claudio Abbado",
+   "apple": {
+    "block": 2,
+    "composer": "Antonín Dvořák",
+    "work": "Symphony No. 9 in E Minor, B 178, Op. 95 · “From the New World”",
+    "part": "II. Largo",
+    "performers": "Berlin Philharmonic Orchestra, Claudio Abbado"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Symphony No. 9 in E Minor, Op. 95 - \"From the New World\": III. Scherzo (Molto vivace)",
+   "durationMs": 459867,
+   "artist": "Claudio Abbado & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Antonín Dvořák",
+    "work": "Symphony No. 9 in E Minor, B 178, Op. 95 · “From the New World”",
+    "part": "III. Scherzo (Molto vivace)",
+    "performers": "Claudio Abbado, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Symphony No. 9 in E Minor, Op. 95 - \"From the New World\": IV. Allegro con fuoco",
+   "durationMs": 688133,
+   "artist": "Claudio Abbado & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Antonín Dvořák",
+    "work": "Symphony No. 9 in E Minor, B 178, Op. 95 · “From the New World”",
+    "part": "IV. Allegro con fuoco",
+    "performers": "Berlin Philharmonic Orchestra, Claudio Abbado"
+   }
+  }
+ ]
+}

@@ -1,0 +1,176 @@
+{
+ "id": "1543281438",
+ "category": "baroque early",
+ "title": "Hildegard Von Bingen - Vespers from Her Abbey",
+ "artist": "Benedictine Nuns of the Abbey of St. Hildegard Eibingen",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Deus in Auditorium",
+   "durationMs": 62600,
+   "artist": "Benedictine Nuns of the Abbey of St. Hildegard Eibingen",
+   "apple": {
+    "block": 1,
+    "composer": "H. von Bingen",
+    "work": "H. von Bingen",
+    "part": "Deus in Auditorium",
+    "performers": "Benedictine Nuns of the Abbey of St. Hildegard Eibingen"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "O Aeterne Deus: Psalm 109 / 110",
+   "durationMs": 384800,
+   "artist": "Benedictine Nuns of the Abbey of St. Hildegard Eibingen",
+   "apple": {
+    "block": 2,
+    "composer": "Hildegard von Bingen",
+    "work": "O æterne Deus",
+    "part": "Psalm 109 / 110",
+    "performers": "Benedictine Nuns of the Abbey of St. Hildegard Eibingen"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Spiritus Sanctus: Psalm 110 / 111",
+   "durationMs": 473600,
+   "artist": "Benedictine Nuns of the Abbey of St. Hildegard Eibingen",
+   "apple": {
+    "block": 3,
+    "composer": "Hildegard von Bingen",
+    "work": "Spiritus sanctus",
+    "part": "Psalm 110 / 111",
+    "performers": "Benedictine Nuns of the Abbey of St. Hildegard Eibingen"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "O Magne Pater: Psalm 129 / 130",
+   "durationMs": 462200,
+   "artist": "Benedictine Nuns of the Abbey of St. Hildegard Eibingen",
+   "apple": {
+    "block": 4,
+    "composer": "Hildegard von Bingen",
+    "work": "O magne pater",
+    "part": "Psalm 129 / 130",
+    "performers": "Benedictine Nuns of the Abbey of St. Hildegard Eibingen"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Caritas Abundat: Psalm 130 / 131",
+   "durationMs": 323600,
+   "artist": "Benedictine Nuns of the Abbey of St. Hildegard Eibingen",
+   "apple": {
+    "block": 5,
+    "composer": "Hildegard von Bingen",
+    "work": "Karitas habundat, “Love abounds”",
+    "part": "Psalm 130 / 131",
+    "performers": "Benedictine Nuns of the Abbey of St. Hildegard Eibingen"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "The Bible: Revelations 21. 1 - 5",
+   "durationMs": 110600,
+   "artist": "Benedictine Nuns of the Abbey of St. Hildegard Eibingen",
+   "apple": {
+    "block": 6,
+    "composer": "H. von Bingen: The Bible",
+    "work": "H. von Bingen: The Bible",
+    "part": "Revelations 21. 1 - 5",
+    "performers": "Benedictine Nuns of the Abbey of St. Hildegard Eibingen"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "O Vis Aeternitatis",
+   "durationMs": 368600,
+   "artist": "Benedictine Nuns of the Abbey of St. Hildegard Eibingen",
+   "apple": {
+    "block": 7,
+    "composer": "Hildegard von Bingen",
+    "work": "O vis aeternitatis",
+    "part": "O Vis Aeternitatis",
+    "performers": "Benedictine Nuns of the Abbey of St. Hildegard Eibingen"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "O Ignis Spiritus Paracliti",
+   "durationMs": 346800,
+   "artist": "Benedictine Nuns of the Abbey of St. Hildegard Eibingen",
+   "apple": {
+    "block": 8,
+    "composer": "Hildegard von Bingen",
+    "work": "O ignee Spiritus",
+    "part": "O Ignis Spiritus Paracliti",
+    "performers": "Benedictine Nuns of the Abbey of St. Hildegard Eibingen"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "O Quam Mirabilis: Magnificat",
+   "durationMs": 494200,
+   "artist": "Benedictine Nuns of the Abbey of St. Hildegard Eibingen",
+   "apple": {
+    "block": 9,
+    "composer": "Hildegard von Bingen",
+    "work": "O quam mirabilis",
+    "part": "Magnificat",
+    "performers": "Benedictine Nuns of the Abbey of St. Hildegard Eibingen"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Closing Prayers: Kyrie, Pater Noster",
+   "durationMs": 149400,
+   "artist": "Benedictine Nuns of the Abbey of St. Hildegard Eibingen",
+   "apple": {
+    "block": 10,
+    "composer": "Hildegard von Bingen",
+    "work": "Kyrie eleison",
+    "part": "Kyrie, Pater Noster",
+    "performers": "Benedictine Nuns of the Abbey of St. Hildegard Eibingen"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "O Praesul Verae Civitatis",
+   "durationMs": 409600,
+   "artist": "Benedictine Nuns of the Abbey of St. Hildegard Eibingen",
+   "apple": {
+    "block": 11,
+    "composer": "H. von Bingen",
+    "work": "H. von Bingen",
+    "part": "O Praesul Verae Civitatis",
+    "performers": "Benedictine Nuns of the Abbey of St. Hildegard Eibingen"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "O Ierusalem, Aurea Civitas",
+   "durationMs": 578800,
+   "artist": "Benedictine Nuns of the Abbey of St. Hildegard Eibingen",
+   "apple": {
+    "block": 12,
+    "composer": "Hildegard von Bingen",
+    "work": "O Jerusalem aurea civitas",
+    "part": "O Ierusalem, Aurea Civitas",
+    "performers": "Benedictine Nuns of the Abbey of St. Hildegard Eibingen"
+   }
+  }
+ ]
+}

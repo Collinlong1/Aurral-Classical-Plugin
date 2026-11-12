@@ -1,0 +1,50 @@
+{
+ "id": "905584086",
+ "category": "concerto",
+ "title": "Beethoven: Violin Concerto",
+ "artist": "Itzhak Perlman, Carlo Maria Giulini & Philharmonia Orchestra",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Violin Concerto in D Major, Op. 61: I. Allegro, ma non troppo",
+   "durationMs": 1465970,
+   "artist": "Carlo Maria Giulini, Itzhak Perlman & Philharmonia Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Ludwig van Beethoven",
+    "work": "Violin Concerto in D Major, Op. 61",
+    "part": "I. Allegro, ma non troppo",
+    "performers": "Itzhak Perlman, Philharmonia Orchestra, Carlo Maria Giulini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Violin Concerto in D Major, Op. 61: II. Larghetto",
+   "durationMs": 563973,
+   "artist": "Carlo Maria Giulini, Itzhak Perlman & Philharmonia Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Ludwig van Beethoven",
+    "work": "Violin Concerto in D Major, Op. 61",
+    "part": "II. Larghetto",
+    "performers": "Carlo Maria Giulini, Itzhak Perlman, Philharmonia Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Violin Concerto in D Major, Op. 61: III. Rondo. Allegro",
+   "durationMs": 607950,
+   "artist": "Carlo Maria Giulini, Itzhak Perlman & Philharmonia Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Ludwig van Beethoven",
+    "work": "Violin Concerto in D Major, Op. 61",
+    "part": "III. Rondo. Allegro",
+    "performers": "Philharmonia Orchestra, Itzhak Perlman, Carlo Maria Giulini"
+   }
+  }
+ ]
+}

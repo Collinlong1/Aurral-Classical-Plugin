@@ -1,0 +1,120 @@
+{
+ "id": "416955662",
+ "category": "twentieth century contemporary",
+ "title": "Messiaen: Quartet for the End of Time",
+ "artist": "Tashi",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Quatuor pour la Fin du Temps: Liturgie de cristal",
+   "durationMs": 144533,
+   "artist": "Tashi, Peter Serkin, Ida Kavafian, Fred Sherry & Richard Stoltzman",
+   "apple": {
+    "block": 1,
+    "composer": "Olivier Messiaen",
+    "work": "Quatuor pour la fin du temps, I/ 22 · “Quartet for the End of Time”",
+    "part": "I. Liturgie de cristal",
+    "performers": "Fred Sherry, Richard Stoltzman, Ida Kavafian, Peter Serkin, Tashi"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Quatuor pour la Fin du Temps: Vocalise, pour l' Ange qui annonce la fin du Temps",
+   "durationMs": 326267,
+   "artist": "Tashi, Peter Serkin, Ida Kavafian, Fred Sherry & Richard Stoltzman",
+   "apple": {
+    "block": 1,
+    "composer": "Olivier Messiaen",
+    "work": "Quatuor pour la fin du temps, I/ 22 · “Quartet for the End of Time”",
+    "part": "II. Vocalise pour l'Ange qui annonce la fin du Temps",
+    "performers": "Ida Kavafian, Peter Serkin, Fred Sherry, Richard Stoltzman, Tashi"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Quatuor pour la Fin du Temps: Abîme des oiseaux",
+   "durationMs": 460667,
+   "artist": "Tashi, Peter Serkin, Ida Kavafian, Fred Sherry & Richard Stoltzman",
+   "apple": {
+    "block": 1,
+    "composer": "Olivier Messiaen",
+    "work": "Quatuor pour la fin du temps, I/ 22 · “Quartet for the End of Time”",
+    "part": "III. Abîme des oiseaux",
+    "performers": "Fred Sherry, Peter Serkin, Richard Stoltzman, Ida Kavafian, Tashi"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Quatuor pour la Fin du Temps: Intermède",
+   "durationMs": 111027,
+   "artist": "Tashi, Peter Serkin, Ida Kavafian, Fred Sherry & Richard Stoltzman",
+   "apple": {
+    "block": 1,
+    "composer": "Olivier Messiaen",
+    "work": "Quatuor pour la fin du temps, I/ 22 · “Quartet for the End of Time”",
+    "part": "IV. Intermède",
+    "performers": "Tashi, Peter Serkin, Ida Kavafian, Fred Sherry, Richard Stoltzman"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Quatuor pour la Fin du Temps: Louange à l' Éternité de Jésus",
+   "durationMs": 465240,
+   "artist": "Tashi, Peter Serkin, Ida Kavafian, Fred Sherry & Richard Stoltzman",
+   "apple": {
+    "block": 1,
+    "composer": "Olivier Messiaen",
+    "work": "Quatuor pour la fin du temps, I/ 22 · “Quartet for the End of Time”",
+    "part": "V. Louange à l'Éternite de Jésus",
+    "performers": "Fred Sherry, Tashi, Ida Kavafian, Richard Stoltzman, Peter Serkin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Quatuor pour la Fin du Temps: Danse de la fureur, pour les sept trompettes",
+   "durationMs": 379240,
+   "artist": "Tashi, Peter Serkin, Ida Kavafian, Fred Sherry & Richard Stoltzman",
+   "apple": {
+    "block": 1,
+    "composer": "Olivier Messiaen",
+    "work": "Quatuor pour la fin du temps, I/ 22 · “Quartet for the End of Time”",
+    "part": "VI. Danse de la fureur, pour les sept trompettes",
+    "performers": "Ida Kavafian, Richard Stoltzman, Tashi, Fred Sherry, Peter Serkin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Quatuor pour la Fin du Temps: Fouillis d' arcs-en-ciel, pour l' Ange qui annonce la fin du Temps",
+   "durationMs": 431440,
+   "artist": "Tashi, Peter Serkin, Ida Kavafian, Fred Sherry & Richard Stoltzman",
+   "apple": {
+    "block": 1,
+    "composer": "Olivier Messiaen",
+    "work": "Quatuor pour la fin du temps, I/ 22 · “Quartet for the End of Time”",
+    "part": "VII. Fouillis d'arcs-en-ciel, pour l'Ange qui announce la fin du Temps",
+    "performers": "Ida Kavafian, Tashi, Peter Serkin, Richard Stoltzman, Fred Sherry"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Quatuor pour la Fin du Temps: Louange à l' Immortalité de Jésus",
+   "durationMs": 491000,
+   "artist": "Tashi, Peter Serkin, Ida Kavafian, Fred Sherry & Richard Stoltzman",
+   "apple": {
+    "block": 1,
+    "composer": "Olivier Messiaen",
+    "work": "Quatuor pour la fin du temps, I/ 22 · “Quartet for the End of Time”",
+    "part": "VIII. Louange à l'Immortalité de Jésus",
+    "performers": "Tashi, Peter Serkin, Fred Sherry, Ida Kavafian, Richard Stoltzman"
+   }
+  }
+ ]
+}

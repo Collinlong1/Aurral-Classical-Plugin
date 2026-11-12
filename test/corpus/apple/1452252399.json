@@ -1,0 +1,442 @@
+{
+ "id": "1452252399",
+ "category": "piano recital",
+ "title": "The Carnegie Recital",
+ "artist": "Daniil Trifonov",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Piano Sonata No. 2 in G-Sharp Minor, Op. 19 \"Sonata Fantasy\": 1. Andante (Live From Carnegie Hall, New York City / 2013)",
+   "durationMs": 425147,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 1,
+    "composer": "Alexander Scriabin",
+    "work": "Piano Sonata No. 2 in G-Sharp Minor, Op. 19, WoO 6 · “Sonata-Fantasy”",
+    "part": "1. Andante (Live From Carnegie Hall, New York City / 2013)",
+    "performers": "Daniil Trifonov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Piano Sonata No. 2 in G-Sharp Minor, Op. 19 \"Sonata Fantasy\": 2. Presto (Live From Carnegie Hall, New York City / 2013)",
+   "durationMs": 205907,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 1,
+    "composer": "Alexander Scriabin",
+    "work": "Piano Sonata No. 2 in G-Sharp Minor, Op. 19, WoO 6 · “Sonata-Fantasy”",
+    "part": "2. Presto (Live From Carnegie Hall, New York City / 2013)",
+    "performers": "Daniil Trifonov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Piano Sonata in B Minor, S. 178: Lento assai - Allegro energico (Live From Carnegie Hall, New York City / 2013)",
+   "durationMs": 672507,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 2,
+    "composer": "Franz Liszt",
+    "work": "Piano Sonata in B Minor, S. 178",
+    "part": "Lento assai - Allegro energico (Live From Carnegie Hall, New York City / 2013)",
+    "performers": "Daniil Trifonov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Piano Sonata in B Minor, S. 178: Andante sostenuto - (Live From Carnegie Hall, New York City / 2013)",
+   "durationMs": 456533,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 2,
+    "composer": "Franz Liszt",
+    "work": "Piano Sonata in B Minor, S. 178",
+    "part": "Andante sostenuto - (Live From Carnegie Hall, New York City / 2013)",
+    "performers": "Daniil Trifonov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Piano Sonata in B Minor, S. 178: Allegro energico - Andante sostenuto - Lento assai (Live From Carnegie Hall, New York City / 2013)",
+   "durationMs": 658520,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 2,
+    "composer": "Franz Liszt",
+    "work": "Piano Sonata in B Minor, S. 178",
+    "part": "Allegro energico - Andante sostenuto - Lento assai (Live From Carnegie Hall, New York City / 2013)",
+    "performers": "Daniil Trifonov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "24 Préludes, Op. 28: No. 1 in C Major (Live From Carnegie Hall, New York City / 2013)",
+   "durationMs": 38013,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 3,
+    "composer": "Frédéric Chopin",
+    "work": "24 Préludes, C. 166-189, Op. 28",
+    "part": "No. 1 in C Major (Live From Carnegie Hall, New York City / 2013)",
+    "performers": "Daniil Trifonov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "24 Préludes, Op. 28: No. 2 in A Minor (Live From Carnegie Hall, New York City / 2013)",
+   "durationMs": 122613,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 3,
+    "composer": "Frédéric Chopin",
+    "work": "24 Préludes, C. 166-189, Op. 28",
+    "part": "No. 2 in A Minor (Live From Carnegie Hall, New York City / 2013)",
+    "performers": "Daniil Trifonov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "24 Préludes, Op. 28: No. 3 in G Major (Live From Carnegie Hall, New York City / 2013)",
+   "durationMs": 48813,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 3,
+    "composer": "Frédéric Chopin",
+    "work": "24 Préludes, C. 166-189, Op. 28",
+    "part": "No. 3 in G Major (Live From Carnegie Hall, New York City / 2013)",
+    "performers": "Daniil Trifonov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "24 Préludes, Op. 28: No. 4 in E Minor (Live From Carnegie Hall, New York City / 2013)",
+   "durationMs": 100453,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 3,
+    "composer": "Frédéric Chopin",
+    "work": "24 Préludes, C. 166-189, Op. 28",
+    "part": "No. 4 in E Minor (Live From Carnegie Hall, New York City / 2013)",
+    "performers": "Daniil Trifonov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "24 Préludes, Op. 28: No. 5 in D Major (Live From Carnegie Hall, New York City / 2013)",
+   "durationMs": 32213,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 3,
+    "composer": "Frédéric Chopin",
+    "work": "24 Préludes, C. 166-189, Op. 28",
+    "part": "No. 5 in D Major (Live From Carnegie Hall, New York City / 2013)",
+    "performers": "Daniil Trifonov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "24 Préludes, Op. 28: No. 6 in B Minor (Live From Carnegie Hall, New York City / 2013)",
+   "durationMs": 111333,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 3,
+    "composer": "Frédéric Chopin",
+    "work": "24 Préludes, C. 166-189, Op. 28",
+    "part": "No. 6 in B Minor (Live From Carnegie Hall, New York City / 2013)",
+    "performers": "Daniil Trifonov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "24 Préludes, Op. 28: No. 7 in A Major (Live From Carnegie Hall, New York City / 2013)",
+   "durationMs": 46533,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 3,
+    "composer": "Frédéric Chopin",
+    "work": "24 Préludes, C. 166-189, Op. 28",
+    "part": "No. 7 in A Major (Live From Carnegie Hall, New York City / 2013)",
+    "performers": "Daniil Trifonov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "24 Préludes, Op. 28: No. 8 in F-Sharp Minor (Live From Carnegie Hall, New York City / 2013)",
+   "durationMs": 99480,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 3,
+    "composer": "Frédéric Chopin",
+    "work": "24 Préludes, C. 166-189, Op. 28",
+    "part": "No. 8 in F-Sharp Minor (Live From Carnegie Hall, New York City / 2013)",
+    "performers": "Daniil Trifonov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "24 Préludes, Op. 28: No. 9 in E Major (Live From Carnegie Hall, New York City / 2013)",
+   "durationMs": 90107,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 3,
+    "composer": "Frédéric Chopin",
+    "work": "24 Préludes, C. 166-189, Op. 28",
+    "part": "No. 9 in E Major (Live From Carnegie Hall, New York City / 2013)",
+    "performers": "Daniil Trifonov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "24 Préludes, Op. 28: No. 10 in C-Sharp Minor (Live From Carnegie Hall, New York City / 2013)",
+   "durationMs": 28253,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 3,
+    "composer": "Frédéric Chopin",
+    "work": "24 Préludes, C. 166-189, Op. 28",
+    "part": "No. 10 in C-Sharp Minor (Live From Carnegie Hall, New York City / 2013)",
+    "performers": "Daniil Trifonov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "24 Préludes, Op. 28: No. 11 in B Major (Live From Carnegie Hall, New York City / 2013)",
+   "durationMs": 38387,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 3,
+    "composer": "Frédéric Chopin",
+    "work": "24 Préludes, C. 166-189, Op. 28",
+    "part": "No. 11 in B Major (Live From Carnegie Hall, New York City / 2013)",
+    "performers": "Daniil Trifonov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "24 Préludes, Op. 28: No. 12 in G-Sharp Minor (Live From Carnegie Hall, New York City / 2013)",
+   "durationMs": 71253,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 3,
+    "composer": "Frédéric Chopin",
+    "work": "24 Préludes, C. 166-189, Op. 28",
+    "part": "No. 12 in G-Sharp Minor (Live From Carnegie Hall, New York City / 2013)",
+    "performers": "Daniil Trifonov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "24 Préludes, Op. 28: No. 13 in F-Sharp Major (Live From Carnegie Hall, New York City / 2013)",
+   "durationMs": 187640,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 3,
+    "composer": "Frédéric Chopin",
+    "work": "24 Préludes, C. 166-189, Op. 28",
+    "part": "No. 13 in F-Sharp Major (Live From Carnegie Hall, New York City / 2013)",
+    "performers": "Daniil Trifonov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "24 Préludes, Op. 28: No. 14 in E-Flat Minor (Live From Carnegie Hall, New York City / 2013)",
+   "durationMs": 31573,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 3,
+    "composer": "Frédéric Chopin",
+    "work": "24 Préludes, C. 166-189, Op. 28",
+    "part": "No. 14 in E-Flat Minor (Live From Carnegie Hall, New York City / 2013)",
+    "performers": "Daniil Trifonov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "24 Préludes, Op. 28: No. 15 in D-Flat Major \"Raindrop\" (Live From Carnegie Hall, New York City / 2013)",
+   "durationMs": 324480,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 3,
+    "composer": "Frédéric Chopin",
+    "work": "24 Préludes, C. 166-189, Op. 28",
+    "part": "No. 15 in D-Flat Major \"Raindrop\" (Live From Carnegie Hall, New York City / 2013)",
+    "performers": "Daniil Trifonov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "24 Préludes, Op. 28: No. 16 in B-Flat Minor (Live From Carnegie Hall, New York City / 2013)",
+   "durationMs": 63547,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 3,
+    "composer": "Frédéric Chopin",
+    "work": "24 Préludes, C. 166-189, Op. 28",
+    "part": "No. 16 in B-Flat Minor (Live From Carnegie Hall, New York City / 2013)",
+    "performers": "Daniil Trifonov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "24 Préludes, Op. 28: No. 17 in A-Flat Major (Live From Carnegie Hall, New York City / 2013)",
+   "durationMs": 178227,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 3,
+    "composer": "Frédéric Chopin",
+    "work": "24 Préludes, C. 166-189, Op. 28",
+    "part": "No. 17 in A-Flat Major (Live From Carnegie Hall, New York City / 2013)",
+    "performers": "Daniil Trifonov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 23,
+   "title": "24 Préludes, Op. 28: No. 18 in F Minor (Live From Carnegie Hall, New York City / 2013)",
+   "durationMs": 49520,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 3,
+    "composer": "Frédéric Chopin",
+    "work": "24 Préludes, C. 166-189, Op. 28",
+    "part": "No. 18 in F Minor (Live From Carnegie Hall, New York City / 2013)",
+    "performers": "Daniil Trifonov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 24,
+   "title": "24 Préludes, Op. 28: No. 19 in E-Flat Major (Live From Carnegie Hall, New York City / 2013)",
+   "durationMs": 65973,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 3,
+    "composer": "Frédéric Chopin",
+    "work": "24 Préludes, C. 166-189, Op. 28",
+    "part": "No. 19 in E-Flat Major (Live From Carnegie Hall, New York City / 2013)",
+    "performers": "Daniil Trifonov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 25,
+   "title": "24 Préludes, Op. 28: No. 20 in C Minor (Live From Carnegie Hall, New York City / 2013)",
+   "durationMs": 89493,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 3,
+    "composer": "Frédéric Chopin",
+    "work": "24 Préludes, C. 166-189, Op. 28",
+    "part": "No. 20 in C Minor (Live From Carnegie Hall, New York City / 2013)",
+    "performers": "Daniil Trifonov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 26,
+   "title": "24 Préludes, Op. 28: No. 21 in B-Flat Major (Live From Carnegie Hall, New York City / 2013)",
+   "durationMs": 135080,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 3,
+    "composer": "Frédéric Chopin",
+    "work": "24 Préludes, C. 166-189, Op. 28",
+    "part": "No. 21 in B-Flat Major (Live From Carnegie Hall, New York City / 2013)",
+    "performers": "Daniil Trifonov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 27,
+   "title": "24 Préludes, Op. 28: No. 22 in G Minor (Live From Carnegie Hall, New York City / 2013)",
+   "durationMs": 40240,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 3,
+    "composer": "Frédéric Chopin",
+    "work": "24 Préludes, C. 166-189, Op. 28",
+    "part": "No. 22 in G Minor (Live From Carnegie Hall, New York City / 2013)",
+    "performers": "Daniil Trifonov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 28,
+   "title": "24 Préludes, Op. 28: No. 23 in F Major (Live From Carnegie Hall, New York City / 2013)",
+   "durationMs": 65813,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 3,
+    "composer": "Frédéric Chopin",
+    "work": "24 Préludes, C. 166-189, Op. 28",
+    "part": "No. 23 in F Major (Live From Carnegie Hall, New York City / 2013)",
+    "performers": "Daniil Trifonov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 29,
+   "title": "24 Préludes, Op. 28: No. 24 in D Minor (Live From Carnegie Hall, New York City / 2013)",
+   "durationMs": 163120,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 3,
+    "composer": "Frédéric Chopin",
+    "work": "24 Préludes, C. 166-189, Op. 28",
+    "part": "No. 24 in D Minor (Live From Carnegie Hall, New York City / 2013)",
+    "performers": "Daniil Trifonov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 30,
+   "title": "Four Fairy Tales (Skazki), Op. 26: No. 2 in E-Flat Major, Molto Vivace (Live From Carnegie Hall, New York City / 2013)",
+   "durationMs": 86080,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 4,
+    "composer": "Nikolai Medtner",
+    "work": "4 skazki, Op. 26",
+    "part": "No. 2 in E-Flat Major, Molto Vivace (Live From Carnegie Hall, New York City / 2013)",
+    "performers": "Daniil Trifonov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 31,
+   "title": "Partita For Violin Solo No. 3 in E Major, BWV 1006: 3. Gavotte (Arr. For Piano By Rachmaninov) [Live From Carnegie Hall, New York City / 2013]",
+   "durationMs": 155693,
+   "artist": "Daniil Trifonov",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 3 for Solo Violin in E Major, BWV 1006",
+    "part": "3. Gavotte (Arr. For Piano By Rachmaninov) [Live From Carnegie Hall, New York City / 2013]",
+    "performers": "Daniil Trifonov"
+   }
+  }
+ ]
+}

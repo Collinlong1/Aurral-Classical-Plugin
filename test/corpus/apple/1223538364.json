@@ -1,0 +1,64 @@
+{
+ "id": "1223538364",
+ "category": "symphony",
+ "title": "Dvořák: Symphony No. 9 \"From the New World\"",
+ "artist": "New York Philharmonic & Alan Gilbert",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Symphony No. 9 in E Minor, Op. 95 \"From the New World\": I. Adagio — Allegro molto",
+   "durationMs": 581911,
+   "artist": "New York Philharmonic & Alan Gilbert",
+   "apple": {
+    "block": 1,
+    "composer": "Antonín Dvořák",
+    "work": "Symphony No. 9 in E Minor, B 178, Op. 95 · “From the New World”",
+    "part": "I. Adagio — Allegro molto",
+    "performers": "New York Philharmonic, Alan Gilbert"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Symphony No. 9 in E Minor, Op. 95 \"From the New World\": II. Largo",
+   "durationMs": 762547,
+   "artist": "New York Philharmonic & Alan Gilbert",
+   "apple": {
+    "block": 1,
+    "composer": "Antonín Dvořák",
+    "work": "Symphony No. 9 in E Minor, B 178, Op. 95 · “From the New World”",
+    "part": "II. Largo",
+    "performers": "New York Philharmonic, Alan Gilbert"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Symphony No. 9 in E Minor, Op. 95 \"From the New World\": III. Scherzo. Molto vivace",
+   "durationMs": 470748,
+   "artist": "New York Philharmonic & Alan Gilbert",
+   "apple": {
+    "block": 1,
+    "composer": "Antonín Dvořák",
+    "work": "Symphony No. 9 in E Minor, B 178, Op. 95 · “From the New World”",
+    "part": "III. Scherzo. Molto vivace",
+    "performers": "Alan Gilbert, New York Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Symphony No. 9 in E Minor, Op. 95 \"From the New World\": IV. Allegro con fuoco",
+   "durationMs": 735257,
+   "artist": "New York Philharmonic & Alan Gilbert",
+   "apple": {
+    "block": 1,
+    "composer": "Antonín Dvořák",
+    "work": "Symphony No. 9 in E Minor, B 178, Op. 95 · “From the New World”",
+    "part": "IV. Allegro con fuoco",
+    "performers": "New York Philharmonic, Alan Gilbert"
+   }
+  }
+ ]
+}

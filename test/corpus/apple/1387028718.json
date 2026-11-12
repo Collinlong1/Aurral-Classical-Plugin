@@ -1,0 +1,106 @@
+{
+ "id": "1387028718",
+ "category": "orchestral",
+ "title": "Holst: The Planets, Op. 32",
+ "artist": "London Symphony Orchestra & Sir Colin Davis",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "The Planets, Op. 32: I. Mars, the Bringer of War",
+   "durationMs": 427734,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "Gustav Holst",
+    "work": "The Planets, H 125, Op. 32",
+    "part": "I. Mars, the Bringer of War",
+    "performers": "London Symphony Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "The Planets, Op. 32: II. Venus, the Bringer of Peace",
+   "durationMs": 500647,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "Gustav Holst",
+    "work": "The Planets, H 125, Op. 32",
+    "part": "II. Venus, the Bringer of Peace",
+    "performers": "London Symphony Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "The Planets, Op. 32: III. Mercury, the Winged Messenger",
+   "durationMs": 256927,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "Gustav Holst",
+    "work": "The Planets, H 125, Op. 32",
+    "part": "III. Mercury, the Winged Messenger",
+    "performers": "London Symphony Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "The Planets, Op. 32: IV. Jupiter, the Bringer of Jollity",
+   "durationMs": 485913,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "Gustav Holst",
+    "work": "The Planets, H 125, Op. 32",
+    "part": "IV. Jupiter, the Bringer of Jollity",
+    "performers": "Sir Colin Davis, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "The Planets, Op. 32: V. Saturn, the Bringer of Old Age",
+   "durationMs": 561767,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "Gustav Holst",
+    "work": "The Planets, H 125, Op. 32",
+    "part": "V. Saturn, the Bringer of Old Age",
+    "performers": "Sir Colin Davis, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "The Planets, Op. 32: VI. Uranus, the Magician",
+   "durationMs": 359247,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "Gustav Holst",
+    "work": "The Planets, H 125, Op. 32",
+    "part": "VI. Uranus, the Magician",
+    "performers": "London Symphony Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "The Planets, Op. 32: VII. Neptune, the Mystic",
+   "durationMs": 395103,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "Gustav Holst",
+    "work": "The Planets, H 125, Op. 32",
+    "part": "VII. Neptune, the Mystic",
+    "performers": "Sir Colin Davis, London Symphony Orchestra"
+   }
+  }
+ ]
+}

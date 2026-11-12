@@ -1,0 +1,120 @@
+{
+ "id": "705088047",
+ "category": "chamber",
+ "title": "Mozart: Clarinet Quintet",
+ "artist": "Arcanto Quartett & Jörg Widmann",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Clarinet Quintet in A Major: I. Allegro",
+   "durationMs": 549627,
+   "artist": "Arcanto Quartett & Jörg Widmann",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Clarinet Quintet in A Major, K. 581, KV 581 · “Stadler”",
+    "part": "I. Allegro",
+    "performers": "Jörg Widmann, Arcanto Quartett"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Clarinet Quintet in A Major: II. Larghetto",
+   "durationMs": 367373,
+   "artist": "Arcanto Quartett & Jörg Widmann",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Clarinet Quintet in A Major, K. 581, KV 581 · “Stadler”",
+    "part": "II. Larghetto",
+    "performers": "Arcanto Quartett, Jörg Widmann"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Clarinet Quintet in A Major: III. Menuetto",
+   "durationMs": 424147,
+   "artist": "Arcanto Quartett & Jörg Widmann",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Clarinet Quintet in A Major, K. 581, KV 581 · “Stadler”",
+    "part": "III. Menuetto",
+    "performers": "Arcanto Quartett, Jörg Widmann"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Clarinet Quintet in A Major: IV. Allegretto con Variazioni",
+   "durationMs": 562627,
+   "artist": "Arcanto Quartett & Jörg Widmann",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Clarinet Quintet in A Major, K. 581, KV 581 · “Stadler”",
+    "part": "IV. Allegretto con Variazioni",
+    "performers": "Jörg Widmann, Arcanto Quartett"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "String Quartet in D Minor: I. Allegro moderato",
+   "durationMs": 481973,
+   "artist": "Arcanto Quartett",
+   "apple": {
+    "block": 2,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "String Quartet No. 15 in D Minor, K. 421, K. 417b, KV 421 · “Haydn Quartet No. 2”",
+    "part": "I. Allegro moderato",
+    "performers": "Arcanto Quartett"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "String Quartet in D Minor: II. Andante",
+   "durationMs": 368880,
+   "artist": "Arcanto Quartett",
+   "apple": {
+    "block": 2,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "String Quartet No. 15 in D Minor, K. 421, K. 417b, KV 421 · “Haydn Quartet No. 2”",
+    "part": "II. Andante",
+    "performers": "Arcanto Quartett"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "String Quartet in D Minor: III. Menuetto",
+   "durationMs": 227840,
+   "artist": "Arcanto Quartett",
+   "apple": {
+    "block": 3,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "String Quartet No. 13 in D Minor, K. 173, KV 173",
+    "part": "III. Menuetto",
+    "performers": "Arcanto Quartett"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "String Quartet in D Minor: IV. Allegretto ma non troppo",
+   "durationMs": 540907,
+   "artist": "Arcanto Quartett",
+   "apple": {
+    "block": 4,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "String Quartet No. 15 in D Minor, K. 421, K. 417b, KV 421 · “Haydn Quartet No. 2”",
+    "part": "IV. Allegretto ma non troppo",
+    "performers": "Arcanto Quartett"
+   }
+  }
+ ]
+}

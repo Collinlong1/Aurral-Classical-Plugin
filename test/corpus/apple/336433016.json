@@ -1,0 +1,120 @@
+{
+ "id": "336433016",
+ "category": "twentieth century contemporary",
+ "title": "Messiaen: Quartet for the End of Time",
+ "artist": "The Fibonacci Sequence, Jack Liebeck, Kathron Sturrock, Julian Farrell & Benjamin Hughes",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Quartet for the End of Time: I. Liturgy of Crystal",
+   "durationMs": 159459,
+   "artist": "The Fibonacci Sequence, Jack Liebeck, Julian Farrell, Benjamin Hughes & Kathron Sturrock",
+   "apple": {
+    "block": 1,
+    "composer": "Olivier Messiaen",
+    "work": "Quatuor pour la fin du temps, I/ 22 · “Quartet for the End of Time”",
+    "part": "I. Liturgy of Crystal",
+    "performers": "Benjamin Hughes, The Fibonacci Sequence, Kathron Sturrock, Jack Liebeck, Julian Farrell"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Quartet for the End of Time: II. Vocalise, for the Angel Who Announces the End of Time",
+   "durationMs": 319199,
+   "artist": "The Fibonacci Sequence, Jack Liebeck, Julian Farrell, Benjamin Hughes & Kathron Sturrock",
+   "apple": {
+    "block": 2,
+    "composer": "Messiaen: Quartet for the End of Time",
+    "work": "Messiaen: Quartet for the End of Time",
+    "part": "II. Vocalise, for the Angel Who Announces the End of Time",
+    "performers": "Jack Liebeck, Julian Farrell, Kathron Sturrock, Benjamin Hughes, The Fibonacci Sequence"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Quartet for the End of Time: III. Abyss of the Birds",
+   "durationMs": 452370,
+   "artist": "The Fibonacci Sequence, Jack Liebeck, Julian Farrell, Benjamin Hughes & Kathron Sturrock",
+   "apple": {
+    "block": 2,
+    "composer": "Messiaen: Quartet for the End of Time",
+    "work": "Messiaen: Quartet for the End of Time",
+    "part": "III. Abyss of the Birds",
+    "performers": "Benjamin Hughes, The Fibonacci Sequence, Kathron Sturrock, Jack Liebeck, Julian Farrell"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Quartet for the End of Time: IV. Interlude",
+   "durationMs": 108101,
+   "artist": "The Fibonacci Sequence, Jack Liebeck, Julian Farrell, Benjamin Hughes & Kathron Sturrock",
+   "apple": {
+    "block": 3,
+    "composer": "Olivier Messiaen",
+    "work": "Quatuor pour la fin du temps, I/ 22 · “Quartet for the End of Time”",
+    "part": "IV. Interlude",
+    "performers": "Benjamin Hughes, Jack Liebeck, Julian Farrell, Kathron Sturrock, The Fibonacci Sequence"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Quartet for the End of Time: V. Praise to the Eternity of Jesus",
+   "durationMs": 568952,
+   "artist": "The Fibonacci Sequence, Jack Liebeck, Julian Farrell, Benjamin Hughes & Kathron Sturrock",
+   "apple": {
+    "block": 3,
+    "composer": "Olivier Messiaen",
+    "work": "Quatuor pour la fin du temps, I/ 22 · “Quartet for the End of Time”",
+    "part": "V. Praise to the Eternity of Jesus",
+    "performers": "The Fibonacci Sequence, Kathron Sturrock, Benjamin Hughes, Jack Liebeck, Julian Farrell"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Quartet for the End of Time: VI. Dance of Fury, for the Seven Trumpets",
+   "durationMs": 387681,
+   "artist": "The Fibonacci Sequence, Jack Liebeck, Julian Farrell, Benjamin Hughes & Kathron Sturrock",
+   "apple": {
+    "block": 4,
+    "composer": "Messiaen: Quartet for the End of Time",
+    "work": "Messiaen: Quartet for the End of Time",
+    "part": "VI. Dance of Fury, for the Seven Trumpets",
+    "performers": "Jack Liebeck, Julian Farrell, The Fibonacci Sequence, Benjamin Hughes, Kathron Sturrock"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Quartet for the End of Time: VII. a Mingling of Rainbows, for the Angel Who Announces the End of Time",
+   "durationMs": 466598,
+   "artist": "The Fibonacci Sequence, Jack Liebeck, Julian Farrell, Benjamin Hughes & Kathron Sturrock",
+   "apple": {
+    "block": 4,
+    "composer": "Messiaen: Quartet for the End of Time",
+    "work": "Messiaen: Quartet for the End of Time",
+    "part": "VII. a Mingling of Rainbows, for the Angel Who Announces the End of Time",
+    "performers": "Kathron Sturrock, The Fibonacci Sequence, Benjamin Hughes, Jack Liebeck, Julian Farrell"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Quartet for the End of Time: VIII. Praise to the Immortality of Jesus",
+   "durationMs": 366979,
+   "artist": "The Fibonacci Sequence, Jack Liebeck, Julian Farrell, Benjamin Hughes & Kathron Sturrock",
+   "apple": {
+    "block": 5,
+    "composer": "Olivier Messiaen",
+    "work": "Quatuor pour la fin du temps, I/ 22 · “Quartet for the End of Time”",
+    "part": "VIII. Praise to the Immortality of Jesus",
+    "performers": "Benjamin Hughes, Jack Liebeck, Julian Farrell, Kathron Sturrock, The Fibonacci Sequence"
+   }
+  }
+ ]
+}

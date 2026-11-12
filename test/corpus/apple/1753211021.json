@@ -1,0 +1,414 @@
+{
+ "id": "1753211021",
+ "category": "opera",
+ "title": "Wagner: Tristan und Isolde",
+ "artist": "Dame Margaret Price, Brigitte Fassbaender, Eberhard Büchner, René Kollo, Dietrich Fischer-Dieskau, Staatskapelle Dresden, Carlos Kleiber & Kurt Moll",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Tristan und Isolde, WWV 90, Act I: Prelude",
+   "durationMs": 635627,
+   "artist": "Staatskapelle Dresden & Carlos Kleiber",
+   "apple": {
+    "block": 1,
+    "composer": "Richard Wagner",
+    "work": "Die Götterdämmerung, WWV 86D · “The Ring Cycle”",
+    "part": "Prelude",
+    "performers": "Carlos Kleiber, Staatskapelle Dresden"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Tristan und Isolde, WWV 90, Act I: Westwärts schweift der Blick",
+   "durationMs": 329960,
+   "artist": "Dame Margaret Price, Brigitte Fassbaender, Eberhard Büchner, Staatskapelle Dresden & Carlos Kleiber",
+   "apple": {
+    "block": 2,
+    "composer": "Richard Wagner",
+    "work": "Tristan und Isolde, WWV 90 · “Tristan and Isolde”",
+    "part": "Westwärts schweift der Blick",
+    "performers": "Carlos Kleiber, Brigitte Fassbaender, Dame Margaret Price, Eberhard Büchner, Staatskapelle Dresden"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Tristan und Isolde, WWV 90, Act I: Frisch weht der Wind der Heimat zu",
+   "durationMs": 564800,
+   "artist": "Dame Margaret Price, Brigitte Fassbaender, Eberhard Büchner, René Kollo, Dietrich Fischer-Dieskau, Staatskapelle Dresden & Carlos Kleiber",
+   "apple": {
+    "block": 2,
+    "composer": "Richard Wagner",
+    "work": "Tristan und Isolde, WWV 90 · “Tristan and Isolde”",
+    "part": "Frisch weht der Wind der Heimat zu",
+    "performers": "Carlos Kleiber, Dame Margaret Price, Staatskapelle Dresden, Brigitte Fassbaender, Eberhard Büchner, Dietrich Fischer-Dieskau, René Kollo"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Tristan und Isolde, WWV 90, Act I: Weh, ach wehe! Dies zu dulden",
+   "durationMs": 1071507,
+   "artist": "Dame Margaret Price, Brigitte Fassbaender, Staatskapelle Dresden & Carlos Kleiber",
+   "apple": {
+    "block": 2,
+    "composer": "Richard Wagner",
+    "work": "Tristan und Isolde, WWV 90 · “Tristan and Isolde”",
+    "part": "Weh, ach wehe! Dies zu dulden",
+    "performers": "Dame Margaret Price, Carlos Kleiber, Brigitte Fassbaender, Staatskapelle Dresden"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Tristan und Isolde, WWV 90, Act I: Auf! Auf! Ihr Frauen!",
+   "durationMs": 443787,
+   "artist": "Dame Margaret Price, Brigitte Fassbaender, Dietrich Fischer-Dieskau, Staatskapelle Dresden & Carlos Kleiber",
+   "apple": {
+    "block": 2,
+    "composer": "Richard Wagner",
+    "work": "Tristan und Isolde, WWV 90 · “Tristan and Isolde”",
+    "part": "Auf! Auf! Ihr Frauen!",
+    "performers": "Brigitte Fassbaender, Dietrich Fischer-Dieskau, Dame Margaret Price, Carlos Kleiber, Staatskapelle Dresden"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Tristan und Isolde, WWV 90, Act I: Herr Tristan trete nah! - Begehrt, Herrin, was Ihr wünscht",
+   "durationMs": 1202573,
+   "artist": "Dame Margaret Price, René Kollo, Dietrich Fischer-Dieskau, MDR-Rundfunkchor, Staatskapelle Dresden & Carlos Kleiber",
+   "apple": {
+    "block": 2,
+    "composer": "Richard Wagner",
+    "work": "Tristan und Isolde, WWV 90 · “Tristan and Isolde”",
+    "part": "Herr Tristan trete nah! - Begehrt, Herrin, was Ihr wünscht",
+    "performers": "MDR-Rundfunkchor, Staatskapelle Dresden, Carlos Kleiber, Dietrich Fischer-Dieskau, Dame Margaret Price, René Kollo"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Tristan und Isolde, WWV 90, Act I: Tristan! - Isolde! Treuloser Holder!",
+   "durationMs": 414267,
+   "artist": "Dame Margaret Price, Brigitte Fassbaender, René Kollo, Dietrich Fischer-Dieskau, MDR-Rundfunkchor, Staatskapelle Dresden & Carlos Kleiber",
+   "apple": {
+    "block": 2,
+    "composer": "Richard Wagner",
+    "work": "Tristan und Isolde, WWV 90 · “Tristan and Isolde”",
+    "part": "Tristan! - Isolde! Treuloser Holder!",
+    "performers": "Carlos Kleiber, Brigitte Fassbaender, MDR-Rundfunkchor, Staatskapelle Dresden, Dietrich Fischer-Dieskau, Dame Margaret Price, René Kollo"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Tristan und Isolde, WWV 90, Act II: Prelude",
+   "durationMs": 121440,
+   "artist": "Staatskapelle Dresden & Carlos Kleiber",
+   "apple": {
+    "block": 3,
+    "composer": "Richard Wagner",
+    "work": "Die Götterdämmerung, WWV 86D · “The Ring Cycle”",
+    "part": "Prelude",
+    "performers": "Staatskapelle Dresden, Carlos Kleiber"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Tristan und Isolde, WWV 90, Act II: Hörst du Sie noch?",
+   "durationMs": 858667,
+   "artist": "Dame Margaret Price, Brigitte Fassbaender, Staatskapelle Dresden & Carlos Kleiber",
+   "apple": {
+    "block": 4,
+    "composer": "Richard Wagner",
+    "work": "Tristan und Isolde, WWV 90 · “Tristan and Isolde”",
+    "part": "Hörst du Sie noch?",
+    "performers": "Staatskapelle Dresden, Carlos Kleiber, Dame Margaret Price, Brigitte Fassbaender"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Tristan und Isolde, WWV 90, Act II: Isolde! Geliebte! - Tristan! Geliebter!",
+   "durationMs": 1050333,
+   "artist": "Dame Margaret Price, René Kollo, Staatskapelle Dresden & Carlos Kleiber",
+   "apple": {
+    "block": 4,
+    "composer": "Richard Wagner",
+    "work": "Tristan und Isolde, WWV 90 · “Tristan and Isolde”",
+    "part": "Isolde! Geliebte! - Tristan! Geliebter!",
+    "performers": "Dame Margaret Price, Carlos Kleiber, René Kollo, Staatskapelle Dresden"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Tristan und Isolde, WWV 90, Act II: O sink hernieder, Nacht der Liebe",
+   "durationMs": 318360,
+   "artist": "Dame Margaret Price, René Kollo, Staatskapelle Dresden & Carlos Kleiber",
+   "apple": {
+    "block": 4,
+    "composer": "Richard Wagner",
+    "work": "Tristan und Isolde, WWV 90 · “Tristan and Isolde”",
+    "part": "O sink hernieder, Nacht der Liebe",
+    "performers": "Dame Margaret Price, Staatskapelle Dresden, René Kollo, Carlos Kleiber"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Tristan und Isolde, WWV 90, Act II: Einsam wachend in der Nacht",
+   "durationMs": 166933,
+   "artist": "Brigitte Fassbaender, Staatskapelle Dresden & Carlos Kleiber",
+   "apple": {
+    "block": 4,
+    "composer": "Richard Wagner",
+    "work": "Tristan und Isolde, WWV 90 · “Tristan and Isolde”",
+    "part": "Einsam wachend in der Nacht",
+    "performers": "Brigitte Fassbaender, Staatskapelle Dresden, Carlos Kleiber"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Tristan und Isolde, WWV 90, Act II: Lausch, Geliebter!",
+   "durationMs": 289027,
+   "artist": "Dame Margaret Price, René Kollo, Staatskapelle Dresden & Carlos Kleiber",
+   "apple": {
+    "block": 4,
+    "composer": "Richard Wagner",
+    "work": "Tristan und Isolde, WWV 90 · “Tristan and Isolde”",
+    "part": "Lausch, Geliebter!",
+    "performers": "René Kollo, Dame Margaret Price, Carlos Kleiber, Staatskapelle Dresden"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Tristan und Isolde, WWV 90, Act II: Doch unsre Liebe, heißt sie nicht Tristan und Isolde?",
+   "durationMs": 152613,
+   "artist": "Dame Margaret Price, René Kollo, Staatskapelle Dresden & Carlos Kleiber",
+   "apple": {
+    "block": 4,
+    "composer": "Richard Wagner",
+    "work": "Tristan und Isolde, WWV 90 · “Tristan and Isolde”",
+    "part": "Doch unsre Liebe, heißt sie nicht Tristan und Isolde?",
+    "performers": "Dame Margaret Price, Carlos Kleiber, René Kollo, Staatskapelle Dresden"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Tristan und Isolde, WWV 90, Act II: So starben wir",
+   "durationMs": 486173,
+   "artist": "Dame Margaret Price, Brigitte Fassbaender, René Kollo, Staatskapelle Dresden & Carlos Kleiber",
+   "apple": {
+    "block": 4,
+    "composer": "Richard Wagner",
+    "work": "Tristan und Isolde, WWV 90 · “Tristan and Isolde”",
+    "part": "So starben wir",
+    "performers": "Carlos Kleiber, René Kollo, Brigitte Fassbaender, Dame Margaret Price, Staatskapelle Dresden"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Tristan und Isolde, WWV 90, Act II: Rette dich, Tristan!",
+   "durationMs": 86173,
+   "artist": "Werner Götz, René Kollo, Dietrich Fischer-Dieskau, Staatskapelle Dresden & Carlos Kleiber",
+   "apple": {
+    "block": 4,
+    "composer": "Richard Wagner",
+    "work": "Tristan und Isolde, WWV 90 · “Tristan and Isolde”",
+    "part": "Rette dich, Tristan!",
+    "performers": "René Kollo, Carlos Kleiber, Werner Götz, Staatskapelle Dresden, Dietrich Fischer-Dieskau"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Tristan und Isolde, WWV 90, Act II: Tatest du's wirklich?",
+   "durationMs": 734827,
+   "artist": "René Kollo, Kurt Moll, Staatskapelle Dresden & Carlos Kleiber",
+   "apple": {
+    "block": 4,
+    "composer": "Richard Wagner",
+    "work": "Tristan und Isolde, WWV 90 · “Tristan and Isolde”",
+    "part": "Tatest du's wirklich?",
+    "performers": "Carlos Kleiber, René Kollo, Kurt Moll, Staatskapelle Dresden"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Tristan und Isolde, WWV 90, Act II: O König, das kann ich dir nicht sagen",
+   "durationMs": 535773,
+   "artist": "Dame Margaret Price, Werner Götz, René Kollo, Staatskapelle Dresden & Carlos Kleiber",
+   "apple": {
+    "block": 4,
+    "composer": "Richard Wagner",
+    "work": "Tristan und Isolde, WWV 90 · “Tristan and Isolde”",
+    "part": "O König, das kann ich dir nicht sagen",
+    "performers": "Dame Margaret Price, Werner Götz, Carlos Kleiber, Staatskapelle Dresden, René Kollo"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "Tristan und Isolde, WWV 90, Act III: Prelude",
+   "durationMs": 272320,
+   "artist": "Staatskapelle Dresden & Carlos Kleiber",
+   "apple": {
+    "block": 5,
+    "composer": "Richard Wagner",
+    "work": "Die Götterdämmerung, WWV 86D · “The Ring Cycle”",
+    "part": "Prelude",
+    "performers": "Staatskapelle Dresden, Carlos Kleiber"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "Tristan und Isolde, WWV 90, Act III: Man hört einen Hirtenreigen",
+   "durationMs": 178560,
+   "artist": "Staatskapelle Dresden & Carlos Kleiber",
+   "apple": {
+    "block": 6,
+    "composer": "Richard Wagner",
+    "work": "Tristan und Isolde, WWV 90 · “Tristan and Isolde”",
+    "part": "Man hört einen Hirtenreigen",
+    "performers": "Staatskapelle Dresden, Carlos Kleiber"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "Tristan und Isolde, WWV 90, Act III: Kurwenal! He!",
+   "durationMs": 514413,
+   "artist": "Anton Dermota, René Kollo, Dietrich Fischer-Dieskau, Staatskapelle Dresden & Carlos Kleiber",
+   "apple": {
+    "block": 6,
+    "composer": "Richard Wagner",
+    "work": "Tristan und Isolde, WWV 90 · “Tristan and Isolde”",
+    "part": "Kurwenal! He!",
+    "performers": "Staatskapelle Dresden, Carlos Kleiber, Anton Dermota, René Kollo, Dietrich Fischer-Dieskau"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "Tristan und Isolde, Act III: Hei nun! Wie du kamst?",
+   "durationMs": 568507,
+   "artist": "Dietrich Fischer-Dieskau, René Kollo, Staatskapelle Dresden & Carlos Kleiber",
+   "apple": {
+    "block": 6,
+    "composer": "Richard Wagner",
+    "work": "Tristan und Isolde, WWV 90 · “Tristan and Isolde”",
+    "part": "Hei nun! Wie du kamst?",
+    "performers": "Staatskapelle Dresden, René Kollo, Carlos Kleiber, Dietrich Fischer-Dieskau"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 23,
+   "title": "Tristan und Isolde, WWV 90, Act III: Noch losch das Licht nicht aus",
+   "durationMs": 310320,
+   "artist": "René Kollo, Dietrich Fischer-Dieskau, Staatskapelle Dresden & Carlos Kleiber",
+   "apple": {
+    "block": 6,
+    "composer": "Richard Wagner",
+    "work": "Tristan und Isolde, WWV 90 · “Tristan and Isolde”",
+    "part": "Noch losch das Licht nicht aus",
+    "performers": "Carlos Kleiber, Dietrich Fischer-Dieskau, Staatskapelle Dresden, René Kollo"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 24,
+   "title": "Tristan und Isolde, WWV 90, Act III: Noch ist kein Schiff zu sehn!",
+   "durationMs": 710787,
+   "artist": "Dietrich Fischer-Dieskau, René Kollo, Staatskapelle Dresden & Carlos Kleiber",
+   "apple": {
+    "block": 6,
+    "composer": "Richard Wagner",
+    "work": "Tristan und Isolde, WWV 90 · “Tristan and Isolde”",
+    "part": "Noch ist kein Schiff zu sehn!",
+    "performers": "Staatskapelle Dresden, Dietrich Fischer-Dieskau, Carlos Kleiber, René Kollo"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 25,
+   "title": "Tristan und Isolde, WWV 90, Act III: Bist du nun tot? O Wonne! Freude!",
+   "durationMs": 543867,
+   "artist": "René Kollo, Dietrich Fischer-Dieskau, Staatskapelle Dresden & Carlos Kleiber",
+   "apple": {
+    "block": 6,
+    "composer": "Richard Wagner",
+    "work": "Tristan und Isolde, WWV 90 · “Tristan and Isolde”",
+    "part": "Bist du nun tot? O Wonne! Freude!",
+    "performers": "René Kollo, Staatskapelle Dresden, Dietrich Fischer-Dieskau, Carlos Kleiber"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 26,
+   "title": "Tristan und Isolde, WWV 90, Act III: O diese Sonne!",
+   "durationMs": 205053,
+   "artist": "Dame Margaret Price, René Kollo, Staatskapelle Dresden & Carlos Kleiber",
+   "apple": {
+    "block": 6,
+    "composer": "Richard Wagner",
+    "work": "Tristan und Isolde, WWV 90 · “Tristan and Isolde”",
+    "part": "O diese Sonne!",
+    "performers": "René Kollo, Staatskapelle Dresden, Carlos Kleiber, Dame Margaret Price"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 27,
+   "title": "Tristan und Isolde, WWV 90, Act III: Ich bin's, ich bin's",
+   "durationMs": 356600,
+   "artist": "Dame Margaret Price, Staatskapelle Dresden & Carlos Kleiber",
+   "apple": {
+    "block": 6,
+    "composer": "Richard Wagner",
+    "work": "Tristan und Isolde, WWV 90 · “Tristan and Isolde”",
+    "part": "Ich bin's, ich bin's",
+    "performers": "Carlos Kleiber, Staatskapelle Dresden, Dame Margaret Price"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 28,
+   "title": "Tristan und Isolde, WWV 90, Act III: Kurwenal! Hör!",
+   "durationMs": 467187,
+   "artist": "Brigitte Fassbaender, Werner Götz, Dietrich Fischer-Dieskau, Wolfgang Hellmich, Kurt Moll, MDR-Rundfunkchor, Staatskapelle Dresden & Carlos Kleiber",
+   "apple": {
+    "block": 6,
+    "composer": "Richard Wagner",
+    "work": "Tristan und Isolde, WWV 90 · “Tristan and Isolde”",
+    "part": "Kurwenal! Hör!",
+    "performers": "Kurt Moll, Dietrich Fischer-Dieskau, Brigitte Fassbaender, MDR-Rundfunkchor, Staatskapelle Dresden, Wolfgang Hellmich, Werner Götz, Carlos Kleiber"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 29,
+   "title": "Tristan und Isolde, WWV 90, Act III: Mild und leise wie er lächelt",
+   "durationMs": 446413,
+   "artist": "Dame Margaret Price, Staatskapelle Dresden & Carlos Kleiber",
+   "apple": {
+    "block": 6,
+    "composer": "Richard Wagner",
+    "work": "Tristan und Isolde, WWV 90 · “Tristan and Isolde”",
+    "part": "Mild und leise wie er lächelt",
+    "performers": "Carlos Kleiber, Dame Margaret Price, Staatskapelle Dresden"
+   }
+  }
+ ]
+}

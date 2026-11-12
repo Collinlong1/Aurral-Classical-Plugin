@@ -1,0 +1,624 @@
+{
+ "id": "1428811891",
+ "category": "symphony",
+ "title": "Beethoven: Symphonies & Overtures",
+ "artist": "Herbert von Karajan & Berlin Philharmonic Orchestra",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Symphony No. 1 in C Major, Op. 21: I. Adagio molto - Allegro con brio",
+   "durationMs": 465200,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 1,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 1 in C Major, Op. 21",
+    "part": "I. Adagio molto - Allegro con brio",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Symphony No. 1 in C Major, Op. 21: II. Andante cantabile con moto",
+   "durationMs": 363707,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 1,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 1 in C Major, Op. 21",
+    "part": "II. Andante cantabile con moto",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Symphony No. 1 in C Major, Op. 21: III. Menuetto (Allegro molto e vivace)",
+   "durationMs": 215373,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 1,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 1 in C Major, Op. 21",
+    "part": "III. Menuetto (Allegro molto e vivace)",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Symphony No. 1 in C Major, Op. 21: IV. Finale (Adagio - Allegro molto e vivace)",
+   "durationMs": 327133,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 1,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 1 in C Major, Op. 21",
+    "part": "IV. Finale (Adagio - Allegro molto e vivace)",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Symphony No. 4 in B-Flat Major, Op. 60: I. Adagio - Allegro vivace",
+   "durationMs": 626667,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 2,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 4 in B-Flat Major, Op. 60",
+    "part": "I. Adagio - Allegro vivace",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Symphony No. 4 in B-Flat Major, Op. 60: II. Adagio",
+   "durationMs": 598907,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 2,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 4 in B-Flat Major, Op. 60",
+    "part": "II. Adagio",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Symphony No. 4 in B-Flat Major, Op. 60: III. Allegro vivace",
+   "durationMs": 351787,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 2,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 4 in B-Flat Major, Op. 60",
+    "part": "III. Allegro vivace",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Symphony No. 4 in B-Flat Major, Op. 60: IV. Allegro ma non troppo",
+   "durationMs": 337333,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 2,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 4 in B-Flat Major, Op. 60",
+    "part": "IV. Allegro ma non troppo",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Egmont, Op. 84: Overture",
+   "durationMs": 499067,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 3,
+    "composer": "Ludwig van Beethoven",
+    "work": "Egmont, Op. 84",
+    "part": "Overture",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 1,
+   "title": "Symphony No. 2 in D Major, Op. 36: I. Adagio molto - Allegro con brio",
+   "durationMs": 616773,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 4,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 2 in D Major, Op. 36",
+    "part": "I. Adagio molto - Allegro con brio",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 2,
+   "title": "Symphony No. 2 in D Major, Op. 36: II. Larghetto",
+   "durationMs": 597360,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 4,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 2 in D Major, Op. 36",
+    "part": "II. Larghetto",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 3,
+   "title": "Symphony No. 2 in D Major, Op. 36: III. Scherzo (Allegro)",
+   "durationMs": 220867,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 4,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 2 in D Major, Op. 36",
+    "part": "III. Scherzo (Allegro)",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 4,
+   "title": "Symphony No. 2 in D Major, Op. 36: IV. Allegro molto",
+   "durationMs": 370760,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 4,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 2 in D Major, Op. 36",
+    "part": "IV. Allegro molto",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 5,
+   "title": "Symphony No. 7 in A Major, Op. 92: I. Poco sostenuto - Vivace",
+   "durationMs": 684733,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 5,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 7 in A Major, Op. 92",
+    "part": "I. Poco sostenuto - Vivace",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 6,
+   "title": "Symphony No. 7 in A Major, Op. 92: II. Allegretto",
+   "durationMs": 477227,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 5,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 7 in A Major, Op. 92",
+    "part": "II. Allegretto",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 7,
+   "title": "Symphony No. 7 in A Major, Op. 92: III. Presto - Assai meno presto",
+   "durationMs": 437693,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 5,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 7 in A Major, Op. 92",
+    "part": "III. Presto - Assai meno presto",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 8,
+   "title": "Symphony No. 7 in A Major, Op. 92: IV. Allegro con brio",
+   "durationMs": 384800,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 5,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 7 in A Major, Op. 92",
+    "part": "IV. Allegro con brio",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 1,
+   "title": "Symphony No. 3 in E-Flat Major, Op. 55 \"Eroica\": I. Allegro con brio",
+   "durationMs": 808360,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 6,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 3 in E-Flat Major, Op. 55 · “Eroica Symphony”",
+    "part": "I. Allegro con brio",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 2,
+   "title": "Symphony No. 3 in E-Flat Major, Op. 55 \"Eroica\": II. Marcia funebre (Adagio assai)",
+   "durationMs": 987333,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 6,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 3 in E-Flat Major, Op. 55 · “Eroica Symphony”",
+    "part": "II. Marcia funebre (Adagio assai)",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 3,
+   "title": "Symphony No. 3 in E-Flat Major, Op. 55 \"Eroica\": III. Scherzo (Allegro vivace)",
+   "durationMs": 369600,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 6,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 3 in E-Flat Major, Op. 55 · “Eroica Symphony”",
+    "part": "III. Scherzo (Allegro vivace)",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 4,
+   "title": "Symphony No. 3 in E-Flat Major, Op. 55 \"Eroica\": IV. Finale (Allegro molto)",
+   "durationMs": 695827,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 6,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 3 in E-Flat Major, Op. 55 · “Eroica Symphony”",
+    "part": "IV. Finale (Allegro molto)",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 5,
+   "title": "Overture \"Leonore No. 3\", Op. 72b",
+   "durationMs": 883333,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 7,
+    "composer": "Ludwig van Beethoven",
+    "work": "Leonore Overture No. 3 in C Major, Op. 72b",
+    "part": "Overture \"Leonore No. 3\", Op. 72b",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 1,
+   "title": "Symphony No. 5 in C Minor, Op. 67: I. Allegro con brio",
+   "durationMs": 428333,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 8,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 5 in C Minor, Op. 67 · “Fate Symphony”",
+    "part": "I. Allegro con brio",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 2,
+   "title": "Symphony No. 5 in C Minor, Op. 67: II. Andante con moto",
+   "durationMs": 567667,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 8,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 5 in C Minor, Op. 67 · “Fate Symphony”",
+    "part": "II. Andante con moto",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 3,
+   "title": "Symphony No. 5 in C Minor, Op. 67: III. Allegro",
+   "durationMs": 277067,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 8,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 5 in C Minor, Op. 67 · “Fate Symphony”",
+    "part": "III. Allegro",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 4,
+   "title": "Symphony No. 5 in C Minor, Op. 67: IV. Allegro",
+   "durationMs": 518493,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 8,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 5 in C Minor, Op. 67 · “Fate Symphony”",
+    "part": "IV. Allegro",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 5,
+   "title": "Symphony No. 8 in F Major, Op. 93: I. Allegro vivace e con brio",
+   "durationMs": 533267,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 9,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 8 in F Major, Op. 93",
+    "part": "I. Allegro vivace e con brio",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 6,
+   "title": "Symphony No. 8 in F Major, Op. 93: II. Allegretto scherzando",
+   "durationMs": 227493,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 9,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 8 in F Major, Op. 93",
+    "part": "II. Allegretto scherzando",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 7,
+   "title": "Symphony No. 8 in F Major, Op. 93: III. Tempo di menuetto",
+   "durationMs": 315507,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 9,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 8 in F Major, Op. 93",
+    "part": "III. Tempo di menuetto",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 8,
+   "title": "Symphony No. 8 in F Major, Op. 93: IV. Allegro vivace",
+   "durationMs": 390560,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 9,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 8 in F Major, Op. 93",
+    "part": "IV. Allegro vivace",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 9,
+   "title": "Overture \"Fidelio\", Op. 72c",
+   "durationMs": 417333,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 10,
+    "composer": "Ludwig van Beethoven",
+    "work": "Fidelio Overture, Op. 72c",
+    "part": "Overture \"Fidelio\", Op. 72c",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 1,
+   "title": "Symphony No. 6 in F Major, Op. 68 \"Pastoral\": I. Erwachen heiterer Empfindungen bei der Ankunft auf dem Lande (Allegro ma non troppo)",
+   "durationMs": 543493,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 11,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 6 in F Major, Op. 68 · “Pastoral Symphony”",
+    "part": "I. Erwachen heiterer Empfindungen bei der Ankunft auf dem Lande (Allegro ma non troppo)",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 2,
+   "title": "Symphony No. 6 in F Major, Op. 68 \"Pastoral\": II. Szene am Bach (Andante molto mosso)",
+   "durationMs": 681667,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 11,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 6 in F Major, Op. 68 · “Pastoral Symphony”",
+    "part": "II. Szene am Bach (Andante molto mosso)",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 3,
+   "title": "Symphony No. 6 in F Major, Op. 68 \"Pastoral\": III. Lustiges Zusammensein der Landleute (Allegro)",
+   "durationMs": 339573,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 11,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 6 in F Major, Op. 68 · “Pastoral Symphony”",
+    "part": "III. Lustiges Zusammensein der Landleute (Allegro)",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 4,
+   "title": "Symphony No. 6 in F Major, Op. 68 \"Pastoral\": IV. Gewitter, Sturm (Allegro)",
+   "durationMs": 209560,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 11,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 6 in F Major, Op. 68 · “Pastoral Symphony”",
+    "part": "IV. Gewitter, Sturm (Allegro)",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 5,
+   "title": "Symphony No. 6 in F Major, Op. 68 \"Pastoral\": V. Hirtengesang. Frohe und dankbare Gefühle nach dem Sturm (Allegretto)",
+   "durationMs": 514373,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 11,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 6 in F Major, Op. 68 · “Pastoral Symphony”",
+    "part": "V. Hirtengesang. Frohe und dankbare Gefühle nach dem Sturm (Allegretto)",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 6,
+   "title": "Overture \"Coriolan\", Op. 62",
+   "durationMs": 537000,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 12,
+    "composer": "Ludwig van Beethoven",
+    "work": "Coriolan in C Minor, Op. 62",
+    "part": "Overture \"Coriolan\", Op. 62",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 7,
+   "title": "The Creatures of Prometheus, Op. 43: Overture",
+   "durationMs": 319667,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 13,
+    "composer": "Ludwig van Beethoven",
+    "work": "Die Geschöpfe des Prometheus, Hess. 90, Op. 43 · “The Creatures of Prometheus”",
+    "part": "Overture",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 8,
+   "title": "The Ruins of Athens, Op. 113",
+   "durationMs": 324173,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 14,
+    "composer": "Ludwig van Beethoven",
+    "work": "Die Ruinen von Athen, Op. 113 · “The Ruins of Athens”",
+    "part": "The Ruins of Athens, Op. 113",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 1,
+   "title": "Symphony No. 9 in D Minor, Op. 125 \"Choral\": I. Allegro ma non troppo, un poco maestoso",
+   "durationMs": 920933,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 15,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 9 in D Minor, Op. 125 · “Choral Symphony”",
+    "part": "I. Allegro ma non troppo, un poco maestoso",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 2,
+   "title": "Symphony No. 9 in D Minor, Op. 125 \"Choral\": II. Molto vivace",
+   "durationMs": 603573,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 15,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 9 in D Minor, Op. 125 · “Choral Symphony”",
+    "part": "II. Molto vivace",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 3,
+   "title": "Symphony No. 9 in D Minor, Op. 125 \"Choral\": III. Adagio molto e cantabile",
+   "durationMs": 1010333,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 16,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 18 in E-Flat Major, Op. 31/3 · “The Hunt”",
+    "part": "III. Adagio molto e cantabile",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 4,
+   "title": "Symphony No. 9 in D Minor, Op. 125 \"Choral\": IVa. Presto -",
+   "durationMs": 386667,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 16,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 18 in E-Flat Major, Op. 31/3 · “The Hunt”",
+    "part": "IVa. Presto -",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 5,
+   "title": "Symphony No. 9 in D Minor, Op. 125 \"Choral\": IVb. Presto- \"O Freunde, nicht diese Töne!\" - Allegro assai",
+   "durationMs": 1076027,
+   "artist": "Anna Tomowa-Sintow, Herbert von Karajan, Berlin Philharmonic Orchestra, Wiener Singverein, Agnes Baltsa, Peter Schreier & José Van Dam",
+   "apple": {
+    "block": 17,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 9 in D Minor, Op. 125 · “Choral Symphony”",
+    "part": "IVb. Presto- \"O Freunde, nicht diese Töne!\" - Allegro assai",
+    "performers": "Herbert von Karajan, Agnes Baltsa, Peter Schreier, Wiener Singverein, Anna Tomowa-Sintow, Berlin Philharmonic Orchestra, José Van Dam"
+   }
+  }
+ ]
+}

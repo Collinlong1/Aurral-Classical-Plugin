@@ -1,0 +1,106 @@
+{
+ "id": "1396495581",
+ "category": "orchestral",
+ "title": "Debussy: La Mer, Nocturnes & Prélude à l'après-midi d'un Faune",
+ "artist": "London Symphony Orchestra & Rafael Frühbeck de Burgos",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "La Mer, L. 109: I. De l'aube à midi sur la mer",
+   "durationMs": 513333,
+   "artist": "London Symphony Orchestra & Rafael Frühbeck de Burgos",
+   "apple": {
+    "block": 1,
+    "composer": "Claude Debussy",
+    "work": "La mer, CD 111, L. 109 · “The Sea”",
+    "part": "I. De l'aube à midi sur la mer",
+    "performers": "Rafael Frühbeck de Burgos, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "La Mer, L. 109: II. Jeux de vagues",
+   "durationMs": 416067,
+   "artist": "London Symphony Orchestra & Rafael Frühbeck de Burgos",
+   "apple": {
+    "block": 1,
+    "composer": "Claude Debussy",
+    "work": "La mer, CD 111, L. 109 · “The Sea”",
+    "part": "II. Jeux de vagues",
+    "performers": "Rafael Frühbeck de Burgos, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "La Mer, L. 109: III. Dialogue du vent et de la mer",
+   "durationMs": 471307,
+   "artist": "London Symphony Orchestra & Rafael Frühbeck de Burgos",
+   "apple": {
+    "block": 1,
+    "composer": "Claude Debussy",
+    "work": "La mer, CD 111, L. 109 · “The Sea”",
+    "part": "III. Dialogue du vent et de la mer",
+    "performers": "London Symphony Orchestra, Rafael Frühbeck de Burgos"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Nocturnes, L. 91: I. Nuages",
+   "durationMs": 481067,
+   "artist": "London Symphony Orchestra & Rafael Frühbeck de Burgos",
+   "apple": {
+    "block": 2,
+    "composer": "Claude Debussy",
+    "work": "Nocturnes, CD 98, L. 91",
+    "part": "I. Nuages",
+    "performers": "London Symphony Orchestra, Rafael Frühbeck de Burgos"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Nocturnes, L. 91: II. Fêtes",
+   "durationMs": 377733,
+   "artist": "London Symphony Orchestra & Rafael Frühbeck de Burgos",
+   "apple": {
+    "block": 2,
+    "composer": "Claude Debussy",
+    "work": "Nocturnes, CD 98, L. 91",
+    "part": "II. Fêtes",
+    "performers": "London Symphony Orchestra, Rafael Frühbeck de Burgos"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Nocturnes, L. 91: III. Sirènes",
+   "durationMs": 597160,
+   "artist": "London Symphony Orchestra & Rafael Frühbeck de Burgos",
+   "apple": {
+    "block": 2,
+    "composer": "Claude Debussy",
+    "work": "Nocturnes, CD 98, L. 91",
+    "part": "III. Sirènes",
+    "performers": "Rafael Frühbeck de Burgos, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Prélude à l'après-midi d'un Faune, L. 86",
+   "durationMs": 661120,
+   "artist": "London Symphony Orchestra & Rafael Frühbeck de Burgos",
+   "apple": {
+    "block": 3,
+    "composer": "Claude Debussy",
+    "work": "Prélude à L'après-midi d'un faune, CD 87, L. 86 · “Prelude to 'The Afternoon of a Faun'”",
+    "part": "Prélude à l'après-midi d'un Faune, L. 86",
+    "performers": "London Symphony Orchestra, Rafael Frühbeck de Burgos"
+   }
+  }
+ ]
+}

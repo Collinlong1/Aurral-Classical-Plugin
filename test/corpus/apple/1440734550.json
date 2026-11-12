@@ -1,0 +1,344 @@
+{
+ "id": "1440734550",
+ "category": "solo instrument",
+ "title": "Chopin: Études",
+ "artist": "Maurizio Pollini",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "12 Études, Op. 10: No. 1 in C Major",
+   "durationMs": 116557,
+   "artist": "Maurizio Pollini",
+   "apple": {
+    "block": 1,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 10",
+    "part": "No. 1 in C Major",
+    "performers": "Maurizio Pollini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "12 Études, Op. 10: No. 2 in A Minor \"Chromatique\"",
+   "durationMs": 86525,
+   "artist": "Maurizio Pollini",
+   "apple": {
+    "block": 1,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 10",
+    "part": "No. 2 in A Minor \"Chromatique\"",
+    "performers": "Maurizio Pollini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "12 Études, Op. 10: No. 3 in E Major \"Tristesse\"",
+   "durationMs": 220865,
+   "artist": "Maurizio Pollini",
+   "apple": {
+    "block": 1,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 10",
+    "part": "No. 3 in E Major \"Tristesse\"",
+    "performers": "Maurizio Pollini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "12 Études, Op. 10: No. 4 in C-Sharp Minor",
+   "durationMs": 121536,
+   "artist": "Maurizio Pollini",
+   "apple": {
+    "block": 1,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 10",
+    "part": "No. 4 in C-Sharp Minor",
+    "performers": "Maurizio Pollini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "12 Études, Op. 10: No. 5 in G-Flat Major \"Black Keys\"",
+   "durationMs": 99331,
+   "artist": "Maurizio Pollini",
+   "apple": {
+    "block": 1,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 10",
+    "part": "No. 5 in G-Flat Major \"Black Keys\"",
+    "performers": "Maurizio Pollini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "12 Études, Op. 10: No. 6 in E-Flat Minor",
+   "durationMs": 190055,
+   "artist": "Maurizio Pollini",
+   "apple": {
+    "block": 1,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 10",
+    "part": "No. 6 in E-Flat Minor",
+    "performers": "Maurizio Pollini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "12 Études, Op. 10: No. 7 in C Major",
+   "durationMs": 89466,
+   "artist": "Maurizio Pollini",
+   "apple": {
+    "block": 1,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 10",
+    "part": "No. 7 in C Major",
+    "performers": "Maurizio Pollini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "12 Études, Op. 10: No. 8 in F Major",
+   "durationMs": 141326,
+   "artist": "Maurizio Pollini",
+   "apple": {
+    "block": 1,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 10",
+    "part": "No. 8 in F Major",
+    "performers": "Maurizio Pollini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "12 Études, Op. 10: No. 9 in F Minor",
+   "durationMs": 126603,
+   "artist": "Maurizio Pollini",
+   "apple": {
+    "block": 1,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 10",
+    "part": "No. 9 in F Minor",
+    "performers": "Maurizio Pollini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "12 Études, Op. 10: No. 10 in A-Flat Major",
+   "durationMs": 123867,
+   "artist": "Maurizio Pollini",
+   "apple": {
+    "block": 1,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 10",
+    "part": "No. 10 in A-Flat Major",
+    "performers": "Maurizio Pollini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "12 Études, Op. 10: No. 11 in E-Flat Major",
+   "durationMs": 135767,
+   "artist": "Maurizio Pollini",
+   "apple": {
+    "block": 1,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 10",
+    "part": "No. 11 in E-Flat Major",
+    "performers": "Maurizio Pollini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "12 Études, Op. 10: No. 12 in C Minor \"Revolutionary\"",
+   "durationMs": 164972,
+   "artist": "Maurizio Pollini",
+   "apple": {
+    "block": 1,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 10",
+    "part": "No. 12 in C Minor \"Revolutionary\"",
+    "performers": "Maurizio Pollini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "12 Études, Op. 25: No. 1 in A-Flat Major \"Harp Study\"",
+   "durationMs": 133169,
+   "artist": "Maurizio Pollini",
+   "apple": {
+    "block": 2,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 25",
+    "part": "No. 1 in A-Flat Major \"Harp Study\"",
+    "performers": "Maurizio Pollini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "12 Études, Op. 25: No. 2 in F Minor",
+   "durationMs": 87731,
+   "artist": "Maurizio Pollini",
+   "apple": {
+    "block": 2,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 25",
+    "part": "No. 2 in F Minor",
+    "performers": "Maurizio Pollini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "12 Études, Op. 25: No. 3 in F Major",
+   "durationMs": 113063,
+   "artist": "Maurizio Pollini",
+   "apple": {
+    "block": 2,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 25",
+    "part": "No. 3 in F Major",
+    "performers": "Maurizio Pollini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "12 Études, Op. 25: No. 4 in A Minor",
+   "durationMs": 101065,
+   "artist": "Maurizio Pollini",
+   "apple": {
+    "block": 2,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 25",
+    "part": "No. 4 in A Minor",
+    "performers": "Maurizio Pollini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "12 Études, Op. 25: No. 5 in E Minor",
+   "durationMs": 175503,
+   "artist": "Maurizio Pollini",
+   "apple": {
+    "block": 2,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 25",
+    "part": "No. 5 in E Minor",
+    "performers": "Maurizio Pollini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "12 Études, Op. 25: No. 6 in G-Sharp Minor",
+   "durationMs": 123553,
+   "artist": "Maurizio Pollini",
+   "apple": {
+    "block": 2,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 25",
+    "part": "No. 6 in G-Sharp Minor",
+    "performers": "Maurizio Pollini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "12 Études, Op. 25: No. 7 in C-Sharp Minor",
+   "durationMs": 291531,
+   "artist": "Maurizio Pollini",
+   "apple": {
+    "block": 2,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 25",
+    "part": "No. 7 in C-Sharp Minor",
+    "performers": "Maurizio Pollini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "12 Études, Op. 25: No. 8 in D-Flat Major",
+   "durationMs": 64331,
+   "artist": "Maurizio Pollini",
+   "apple": {
+    "block": 2,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 25",
+    "part": "No. 8 in D-Flat Major",
+    "performers": "Maurizio Pollini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "12 Études, Op. 25: No. 9 in G-Flat Major \"Butterfly Wings\"",
+   "durationMs": 57086,
+   "artist": "Maurizio Pollini",
+   "apple": {
+    "block": 2,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 25",
+    "part": "No. 9 in G-Flat Major \"Butterfly Wings\"",
+    "performers": "Maurizio Pollini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "12 Études, Op. 25: No. 10 in B Minor",
+   "durationMs": 237572,
+   "artist": "Maurizio Pollini",
+   "apple": {
+    "block": 2,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 25",
+    "part": "No. 10 in B Minor",
+    "performers": "Maurizio Pollini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 23,
+   "title": "12 Études, Op. 25: No. 11 in A Minor \"Winter Wind\"",
+   "durationMs": 212062,
+   "artist": "Maurizio Pollini",
+   "apple": {
+    "block": 2,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 25",
+    "part": "No. 11 in A Minor \"Winter Wind\"",
+    "performers": "Maurizio Pollini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 24,
+   "title": "12 Études, Op. 25: No. 12 in C Minor",
+   "durationMs": 152114,
+   "artist": "Maurizio Pollini",
+   "apple": {
+    "block": 2,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 25",
+    "part": "No. 12 in C Minor",
+    "performers": "Maurizio Pollini"
+   }
+  }
+ ]
+}

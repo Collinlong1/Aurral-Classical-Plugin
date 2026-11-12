@@ -1,0 +1,232 @@
+{
+ "id": "258630580",
+ "category": "baroque early",
+ "title": "Hildegard Von Bingen - Canticles of Ecstasy",
+ "artist": "Sequentia",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "O Vis Aeternitatis",
+   "durationMs": 477000,
+   "artist": "Sequentia, Barbara Thornton & Laurie Monahan",
+   "apple": {
+    "block": 1,
+    "composer": "Hildegard von Bingen",
+    "work": "O vis aeternitatis",
+    "part": "O Vis Aeternitatis",
+    "performers": "Laurie Monahan, Barbara Thornton, Sequentia"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Nunc Aperuit Nobis",
+   "durationMs": 120933,
+   "artist": "Barbara Thornton, Sequentia, Heather Knutson & Susanne Norin",
+   "apple": {
+    "block": 2,
+    "composer": "H. von Bingen",
+    "work": "H. von Bingen",
+    "part": "Nunc Aperuit Nobis",
+    "performers": "Heather Knutson, Susanne Norin, Barbara Thornton, Sequentia"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Quia Ergo Femina Mortem Instruxit",
+   "durationMs": 109067,
+   "artist": "Janet Youngdahl, Barbara Thornton & Sequentia",
+   "apple": {
+    "block": 3,
+    "composer": "Hildegard von Bingen",
+    "work": "Quia ergo femina",
+    "part": "Quia Ergo Femina Mortem Instruxit",
+    "performers": "Barbara Thornton, Sequentia, Janet Youngdahl"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Cum Processit Factura Digiti Dei",
+   "durationMs": 394000,
+   "artist": "Janet Youngdahl, Barbara Thornton & Sequentia",
+   "apple": {
+    "block": 4,
+    "composer": "H. von Bingen",
+    "work": "H. von Bingen",
+    "part": "Cum Processit Factura Digiti Dei",
+    "performers": "Janet Youngdahl, Barbara Thornton, Sequentia"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Alma Redemptoris Mater",
+   "durationMs": 138293,
+   "artist": "Sequentia & Barbara Thornton",
+   "apple": {
+    "block": 4,
+    "composer": "H. von Bingen",
+    "work": "H. von Bingen",
+    "part": "Alma Redemptoris Mater",
+    "performers": "Barbara Thornton, Sequentia"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Ave Maria, O Auctrix Vite",
+   "durationMs": 536707,
+   "artist": "Heather Knutson, Barbara Thornton & Sequentia",
+   "apple": {
+    "block": 5,
+    "composer": "Hildegard von Bingen",
+    "work": "Ave Maria O auctrix",
+    "part": "Ave Maria, O Auctrix Vite",
+    "performers": "Heather Knutson, Barbara Thornton, Sequentia"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Spiritus Sanctus Vivificans Vite",
+   "durationMs": 142000,
+   "artist": "Pamela Dellal, Barbara Thornton & Sequentia",
+   "apple": {
+    "block": 6,
+    "composer": "H. von Bingen",
+    "work": "H. von Bingen",
+    "part": "Spiritus Sanctus Vivificans Vite",
+    "performers": "Pamela Dellal, Barbara Thornton, Sequentia"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "O Ignis Spiritus Paracliti",
+   "durationMs": 379000,
+   "artist": "Susanne Norin, Barbara Thornton & Sequentia",
+   "apple": {
+    "block": 7,
+    "composer": "Hildegard von Bingen",
+    "work": "O ignis Spiritus Paraclitus",
+    "part": "O Ignis Spiritus Paracliti",
+    "performers": "Susanne Norin, Barbara Thornton, Sequentia"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Caritas Habundat In Omnia",
+   "durationMs": 139000,
+   "artist": "Sequentia & Barbara Thornton",
+   "apple": {
+    "block": 8,
+    "composer": "H. von Bingen",
+    "work": "H. von Bingen",
+    "part": "Caritas Habundat In Omnia",
+    "performers": "Barbara Thornton, Sequentia"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "O Virga Mediatrix",
+   "durationMs": 152000,
+   "artist": "Laurie Monahan, Sequentia & Barbara Thornton",
+   "apple": {
+    "block": 9,
+    "composer": "Hildegard von Bingen",
+    "work": "Alleluia, O virga mediatrix",
+    "part": "O Virga Mediatrix",
+    "performers": "Barbara Thornton, Sequentia, Laurie Monahan"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "O Viridissima Virga, Ave",
+   "durationMs": 234000,
+   "artist": "Sequentia & Barbara Thornton",
+   "apple": {
+    "block": 10,
+    "composer": "Hildegard von Bingen",
+    "work": "O viridissima virga",
+    "part": "O Viridissima Virga, Ave",
+    "performers": "Barbara Thornton, Sequentia"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Instrumentalstück",
+   "durationMs": 213000,
+   "artist": "Sequentia & Barbara Thornton",
+   "apple": {
+    "block": 11,
+    "composer": "Hildegard von Bingen",
+    "work": "Instrumental piece 1",
+    "part": "Instrumentalstück",
+    "performers": "Barbara Thornton, Sequentia"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "O Pastor Animarum",
+   "durationMs": 82000,
+   "artist": "Elizabeth Glen, Barbara Thornton & Sequentia",
+   "apple": {
+    "block": 12,
+    "composer": "Hildegard von Bingen",
+    "work": "O pastor animarum",
+    "part": "O Pastor Animarum",
+    "performers": "Elizabeth Glen, Barbara Thornton, Sequentia"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "O Tu Suavissima Virga",
+   "durationMs": 682000,
+   "artist": "Susanne Norin, Barbara Thornton & Sequentia",
+   "apple": {
+    "block": 13,
+    "composer": "Hildegard von Bingen",
+    "work": "O tu suavissima",
+    "part": "O Tu Suavissima Virga",
+    "performers": "Barbara Thornton, Sequentia, Susanne Norin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "O Choruscans Stellarum",
+   "durationMs": 168000,
+   "artist": "Barbara Thornton & Sequentia",
+   "apple": {
+    "block": 14,
+    "composer": "H. von Bingen",
+    "work": "H. von Bingen",
+    "part": "O Choruscans Stellarum",
+    "performers": "Barbara Thornton, Sequentia"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "O Nobilissima Viriditas",
+   "durationMs": 407000,
+   "artist": "Gundula Anders, Elizabeth Glen, Barbara Thornton & Sequentia",
+   "apple": {
+    "block": 15,
+    "composer": "Bryce Dessner",
+    "work": "O nobilissima viriditas",
+    "part": "O Nobilissima Viriditas",
+    "performers": "Gundula Anders, Barbara Thornton, Sequentia, Elizabeth Glen"
+   }
+  }
+ ]
+}

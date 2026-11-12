@@ -1,0 +1,120 @@
+{
+ "id": "211475181",
+ "category": "piano recital",
+ "title": "Kissin Plays Chopin - The Verbier Festival Recital",
+ "artist": "Evgeny Kissin",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Polonaise in C-Sharp Minor, Op. 26, No. 1",
+   "durationMs": 539307,
+   "artist": "Evgeny Kissin",
+   "apple": {
+    "block": 1,
+    "composer": "Frédéric Chopin",
+    "work": "Polonaise No. 1 in C-Sharp Minor, B. 90/1, Op. 26/1 · “Les favorites 1”",
+    "part": "Polonaise in C-Sharp Minor, Op. 26, No. 1",
+    "performers": "Evgeny Kissin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Polonaise in E-Flat Minor, Op. 26, No. 2",
+   "durationMs": 577853,
+   "artist": "Evgeny Kissin",
+   "apple": {
+    "block": 2,
+    "composer": "Frédéric Chopin",
+    "work": "Polonaise No. 2 in E-Flat Minor, B. 90/2, Op. 26/2 · “Les favorites 2”",
+    "part": "Polonaise in E-Flat Minor, Op. 26, No. 2",
+    "performers": "Evgeny Kissin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Impromptu in A-Flat Major, Op. 29",
+   "durationMs": 258227,
+   "artist": "Evgeny Kissin",
+   "apple": {
+    "block": 3,
+    "composer": "Frédéric Chopin",
+    "work": "Impromptu No. 1 in A-Flat Major, B. 110, Op. 29",
+    "part": "Impromptu in A-Flat Major, Op. 29",
+    "performers": "Evgeny Kissin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Impromptu in F-Sharp Major, Op. 36",
+   "durationMs": 346653,
+   "artist": "Evgeny Kissin",
+   "apple": {
+    "block": 4,
+    "composer": "Frédéric Chopin",
+    "work": "Impromptu No. 2 in F-Sharp Major, B. 129, Op. 36",
+    "part": "Impromptu in F-Sharp Major, Op. 36",
+    "performers": "Evgeny Kissin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Impromptu in G-Flat Major, Op. 51",
+   "durationMs": 376480,
+   "artist": "Evgeny Kissin",
+   "apple": {
+    "block": 5,
+    "composer": "Frédéric Chopin",
+    "work": "Impromptu No. 3 in G-Flat Major, B. 149, Op. 51",
+    "part": "Impromptu in G-Flat Major, Op. 51",
+    "performers": "Evgeny Kissin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Fantaisie-Impromptu in C-Sharp Minor, Op. 66",
+   "durationMs": 350840,
+   "artist": "Evgeny Kissin",
+   "apple": {
+    "block": 6,
+    "composer": "Frédéric Chopin",
+    "work": "Fantaisie-Impromptu in C-Sharp Minor, B. 87, Op. 66 · “Mme d'Este”",
+    "part": "Fantaisie-Impromptu in C-Sharp Minor, Op. 66",
+    "performers": "Evgeny Kissin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Polonaise in C Minor, Op. 40, No. 2",
+   "durationMs": 530173,
+   "artist": "Evgeny Kissin",
+   "apple": {
+    "block": 7,
+    "composer": "Frédéric Chopin",
+    "work": "Polonaise No. 4 in C Minor, B. 121, Op. 40/2 · “Les favorites 4”",
+    "part": "Polonaise in C Minor, Op. 40, No. 2",
+    "performers": "Evgeny Kissin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Polonaise in A-Flat Major, Op. 53",
+   "durationMs": 438627,
+   "artist": "Evgeny Kissin",
+   "apple": {
+    "block": 8,
+    "composer": "Frédéric Chopin",
+    "work": "Polonaise No. 6 in A-Flat Major, B. 147, Op. 53 · “Héroique”",
+    "part": "Polonaise in A-Flat Major, Op. 53",
+    "performers": "Evgeny Kissin"
+   }
+  }
+ ]
+}

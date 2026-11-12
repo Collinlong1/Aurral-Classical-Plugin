@@ -1,0 +1,624 @@
+{
+ "id": "1152447059",
+ "category": "guitar harp other",
+ "title": "Segovia: Guitar Music",
+ "artist": "Alberto la Rocca",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Preludio No. 1",
+   "durationMs": 46000,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 1,
+    "composer": "Andrés Segovia",
+    "work": "11 Preludios",
+    "part": "Preludio No. 1",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Preludio No. 2: Fatiga",
+   "durationMs": 181160,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 1,
+    "composer": "Andrés Segovia",
+    "work": "11 Preludios",
+    "part": "Fatiga",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Preludio No. 3: León",
+   "durationMs": 71200,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 1,
+    "composer": "Andrés Segovia",
+    "work": "11 Preludios",
+    "part": "León",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Preludio No. 4",
+   "durationMs": 42147,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 1,
+    "composer": "Andrés Segovia",
+    "work": "11 Preludios",
+    "part": "Preludio No. 4",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Preludio No. 5: Preludio a Deli",
+   "durationMs": 68480,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 2,
+    "composer": "Segovia: Preludio No. 5",
+    "work": "Segovia: Preludio No. 5",
+    "part": "Preludio a Deli",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Preludio No. 6: Preludio en Si Menor",
+   "durationMs": 143093,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 3,
+    "composer": "Andrés Segovia",
+    "work": "11 Preludios",
+    "part": "Preludio en Si Menor",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Preludio No. 7: Preludio Madrileño",
+   "durationMs": 236760,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 4,
+    "composer": "Segovia: Preludio No. 7",
+    "work": "Segovia: Preludio No. 7",
+    "part": "Preludio Madrileño",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Preludio No. 8: Preludio sobre un tema de Aparicio Méndez",
+   "durationMs": 111147,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 5,
+    "composer": "Segovia: Preludio No. 8",
+    "work": "Segovia: Preludio No. 8",
+    "part": "Preludio sobre un tema de Aparicio Méndez",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Preludio No. 9",
+   "durationMs": 60080,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 6,
+    "composer": "Andrés Segovia",
+    "work": "11 Preludios",
+    "part": "Preludio No. 9",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Preludio No. 10",
+   "durationMs": 50293,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 6,
+    "composer": "Andrés Segovia",
+    "work": "11 Preludios",
+    "part": "Preludio No. 10",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Preludio No. 11: Vara",
+   "durationMs": 67453,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 7,
+    "composer": "Segovia: Preludio No. 11",
+    "work": "Segovia: Preludio No. 11",
+    "part": "Vara",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Estudio en Mi mayor",
+   "durationMs": 213560,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 8,
+    "composer": "Andrés Segovia",
+    "work": "Estudio in E Major",
+    "part": "Estudio en Mi mayor",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Estudio para deli",
+   "durationMs": 91680,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 9,
+    "composer": "Andrés Segovia",
+    "work": "Estudio para Deli",
+    "part": "Estudio para deli",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Recordando a deli - Estudio para sus deditos inteligentes",
+   "durationMs": 206253,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 10,
+    "composer": "Segovia",
+    "work": "Segovia",
+    "part": "Recordando a deli - Estudio para sus deditos inteligentes",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Estudios: I. Oración",
+   "durationMs": 155667,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 11,
+    "composer": "Andrés Segovia",
+    "work": "Estudios Diarios",
+    "part": "I. Oración",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Estudios: II. Remembranza",
+   "durationMs": 195573,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 11,
+    "composer": "Andrés Segovia",
+    "work": "Estudios Diarios",
+    "part": "II. Remembranza",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Estudio-Vals",
+   "durationMs": 139427,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 12,
+    "composer": "Andrés Segovia",
+    "work": "Estudio in E Major",
+    "part": "Estudio-Vals",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Estudio sin luz",
+   "durationMs": 195067,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 13,
+    "composer": "Andrés Segovia",
+    "work": "Estudio Sin Luz",
+    "part": "Estudio sin luz",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "Impromtu",
+   "durationMs": 97267,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 14,
+    "composer": "Segovia",
+    "work": "Segovia",
+    "part": "Impromtu",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "Two Pieces: I. Estudio",
+   "durationMs": 187573,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 15,
+    "composer": "Andrés Segovia",
+    "work": "Estudio in E Major",
+    "part": "I. Estudio",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "Two Pieces: II. Humorada",
+   "durationMs": 122613,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 16,
+    "composer": "Segovia: Two Pieces",
+    "work": "Segovia: Two Pieces",
+    "part": "II. Humorada",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "Veintitrés canciones populares de distintos países: I. Inglesa",
+   "durationMs": 73347,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 17,
+    "composer": "Segovia: Veintitrés canciones populares de distintos países",
+    "work": "Segovia: Veintitrés canciones populares de distintos países",
+    "part": "I. Inglesa",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 23,
+   "title": "Veintitrés canciones populares de distintos países: II. Escocesa",
+   "durationMs": 70093,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 17,
+    "composer": "Segovia: Veintitrés canciones populares de distintos países",
+    "work": "Segovia: Veintitrés canciones populares de distintos países",
+    "part": "II. Escocesa",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 24,
+   "title": "Veintitrés canciones populares de distintos países: III. Irlandesa",
+   "durationMs": 52040,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 17,
+    "composer": "Segovia: Veintitrés canciones populares de distintos países",
+    "work": "Segovia: Veintitrés canciones populares de distintos países",
+    "part": "III. Irlandesa",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 25,
+   "title": "Veintitrés canciones populares de distintos países: IV. Rusa",
+   "durationMs": 115000,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 17,
+    "composer": "Segovia: Veintitrés canciones populares de distintos países",
+    "work": "Segovia: Veintitrés canciones populares de distintos países",
+    "part": "IV. Rusa",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 26,
+   "title": "Veintitrés canciones populares de distintos países: V. Rusa",
+   "durationMs": 47947,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 17,
+    "composer": "Segovia: Veintitrés canciones populares de distintos países",
+    "work": "Segovia: Veintitrés canciones populares de distintos países",
+    "part": "V. Rusa",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 27,
+   "title": "Veintitrés canciones populares de distintos países: VI. Tscheca",
+   "durationMs": 51053,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 17,
+    "composer": "Segovia: Veintitrés canciones populares de distintos países",
+    "work": "Segovia: Veintitrés canciones populares de distintos países",
+    "part": "VI. Tscheca",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 28,
+   "title": "Veintitrés canciones populares de distintos países: VII. Polaca",
+   "durationMs": 65667,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 17,
+    "composer": "Segovia: Veintitrés canciones populares de distintos países",
+    "work": "Segovia: Veintitrés canciones populares de distintos países",
+    "part": "VII. Polaca",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 29,
+   "title": "Veintitrés canciones populares de distintos países: VIII. Polaca",
+   "durationMs": 54427,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 17,
+    "composer": "Segovia: Veintitrés canciones populares de distintos países",
+    "work": "Segovia: Veintitrés canciones populares de distintos países",
+    "part": "VIII. Polaca",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 30,
+   "title": "Veintitrés canciones populares de distintos países: IX. Finlandesa",
+   "durationMs": 73707,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 17,
+    "composer": "Segovia: Veintitrés canciones populares de distintos países",
+    "work": "Segovia: Veintitrés canciones populares de distintos países",
+    "part": "IX. Finlandesa",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 31,
+   "title": "Veintitrés canciones populares de distintos países: X. Finlandesa",
+   "durationMs": 31013,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 17,
+    "composer": "Segovia: Veintitrés canciones populares de distintos países",
+    "work": "Segovia: Veintitrés canciones populares de distintos países",
+    "part": "X. Finlandesa",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 32,
+   "title": "Veintitrés canciones populares de distintos países: XI. Serbia",
+   "durationMs": 34893,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 17,
+    "composer": "Segovia: Veintitrés canciones populares de distintos países",
+    "work": "Segovia: Veintitrés canciones populares de distintos países",
+    "part": "XI. Serbia",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 33,
+   "title": "Veintitrés canciones populares de distintos países: XII. Serbia",
+   "durationMs": 62307,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 17,
+    "composer": "Segovia: Veintitrés canciones populares de distintos países",
+    "work": "Segovia: Veintitrés canciones populares de distintos países",
+    "part": "XII. Serbia",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 34,
+   "title": "Veintitrés canciones populares de distintos países: XIII. Croata",
+   "durationMs": 67013,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 17,
+    "composer": "Segovia: Veintitrés canciones populares de distintos países",
+    "work": "Segovia: Veintitrés canciones populares de distintos países",
+    "part": "XIII. Croata",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 35,
+   "title": "Veintitrés canciones populares de distintos países: XIV. Croata",
+   "durationMs": 44973,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 17,
+    "composer": "Segovia: Veintitrés canciones populares de distintos países",
+    "work": "Segovia: Veintitrés canciones populares de distintos países",
+    "part": "XIV. Croata",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 36,
+   "title": "Veintitrés canciones populares de distintos países: XV. Eslovania",
+   "durationMs": 95027,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 17,
+    "composer": "Segovia: Veintitrés canciones populares de distintos países",
+    "work": "Segovia: Veintitrés canciones populares de distintos países",
+    "part": "XV. Eslovania",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 37,
+   "title": "Veintitrés canciones populares de distintos países: XVI. Sueca",
+   "durationMs": 69027,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 17,
+    "composer": "Segovia: Veintitrés canciones populares de distintos países",
+    "work": "Segovia: Veintitrés canciones populares de distintos países",
+    "part": "XVI. Sueca",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 38,
+   "title": "Veintitrés canciones populares de distintos países: XVII. Bretona",
+   "durationMs": 57947,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 17,
+    "composer": "Segovia: Veintitrés canciones populares de distintos países",
+    "work": "Segovia: Veintitrés canciones populares de distintos países",
+    "part": "XVII. Bretona",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 39,
+   "title": "Veintitrés canciones populares de distintos países: XVIII. Vasca",
+   "durationMs": 59053,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 17,
+    "composer": "Segovia: Veintitrés canciones populares de distintos países",
+    "work": "Segovia: Veintitrés canciones populares de distintos países",
+    "part": "XVIII. Vasca",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 40,
+   "title": "Veintitrés canciones populares de distintos países: XIX. Catalana",
+   "durationMs": 26613,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 17,
+    "composer": "Segovia: Veintitrés canciones populares de distintos países",
+    "work": "Segovia: Veintitrés canciones populares de distintos países",
+    "part": "XIX. Catalana",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 41,
+   "title": "Veintitrés canciones populares de distintos países: XX. Catalana",
+   "durationMs": 35333,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 17,
+    "composer": "Segovia: Veintitrés canciones populares de distintos países",
+    "work": "Segovia: Veintitrés canciones populares de distintos países",
+    "part": "XX. Catalana",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 42,
+   "title": "Veintitrés canciones populares de distintos países: XXI. Catalana",
+   "durationMs": 70507,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 17,
+    "composer": "Segovia: Veintitrés canciones populares de distintos países",
+    "work": "Segovia: Veintitrés canciones populares de distintos países",
+    "part": "XXI. Catalana",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 43,
+   "title": "Veintitrés canciones populares de distintos países: XXII. Francesa",
+   "durationMs": 79507,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 17,
+    "composer": "Segovia: Veintitrés canciones populares de distintos países",
+    "work": "Segovia: Veintitrés canciones populares de distintos países",
+    "part": "XXII. Francesa",
+    "performers": "Alberto la Rocca"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 44,
+   "title": "Veintitrés canciones populares de distintos países: XXIII. Catalana",
+   "durationMs": 66997,
+   "artist": "Alberto la Rocca",
+   "apple": {
+    "block": 17,
+    "composer": "Segovia: Veintitrés canciones populares de distintos países",
+    "work": "Segovia: Veintitrés canciones populares de distintos países",
+    "part": "XXIII. Catalana",
+    "performers": "Alberto la Rocca"
+   }
+  }
+ ]
+}

@@ -1,0 +1,176 @@
+{
+ "id": "1272287210",
+ "category": "chamber",
+ "title": "Brahms: The Piano Trios",
+ "artist": "Yo-Yo Ma, Emanuel Ax & Leonidas Kavakos",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Piano Trio No. 2 in C Major, Op. 87: I. Allegro",
+   "durationMs": 590728,
+   "artist": "Emanuel Ax, Leonidas Kavakos & Yo-Yo Ma",
+   "apple": {
+    "block": 1,
+    "composer": "Johannes Brahms",
+    "work": "Piano Trio No. 2 in C Major, Op. 87",
+    "part": "I. Allegro",
+    "performers": "Leonidas Kavakos, Yo-Yo Ma, Emanuel Ax"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Piano Trio No. 2 in C Major, Op. 87: II. Andante con moto",
+   "durationMs": 483853,
+   "artist": "Emanuel Ax, Leonidas Kavakos & Yo-Yo Ma",
+   "apple": {
+    "block": 1,
+    "composer": "Johannes Brahms",
+    "work": "Piano Trio No. 2 in C Major, Op. 87",
+    "part": "II. Andante con moto",
+    "performers": "Emanuel Ax, Yo-Yo Ma, Leonidas Kavakos"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Piano Trio No. 2 in C Major, Op. 87: III. Scherzo. Presto",
+   "durationMs": 288107,
+   "artist": "Emanuel Ax, Leonidas Kavakos & Yo-Yo Ma",
+   "apple": {
+    "block": 1,
+    "composer": "Johannes Brahms",
+    "work": "Piano Trio No. 2 in C Major, Op. 87",
+    "part": "III. Scherzo. Presto - Trio",
+    "performers": "Emanuel Ax, Leonidas Kavakos, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Piano Trio No. 2 in C Major, Op. 87: IV. Finale. Allegro giocoso",
+   "durationMs": 371227,
+   "artist": "Emanuel Ax, Leonidas Kavakos & Yo-Yo Ma",
+   "apple": {
+    "block": 1,
+    "composer": "Johannes Brahms",
+    "work": "Piano Trio No. 2 in C Major, Op. 87",
+    "part": "IV. Finale. Allegro giocoso",
+    "performers": "Leonidas Kavakos, Emanuel Ax, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 1,
+   "title": "Piano Trio No. 3 in C Minor, Op. 101: I. Allegro energico",
+   "durationMs": 448227,
+   "artist": "Emanuel Ax, Leonidas Kavakos & Yo-Yo Ma",
+   "apple": {
+    "block": 2,
+    "composer": "Johannes Brahms",
+    "work": "Piano Trio No. 3 in C Minor, Op. 101",
+    "part": "I. Allegro energico",
+    "performers": "Emanuel Ax, Leonidas Kavakos, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 2,
+   "title": "Piano Trio No. 3 in C Minor, Op. 101: II. Presto non assai",
+   "durationMs": 231827,
+   "artist": "Emanuel Ax, Leonidas Kavakos & Yo-Yo Ma",
+   "apple": {
+    "block": 2,
+    "composer": "Johannes Brahms",
+    "work": "Piano Trio No. 3 in C Minor, Op. 101",
+    "part": "II. Presto non assai",
+    "performers": "Leonidas Kavakos, Emanuel Ax, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 3,
+   "title": "Piano Trio No. 3 in C Minor, Op. 101: III. Andante grazioso",
+   "durationMs": 245613,
+   "artist": "Emanuel Ax, Leonidas Kavakos & Yo-Yo Ma",
+   "apple": {
+    "block": 2,
+    "composer": "Johannes Brahms",
+    "work": "Piano Trio No. 3 in C Minor, Op. 101",
+    "part": "III. Andante grazioso",
+    "performers": "Emanuel Ax, Leonidas Kavakos, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 4,
+   "title": "Piano Trio No. 3 in C Minor, Op. 101: IV. Allegro molto",
+   "durationMs": 338507,
+   "artist": "Emanuel Ax, Leonidas Kavakos & Yo-Yo Ma",
+   "apple": {
+    "block": 2,
+    "composer": "Johannes Brahms",
+    "work": "Piano Trio No. 3 in C Minor, Op. 101",
+    "part": "IV. Allegro molto",
+    "performers": "Leonidas Kavakos, Emanuel Ax, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 5,
+   "title": "Piano Trio No. 1 in B Major, Op. 8: I. Allegro con brio",
+   "durationMs": 874018,
+   "artist": "Emanuel Ax, Leonidas Kavakos & Yo-Yo Ma",
+   "apple": {
+    "block": 3,
+    "composer": "Johannes Brahms",
+    "work": "Piano Trio No. 1 in B Major, Op. 8",
+    "part": "I. Allegro con moto - Allegro con brio",
+    "performers": "Emanuel Ax, Leonidas Kavakos, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 6,
+   "title": "Piano Trio No. 1 in B Major, Op. 8: II. Scherzo. Allegro molto",
+   "durationMs": 391067,
+   "artist": "Emanuel Ax, Leonidas Kavakos & Yo-Yo Ma",
+   "apple": {
+    "block": 3,
+    "composer": "Johannes Brahms",
+    "work": "Piano Trio No. 1 in B Major, Op. 8",
+    "part": "II. Scherzo & Trio. Allegro molto - Più lento",
+    "performers": "Emanuel Ax, Yo-Yo Ma, Leonidas Kavakos"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 7,
+   "title": "Piano Trio No. 1 in B Major, Op. 8: III. Adagio",
+   "durationMs": 510120,
+   "artist": "Emanuel Ax, Leonidas Kavakos & Yo-Yo Ma",
+   "apple": {
+    "block": 3,
+    "composer": "Johannes Brahms",
+    "work": "Piano Trio No. 1 in B Major, Op. 8",
+    "part": "III. Adagio non troppo",
+    "performers": "Leonidas Kavakos, Emanuel Ax, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 8,
+   "title": "Piano Trio No. 1 in B Major, Op. 8: IV. Finale. Allegro",
+   "durationMs": 405800,
+   "artist": "Emanuel Ax, Leonidas Kavakos & Yo-Yo Ma",
+   "apple": {
+    "block": 3,
+    "composer": "Johannes Brahms",
+    "work": "Piano Trio No. 1 in B Major, Op. 8",
+    "part": "IV. Finale. Allegro molto agitato",
+    "performers": "Emanuel Ax, Leonidas Kavakos, Yo-Yo Ma"
+   }
+  }
+ ]
+}

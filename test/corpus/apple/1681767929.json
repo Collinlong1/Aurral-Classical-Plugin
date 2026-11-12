@@ -1,0 +1,64 @@
+{
+ "id": "1681767929",
+ "category": "symphony",
+ "title": "Tchaikovsky: Symphony No. 6 \"Pathétique\"",
+ "artist": "Berlin Philharmonic Orchestra & Kirill Petrenko",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Symphony No. 6 in B Minor, Op. 74, TH 30 \"Pathétique\": I. Adagio. Allegro non troppo",
+   "durationMs": 1071464,
+   "artist": "Kirill Petrenko & Berlin Philharmonic",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "Symphony No. 6 in B Minor, Op. 74, TH 30 · “Pathétique”",
+    "part": "I. Adagio. Allegro non troppo",
+    "performers": "Berlin Philharmonic Orchestra, Kirill Petrenko"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Symphony No. 6 in B Minor, Op. 74, TH 30 \"Pathétique\": II. Allegro con grazia",
+   "durationMs": 458004,
+   "artist": "Kirill Petrenko & Berlin Philharmonic",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "Symphony No. 6 in B Minor, Op. 74, TH 30 · “Pathétique”",
+    "part": "II. Allegro con grazia",
+    "performers": "Berlin Philharmonic Orchestra, Kirill Petrenko"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Symphony No. 6 in B Minor, Op. 74, TH 30 \"Pathétique\": III. Allegro molto vivace",
+   "durationMs": 526735,
+   "artist": "Kirill Petrenko & Berlin Philharmonic",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "Symphony No. 6 in B Minor, Op. 74, TH 30 · “Pathétique”",
+    "part": "III. Allegro molto vivace",
+    "performers": "Berlin Philharmonic Orchestra, Kirill Petrenko"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Symphony No. 6 in B Minor, Op. 74, TH 30 \"Pathétique\": IV. Finale. Adagio lamentoso – Andante",
+   "durationMs": 587661,
+   "artist": "Kirill Petrenko & Berlin Philharmonic",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "Symphony No. 6 in B Minor, Op. 74, TH 30 · “Pathétique”",
+    "part": "IV. Finale. Adagio lamentoso – Andante",
+    "performers": "Berlin Philharmonic Orchestra, Kirill Petrenko"
+   }
+  }
+ ]
+}

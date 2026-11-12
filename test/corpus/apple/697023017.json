@@ -1,0 +1,372 @@
+{
+ "id": "697023017",
+ "category": "opera",
+ "title": "Puccini: La Bohème",
+ "artist": "Maria Callas, Giuseppe di Stefano, Teatro Alla Scala Orchestra & Coro del Teatro alla Scala di Milano",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Questo 'Mar Rosso' (Marcello/Rodolfo/Colline)",
+   "durationMs": 335960,
+   "artist": "Antonino Votto, Giuseppe di Stefano & Teatro Alla Scala Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Giacomo Puccini",
+    "work": "La Bohème, SC 67",
+    "part": "Questo 'Mar Rosso' (Marcello/Rodolfo/Colline)",
+    "performers": "Giuseppe di Stefano, Teatro Alla Scala Orchestra, Antonino Votto"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Abbasso, abbasso I'autore! (Marcello/Colline/Rodolfo/Schuanard)",
+   "durationMs": 227107,
+   "artist": "Antonino Votto, Giuseppe di Stefano & Teatro Alla Scala Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "G. Puccini",
+    "work": "G. Puccini",
+    "part": "Abbasso, abbasso I'autore! (Marcello/Colline/Rodolfo/Schuanard)",
+    "performers": "Giuseppe di Stefano, Antonino Votto, Teatro Alla Scala Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Si può?....Chi è là? (Benoît/Marcello/Schaunard/Colline/Rodolfo)",
+   "durationMs": 259467,
+   "artist": "Antonino Votto, Giuseppe di Stefano & Teatro Alla Scala Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Giacomo Puccini",
+    "work": "La Bohème, SC 67",
+    "part": "Si può?....Chi è là? (Benoît/Marcello/Schaunard/Colline/Rodolfo)",
+    "performers": "Antonino Votto, Teatro Alla Scala Orchestra, Giuseppe di Stefano, Rolando Panerai, Manuel Spatafora"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Al Quatiere latin ci attende Momus (Schaunard/Marcello/Rodolfo/Colline)",
+   "durationMs": 104133,
+   "artist": "Antonino Votto, Giuseppe di Stefano & Teatro Alla Scala Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Giacomo Puccini",
+    "work": "La Bohème, SC 67",
+    "part": "Al Quatiere latin ci attende Momus (Schaunard/Marcello/Rodolfo/Colline)",
+    "performers": "Teatro Alla Scala Orchestra, Giuseppe di Stefano, Antonino Votto"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "La Bohème: Non sono in vena (Rodolfo/Mimì)",
+   "durationMs": 228627,
+   "artist": "Anna Moffo, Antonino Votto, Teatro Alla Scala Orchestra, Coro del Teatro alla Scala di Milano, Franco Ricciardi, Giuseppe di Stefano & Maria Callas",
+   "apple": {
+    "block": 3,
+    "composer": "Giacomo Puccini",
+    "work": "La Bohème, SC 67",
+    "part": "Non sono in vena (Rodolfo/Mimì)",
+    "performers": "Franco Ricciardi, Anna Moffo, Giuseppe di Stefano, Antonino Votto, Teatro Alla Scala Orchestra, Maria Callas"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "La Bohème: Che gelida manina! (Rodolfo)",
+   "durationMs": 301600,
+   "artist": "Antonino Votto, Giuseppe di Stefano & Teatro Alla Scala Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Giacomo Puccini",
+    "work": "La Bohème, SC 67",
+    "part": "Che gelida manina! (Rodolfo)",
+    "performers": "Giuseppe di Stefano, Teatro Alla Scala Orchestra, Antonino Votto"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Sì. mi chiamano Mimì (Mimì/Rodolfo)",
+   "durationMs": 295240,
+   "artist": "Antonino Votto, Giuseppe di Stefano, Maria Callas & Teatro Alla Scala Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Giacomo Puccini",
+    "work": "La Bohème, SC 67",
+    "part": "Sì. mi chiamano Mimì (Mimì/Rodolfo)",
+    "performers": "Teatro Alla Scala Orchestra, Giuseppe di Stefano, Antonino Votto, Maria Callas"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "La Bohème: Ehi! Rodolfo!...O soave fanciulla (Schaunard/Colline/Marcello/Rodolfo/Mimì)",
+   "durationMs": 299067,
+   "artist": "Antonino Votto, Giuseppe di Stefano, Maria Callas & Teatro Alla Scala Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Giacomo Puccini",
+    "work": "La Bohème, SC 67",
+    "part": "Ehi! Rodolfo!...O soave fanciulla (Schaunard/Colline/Marcello/Rodolfo/Mimì)",
+    "performers": "Antonino Votto, Maria Callas, Teatro Alla Scala Orchestra, Giuseppe di Stefano, Manuel Spatafora, Rolando Panerai"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Aranci, datteri! (Coro/Schaunard/Colline/Rodolfo/Mimì/Marcello/Ragazzi)",
+   "durationMs": 170093,
+   "artist": "Antonino Votto, Coro del Teatro alla Scala di Milano, Giuseppe di Stefano, Maria Callas & Teatro Alla Scala Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Giacomo Puccini",
+    "work": "La Bohème, SC 67",
+    "part": "Aranci, datteri! (Coro/Schaunard/Colline/Rodolfo/Mimì/Marcello/Ragazzi)",
+    "performers": "Teatro Alla Scala Orchestra, Maria Callas, Coro del Teatro alla Scala di Milano, Antonino Votto, Giuseppe di Stefano"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Chi guardi? (Rodolfo/Colline/Mimì/Schaunard/Marcello/Coro/Parpignol/Ragazzi)",
+   "durationMs": 339440,
+   "artist": "Antonino Votto, Coro del Teatro alla Scala di Milano, Franco Ricciardi, Giuseppe di Stefano, Maria Callas & Teatro Alla Scala Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Giacomo Puccini",
+    "work": "La Bohème, SC 67",
+    "part": "Chi guardi? (Rodolfo/Colline/Mimì/Schaunard/Marcello/Coro/Parpignol/Ragazzi)",
+    "performers": "Franco Ricciardi, Teatro Alla Scala Orchestra, Antonino Votto, Coro del Teatro alla Scala di Milano, Maria Callas, Giuseppe di Stefano, Manuel Spatafora, Noberto Mola, Rolando Panerai, Anna Moffo"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Beviam...Ch'io beva del tossico! (Mimì/Marcello/Schaunard/Colline/Rodolfo/Coro)",
+   "durationMs": 198467,
+   "artist": "Anna Moffo, Antonino Votto, Coro del Teatro alla Scala di Milano, Giuseppe di Stefano & Maria Callas",
+   "apple": {
+    "block": 3,
+    "composer": "Giacomo Puccini",
+    "work": "La Bohème, SC 67",
+    "part": "Beviam...Ch'io beva del tossico! (Mimì/Marcello/Schaunard/Colline/Rodolfo/Coro)",
+    "performers": "Antonino Votto, Giuseppe di Stefano, Maria Callas, Coro del Teatro alla Scala di Milano, Anna Moffo"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "La Bohème: Quando me'n vo soletta (Musetta/Marcellop/Alcindoro/Mimì/Rodolfo/Schaunard/Colline)",
+   "durationMs": 280227,
+   "artist": "Anna Moffo, Antonino Votto, Teatro Alla Scala Orchestra, Coro del Teatro alla Scala di Milano, Franco Ricciardi, Giuseppe di Stefano & Maria Callas",
+   "apple": {
+    "block": 3,
+    "composer": "Giacomo Puccini",
+    "work": "La Bohème, SC 67",
+    "part": "Quando me'n vo soletta (Musetta/Marcellop/Alcindoro/Mimì/Rodolfo/Schaunard/Colline)",
+    "performers": "Giuseppe di Stefano, Teatro Alla Scala Orchestra, Maria Callas, Franco Ricciardi, Coro del Teatro alla Scala di Milano, Anna Moffo, Antonino Votto, Manuel Spatafora, Rolando Panerai"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Chi I'ha richiesto?....Vediam (Colline/Schaunard/Rodolfo/Ragazzi/Marcello/Coro/Musetta)",
+   "durationMs": 141573,
+   "artist": "Anna Moffo, Antonino Votto, Coro del Teatro alla Scala di Milano & Giuseppe di Stefano",
+   "apple": {
+    "block": 3,
+    "composer": "Giacomo Puccini",
+    "work": "La Bohème, SC 67",
+    "part": "Chi I'ha richiesto?....Vediam (Colline/Schaunard/Rodolfo/Ragazzi/Marcello/Coro/Musetta)",
+    "performers": "Giuseppe di Stefano, Coro del Teatro alla Scala di Milano, Antonino Votto, Anna Moffo, Nicola Zaccaria, Manuel Spatafora, Teatro Alla Scala Orchestra, Rolando Panerai"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 1,
+   "title": "Ohè, là, le guardie...Aprite! (Coro/Un doganiere/Musetta/Mimì/Sergente)",
+   "durationMs": 309360,
+   "artist": "Anna Moffo, Antonino Votto, Coro del Teatro alla Scala di Milano, Maria Callas & Teatro Alla Scala Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Giacomo Puccini",
+    "work": "La Bohème, SC 67",
+    "part": "Ohè, là, le guardie...Aprite! (Coro/Un doganiere/Musetta/Mimì/Sergente)",
+    "performers": "Teatro Alla Scala Orchestra, Antonino Votto, Coro del Teatro alla Scala di Milano, Anna Moffo, Maria Callas"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 2,
+   "title": "Mimì?!...Speravo di trovarvi qui (Marcello/Mimì)",
+   "durationMs": 287600,
+   "artist": "Antonino Votto, Maria Callas & Teatro Alla Scala Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Giacomo Puccini",
+    "work": "La Bohème, SC 67",
+    "part": "Mimì?!...Speravo di trovarvi qui (Marcello/Mimì)",
+    "performers": "Maria Callas, Teatro Alla Scala Orchestra, Antonino Votto"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 3,
+   "title": "Marcello. Finalmente (Rodolfo/Marcello/Mimì)",
+   "durationMs": 371840,
+   "artist": "Antonino Votto, Giuseppe di Stefano, Maria Callas & Teatro Alla Scala Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Giacomo Puccini",
+    "work": "La Bohème, SC 67",
+    "part": "Marcello. Finalmente (Rodolfo/Marcello/Mimì)",
+    "performers": "Antonino Votto, Giuseppe di Stefano, Maria Callas, Teatro Alla Scala Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 4,
+   "title": "Donde lieta uscì al tuo grido d'amore (Mimì)",
+   "durationMs": 208160,
+   "artist": "Antonino Votto, Maria Callas & Teatro Alla Scala Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Giacomo Puccini",
+    "work": "La Bohème, SC 67",
+    "part": "Donde lieta uscì al tuo grido d'amore (Mimì)",
+    "performers": "Teatro Alla Scala Orchestra, Maria Callas, Antonino Votto"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 5,
+   "title": "Dunque è proprio finita? (Rodolfo/Mimì/Marcello/Musetta)",
+   "durationMs": 359800,
+   "artist": "Anna Moffo, Antonino Votto, Giuseppe di Stefano, Maria Callas & Teatro Alla Scala Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Giacomo Puccini",
+    "work": "La Bohème, SC 67",
+    "part": "Dunque è proprio finita? (Rodolfo/Mimì/Marcello/Musetta)",
+    "performers": "Giuseppe di Stefano, Anna Moffo, Maria Callas, Teatro Alla Scala Orchestra, Antonino Votto, Rolando Panerai"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 6,
+   "title": "In un coupé?....Con pariglia e livree (Marcello/Rodolfo)",
+   "durationMs": 76800,
+   "artist": "Antonino Votto, Giuseppe di Stefano & Teatro Alla Scala Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Giacomo Puccini",
+    "work": "La Bohème, SC 67",
+    "part": "In un coupé?....Con pariglia e livree (Marcello/Rodolfo)",
+    "performers": "Antonino Votto, Giuseppe di Stefano, Teatro Alla Scala Orchestra, Rolando Panerai"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 7,
+   "title": "O Mimì, tu più non torni (Rodolfo/Marcello)",
+   "durationMs": 189640,
+   "artist": "Antonino Votto, Giuseppe di Stefano & Teatro Alla Scala Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Giacomo Puccini",
+    "work": "La Bohème, SC 67",
+    "part": "O Mimì, tu più non torni (Rodolfo/Marcello)",
+    "performers": "Antonino Votto, Giuseppe di Stefano, Teatro Alla Scala Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 8,
+   "title": "Che ora sia? (Rodolfo/Marcello/Schaunard/Colline)",
+   "durationMs": 247067,
+   "artist": "Antonino Votto, Giuseppe di Stefano & Teatro Alla Scala Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Giacomo Puccini",
+    "work": "La Bohème, SC 67",
+    "part": "Che ora sia? (Rodolfo/Marcello/Schaunard/Colline)",
+    "performers": "Giuseppe di Stefano, Teatro Alla Scala Orchestra, Antonino Votto"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 9,
+   "title": "C'è Mimì...c'e Mimì che mi seque (Musetta/Rodolfo/Schaunard/Mimì/Marcello)",
+   "durationMs": 328800,
+   "artist": "Anna Moffo, Antonino Votto, Giuseppe di Stefano, Maria Callas & Teatro Alla Scala Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Giacomo Puccini",
+    "work": "La Bohème, SC 67",
+    "part": "C'è Mimì...c'e Mimì che mi seque (Musetta/Rodolfo/Schaunard/Mimì/Marcello)",
+    "performers": "Anna Moffo, Giuseppe di Stefano, Maria Callas, Antonino Votto, Teatro Alla Scala Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 10,
+   "title": "Vecchia zimarra, senti (Colline/Schaunard)",
+   "durationMs": 90800,
+   "artist": "Antonino Votto & Teatro Alla Scala Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Giacomo Puccini",
+    "work": "La Bohème, SC 67",
+    "part": "Vecchia zimarra, senti (Colline/Schaunard)",
+    "performers": "Teatro Alla Scala Orchestra, Antonino Votto"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 11,
+   "title": "Schaunard, ognuno per diversa via (Colline/Schaunard)",
+   "durationMs": 103427,
+   "artist": "Antonino Votto & Teatro Alla Scala Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Giacomo Puccini",
+    "work": "La Bohème, SC 67",
+    "part": "Schaunard, ognuno per diversa via (Colline/Schaunard)",
+    "performers": "Antonino Votto, Teatro Alla Scala Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 12,
+   "title": "Sono andati? (Mimì/Rodolfo)",
+   "durationMs": 283333,
+   "artist": "Antonino Votto, Giuseppe di Stefano, Maria Callas & Teatro Alla Scala Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Giacomo Puccini",
+    "work": "La Bohème, SC 67",
+    "part": "Sono andati? (Mimì/Rodolfo)",
+    "performers": "Antonino Votto, Teatro Alla Scala Orchestra, Maria Callas, Giuseppe di Stefano"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 13,
+   "title": "Oh Dio! Mimi! (Rodolfo/Schaunard/Mimì/Musetta/Marcello/Colline)",
+   "durationMs": 313200,
+   "artist": "Anna Moffo, Antonino Votto, Giuseppe di Stefano, Maria Callas & Teatro Alla Scala Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Giacomo Puccini",
+    "work": "La Bohème, SC 67",
+    "part": "Oh Dio! Mimi! (Rodolfo/Schaunard/Mimì/Musetta/Marcello/Colline)",
+    "performers": "Teatro Alla Scala Orchestra, Maria Callas, Anna Moffo, Antonino Votto, Giuseppe di Stefano, Franco Ricciardi, Coro del Teatro alla Scala di Milano, Manuel Spatafora, Noberto Mola, Rolando Panerai"
+   }
+  }
+ ]
+}

@@ -1,0 +1,78 @@
+{
+ "id": "199992897",
+ "category": "symphony",
+ "title": "Mahler: Symphony No. 5",
+ "artist": "Leonard Bernstein & New York Philharmonic",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Part I: I. Trauermarsch. In Gemessenem Schritt. Streng. Wie Ein Kondukt",
+   "durationMs": 750307,
+   "artist": "Leonard Bernstein, New York Philharmonic & James Chambers",
+   "apple": {
+    "block": 1,
+    "composer": "Gustav Mahler",
+    "work": "Symphony No. 5 in C-Sharp Minor",
+    "part": "I. Trauermarsch. In Gemessenem Schritt. Streng. Wie Ein Kondukt",
+    "performers": "New York Philharmonic, Leonard Bernstein, James Chambers"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "II. Stürmisch Bewegt. Mit Grösster Vehemenz",
+   "durationMs": 860200,
+   "artist": "Leonard Bernstein, New York Philharmonic & James Chambers",
+   "apple": {
+    "block": 2,
+    "composer": "G. Mahler",
+    "work": "G. Mahler",
+    "part": "II. Stürmisch Bewegt. Mit Grösster Vehemenz",
+    "performers": "New York Philharmonic, James Chambers, Leonard Bernstein, Global Journey"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Part II: III. Scherzo. Kräftig, Nicht Zu Schnell",
+   "durationMs": 1064467,
+   "artist": "Leonard Bernstein, New York Philharmonic & James Chambers",
+   "apple": {
+    "block": 3,
+    "composer": "Gustav Mahler",
+    "work": "Symphony No. 5 in C-Sharp Minor",
+    "part": "III. Scherzo. Kräftig, Nicht Zu Schnell",
+    "performers": "New York Philharmonic, Leonard Bernstein, James Chambers"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Part III: IV. Adagietto. Sehr Langsam",
+   "durationMs": 660293,
+   "artist": "Leonard Bernstein, New York Philharmonic & James Chambers",
+   "apple": {
+    "block": 3,
+    "composer": "Gustav Mahler",
+    "work": "Symphony No. 5 in C-Sharp Minor",
+    "part": "IV. Adagietto. Sehr Langsam",
+    "performers": "Leonard Bernstein, New York Philharmonic, James Chambers"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "V. Rondo - Finale. Allegro",
+   "durationMs": 826707,
+   "artist": "Leonard Bernstein, New York Philharmonic & James Chambers",
+   "apple": {
+    "block": 3,
+    "composer": "Gustav Mahler",
+    "work": "Symphony No. 5 in C-Sharp Minor",
+    "part": "V. Rondo - Finale. Allegro",
+    "performers": "New York Philharmonic, Leonard Bernstein, James Chambers"
+   }
+  }
+ ]
+}

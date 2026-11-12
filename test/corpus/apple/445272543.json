@@ -1,0 +1,568 @@
+{
+ "id": "445272543",
+ "category": "guitar harp other",
+ "title": "40 Most Beautiful Violin Classics",
+ "artist": "Various Artists",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Theme From \"Schindler's List\"",
+   "durationMs": 289027,
+   "artist": "London Symphony Orchestra & Paul Mann",
+   "apple": {
+    "block": 1,
+    "composer": "John Williams",
+    "work": "Schindler's List",
+    "part": "Theme From \"Schindler's List\"",
+    "performers": "London Symphony Orchestra, Paul Mann"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "The Lark Ascending",
+   "durationMs": 364187,
+   "artist": "Sir Andrew Davis & BBC Symphony Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Ralph Vaughan Williams",
+    "work": "The Lark Ascending",
+    "part": "The Lark Ascending",
+    "performers": "Sir Andrew Davis, BBC Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Ave Maria",
+   "durationMs": 287400,
+   "artist": "Alexander Markov & Dmitriy Cogan",
+   "apple": {
+    "block": 3,
+    "composer": "Franz Schubert",
+    "work": "Ellens Gesang, III in B-Flat Major, D 839, Op. 52/6 · “Ave Maria”",
+    "part": "Ave Maria",
+    "performers": "Alexander Markov, Dmitriy Cogan"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "The Swan Lake Op. 20: Act III - Prince's Variation",
+   "durationMs": 80333,
+   "artist": "Alexander Markov & Alexander Markovich",
+   "apple": {
+    "block": 4,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Swan Lake, Op. 20, TH 12",
+    "part": "Act III - Prince's Variation",
+    "performers": "Alexander Markovich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "The Gadfly Suite Op. 97a: VIII. Romance",
+   "durationMs": 357333,
+   "artist": "BBC Symphony Orchestra & Maxim Shostakovich",
+   "apple": {
+    "block": 5,
+    "composer": "Dmitri Shostakovich",
+    "work": "The Gadfly, Op. 97a",
+    "part": "VIII. Romance",
+    "performers": "Maxim Shostakovich, BBC Symphony Orchestra, Daniel Hope"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Violin Concerto No. 5 in A Major K. 219: II. Adagio",
+   "durationMs": 672133,
+   "artist": "Armin Jordan, Orchestre de Chambre de Lausanne & Pierre Amoyal",
+   "apple": {
+    "block": 6,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Violin Concerto No. 5 in A Major, K. 219, KV 219 · “Turkish”",
+    "part": "II. Adagio",
+    "performers": "Orchestre de Chambre de Lausanne, Pierre Amoyal, Armin Jordan"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Concerto for 2 Violins in D Minor, BWV1043: II. Largo ma non tanto",
+   "durationMs": 450040,
+   "artist": "Gérard Jarry, Jean-François Paillard, Orchestre de Chambre Jean-François Paillard & Pierre Amoyal",
+   "apple": {
+    "block": 7,
+    "composer": "Johann Sebastian Bach",
+    "work": "Double Violin Concerto in D Minor, BWV 1043",
+    "part": "II. Largo ma non tanto",
+    "performers": "Pierre Amoyal, Orchestre de Chambre Jean-François Paillard, Gérard Jarry, Jean-François Paillard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Violin Sonata in A Major: I. Allegretto poco mosso",
+   "durationMs": 357840,
+   "artist": "Mikhaïl Rudi & Pierre Amoyal",
+   "apple": {
+    "block": 8,
+    "composer": "César Franck",
+    "work": "Violin Sonata in A Major, FWV 8, M 8",
+    "part": "I. Allegretto poco mosso",
+    "performers": "Pierre Amoyal, Mikhaïl Rudi"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Violin Concerto No. 8 in A Minor, Op. 47, \"In modo di scena cantate\": II. Adagio",
+   "durationMs": 484693,
+   "artist": "Armin Jordan & Orchestre de Chambre de Lausanne",
+   "apple": {
+    "block": 9,
+    "composer": "Louis Spohr",
+    "work": "Violin Concerto No. 8 in A Minor, Op. 47 · “in Form einer Gesangszene”",
+    "part": "II. Adagio",
+    "performers": "Orchestre de Chambre de Lausanne, Armin Jordan"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Violin Sonata No. 5 in F Major, Op. 24, \"Spring\": II. Adagio molto espressivo",
+   "durationMs": 330333,
+   "artist": "Malcolm Frager & Thomas Zehetmair",
+   "apple": {
+    "block": 10,
+    "composer": "Ludwig van Beethoven",
+    "work": "Violin Sonata No. 5 in F Major, Op. 24 · “Spring”",
+    "part": "II. Adagio molto espressivo",
+    "performers": "Thomas Zehetmair, Malcolm Frager"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Symphonie espagnole, Op. 21: I. Allegro non troppo",
+   "durationMs": 489400,
+   "artist": "Orchestre national de l'Opéra de Monte-Carlo, Paul Paray & Pierre Amoyal",
+   "apple": {
+    "block": 11,
+    "composer": "Édouard Lalo",
+    "work": "Symphonie espagnole, Op. 21",
+    "part": "I. Allegro non troppo",
+    "performers": "Pierre Amoyal, Orchestre national de l'Opéra de Monte-Carlo, Paul Paray"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Carmen Fantasia",
+   "durationMs": 599973,
+   "artist": "Israel Philharmonic Orchestra, Maxim Vengerov & Zubin Mehta",
+   "apple": {
+    "block": 12,
+    "composer": "Bizet",
+    "work": "Bizet",
+    "part": "Carmen Fantasia",
+    "performers": "Israel Philharmonic Orchestra, Zubin Mehta, Maxim Vengerov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Cantabile, Op. 17",
+   "durationMs": 218693,
+   "artist": "Alexander Markov",
+   "apple": {
+    "block": 13,
+    "composer": "Niccolò Paganini",
+    "work": "Cantabile in D Major, MS 5599, MS 109, Op. 17",
+    "part": "Cantabile, Op. 17",
+    "performers": "Alexander Markov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Violin Partita No. 1 in B Minor, BWV 1002: III. Sarabande - Double",
+   "durationMs": 340427,
+   "artist": "Thomas Zehetmair",
+   "apple": {
+    "block": 14,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 1 for Solo Violin in B Minor, BWV 1002",
+    "part": "III. Sarabande - Double",
+    "performers": "Thomas Zehetmair"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Romance No. 2 in F Major, Op. 50 (Excerpt)",
+   "durationMs": 119667,
+   "artist": "The Deutsche Kammerphilharmonie Bremen & Thomas Zehetmair",
+   "apple": {
+    "block": 15,
+    "composer": "Ludwig van Beethoven",
+    "work": "Romance for Violin and Orchestra No. 2 in F Major, Op. 50",
+    "part": "Romance No. 2 in F Major, Op. 50 (Excerpt)",
+    "performers": "The Deutsche Kammerphilharmonie Bremen, Thomas Zehetmair"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Märchenbilder, Op. 113: IV. Langsam mit melancholischem Ausdruck",
+   "durationMs": 290720,
+   "artist": "Cyprien Katsaris & Thomas Zehetmair",
+   "apple": {
+    "block": 16,
+    "composer": "Robert Schumann",
+    "work": "Märchenbilder, Op. 113 · “Fairy Tale Pictures”",
+    "part": "IV. Langsam mit melancholischem Ausdruck",
+    "performers": "Cyprien Katsaris, Thomas Zehetmair"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "The Sleeping Beauty, Op. 66: Act I - Variation d'Aurore",
+   "durationMs": 172107,
+   "artist": "Alexander Markov & Alexander Markovich",
+   "apple": {
+    "block": 17,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Sleeping Beauty, Op. 66, TH 13",
+    "part": "Act I - Variation d'Aurore",
+    "performers": "Alexander Markovich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Introduction and Rondo Capriccioso, Op.28",
+   "durationMs": 548667,
+   "artist": "Philharmonia Orchestra, Pierre Amoyal & Vernon Handley",
+   "apple": {
+    "block": 18,
+    "composer": "Camille Saint-Saëns",
+    "work": "Introduction and Rondo capriccioso in A Minor, Op. 28, R. 188",
+    "part": "Introduction and Rondo Capriccioso, Op.28",
+    "performers": "Vernon Handley, Pierre Amoyal, Philharmonia Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "Humoresque, Op.10",
+   "durationMs": 169373,
+   "artist": "Alexander Markov & Alexander Markovich",
+   "apple": {
+    "block": 19,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "Deux morceaux, Op. 10, TH 132",
+    "part": "Humoresque, Op.10",
+    "performers": "Alexander Markovich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "Violin Concerto No. 1 in D Major, Op. 6: III. Rondo - Allegro spirituoso",
+   "durationMs": 535800,
+   "artist": "Alexander Markov, Marcello Viotti & Saarbrücken Radio Symphony Orchestra",
+   "apple": {
+    "block": 20,
+    "composer": "Niccolò Paganini",
+    "work": "Violin Concerto No. 1 in E-Flat Major, MS 5560–2, MS 21, Op. 6",
+    "part": "III. Rondo - Allegro spirituoso",
+    "performers": "Alexander Markov, Marcello Viotti, Saarbrücken Radio Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "Meditation Op. 42 No. 1",
+   "durationMs": 574533,
+   "artist": "Alexander Markov & Alexander Markovich",
+   "apple": {
+    "block": 21,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "Souvenir d'un lieu cher, Op. 42 · “Memory of a Dear Place”",
+    "part": "Meditation Op. 42 No. 1",
+    "performers": "Alexander Markovich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "Song Without Words Op. 2 No. 3",
+   "durationMs": 199200,
+   "artist": "Alexander Markov & Alexander Markovich",
+   "apple": {
+    "block": 22,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "Souvenir de Hapsal, Op. 2, TH 125",
+    "part": "Song Without Words Op. 2 No. 3",
+    "performers": "Alexander Markovich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 23,
+   "title": "Violin Sonata in C Major, Op. 45: I. Allegro molto e appassionato",
+   "durationMs": 520067,
+   "artist": "Mikhaïl Rudi & Pierre Amoyal",
+   "apple": {
+    "block": 23,
+    "composer": "Edvard Grieg",
+    "work": "Violin Sonata No. 3 in C Minor, Op. 45",
+    "part": "I. Allegro molto e appassionato",
+    "performers": "Mikhaïl Rudi, Pierre Amoyal"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 24,
+   "title": "Mélodie",
+   "durationMs": 209720,
+   "artist": "Alexander Markov & Dmitry Cogan",
+   "apple": {
+    "block": 24,
+    "composer": "Christoph Willibald Gluck",
+    "work": "Orfeo ed Euridice, Wq. 30 · “Orpheus and Eurydice”",
+    "part": "Mélodie",
+    "performers": "Alexander Markov, Dmitry Cogan"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 25,
+   "title": "Thaïs: Meditation",
+   "durationMs": 291067,
+   "artist": "Alexander Markov & Dmitriy Cogan",
+   "apple": {
+    "block": 25,
+    "composer": "Jules Massenet",
+    "work": "Thaïs",
+    "part": "Meditation",
+    "performers": "Alexander Markov, Dmitriy Cogan"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 26,
+   "title": "Violin Sonata in G Minor, \"Devil's Trill'\": I. Larghetto",
+   "durationMs": 277947,
+   "artist": "Edoardo Farina & Pierre Amoyal",
+   "apple": {
+    "block": 26,
+    "composer": "Giuseppe Tartini",
+    "work": "Violin Sonata in G Minor, B. g5 · “The Devil's Trill”",
+    "part": "I. Larghetto",
+    "performers": "Pierre Amoyal, Edoardo Farina"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 27,
+   "title": "Suite populaire espagnole: IV. Canción",
+   "durationMs": 92907,
+   "artist": "Daniel Hope & Sebastian Knauer",
+   "apple": {
+    "block": 27,
+    "composer": "Manuel de Falla",
+    "work": "Canción",
+    "part": "IV. Canción",
+    "performers": "Daniel Hope, Sebastian Knauer"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 28,
+   "title": "Adagio Appassionato, Op. 57",
+   "durationMs": 643907,
+   "artist": "London Symphony Orchestra & Paul Mann",
+   "apple": {
+    "block": 28,
+    "composer": "Max Bruch",
+    "work": "Adagio appassionato in C-Sharp Minor, Op. 57",
+    "part": "Adagio Appassionato, Op. 57",
+    "performers": "London Symphony Orchestra, Paul Mann"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 29,
+   "title": "Valse-Scherzo for Violin & Orchestra, Op.34",
+   "durationMs": 349173,
+   "artist": "London Symphony Orchestra & Paul Mann",
+   "apple": {
+    "block": 29,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "Valse-scherzo in C Major, Op. 34, TH 58",
+    "part": "Valse-Scherzo for Violin & Orchestra, Op.34",
+    "performers": "Paul Mann, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 30,
+   "title": "Violin Sonata No. 5, Op. 27: I. L'Aurore",
+   "durationMs": 209253,
+   "artist": "Rachel Kolly d'Alba",
+   "apple": {
+    "block": 30,
+    "composer": "Eugène Ysaÿe",
+    "work": "Sonata No. 5 in G Major, Op. 27/5 · “Mathieu Crickboom”",
+    "part": "I. L'Aurore",
+    "performers": "Rachel Kolly d'Alba"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 31,
+   "title": "Music-Poem No. 4, Op. 18, \"Apotheosis - Elegy\": IV. Tempo de la prima stanza",
+   "durationMs": 258653,
+   "artist": "City of Birmingham Symphony Orchestra, Daniel Hope & Sakari Oramo",
+   "apple": {
+    "block": 31,
+    "composer": "John Herbert Foulds",
+    "work": "Apotheosis, Op. 18",
+    "part": "IV. Tempo de la prima stanza",
+    "performers": "Daniel Hope, Sakari Oramo, City of Birmingham Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 32,
+   "title": "Violin Partita No. 3 in E Major, BWV 1006: I. Preludio",
+   "durationMs": 218400,
+   "artist": "Thomas Zehetmair",
+   "apple": {
+    "block": 32,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 3 for Solo Violin in E Major, BWV 1006",
+    "part": "I. Preludio",
+    "performers": "Thomas Zehetmair"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 33,
+   "title": "Violin Concerto in E Minor, Op. 64: II. Andante",
+   "durationMs": 477867,
+   "artist": "Gewandhausorchester Leipzig, Kurt Masur & Maxim Vengerov",
+   "apple": {
+    "block": 33,
+    "composer": "Felix Mendelssohn",
+    "work": "Violin Concerto in E Minor, Op. 64",
+    "part": "II. Andante",
+    "performers": "Kurt Masur, Maxim Vengerov, Gewandhausorchester Leipzig"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 34,
+   "title": "Violin Sonata No. 4, Op. 27: II. Sarabande",
+   "durationMs": 175200,
+   "artist": "Rachel Kolly d'Alba",
+   "apple": {
+    "block": 34,
+    "composer": "Eugène Ysaÿe",
+    "work": "Sonata No. 4 in E Minor, Op. 27/4 · “Fritz Kreisler”",
+    "part": "II. Sarabande",
+    "performers": "Rachel Kolly d'Alba"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 35,
+   "title": "Sorochintsky Fair: Gopak",
+   "durationMs": 114760,
+   "artist": "London Symphony Orchestra & Paul Mann",
+   "apple": {
+    "block": 35,
+    "composer": "Mussorgsky: Sorochintsky Fair",
+    "work": "Mussorgsky: Sorochintsky Fair",
+    "part": "Gopak",
+    "performers": "Paul Mann, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 36,
+   "title": "Sérénade mélancolique, Op.26",
+   "durationMs": 550400,
+   "artist": "Alexander Markov & Alexander Markovich",
+   "apple": {
+    "block": 36,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "Sérénade mélancolique in B-Flat Minor, Op. 26, TH 56 · “Melancholy Serenade”",
+    "part": "Sérénade mélancolique, Op.26",
+    "performers": "Alexander Markovich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 37,
+   "title": "Estrellita",
+   "durationMs": 208467,
+   "artist": "Alexander Markovich & Vadim Repin",
+   "apple": {
+    "block": 37,
+    "composer": "Manuel Ponce",
+    "work": "2 Canciones Mexicanas",
+    "part": "Estrellita",
+    "performers": "Vadim Repin, Alexander Markovich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 38,
+   "title": "14 Songs, Op.34: XIV. Vocalise",
+   "durationMs": 338200,
+   "artist": "Alexander Markov & Dmitry Cogan",
+   "apple": {
+    "block": 38,
+    "composer": "Sergei Rachmaninoff",
+    "work": "14 Romances, Op. 34 · “14 Songs”",
+    "part": "XIV. Vocalise",
+    "performers": "Dmitry Cogan, Alexander Markov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 39,
+   "title": "Peter and the Wolf, Op.67 (Excerpt)",
+   "durationMs": 216067,
+   "artist": "Alexander Markov & Dmitriy Cogan",
+   "apple": {
+    "block": 39,
+    "composer": "Sergei Prokofiev",
+    "work": "Peter and the Wolf, Op. 67",
+    "part": "Peter and the Wolf, Op.67 (Excerpt)",
+    "performers": "Dmitriy Cogan, Alexander Markov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 40,
+   "title": "Légende in G Minor, Op. 17",
+   "durationMs": 426467,
+   "artist": "Alexander Markov & Dmitry Cogan",
+   "apple": {
+    "block": 40,
+    "composer": "Henryk Wieniawski",
+    "work": "Légende in G Minor, Op. 17",
+    "part": "Légende in G Minor, Op. 17",
+    "performers": "Alexander Markov, Dmitry Cogan"
+   }
+  }
+ ]
+}

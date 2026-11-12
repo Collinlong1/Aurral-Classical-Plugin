@@ -1,0 +1,1002 @@
+{
+ "id": "1452151425",
+ "category": "chamber",
+ "title": "Beethoven: The String Quartets (Complete)",
+ "artist": "Emerson String Quartet",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "String Quartet No. 3 in D, Op. 18, No. 3: I. Allegro",
+   "durationMs": 455427,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 1,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 3 in D Major, Op. 18/3",
+    "part": "I. Allegro",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "String Quartet No. 3 in D, Op. 18, No. 3: II. Andante con moto",
+   "durationMs": 428000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 1,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 3 in D Major, Op. 18/3",
+    "part": "II. Andante con moto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "String Quartet No. 3 in D, Op. 18, No. 3: III. Allegro",
+   "durationMs": 163000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 1,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 3 in D Major, Op. 18/3",
+    "part": "III. Allegro",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "String Quartet No. 3 in D, Op. 18, No. 3: IV. Presto",
+   "durationMs": 334000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 1,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 3 in D Major, Op. 18/3",
+    "part": "IV. Presto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "String Quartet No. 1 in F, Op. 18, No. 1: I. Allegro con brio",
+   "durationMs": 525000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 2,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 1 in F Major, Op. 18/1",
+    "part": "I. Allegro con brio",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "String Quartet No. 1 in F, Op. 18, No. 1: II. Adagio affettuoso ed appassionato",
+   "durationMs": 529000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 2,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 1 in F Major, Op. 18/1",
+    "part": "II. Adagio affettuoso ed appassionato",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "String Quartet No. 1 in F, Op. 18, No. 1: III. Scherzo (Allegro Molto)",
+   "durationMs": 184000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 2,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 1 in F Major, Op. 18/1",
+    "part": "III. Scherzo (Allegro Molto)",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "String Quartet No. 1 in F, Op. 18, No. 1: IV. Allegro",
+   "durationMs": 372000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 2,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 1 in F Major, Op. 18/1",
+    "part": "IV. Allegro",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "String Quartet No. 2 in G, Op. 18, No. 2: I. Allegro",
+   "durationMs": 450000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 3,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 2 in G Major, Op. 18/2 · “Compliments”",
+    "part": "I. Allegro",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "String Quartet No. 2 in G, Op. 18, No. 2: II. Adagio cantabile - Allegro - Tempo I",
+   "durationMs": 354000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 3,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 2 in G Major, Op. 18/2 · “Compliments”",
+    "part": "II. Adagio cantabile - Allegro - Tempo I",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "String Quartet No. 2 in G, Op. 18, No. 2: III. Scherzo (Allegro)",
+   "durationMs": 243995,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 3,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 2 in G Major, Op. 18/2 · “Compliments”",
+    "part": "III. Scherzo (Allegro)",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "String Quartet No. 2 in G, Op. 18, No. 2: IV. Allegro molto, Quasi presto",
+   "durationMs": 310000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 3,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 2 in G Major, Op. 18/2 · “Compliments”",
+    "part": "IV. Allegro molto, Quasi presto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 1,
+   "title": "String Quartet No. 4 in C Minor, Op. 18, No. 4: I. Allegro ma non tanto",
+   "durationMs": 491000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 4,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 4 in C Minor, Op. 18/4",
+    "part": "I. Allegro ma non tanto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 2,
+   "title": "String Quartet No. 4 in C Minor, Op. 18, No. 4: II. Andante scherzoso, Quasi allegretto",
+   "durationMs": 421000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 4,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 4 in C Minor, Op. 18/4",
+    "part": "II. Andante scherzoso, Quasi allegretto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 3,
+   "title": "String Quartet No. 4 in C Minor, Op. 18, No. 4: III. Menuetto (Allegretto)",
+   "durationMs": 202000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 4,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 4 in C Minor, Op. 18/4",
+    "part": "III. Menuetto (Allegretto)",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 4,
+   "title": "String Quartet No. 4 in C Minor, Op. 18, No. 4: IV. Allegro",
+   "durationMs": 245000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 4,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 4 in C Minor, Op. 18/4",
+    "part": "IV. Allegro",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 5,
+   "title": "String Quartet No. 5 in A, Op. 18, No. 5: I. Allegro",
+   "durationMs": 386000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 5,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 5 in A Major, Op. 18/5",
+    "part": "I. Allegro",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 6,
+   "title": "String Quartet No. 5 in A, Op. 18, No. 5: II. Menuetto",
+   "durationMs": 297000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 5,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 5 in A Major, Op. 18/5",
+    "part": "II. Menuetto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 7,
+   "title": "String Quartet No. 5 in A, Op. 18, No. 5: III. Andante cantabile",
+   "durationMs": 536000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 5,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 5 in A Major, Op. 18/5",
+    "part": "III. Andante cantabile",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 8,
+   "title": "String Quartet No. 5 in A, Op. 18, No. 5: IV. Allegro",
+   "durationMs": 374000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 5,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 5 in A Major, Op. 18/5",
+    "part": "IV. Allegro",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 9,
+   "title": "String Quartet No. 6 in B-Flat, Op. 18, No. 6: I. Allegro con brio",
+   "durationMs": 359000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 6,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 6 in B-Flat Major, Op. 18/6",
+    "part": "I. Allegro con brio",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 10,
+   "title": "String Quartet No. 6 in B-Flat, Op. 18, No. 6: II. Adagio ma non troppo",
+   "durationMs": 412000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 6,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 6 in B-Flat Major, Op. 18/6",
+    "part": "II. Adagio ma non troppo",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 11,
+   "title": "String Quartet No. 6 in B-Flat, Op. 18, No. 6: III. Scherzo (Allegro)",
+   "durationMs": 180000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 6,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 6 in B-Flat Major, Op. 18/6",
+    "part": "III. Scherzo (Allegro)",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 12,
+   "title": "String Quartet No. 6 in B-Flat, Op. 18, No. 6: IV. La Malinconia (Adagio - Allegretto quasi allegro - Adagio - Allegretto - Poco adagio - Prestissimo)",
+   "durationMs": 496000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 6,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 6 in B-Flat Major, Op. 18/6",
+    "part": "IV. La Malinconia (Adagio - Allegretto quasi allegro - Adagio - Allegretto - Poco adagio - Prestissimo)",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 1,
+   "title": "String Quartet No. 7 in F, Op. 59, No. 1 \"Rasumovsky No. 1\": I. Allegro",
+   "durationMs": 616427,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 7,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 7 in F Major, Op. 59/1 · “Razumovsky No. 1”",
+    "part": "I. Allegro",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 2,
+   "title": "String Quartet No. 7 in F, Op. 59, No. 1 \"Rasumovsky No. 1\": II. Allegretto vivace e sempre scherzando",
+   "durationMs": 515000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 7,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 7 in F Major, Op. 59/1 · “Razumovsky No. 1”",
+    "part": "II. Allegretto vivace e sempre scherzando",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 3,
+   "title": "String Quartet No. 7 in F, Op. 59, No. 1 \"Rasumovsky No. 1\": III. Adagio molto e mesto",
+   "durationMs": 700133,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 7,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 7 in F Major, Op. 59/1 · “Razumovsky No. 1”",
+    "part": "III. Adagio molto e mesto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 4,
+   "title": "String Quartet No. 7 in F, Op. 59, No. 1 \"Rasumovsky No. 1\": IV. Thème Russe (Allegro)",
+   "durationMs": 430867,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 7,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 7 in F Major, Op. 59/1 · “Razumovsky No. 1”",
+    "part": "IV. Thème Russe (Allegro)",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 5,
+   "title": "String Quartet No. 8 in E Minor, Op. 59, No. 2 \"Rasumovsky No. 2\": I. Allegro",
+   "durationMs": 558000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 8,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 8 in E Minor, Op. 59/2 · “Razumovsky No. 2”",
+    "part": "I. Allegro",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 6,
+   "title": "String Quartet No. 8 in E Minor, Op. 59, No. 2 \"Rasumovsky No. 2\": II. Molto adagio",
+   "durationMs": 725995,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 8,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 8 in E Minor, Op. 59/2 · “Razumovsky No. 2”",
+    "part": "II. Molto adagio",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 7,
+   "title": "String Quartet No. 8 in E Minor, Op. 59, No. 2 \"Rasumovsky No. 2\": III. Allegretto",
+   "durationMs": 445000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 8,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 8 in E Minor, Op. 59/2 · “Razumovsky No. 2”",
+    "part": "III. Allegretto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 8,
+   "title": "String Quartet No. 8 in E Minor, Op. 59, No. 2 \"Rasumovsky No. 2\": IV. Finale (Presto)",
+   "durationMs": 317000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 8,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 8 in E Minor, Op. 59/2 · “Razumovsky No. 2”",
+    "part": "IV. Finale (Presto)",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 1,
+   "title": "String Quartet No. 9 in C, Op. 59, No. 3 \"Rasumovsky No. 3\": I. Introduzione (Andante con moto) - Allegro vivace",
+   "durationMs": 608000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 9,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 9 in C Major, Op. 59/3 · “Razumovsky No. 3”",
+    "part": "I. Introduzione (Andante con moto) - Allegro vivace",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 2,
+   "title": "String Quartet No. 9 in C, Op. 59, No. 3 \"Rasumovsky No. 3\": II. Andante con moto quasi allegretto",
+   "durationMs": 529000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 9,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 9 in C Major, Op. 59/3 · “Razumovsky No. 3”",
+    "part": "II. Andante con moto quasi allegretto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 3,
+   "title": "String Quartet No. 9 in C, Op. 59, No. 3 \"Rasumovsky No. 3\": III. Menuetto (Grazioso)",
+   "durationMs": 306160,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 10,
+    "composer": "Beethoven: String Quartet No. 9 in C, Op. 59, No. 3 \"Rasumovsky No. 3\"",
+    "work": "Beethoven: String Quartet No. 9 in C, Op. 59, No. 3 \"Rasumovsky No. 3\"",
+    "part": "III. Menuetto (Grazioso)",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 4,
+   "title": "String Quartet No. 9 in C, Op. 59, No. 3 - \"Rasumovsky No. 3\": IV. Allegro molto",
+   "durationMs": 324840,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 11,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 9 in C Major, Op. 59/3 · “Razumovsky No. 3”",
+    "part": "IV. Allegro molto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 5,
+   "title": "String Quartet No. 10 in E-Flat, Op. 74 \"Harp\": I. Poco adagio - Allegro",
+   "durationMs": 557000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 12,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 10 \"Harp\" in E-Flat Major, Op. 74",
+    "part": "I. Poco adagio - Allegro",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 6,
+   "title": "String Quartet No. 10 in E-Flat, Op. 74 \"Harp\": II. Adagio ma non troppo",
+   "durationMs": 534000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 12,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 10 \"Harp\" in E-Flat Major, Op. 74",
+    "part": "II. Adagio ma non troppo",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 7,
+   "title": "String Quartet No. 10 in E-Flat, Op. 74 \"Harp\": III. Presto - Più presto quasi prestissimo",
+   "durationMs": 286067,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 12,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 10 \"Harp\" in E-Flat Major, Op. 74",
+    "part": "III. Presto - Più presto quasi prestissimo",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 8,
+   "title": "String Quartet No. 10 in E-Flat, Op. 74 \"Harp\": IV. Allegretto con variazioni",
+   "durationMs": 393933,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 12,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 10 \"Harp\" in E-Flat Major, Op. 74",
+    "part": "IV. Allegretto con variazioni",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 9,
+   "title": "String Quartet No. 11 in F Minor, Op. 95 \"Serioso\": I. Allegro con brio",
+   "durationMs": 245000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 13,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 11 \"Serioso\" in F Minor, Op. 95",
+    "part": "I. Allegro con brio",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 10,
+   "title": "String Quartet No. 11 in F Minor, Op. 95 \"Serioso\": II. Allegretto ma non troppo",
+   "durationMs": 390200,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 13,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 11 \"Serioso\" in F Minor, Op. 95",
+    "part": "II. Allegretto ma non troppo",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 11,
+   "title": "String Quartet No. 11 in F Minor, Op. 95 \"Serioso\": III. Allegro assai vivace ma serioso",
+   "durationMs": 242800,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 13,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 11 \"Serioso\" in F Minor, Op. 95",
+    "part": "III. Allegro assai vivace ma serioso",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 12,
+   "title": "String Quartet No. 11 in F Minor, Op. 95 \"Serioso\": IV. Larghetto espressivo - Allegretto agitato",
+   "durationMs": 256000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 13,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 11 \"Serioso\" in F Minor, Op. 95",
+    "part": "IV. Larghetto espressivo - Allegretto agitato",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 1,
+   "title": "String Quartet No. 12 in E-Flat, Op. 127: I. Maestoso - Allegro",
+   "durationMs": 418427,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 14,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 12 in E-Flat Major, Op. 127",
+    "part": "I. Maestoso - Allegro",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 2,
+   "title": "String Quartet No. 12 in E-Flat, Op. 127: II. Adagio ma non troppo e molto cantabile",
+   "durationMs": 863000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 14,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 12 in E-Flat Major, Op. 127",
+    "part": "II. Adagio ma non troppo e molto cantabile",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 3,
+   "title": "String Quartet No. 12 in E-Flat, Op. 127: III. Scherzando vivace",
+   "durationMs": 493000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 14,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 12 in E-Flat Major, Op. 127",
+    "part": "III. Scherzando vivace",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 4,
+   "title": "String Quartet No. 12 in E-Flat, Op. 127: IV. Finale",
+   "durationMs": 394971,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 14,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 12 in E-Flat Major, Op. 127",
+    "part": "IV. Finale",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 5,
+   "title": "String Quartet No. 14 in C-Sharp Minor, Op. 131: I. Adagio ma non troppo e molto espressivo",
+   "durationMs": 381440,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 15,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 14 in C-Sharp Minor, Op. 131",
+    "part": "I. Adagio ma non troppo e molto espressivo",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 6,
+   "title": "String Quartet No. 14 in C-Sharp Minor, Op. 131: II. Allegro molto vivace",
+   "durationMs": 164893,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 15,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 14 in C-Sharp Minor, Op. 131",
+    "part": "II. Allegro molto vivace",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 7,
+   "title": "String Quartet No. 1 4 in C-Sharp Minor, Op. 131: III. Allegro moderato",
+   "durationMs": 44333,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 15,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 14 in C-Sharp Minor, Op. 131",
+    "part": "III. Allegro moderato",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 8,
+   "title": "String Quartet No. 14 in C-Sharp Minor, Op. 131: IV. Andante ma non troppo e molto cantabile - Più mosso - Andante moderato e lusinghiero - Adagio - Allegretto - Adagio, Ma Non troppo e semplice - Allegretto",
+   "durationMs": 800533,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 15,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 14 in C-Sharp Minor, Op. 131",
+    "part": "IV. Andante ma non troppo e molto cantabile - Più mosso - Andante moderato e lusinghiero - Adagio - Allegretto - Adagio, Ma Non troppo e semplice - Allegretto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 9,
+   "title": "String Quartet No. 14 in C-Sharp Minor, Op. 131: V. Presto",
+   "durationMs": 273400,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 15,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 14 in C-Sharp Minor, Op. 131",
+    "part": "V. Presto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 10,
+   "title": "String Quartet No. 14 in C-Sharp Minor, Op. 131: VI. Adagio quasi un poco andante",
+   "durationMs": 112640,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 15,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 14 in C-Sharp Minor, Op. 131",
+    "part": "VI. Adagio quasi un poco andante",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 11,
+   "title": "String Quartet No. 14 in C-Sharp Minor, Op. 131: VII. Allegro",
+   "durationMs": 376760,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 15,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 14 in C-Sharp Minor, Op. 131",
+    "part": "VII. Allegro",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 1,
+   "title": "String Quartet No. 15 in A Minor, Op. 132: I. Assai sostenuto - Allegro",
+   "durationMs": 576000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 16,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 15 in A Minor, Op. 132 · “Heiliger Dankgesang”",
+    "part": "I. Assai sostenuto - Allegro",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 2,
+   "title": "String Quartet No. 15 in A Minor, Op. 132: II. Allegro ma non tanto",
+   "durationMs": 565000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 16,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 15 in A Minor, Op. 132 · “Heiliger Dankgesang”",
+    "part": "II. Allegro ma non tanto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 3,
+   "title": "String Quartet No. 15 in A Minor, Op. 132: III. Canzona di Ringraziamento offerta alla Divinità da un guarito, in modo lidico (Molto adagio) - Sentendo nuova forza (Andante)",
+   "durationMs": 1070000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 16,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 15 in A Minor, Op. 132 · “Heiliger Dankgesang”",
+    "part": "III. Canzona di Ringraziamento offerta alla Divinità da un guarito, in modo lidico (Molto adagio) - Sentendo nuova forza (Andante)",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 4,
+   "title": "String Quartet No. 15 in A Minor, Op. 132: IV. Alla marcia, Assai vivace - Più allegro - Presto",
+   "durationMs": 128960,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 16,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 15 in A Minor, Op. 132 · “Heiliger Dankgesang”",
+    "part": "IV. Alla marcia, Assai vivace - Più allegro - Presto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 5,
+   "title": "String Quartet No. 15 in A Minor, Op. 132: V. Allegro appassionato",
+   "durationMs": 362040,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 16,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 15 in A Minor, Op. 132 · “Heiliger Dankgesang”",
+    "part": "V. Allegro appassionato",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 6,
+   "title": "String Quartet No. 16 in F, Op. 135: 1. Allegretto",
+   "durationMs": 387000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 17,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 16 in F Major, Op. 135",
+    "part": "1. Allegretto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 7,
+   "title": "String Quartet No. 16 in F, Op. 135: II. Vivace",
+   "durationMs": 181000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 17,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 16 in F Major, Op. 135",
+    "part": "II. Vivace",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 8,
+   "title": "String Quartet No. 16 in F, Op. 135: III. Lento assai, Cantante e tranquillo",
+   "durationMs": 409000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 17,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 16 in F Major, Op. 135",
+    "part": "III. Lento assai, Cantante e tranquillo",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 9,
+   "title": "String Quartet No. 16 in F, Op. 135: IV. Der schwer gefaßte Entschluß (Grave - Allegro - Grave ma non troppo tratto - Allegro)",
+   "durationMs": 381000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 17,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 16 in F Major, Op. 135",
+    "part": "IV. Der schwer gefaßte Entschluß (Grave - Allegro - Grave ma non troppo tratto - Allegro)",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 7,
+   "number": 1,
+   "title": "String Quartet No. 13 in B-Flat, Op. 130: I. Adagio ma non troppo - Allegro",
+   "durationMs": 782427,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 18,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 13 in B-Flat Major, Op. 130 · “Leibquartett”",
+    "part": "I. Adagio ma non troppo - Allegro",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 7,
+   "number": 2,
+   "title": "String Quartet No. 13 in B-Flat, Op. 130: II. Presto",
+   "durationMs": 114000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 18,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 13 in B-Flat Major, Op. 130 · “Leibquartett”",
+    "part": "II. Presto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 7,
+   "number": 3,
+   "title": "String Quartet No. 13 in B-Flat, Op. 130: III. Andante con moto ma non troppo. Poco scherzando",
+   "durationMs": 408000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 18,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 13 in B-Flat Major, Op. 130 · “Leibquartett”",
+    "part": "III. Andante con moto ma non troppo. Poco scherzando",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 7,
+   "number": 4,
+   "title": "String Quartet No. 13 in B-Flat, Op. 130: IV. Alla danza tedesca (Allegro assai)",
+   "durationMs": 214000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 18,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 13 in B-Flat Major, Op. 130 · “Leibquartett”",
+    "part": "IV. Alla danza tedesca (Allegro assai)",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 7,
+   "number": 5,
+   "title": "String Quartet No. 13 in B-Flat, Op. 130: V. Cavatina (Adagio molto espressivo)",
+   "durationMs": 433000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 18,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 13 in B-Flat Major, Op. 130 · “Leibquartett”",
+    "part": "V. Cavatina (Adagio molto espressivo)",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 7,
+   "number": 6,
+   "title": "Grosse Fuge in B-Flat, Op. 133",
+   "durationMs": 882000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 19,
+    "composer": "Ludwig van Beethoven",
+    "work": "Grosse Fuge in B-Flat Major, Op. 133",
+    "part": "Grosse Fuge in B-Flat, Op. 133",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 7,
+   "number": 7,
+   "title": "String Quartet No. 13 in B-Flat, Op. 130: VI. Finale (Allegro)",
+   "durationMs": 602000,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 20,
+    "composer": "Ludwig van Beethoven",
+    "work": "String Quartet No. 13 in B-Flat Major, Op. 130 · “Leibquartett”",
+    "part": "VI. Finale (Allegro)",
+    "performers": "Emerson String Quartet"
+   }
+  }
+ ]
+}

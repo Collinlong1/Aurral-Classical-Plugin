@@ -1,0 +1,288 @@
+{
+ "id": "1630346272",
+ "category": "piano recital",
+ "title": "The Salzburg Recital (Live)",
+ "artist": "Evgeny Kissin",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Piano Sonata, Op. 1 (Live)",
+   "durationMs": 813063,
+   "artist": "Evgeny Kissin",
+   "apple": {
+    "block": 1,
+    "composer": "Alban Berg",
+    "work": "Piano Sonata in B Minor, Op. 1",
+    "part": "Piano Sonata, Op. 1",
+    "performers": "Evgeny Kissin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Three Pieces for Piano, Op. 5: III. Dance (Live)",
+   "durationMs": 149644,
+   "artist": "Evgeny Kissin",
+   "apple": {
+    "block": 2,
+    "composer": "Khrennikov: Three Pieces for Piano, Op. 5",
+    "work": "Khrennikov: Three Pieces for Piano, Op. 5",
+    "part": "III. Dance",
+    "performers": "Evgeny Kissin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Five Pieces for Piano, Op. 2: I. Vivace (Live)",
+   "durationMs": 70793,
+   "artist": "Evgeny Kissin",
+   "apple": {
+    "block": 3,
+    "composer": "Khrennikov: Five Pieces for Piano, Op. 2",
+    "work": "Khrennikov: Five Pieces for Piano, Op. 2",
+    "part": "I. Vivace",
+    "performers": "Evgeny Kissin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Five Pieces for Piano, Op. 2: II. Andante con moto (Live)",
+   "durationMs": 166583,
+   "artist": "Evgeny Kissin",
+   "apple": {
+    "block": 3,
+    "composer": "Khrennikov: Five Pieces for Piano, Op. 2",
+    "work": "Khrennikov: Five Pieces for Piano, Op. 2",
+    "part": "II. Andante con moto",
+    "performers": "Evgeny Kissin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Five Pieces for Piano, Op. 2: III. Moderato (Live)",
+   "durationMs": 102661,
+   "artist": "Evgeny Kissin",
+   "apple": {
+    "block": 3,
+    "composer": "Khrennikov: Five Pieces for Piano, Op. 2",
+    "work": "Khrennikov: Five Pieces for Piano, Op. 2",
+    "part": "III. Moderato",
+    "performers": "Evgeny Kissin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Five Pieces for Piano, Op. 2: IV. Andante (Live)",
+   "durationMs": 131972,
+   "artist": "Evgeny Kissin",
+   "apple": {
+    "block": 3,
+    "composer": "Khrennikov: Five Pieces for Piano, Op. 2",
+    "work": "Khrennikov: Five Pieces for Piano, Op. 2",
+    "part": "IV. Andante",
+    "performers": "Evgeny Kissin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Five Pieces for Piano, Op. 2: V. Allegro vivace (Live)",
+   "durationMs": 181619,
+   "artist": "Evgeny Kissin",
+   "apple": {
+    "block": 3,
+    "composer": "Khrennikov: Five Pieces for Piano, Op. 2",
+    "work": "Khrennikov: Five Pieces for Piano, Op. 2",
+    "part": "V. Allegro vivace",
+    "performers": "Evgeny Kissin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Three Preludes: I. Allegro ben ritmato e deciso (Live)",
+   "durationMs": 92207,
+   "artist": "Evgeny Kissin",
+   "apple": {
+    "block": 4,
+    "composer": "George Gershwin",
+    "work": "3 Preludes",
+    "part": "I. Allegro ben ritmato e deciso",
+    "performers": "Evgeny Kissin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Three Preludes: II. Andante con moto e poco rubato (Live)",
+   "durationMs": 199422,
+   "artist": "Evgeny Kissin",
+   "apple": {
+    "block": 4,
+    "composer": "George Gershwin",
+    "work": "3 Preludes",
+    "part": "II. Andante con moto e poco rubato",
+    "performers": "Evgeny Kissin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Three Preludes: III. Allegro ben ritmato e deciso (Live)",
+   "durationMs": 77000,
+   "artist": "Evgeny Kissin",
+   "apple": {
+    "block": 4,
+    "composer": "George Gershwin",
+    "work": "3 Preludes",
+    "part": "III. Allegro ben ritmato e deciso",
+    "performers": "Evgeny Kissin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Nocturnes, Op. 62: No. 1 in B Major. Andante (Live)",
+   "durationMs": 442452,
+   "artist": "Evgeny Kissin",
+   "apple": {
+    "block": 5,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 17 in B Major, B. 161/1, Op. 62/1",
+    "part": "No. 1 in B Major. Andante",
+    "performers": "Evgeny Kissin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Impromptu No. 1 in A-Flat Major, Op. 29 (Live)",
+   "durationMs": 251418,
+   "artist": "Evgeny Kissin",
+   "apple": {
+    "block": 6,
+    "composer": "Frédéric Chopin",
+    "work": "Impromptu No. 1 in A-Flat Major, B. 110, Op. 29",
+    "part": "Impromptu No. 1 in A-Flat Major, Op. 29",
+    "performers": "Evgeny Kissin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Impromptu No. 2 in F-Sharp Major, Op. 36 (Live)",
+   "durationMs": 374920,
+   "artist": "Evgeny Kissin",
+   "apple": {
+    "block": 7,
+    "composer": "Frédéric Chopin",
+    "work": "Impromptu No. 2 in F-Sharp Major, B. 129, Op. 36",
+    "part": "Impromptu No. 2 in F-Sharp Major, Op. 36",
+    "performers": "Evgeny Kissin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Impromptu No. 3 in G-Flat Major, Op. 51 (Live)",
+   "durationMs": 354865,
+   "artist": "Evgeny Kissin",
+   "apple": {
+    "block": 8,
+    "composer": "Frédéric Chopin",
+    "work": "Impromptu No. 3 in G-Flat Major, B. 149, Op. 51",
+    "part": "Impromptu No. 3 in G-Flat Major, Op. 51",
+    "performers": "Evgeny Kissin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Scherzo No. 1 in B Minor, Op. 20 (Live)",
+   "durationMs": 653301,
+   "artist": "Evgeny Kissin",
+   "apple": {
+    "block": 9,
+    "composer": "Frédéric Chopin",
+    "work": "Scherzo No. 1 in B Minor, B. 65, Op. 20 · “Le banquet infernal”",
+    "part": "Scherzo No. 1 in B Minor, Op. 20",
+    "performers": "Evgeny Kissin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Polonaise in A-Flat Major, Op. 53 \"Heroic\" (Live)",
+   "durationMs": 447467,
+   "artist": "Evgeny Kissin",
+   "apple": {
+    "block": 10,
+    "composer": "Frédéric Chopin",
+    "work": "Polonaise No. 6 in A-Flat Major, B. 147, Op. 53 · “Héroique”",
+    "part": "Polonaise in A-Flat Major, Op. 53 \"Heroic\"",
+    "performers": "Evgeny Kissin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Lieder ohne Worte, Op. 38: VI. Andante con moto in A-Flat Major \"Duetto\" (Live)",
+   "durationMs": 223808,
+   "artist": "Evgeny Kissin",
+   "apple": {
+    "block": 11,
+    "composer": "Felix Mendelssohn",
+    "work": "Songs without Words, Book III, Op. 38",
+    "part": "VI. Andante con moto in A-Flat Major \"Duetto\"",
+    "performers": "Evgeny Kissin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Four Piano Pieces, Op. 1: II. Dodecaphonic Tango (Live)",
+   "durationMs": 163845,
+   "artist": "Evgeny Kissin",
+   "apple": {
+    "block": 12,
+    "composer": "Evgeny Kissin",
+    "work": "4 Piano Pieces, Op. 1",
+    "part": "II. Dodecaphonic Tango",
+    "performers": "Evgeny Kissin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "Scherzo No. 2 in B-Flat Minor, Op. 31 (Live)",
+   "durationMs": 622297,
+   "artist": "Evgeny Kissin",
+   "apple": {
+    "block": 13,
+    "composer": "Frédéric Chopin",
+    "work": "Scherzo No. 2 in B-Flat Minor, B. 111, Op. 31",
+    "part": "Scherzo No. 2 in B-Flat Minor, Op. 31",
+    "performers": "Evgeny Kissin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "Suite bergamasque, L. 75: III. Clair de lune (Live)",
+   "durationMs": 368000,
+   "artist": "Evgeny Kissin",
+   "apple": {
+    "block": 14,
+    "composer": "Claude Debussy",
+    "work": "Suite bergamasque, CD 82, L. 75",
+    "part": "III. Clair de lune",
+    "performers": "Evgeny Kissin"
+   }
+  }
+ ]
+}

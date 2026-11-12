@@ -1,0 +1,204 @@
+{
+ "id": "1724466223",
+ "category": "twentieth century contemporary",
+ "title": "Richter: Recomposed: Vivaldi's Four Seasons",
+ "artist": "Daniel Rowland & Stift Festival Orchestra",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Recomposed: Vivaldi - The Four Seasons: Spring 0",
+   "durationMs": 38080,
+   "artist": "Daniel Rowland & Stift Festival Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "M. Richter: Recomposed: Vivaldi - The Four Seasons",
+    "work": "M. Richter: Recomposed: Vivaldi - The Four Seasons",
+    "part": "Spring 0",
+    "performers": "Daniel Rowland, Stift Festival Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Recomposed: Vivaldi - The Four Seasons: Spring 1",
+   "durationMs": 144760,
+   "artist": "Daniel Rowland & Stift Festival Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Antonio Vivaldi",
+    "work": "Violin Concerto in E Major, Op. 8/1, RV 269 · “Spring from The Four Seasons”",
+    "part": "Spring 1",
+    "performers": "Daniel Rowland, Stift Festival Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Recomposed: Vivaldi - The Four Seasons: Spring 2",
+   "durationMs": 220747,
+   "artist": "Daniel Rowland & Stift Festival Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Antonio Vivaldi",
+    "work": "Violin Concerto in E Major, Op. 8/1, RV 269 · “Spring from The Four Seasons”",
+    "part": "Spring 2",
+    "performers": "Stift Festival Orchestra, Daniel Rowland"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Recomposed: Vivaldi - The Four Seasons: Spring 3",
+   "durationMs": 180347,
+   "artist": "Daniel Rowland & Stift Festival Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Antonio Vivaldi",
+    "work": "Violin Concerto in E Major, Op. 8/1, RV 269 · “Spring from The Four Seasons”",
+    "part": "Spring 3",
+    "performers": "Stift Festival Orchestra, Daniel Rowland"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Recomposed: Vivaldi - The Four Seasons: Summer 1",
+   "durationMs": 220267,
+   "artist": "Daniel Rowland & Stift Festival Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Antonio Vivaldi",
+    "work": "Violin Concerto in G Minor, Op. 8/2, RV 315 · “Summer from The Four Seasons”",
+    "part": "Summer 1",
+    "performers": "Daniel Rowland, Stift Festival Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Recomposed: Vivaldi - The Four Seasons: Summer 2",
+   "durationMs": 252467,
+   "artist": "Daniel Rowland & Stift Festival Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Antonio Vivaldi",
+    "work": "Violin Concerto in G Minor, Op. 8/2, RV 315 · “Summer from The Four Seasons”",
+    "part": "Summer 2",
+    "performers": "Stift Festival Orchestra, Daniel Rowland"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Recomposed: Vivaldi - The Four Seasons: Summer 3",
+   "durationMs": 197133,
+   "artist": "Daniel Rowland & Stift Festival Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Antonio Vivaldi",
+    "work": "Violin Concerto in G Minor, Op. 8/2, RV 315 · “Summer from The Four Seasons”",
+    "part": "Summer 3",
+    "performers": "Stift Festival Orchestra, Daniel Rowland"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Recomposed: Vivaldi - The Four Seasons: Autumn 0",
+   "durationMs": 21267,
+   "artist": "Daniel Rowland & Stift Festival Orchestra",
+   "apple": {
+    "block": 4,
+    "composer": "M. Richter: Recomposed: Vivaldi - The Four Seasons",
+    "work": "M. Richter: Recomposed: Vivaldi - The Four Seasons",
+    "part": "Autumn 0",
+    "performers": "Stift Festival Orchestra, Daniel Rowland"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Recomposed: Vivaldi - The Four Seasons: Autumn 1",
+   "durationMs": 375000,
+   "artist": "Daniel Rowland & Stift Festival Orchestra",
+   "apple": {
+    "block": 5,
+    "composer": "Antonio Vivaldi",
+    "work": "Violin Concerto in F Major, Op. 8/3, RV 293 · “Autumn from The Four Seasons”",
+    "part": "Autumn 1",
+    "performers": "Stift Festival Orchestra, Daniel Rowland"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Recomposed: Vivaldi - The Four Seasons: Autumn 2",
+   "durationMs": 187667,
+   "artist": "Daniel Rowland & Stift Festival Orchestra",
+   "apple": {
+    "block": 5,
+    "composer": "Antonio Vivaldi",
+    "work": "Violin Concerto in F Major, Op. 8/3, RV 293 · “Autumn from The Four Seasons”",
+    "part": "Autumn 2",
+    "performers": "Daniel Rowland, Stift Festival Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Recomposed: Vivaldi - The Four Seasons: Autumn 3",
+   "durationMs": 89267,
+   "artist": "Daniel Rowland & Stift Festival Orchestra",
+   "apple": {
+    "block": 5,
+    "composer": "Antonio Vivaldi",
+    "work": "Violin Concerto in F Major, Op. 8/3, RV 293 · “Autumn from The Four Seasons”",
+    "part": "Autumn 3",
+    "performers": "Stift Festival Orchestra, Daniel Rowland"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Recomposed: Vivaldi - The Four Seasons: Winter 1",
+   "durationMs": 183133,
+   "artist": "Daniel Rowland & Stift Festival Orchestra",
+   "apple": {
+    "block": 6,
+    "composer": "Antonio Vivaldi",
+    "work": "Violin Concerto in F Minor, Op. 8/4, RV 297 · “Winter from The Four Seasons”",
+    "part": "Winter 1",
+    "performers": "Stift Festival Orchestra, Daniel Rowland"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Recomposed: Vivaldi - The Four Seasons: Winter 2",
+   "durationMs": 198867,
+   "artist": "Daniel Rowland & Stift Festival Orchestra",
+   "apple": {
+    "block": 6,
+    "composer": "Antonio Vivaldi",
+    "work": "Violin Concerto in F Minor, Op. 8/4, RV 297 · “Winter from The Four Seasons”",
+    "part": "Winter 2",
+    "performers": "Stift Festival Orchestra, Daniel Rowland"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Recomposed: Vivaldi - The Four Seasons: Winter 3",
+   "durationMs": 282667,
+   "artist": "Daniel Rowland & Stift Festival Orchestra",
+   "apple": {
+    "block": 6,
+    "composer": "Antonio Vivaldi",
+    "work": "Violin Concerto in F Minor, Op. 8/4, RV 297 · “Winter from The Four Seasons”",
+    "part": "Winter 3",
+    "performers": "Daniel Rowland, Stift Festival Orchestra"
+   }
+  }
+ ]
+}

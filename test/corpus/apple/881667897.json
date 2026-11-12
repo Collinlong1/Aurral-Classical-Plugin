@@ -1,0 +1,540 @@
+{
+ "id": "881667897",
+ "category": "opera",
+ "title": "Verdi: La Traviata",
+ "artist": "Vienna Philharmonic, Anna Netrebko, Carlo Rizzi, Rolando Villazón & Thomas Hampson",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "La traviata, Act I: Prelude",
+   "durationMs": 216867,
+   "artist": "Carlo Rizzi & Vienna Philharmonic",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "Prelude",
+    "performers": "Vienna Philharmonic, Carlo Rizzi"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "La traviata, Act I: \"Dell'invito trascorsa è già l'ora\"",
+   "durationMs": 281053,
+   "artist": "Anna Netrebko, Carlo Rizzi, Vienna Philharmonic, Helene Schneidermann, Herman Wallen, Salvatore Cordella, Rolando Villazón, Paul Gay, Chor der Wiener Staatsoper & Rupert Huber",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Dell'invito trascorsa è già l'ora\"",
+    "performers": "Chor der Wiener Staatsoper, Anna Netrebko, Carlo Rizzi, Rolando Villazón, Vienna Philharmonic, Salvatore Cordella, Paul Gay, Helene Schneidermann, Rupert Huber, Herman Wallen"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "La traviata, Act I: \"Libiamo ne'lieti calici  (Brindisi)",
+   "durationMs": 184107,
+   "artist": "Rolando Villazón, Carlo Rizzi, Vienna Philharmonic, Anna Netrebko, Helene Schneidermann, Herman Wallen, Salvatore Cordella, Paul Gay & Chor der Wiener Staatsoper",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Libiamo ne' lieti calici\" (Brindisi)",
+    "performers": "Rolando Villazón, Vienna Philharmonic, Chor der Wiener Staatsoper, Paul Gay, Helene Schneidermann, Herman Wallen, Carlo Rizzi, Salvatore Cordella, Anna Netrebko"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "La traviata, Act I: \"Che è ciò?\"",
+   "durationMs": 131707,
+   "artist": "Anna Netrebko, Carlo Rizzi, Vienna Philharmonic, Rolando Villazón, Helene Schneidermann, Herman Wallen, Salvatore Cordella, Paul Gay, Chor der Wiener Staatsoper & Rupert Huber",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Che è ciò?\"",
+    "performers": "Salvatore Cordella, Chor der Wiener Staatsoper, Carlo Rizzi, Rupert Huber, Paul Gay, Rolando Villazón, Vienna Philharmonic, Anna Netrebko, Herman Wallen, Helene Schneidermann"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "La traviata, Act I: \"Un dì felice, eterea\"",
+   "durationMs": 213253,
+   "artist": "Rolando Villazón, Carlo Rizzi, Vienna Philharmonic & Anna Netrebko",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Un dì felice, eterea\"",
+    "performers": "Anna Netrebko, Carlo Rizzi, Vienna Philharmonic, Rolando Villazón"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "La traviata, Act I: \"Ebben? che diavol fate?\"",
+   "durationMs": 72107,
+   "artist": "Salvatore Cordella, Carlo Rizzi, Vienna Philharmonic, Anna Netrebko & Rolando Villazón",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Ebben? che diavol fate?\"",
+    "performers": "Carlo Rizzi, Rolando Villazón, Anna Netrebko, Salvatore Cordella, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "La traviata, Act I: \"Si ridesta in ciel l'aurora\"",
+   "durationMs": 87787,
+   "artist": "Anna Netrebko, Carlo Rizzi, Vienna Philharmonic, Rolando Villazón, Helene Schneidermann, Herman Wallen, Salvatore Cordella, Paul Gay, Chor der Wiener Staatsoper & Rupert Huber",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Si ridesta in ciel l'aurora\"",
+    "performers": "Salvatore Cordella, Paul Gay, Herman Wallen, Vienna Philharmonic, Rupert Huber, Chor der Wiener Staatsoper, Rolando Villazón, Anna Netrebko, Carlo Rizzi, Helene Schneidermann"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "La traviata, Act I: \"E strano!\" - \"Ah, fors'è lui\"",
+   "durationMs": 268707,
+   "artist": "Anna Netrebko, Carlo Rizzi & Vienna Philharmonic",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"È strano!\" - \"Ah, fors'è lui\"",
+    "performers": "Anna Netrebko, Carlo Rizzi, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "La traviata, Act I: \"Follie! Delirio vano è questo!\" - \"Sempre libera\"",
+   "durationMs": 293533,
+   "artist": "Carlo Rizzi, Vienna Philharmonic, Anna Netrebko & Rolando Villazón",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Follie! Delirio vano è questo!\" - \"Sempre libera\"",
+    "performers": "Vienna Philharmonic, Anna Netrebko, Carlo Rizzi, Rolando Villazón"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "La traviata, Act II: \"Lunge da lei\" - \"De' miei bollenti spiriti\"",
+   "durationMs": 218973,
+   "artist": "Carlo Rizzi, Vienna Philharmonic & Rolando Villazón",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Lunge da lei\" - \"De' miei bollenti spiriti\"",
+    "performers": "Rolando Villazón, Vienna Philharmonic, Carlo Rizzi"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "La traviata, Act II: \"Annina, donde vieni?\" - \"Oh mio rimorso!\"",
+   "durationMs": 141427,
+   "artist": "Rolando Villazón, Carlo Rizzi, Vienna Philharmonic & Diane Pilcher",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Annina, donde vieni?\" - \"Oh mio rimorso!\"",
+    "performers": "Diane Pilcher, Vienna Philharmonic, Carlo Rizzi, Rolando Villazón"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "La traviata, Act II: \"Alfredo?\" \"Per Parigi or or partiva\"",
+   "durationMs": 225467,
+   "artist": "Anna Netrebko, Carlo Rizzi, Vienna Philharmonic, Diane Pilcher, Dritan Luca & Thomas Hampson",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Alfredo?\" \"Per Parigi or or partiva\"",
+    "performers": "Anna Netrebko, Thomas Hampson, Diane Pilcher, Dritan Luca, Carlo Rizzi, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "La traviata, Act II: \"Pura siccome un angelo\"",
+   "durationMs": 110960,
+   "artist": "Thomas Hampson, Carlo Rizzi, Vienna Philharmonic & Anna Netrebko",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Pura siccome un angelo\"",
+    "performers": "Thomas Hampson, Carlo Rizzi, Vienna Philharmonic, Anna Netrebko"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "La traviata, Act II: \"Non sapete quale affetto\"",
+   "durationMs": 133733,
+   "artist": "Carlo Rizzi, Vienna Philharmonic, Anna Netrebko & Thomas Hampson",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Non sapete quale affetto\"",
+    "performers": "Thomas Hampson, Vienna Philharmonic, Carlo Rizzi, Anna Netrebko"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "La traviata, Act II: \"Un dì, quando le veneri\"",
+   "durationMs": 169627,
+   "artist": "Thomas Hampson, Carlo Rizzi, Vienna Philharmonic & Anna Netrebko",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Un dì, quando le veneri\"",
+    "performers": "Anna Netrebko, Carlo Rizzi, Thomas Hampson, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "La traviata, Act II: \"Ah! Dite alla giovine\"",
+   "durationMs": 291267,
+   "artist": "Anna Netrebko, Carlo Rizzi, Vienna Philharmonic & Thomas Hampson",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Ah! Dite alla giovine\"",
+    "performers": "Carlo Rizzi, Anna Netrebko, Thomas Hampson, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "La traviata, Act II: \"Imponete\" \"Non amarlo ditegli\"",
+   "durationMs": 303133,
+   "artist": "Carlo Rizzi, Vienna Philharmonic, Anna Netrebko & Thomas Hampson",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Imponete\" \"Non amarlo ditegli\"",
+    "performers": "Carlo Rizzi, Anna Netrebko, Vienna Philharmonic, Thomas Hampson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "La traviata, Act II: \"Dammi tu forza, o cielo!\"",
+   "durationMs": 108827,
+   "artist": "Anna Netrebko, Carlo Rizzi, Vienna Philharmonic & Diane Pilcher",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Dammi tu forza, o cielo!\"",
+    "performers": "Carlo Rizzi, Anna Netrebko, Diane Pilcher, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "La traviata, Act II: \"Che fai?\" \"Nulla\"",
+   "durationMs": 148600,
+   "artist": "Rolando Villazón, Carlo Rizzi, Vienna Philharmonic & Anna Netrebko",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Che fai?\" \"Nulla\"",
+    "performers": "Rolando Villazón, Carlo Rizzi, Anna Netrebko, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "La traviata, Act II: \"Ah, vive sol quel core\"",
+   "durationMs": 144120,
+   "artist": "Rolando Villazón, Carlo Rizzi, Vienna Philharmonic, Dritan Luca & Wilhelm Schwinghammer",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Ah, vive sol quel core\"",
+    "performers": "Carlo Rizzi, Dritan Luca, Wilhelm Schwinghammer, Vienna Philharmonic, Rolando Villazón"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "La traviata, Act II: \"Di Provenza il mar, il suol\"",
+   "durationMs": 265347,
+   "artist": "Carlo Rizzi, Vienna Philharmonic & Thomas Hampson",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Di Provenza il mar, il suol\"",
+    "performers": "Thomas Hampson, Vienna Philharmonic, Carlo Rizzi"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "La traviata, Act II: \"Né rispondi d'un padre all'affetto?\" - \"No, non udrai rimproveri\"",
+   "durationMs": 228400,
+   "artist": "Thomas Hampson, Carlo Rizzi, Vienna Philharmonic & Rolando Villazón",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Né rispondi d'un padre all'affetto?\" - \"No, non udrai rimproveri\"",
+    "performers": "Vienna Philharmonic, Carlo Rizzi, Thomas Hampson, Rolando Villazón"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 1,
+   "title": "La traviata, Act II: \"Avrem lieta di maschere la notte\"",
+   "durationMs": 56293,
+   "artist": "Helene Schneidermann, Carlo Rizzi, Vienna Philharmonic, Herman Wallen & Luigi Roni",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Avrem lieta di maschere la notte\"",
+    "performers": "Vienna Philharmonic, Helene Schneidermann, Carlo Rizzi, Herman Wallen, Luigi Roni"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 2,
+   "title": "La traviata, Act II: \"Noi siamo zingarelle\"",
+   "durationMs": 170187,
+   "artist": "Helene Schneidermann, Carlo Rizzi, Vienna Philharmonic, Herman Wallen, Chor der Wiener Staatsoper & Rupert Huber",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Noi siamo zingarelle\"",
+    "performers": "Chor der Wiener Staatsoper, Rupert Huber, Vienna Philharmonic, Herman Wallen, Carlo Rizzi, Helene Schneidermann"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 3,
+   "title": "La traviata, Act II: \"Di Madride noi siam mattadori\"",
+   "durationMs": 143413,
+   "artist": "Helene Schneidermann, Carlo Rizzi, Vienna Philharmonic, Herman Wallen, Luigi Roni, Chor der Wiener Staatsoper & Rupert Huber",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Di Madride noi siam mattadori\"",
+    "performers": "Rupert Huber, Luigi Roni, Carlo Rizzi, Herman Wallen, Vienna Philharmonic, Helene Schneidermann, Chor der Wiener Staatsoper"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 4,
+   "title": "La traviata, Act II: \"Alfredo! Voi!\"",
+   "durationMs": 224080,
+   "artist": "Rolando Villazón, Carlo Rizzi, Vienna Philharmonic, Helene Schneidermann, Herman Wallen, Luigi Roni, Anna Netrebko, Paul Gay, Chor der Wiener Staatsoper & Rupert Huber",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Alfredo! Voi!\"",
+    "performers": "Vienna Philharmonic, Chor der Wiener Staatsoper, Rupert Huber, Luigi Roni, Carlo Rizzi, Herman Wallen, Rolando Villazón, Helene Schneidermann, Paul Gay, Anna Netrebko"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 5,
+   "title": "La traviata, Act II: \"Invitato a qui seguirmi\"",
+   "durationMs": 144947,
+   "artist": "Anna Netrebko, Carlo Rizzi, Vienna Philharmonic, Rolando Villazón, Helene Schneidermann, Herman Wallen, Luigi Roni, Paul Gay, Chor der Wiener Staatsoper & Rupert Huber",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Invitato a qui seguirmi\"",
+    "performers": "Carlo Rizzi, Anna Netrebko, Vienna Philharmonic, Rolando Villazón, Rupert Huber, Paul Gay, Luigi Roni, Chor der Wiener Staatsoper, Herman Wallen, Helene Schneidermann"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 6,
+   "title": "La traviata, Act II: \"Ogni suo aver tal femmina\"",
+   "durationMs": 91787,
+   "artist": "Rolando Villazón, Carlo Rizzi, Vienna Philharmonic, Helene Schneidermann, Herman Wallen, Luigi Roni, Paul Gay, Chor der Wiener Staatsoper & Rupert Huber",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Ogni suo aver tal femmina\"",
+    "performers": "Helene Schneidermann, Paul Gay, Rolando Villazón, Vienna Philharmonic, Herman Wallen, Chor der Wiener Staatsoper, Carlo Rizzi, Rupert Huber, Luigi Roni"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 7,
+   "title": "La traviata, Act II: \"Di sprezzo degno se stesso rende\"",
+   "durationMs": 116400,
+   "artist": "Thomas Hampson, Carlo Rizzi, Vienna Philharmonic, Rolando Villazón, Helene Schneidermann, Herman Wallen, Luigi Roni, Paul Gay, Chor der Wiener Staatsoper & Rupert Huber",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Di sprezzo degno se stesso rende\"",
+    "performers": "Carlo Rizzi, Rolando Villazón, Vienna Philharmonic, Chor der Wiener Staatsoper, Helene Schneidermann, Rupert Huber, Paul Gay, Luigi Roni, Herman Wallen, Thomas Hampson"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 8,
+   "title": "La traviata, Act II: \"Alfredo, Alfredo, di questo core\" (Live At Festspielhaus, Salzburg / 2005)",
+   "durationMs": 282987,
+   "artist": "Carlo Rizzi, Vienna Philharmonic & Anna Netrebko",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Alfredo, Alfredo, di questo core\"",
+    "performers": "Anna Netrebko, Carlo Rizzi, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 9,
+   "title": "La traviata, Act III: Prelude",
+   "durationMs": 218240,
+   "artist": "Carlo Rizzi & Vienna Philharmonic",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "Prelude",
+    "performers": "Carlo Rizzi, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 10,
+   "title": "La traviata, Act III: \"Annina?\" \"Comandate?\"",
+   "durationMs": 299293,
+   "artist": "Anna Netrebko, Carlo Rizzi, Vienna Philharmonic, Diane Pilcher & Luigi Roni",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Annina?\" \"Comandate?\"",
+    "performers": "Carlo Rizzi, Anna Netrebko, Luigi Roni, Diane Pilcher, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 11,
+   "title": "La traviata, Act III: Teneste la promessa...Addio del passato",
+   "durationMs": 447373,
+   "artist": "Anna Netrebko, Carlo Rizzi & Vienna Philharmonic",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Teneste la promessa... Addio del passato\"",
+    "performers": "Vienna Philharmonic, Carlo Rizzi, Anna Netrebko"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 12,
+   "title": "La traviata, Act III: \"Largo a quadrupede\"",
+   "durationMs": 53760,
+   "artist": "Vienna Philharmonic, Carlo Rizzi, Chor der Wiener Staatsoper & Luigi Roni",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Largo al quadrupede\"",
+    "performers": "Luigi Roni, Vienna Philharmonic, Carlo Rizzi, Chor der Wiener Staatsoper"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 13,
+   "title": "La traviata, Act III: Signora...Che t'accadde...Parigi, o cara",
+   "durationMs": 362000,
+   "artist": "Diane Pilcher, Carlo Rizzi, Vienna Philharmonic, Anna Netrebko & Rolando Villazón",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Signora...\" \"Che t'accadde? ...Parigi, o cara\"",
+    "performers": "Carlo Rizzi, Anna Netrebko, Vienna Philharmonic, Rolando Villazón, Diane Pilcher"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 14,
+   "title": "La traviata, Act III: \"Ah, non più!\" - \"Ah! Gran Dio! Morir sì giovine\"",
+   "durationMs": 223613,
+   "artist": "Anna Netrebko, Carlo Rizzi, Vienna Philharmonic & Rolando Villazón",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Ah, non più!\" - \"Ah! Gran Dio! Morir sì giovine\"",
+    "performers": "Rolando Villazón, Carlo Rizzi, Vienna Philharmonic, Anna Netrebko"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 15,
+   "title": "La traviata, Act III: \"Ah, Violetta!\" \"Voi? Signor?\"",
+   "durationMs": 103827,
+   "artist": "Carlo Rizzi, Vienna Philharmonic, Thomas Hampson, Anna Netrebko & Rolando Villazón",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Ah, Violetta!\" \"Voi? Signor?\"",
+    "performers": "Anna Netrebko, Thomas Hampson, Carlo Rizzi, Rolando Villazón, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 16,
+   "title": "La traviata, Act III: \"Prendi, quest'è l'immagine\"",
+   "durationMs": 275667,
+   "artist": "Anna Netrebko, Carlo Rizzi, Vienna Philharmonic, Rolando Villazón, Thomas Hampson, Diane Pilcher & Luigi Roni",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "\"Prendi, quest'è l'immagine\"",
+    "performers": "Rolando Villazón, Vienna Philharmonic, Luigi Roni, Thomas Hampson, Carlo Rizzi, Diane Pilcher, Anna Netrebko"
+   }
+  }
+ ]
+}

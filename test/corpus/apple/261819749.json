@@ -1,0 +1,162 @@
+{
+ "id": "261819749",
+ "category": "guitar harp other",
+ "title": "Organ Music - Italy, Germany, France",
+ "artist": "Hans Helmut Tillmanns",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Passacaglia in B-Major",
+   "durationMs": 437960,
+   "artist": "Hans Helmut Tillmanns",
+   "apple": {
+    "block": 1,
+    "composer": "Frescobaldi",
+    "work": "Frescobaldi",
+    "part": "Passacaglia in B-Major",
+    "performers": "Hans Helmut Tillmanns"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Prelude in F-Minor BWV 534",
+   "durationMs": 258573,
+   "artist": "Hans Helmut Tillmanns",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Prelude & Fugue in F Minor, BWV 534",
+    "part": "Prelude in F-Minor BWV 534",
+    "performers": "Hans Helmut Tillmanns"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Fugue in F-Minor BWV 534",
+   "durationMs": 307827,
+   "artist": "Hans Helmut Tillmanns",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Toccata & Fugue in D Minor, BWV 565",
+    "part": "Fugue in F-Minor BWV 534",
+    "performers": "Hans Helmut Tillmanns"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Partita \"Aus Der Tiefe Rufe Ich\" BWV 788",
+   "durationMs": 208933,
+   "artist": "Hans Helmut Tillmanns",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "St. Luke Passion, BWV 246 · “Dubious Authorship”",
+    "part": "Partita \"Aus Der Tiefe Rufe Ich\" BWV 788",
+    "performers": "Hans Helmut Tillmanns"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Choral Setting and Fragment \"Erbarm Dich Mein, O Herre Gott\"",
+   "durationMs": 400000,
+   "artist": "Hans Helmut Tillmanns",
+   "apple": {
+    "block": 5,
+    "composer": "J. Hanff",
+    "work": "J. Hanff",
+    "part": "Choral Setting and Fragment \"Erbarm Dich Mein, O Herre Gott\"",
+    "performers": "Hans Helmut Tillmanns"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Sonata III Op. 65 \"Aus Tiefer Not Schrei Ich Zu Dir'\"",
+   "durationMs": 608040,
+   "artist": "Hans Helmut Tillmanns",
+   "apple": {
+    "block": 6,
+    "composer": "Felix Mendelssohn",
+    "work": "Felix Mendelssohn",
+    "part": "Sonata III Op. 65 \"Aus Tiefer Not Schrei Ich Zu Dir'\"",
+    "performers": "Hans Helmut Tillmanns"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Transcription Adagio from the Concerto In D-minor:",
+   "durationMs": 219733,
+   "artist": "Hans Helmut Tillmanns",
+   "apple": {
+    "block": 7,
+    "composer": "B. Marcello",
+    "work": "B. Marcello",
+    "part": "Transcription Adagio from the Concerto In D-minor:",
+    "performers": "Hans Helmut Tillmanns"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Weihnachten / Christmas Op. 145 No. 3",
+   "durationMs": 413067,
+   "artist": "Hans Helmut Tillmanns",
+   "apple": {
+    "block": 8,
+    "composer": "Max Reger",
+    "work": "7 Organ Pieces, Op. 145",
+    "part": "Weihnachten / Christmas Op. 145 No. 3",
+    "performers": "Hans Helmut Tillmanns"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Choral Setting \"Es Ist Ein Ros Entsprungen\"",
+   "durationMs": 141427,
+   "artist": "Hans Helmut Tillmanns",
+   "apple": {
+    "block": 9,
+    "composer": "Johannes Brahms",
+    "work": "11 Choral preludes, Op. posth 122",
+    "part": "Choral Setting \"Es Ist Ein Ros Entsprungen\"",
+    "performers": "Hans Helmut Tillmanns"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Pastorale Op. 19",
+   "durationMs": 523573,
+   "artist": "Hans Helmut Tillmanns",
+   "apple": {
+    "block": 10,
+    "composer": "César Franck",
+    "work": "Pastorale in E Major, FWV 31, M 31, Op. 19 · “6 Pièces pour Grande Orgue”",
+    "part": "Pastorale Op. 19",
+    "performers": "Hans Helmut Tillmanns"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Chaconne in D",
+   "durationMs": 174893,
+   "artist": "Hans Helmut Tillmanns",
+   "apple": {
+    "block": 11,
+    "composer": "Louis Couperin",
+    "work": "Suite in D Major",
+    "part": "Chaconne in D",
+    "performers": "Hans Helmut Tillmanns"
+   }
+  }
+ ]
+}

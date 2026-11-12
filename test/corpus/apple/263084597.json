@@ -1,0 +1,372 @@
+{
+ "id": "263084597",
+ "category": "twentieth century contemporary",
+ "title": "Ligeti: Études, Música Ricercata",
+ "artist": "Pierre-Laurent Aimard",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Etudes pour Piano (Premier Livre): I. Désórdre",
+   "durationMs": 142707,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 1,
+    "composer": "György Ligeti",
+    "work": "Etudes, Book 1",
+    "part": "I. Désórdre",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Etudes pour Piano (Premier Livre): II. Cordes à Vide",
+   "durationMs": 196520,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 1,
+    "composer": "György Ligeti",
+    "work": "Etudes, Book 1",
+    "part": "II. Cordes à Vide",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Etudes pour Piano (Premier Livre): III. Touches Bloquies",
+   "durationMs": 116693,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 1,
+    "composer": "György Ligeti",
+    "work": "Etudes, Book 1",
+    "part": "III. Touches Bloquies",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Etudes pour Piano (Premier Livre): IV. Fanfares",
+   "durationMs": 216613,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 1,
+    "composer": "György Ligeti",
+    "work": "Etudes, Book 1",
+    "part": "IV. Fanfares",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Etudes pour Piano (Premier Livre): V. Arc-en-ciel",
+   "durationMs": 231613,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 1,
+    "composer": "György Ligeti",
+    "work": "Etudes, Book 1",
+    "part": "V. Arc-en-ciel",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Etudes pour Piano (Premier Livre): VI. Automne à Varsóvie",
+   "durationMs": 263947,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 1,
+    "composer": "György Ligeti",
+    "work": "Etudes, Book 1",
+    "part": "VI. Automne à Varsóvie",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Etudes pour Piano (Deuxieme Livre): VII. Galamb Borong",
+   "durationMs": 167773,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 2,
+    "composer": "György Ligeti",
+    "work": "Etudes, Book 2",
+    "part": "VII. Galamb Borong",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Etudes pour Piano (Deuxieme Livre): VIII. Fém",
+   "durationMs": 184813,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 2,
+    "composer": "György Ligeti",
+    "work": "Etudes, Book 2",
+    "part": "VIII. Fém",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Etudes pour Piano (Deuxieme Livre): IX. Vertige",
+   "durationMs": 182493,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 2,
+    "composer": "György Ligeti",
+    "work": "Etudes, Book 2",
+    "part": "IX. Vertige",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Etudes pour Piano (Deuxieme Livre): X. Der Zauberlehrling",
+   "durationMs": 139933,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 2,
+    "composer": "György Ligeti",
+    "work": "Etudes, Book 2",
+    "part": "X. Der Zauberlehrling",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Etudes pour Piano (Deuxieme Livre): XI. En Suspens",
+   "durationMs": 126867,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 2,
+    "composer": "György Ligeti",
+    "work": "Etudes, Book 2",
+    "part": "XI. En Suspens",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Etudes pour Piano (Deuxieme Livre): XII. Entrelacs",
+   "durationMs": 175733,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 2,
+    "composer": "György Ligeti",
+    "work": "Etudes, Book 2",
+    "part": "XII. Entrelacs",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Etudes pour Piano (Deuxieme Livre): XIII. L'escalier Du Diable",
+   "durationMs": 317133,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 2,
+    "composer": "György Ligeti",
+    "work": "Etudes, Book 2",
+    "part": "XIII. L'escalier Du Diable",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Etudes pour Piano (Deuxieme Livre): XIV. Coloana Infinita",
+   "durationMs": 101440,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 2,
+    "composer": "György Ligeti",
+    "work": "Etudes, Book 2",
+    "part": "XIV. Coloana Infinita",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Música Ricercata: I. Sósenuto - Misurato - Prestissimo",
+   "durationMs": 162227,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 3,
+    "composer": "György Ligeti",
+    "work": "Musica ricercata",
+    "part": "I. Sósenuto - Misurato - Prestissimo",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Música Ricercata: II. Mesto, rigido e cerimoniale",
+   "durationMs": 231933,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 3,
+    "composer": "György Ligeti",
+    "work": "Musica ricercata",
+    "part": "II. Mesto, rigido e cerimoniale",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Música Ricercata: III. Allegro con spirito",
+   "durationMs": 71640,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 3,
+    "composer": "György Ligeti",
+    "work": "Musica ricercata",
+    "part": "III. Allegro con spirito",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Música Ricercata: IV. Tempo de Valse (Poco vivace - a' l'orgue de Barbarie)",
+   "durationMs": 137920,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 3,
+    "composer": "György Ligeti",
+    "work": "Musica ricercata",
+    "part": "IV. Tempo de Valse (Poco vivace - a' l'orgue de Barbarie)",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "Música Ricercata: V. Rubato. Lamentosó",
+   "durationMs": 192453,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 3,
+    "composer": "György Ligeti",
+    "work": "Musica ricercata",
+    "part": "V. Rubato. Lamentosó",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "Música Ricercata: VI. Allegro molto capricciosó",
+   "durationMs": 49987,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 3,
+    "composer": "György Ligeti",
+    "work": "Musica ricercata",
+    "part": "VI. Allegro molto capricciosó",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "Música Ricercata: VII. Cantabilê, molto legato",
+   "durationMs": 244120,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 3,
+    "composer": "György Ligeti",
+    "work": "Musica ricercata",
+    "part": "VII. Cantabilê, molto legato",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "Música Ricercata: VIII. Vivace. Energico",
+   "durationMs": 75400,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 3,
+    "composer": "György Ligeti",
+    "work": "Musica ricercata",
+    "part": "VIII. Vivace. Energico",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 23,
+   "title": "Música Ricercata: IX. Adagio. Mesto - Allegro mãestosó",
+   "durationMs": 135267,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 3,
+    "composer": "György Ligeti",
+    "work": "Musica ricercata",
+    "part": "IX. Adagio. Mesto - Allegro mãestosó",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 24,
+   "title": "Música Ricercata: X. Vivace. Capricciosó",
+   "durationMs": 82387,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 3,
+    "composer": "György Ligeti",
+    "work": "Musica ricercata",
+    "part": "X. Vivace. Capricciosó",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 25,
+   "title": "Música Ricercata: XI. Andante misurato e tranquillo",
+   "durationMs": 255413,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 3,
+    "composer": "György Ligeti",
+    "work": "Musica ricercata",
+    "part": "XI. Andante misurato e tranquillo",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 26,
+   "title": "Etudes pour Piano (Troisihme Livre): XV. White on White (Excerpt)",
+   "durationMs": 232160,
+   "artist": "Pierre-Laurent Aimard",
+   "apple": {
+    "block": 4,
+    "composer": "György Ligeti",
+    "work": "Etudes, Book 1",
+    "part": "XV. White on White (Excerpt)",
+    "performers": "Pierre-Laurent Aimard"
+   }
+  }
+ ]
+}
