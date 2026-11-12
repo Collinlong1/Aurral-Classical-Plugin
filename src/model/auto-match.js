@@ -4,7 +4,7 @@ import { transaction } from "./database.js";
 import { catalogueNumber } from "../works.js";
 
 const MULTI_MOVEMENT =
-  /\b(symphon(?:y|ie)|sinfonia|sonata|sonatina|concerto|suite|partita|quartet|quintet|sextet|septet|octet|nonet|trio|serenade|divertimento|cassation|mass|missa|requiem|stabat mater|magnificat|te deum|vespers|cantata|oratorio|passion|variations|ballet)\b/i;
+  /\b(symphon(?:y|ie)|sinfonia|sonata|sonatina|concerto|suite|partita|quartet|quintet|sextet|septet|octet|nonet|trio|serenade|divertimento|cassation|mass|missa|requiem|stabat mater|magnificat|te deum|vespers|cantata|oratorio|passion|variations?|ballet)\b/i;
 const COLLECTION_LIKE = /\b(etudes?|études?|preludes?|préludes?|songs?|lieder)\b/i;
 export const isCollectionLike = (value) => COLLECTION_LIKE.test(clean(value));
 const MOVEMENT_PREFIX = /^(?:[IVXLCDM]+|\d+)[.)\s:-]/i;
@@ -14,22 +14,35 @@ const normalized = (value) =>
     .normalize("NFKD")
     .replace(/\p{M}/gu, "")
     .toLowerCase();
+const sameCatalogue = (a, b) => {
+  const number = catalogueNumber(a).toLowerCase();
+  return Boolean(number) && number === catalogueNumber(b).toLowerCase();
+};
 const identity = (...values) =>
   createHash("sha256").update(JSON.stringify(values)).digest("hex");
+
+// The work part of a structured title: text before the first ":", ";" or
+// spaced dash. "B-flat" has no spaces, so it stays in the work.
+const WORK_HEAD = /^(.+?)(?:\s*[:;]|\s+[–—-])\s+(.+)$/;
+export const titleHead = (title) => splitTitle(title).head;
+export function splitTitle(title) {
+  const match = clean(title).match(WORK_HEAD);
+  return match ? { head: clean(match[1]), tail: clean(match[2]) } : { head: "", tail: clean(title) };
+}
 
 function proposedWork(work, title, allowStructuredTitles) {
   const tagged = clean(work);
   if (tagged && !isCollectionLike(tagged)) {
     const parent = clean(tagged.split(/\s*:\s*/, 1)[0]);
-    const candidate = MULTI_MOVEMENT.test(parent) ? parent : tagged;
-    if (MULTI_MOVEMENT.test(candidate))
-      return { title: candidate, evidence: "work-tag" };
+    // A WORK tag names a work outright when it reads like one or carries
+    // a catalogue number, as song cycles do ("Winterreise, D. 911").
+    if (MULTI_MOVEMENT.test(parent) || catalogueNumber(parent))
+      return { title: parent, evidence: "work-tag" };
   }
   if (!allowStructuredTitles) return null;
-  const structured = clean(title).match(/^(.+?)(?::|\s+[–—-]\s+)\s*(.+)$/);
-  if (!structured || !MOVEMENT_PREFIX.test(structured[2])) return null;
-  const candidate = clean(structured[1]);
-  return MULTI_MOVEMENT.test(candidate) && !isCollectionLike(candidate)
+  // Every track of a work shares the head, numbered or not ("Theme: Largo").
+  const candidate = titleHead(title);
+  return candidate && MULTI_MOVEMENT.test(candidate) && !isCollectionLike(candidate)
     ? { title: candidate, evidence: "structured-title" }
     : null;
 }
@@ -59,9 +72,14 @@ function candidates(
   for (const row of rows) {
     const hints = row.evidence.hints || {};
     const provider = providerMatches.get(row.id);
+    const local = proposedWork(hints.work, hints.title, true);
     const proposal = provider
       ? {
-          title: clean(provider.work),
+          // The tags' own title wins when it names the same catalogue number.
+          title:
+            local && sameCatalogue(local.title, provider.work)
+              ? local.title
+              : clean(provider.work),
           evidence: "musicbrainz-parent",
           identity: provider.workId,
         }
@@ -85,7 +103,7 @@ function candidates(
     const key = JSON.stringify([
       row.instance_id,
       String(row.evidence.albumId),
-      proposal.identity || normalized(proposal.title),
+      proposal.identity || workKey(proposal.title, composers),
       composers.map(normalized).sort(),
       proposal.evidence,
     ]);
@@ -93,6 +111,7 @@ function candidates(
       groups.set(key, {
         key,
         work: proposal.title,
+        titles: new Map(),
         evidence: proposal.evidence,
         providerWorkId: proposal.identity || null,
         providerAliases: provider?.aliases || [],
@@ -101,7 +120,9 @@ function candidates(
         album: clean(hints.album),
         tracks: [],
       });
-    groups.get(key).tracks.push({
+    const group = groups.get(key);
+    group.titles.set(proposal.title, (group.titles.get(proposal.title) || 0) + 1);
+    group.tracks.push({
       ...row,
       providerMovement: provider?.movement ? clean(provider.movement) : null,
       title: clean(hints.title),
@@ -110,7 +131,9 @@ function candidates(
     });
   }
   return [...groups.values()].filter((group) => {
-    if (group.tracks.length < 2 || group.tracks.some((track) => track.attached))
+    // The title most of the work's tracks use, so one typo doesn't name it.
+    group.work = [...group.titles].sort((a, b) => b[1] - a[1])[0][0];
+    if (group.tracks.length < 2 || group.tracks.every((track) => track.attached))
       return false;
     const positions = group.tracks.map(
       (track) => `${track.discNumber}:${track.trackNumber}`,
@@ -177,16 +200,20 @@ export function movementParts(title) {
 }
 // The movement part of a structured track title or WORK tag.
 export function movementTitle(track, workTitle) {
+  // The track title usually spells the movement out in full; a WORK tag
+  // holds MusicBrainz's shorter name, so it is the fallback.
+  const fromTitle = stripWorkPrefix(clean(track.title), workTitle);
+  if (fromTitle !== clean(track.title) || MOVEMENT_PREFIX.test(fromTitle)) return fromTitle;
   const work = clean(track.work);
   if (work.includes(":")) {
     const tail = clean(work.slice(work.indexOf(":") + 1));
     if (tail) return stripWorkPrefix(tail, workTitle);
   }
-  return stripWorkPrefix(clean(track.title), workTitle);
+  return fromTitle;
 }
 
-const SEPARATOR = /:\s*|\s+[–—-]\s+/g;
-const NICKNAME = /^["“„«'‘][^"”»'’]+["”»'’]\s*(?::|\s[–—-])\s*(.+)$/;
+const SEPARATOR = /[:;]\s*|\s+[–—-]\s+/g;
+const NICKNAME = /^["“„«'‘][^"”»'’]+["”»'’]\s*(?:[:;]|\s[–—-])\s*(.+)$/;
 // "Piano Sonata No. 29, Op. 106 - "Hammerklavier": Allegro" -> "Allegro".
 // A head names the work when it matches its words or catalogue number.
 export function stripWorkPrefix(title, workTitle) {
@@ -315,7 +342,92 @@ export function mapToMovements(movements, tracks) {
   return null;
 }
 
+const albumOrder = (a, b) =>
+  a.discNumber - b.discNumber || a.trackNumber - b.trackNumber || a.id.localeCompare(b.id);
+
+// Moves rows at or after `from` up one, through a gap, so unique positions
+// never collide mid-update.
+function shiftUp(catalogue, table, column, where, args, from) {
+  catalogue.db
+    .prepare(`UPDATE ${table} SET ${column}=${column}+1000000 WHERE ${where} AND ${column}>=?`)
+    .run(...args, from);
+  catalogue.db
+    .prepare(`UPDATE ${table} SET ${column}=${column}-999999 WHERE ${where} AND ${column}>=1000000`)
+    .run(...args);
+}
+
+// A work this album already has gains the album's other tracks of it, such
+// as a theme or intermezzo an earlier pass left out. Each new movement goes
+// right after the movement of the track before it on the album.
+function extendRealization(catalogue, group, actor) {
+  const attached = group.tracks.filter((track) => track.attached);
+  const found = catalogue.db
+    .prepare(
+      `SELECT DISTINCT i.realization_id AS id,r.work_id,r.performance_work_id FROM realization_item i
+       JOIN segment s ON s.id=i.segment_id JOIN realization r ON r.id=i.realization_id
+       WHERE s.track_link_id IN (${attached.map(() => "?").join(",")})`,
+    )
+    .all(...attached.map((track) => track.id));
+  if (found.length !== 1) return false;
+  const [realization] = found;
+  const metadata = new Metadata(catalogue);
+  return transaction(catalogue.db, () => {
+    const workTitle = resolvedName(catalogue, realization.work_id, "title") || group.work;
+    const performance = catalogue.db
+      .prepare("SELECT source_id FROM relation WHERE id=?")
+      .get(realization.performance_work_id).source_id;
+    const itemOf = catalogue.db.prepare(
+      `SELECT i.movement_id,i.sequence FROM realization_item i JOIN segment s ON s.id=i.segment_id
+       WHERE i.realization_id=? AND s.track_link_id=?`,
+    );
+    const ordered = [...group.tracks].sort(albumOrder);
+    let added = 0;
+    for (const [index, track] of ordered.entries()) {
+      if (track.attached) continue;
+      const before = ordered
+        .slice(0, index)
+        .reverse()
+        .map((other) => itemOf.get(realization.id, other.id))
+        .find(Boolean);
+      const position = before?.movement_id
+        ? catalogue.db
+            .prepare("SELECT position FROM relation WHERE kind='movement' AND source_id=? AND target_id=?")
+            .get(realization.work_id, before.movement_id).position + 1
+        : 1;
+      shiftUp(catalogue, "relation", "position", "kind='movement' AND source_id=?", [realization.work_id], position);
+      const movement = catalogue.createEntity("movement");
+      metadata.derived(
+        movement,
+        "title",
+        movementTitle({ title: track.title, work: track.evidence.hints?.work }, workTitle) ||
+          `Movement ${position}`,
+      );
+      catalogue.relate("movement", realization.work_id, movement, { position });
+      const sequence = (before?.sequence || 0) + 1;
+      shiftUp(catalogue, "realization_item", "sequence", "realization_id=?", [realization.id], sequence);
+      const recording = catalogue.createEntity("recording", { durationMs: track.evidence.durationMs });
+      metadata.derived(recording, "title", track.title);
+      catalogue.relate("recording_performance", recording, performance);
+      const content = catalogue.recordingContent(recording, realization.performance_work_id, { movement });
+      const segment = catalogue.segment(track.id, { kind: "whole" });
+      catalogue.segmentContent(segment, content);
+      catalogue.realizationItem(realization.id, segment, { movement, sequence });
+      track.attached = 1;
+      added++;
+    }
+    catalogue.audit(
+      "work.auto_match_extend",
+      realization.work_id,
+      { albumId: group.albumId, added, tracks: ordered.map((track) => track.id) },
+      actor,
+    );
+    return added > 0;
+  });
+}
+
 function createGroup(catalogue, group, actor, index) {
+  if (group.tracks.some((track) => track.attached))
+    return extendRealization(catalogue, group, actor);
   const metadata = new Metadata(catalogue);
   const recordId = identity("album-work", group.key);
   if (existingIdentity(catalogue, "album-work", recordId)) return false;
@@ -673,6 +785,41 @@ export function repairMovementTitles(catalogue) {
   return repaired;
 }
 
+// Work titles taken from MusicBrainz before the tags' own title won: when
+// every track of a work agrees on a title naming the same catalogue number,
+// use it. Manual and provider titles are left alone.
+export function repairWorkTitles(catalogue) {
+  const metadata = new Metadata(catalogue);
+  const works = catalogue.db
+    .prepare(
+      `SELECT DISTINCT r.work_id AS id,a.value FROM realization r
+       JOIN field_resolution f ON f.target_id=r.work_id AND f.field='title'
+       JOIN assertion a ON a.id=f.assertion_id WHERE a.source='derived'`,
+    )
+    .all();
+  const tracks = catalogue.db.prepare(
+    `SELECT t.evidence FROM realization r JOIN realization_item i ON i.realization_id=r.id
+     JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id
+     WHERE r.work_id=?`,
+  );
+  let repaired = 0;
+  for (const work of works) {
+    const current = JSON.parse(work.value);
+    const heads = new Set(
+      tracks.all(work.id).map((row) => {
+        const hints = JSON.parse(row.evidence).hints || {};
+        return proposedWork(hints.work, hints.title, true)?.title || "";
+      }),
+    );
+    const [head] = heads;
+    if (heads.size === 1 && head && head !== current && sameCatalogue(head, current)) {
+      metadata.derived(work.id, "title", head);
+      repaired++;
+    }
+  }
+  return repaired;
+}
+
 export function autoMatchTaggedWorks(
   catalogue,
   {
@@ -689,6 +836,7 @@ export function autoMatchTaggedWorks(
     providerMatches,
   );
   mergeDuplicateAutoWorks(catalogue, { actor });
+  repairWorkTitles(catalogue);
   repairMovementTitles(catalogue);
   const metadata = new Metadata(catalogue);
   for (const { id } of catalogue.db

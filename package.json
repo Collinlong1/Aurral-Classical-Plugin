@@ -4,7 +4,8 @@
   "scripts": {
     "build": "node build.mjs",
     "build:dev": "node build.mjs --dev",
-    "test": "node --test test/*.test.js"
+    "test": "node --test test/*.test.js",
+    "corpus": "node scripts/corpus.mjs"
   },
   "repository": {
     "type": "git",

@@ -197,6 +197,23 @@ the plugin developer tools:
 AURRAL_MCP_URL=https://aurral.example/api/mcp AURRAL_DEV_KEY=aurral_dev_... node scripts/mcp.mjs write-dev
 ```
 
+## Test corpus
+
+`test/corpus/albums.js` is a library of classical albums written as tags: well
+and poorly tagged MusicBrainz releases, an album MusicBrainz doesn't have, a
+recital, a box set disc, a song cycle, a compilation and a pop album, each
+with the work view it should produce. `npm test` checks every album.
+
+```bash
+npm run corpus                                  # print each album as the By work view shows it
+npm run corpus -- --audio ../corpus-music       # write silent FLAC files with the same tags and lengths
+npm run corpus -- --serve-musicbrainz 5099      # answer MusicBrainz lookups from the corpus
+```
+
+For a real Aurral, put the generated folder in Aurral's library folder, set
+the plugin's MusicBrainz mirror to `http://localhost:5099`, then run the model
+scan and "Auto-match classical works". Add an album here for every new case.
+
 ## Release
 
 Bump `version` in `manifest.json`, run `npm run build`, and push to `main`.

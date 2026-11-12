@@ -1,6 +1,7 @@
 import path from "node:path";
 import { openCatalogue } from "./catalogue.js";
 import { transaction } from "./database.js";
+import { splitTitle } from "./auto-match.js";
 
 const text = (value, fallback) =>
   typeof value === "string" && value.trim() ? value.trim() : fallback;
@@ -55,6 +56,19 @@ function realizationRows(c, realizationId = null, workId = null, albumId = null)
     .all(...filters.map(([value]) => value));
 }
 
+const words = (value) =>
+  String(value || "").normalize("NFKD").replace(/\p{M}/gu, "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+// "Ludwig van Beethoven — Igor Levit" -> "Igor Levit": the composer already
+// heads the work, so rows name only who plays.
+function performerOf(hints) {
+  const artist = text(hints?.artist, text(hints?.albumArtist, ""));
+  const composers = new Set((hints?.composer || []).map(words));
+  const performers = artist
+    .split(/\s+[—–]\s+|\s*;\s*/)
+    .filter((name) => name && !composers.has(words(name)));
+  return performers.length ? performers.join(", ") : artist;
+}
+
 function queueItem(metadata, row) {
   const evidence = evidenceOf(row);
   return {
@@ -66,6 +80,7 @@ function queueItem(metadata, row) {
       ? entityValue(metadata, row.movement_id, "title", trackTitle(evidence))
       : trackTitle(evidence),
     artist: text(evidence.hints?.artist, text(evidence.hints?.albumArtist, "")),
+    performer: performerOf(evidence.hints),
     album: text(evidence.hints?.album, ""),
     durationMs: Number(evidence.durationMs) || null,
     startMs: row.start_ms,
@@ -107,6 +122,59 @@ function credits(c, metadata, targetId) {
     }));
 }
 
+const albumPosition = (row) => {
+  const hints = evidenceOf(row).hints || {};
+  return (Number(hints.discNumber) || 1) * 10000 + (Number(hints.trackNumber) || 9999);
+};
+
+// Classical tracks outside every work become pieces, as Apple Music
+// Classical shows a recital: neighbouring tracks of one set share a block
+// headed by the set ("Études, Book 1"), and a lone piece heads itself.
+function pieceGroups(c, album) {
+  const rows = c.db
+    .prepare(
+      `SELECT t.id AS track_link_id,t.core_id,t.file_id,t.evidence FROM track_link t
+       JOIN classification c ON c.target_id=t.id AND c.state='classical'
+       WHERE t.state='active' AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?
+       AND NOT EXISTS(SELECT 1 FROM segment s WHERE s.track_link_id=t.id)`,
+    )
+    .all(album)
+    .sort((a, b) => albumPosition(a) - albumPosition(b));
+  const pieces = [];
+  for (const row of rows) {
+    const evidence = evidenceOf(row);
+    const { head, tail } = splitTitle(trackTitle(evidence));
+    const heading = head || tail;
+    const composer = (evidence.hints?.composer || []).join(", ");
+    const last = pieces.at(-1);
+    const item = {
+      id: `piece:${row.track_link_id}`,
+      trackId: String(row.core_id),
+      fileId: String(row.file_id),
+      albumId: String(evidence.albumId ?? ""),
+      title: tail,
+      artist: text(evidence.hints?.artist, text(evidence.hints?.albumArtist, "")),
+      performer: performerOf(evidence.hints),
+      album: text(evidence.hints?.album, ""),
+      durationMs: Number(evidence.durationMs) || null,
+      startMs: 0,
+      endMs: null,
+      position: albumPosition(row),
+    };
+    if (head && last?.title === heading && last.composer === composer && last.next === item.position - 1)
+      last.items.push(item);
+    else
+      pieces.push({ id: item.id, workId: null, title: heading, composer, items: [item], missing: [] });
+    pieces.at(-1).next = item.position;
+  }
+  return pieces.map(({ next, items, ...piece }) => ({
+    ...piece,
+    first: items[0].position,
+    items: items.map(({ position, ...item }) => item),
+    movementCount: items.length,
+  }));
+}
+
 export function renderAlbumPresentation(c, albumId) {
   const metadata = new DisplayValues(c);
   const album = String(albumId);
@@ -119,17 +187,7 @@ export function renderAlbumPresentation(c, albumId) {
     group.push(row);
     grouped.set(row.realization_id, group);
   }
-  // Works follow the album: by each one's first disc and track.
-  const albumPosition = (row) => {
-    const hints = evidenceOf(row).hints || {};
-    return (Number(hints.discNumber) || 1) * 10000 + (Number(hints.trackNumber) || 9999);
-  };
-  const firstPosition = new Map(
-    [...grouped].map(([id, rows]) => [id, Math.min(...rows.map(albumPosition))]),
-  );
-  const groups = [...grouped.entries()]
-    .sort(([a], [b]) => firstPosition.get(a) - firstPosition.get(b))
-    .map(([realizationId, rows]) => {
+  const works = [...grouped.entries()].map(([realizationId, rows]) => {
     const workId = rows[0].work_id;
     const movements = workMovements(c, metadata, workId);
     const present = new Set(rows.map((row) => row.movement_id).filter(Boolean));
@@ -144,11 +202,15 @@ export function renderAlbumPresentation(c, albumId) {
       items: rows.map((row) => queueItem(metadata, row)),
       missing: movements.filter((movement) => !present.has(movement.id)),
       movementCount: movements.length,
+      first: Math.min(...rows.map(albumPosition)),
     };
   });
-  const supportsToggle = groups.some((group) => group.movementCount > 1);
-  if (!supportsToggle) return null;
-  return { version: 1, albumId: album, supportsToggle, groups };
+  if (!works.some((group) => group.movementCount > 1)) return null;
+  // Works and pieces follow the album: by each one's first disc and track.
+  const groups = [...works, ...pieceGroups(c, album)]
+    .sort((a, b) => a.first - b.first)
+    .map(({ first, ...group }) => group);
+  return { version: 1, albumId: album, supportsToggle: true, groups };
 }
 
 export function renderWork(c, workId, user) {

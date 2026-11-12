@@ -34,6 +34,7 @@ import {
 import {
   autoMatchTaggedWorks,
   repairMovementTitles,
+  repairWorkTitles,
 } from "../src/model/auto-match.js";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
@@ -137,6 +138,10 @@ test("album works follow the album, and movement titles drop the work's name", a
   m.derived(movements[0], "title", `${hammerklavier}: Allegro`);
   m.manual(movements[1], "title", `${hammerklavier}: Kept`, { actor: "admin" });
   assert.equal(repairMovementTitles(c), 1);
+  // A MusicBrainz title stored by an older pass gives way to the tags' title.
+  m.derived(hammerklavierWork, "title", 'Sonata for Piano no. 29 in B-flat major, op. 106 "Hammer-Klavier"');
+  assert.equal(repairWorkTitles(c), 1);
+  assert.equal(m.resolve(hammerklavierWork, "title").value, hammerklavier);
   assert.deepEqual(
     renderAlbumPresentation(c, "cycle-album").groups[1].items.map((item) => item.title),
     ["Allegro", `${hammerklavier}: Kept`],
@@ -515,6 +520,7 @@ test("Phase 4 groups an album by work and isolates user picks with an admin fall
     albumId: "album-1",
     title: "I. First",
     artist: "Fixture Orchestra",
+    performer: "Fixture Orchestra",
     album: "Fixture Album",
     durationMs: 10000,
     startMs: 1000,

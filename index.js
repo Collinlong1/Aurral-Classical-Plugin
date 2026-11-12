@@ -36423,26 +36423,33 @@ function releaseYear(date) {
 }
 
 // src/model/auto-match.js
-var MULTI_MOVEMENT = /\b(symphon(?:y|ie)|sinfonia|sonata|sonatina|concerto|suite|partita|quartet|quintet|sextet|septet|octet|nonet|trio|serenade|divertimento|cassation|mass|missa|requiem|stabat mater|magnificat|te deum|vespers|cantata|oratorio|passion|variations|ballet)\b/i;
+var MULTI_MOVEMENT = /\b(symphon(?:y|ie)|sinfonia|sonata|sonatina|concerto|suite|partita|quartet|quintet|sextet|septet|octet|nonet|trio|serenade|divertimento|cassation|mass|missa|requiem|stabat mater|magnificat|te deum|vespers|cantata|oratorio|passion|variations?|ballet)\b/i;
 var COLLECTION_LIKE = /\b(etudes?|études?|preludes?|préludes?|songs?|lieder)\b/i;
 var isCollectionLike = (value) => COLLECTION_LIKE.test(clean(value));
 var MOVEMENT_PREFIX = /^(?:[IVXLCDM]+|\d+)[.)\s:-]/i;
 var clean = (value) => String(value || "").trim().replace(/\s+/g, " ");
 var normalized = (value) => clean(value).normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase();
+var sameCatalogue = (a, b) => {
+  const number = catalogueNumber(a).toLowerCase();
+  return Boolean(number) && number === catalogueNumber(b).toLowerCase();
+};
 var identity = (...values) => createHash2("sha256").update(JSON.stringify(values)).digest("hex");
+var WORK_HEAD = /^(.+?)(?:\s*[:;]|\s+[–—-])\s+(.+)$/;
+var titleHead = (title) => splitTitle(title).head;
+function splitTitle(title) {
+  const match2 = clean(title).match(WORK_HEAD);
+  return match2 ? { head: clean(match2[1]), tail: clean(match2[2]) } : { head: "", tail: clean(title) };
+}
 function proposedWork(work, title, allowStructuredTitles) {
   const tagged = clean(work);
   if (tagged && !isCollectionLike(tagged)) {
     const parent = clean(tagged.split(/\s*:\s*/, 1)[0]);
-    const candidate2 = MULTI_MOVEMENT.test(parent) ? parent : tagged;
-    if (MULTI_MOVEMENT.test(candidate2))
-      return { title: candidate2, evidence: "work-tag" };
+    if (MULTI_MOVEMENT.test(parent) || catalogueNumber(parent))
+      return { title: parent, evidence: "work-tag" };
   }
   if (!allowStructuredTitles) return null;
-  const structured = clean(title).match(/^(.+?)(?::|\s+[–—-]\s+)\s*(.+)$/);
-  if (!structured || !MOVEMENT_PREFIX.test(structured[2])) return null;
-  const candidate = clean(structured[1]);
-  return MULTI_MOVEMENT.test(candidate) && !isCollectionLike(candidate) ? { title: candidate, evidence: "structured-title" } : null;
+  const candidate = titleHead(title);
+  return candidate && MULTI_MOVEMENT.test(candidate) && !isCollectionLike(candidate) ? { title: candidate, evidence: "structured-title" } : null;
 }
 function candidates(catalogue, albumId = null, allowStructuredTitles = false, providerMatches = /* @__PURE__ */ new Map()) {
   const rows = catalogue.db.prepare(
@@ -36458,8 +36465,10 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
   for (const row of rows) {
     const hints = row.evidence.hints || {};
     const provider = providerMatches.get(row.id);
+    const local = proposedWork(hints.work, hints.title, true);
     const proposal = provider ? {
-      title: clean(provider.work),
+      // The tags' own title wins when it names the same catalogue number.
+      title: local && sameCatalogue(local.title, provider.work) ? local.title : clean(provider.work),
       evidence: "musicbrainz-parent",
       identity: provider.workId
     } : proposedWork(hints.work, hints.title, allowStructuredTitles);
@@ -36475,7 +36484,7 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
     const key = JSON.stringify([
       row.instance_id,
       String(row.evidence.albumId),
-      proposal.identity || normalized(proposal.title),
+      proposal.identity || workKey(proposal.title, composers),
       composers.map(normalized).sort(),
       proposal.evidence
     ]);
@@ -36483,6 +36492,7 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
       groups.set(key, {
         key,
         work: proposal.title,
+        titles: /* @__PURE__ */ new Map(),
         evidence: proposal.evidence,
         providerWorkId: proposal.identity || null,
         providerAliases: provider?.aliases || [],
@@ -36491,7 +36501,9 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
         album: clean(hints.album),
         tracks: []
       });
-    groups.get(key).tracks.push({
+    const group = groups.get(key);
+    group.titles.set(proposal.title, (group.titles.get(proposal.title) || 0) + 1);
+    group.tracks.push({
       ...row,
       providerMovement: provider?.movement ? clean(provider.movement) : null,
       title: clean(hints.title),
@@ -36500,7 +36512,8 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
     });
   }
   return [...groups.values()].filter((group) => {
-    if (group.tracks.length < 2 || group.tracks.some((track) => track.attached))
+    group.work = [...group.titles].sort((a, b) => b[1] - a[1])[0][0];
+    if (group.tracks.length < 2 || group.tracks.every((track) => track.attached))
       return false;
     const positions = group.tracks.map(
       (track) => `${track.discNumber}:${track.trackNumber}`
@@ -36544,15 +36557,17 @@ function movementParts(title) {
   return index ? { index, text: match2[2] } : { index: null, text: text4 };
 }
 function movementTitle(track, workTitle) {
+  const fromTitle = stripWorkPrefix(clean(track.title), workTitle);
+  if (fromTitle !== clean(track.title) || MOVEMENT_PREFIX.test(fromTitle)) return fromTitle;
   const work = clean(track.work);
   if (work.includes(":")) {
     const tail = clean(work.slice(work.indexOf(":") + 1));
     if (tail) return stripWorkPrefix(tail, workTitle);
   }
-  return stripWorkPrefix(clean(track.title), workTitle);
+  return fromTitle;
 }
-var SEPARATOR = /:\s*|\s+[–—-]\s+/g;
-var NICKNAME = /^["“„«'‘][^"”»'’]+["”»'’]\s*(?::|\s[–—-])\s*(.+)$/;
+var SEPARATOR = /[:;]\s*|\s+[–—-]\s+/g;
+var NICKNAME = /^["“„«'‘][^"”»'’]+["”»'’]\s*(?:[:;]|\s[–—-])\s*(.+)$/;
 function stripWorkPrefix(title, workTitle) {
   const text4 = clean(title);
   const separators = [...text4.matchAll(SEPARATOR)];
@@ -36649,7 +36664,66 @@ function mapToMovements(movements, tracks) {
   if (movements.length === tracks.length) return movements.map((m) => m.id);
   return null;
 }
+var albumOrder = (a, b) => a.discNumber - b.discNumber || a.trackNumber - b.trackNumber || a.id.localeCompare(b.id);
+function shiftUp(catalogue, table, column, where, args, from) {
+  catalogue.db.prepare(`UPDATE ${table} SET ${column}=${column}+1000000 WHERE ${where} AND ${column}>=?`).run(...args, from);
+  catalogue.db.prepare(`UPDATE ${table} SET ${column}=${column}-999999 WHERE ${where} AND ${column}>=1000000`).run(...args);
+}
+function extendRealization(catalogue, group, actor3) {
+  const attached = group.tracks.filter((track) => track.attached);
+  const found = catalogue.db.prepare(
+    `SELECT DISTINCT i.realization_id AS id,r.work_id,r.performance_work_id FROM realization_item i
+       JOIN segment s ON s.id=i.segment_id JOIN realization r ON r.id=i.realization_id
+       WHERE s.track_link_id IN (${attached.map(() => "?").join(",")})`
+  ).all(...attached.map((track) => track.id));
+  if (found.length !== 1) return false;
+  const [realization] = found;
+  const metadata = new Metadata(catalogue);
+  return transaction(catalogue.db, () => {
+    const workTitle = resolvedName(catalogue, realization.work_id, "title") || group.work;
+    const performance = catalogue.db.prepare("SELECT source_id FROM relation WHERE id=?").get(realization.performance_work_id).source_id;
+    const itemOf = catalogue.db.prepare(
+      `SELECT i.movement_id,i.sequence FROM realization_item i JOIN segment s ON s.id=i.segment_id
+       WHERE i.realization_id=? AND s.track_link_id=?`
+    );
+    const ordered = [...group.tracks].sort(albumOrder);
+    let added = 0;
+    for (const [index, track] of ordered.entries()) {
+      if (track.attached) continue;
+      const before = ordered.slice(0, index).reverse().map((other) => itemOf.get(realization.id, other.id)).find(Boolean);
+      const position = before?.movement_id ? catalogue.db.prepare("SELECT position FROM relation WHERE kind='movement' AND source_id=? AND target_id=?").get(realization.work_id, before.movement_id).position + 1 : 1;
+      shiftUp(catalogue, "relation", "position", "kind='movement' AND source_id=?", [realization.work_id], position);
+      const movement = catalogue.createEntity("movement");
+      metadata.derived(
+        movement,
+        "title",
+        movementTitle({ title: track.title, work: track.evidence.hints?.work }, workTitle) || `Movement ${position}`
+      );
+      catalogue.relate("movement", realization.work_id, movement, { position });
+      const sequence = (before?.sequence || 0) + 1;
+      shiftUp(catalogue, "realization_item", "sequence", "realization_id=?", [realization.id], sequence);
+      const recording = catalogue.createEntity("recording", { durationMs: track.evidence.durationMs });
+      metadata.derived(recording, "title", track.title);
+      catalogue.relate("recording_performance", recording, performance);
+      const content = catalogue.recordingContent(recording, realization.performance_work_id, { movement });
+      const segment = catalogue.segment(track.id, { kind: "whole" });
+      catalogue.segmentContent(segment, content);
+      catalogue.realizationItem(realization.id, segment, { movement, sequence });
+      track.attached = 1;
+      added++;
+    }
+    catalogue.audit(
+      "work.auto_match_extend",
+      realization.work_id,
+      { albumId: group.albumId, added, tracks: ordered.map((track) => track.id) },
+      actor3
+    );
+    return added > 0;
+  });
+}
 function createGroup(catalogue, group, actor3, index) {
+  if (group.tracks.some((track) => track.attached))
+    return extendRealization(catalogue, group, actor3);
   const metadata = new Metadata(catalogue);
   const recordId = identity("album-work", group.key);
   if (existingIdentity(catalogue, "album-work", recordId)) return false;
@@ -36924,6 +36998,35 @@ function repairMovementTitles(catalogue) {
   }
   return repaired;
 }
+function repairWorkTitles(catalogue) {
+  const metadata = new Metadata(catalogue);
+  const works = catalogue.db.prepare(
+    `SELECT DISTINCT r.work_id AS id,a.value FROM realization r
+       JOIN field_resolution f ON f.target_id=r.work_id AND f.field='title'
+       JOIN assertion a ON a.id=f.assertion_id WHERE a.source='derived'`
+  ).all();
+  const tracks = catalogue.db.prepare(
+    `SELECT t.evidence FROM realization r JOIN realization_item i ON i.realization_id=r.id
+     JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id
+     WHERE r.work_id=?`
+  );
+  let repaired = 0;
+  for (const work of works) {
+    const current = JSON.parse(work.value);
+    const heads = new Set(
+      tracks.all(work.id).map((row) => {
+        const hints = JSON.parse(row.evidence).hints || {};
+        return proposedWork(hints.work, hints.title, true)?.title || "";
+      })
+    );
+    const [head] = heads;
+    if (heads.size === 1 && head && head !== current && sameCatalogue(head, current)) {
+      metadata.derived(work.id, "title", head);
+      repaired++;
+    }
+  }
+  return repaired;
+}
 function autoMatchTaggedWorks(catalogue, {
   albumId = null,
   actor: actor3 = null,
@@ -36937,6 +37040,7 @@ function autoMatchTaggedWorks(catalogue, {
     providerMatches
   );
   mergeDuplicateAutoWorks(catalogue, { actor: actor3 });
+  repairWorkTitles(catalogue);
   repairMovementTitles(catalogue);
   const metadata = new Metadata(catalogue);
   for (const { id } of catalogue.db.prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL").all())
@@ -38967,6 +39071,13 @@ function realizationRows(c, realizationId = null, workId = null, albumId = null)
       ORDER BY r.id,i.sequence,i.occurrence,i.id`
   ).all(...filters.map(([value]) => value));
 }
+var words2 = (value) => String(value || "").normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+function performerOf(hints) {
+  const artist = text2(hints?.artist, text2(hints?.albumArtist, ""));
+  const composers = new Set((hints?.composer || []).map(words2));
+  const performers = artist.split(/\s+[—–]\s+|\s*;\s*/).filter((name) => name && !composers.has(words2(name)));
+  return performers.length ? performers.join(", ") : artist;
+}
 function queueItem(metadata, row) {
   const evidence2 = evidenceOf(row);
   return {
@@ -38976,6 +39087,7 @@ function queueItem(metadata, row) {
     albumId: String(evidence2.albumId ?? ""),
     title: row.movement_id ? entityValue(metadata, row.movement_id, "title", trackTitle2(evidence2)) : trackTitle2(evidence2),
     artist: text2(evidence2.hints?.artist, text2(evidence2.hints?.albumArtist, "")),
+    performer: performerOf(evidence2.hints),
     album: text2(evidence2.hints?.album, ""),
     durationMs: Number(evidence2.durationMs) || null,
     startMs: row.start_ms,
@@ -39008,6 +39120,51 @@ function credits2(c, metadata, targetId) {
     )
   }));
 }
+var albumPosition = (row) => {
+  const hints = evidenceOf(row).hints || {};
+  return (Number(hints.discNumber) || 1) * 1e4 + (Number(hints.trackNumber) || 9999);
+};
+function pieceGroups(c, album) {
+  const rows = c.db.prepare(
+    `SELECT t.id AS track_link_id,t.core_id,t.file_id,t.evidence FROM track_link t
+       JOIN classification c ON c.target_id=t.id AND c.state='classical'
+       WHERE t.state='active' AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?
+       AND NOT EXISTS(SELECT 1 FROM segment s WHERE s.track_link_id=t.id)`
+  ).all(album).sort((a, b) => albumPosition(a) - albumPosition(b));
+  const pieces = [];
+  for (const row of rows) {
+    const evidence2 = evidenceOf(row);
+    const { head, tail } = splitTitle(trackTitle2(evidence2));
+    const heading = head || tail;
+    const composer = (evidence2.hints?.composer || []).join(", ");
+    const last = pieces.at(-1);
+    const item = {
+      id: `piece:${row.track_link_id}`,
+      trackId: String(row.core_id),
+      fileId: String(row.file_id),
+      albumId: String(evidence2.albumId ?? ""),
+      title: tail,
+      artist: text2(evidence2.hints?.artist, text2(evidence2.hints?.albumArtist, "")),
+      performer: performerOf(evidence2.hints),
+      album: text2(evidence2.hints?.album, ""),
+      durationMs: Number(evidence2.durationMs) || null,
+      startMs: 0,
+      endMs: null,
+      position: albumPosition(row)
+    };
+    if (head && last?.title === heading && last.composer === composer && last.next === item.position - 1)
+      last.items.push(item);
+    else
+      pieces.push({ id: item.id, workId: null, title: heading, composer, items: [item], missing: [] });
+    pieces.at(-1).next = item.position;
+  }
+  return pieces.map(({ next, items, ...piece }) => ({
+    ...piece,
+    first: items[0].position,
+    items: items.map(({ position, ...item }) => item),
+    movementCount: items.length
+  }));
+}
 function renderAlbumPresentation(c, albumId) {
   const metadata = new DisplayValues(c);
   const album = String(albumId);
@@ -39019,14 +39176,7 @@ function renderAlbumPresentation(c, albumId) {
     group.push(row);
     grouped.set(row.realization_id, group);
   }
-  const albumPosition = (row) => {
-    const hints = evidenceOf(row).hints || {};
-    return (Number(hints.discNumber) || 1) * 1e4 + (Number(hints.trackNumber) || 9999);
-  };
-  const firstPosition = new Map(
-    [...grouped].map(([id, rows]) => [id, Math.min(...rows.map(albumPosition))])
-  );
-  const groups = [...grouped.entries()].sort(([a], [b]) => firstPosition.get(a) - firstPosition.get(b)).map(([realizationId, rows]) => {
+  const works = [...grouped.entries()].map(([realizationId, rows]) => {
     const workId = rows[0].work_id;
     const movements = workMovements2(c, metadata, workId);
     const present = new Set(rows.map((row) => row.movement_id).filter(Boolean));
@@ -39039,12 +39189,13 @@ function renderAlbumPresentation(c, albumId) {
       )?.name || "",
       items: rows.map((row) => queueItem(metadata, row)),
       missing: movements.filter((movement) => !present.has(movement.id)),
-      movementCount: movements.length
+      movementCount: movements.length,
+      first: Math.min(...rows.map(albumPosition))
     };
   });
-  const supportsToggle = groups.some((group) => group.movementCount > 1);
-  if (!supportsToggle) return null;
-  return { version: 1, albumId: album, supportsToggle, groups };
+  if (!works.some((group) => group.movementCount > 1)) return null;
+  const groups = [...works, ...pieceGroups(c, album)].sort((a, b) => a.first - b.first).map(({ first, ...group }) => group);
+  return { version: 1, albumId: album, supportsToggle: true, groups };
 }
 function renderWork(c, workId, user) {
   c.entity(workId, "work");
@@ -40819,7 +40970,7 @@ function summarize(lines2) {
 import path10 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.7" : "dev";
+var VERSION = true ? "1.0.8" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js
