@@ -1,3 +1,11 @@
+# 1.0.33: unchanged files are not re-hashed on filesystems with unstable inode numbers
+
+November 13, 2026. `scripts/scan-timing.mjs` on the user's server (12,802 files): hashing the audio takes 284 ms a file, about 61 minutes of a scan; reading tags 48 ms (10 minutes); path and stat about a minute. Of 200 sampled files, 105 reported a different inode number than the last scan stored, with the same path, size and modified time: the filesystem (mergerfs, a network share or a container mount) numbers files anew. Since the unchanged check required the inode, those files were re-hashed at every scan, and the 1.0.31 skip (which required it too) reused 16 of the first 791.
+
+Now, where the last scan stored a ctime, it decides together with path, size and modified time; the inode is only the fallback for evidence from before 1.0.31. Any write or replacement moves ctime, so this catches more than the inode did: an in-place write keeping size, modified time and inode is now re-hashed (before, its stale fingerprint was kept). Reused evidence takes the current inode, and `reconcile` ignores `ino` and `ctimeMs` when deciding whether evidence changed. `scan-timing.mjs` applies the same rule.
+
+Tests: `test/sync.test.js` (a changed inode number alone reuses all files and adds no evidence row; fails on 1.0.32), and the old "reuse unchanged fingerprints" test now asserts the in-place write is caught. 302 plugin tests pass. The scan running on 1.0.32 stores a ctime for every file, so the first scan on 1.0.33 should already skip hashing and tags for unchanged files.
+
 # 1.0.32: film scores are not classical from a Classical genre tag
 
 November 13, 2026. Audit on 1.0.31 after the scan: matched tracks 4,293 of 4,920; albums 38/31/27 (96 with classical tracks); the 10 refused split pieces matched; the dry run has nothing left; reviews classification 300, movement-mismatch 24, identity 11, duplicate-work 5. `explain-classification.mjs` on six film-score albums: no manual classification change ever, so the user's "not classical" marks never reached the plugin; the automatic classifier made Interstellar, both Hobbit scores, the Lord of the Rings trilogy and Mulan classical (The Last Jedi unsure, 20 reviews).

@@ -106,19 +106,44 @@ test("one unreadable or deleted file never fails the library scan", async (t) =>
 
 test("rescans reuse unchanged fingerprints and add no evidence rows", async (t) => {
   const { ctx, files } = await library(t, 2);
-  await enqueueModelScan(ctx, { id: 1, role: "admin" });
-  await runModelJobs(ctx, { budgetMs: 60_000 });
+  const scan = async () => {
+    await enqueueModelScan(ctx, { id: 1, role: "admin" });
+    await runModelJobs(ctx, { budgetMs: 60_000 });
+  };
+  const fingerprints = async () => {
+    const c = await openCatalogue(path.join(ctx.dataFolder, "model"));
+    try {
+      return c.db.prepare("SELECT json_extract(evidence,'$.fingerprint') AS f FROM track_link WHERE state='active' ORDER BY core_id").all().map((row) => row.f);
+    } finally {
+      c.close();
+    }
+  };
+  await scan();
   const rows = await evidenceRows(ctx);
-  // Change audio bytes but keep size, mtime and inode: an unchanged-looking
-  // file is not re-hashed, so the stored fingerprint is reused.
+  const first = await fingerprints();
+  await scan();
+  assert.equal(await evidenceRows(ctx), rows);
+  assert.deepEqual(await fingerprints(), first);
+  // Written in place, keeping size, modified time and inode: before 1.0.33
+  // this file was taken as unchanged; the ctime now shows the write.
   const stat = await fs.stat(files[0]);
   const fd = await fs.open(files[0], "r+");
   await fd.write(Buffer.from([0x55]), 0, 1, stat.size - 100);
   await fd.close();
   await fs.utimes(files[0], 1_000_000_000, 1_000_000_000);
-  await enqueueModelScan(ctx, { id: 1, role: "admin" });
+  const id = await enqueueModelScan(ctx, { id: 1, role: "admin" });
   await runModelJobs(ctx, { budgetMs: 60_000 });
-  assert.equal(await evidenceRows(ctx), rows);
+  const c = await openCatalogue(path.join(ctx.dataFolder, "model"));
+  try {
+    // The written file is opened and hashed again; the other is reused.
+    assert.equal(JSON.parse(c.db.prepare("SELECT progress FROM model_job WHERE id=?").get(id).progress).reused, 1);
+  } finally {
+    c.close();
+  }
+  // Its audio changed, so it is hashed anew; the other keeps its hash.
+  const after = await fingerprints();
+  assert.notEqual(after[0], first[0]);
+  assert.equal(after[1], first[1]);
   const status = await modelStatus(ctx);
   assert.equal(status.tracks.find((r) => r.state === "active").count, 2);
 });
@@ -227,4 +252,33 @@ test("rescans open only files written since the last scan, even when a tag edit 
   const inPlace = await fs.stat(files[2]);
   assert.deepEqual([inPlace.size, inPlace.ino, inPlace.mtimeMs], [before.size, before.ino, before.mtimeMs]);
   assert.equal((await scan()).reused, 2);
+});
+
+// On the user's server half the files reported a new inode number at every
+// scan (a filesystem that makes them up), so every rescan re-hashed them:
+// an hour for 12,802 files. Once a ctime is stored, it decides.
+test("rescans reuse files whose inode number changed but which nothing wrote to", async (t) => {
+  const { ctx } = await library(t, 3);
+  const scan = async () => {
+    const id = await enqueueModelScan(ctx, { id: 1, role: "admin" });
+    await runModelJobs(ctx, { budgetMs: 30_000 });
+    const c = await openCatalogue(path.join(ctx.dataFolder, "model"));
+    try {
+      return JSON.parse(c.db.prepare("SELECT progress FROM model_job WHERE id=?").get(id).progress).reused;
+    } finally {
+      c.close();
+    }
+  };
+  await scan();
+  const rows = await evidenceRows(ctx);
+  // As if the filesystem had numbered every file differently since.
+  const c = await openCatalogue(path.join(ctx.dataFolder, "model"));
+  for (const row of c.db.prepare("SELECT id,evidence FROM track_link").all()) {
+    const evidence = JSON.parse(row.evidence);
+    evidence.ino += 1_000_000;
+    c.db.prepare("UPDATE track_link SET evidence=? WHERE id=?").run(JSON.stringify(evidence), row.id);
+  }
+  c.close();
+  assert.equal(await scan(), 3);
+  assert.equal(await evidenceRows(ctx), rows);
 });

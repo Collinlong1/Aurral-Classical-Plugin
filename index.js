@@ -37203,7 +37203,7 @@ function reconcile(catalogue, snapshot) {
   });
 }
 function withoutCtime(evidence2) {
-  const { ctimeMs, ...rest } = JSON.parse(evidence2);
+  const { ctimeMs, ino, ...rest } = JSON.parse(evidence2);
   return JSON.stringify(rest);
 }
 function classify(catalogue, target, hints, { manual = null, actor: actor3 = null, inherited = null } = {}) {
@@ -41800,9 +41800,9 @@ async function scanFile(file, root, prior) {
   if (!relative || relative === ".." || relative.startsWith(`..${path7.sep}`) || path7.isAbsolute(relative))
     throw new Error("Indexed model file is outside the configured library");
   const before = await fs4.stat(real);
-  const unchanged = prior?.fingerprint && prior.observedRealPath === real && prior.size === before.size && prior.mtimeMs === before.mtimeMs && prior.ino === before.ino;
-  if (unchanged && prior.hints && !prior.hints.tagsUnreadable && prior.ctimeMs != null && prior.ctimeMs === before.ctimeMs && ["title", "album", "artist", "albumId", "trackNumber", "discNumber", "recordingMbid"].every((key) => prior[key] === file[key]))
-    return { ...prior, ...file, durationMs: prior.durationMs, [REUSED]: true };
+  const unchanged = prior?.fingerprint && prior.observedRealPath === real && prior.size === before.size && prior.mtimeMs === before.mtimeMs && (prior.ctimeMs != null ? prior.ctimeMs === before.ctimeMs : prior.ino === before.ino);
+  if (unchanged && prior.hints && !prior.hints.tagsUnreadable && prior.ctimeMs != null && ["title", "album", "artist", "albumId", "trackNumber", "discNumber", "recordingMbid"].every((key) => prior[key] === file[key]))
+    return { ...prior, ...file, ino: before.ino, durationMs: prior.durationMs, [REUSED]: true };
   const hash = unchanged ? prior.fingerprint : await fingerprint(real);
   const parsed = readModelTags(real);
   const tags = parsed || emptyTags();
@@ -42563,7 +42563,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.32" : "dev";
+var VERSION = true ? "1.0.33" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js

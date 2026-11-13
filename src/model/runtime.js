@@ -260,12 +260,17 @@ async function scanFile(file, root, prior) {
   )
     throw new Error("Indexed model file is outside the configured library");
   const before = await fs.stat(real);
+  // Same file, not written since the last scan. Any write or replacement
+  // moves ctime, so where the last scan stored one it decides; the inode is
+  // the fallback for evidence from before 1.0.31. Some filesystems (mergerfs,
+  // network shares, some container mounts) report a new inode number for an
+  // unchanged file, which made every rescan re-hash half the library.
   const unchanged =
     prior?.fingerprint &&
     prior.observedRealPath === real &&
     prior.size === before.size &&
     prior.mtimeMs === before.mtimeMs &&
-    prior.ino === before.ino;
+    (prior.ctimeMs != null ? prior.ctimeMs === before.ctimeMs : prior.ino === before.ino);
   // Nothing wrote to the file since the last scan read it: any write,
   // a tag edit that keeps the modified time included, moves its ctime. And
   // the host still places it the same way. What that scan read still holds,
@@ -276,10 +281,9 @@ async function scanFile(file, root, prior) {
     prior.hints &&
     !prior.hints.tagsUnreadable &&
     prior.ctimeMs != null &&
-    prior.ctimeMs === before.ctimeMs &&
     ["title", "album", "artist", "albumId", "trackNumber", "discNumber", "recordingMbid"].every((key) => prior[key] === file[key])
   )
-    return { ...prior, ...file, durationMs: prior.durationMs, [REUSED]: true };
+    return { ...prior, ...file, ino: before.ino, durationMs: prior.durationMs, [REUSED]: true };
   const hash = unchanged ? prior.fingerprint : await fingerprint(real);
   const parsed = readModelTags(real);
   const tags = parsed || emptyTags();

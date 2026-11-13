@@ -215,8 +215,11 @@ export function reconcile(catalogue, snapshot) {
   });
 }
 
+// What a scan keeps only to tell whether a file was written since (its
+// ctime, and an inode number some filesystems change at will) is no new
+// evidence when it alone changes.
 function withoutCtime(evidence) {
-  const { ctimeMs, ...rest } = JSON.parse(evidence);
+  const { ctimeMs, ino, ...rest } = JSON.parse(evidence);
   return JSON.stringify(rest);
 }
 

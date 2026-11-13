@@ -61,13 +61,11 @@ for (const prior of sample) {
             ? "size differs"
             : prior.mtimeMs !== stat.mtimeMs
               ? "modified time differs"
-              : prior.ino !== stat.ino
-                ? "inode differs"
-                : prior.ctimeMs !== stat.ctimeMs
-                  ? `ctime differs (stored ${new Date(prior.ctimeMs).toISOString()}, now ${stat.ctime.toISOString()})`
-                  : prior.hints?.tagsUnreadable
+              : prior.ctimeMs !== stat.ctimeMs
+                ? `ctime differs (stored ${new Date(prior.ctimeMs).toISOString()}, now ${stat.ctime.toISOString()})`
+                : prior.hints?.tagsUnreadable
                     ? "tags were unreadable"
-                    : "reusable (if the host lists it the same way)";
+                  : `reusable (if the host lists it the same way)${prior.ino !== stat.ino ? "; its inode number changed, which 1.0.33 ignores" : ""}`;
     const key = why.replace(/ \(stored.*$/, "");
     reasons.set(key, [...(reasons.get(key) || []), why]);
     await time("readTags", async () => readTags(real));
