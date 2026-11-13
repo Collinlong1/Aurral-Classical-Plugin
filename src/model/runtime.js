@@ -35,7 +35,6 @@ const emptyTags = () => ({
   work: "",
   grouping: "",
   workId: "",
-  discSubtitle: "",
   trackNumber: 0,
   discNumber: 0,
   durationMs: 0,
@@ -313,7 +312,6 @@ async function scanFile(file, root, prior) {
       work: tags.work,
       // Only when set, so files without it keep their stored evidence.
       ...(tags.grouping && { grouping: tags.grouping }),
-      ...(tags.discSubtitle && { discSubtitle: tags.discSubtitle }),
       workId: tags.workId,
       recordingMbid: tags.recordingMbid || file.recordingMbid || "",
       composerDistinct:
@@ -558,7 +556,11 @@ export async function autoMatchWorks(ctx, actor, albumId = null) {
         // Aliases come in the same requests, for English titles.
         const inc = "aliases+artist-rels+work-rels";
         const leaf = await arrangedWork(ctx.mb, await ctx.mb.get("work", workId, inc), inc);
-        const parent = leaf && (await topWork(ctx.mb, leaf, 0, inc));
+        // A book of a set (Debussy's "Préludes, Livre I") is the work, not
+        // the set above it: stop below a set-named parent once the work has
+        // parts of its own.
+        const hasParts = (work) => (work.relations || []).some((rel) => rel.type === "parts" && rel.direction === "forward");
+        const parent = leaf && (await topWork(ctx.mb, leaf, 0, inc, { stop: (above, below) => isCollectionLike(above.title) && hasParts(below) }));
         // A work with no parent is a whole piece only when the track's own
         // title reads as one, not as a movement of something MusicBrainz
         // hasn't linked up.
@@ -568,8 +570,9 @@ export async function autoMatchWorks(ctx, actor, albumId = null) {
           !isCollectionLike(leaf.title) &&
           !String(hints.title || "").includes(":") &&
           !/^(?:[IVXLCDM]+|\d+)[.)]\s/i.test(String(hints.title || "").trim());
-        if (!parent?.id || (parent.id === leaf.id && !standalone) || isCollectionLike(parent.title))
-          continue;
+        // A set MusicBrainz identifies is a work like any other; only a
+        // free-text set name in the tags ("Études") is too loose to be one.
+        if (!parent?.id || (parent.id === leaf.id && !standalone)) continue;
         providerMatches.set(row.id, {
           workId: parent.id,
           work: englishTitle(parent),

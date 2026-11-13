@@ -10,6 +10,7 @@ import { artistCredits, composersOf } from "../src/model/credits.js";
 import { classificationEvidence } from "../src/model/classify-evidence.js";
 import { splitTitle, stripWorkPrefix, autoMatchTaggedWorks, withoutComposer, mapToMovements, movementParts } from "../src/model/auto-match.js";
 import { openCatalogue } from "../src/model/catalogue.js";
+import { Metadata } from "../src/model/metadata.js";
 import { reconcile, classify } from "../src/model/reconcile.js";
 import { renderAlbumPresentation } from "../src/model/presentation.js";
 import { renderV2 } from "../src/model/editor-v2.js";
@@ -101,6 +102,10 @@ test("titles: comma-separated movements and colon-before-quote headings split", 
   assert.equal(withoutComposer(`Rachmaninoff: ${concerto}`, ["Sergei Rachmaninoff"]), concerto);
   assert.equal(withoutComposer(`Sergei Rachmaninoff: ${concerto}`, ["Sergei Rachmaninoff"]), concerto);
   assert.equal(withoutComposer(`Italie: ${concerto}`, ["Franz Liszt"]), `Italie: ${concerto}`);
+  // Spelled another way than the composer tag.
+  assert.equal(withoutComposer(`Rachmaninoff: ${concerto}`, ["Sergei Rachmaninov"]), concerto);
+  assert.equal(withoutComposer("Tschaikowsky: Swan Lake", ["Pyotr Ilyich Tchaikovsky"]), "Swan Lake");
+  assert.equal(withoutComposer("Prokofieff: Romeo and Juliet", ["Sergei Prokofiev"]), "Romeo and Juliet");
 });
 
 test("matching: a composer-prefixed title matches, and its rows name only the movement", async (t) => {
@@ -115,7 +120,16 @@ test("matching: a composer-prefixed title matches, and its rows name only the mo
   assert.deepEqual(rows("tagged"), [[concerto, movements]]);
   autoMatchTaggedWorks(c, { albumId: "untagged", actor: "admin", allowStructuredTitles: true });
   assert.deepEqual(rows("untagged"), [[concerto, movements]]);
-  assert.ok(renderAlbumPresentation(c, "untagged").groups[0].workId);
+  const [{ workId, items }] = renderAlbumPresentation(c, "untagged").groups;
+  assert.ok(workId);
+  // A version before 1.0.17 stored the prefixed title; matching the album
+  // again reads it as the movement.
+  const movement = c.db.prepare("SELECT target_id FROM relation WHERE kind='movement' AND source_id=? ORDER BY position").get(workId).target_id;
+  new Metadata(c).derived(movement, "title", `Rachmaninoff: ${concerto}: ${movements[0]}`);
+  assert.equal(rows("untagged")[0][1][0], `Rachmaninoff: ${concerto}: ${movements[0]}`);
+  autoMatchTaggedWorks(c, { albumId: "untagged", actor: "admin", allowStructuredTitles: true });
+  assert.deepEqual(rows("untagged"), [[concerto, movements]]);
+  assert.equal(items.length, 3);
 });
 
 async function catalogueWith(t, albums) {
@@ -370,41 +384,6 @@ test("album page: numbered pieces of a set head as the set; single numbered piec
   // Field's nocturnes are pieces of their own: no set, so no work view.
   assert.equal(blocks("field"), null);
   // Display only: none of these becomes a work.
-  autoMatchTaggedWorks(c, { actor: "admin", allowStructuredTitles: true });
-  assert.equal(c.db.prepare("SELECT COUNT(*) AS n FROM entity WHERE kind='work' AND deleted_at IS NULL").get().n, 0);
-});
-
-test("album page: a disc that holds one book of a set heads its untitled pieces", async (t) => {
-  const debussy = ["Claude Debussy"];
-  const book = (subtitle, titles, disc) =>
-    titles.map((title, i) => ({ title, composer: debussy, genres: ["Classical"], discNumber: disc, trackNumber: i + 1, discSubtitle: subtitle }));
-  const c = await catalogueWith(t, [
-    {
-      id: "zimerman",
-      album: "Préludes",
-      albumArtist: "Krystian Zimerman",
-      artist: "Claude Debussy — Krystian Zimerman",
-      titles: [
-        ...book("Livre - Heft - Book I", ["Danseuses de Delphes", "Voiles"], 1),
-        ...book("Livre - Heft - Book II", ["Brouillards", "Feuilles mortes"], 2),
-      ],
-    },
-    // The disc names the book itself.
-    { id: "named", album: "Debussy: Piano Works", albumArtist: "Pianist", artist: "Pianist", titles: book("Préludes, Book I", ["Voiles", "Le vent dans la plaine"], 1) },
-    // A disc title that names no book, or a book under an album that names no set, heads nothing.
-    { id: "live", album: "Préludes", albumArtist: "Pianist", artist: "Pianist", titles: book("Live in Vienna", ["Voiles", "Le vent dans la plaine"], 1) },
-    { id: "images", album: "Recital", albumArtist: "Pianist", artist: "Pianist", titles: book("Book I", ["Reflets dans l'eau", "Mouvement"], 1) },
-  ]);
-  const blocks = (albumId) =>
-    renderAlbumPresentation(c, albumId)?.groups.map((group) => [group.title, group.items.map((item) => item.title), group.detail ?? null]) ?? null;
-  assert.deepEqual(blocks("zimerman"), [
-    ["Préludes, Book I", ["Danseuses de Delphes", "Voiles"], null],
-    ["Préludes, Book II", ["Brouillards", "Feuilles mortes"], null],
-  ]);
-  assert.deepEqual(blocks("named"), [["Préludes, Book I", ["Voiles", "Le vent dans la plaine"], null]]);
-  assert.equal(blocks("live"), null);
-  assert.equal(blocks("images"), null);
-  // Display only: a book of a set never becomes a work.
   autoMatchTaggedWorks(c, { actor: "admin", allowStructuredTitles: true });
   assert.equal(c.db.prepare("SELECT COUNT(*) AS n FROM entity WHERE kind='work' AND deleted_at IS NULL").get().n, 0);
 });

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { albums, kobayashi, lugansky, trifonovArranged } from "./corpus/albums.js";
+import { albums, argerichPreludes, kobayashi, lugansky, trifonovArranged, zimerman } from "./corpus/albums.js";
 import { runCorpus, trackId } from "./corpus/run.js";
 
 const results = await runCorpus(albums);
@@ -41,4 +41,11 @@ test("corpus: a set WORK names is matched by the catalogue number in its titles"
       [true, null],
     ],
   );
+});
+
+test("corpus: sets MusicBrainz identifies are works, one per book", () => {
+  const books = results.get(zimerman.id).groups;
+  assert.equal(new Set(books.map((group) => group.workId)).size, 2);
+  assert.ok(books.every((group) => group.workId));
+  assert.ok(results.get(argerichPreludes.id).groups[0].workId);
 });

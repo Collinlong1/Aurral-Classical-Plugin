@@ -1,7 +1,7 @@
 import path from "node:path";
 import { openCatalogue } from "./catalogue.js";
 import { transaction } from "./database.js";
-import { isCollectionLike, movementTitle, splitTitle, withoutComposer } from "./auto-match.js";
+import { NUMBERED_SET, isCollectionLike, movementTitle, splitTitle, withoutComposer } from "./auto-match.js";
 import { catalogueNumber } from "../works.js";
 import { composersOf } from "./credits.js";
 
@@ -145,30 +145,11 @@ function sameNamedWork(a, b) {
   return name.length >= 4 && words(short) === name && long.includes(",");
 }
 
-// Sets named in the plural whose pieces are numbered, not Field's single
-// "Nocturne no. 10", which is a piece of its own.
-const NUMBERED_SET =
-  /(?<!\p{L})(pr[eé]ludes|[eé]tudes|nocturnes|mazurkas|waltzes|valses|impromptus|ballades|polonaises|bagatelles|intermezzi|consolations|songs without words|lieder ohne worte)(?!\p{L})/iu;
 function numberedPiece(title) {
   const match = String(title).match(/^(.+?)[,\s]+(no\.?\s*\d+\b.*)$/i);
   // A key before the number names one piece: "Études in G-flat major, Op. 10 No. 5".
   if (!match || !NUMBERED_SET.test(match[1]) || /\bin\s+[a-h]\b/i.test(match[1])) return null;
   return { set: match[1].trim(), part: match[2].charAt(0).toUpperCase() + match[2].slice(1) };
-}
-
-// A disc that holds one book of a set titles it, as Picard writes the
-// release's medium title: "Préludes, Book I" outright, or a book in one or
-// several languages ("Livre - Heft - Book I") under a set-named album.
-const BOOK = /^(?:book|livre|heft|band|cahier|libro|vol(?:ume|\.)?|teil|part)\s+(?:[ivxlc]+|\d+)\.?$/i;
-const namesSet = (value) => isCollectionLike(value) || NUMBERED_SET.test(value);
-function discSet(hints, composers) {
-  const subtitle = text(hints?.discSubtitle, "");
-  if (!subtitle) return null;
-  if (namesSet(subtitle)) return subtitle;
-  const parts = subtitle.split(/\s+[-–—/]\s+|\s*[;|]\s*/).map((part) => part.trim());
-  const book = parts.find((part) => /^book\b/i.test(part) && BOOK.test(part)) ?? parts.find((part) => BOOK.test(part));
-  const album = withoutComposer(text(hints?.album, ""), composers);
-  return book && namesSet(album) ? `${album}, ${book}` : null;
 }
 
 // The same people in any order credit the same piece. One catalogue number
@@ -218,12 +199,9 @@ function pieceGroups(c, album, following) {
     const numbered = fullHead ? null : numberedPiece(fullTail);
     const tail = numbered?.part ?? fullTail;
     const names = composersOf(evidence.hints || {});
-    // A piece with nothing in its own tags but a name ("Voiles") heads as
-    // the book its disc holds.
-    const book = fullHead || numbered ? null : discSet(evidence.hints, names);
     // An opera is one work across its acts: "La traviata, Act II" heads as
     // "La traviata", the way Apple Music Classical shows it.
-    const head = numbered?.set ?? book ?? fullHead.replace(ACT, "");
+    const head = numbered?.set ?? fullHead.replace(ACT, "");
     const heading = head || tail;
     const composer = names.join(", ");
     const last = pieces.at(-1);

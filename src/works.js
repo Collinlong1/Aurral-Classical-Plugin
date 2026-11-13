@@ -67,12 +67,12 @@ export function creditString(credit) {
 }
 
 // The Work a movement belongs to, or the work itself.
-export async function topWork(mb, work, depth = 0, inc = "artist-rels+work-rels") {
+export async function topWork(mb, work, depth = 0, inc = "artist-rels+work-rels", { stop = () => false } = {}) {
   if (!work || depth >= 3) return work;
   const parent = (work.relations || []).find((rel) => rel.type === "parts" && rel.direction === "backward" && rel.work?.id);
   if (!parent) return work;
   const data = await mb.get("work", parent.work.id, inc);
-  return data ? topWork(mb, data, depth + 1, inc) : work;
+  return data && !stop(data, work) ? topWork(mb, data, depth + 1, inc, { stop }) : work;
 }
 
 export const RELEASE_INC = "recordings+artist-credits+release-groups+media";

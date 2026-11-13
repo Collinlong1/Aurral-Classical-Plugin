@@ -79,6 +79,10 @@ function musicbrainz(albums) {
           aliases: work.aliases || [],
           relations: [
             ...(work.parent ? [{ type: "parts", direction: "backward", work: { id: work.parent } }] : []),
+            // MusicBrainz lists a work's own parts too.
+            ...Object.entries(works)
+              .filter(([, part]) => part.parent === id)
+              .map(([part]) => ({ type: "parts", direction: "forward", work: { id: part } })),
             // An arrangement links to the work it arranges, not to a parent.
             ...(work.arrangementOf
               ? [{ type: "arrangement", direction: "backward", work: { id: work.arrangementOf } }]

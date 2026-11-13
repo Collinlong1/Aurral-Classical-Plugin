@@ -23,6 +23,10 @@ const sameCatalogue = (a, b) => {
 const identity = (...values) =>
   createHash("sha256").update(JSON.stringify(values)).digest("hex");
 
+// Sets named in the plural whose pieces are numbered, not Field's single
+// "Nocturne no. 10", which is a piece of its own.
+export const NUMBERED_SET =
+  /(?<!\p{L})(pr[eé]ludes|[eé]tudes|nocturnes|mazurkas|waltzes|valses|impromptus|ballades|polonaises|bagatelles|intermezzi|consolations|songs without words|lieder ohne worte)(?!\p{L})/iu;
 // "Rachmaninoff: Piano Concerto No. 2…: I. Moderato" from a store that puts
 // the composer first: the title is what follows, when the prefix names one
 // of the track's composers in full or by surname.
@@ -30,12 +34,26 @@ export function withoutComposer(title, composers = []) {
   const text = clean(title);
   const match = text.match(/^([^:]{2,60}):\s+(\S.*)$/);
   if (!match) return text;
-  const prefix = normalized(match[1]).replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+  const prefix = nameKey(match[1]);
   const named = (Array.isArray(composers) ? composers : [composers]).some((name) => {
-    const full = normalized(name).replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+    const full = nameKey(name);
     return Boolean(full) && (prefix === full || prefix === full.split(" ").at(-1));
   });
   return named ? clean(match[2]) : text;
+}
+
+// A name as it sounds across transliterations, so Rachmaninoff and
+// Rachmaninov, Tchaikovsky and Tschaikowsky, or Prokofieff and Prokofiev
+// compare equal.
+export function nameKey(name) {
+  return normalized(name)
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim()
+    .replace(/ts?ch/g, "ch")
+    .replace(/ff\b/g, "v")
+    .replace(/w/g, "v")
+    .replace(/[yj]/g, "i")
+    .replace(/kh/g, "h");
 }
 
 // The work part of a structured title: text before the first ":", ";" or
@@ -425,6 +443,15 @@ export function stripWorkPrefix(title, workTitle) {
     if (!tail || !namesWork) continue;
     return clean(tail.match(NICKNAME)?.[1] ?? tail);
   }
+  // A numbered piece of a set, named in full: "24 Préludes, op. 28 no. 6 in
+  // B minor" under "24 Préludes, op. 28" reads "No. 6 in B minor".
+  const set = clean(workTitle);
+  // Only a set named in the plural: "Metamorphosis No. 1" is its own name.
+  const rest =
+    set && NUMBERED_SET.test(set) && text.toLowerCase().startsWith(set.toLowerCase())
+      ? text.slice(set.length).match(/^[,\s]+(no\.?\s*\d+\b.*)$/i)
+      : null;
+  if (rest) return rest[1].charAt(0).toUpperCase() + rest[1].slice(1);
   return text;
 }
 
@@ -1302,16 +1329,24 @@ export function deriveWorkFields(catalogue, work, metadata = new Metadata(catalo
 
 // Movement titles derived before stripWorkPrefix understood a title can
 // still carry the work's name. Manual and provider titles are left alone.
-export function repairMovementTitles(catalogue) {
+export function repairMovementTitles(catalogue, { albumId = null } = {}) {
   const metadata = new Metadata(catalogue);
+  // One album's match repairs only the works that album realizes.
   const rows = catalogue.db
     .prepare(
       `SELECT r.source_id AS work,r.target_id AS movement,a.value,a.source
        FROM relation r JOIN field_resolution f ON f.target_id=r.target_id AND f.field='title'
        JOIN assertion a ON a.id=f.assertion_id
-       WHERE r.kind='movement' AND a.source='derived'`,
+       WHERE r.kind='movement' AND a.source='derived'
+       ${
+         albumId == null
+           ? ""
+           : `AND r.source_id IN (SELECT re.work_id FROM realization re JOIN realization_item i ON i.realization_id=re.id
+              JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id
+              WHERE CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?)`
+       }`,
     )
-    .all();
+    .all(...(albumId == null ? [] : [String(albumId)]));
   const titles = new Map();
   let repaired = 0;
   for (const row of rows) {
@@ -1319,6 +1354,10 @@ export function repairMovementTitles(catalogue) {
     const workTitle = titles.get(row.work);
     const current = JSON.parse(row.value);
     if (typeof workTitle !== "string" || typeof current !== "string") continue;
+    // Only a title that still spells out its work ("Rachmaninoff: Piano
+    // Concerto No. 1…: I. Vivace"); "IV. Menuet I - V. Menuet II" is
+    // already the movement.
+    if (!words(current).includes(words(workTitle))) continue;
     const stripped = stripWorkPrefix(current, workTitle);
     if (stripped && stripped !== current) {
       metadata.derived(row.movement, "title", stripped);
@@ -1381,6 +1420,9 @@ export function autoMatchTaggedWorks(
   );
   repairMergedIdentities(catalogue);
   mergeDuplicateAutoWorks(catalogue, { actor });
+  // Titles stored before composer prefixes were read past ("Rachmaninoff:
+  // …: I. Vivace") read as the movement again.
+  if (albumId != null) repairMovementTitles(catalogue, { albumId });
   // Catalogue-wide repairs belong to the library pass, not to each album.
   if (albumId == null) {
     repairWorkTitles(catalogue);

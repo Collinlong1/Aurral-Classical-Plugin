@@ -440,4 +440,56 @@ export const kobayashi = album("kobayashi-recital", {
   },
 });
 
-export const albums = [levit, lugansky, recital, recitalPicard, cello, symphonies, seventh, songCycle, compilation, pop, trifonovArrival, trifonovArranged, groupingCompilation, kobayashi];
+// Picard-tagged with recording IDs and nothing else that names a work:
+// MusicBrainz files each prelude under its book, and both books under one set.
+const bookOne = ["Danseuses de Delphes", "Voiles", "Le vent dans la plaine"];
+const bookTwo = ["Brouillards", "Feuilles mortes"];
+export const zimerman = album("zimerman-debussy", {
+  title: "Préludes",
+  artist: "Krystian Zimerman",
+  composer: "Claude Debussy",
+  kind: "titles only; MusicBrainz names the books",
+  tracks: [
+    ...bookOne.map((title, i) => [1, i + 1, title, min(3, 0), { recordingMbid: `zim-1-${i + 1}` }]),
+    ...bookTwo.map((title, i) => [2, i + 1, title, min(3, 0), { recordingMbid: `zim-2-${i + 1}` }]),
+  ],
+  musicbrainz: {
+    recordings: Object.fromEntries([...bookOne.map((_, i) => [`zim-1-${i + 1}`, `mb-livre-1-${i + 1}`]), ...bookTwo.map((_, i) => [`zim-2-${i + 1}`, `mb-livre-2-${i + 1}`])]),
+    works: {
+      "mb-preludes": { title: "Préludes" },
+      "mb-livre-1": { title: "Préludes, Livre I", parent: "mb-preludes" },
+      "mb-livre-2": { title: "Préludes, Livre II", parent: "mb-preludes" },
+      ...Object.fromEntries(bookOne.map((title, i) => [`mb-livre-1-${i + 1}`, { title: `Préludes, Livre I: ${["I", "II", "III"][i]}. ${title}`, parent: "mb-livre-1" }])),
+      ...Object.fromEntries(bookTwo.map((title, i) => [`mb-livre-2-${i + 1}`, { title: `Préludes, Livre II: ${["I", "II"][i]}. ${title}`, parent: "mb-livre-2" }])),
+    },
+  },
+  expect: {
+    groups: [
+      ["Préludes, Livre I", bookOne],
+      ["Préludes, Livre II", bookTwo],
+    ],
+  },
+});
+
+// A recital with some of Chopin's Op. 28: the set is the work.
+export const argerichPreludes = album("argerich-op28", {
+  title: "Chopin",
+  artist: "Martha Argerich",
+  composer: "Frédéric Chopin",
+  kind: "MusicBrainz names a set the titles only number",
+  tracks: [
+    [1, 1, "24 Préludes, op. 28 no. 6 in B minor", min(1, 48), { recordingMbid: "arg-6" }],
+    [1, 2, "24 Préludes, op. 28 no. 10 in C-sharp minor", min(0, 24), { recordingMbid: "arg-10" }],
+  ],
+  musicbrainz: {
+    recordings: { "arg-6": "mb-op28-6", "arg-10": "mb-op28-10" },
+    works: {
+      "mb-op28": { title: "24 Préludes, op. 28" },
+      "mb-op28-6": { title: "24 Préludes, op. 28: no. 6 in B minor", parent: "mb-op28" },
+      "mb-op28-10": { title: "24 Préludes, op. 28: no. 10 in C-sharp minor", parent: "mb-op28" },
+    },
+  },
+  expect: { groups: [["24 Préludes, op. 28", ["No. 6 in B minor", "No. 10 in C-sharp minor"]]] },
+});
+
+export const albums = [levit, lugansky, recital, recitalPicard, cello, symphonies, seventh, songCycle, compilation, pop, trifonovArrival, trifonovArranged, groupingCompilation, kobayashi, zimerman, argerichPreludes];
