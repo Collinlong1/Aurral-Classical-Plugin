@@ -1,3 +1,9 @@
+# First audit on 1.0.27 (before any scan): dry run checked; a diagnostic for what it left alone
+
+November 13, 2026. Counts unchanged from 1.0.22 (36/33/28; reviews classification 300, movement-mismatch 99, ambiguous-work 1), as expected before a scan. "Duplicate works" is down to 4 (was 47): Vocalise op. 34 no. 14 and The Fairy Queen Z. 629 (real; left unmerged by the run, so a distinct verified identity, an edit or a non-auto copy keeps them apart), and Beethoven's Symphonies 5 and 6 beside Liszt's transcriptions S463a/b (different works sharing the opus key; correctly not merged). Dry run: 13 sibling splits, all Searle versions or revisions (S422i/ii, S203i/ii, S185/185a, S176/176a, S514/514a, S195/195a, S510/510a, S199/199a, S240i/ii, S248i/ii, S461i/ii, S207/207a, S170/170a); 2 expansions (Études-tableaux op. 33 2 → 8, Children's Corner 2 → 6); 0 merges; 58 reviews closed; movement-mismatch 99 → 42 open after.
+
+Left alone, though their rules apply: S215 No. 2 holding Nos. 1, 3, 4; S214 No. 2 holding No. 1 and /3; S225 No. 1 holding No. 2; S406i holding S406ii; S385i holding S385a; S388 holding S388b; and Études-tableaux op. 39 (2 movements) against three fuller albums (10639, 9289, 13557). Reproduced op. 39 with the library's exact titles: it expands to 9. So those works are gated in the catalogue itself: a manual edit or `editor.*` event on the work or its movements keeps both the repair and the expansion away. `scripts/explain-works.mjs` (read-only) prints, per work: album records, MusicBrainz IDs, manual edits, editor actions, merges into it, and recordings by album. Waiting on its output from the user's server.
+
 # v0.1 completion, step 5 (part): settled reviews close; box-set timing; ready for the re-audit
 
 Manifest 1.0.27, November 13, 2026.
