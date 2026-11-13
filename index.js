@@ -35207,6 +35207,7 @@ var require_dist = __commonJS({
 
 // src/index.js
 import path15 from "node:path";
+import { Worker, isMainThread, parentPort, workerData } from "node:worker_threads";
 
 // src/model/editor.js
 import path4 from "node:path";
@@ -42563,7 +42564,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.33" : "dev";
+var VERSION = true ? "1.0.34" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js
@@ -44088,7 +44089,7 @@ var index_default = {
     async "classical-model-scan"(input) {
       const ctx = makeContext(input);
       const id = await enqueueModelScan(ctx, input.user);
-      await runModelJobs(ctx, { budgetMs: ACTION_BUDGET_MS });
+      await modelJobs(ctx, { budgetMs: ACTION_BUDGET_MS });
       const { scan } = await modelStatus(ctx);
       return {
         message: `Classical model scan ${id}: ${scan?.state || "saved"}; processed ${scan?.processed ?? 0}/${scan?.total ?? 0} files.${scan?.skipped ? ` ${scan.skipped} unreadable file${scan.skipped === 1 ? "" : "s"} skipped.` : ""} ${scan?.state === "done" ? "Reload the editor to search indexed tracks." : "Existing progress is saved. Run Scan again to resume immediately, or enable the plugin schedule for automatic continuation."}`.slice(
@@ -44117,7 +44118,7 @@ var index_default = {
     async "classical-identify-backlog"(input) {
       const ctx = makeContext(input);
       const result = await identifyBacklog(ctx, input.user);
-      await runModelJobs(ctx, { budgetMs: ACTION_BUDGET_MS });
+      await modelJobs(ctx, { budgetMs: ACTION_BUDGET_MS });
       const { identification: id } = await modelStatus(ctx);
       const progress = `${id.done} album${id.done === 1 ? "" : "s"} looked up, ${id.matched} work group${id.matched === 1 ? "" : "s"} made${id.queued ? `; ${id.queued} still queued: run this again, or enable the plugin schedule, to continue` : ""}.`;
       return {
@@ -44205,14 +44206,14 @@ var index_default = {
     const ctx = makeContext(input);
     const deadline = Date.now() + SCHEDULE_BUDGET_MS;
     try {
-      await runModelJobs(ctx, { budgetMs: SCHEDULE_BUDGET_MS });
+      await modelJobs(ctx, { budgetMs: SCHEDULE_BUDGET_MS });
       if (canReadHostLibrary(ctx) && await modelSyncDue(ctx)) {
         await enqueueModelScan(ctx, null, { system: true });
         const left2 = deadline - Date.now();
-        if (left2 > 0) await runModelJobs(ctx, { budgetMs: left2 });
+        if (left2 > 0) await modelJobs(ctx, { budgetMs: left2 });
       }
       const left = deadline - Date.now();
-      if (left > 0) await runModelJobs(ctx, { budgetMs: left });
+      if (left > 0) await modelJobs(ctx, { budgetMs: left });
     } catch (error) {
       log(`Classical model unavailable: ${error.message}`);
     }
@@ -44235,6 +44236,28 @@ var index_default = {
     status: (input) => downloadStatus(makeContext(input), input.id, input.directory)
   }
 };
+function modelJobs(ctx, options) {
+  const input = {
+    settings: ctx.settings,
+    dataFolder: ctx.dataFolder,
+    libraryFolder: ctx.libraryFolder,
+    api: ctx.api,
+    userOperations: ctx.userOperations
+  };
+  return new Promise((resolve, reject) => {
+    const worker = new Worker(new URL(import.meta.url), { workerData: { classicalModelJobs: { input, options } } });
+    worker.once("message", (message) => message?.error ? reject(new Error(message.error)) : resolve());
+    worker.once("error", reject);
+    worker.once("exit", (code) => code ? reject(new Error(`Classical model worker stopped (${code})`)) : resolve());
+  });
+}
+if (!isMainThread && workerData?.classicalModelJobs) {
+  const { input, options } = workerData.classicalModelJobs;
+  runModelJobs(makeContext(input), options).then(
+    () => parentPort.postMessage({}),
+    (error) => parentPort.postMessage({ error: error?.message || String(error) })
+  );
+}
 export {
   index_default as default,
   makeContext,

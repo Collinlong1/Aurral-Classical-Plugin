@@ -1,4 +1,5 @@
 import path from "node:path";
+import { Worker, isMainThread, parentPort, workerData } from "node:worker_threads";
 import { readEditor, mutateEditor } from "./model/editor.js";
 import {
   albumPresentation,
@@ -221,7 +222,7 @@ export default {
     async "classical-model-scan"(input) {
       const ctx = makeContext(input);
       const id = await enqueueModelScan(ctx, input.user);
-      await runModelJobs(ctx, { budgetMs: ACTION_BUDGET_MS });
+      await modelJobs(ctx, { budgetMs: ACTION_BUDGET_MS });
       const { scan } = await modelStatus(ctx);
       return {
         message:
@@ -254,7 +255,7 @@ export default {
       const result = await identifyBacklog(ctx, input.user);
       // Work the queue now, in this action's budget, rather than waiting for
       // the plugin schedule (which may be off).
-      await runModelJobs(ctx, { budgetMs: ACTION_BUDGET_MS });
+      await modelJobs(ctx, { budgetMs: ACTION_BUDGET_MS });
       const { identification: id } = await modelStatus(ctx);
       const progress = `${id.done} album${id.done === 1 ? "" : "s"} looked up, ${id.matched} work group${id.matched === 1 ? "" : "s"} made${id.queued ? `; ${id.queued} still queued: run this again, or enable the plugin schedule, to continue` : ""}.`;
       return {
@@ -361,15 +362,15 @@ export default {
     // Continue a queued scan, then start an incremental one when a download
     // asked for it or the last completed scan is older than the sync interval.
     try {
-      await runModelJobs(ctx, { budgetMs: SCHEDULE_BUDGET_MS });
+      await modelJobs(ctx, { budgetMs: SCHEDULE_BUDGET_MS });
       if (canReadHostLibrary(ctx) && (await modelSyncDue(ctx))) {
         await enqueueModelScan(ctx, null, { system: true });
         const left = deadline - Date.now();
-        if (left > 0) await runModelJobs(ctx, { budgetMs: left });
+        if (left > 0) await modelJobs(ctx, { budgetMs: left });
       }
       // A run that finished a scan goes on with MusicBrainz identification.
       const left = deadline - Date.now();
-      if (left > 0) await runModelJobs(ctx, { budgetMs: left });
+      if (left > 0) await modelJobs(ctx, { budgetMs: left });
     } catch (error) {
       log(`Classical model unavailable: ${error.message}`);
     }
@@ -396,3 +397,33 @@ export default {
       downloadStatus(makeContext(input), input.id, input.directory),
   },
 };
+
+// Scans and MusicBrainz identification run on a worker thread. Their last
+// steps (publishing a scan, the library-wide matching pass) are seconds of
+// synchronous SQLite work; on the plugin's own thread every album page and
+// editor call waited behind them ("was busy and didn't answer within 15
+// seconds"). The worker opens the catalogue itself (SQLite WAL lets pages
+// read meanwhile) and builds its own MusicBrainz client from the settings.
+function modelJobs(ctx, options) {
+  const input = {
+    settings: ctx.settings,
+    dataFolder: ctx.dataFolder,
+    libraryFolder: ctx.libraryFolder,
+    api: ctx.api,
+    userOperations: ctx.userOperations,
+  };
+  return new Promise((resolve, reject) => {
+    const worker = new Worker(new URL(import.meta.url), { workerData: { classicalModelJobs: { input, options } } });
+    worker.once("message", (message) => (message?.error ? reject(new Error(message.error)) : resolve()));
+    worker.once("error", reject);
+    worker.once("exit", (code) => (code ? reject(new Error(`Classical model worker stopped (${code})`)) : resolve()));
+  });
+}
+
+if (!isMainThread && workerData?.classicalModelJobs) {
+  const { input, options } = workerData.classicalModelJobs;
+  runModelJobs(makeContext(input), options).then(
+    () => parentPort.postMessage({}),
+    (error) => parentPort.postMessage({ error: error?.message || String(error) }),
+  );
+}

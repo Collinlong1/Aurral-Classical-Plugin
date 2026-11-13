@@ -6,7 +6,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { tempFolders, copyFixture, json as response, fakeFetch, symphonyEntities, MB } from "./helpers.js";
+import http from "node:http";
+import { tempFolders, copyFixture, json as response, symphonyEntities } from "./helpers.js";
 import plugin from "../src/index.js";
 import { writeTags } from "../src/tags.js";
 import { openCatalogue } from "../src/model/catalogue.js";
@@ -171,7 +172,7 @@ test("background matching: an unreachable MusicBrainz retries the album later in
 
 // On the user's server the backlog stayed "queued": the action only queued
 // it, and the plugin schedule runs the queue. The action now works the
-// queue itself, in its background budget.
+// queue itself, in its background budget, on the model worker thread.
 test("background matching: the backlog action looks the albums up itself, without the schedule", async (t) => {
   const lib = await library(t);
   await lib.add("earlier", ["I. Allegro con brio", "II. Andante con moto"], { composer: "Ludwig van Beethoven", recordings: [recording(1), recording(2)] });
@@ -184,9 +185,18 @@ test("background matching: the backlog action looks the albums up itself, withou
     relations: [{ type: "performance", "target-type": "work", direction: "forward", work: { id: "mvt2", title: "Symphony No. 5: II" } }],
   };
   entities["work:mvt2"] = { ...entities["work:mvt1"], id: "mvt2", title: "Symphony No. 5 in C minor, op. 67: II. Andante con moto" };
-  const musicbrainz = fakeFetch({ entities });
-  t.mock.method(globalThis, "fetch", (url, init) => (String(url).startsWith(MB) ? musicbrainz(url, init) : lib.ctx.fetch(url, init)));
-  const input = { ...lib.ctx, settings: { mbMirror: MB }, user: { id: 1, role: "admin" } };
+  // Served over HTTP as a MusicBrainz mirror: the lookups run on the
+  // model worker thread, which reaches the network itself.
+  const server = http.createServer((request, response) => {
+    const [, , , entity, id] = new URL(request.url, "http://mirror").pathname.split("/");
+    const data = entities[`${entity}:${id}`];
+    response.writeHead(data ? 200 : 404, { "content-type": "application/json" });
+    response.end(JSON.stringify(data || { error: "Not Found" }));
+  });
+  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  t.after(() => server.close());
+  const mirror = `http://127.0.0.1:${server.address().port}`;
+  const input = { ...lib.ctx, settings: { mbMirror: mirror }, user: { id: 1, role: "admin" } };
   const { message } = await plugin.actions["classical-identify-backlog"](input);
   assert.match(message, /Queued 1 album \(2 tracks\).* 1 album looked up, 1 work group made/);
   assert.deepEqual(await lib.view("earlier"), [["Symphony No. 5 in C minor, op. 67", true, 2]]);
