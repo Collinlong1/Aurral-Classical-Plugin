@@ -404,12 +404,18 @@ function mergeCompletions(groups) {
 // recording, and each is matched on its own; a whole piece listed twice is
 // two recordings. A movement repeated inside one work (the B minor Mass
 // returns to "Kyrie eleison" after the Christe) starts nothing.
+// A recording's credit after a title ("I. Moderato - Allegro (Philadelphia
+// Orchestra feat. conductor: Leopold Stokowski)") and punctuation ("I.
+// Moderato; Allegro") don't make it another movement.
+// A bracket of numbers only ("Mazurka … (3)") tells repeats apart, so it stays.
+const recordingTitle = (title) =>
+  words(clean(title).replace(/\s*[([][^()[\]]*\p{L}[^()[\]]*[)\]]\s*$/u, ""));
 function separateRecordings(groups) {
   return groups.flatMap((group) => {
-    const titles = group.tracks.map((track) => normalized(track.title));
+    const titles = group.tracks.map((track) => recordingTitle(track.title));
     if (new Set(titles).size === titles.length) return [group];
     const ordered = [...group.tracks].sort(albumOrder);
-    const title = (track) => normalized(track?.title);
+    const title = (track) => recordingTitle(track?.title);
     const runs = [[]];
     ordered.forEach((track, i) => {
       const run = runs.at(-1);
@@ -466,6 +472,10 @@ const KEY_PHRASE =
   /\bin\s+[a-h](?:\s*(?:flat|sharp|b|#))?(?:\s+(?:major|minor|dur|moll))?\b/g;
 // The catalogue number a work's identity rests on, or "" without one.
 export function catalogueSubject(title) {
+  // "Op. 27/2" is "Op. 27 No. 2", not op. 27; "Op. 2/3" too. A second
+  // number above both is a range ("Op. 30/31").
+  const slashed = String(title || "").match(/\bop(?:us|\.)?\s*(\d+[a-z]?)\s*\/\s*(\d+)\b(?![a-z])/i);
+  if (slashed && (Number(slashed[2]) < Number.parseInt(slashed[1], 10) || Number(slashed[2]) <= 12)) return `cat:op:${slashed[1].toLowerCase()}:${slashed[2]}`;
   const cat = words(title).match(CATALOGUE);
   if (cat)
     return `cat:${cat[1] === "opus" ? "op" : cat[1] === "kv" ? "k" : cat[1]}:${cat[2].replace(/\s+/g, "")}${cat[3] ? `:${cat[3]}` : ""}`;
@@ -717,15 +727,124 @@ export function workMovements(catalogue, work) {
        WHERE r.kind='movement' AND r.source_id=? AND e.deleted_at IS NULL ORDER BY r.position`,
     )
     .all(work)
-    .map((row) => ({
-      ...row,
-      ...movementParts(resolvedName(catalogue, row.id, "title") || ""),
-    }));
+    .map((row) => {
+      const title = resolvedName(catalogue, row.id, "title") || "";
+      return { ...row, title, ...movementParts(title) };
+    });
+}
+
+// The number of a piece within its set, when the title gives one: "No. 3.
+// Allegro vivace", "Allegro agitato in C minor, no. 1", or the set's own
+// catalogue number with the piece after it ("Prelude, Op. 32, No. 3" in
+// "13 Preludes, op. 32"). Null for an ordinary "II. Andante".
+function pieceNumber(title, setSubject) {
+  const parts = movementParts(title);
+  if (parts.piece) return parts.index;
+  const trailing = clean(title).match(/(?:^|[\s,])(?:no\.?|nr\.?|n°)\s*(\d+)\s*$/i);
+  if (trailing) return Number(trailing[1]);
+  const subject = catalogueSubject(title);
+  if (setSubject && subject.startsWith(`${setSubject}:`)) {
+    const rest = subject.slice(setSubject.length + 1);
+    if (/^\d+$/.test(rest)) return Number(rest);
+  }
+  return null;
+}
+// A movement's number as a piece of its set: its own piece number, or, in a
+// set whose movements are numbered "IV. Sonetto 47", that number.
+const movementPiece = (movement, setSubject) => pieceNumber(movement.title || "", setSubject) ?? movement.index ?? null;
+
+// Two names that differ only by an abbreviation written with a full stop:
+// "Dr. Gradus ad Parnassum" and "Doctor Gradus ad Parnassum". Every other
+// word is the same, and the short form keeps the long one's first and last
+// letters, in order ("Dr." for Doctor, "St." for Saint).
+function abbreviates(short, long) {
+  if (short.length < 2 || short.length >= long.length || short[0] !== long[0] || short.at(-1) !== long.at(-1)) return false;
+  let at = 0;
+  for (const letter of long) if (letter === short[at]) at++;
+  return at === short.length;
+}
+function sameNameAbbreviated(a, b) {
+  const tokens = (text) =>
+    normalized(text)
+      .replace(/^(?:[ivxlc]+|\d+)[.)]\s+/, "")
+      .replace(/[^\p{L}\p{N}.]+/gu, " ")
+      .trim()
+      .split(" ")
+      .filter(Boolean);
+  const [x, y] = [tokens(a), tokens(b)];
+  if (!x.length || x.length !== y.length) return false;
+  let abbreviated = 0;
+  for (let i = 0; i < x.length; i++) {
+    const [p, q] = [x[i].replace(/\.$/, ""), y[i].replace(/\.$/, "")];
+    if (p === q) continue;
+    const shortened = x[i].endsWith(".") ? abbreviates(p, q) : y[i].endsWith(".") ? abbreviates(q, p) : false;
+    if (!shortened) return false;
+    abbreviated++;
+  }
+  return abbreviated > 0;
+}
+
+// A track's movement on a work, from its name, its abbreviated name or its
+// number as a piece of the set. Null unless exactly one movement fits.
+function namedMovement(movements, title, used, setSubject) {
+  const text = movementParts(title).text;
+  const free = movements.filter((m) => !used.has(m.id));
+  let found = free.filter((m) => m.text && m.text === text);
+  if (found.length !== 1) found = free.filter((m) => m.title && sameNameAbbreviated(m.title, title));
+  if (found.length !== 1) {
+    const piece = pieceNumber(title, setSubject);
+    found = piece == null ? [] : free.filter((m) => movementPiece(m, setSubject) === piece);
+  }
+  return found.length === 1 ? found[0] : null;
+}
+
+// A movement that names several sections ("Theme: L'istesso tempo / II.
+// L'istesso tempo / III. L'istesso tempo", from an album that gave them one
+// track) and an album that gives each section, or a run of them, its own
+// track. Sections compare by their words, with "Variation No. 2", "Var. 2."
+// and "II." alike as variation two and Tema, Thema and Theme alike.
+function sectionWords(text) {
+  const out = [];
+  for (const section of clean(text).split(/\s+\/\s+/)) {
+    let value = words(section)
+      .replace(/^(?:var(?:iation|iazione)?s?|variazioni)\s+(?:(?:no|nr|n)\s+)?/, "")
+      .replace(/\b(?:var(?:iation)?|variazione)\s+(?:(?:no|nr|n)\s+)?(?=\d)/g, "")
+      .replace(/\b(?:tema|thema)\b/g, "theme");
+    const roman = value.match(/^([ivxlc]+)\s+(.*)$/);
+    if (roman && romanValue(roman[1])) value = `${romanValue(roman[1])} ${roman[2]}`;
+    out.push(value.trim());
+  }
+  return out.join(" ");
+}
+function mapBySections(movements, tracks) {
+  if (!movements.some((m) => / \/ /.test(m.title || ""))) return null;
+  const sections = movements.map((m) => clean(m.title).split(/\s+\/\s+/).map(sectionWords));
+  const result = [];
+  let at = 0,
+    offset = 0;
+  for (const track of tracks) {
+    const wanted = sectionWords(track.movementTitle);
+    let hit = null;
+    // The next sections in order, within one movement; earlier sections an
+    // album leaves out are skipped, never revisited.
+    for (let m = at; m < movements.length && !hit; m++)
+      for (let from = m === at ? offset : 0; from < sections[m].length && !hit; from++)
+        for (let to = from + 1; to <= sections[m].length; to++)
+          if (sections[m].slice(from, to).join(" ") === wanted) {
+            hit = { m, to };
+            break;
+          }
+    if (!hit) return null;
+    result.push(movements[hit.m].id);
+    [at, offset] = hit.to === sections[hit.m].length ? [hit.m + 1, 0] : [hit.m, hit.to];
+  }
+  return result;
 }
 
 // Map an album's tracks to an existing work's movements: by title, then by
 // numbered prefix, then by order when the counts agree. Null when unsure.
-export function mapToMovements(movements, tracks) {
+// `setSubject` is the work's catalogue identity, for pieces numbered within it.
+export function mapToMovements(movements, tracks, { setSubject = "" } = {}) {
   const used = new Set(),
     result = [];
   const firstWord = (text) => text.split(" ")[0];
@@ -741,6 +860,12 @@ export function mapToMovements(movements, tracks) {
     let found = movements.filter(
       (m) => !used.has(m.id) && m.text && m.text === parts.text,
     );
+    // A piece numbered within its set ("No. 3", "Op. 32, No. 3") or an
+    // abbreviated name ("Dr. Gradus").
+    if (found.length !== 1) {
+      const named = namedMovement(movements, track.movementTitle, used, setSubject);
+      if (named) found = [named];
+    }
     if (found.length !== 1 && parts.index)
       found = movements.filter(
         (m) =>
@@ -771,7 +896,7 @@ export function mapToMovements(movements, tracks) {
   }
   if (result.every(Boolean)) return result;
   if (movements.length === tracks.length) return movements.map((m) => m.id);
-  return null;
+  return mapBySections(movements, tracks);
 }
 
 const albumOrder = (a, b) =>
@@ -1011,9 +1136,13 @@ function createGroup(catalogue, group, actor, index) {
     if (work && unassignedByAdmin(catalogue, work, group.albumId)) return false;
     if (work) {
       const existing = workMovements(catalogue, work);
+      const setSubject = catalogueSubject(String(resolvedName(catalogue, work, "title") || "")) || catalogueSubject(catalogued || group.work);
       movements = existing.length
-        ? mapToMovements(existing, ordered)
+        ? mapToMovements(existing, ordered, { setSubject })
         : null;
+      // A work an earlier album made from part of a piece takes the rest
+      // from this fuller album.
+      if (!movements && existing.length) movements = expandIncompleteWork(catalogue, metadata, work, existing, ordered, setSubject, group, actor);
       if (!movements && existing.length) {
         // Same work, but the album's movements can't be mapped safely.
         catalogue.review("auto_match", ordered[0].id, {
@@ -1137,6 +1266,59 @@ function createGroup(catalogue, group, actor, index) {
     );
     return true;
   });
+}
+
+// An auto-made work holding only part of a piece (two of Debussy's six
+// Children's Corner pieces, two of nine Études-tableaux) takes a fuller
+// album's movements. Only when nobody edited the work or its movements,
+// every movement it has is on this album, by name, abbreviated name or
+// piece number, once each and in the album's order, and every other track
+// names its movement. The work's movements then follow the album; the
+// movements it had keep their recordings. Null when any of that fails.
+function expandIncompleteWork(catalogue, metadata, work, existing, ordered, setSubject, group, actor) {
+  if (ordered.length <= existing.length) return null;
+  const ids = [work, ...existing.map((m) => m.id)];
+  const madeByMatching = catalogue.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work'").get(work);
+  const edited = catalogue.db
+    .prepare(`SELECT 1 FROM audit_event WHERE action LIKE 'editor.%' AND target_id IN (${ids.map(() => "?").join(",")}) LIMIT 1`)
+    .get(...ids);
+  if (!madeByMatching || edited || hasManualEdits(catalogue, ids)) return null;
+  const used = new Set();
+  const mapped = ordered.map((track) => {
+    const movement = namedMovement(existing, track.movementTitle, used, setSubject);
+    if (movement) used.add(movement.id);
+    return movement;
+  });
+  if (used.size !== existing.length) return null;
+  const positions = mapped.filter(Boolean).map((m) => m.position);
+  if (positions.some((position, i) => i && position < positions[i - 1])) return null;
+  // A new track must name its movement, and not a number the work holds.
+  const held = new Set(existing.map((m) => movementPiece(m, setSubject)).filter((n) => n != null));
+  for (const [i, track] of ordered.entries()) {
+    if (mapped[i]) continue;
+    const name = movementParts(track.movementTitle).text;
+    const piece = pieceNumber(track.movementTitle, setSubject);
+    if (!name || (piece != null && held.has(piece))) return null;
+    // A track continuing a movement the work names in full ("IV. Fuga"
+    // after "III. Adagio ma non troppo - Fuga") divides it, adds nothing.
+    if (existing.some((m) => m.text && ` ${m.text} `.includes(` ${name} `))) return null;
+  }
+  // Renumber through a gap, so unique positions never collide.
+  catalogue.db.prepare("UPDATE relation SET position=position+1000000 WHERE kind='movement' AND source_id=?").run(work);
+  const result = ordered.map((track, i) => {
+    const position = i + 1;
+    let movement = mapped[i]?.id;
+    if (movement) catalogue.db.prepare("UPDATE relation SET position=? WHERE kind='movement' AND source_id=? AND target_id=?").run(position, work, movement);
+    else {
+      movement = catalogue.createEntity("movement");
+      metadata.derived(movement, "title", track.movementTitle);
+      catalogue.relate("movement", work, movement, { position });
+    }
+    metadata.derived(movement, "movementNumber", String(position));
+    return movement;
+  });
+  catalogue.audit("work.auto_match_expand", work, { albumId: group.albumId, from: existing.length, to: result.length, tracks: ordered.map((t) => t.id) }, actor);
+  return result;
 }
 
 const hasManualEdits = (catalogue, ids) =>

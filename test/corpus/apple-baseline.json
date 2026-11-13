@@ -1064,7 +1064,7 @@
   },
   "201439672": {
    "grouping": true,
-   "parts": 0.875,
+   "parts": 0.188,
    "falseJoins": 0
   },
   "211475181": {
@@ -1173,13 +1173,13 @@
    "falseJoins": 0
   },
   "557321019": {
-   "grouping": false,
-   "parts": 0.94,
-   "falseJoins": 8
+   "grouping": true,
+   "parts": 0.836,
+   "falseJoins": 0
   },
   "594180316": {
    "grouping": false,
-   "parts": 0.632,
+   "parts": 1,
    "falseJoins": 10
   },
   "642211702": {
@@ -1224,7 +1224,7 @@
   },
   "693711974": {
    "grouping": true,
-   "parts": 1,
+   "parts": 0.429,
    "falseJoins": 0
   },
   "694083664": {
@@ -1548,9 +1548,9 @@
    "falseJoins": 0
   },
   "1452151425": {
-   "grouping": false,
+   "grouping": true,
    "parts": 1,
-   "falseJoins": 7
+   "falseJoins": 0
   },
   "1452153781": {
    "grouping": true,
@@ -1603,9 +1603,9 @@
    "falseJoins": 0
   },
   "1452194647": {
-   "grouping": false,
-   "parts": 1,
-   "falseJoins": 8
+   "grouping": true,
+   "parts": 0.99,
+   "falseJoins": 0
   },
   "1452196841": {
    "grouping": true,
@@ -1648,9 +1648,9 @@
    "falseJoins": 0
   },
   "1452226734": {
-   "grouping": false,
+   "grouping": true,
    "parts": 1,
-   "falseJoins": 1
+   "falseJoins": 0
   },
   "1452233586": {
    "grouping": false,
@@ -1713,9 +1713,9 @@
    "falseJoins": 0
   },
   "1452326250": {
-   "grouping": false,
-   "parts": 0.933,
-   "falseJoins": 1
+   "grouping": true,
+   "parts": 0.867,
+   "falseJoins": 0
   },
   "1452341842": {
    "grouping": true,
@@ -1933,9 +1933,9 @@
    "falseJoins": 0
   },
   "1648305509": {
-   "grouping": false,
-   "parts": 0.521,
-   "falseJoins": 6
+   "grouping": true,
+   "parts": 0.028,
+   "falseJoins": 0
   },
   "1650387312": {
    "grouping": true,
@@ -1989,13 +1989,13 @@
   },
   "1721447447": {
    "grouping": false,
-   "parts": 0.8,
+   "parts": 0.6,
    "falseJoins": 2
   },
   "1724466223": {
-   "grouping": false,
+   "grouping": true,
    "parts": 1,
-   "falseJoins": 2
+   "falseJoins": 0
   },
   "1727580320": {
    "grouping": true,

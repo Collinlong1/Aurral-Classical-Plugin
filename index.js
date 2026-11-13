@@ -37563,12 +37563,13 @@ function mergeCompletions(groups) {
   }
   return [...groups.filter((group) => !merged.has(group)), ...result];
 }
+var recordingTitle = (title) => words(clean3(title).replace(new RegExp("\\s*[([][^()[\\]]*\\p{L}[^()[\\]]*[)\\]]\\s*$", "u"), ""));
 function separateRecordings(groups) {
   return groups.flatMap((group) => {
-    const titles = group.tracks.map((track) => normalized(track.title));
+    const titles = group.tracks.map((track) => recordingTitle(track.title));
     if (new Set(titles).size === titles.length) return [group];
     const ordered = [...group.tracks].sort(albumOrder);
-    const title = (track) => normalized(track?.title);
+    const title = (track) => recordingTitle(track?.title);
     const runs = [[]];
     ordered.forEach((track, i) => {
       const run = runs.at(-1);
@@ -37607,6 +37608,8 @@ var words = (value) => normalized(value).replace(/[^\p{L}\p{N}]+/gu, " ").trim()
 var CATALOGUE = /\b(op|opus|bwv|kv|k|d|hob|rv|woo|hwv|sz|twv|bb)\s*((?:[ivxlc]+\s+)?\d+[a-z]?)(?:\s+(?:no|nr|n)\s*(\d+))?\b/;
 var KEY_PHRASE = /\bin\s+[a-h](?:\s*(?:flat|sharp|b|#))?(?:\s+(?:major|minor|dur|moll))?\b/g;
 function catalogueSubject(title) {
+  const slashed = String(title || "").match(/\bop(?:us|\.)?\s*(\d+[a-z]?)\s*\/\s*(\d+)\b(?![a-z])/i);
+  if (slashed && (Number(slashed[2]) < Number.parseInt(slashed[1], 10) || Number(slashed[2]) <= 12)) return `cat:op:${slashed[1].toLowerCase()}:${slashed[2]}`;
   const cat = words(title).match(CATALOGUE);
   if (cat)
     return `cat:${cat[1] === "opus" ? "op" : cat[1] === "kv" ? "k" : cat[1]}:${cat[2].replace(/\s+/g, "")}${cat[3] ? `:${cat[3]}` : ""}`;
@@ -37778,12 +37781,87 @@ function workMovements(catalogue, work) {
   return catalogue.db.prepare(
     `SELECT r.target_id AS id,r.position FROM relation r JOIN entity e ON e.id=r.target_id
        WHERE r.kind='movement' AND r.source_id=? AND e.deleted_at IS NULL ORDER BY r.position`
-  ).all(work).map((row) => ({
-    ...row,
-    ...movementParts(resolvedName(catalogue, row.id, "title") || "")
-  }));
+  ).all(work).map((row) => {
+    const title = resolvedName(catalogue, row.id, "title") || "";
+    return { ...row, title, ...movementParts(title) };
+  });
 }
-function mapToMovements(movements, tracks) {
+function pieceNumber(title, setSubject) {
+  const parts = movementParts(title);
+  if (parts.piece) return parts.index;
+  const trailing = clean3(title).match(/(?:^|[\s,])(?:no\.?|nr\.?|n°)\s*(\d+)\s*$/i);
+  if (trailing) return Number(trailing[1]);
+  const subject = catalogueSubject(title);
+  if (setSubject && subject.startsWith(`${setSubject}:`)) {
+    const rest = subject.slice(setSubject.length + 1);
+    if (/^\d+$/.test(rest)) return Number(rest);
+  }
+  return null;
+}
+var movementPiece = (movement, setSubject) => pieceNumber(movement.title || "", setSubject) ?? movement.index ?? null;
+function abbreviates(short, long) {
+  if (short.length < 2 || short.length >= long.length || short[0] !== long[0] || short.at(-1) !== long.at(-1)) return false;
+  let at = 0;
+  for (const letter of long) if (letter === short[at]) at++;
+  return at === short.length;
+}
+function sameNameAbbreviated(a, b) {
+  const tokens = (text4) => normalized(text4).replace(/^(?:[ivxlc]+|\d+)[.)]\s+/, "").replace(/[^\p{L}\p{N}.]+/gu, " ").trim().split(" ").filter(Boolean);
+  const [x, y] = [tokens(a), tokens(b)];
+  if (!x.length || x.length !== y.length) return false;
+  let abbreviated = 0;
+  for (let i = 0; i < x.length; i++) {
+    const [p, q] = [x[i].replace(/\.$/, ""), y[i].replace(/\.$/, "")];
+    if (p === q) continue;
+    const shortened = x[i].endsWith(".") ? abbreviates(p, q) : y[i].endsWith(".") ? abbreviates(q, p) : false;
+    if (!shortened) return false;
+    abbreviated++;
+  }
+  return abbreviated > 0;
+}
+function namedMovement(movements, title, used, setSubject) {
+  const text4 = movementParts(title).text;
+  const free = movements.filter((m) => !used.has(m.id));
+  let found = free.filter((m) => m.text && m.text === text4);
+  if (found.length !== 1) found = free.filter((m) => m.title && sameNameAbbreviated(m.title, title));
+  if (found.length !== 1) {
+    const piece = pieceNumber(title, setSubject);
+    found = piece == null ? [] : free.filter((m) => movementPiece(m, setSubject) === piece);
+  }
+  return found.length === 1 ? found[0] : null;
+}
+function sectionWords(text4) {
+  const out = [];
+  for (const section of clean3(text4).split(/\s+\/\s+/)) {
+    let value = words(section).replace(/^(?:var(?:iation|iazione)?s?|variazioni)\s+(?:(?:no|nr|n)\s+)?/, "").replace(/\b(?:var(?:iation)?|variazione)\s+(?:(?:no|nr|n)\s+)?(?=\d)/g, "").replace(/\b(?:tema|thema)\b/g, "theme");
+    const roman = value.match(/^([ivxlc]+)\s+(.*)$/);
+    if (roman && romanValue(roman[1])) value = `${romanValue(roman[1])} ${roman[2]}`;
+    out.push(value.trim());
+  }
+  return out.join(" ");
+}
+function mapBySections(movements, tracks) {
+  if (!movements.some((m) => / \/ /.test(m.title || ""))) return null;
+  const sections = movements.map((m) => clean3(m.title).split(/\s+\/\s+/).map(sectionWords));
+  const result = [];
+  let at = 0, offset = 0;
+  for (const track of tracks) {
+    const wanted = sectionWords(track.movementTitle);
+    let hit = null;
+    for (let m = at; m < movements.length && !hit; m++)
+      for (let from = m === at ? offset : 0; from < sections[m].length && !hit; from++)
+        for (let to = from + 1; to <= sections[m].length; to++)
+          if (sections[m].slice(from, to).join(" ") === wanted) {
+            hit = { m, to };
+            break;
+          }
+    if (!hit) return null;
+    result.push(movements[hit.m].id);
+    [at, offset] = hit.to === sections[hit.m].length ? [hit.m + 1, 0] : [hit.m, hit.to];
+  }
+  return result;
+}
+function mapToMovements(movements, tracks, { setSubject = "" } = {}) {
   const used = /* @__PURE__ */ new Set(), result = [];
   const firstWord = (text4) => text4.split(" ")[0];
   let previous = null;
@@ -37796,6 +37874,10 @@ function mapToMovements(movements, tracks) {
     let found = movements.filter(
       (m) => !used.has(m.id) && m.text && m.text === parts.text
     );
+    if (found.length !== 1) {
+      const named = namedMovement(movements, track.movementTitle, used, setSubject);
+      if (named) found = [named];
+    }
     if (found.length !== 1 && parts.index)
       found = movements.filter(
         (m) => !used.has(m.id) && Boolean(m.piece) === Boolean(parts.piece) && (parts.piece ? m.index : m.index ?? m.position) === parts.index
@@ -37813,7 +37895,7 @@ function mapToMovements(movements, tracks) {
   }
   if (result.every(Boolean)) return result;
   if (movements.length === tracks.length) return movements.map((m) => m.id);
-  return null;
+  return mapBySections(movements, tracks);
 }
 var albumOrder = (a, b) => a.discNumber - b.discNumber || a.trackNumber - b.trackNumber || a.id.localeCompare(b.id);
 function shiftUp(catalogue, table, column, where, args, from) {
@@ -37972,7 +38054,9 @@ function createGroup(catalogue, group, actor3, index) {
     if (work && unassignedByAdmin(catalogue, work, group.albumId)) return false;
     if (work) {
       const existing = workMovements(catalogue, work);
-      movements = existing.length ? mapToMovements(existing, ordered) : null;
+      const setSubject = catalogueSubject(String(resolvedName(catalogue, work, "title") || "")) || catalogueSubject(catalogued2 || group.work);
+      movements = existing.length ? mapToMovements(existing, ordered, { setSubject }) : null;
+      if (!movements && existing.length) movements = expandIncompleteWork(catalogue, metadata, work, existing, ordered, setSubject, group, actor3);
       if (!movements && existing.length) {
         catalogue.review("auto_match", ordered[0].id, {
           reason: "movement-mismatch",
@@ -38089,6 +38173,45 @@ function createGroup(catalogue, group, actor3, index) {
     );
     return true;
   });
+}
+function expandIncompleteWork(catalogue, metadata, work, existing, ordered, setSubject, group, actor3) {
+  if (ordered.length <= existing.length) return null;
+  const ids = [work, ...existing.map((m) => m.id)];
+  const madeByMatching = catalogue.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work'").get(work);
+  const edited = catalogue.db.prepare(`SELECT 1 FROM audit_event WHERE action LIKE 'editor.%' AND target_id IN (${ids.map(() => "?").join(",")}) LIMIT 1`).get(...ids);
+  if (!madeByMatching || edited || hasManualEdits(catalogue, ids)) return null;
+  const used = /* @__PURE__ */ new Set();
+  const mapped = ordered.map((track) => {
+    const movement = namedMovement(existing, track.movementTitle, used, setSubject);
+    if (movement) used.add(movement.id);
+    return movement;
+  });
+  if (used.size !== existing.length) return null;
+  const positions = mapped.filter(Boolean).map((m) => m.position);
+  if (positions.some((position, i) => i && position < positions[i - 1])) return null;
+  const held2 = new Set(existing.map((m) => movementPiece(m, setSubject)).filter((n) => n != null));
+  for (const [i, track] of ordered.entries()) {
+    if (mapped[i]) continue;
+    const name = movementParts(track.movementTitle).text;
+    const piece = pieceNumber(track.movementTitle, setSubject);
+    if (!name || piece != null && held2.has(piece)) return null;
+    if (existing.some((m) => m.text && ` ${m.text} `.includes(` ${name} `))) return null;
+  }
+  catalogue.db.prepare("UPDATE relation SET position=position+1000000 WHERE kind='movement' AND source_id=?").run(work);
+  const result = ordered.map((track, i) => {
+    const position = i + 1;
+    let movement = mapped[i]?.id;
+    if (movement) catalogue.db.prepare("UPDATE relation SET position=? WHERE kind='movement' AND source_id=? AND target_id=?").run(position, work, movement);
+    else {
+      movement = catalogue.createEntity("movement");
+      metadata.derived(movement, "title", track.movementTitle);
+      catalogue.relate("movement", work, movement, { position });
+    }
+    metadata.derived(movement, "movementNumber", String(position));
+    return movement;
+  });
+  catalogue.audit("work.auto_match_expand", work, { albumId: group.albumId, from: existing.length, to: result.length, tracks: ordered.map((t) => t.id) }, actor3);
+  return result;
 }
 var hasManualEdits = (catalogue, ids) => ids.some(
   (id) => catalogue.db.prepare(
@@ -42146,7 +42269,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.23" : "dev";
+var VERSION = true ? "1.0.24" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js

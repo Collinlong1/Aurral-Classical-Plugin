@@ -678,3 +678,111 @@ test("matching: tracks taken out under the old catalogue key stay out only for t
   assert.notEqual(work("Klavierstück, S189a"), sibling);
   assert.ok(same);
 });
+
+// From the 1.0.22 audit: a work an earlier album made from part of a piece
+// turned fuller albums away as movement-mismatch reviews, and an album that
+// divides a piece into more tracks (one per variation) could not share the
+// work an album with fewer, longer tracks had made.
+test("matching: an incomplete auto-made work takes a fuller album's movements; other divisions line up", async (t) => {
+  const tag = (composer, work = "") => (title) => ({ title, composer: [composer], genres: ["Classical"], work });
+  const rach = tag("Sergei Rachmaninoff");
+  const c = await catalogueWith(t, [
+    // Two of the nine Études-tableaux, named the MusicBrainz way.
+    { id: "ampico", album: "Rachmaninov plays Rachmaninov", albumArtist: "Sergei Rachmaninoff", artist: "Sergei Rachmaninoff", titles: ["Etude-tableau in B minor, op. 39 no. 4", "Etude-tableau in A minor, op. 39 no. 6"].map(tag("Sergei Rachmaninoff", "Études-tableaux, op. 39")) },
+    { id: "lugansky", album: "Nikolai Lugansky plays Rachmaninov: Études-tableaux", albumArtist: "Nikolai Lugansky", artist: "Nikolai Lugansky", titles: ["Allegro agitato in C minor", "Lento assai in A minor", "Allegro molto in F-sharp minor", "Allegro assai in B minor", "Appassionato in E-flat minor", "Allegro in A minor", "Lento lugubre in C minor", "Allegro moderato in D minor", "Allegro moderato in D major"].map((piece, i) => `Études-tableaux op. 39: ${piece}, no. ${i + 1}`).map(rach) },
+    // A few of them later, out of order.
+    { id: "fantasia", album: "Fantasia", albumArtist: "Pianist", artist: "Pianist", titles: ["Études-tableaux, Op. 39, No. 6", "Études-tableaux, Op. 39, No. 4", "Études-tableaux, Op. 39, No. 5"].map(rach) },
+    // Two of Children's Corner, one abbreviated.
+    { id: "excerpts", album: "The Complete Recordings", albumArtist: "Pianist", artist: "Pianist", titles: ["Children’s Corner, L. 113, CD 119: Dr. Gradus ad Parnassum", "Children’s Corner, L. 113, CD 119: Golliwogg's Cakewalk"].map(tag("Claude Debussy")) },
+    { id: "decca", album: "Decca Sound", albumArtist: "Various Artists", artist: "Pianist", titles: ["I. Doctor Gradus ad Parnassum", "II. Jimbo’s Lullaby", "III. Serenade for the Doll", "IV. The Snow is dancing", "V. The little Shepherd", "VI. Golliwogg’s Cakewalk"].map((m) => `Children’s Corner, L. 113: ${m}`).map(tag("Claude Debussy")) },
+    // Several variations per track first, then one per track, two ways.
+    { id: "combined", album: "Rhapsody on a Theme of Paganini", albumArtist: "Pianist", artist: "Pianist", titles: ["Introduction: Allegro vivace / I. (Precedente)", "Theme: L'istesso tempo / II. L'istesso tempo / III. L'istesso tempo", "IV. Più vivo"].map((m) => `Rhapsody on a Theme of Paganini, op. 43: ${m}`).map(rach) },
+    { id: "trifonov", album: "Rachmaninoff - Piano Works", albumArtist: "Daniil Trifonov", artist: "Daniil Trifonov", titles: ["Introduction. Allegro vivace - Variation No. 1 (Precedente)", "Tema. L'istesso tempo", "Variation No. 2 L'istesso tempo", "Variation No. 3 L'istesso tempo", "Variation No. 4 Più vivo"].map((m) => `Rachmaninoff: Rhapsody on a Theme of Paganini, Op. 43: ${m}`).map(rach) },
+    { id: "complete", album: "The Complete Recordings", albumArtist: "Pianist", artist: "Pianist", titles: ["Introduction: Allegro vivace", "Variation 1: (Precedente)", "Tema: L'istesso tempo", "Variation 2: L'istesso tempo", "Variation 3: L'istesso tempo", "Variation 4: Più vivo"].map((m) => `Rhapsody on a Theme of Paganini, op. 43: ${m}`).map(rach) },
+  ]);
+  const order = ["ampico", "lugansky", "fantasia", "excerpts", "decca", "combined", "trifonov", "complete"];
+  for (const albumId of order) autoMatchTaggedWorks(c, { albumId, actor: "admin", allowStructuredTitles: true });
+  const blocks = (albumId) => renderAlbumPresentation(c, albumId).groups.map((group) => [group.workId, group.items.map((item) => item.title)]);
+  const movements = (work) => workMovementTitles(c, work);
+  // One work of nine; the first album's pieces keep their recordings.
+  const [[etudes, ampico]] = blocks("ampico");
+  assert.ok(etudes);
+  assert.equal(movements(etudes).length, 9);
+  assert.deepEqual(ampico, ["Etude-tableau in B minor, op. 39 no. 4", "Etude-tableau in A minor, op. 39 no. 6"]);
+  assert.deepEqual(movements(etudes).slice(3, 6), ["Etude-tableau in B minor, op. 39 no. 4", "Appassionato in E-flat minor, no. 5", "Etude-tableau in A minor, op. 39 no. 6"]);
+  assert.deepEqual(blocks("lugansky").map(([work, rows]) => [work, rows.length]), [[etudes, 9]]);
+  assert.deepEqual(blocks("fantasia").map(([work, rows]) => [work, rows]), [[etudes, ["Etude-tableau in A minor, op. 39 no. 6", "Etude-tableau in B minor, op. 39 no. 4", "Appassionato in E-flat minor, no. 5"]]]);
+  // Children's Corner: six movements, Dr. and Doctor alike.
+  const [[corner]] = blocks("excerpts");
+  assert.deepEqual(blocks("decca").map(([work, rows]) => [work, rows.length]), [[corner, 6]]);
+  assert.deepEqual(movements(corner), ["Dr. Gradus ad Parnassum", "II. Jimbo’s Lullaby", "III. Serenade for the Doll", "IV. The Snow is dancing", "V. The little Shepherd", "Golliwogg's Cakewalk"]);
+  // The rhapsody keeps its three movements; the other albums' tracks line
+  // up with their sections in order.
+  const [[rhapsody]] = blocks("combined");
+  assert.equal(movements(rhapsody).length, 3);
+  for (const albumId of ["trifonov", "complete"]) assert.deepEqual(blocks(albumId).map(([work]) => work), [rhapsody]);
+  const sequence = (albumId) =>
+    c.db
+      .prepare(
+        `SELECT i.movement_id,i.occurrence FROM realization_item i JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id
+         WHERE CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=? ORDER BY i.sequence`,
+      )
+      .all(albumId)
+      .map((row) => [workMovementTitles(c, rhapsody, true).indexOf(row.movement_id) + 1, row.occurrence]);
+  assert.deepEqual(sequence("trifonov"), [[1, 1], [2, 1], [2, 2], [2, 3], [3, 1]]);
+  assert.deepEqual(sequence("complete"), [[1, 1], [1, 2], [2, 1], [2, 2], [2, 3], [3, 1]]);
+  assert.equal(c.db.prepare("SELECT COUNT(*) AS n FROM review_item WHERE status='open' AND json_extract(evidence,'$.reason')='movement-mismatch'").get().n, 0);
+});
+
+test("matching: an edited work is never expanded; a track continuing a movement adds none", async (t) => {
+  const beethoven = (title) => ({ title, composer: ["Ludwig van Beethoven"], genres: ["Classical"] });
+  const debussy = (title) => ({ title, composer: ["Claude Debussy"], genres: ["Classical"] });
+  const c = await catalogueWith(t, [
+    { id: "three", album: "Late Sonatas", albumArtist: "Pianist", artist: "Pianist", titles: ["I. Moderato cantabile molto espressivo", "II. Allegro molto", "III. Adagio ma non troppo - Fuga (Allegro ma non troppo)"].map((m) => `Piano Sonata No. 31 in A-flat major, Op. 110: ${m}`).map(beethoven) },
+    { id: "four", album: "Sonatas", albumArtist: "Pianist", artist: "Pianist", titles: ["I. Moderato cantabile molto espressivo", "II. Allegro molto", "III. Adagio ma non troppo - Fuga (Allegro ma non troppo)", "IV. Fuga (Allegro ma non troppo)"].map((m) => `Piano Sonata No. 31 in A-flat major, Op. 110: ${m}`).map(beethoven) },
+    { id: "excerpts", album: "Encores", albumArtist: "Pianist", artist: "Pianist", titles: ["Children’s Corner, L. 113: The Snow is dancing", "Children’s Corner, L. 113: Golliwogg's Cakewalk"].map(debussy) },
+    { id: "full", album: "Debussy", albumArtist: "Pianist", artist: "Pianist", titles: ["I. Doctor Gradus ad Parnassum", "II. Jimbo’s Lullaby", "III. Serenade for the Doll", "IV. The Snow is dancing", "V. The little Shepherd", "VI. Golliwogg’s Cakewalk"].map((m) => `Children’s Corner, L. 113: ${m}`).map(debussy) },
+  ]);
+  const match = (albumId) => autoMatchTaggedWorks(c, { albumId, actor: "admin", allowStructuredTitles: true });
+  match("three");
+  match("four");
+  const sonata = renderAlbumPresentation(c, "three").groups[0].workId;
+  assert.equal(workMovementTitles(c, sonata).length, 3);
+  match("excerpts");
+  const corner = renderAlbumPresentation(c, "excerpts").groups[0].workId;
+  // An admin edited the work: its structure is theirs.
+  new Metadata(c).manual(corner, "description", "Two pieces from the suite.", { actor: "admin" });
+  match("full");
+  assert.equal(workMovementTitles(c, corner).length, 2);
+  assert.ok(renderAlbumPresentation(c, "full").groups.every((group) => group.workId !== corner));
+});
+
+// A box with two recordings of a concerto, the second's titles ending in its
+// performers, made one six-movement work that turned away every album with
+// the concerto's three. And "Op. 27/1" and "Op. 27/2" were one work.
+test("matching: a performer credit after a title is the same movement; an opus's slash number is its piece", async (t) => {
+  assert.equal(catalogueSubject("Piano Sonata No. 14 in C-sharp minor, Op. 27/2"), "cat:op:27:2");
+  assert.equal(catalogueSubject("String Quartet No. 3, Op. 18/3"), catalogueSubject("String Quartet No. 3, Op. 18 No. 3"));
+  assert.notEqual(catalogueSubject("Op. 27/1"), catalogueSubject("Op. 27/2"));
+  const rach = (title) => ({ title, composer: ["Sergei Rachmaninoff"], genres: ["Classical"] });
+  const concerto = (m) => `Piano Concerto No. 2 in C minor, Op. 18: ${m}`;
+  const c = await catalogueWith(t, [
+    { id: "box", album: "Decca Sound", albumArtist: "Various Artists", artist: "Orchestra", titles: ["I. Moderato; Allegro", "II. Adagio sostenuto", "III. Allegro scherzando", "I. Moderato - Allegro (Philadelphia Orchestra feat. conductor: Leopold Stokowski)", "II. Adagio sostenuto (Philadelphia Orchestra feat. conductor: Leopold Stokowski)", "III. Allegro scherzando (Philadelphia Orchestra feat. conductor: Leopold Stokowski)"].map(concerto).map(rach) },
+    { id: "single", album: "Piano Concertos", albumArtist: "Pianist", artist: "Pianist", titles: ["I. Moderato", "II. Adagio sostenuto", "III. Allegro scherzando"].map(concerto).map(rach) },
+  ]);
+  for (const albumId of ["box", "single"]) autoMatchTaggedWorks(c, { albumId, actor: "admin", allowStructuredTitles: true });
+  const box = renderAlbumPresentation(c, "box").groups;
+  assert.deepEqual(box.map((group) => group.items.length), [3, 3]);
+  assert.equal(box[0].workId, box[1].workId);
+  assert.equal(workMovementTitles(c, box[0].workId).length, 3);
+  assert.deepEqual(renderAlbumPresentation(c, "single").groups.map((group) => group.workId), [box[0].workId]);
+});
+
+function workMovementTitles(c, work, ids = false) {
+  const rows = c.db.prepare("SELECT target_id FROM relation WHERE kind='movement' AND source_id=? ORDER BY position").all(work);
+  if (ids) return rows.map((row) => row.target_id);
+  const metadata = new Metadata(c);
+  return rows.map((row) => metadata.resolve?.(row.target_id, "title")?.value ?? c.db.prepare(
+    `SELECT a.value FROM field_resolution f JOIN assertion a ON a.id=f.assertion_id JOIN metadata_target m ON m.id=f.target_id WHERE m.entity_id=? AND f.field='title'`,
+  ).get(row.target_id)?.value?.replace(/^"|"$/g, ""));
+}
