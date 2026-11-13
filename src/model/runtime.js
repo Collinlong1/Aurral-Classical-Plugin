@@ -1,8 +1,8 @@
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { openCatalogue } from "./catalogue.js";
-import { verifyOnce } from "./database.js";
+import { transaction, verifyOnce } from "./database.js";
 import { ModelJobs } from "./jobs.js";
 import { reconcile, classify } from "./reconcile.js";
 import { UserOperations } from "../user-operations.js";
@@ -73,8 +73,14 @@ export async function modelStatus(ctx) {
           .get() || null,
       now: Date.now(),
       jobs: catalogue.db
-        .prepare("SELECT state,count(*) AS count FROM model_job WHERE type!='scan_chunk' GROUP BY state")
+        // Markers of albums seen without a lookup are no jobs.
+        .prepare(
+          `SELECT state,count(*) AS count FROM model_job WHERE type NOT IN ('scan_chunk','album_identify_baseline')
+           AND NOT (type='album_identify' AND json_extract(progress,'$.baseline')=1) GROUP BY state`,
+        )
         .all(),
+
+      identification: identificationStatus(catalogue),
     };
   } finally {
     catalogue.close();
@@ -320,6 +326,199 @@ async function scanFile(file, root, prior) {
   };
 }
 
+// Background MusicBrainz identification, one album at a time.
+//
+// A scan queues an album when it has classical tracks outside every work
+// that carry a recording or work ID, and that set of tracks is new: the
+// job's key holds a hash of it, and a key that ever ran is never queued
+// again. So only what changed is looked up (core rule 5). The first time
+// this runs it records the albums already there as seen without looking
+// them up; the one-time backfill of those (`identifyBacklog`) is an admin
+// action, never automatic.
+const IDENTIFY = "album_identify";
+const BASELINE_KEY = "album-identify-baseline";
+
+function pendingIdentification(catalogue) {
+  const albums = new Map();
+  for (const row of catalogue.db
+    .prepare(
+      `SELECT t.id,CAST(json_extract(t.evidence,'$.albumId') AS TEXT) AS album,
+         json_extract(t.evidence,'$.hints.recordingMbid') AS recording,json_extract(t.evidence,'$.hints.workId') AS work
+       FROM track_link t JOIN classification c ON c.target_id=t.id AND c.state='classical'
+       WHERE t.state='active' AND json_extract(t.evidence,'$.albumId') IS NOT NULL
+       AND (coalesce(json_extract(t.evidence,'$.hints.recordingMbid'),'')!='' OR coalesce(json_extract(t.evidence,'$.hints.workId'),'')!='')
+       AND NOT EXISTS(SELECT 1 FROM segment s JOIN realization_item i ON i.segment_id=s.id WHERE s.track_link_id=t.id)
+       ORDER BY t.id`,
+    )
+    .all()) {
+    if (!albums.has(row.album)) albums.set(row.album, []);
+    albums.get(row.album).push(`${row.id}|${row.recording || ""}|${row.work || ""}`);
+  }
+  return [...albums].map(([albumId, tracks]) => ({
+    albumId,
+    tracks: tracks.length,
+    key: `${IDENTIFY}:${albumId}:${createHash("sha256").update(tracks.join("\n")).digest("hex").slice(0, 32)}`,
+  }));
+}
+
+const keyRan = (catalogue, key) => Boolean(catalogue.db.prepare("SELECT 1 FROM model_job WHERE key=? LIMIT 1").get(key));
+// A finished marker: never claimed, it only says this key was handled.
+function markSeen(catalogue, album, progress) {
+  catalogue.db
+    .prepare(
+      `INSERT INTO model_job(id,type,key,input,state,progress,max_attempts,created_at)
+       VALUES (?,?,?,?,'done',?,1,?)`,
+    )
+    .run(randomUUID(), IDENTIFY, album.key, JSON.stringify({ albumId: album.albumId }), JSON.stringify(progress), Date.now());
+}
+
+export function queueAlbumIdentification(catalogue, { now = Date.now() } = {}) {
+  return transaction(catalogue.db, () => {
+    const pending = pendingIdentification(catalogue);
+    if (!keyRan(catalogue, BASELINE_KEY)) {
+      // Albums already in the library when this first runs are the backlog.
+      for (const album of pending) if (!keyRan(catalogue, album.key)) markSeen(catalogue, album, { baseline: true, tracks: album.tracks });
+      catalogue.db
+        .prepare(`INSERT INTO model_job(id,type,key,input,state,max_attempts,created_at) VALUES (?,?,?,'{}','done',1,?)`)
+        .run(randomUUID(), `${IDENTIFY}_baseline`, BASELINE_KEY, now);
+      return 0;
+    }
+    const jobs = new ModelJobs(catalogue);
+    let queued = 0;
+    for (const album of pending)
+      if (!keyRan(catalogue, album.key)) {
+        jobs.enqueue(IDENTIFY, album.key, { albumId: album.albumId }, { maxAttempts: 5 });
+        queued++;
+      }
+    return queued;
+  });
+}
+
+// The one-time backfill (Option A in the v0.1 scope, an explicit exception
+// to rule 5 that the admin starts): every album the baseline recorded as
+// seen, and still pending, is looked up once, paced like any other.
+export async function identifyBacklog(ctx, actor) {
+  if (actor?.role !== "admin")
+    throw new Error("MusicBrainz identification requires a current host admin");
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  try {
+    return transaction(catalogue.db, () => {
+      const jobs = new ModelJobs(catalogue);
+      let queued = 0,
+        tracks = 0;
+      for (const album of pendingIdentification(catalogue)) {
+        const prior = catalogue.db
+          .prepare("SELECT json_extract(progress,'$.baseline') AS baseline FROM model_job WHERE key=? ORDER BY created_at DESC LIMIT 1")
+          .get(album.key);
+        // Already looked up (or queued): nothing to repeat.
+        if (prior && !prior.baseline) continue;
+        catalogue.db.prepare("DELETE FROM model_job WHERE key=? AND state='done' AND json_extract(progress,'$.baseline')=1").run(album.key);
+        jobs.enqueue(IDENTIFY, album.key, { albumId: album.albumId, backfill: true }, { maxAttempts: 5 });
+        catalogue.audit("work.identify_backlog", album.albumId, { tracks: album.tracks }, String(actor.id));
+        queued++;
+        tracks += album.tracks;
+      }
+      return { albums: queued, tracks };
+    });
+  } finally {
+    catalogue.close();
+  }
+}
+
+export function identificationStatus(catalogue) {
+  const rows = catalogue.db
+    .prepare(
+      `SELECT state,json_extract(progress,'$.baseline') AS baseline,count(*) AS albums,
+         coalesce(sum(json_extract(progress,'$.matched')),0) AS matched,coalesce(sum(json_extract(progress,'$.errors')),0) AS errors
+       FROM model_job WHERE type=? GROUP BY state,baseline`,
+    )
+    .all(IDENTIFY);
+  const sum = (test, field = "albums") => rows.filter(test).reduce((total, row) => total + row[field], 0);
+  return {
+    queued: sum((row) => ["queued", "running", "retry"].includes(row.state)),
+    done: sum((row) => row.state === "done" && !row.baseline),
+    backlog: sum((row) => row.state === "done" && row.baseline),
+    failed: sum((row) => row.state === "failed"),
+    matched: sum(() => true, "matched"),
+    errors: sum(() => true, "errors"),
+  };
+}
+
+// Works an identification job: its album's pending tracks, one MusicBrainz
+// lookup chain at a time, saving progress after each, so an interrupted run
+// resumes where it stopped (and the disk cache makes repeats free). Then
+// the album is matched with what MusicBrainz said. Further jobs follow
+// while the budget lasts.
+async function runIdentification(ctx, catalogue, jobs, first, owner, deadline) {
+  for (let job = first; job; job = Date.now() < deadline ? jobs.claim(owner, { leaseMs: 60_000, type: IDENTIFY }) : null) {
+    try {
+      const { albumId } = job.input;
+      const rows = catalogue.db
+        .prepare(
+          `SELECT t.id,t.evidence FROM track_link t JOIN classification c ON c.target_id=t.id AND c.state='classical'
+           WHERE t.state='active' AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?
+           AND NOT EXISTS(SELECT 1 FROM segment s JOIN realization_item i ON i.segment_id=s.id WHERE s.track_link_id=t.id)
+           ORDER BY t.id`,
+        )
+        .all(String(albumId));
+      const progress = { cursor: 0, matches: [], failed: [], errors: 0, ...job.progress };
+      const lookUp = async (row) => {
+        const match = await identifyTrack(ctx, JSON.parse(row.evidence).hints || {});
+        if (match) progress.matches.push([row.id, match]);
+      };
+      let streak = [];
+      while (progress.cursor < rows.length) {
+        if (Date.now() >= deadline) break;
+        const row = rows[progress.cursor];
+        try {
+          await lookUp(row);
+          streak = [];
+        } catch (error) {
+          streak.push(row.id);
+          // MusicBrainz down: stop and try the album again later from the
+          // first lookup that failed, instead of skipping those tracks.
+          if (streak.length >= 3) {
+            progress.cursor -= streak.length - 1;
+            progress.failed = progress.failed.filter((id) => !streak.includes(id));
+            jobs.checkpoint(job, progress, { leaseMs: 60_000 });
+            throw new Error(`MusicBrainz unavailable: ${error.message}`);
+          }
+          progress.failed.push(row.id);
+          ctx.log(`Classical work identification of one track failed: ${error.message}`);
+        }
+        progress.cursor++;
+        jobs.checkpoint(job, progress, { leaseMs: 60_000 });
+      }
+      if (progress.cursor < rows.length) {
+        jobs.yield(job);
+        return;
+      }
+      // A lookup that failed on its own gets one more try.
+      for (const id of progress.failed.splice(0)) {
+        const row = rows.find((candidate) => candidate.id === id);
+        if (!row) continue;
+        try {
+          await lookUp(row);
+        } catch (error) {
+          progress.errors++;
+          ctx.log(`Classical work identification skipped: ${error.message}`);
+        }
+      }
+      const result = autoMatchTaggedWorks(catalogue, {
+        albumId,
+        actor: "model-identify",
+        allowStructuredTitles: true,
+        providerMatches: new Map(progress.matches),
+      });
+      jobs.checkpoint(job, { cursor: progress.cursor, identified: progress.matches.length, matched: result.created, errors: progress.errors }, { done: true, leaseMs: 60_000 });
+    } catch (error) {
+      jobs.fail(job, error.message);
+      ctx.log(`Classical identification of album ${job.input.albumId} failed: ${error.message}`);
+      return;
+    }
+  }
+}
+
 // File reads happen outside the writer transaction. Only a fenced checkpoint may publish them.
 export async function runModelJobs(
   ctx,
@@ -332,6 +531,7 @@ export async function runModelJobs(
   try {
     const job = jobs.claim(owner, { leaseMs: 60_000 });
     if (!job) return;
+    if (job.type === IDENTIFY) return await runIdentification(ctx, catalogue, jobs, job, owner, deadline);
     try {
       if (job.type !== "library_scan")
         throw new Error("Unknown model job type");
@@ -490,7 +690,11 @@ export async function runModelJobs(
                         Date.now(),
                       );
                 }
-                autoMatchTaggedWorks(catalogue, { actor: "model-scan" });
+                // The same tag and title rules as Auto-match every album, with
+                // no network. Then MusicBrainz is asked, in the background,
+                // only about albums whose unmatched tracks changed.
+                autoMatchTaggedWorks(catalogue, { actor: "model-scan", allowStructuredTitles: true });
+                queueAlbumIdentification(catalogue);
               }
             : undefined,
       });
@@ -517,6 +721,64 @@ async function arrangedWork(mb, work, inc) {
   return (await mb.get("work", originals[0].work.id, inc)) || work;
 }
 
+// MusicBrainz's work for one unmatched track, from its WORK ID tag or its
+// recording ID: the parent work (or the work itself, when it is a whole
+// piece), its English title, aliases and composers' IDs. Null when there
+// is none. Every request goes through the shared throttle and disk cache.
+async function identifyTrack(ctx, hints) {
+  let workId = hints.workId;
+  let composers = hints.composer || [];
+  if (!workId && hints.recordingMbid) {
+    const fields = await ctx.resolver.resolve(hints.recordingMbid, {
+      confirmed: true,
+    });
+    workId = fields?.workId;
+    if (!composers.length) composers = fields?.composers || [];
+  }
+  if (!workId) return null;
+  // Aliases come in the same requests, for English titles.
+  const inc = "aliases+artist-rels+work-rels";
+  const leaf = await arrangedWork(ctx.mb, await ctx.mb.get("work", workId, inc), inc);
+  // A book of a set (Debussy's "Préludes, Livre I") is the work, not
+  // the set above it: stop below a set-named parent once the work has
+  // parts of its own.
+  const hasParts = (work) => (work.relations || []).some((rel) => rel.type === "parts" && rel.direction === "forward");
+  const parent = leaf && (await topWork(ctx.mb, leaf, 0, inc, { stop: (above, below) => isCollectionLike(above.title) && hasParts(below) }));
+  // A work with no parent is a whole piece only when the track's own
+  // title reads as one, not as a movement of something MusicBrainz
+  // hasn't linked up.
+  const standalone =
+    parent?.id === leaf.id &&
+    !(leaf.relations || []).some((rel) => rel.type === "parts" && rel.direction === "backward") &&
+    !isCollectionLike(leaf.title) &&
+    !String(hints.title || "").includes(":") &&
+    !/^(?:[IVXLCDM]+|\d+)[.)]\s/i.test(String(hints.title || "").trim());
+  // A set MusicBrainz identifies is a work like any other; only a
+  // free-text set name in the tags ("Études") is too loose to be one.
+  if (!parent?.id || (parent.id === leaf.id && !standalone)) return null;
+  return {
+    workId: parent.id,
+    work: englishTitle(parent),
+    movement: standalone ? null : englishTitle(leaf, null),
+    ...(standalone && { standalone: true }),
+    aliases: [
+      ...new Set(
+        (parent.aliases || [])
+          .filter((alias) => alias.name && alias.type !== "Search hint")
+          .map((alias) => alias.name)
+          .filter((name) => name !== englishTitle(parent)),
+      ),
+    ].slice(0, 20),
+    composers,
+    // MusicBrainz's own composer IDs tell same-named people apart.
+    composerIds: Object.fromEntries(
+      [...(parent.relations || []), ...(leaf.relations || [])]
+        .filter((rel) => rel.type === "composer" && rel.artist?.id && rel.artist?.name)
+        .map((rel) => [rel.artist.name, rel.artist.id]),
+    ),
+  };
+}
+
 export async function autoMatchWorks(ctx, actor, albumId = null) {
   if (actor?.role !== "admin")
     throw new Error("Automatic work matching requires a current host admin");
@@ -525,9 +787,7 @@ export async function autoMatchWorks(ctx, actor, albumId = null) {
     const local = autoMatchTaggedWorks(catalogue, {
       albumId,
       actor: String(actor.id),
-      // This is an explicit admin action. A structured classical title may be
-      // accepted with matching composer, album, classification and ordering;
-      // unattended scans continue to require an embedded WORK or GROUPING tag.
+      // Structured classical titles count, as they do after every scan.
       allowStructuredTitles: true,
     });
     const providerMatches = new Map();
@@ -543,57 +803,8 @@ export async function autoMatchWorks(ctx, actor, albumId = null) {
     for (const row of rows) {
       const hints = JSON.parse(row.evidence).hints || {};
       try {
-        let workId = hints.workId;
-        let composers = hints.composer || [];
-        if (!workId && hints.recordingMbid) {
-          const fields = await ctx.resolver.resolve(hints.recordingMbid, {
-            confirmed: true,
-          });
-          workId = fields?.workId;
-          if (!composers.length) composers = fields?.composers || [];
-        }
-        if (!workId) continue;
-        // Aliases come in the same requests, for English titles.
-        const inc = "aliases+artist-rels+work-rels";
-        const leaf = await arrangedWork(ctx.mb, await ctx.mb.get("work", workId, inc), inc);
-        // A book of a set (Debussy's "Préludes, Livre I") is the work, not
-        // the set above it: stop below a set-named parent once the work has
-        // parts of its own.
-        const hasParts = (work) => (work.relations || []).some((rel) => rel.type === "parts" && rel.direction === "forward");
-        const parent = leaf && (await topWork(ctx.mb, leaf, 0, inc, { stop: (above, below) => isCollectionLike(above.title) && hasParts(below) }));
-        // A work with no parent is a whole piece only when the track's own
-        // title reads as one, not as a movement of something MusicBrainz
-        // hasn't linked up.
-        const standalone =
-          parent?.id === leaf.id &&
-          !(leaf.relations || []).some((rel) => rel.type === "parts" && rel.direction === "backward") &&
-          !isCollectionLike(leaf.title) &&
-          !String(hints.title || "").includes(":") &&
-          !/^(?:[IVXLCDM]+|\d+)[.)]\s/i.test(String(hints.title || "").trim());
-        // A set MusicBrainz identifies is a work like any other; only a
-        // free-text set name in the tags ("Études") is too loose to be one.
-        if (!parent?.id || (parent.id === leaf.id && !standalone)) continue;
-        providerMatches.set(row.id, {
-          workId: parent.id,
-          work: englishTitle(parent),
-          movement: standalone ? null : englishTitle(leaf, null),
-          ...(standalone && { standalone: true }),
-          aliases: [
-            ...new Set(
-              (parent.aliases || [])
-                .filter((alias) => alias.name && alias.type !== "Search hint")
-                .map((alias) => alias.name)
-                .filter((name) => name !== englishTitle(parent)),
-            ),
-          ].slice(0, 20),
-          composers,
-          // MusicBrainz's own composer IDs tell same-named people apart.
-          composerIds: Object.fromEntries(
-            [...(parent.relations || []), ...(leaf.relations || [])]
-              .filter((rel) => rel.type === "composer" && rel.artist?.id && rel.artist?.name)
-              .map((rel) => [rel.artist.name, rel.artist.id]),
-          ),
-        });
+        const match = await identifyTrack(ctx, hints);
+        if (match) providerMatches.set(row.id, match);
       } catch (error) {
         ctx.log(`Classical work identification skipped: ${error.message}`);
       }
@@ -614,8 +825,9 @@ export async function autoMatchWorks(ctx, actor, albumId = null) {
 }
 
 // Auto-match for every album at once, from tags and titles only. MusicBrainz
-// stays per album: a lookup for every track of a library is the kind of
-// load the shared service can't take.
+// is asked only about what changed, by `queueAlbumIdentification` after a
+// scan: a lookup for every track of a library is the kind of load the
+// shared service can't take.
 export async function autoMatchLibrary(ctx, actor) {
   if (actor?.role !== "admin")
     throw new Error("Automatic work matching requires a current host admin");

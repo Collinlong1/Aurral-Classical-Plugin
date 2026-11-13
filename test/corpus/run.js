@@ -106,7 +106,7 @@ export async function runCorpus(albums, { heldBack = [] } = {}) {
       const links = reconcile(c, snapshot(albums));
       for (const link of links)
         classify(c, link.id, link.hints, heldBack.includes(link.coreId) ? { manual: "unsure", actor: "corpus" } : {});
-      autoMatchTaggedWorks(c, { actor: "model-scan" });
+      autoMatchTaggedWorks(c, { actor: "model-scan", allowStructuredTitles: true });
     } finally {
       c.close();
     }

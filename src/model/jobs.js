@@ -26,7 +26,8 @@ export class ModelJobs {
       return id;
     });
   }
-  claim(owner, { now = Date.now(), leaseMs = 30_000 } = {}) {
+  // A scan goes before background identification; `type` claims only that kind.
+  claim(owner, { now = Date.now(), leaseMs = 30_000, type = null } = {}) {
     if (!owner || !Number.isFinite(leaseMs) || leaseMs <= 0)
       throw new Error("Invalid job lease");
     return transaction(this.db, () => {
@@ -43,9 +44,10 @@ export class ModelJobs {
       const row = this.db
         .prepare(
           `SELECT * FROM model_job WHERE cancel_requested=0 AND attempt<max_attempts AND
-        ((state IN ('queued','retry') AND next_run_at<=?) OR (state='running' AND lease_until<=?)) ORDER BY created_at LIMIT 1`,
+        ((state IN ('queued','retry') AND next_run_at<=?) OR (state='running' AND lease_until<=?))
+        ${type ? "AND type=?" : ""} ORDER BY type='library_scan' DESC,created_at LIMIT 1`,
         )
-        .get(now, now);
+        .get(now, now, ...(type ? [type] : []));
       if (!row) return null;
       this.db
         .prepare(
@@ -125,7 +127,7 @@ export class ModelJobs {
         this.db
           .prepare("UPDATE model_job SET state='cancelled' WHERE id=?")
           .run(job.id);
-        this.#compact(job.id);
+        if (job.type === "library_scan") this.#compact(job.id);
         return false;
       }
       // Commit callback is synchronous SQL only, covered by the same fence/transaction.
@@ -147,7 +149,7 @@ export class ModelJobs {
           now + leaseMs,
           job.id,
         );
-      if (done) this.#compact(job.id);
+      if (done && job.type === "library_scan") this.#compact(job.id);
       return true;
     });
   }

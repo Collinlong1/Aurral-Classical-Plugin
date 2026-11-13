@@ -1,0 +1,169 @@
+// Matching with no admin clicks (v0.1 completion, step 3): a scan applies
+// the full tag and title rules, and MusicBrainz is asked in the background
+// only about albums whose unmatched tracks are new or changed. The albums
+// already there when this first runs wait for the one-time backlog action.
+import assert from "node:assert/strict";
+import test from "node:test";
+import fs from "node:fs/promises";
+import path from "node:path";
+import { tempFolders, copyFixture, json as response } from "./helpers.js";
+import { writeTags } from "../src/tags.js";
+import { openCatalogue } from "../src/model/catalogue.js";
+import { renderAlbumPresentation } from "../src/model/presentation.js";
+import { enqueueModelScan, identifyBacklog, modelStatus, runModelJobs } from "../src/model/runtime.js";
+
+const admin = { id: 1, role: "admin" };
+const DEBUSSY = "Claude Debussy";
+const recording = (n) => `00000000-0000-4000-8000-${String(n).padStart(12, "0")}`;
+
+// A library the test can grow: each album is its tracks' titles, composer,
+// and recording IDs (or none).
+async function library(t) {
+  const folders = await tempFolders();
+  t.after(() => fs.rm(folders.root, { recursive: true, force: true }));
+  const tracks = [];
+  const add = async (album, titles, { composer = DEBUSSY, recordings = [] } = {}) => {
+    for (const [i, title] of titles.entries()) {
+      const id = tracks.length;
+      const file = await copyFixture("sine.flac", path.join(folders.libraryFolder, `${id}.flac`));
+      // Distinct audio per file.
+      const { size } = await fs.stat(file);
+      const fd = await fs.open(file, "r+");
+      await fd.write(Buffer.from([id + 1]), 0, 1, size - 50);
+      await fd.close();
+      await writeTags(file, { title: [title], composer: [composer], artist: ["Pianist"], ...(recordings[i] && { recordingMbid: [recordings[i]] }) });
+      tracks.push({ id, title, album, file, trackNumber: i + 1 });
+    }
+  };
+  const lookups = [];
+  const works = {
+    // MusicBrainz: each recording is a movement of one parent work.
+    "work-parent": { id: "work-parent", title: "Suite bergamasque", relations: [{ type: "composer", artist: { id: "artist-debussy", name: DEBUSSY } }] },
+    ...Object.fromEntries(
+      ["Prélude", "Menuet", "Clair de lune", "Passepied"].map((title, i) => [
+        `work-${i + 1}`,
+        { id: `work-${i + 1}`, title, relations: [{ type: "parts", direction: "backward", work: { id: "work-parent" } }] },
+      ]),
+    ),
+  };
+  const ctx = {
+    ...folders,
+    settings: {},
+    log: () => {},
+    userOperations: { version: 1, url: "http://host.test/ops", token: "test-only" },
+    fetch: async () =>
+      response({
+        version: 1,
+        complete: true,
+        library: {
+          albums: [...new Set(tracks.map((track) => track.album))].map((album) => ({ id: album, title: album })),
+          tracks: tracks.map((track) => ({
+            id: track.id,
+            title: track.title,
+            files: [{ id: track.id, path: track.file, available: true, durationMs: 1000, albumId: track.album, trackNumber: track.trackNumber, discNumber: 1 }],
+          })),
+        },
+      }),
+    resolver: {
+      async resolve(id) {
+        lookups.push(`recording:${id}`);
+        const n = Number(id.slice(-12));
+        return { workId: `work-${n}`, composers: [DEBUSSY] };
+      },
+    },
+    mb: {
+      async get(kind, id) {
+        lookups.push(`${kind}:${id}`);
+        return works[id] || null;
+      },
+    },
+  };
+  const scan = async () => {
+    await enqueueModelScan(ctx, admin);
+    await runModelJobs(ctx, { budgetMs: 30_000 });
+  };
+  const view = async (albumId) => {
+    const c = await openCatalogue(path.join(folders.dataFolder, "model"));
+    try {
+      return renderAlbumPresentation(c, albumId)?.groups.map((group) => [group.title, Boolean(group.workId), group.items.length]) ?? null;
+    } finally {
+      c.close();
+    }
+  };
+  return { ctx, add, scan, view, lookups };
+}
+
+test("background matching: a scan applies the full title rules without MusicBrainz", async (t) => {
+  const lib = await library(t);
+  await lib.add("corner", ["I. Doctor Gradus ad Parnassum", "II. Jimbo’s Lullaby", "III. Serenade for the Doll"].map((m) => `Children’s Corner, L. 113: ${m}`));
+  await lib.scan();
+  // Before: scans read only WORK and GROUPING tags, so this stayed unmatched.
+  assert.deepEqual(await lib.view("corner"), [["Children’s Corner, L. 113", true, 3]]);
+  assert.deepEqual(lib.lookups, []);
+});
+
+test("background matching: only new albums are looked up, once, paced and resumable; the backlog waits for the admin", async (t) => {
+  const lib = await library(t);
+  const titles = ["Prélude", "Menuet", "Clair de lune", "Passepied"];
+  // Titles that name no work: only MusicBrainz can.
+  await lib.add("earlier", titles, { recordings: [1, 2, 3, 4].map(recording) });
+  await lib.scan();
+  // Already there on the first run: recorded as the backlog, not looked up.
+  assert.deepEqual(lib.lookups, []);
+  let status = (await modelStatus(lib.ctx)).identification;
+  assert.equal(status.backlog, 1);
+  assert.equal(status.queued, 0);
+
+  await lib.add("new", titles, { recordings: [1, 2, 3, 4].map(recording) });
+  await lib.scan();
+  // The scan finished first; identification runs on the next job run.
+  status = (await modelStatus(lib.ctx)).identification;
+  assert.equal(status.queued, 1);
+  // A run that stops part way keeps what it looked up.
+  await runModelJobs(lib.ctx, { budgetMs: 0 });
+  await runModelJobs(lib.ctx, { budgetMs: 30_000 });
+  status = (await modelStatus(lib.ctx)).identification;
+  assert.deepEqual([status.queued, status.done, status.matched], [0, 1, 1]);
+  assert.deepEqual(await lib.view("new"), [["Suite bergamasque", true, 4]]);
+  assert.equal(await lib.view("earlier").then((groups) => groups?.some(([, matched]) => matched) ?? false), false);
+  assert.ok(lib.lookups.every((lookup) => !lookup.includes("earlier")));
+
+  // A rescan with nothing changed looks nothing up again.
+  const before = lib.lookups.length;
+  await lib.scan();
+  await runModelJobs(lib.ctx, { budgetMs: 30_000 });
+  assert.equal(lib.lookups.length, before);
+
+  // The admin's one-time backlog lookup.
+  await assert.rejects(identifyBacklog(lib.ctx, { id: 2, role: "user" }), /admin/);
+  assert.deepEqual(await identifyBacklog(lib.ctx, admin), { albums: 1, tracks: 4 });
+  assert.deepEqual(await identifyBacklog(lib.ctx, admin), { albums: 0, tracks: 0 });
+  await runModelJobs(lib.ctx, { budgetMs: 30_000 });
+  // Both albums share the one work MusicBrainz names.
+  const [earlier] = await lib.view("earlier");
+  assert.deepEqual(earlier, ["Suite bergamasque", true, 4]);
+  status = (await modelStatus(lib.ctx)).identification;
+  assert.deepEqual([status.queued, status.backlog, status.done], [0, 0, 2]);
+});
+
+test("background matching: an unreachable MusicBrainz retries the album later instead of skipping it", async (t) => {
+  const lib = await library(t);
+  await lib.add("first", ["Prélude"], { recordings: [recording(1)] });
+  await lib.scan();
+  await lib.add("later", ["Prélude", "Menuet", "Clair de lune", "Passepied"], { recordings: [1, 2, 3, 4].map(recording) });
+  const working = lib.ctx.resolver.resolve;
+  lib.ctx.resolver.resolve = async () => {
+    throw new Error("fetch failed");
+  };
+  await lib.scan();
+  await runModelJobs(lib.ctx, { budgetMs: 30_000 });
+  const c = await openCatalogue(path.join(lib.ctx.dataFolder, "model"));
+  const job = c.db.prepare("SELECT state,error FROM model_job WHERE type='album_identify' AND state!='done'").get();
+  c.db.prepare("UPDATE model_job SET next_run_at=0 WHERE type='album_identify'").run();
+  c.close();
+  assert.equal(job.state, "retry");
+  assert.match(job.error, /MusicBrainz unavailable/);
+  lib.ctx.resolver.resolve = working;
+  await runModelJobs(lib.ctx, { budgetMs: 30_000 });
+  assert.deepEqual(await lib.view("later"), [["Suite bergamasque", true, 4]]);
+});

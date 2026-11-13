@@ -41095,7 +41095,7 @@ async function albumPresentation(input) {
 }
 
 // src/model/runtime.js
-import { randomUUID as randomUUID7 } from "node:crypto";
+import { createHash as createHash4, randomUUID as randomUUID7 } from "node:crypto";
 import fs4 from "node:fs/promises";
 import path7 from "node:path";
 
@@ -41121,7 +41121,8 @@ var ModelJobs = class _ModelJobs {
       return id;
     });
   }
-  claim(owner, { now = Date.now(), leaseMs = 3e4 } = {}) {
+  // A scan goes before background identification; `type` claims only that kind.
+  claim(owner, { now = Date.now(), leaseMs = 3e4, type = null } = {}) {
     if (!owner || !Number.isFinite(leaseMs) || leaseMs <= 0)
       throw new Error("Invalid job lease");
     return transaction(this.db, () => {
@@ -41133,8 +41134,9 @@ var ModelJobs = class _ModelJobs {
       ).run(now);
       const row = this.db.prepare(
         `SELECT * FROM model_job WHERE cancel_requested=0 AND attempt<max_attempts AND
-        ((state IN ('queued','retry') AND next_run_at<=?) OR (state='running' AND lease_until<=?)) ORDER BY created_at LIMIT 1`
-      ).get(now, now);
+        ((state IN ('queued','retry') AND next_run_at<=?) OR (state='running' AND lease_until<=?))
+        ${type ? "AND type=?" : ""} ORDER BY type='library_scan' DESC,created_at LIMIT 1`
+      ).get(now, now, ...type ? [type] : []);
       if (!row) return null;
       this.db.prepare(
         "UPDATE model_job SET state='running',owner=?,lease_until=?,generation=generation+1,attempt=attempt+1,error=NULL WHERE id=?"
@@ -41188,7 +41190,7 @@ var ModelJobs = class _ModelJobs {
         throw new Error("Stale job lease");
       if (row.cancel_requested) {
         this.db.prepare("UPDATE model_job SET state='cancelled' WHERE id=?").run(job.id);
-        this.#compact(job.id);
+        if (job.type === "library_scan") this.#compact(job.id);
         return false;
       }
       if (commit) commit();
@@ -41205,7 +41207,7 @@ var ModelJobs = class _ModelJobs {
         now + leaseMs,
         job.id
       );
-      if (done) this.#compact(job.id);
+      if (done && job.type === "library_scan") this.#compact(job.id);
       return true;
     });
   }
@@ -41533,7 +41535,11 @@ async function modelStatus(ctx) {
           FROM model_job WHERE type='library_scan' ORDER BY created_at DESC,rowid DESC LIMIT 1`
       ).get() || null,
       now: Date.now(),
-      jobs: catalogue.db.prepare("SELECT state,count(*) AS count FROM model_job WHERE type!='scan_chunk' GROUP BY state").all()
+      jobs: catalogue.db.prepare(
+        `SELECT state,count(*) AS count FROM model_job WHERE type NOT IN ('scan_chunk','album_identify_baseline')
+           AND NOT (type='album_identify' AND json_extract(progress,'$.baseline')=1) GROUP BY state`
+      ).all(),
+      identification: identificationStatus(catalogue)
     };
   } finally {
     catalogue.close();
@@ -41721,12 +41727,163 @@ async function scanFile(file, root, prior) {
     }
   };
 }
+var IDENTIFY = "album_identify";
+var BASELINE_KEY = "album-identify-baseline";
+function pendingIdentification(catalogue) {
+  const albums2 = /* @__PURE__ */ new Map();
+  for (const row of catalogue.db.prepare(
+    `SELECT t.id,CAST(json_extract(t.evidence,'$.albumId') AS TEXT) AS album,
+         json_extract(t.evidence,'$.hints.recordingMbid') AS recording,json_extract(t.evidence,'$.hints.workId') AS work
+       FROM track_link t JOIN classification c ON c.target_id=t.id AND c.state='classical'
+       WHERE t.state='active' AND json_extract(t.evidence,'$.albumId') IS NOT NULL
+       AND (coalesce(json_extract(t.evidence,'$.hints.recordingMbid'),'')!='' OR coalesce(json_extract(t.evidence,'$.hints.workId'),'')!='')
+       AND NOT EXISTS(SELECT 1 FROM segment s JOIN realization_item i ON i.segment_id=s.id WHERE s.track_link_id=t.id)
+       ORDER BY t.id`
+  ).all()) {
+    if (!albums2.has(row.album)) albums2.set(row.album, []);
+    albums2.get(row.album).push(`${row.id}|${row.recording || ""}|${row.work || ""}`);
+  }
+  return [...albums2].map(([albumId, tracks]) => ({
+    albumId,
+    tracks: tracks.length,
+    key: `${IDENTIFY}:${albumId}:${createHash4("sha256").update(tracks.join("\n")).digest("hex").slice(0, 32)}`
+  }));
+}
+var keyRan = (catalogue, key) => Boolean(catalogue.db.prepare("SELECT 1 FROM model_job WHERE key=? LIMIT 1").get(key));
+function markSeen(catalogue, album, progress) {
+  catalogue.db.prepare(
+    `INSERT INTO model_job(id,type,key,input,state,progress,max_attempts,created_at)
+       VALUES (?,?,?,?,'done',?,1,?)`
+  ).run(randomUUID7(), IDENTIFY, album.key, JSON.stringify({ albumId: album.albumId }), JSON.stringify(progress), Date.now());
+}
+function queueAlbumIdentification(catalogue, { now = Date.now() } = {}) {
+  return transaction(catalogue.db, () => {
+    const pending = pendingIdentification(catalogue);
+    if (!keyRan(catalogue, BASELINE_KEY)) {
+      for (const album of pending) if (!keyRan(catalogue, album.key)) markSeen(catalogue, album, { baseline: true, tracks: album.tracks });
+      catalogue.db.prepare(`INSERT INTO model_job(id,type,key,input,state,max_attempts,created_at) VALUES (?,?,?,'{}','done',1,?)`).run(randomUUID7(), `${IDENTIFY}_baseline`, BASELINE_KEY, now);
+      return 0;
+    }
+    const jobs = new ModelJobs(catalogue);
+    let queued = 0;
+    for (const album of pending)
+      if (!keyRan(catalogue, album.key)) {
+        jobs.enqueue(IDENTIFY, album.key, { albumId: album.albumId }, { maxAttempts: 5 });
+        queued++;
+      }
+    return queued;
+  });
+}
+async function identifyBacklog(ctx, actor3) {
+  if (actor3?.role !== "admin")
+    throw new Error("MusicBrainz identification requires a current host admin");
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  try {
+    return transaction(catalogue.db, () => {
+      const jobs = new ModelJobs(catalogue);
+      let queued = 0, tracks = 0;
+      for (const album of pendingIdentification(catalogue)) {
+        const prior = catalogue.db.prepare("SELECT json_extract(progress,'$.baseline') AS baseline FROM model_job WHERE key=? ORDER BY created_at DESC LIMIT 1").get(album.key);
+        if (prior && !prior.baseline) continue;
+        catalogue.db.prepare("DELETE FROM model_job WHERE key=? AND state='done' AND json_extract(progress,'$.baseline')=1").run(album.key);
+        jobs.enqueue(IDENTIFY, album.key, { albumId: album.albumId, backfill: true }, { maxAttempts: 5 });
+        catalogue.audit("work.identify_backlog", album.albumId, { tracks: album.tracks }, String(actor3.id));
+        queued++;
+        tracks += album.tracks;
+      }
+      return { albums: queued, tracks };
+    });
+  } finally {
+    catalogue.close();
+  }
+}
+function identificationStatus(catalogue) {
+  const rows = catalogue.db.prepare(
+    `SELECT state,json_extract(progress,'$.baseline') AS baseline,count(*) AS albums,
+         coalesce(sum(json_extract(progress,'$.matched')),0) AS matched,coalesce(sum(json_extract(progress,'$.errors')),0) AS errors
+       FROM model_job WHERE type=? GROUP BY state,baseline`
+  ).all(IDENTIFY);
+  const sum = (test, field2 = "albums") => rows.filter(test).reduce((total, row) => total + row[field2], 0);
+  return {
+    queued: sum((row) => ["queued", "running", "retry"].includes(row.state)),
+    done: sum((row) => row.state === "done" && !row.baseline),
+    backlog: sum((row) => row.state === "done" && row.baseline),
+    failed: sum((row) => row.state === "failed"),
+    matched: sum(() => true, "matched"),
+    errors: sum(() => true, "errors")
+  };
+}
+async function runIdentification(ctx, catalogue, jobs, first, owner, deadline) {
+  for (let job = first; job; job = Date.now() < deadline ? jobs.claim(owner, { leaseMs: 6e4, type: IDENTIFY }) : null) {
+    try {
+      const { albumId } = job.input;
+      const rows = catalogue.db.prepare(
+        `SELECT t.id,t.evidence FROM track_link t JOIN classification c ON c.target_id=t.id AND c.state='classical'
+           WHERE t.state='active' AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?
+           AND NOT EXISTS(SELECT 1 FROM segment s JOIN realization_item i ON i.segment_id=s.id WHERE s.track_link_id=t.id)
+           ORDER BY t.id`
+      ).all(String(albumId));
+      const progress = { cursor: 0, matches: [], failed: [], errors: 0, ...job.progress };
+      const lookUp = async (row) => {
+        const match2 = await identifyTrack(ctx, JSON.parse(row.evidence).hints || {});
+        if (match2) progress.matches.push([row.id, match2]);
+      };
+      let streak = [];
+      while (progress.cursor < rows.length) {
+        if (Date.now() >= deadline) break;
+        const row = rows[progress.cursor];
+        try {
+          await lookUp(row);
+          streak = [];
+        } catch (error) {
+          streak.push(row.id);
+          if (streak.length >= 3) {
+            progress.cursor -= streak.length - 1;
+            progress.failed = progress.failed.filter((id) => !streak.includes(id));
+            jobs.checkpoint(job, progress, { leaseMs: 6e4 });
+            throw new Error(`MusicBrainz unavailable: ${error.message}`);
+          }
+          progress.failed.push(row.id);
+          ctx.log(`Classical work identification of one track failed: ${error.message}`);
+        }
+        progress.cursor++;
+        jobs.checkpoint(job, progress, { leaseMs: 6e4 });
+      }
+      if (progress.cursor < rows.length) {
+        jobs.yield(job);
+        return;
+      }
+      for (const id of progress.failed.splice(0)) {
+        const row = rows.find((candidate) => candidate.id === id);
+        if (!row) continue;
+        try {
+          await lookUp(row);
+        } catch (error) {
+          progress.errors++;
+          ctx.log(`Classical work identification skipped: ${error.message}`);
+        }
+      }
+      const result = autoMatchTaggedWorks(catalogue, {
+        albumId,
+        actor: "model-identify",
+        allowStructuredTitles: true,
+        providerMatches: new Map(progress.matches)
+      });
+      jobs.checkpoint(job, { cursor: progress.cursor, identified: progress.matches.length, matched: result.created, errors: progress.errors }, { done: true, leaseMs: 6e4 });
+    } catch (error) {
+      jobs.fail(job, error.message);
+      ctx.log(`Classical identification of album ${job.input.albumId} failed: ${error.message}`);
+      return;
+    }
+  }
+}
 async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 200, checkpointMs = 1e4 } = {}) {
   const catalogue = await openCatalogue(modelFolder(ctx));
   const jobs = new ModelJobs(catalogue), owner = randomUUID7(), deadline = Date.now() + budgetMs;
   try {
     const job = jobs.claim(owner, { leaseMs: 6e4 });
     if (!job) return;
+    if (job.type === IDENTIFY) return await runIdentification(ctx, catalogue, jobs, job, owner, deadline);
     try {
       if (job.type !== "library_scan")
         throw new Error("Unknown model job type");
@@ -41850,7 +42007,8 @@ async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 200, checkpointMs
                 Date.now()
               );
           }
-          autoMatchTaggedWorks(catalogue, { actor: "model-scan" });
+          autoMatchTaggedWorks(catalogue, { actor: "model-scan", allowStructuredTitles: true });
+          queueAlbumIdentification(catalogue);
         } : void 0
       });
       if (committed && !done) jobs.yield(job);
@@ -41871,6 +42029,40 @@ async function arrangedWork(mb, work, inc) {
   if (originals.length !== 1) return work;
   return await mb.get("work", originals[0].work.id, inc) || work;
 }
+async function identifyTrack(ctx, hints) {
+  let workId = hints.workId;
+  let composers = hints.composer || [];
+  if (!workId && hints.recordingMbid) {
+    const fields = await ctx.resolver.resolve(hints.recordingMbid, {
+      confirmed: true
+    });
+    workId = fields?.workId;
+    if (!composers.length) composers = fields?.composers || [];
+  }
+  if (!workId) return null;
+  const inc = "aliases+artist-rels+work-rels";
+  const leaf = await arrangedWork(ctx.mb, await ctx.mb.get("work", workId, inc), inc);
+  const hasParts = (work) => (work.relations || []).some((rel) => rel.type === "parts" && rel.direction === "forward");
+  const parent = leaf && await topWork(ctx.mb, leaf, 0, inc, { stop: (above, below) => isCollectionLike(above.title) && hasParts(below) });
+  const standalone = parent?.id === leaf.id && !(leaf.relations || []).some((rel) => rel.type === "parts" && rel.direction === "backward") && !isCollectionLike(leaf.title) && !String(hints.title || "").includes(":") && !/^(?:[IVXLCDM]+|\d+)[.)]\s/i.test(String(hints.title || "").trim());
+  if (!parent?.id || parent.id === leaf.id && !standalone) return null;
+  return {
+    workId: parent.id,
+    work: englishTitle(parent),
+    movement: standalone ? null : englishTitle(leaf, null),
+    ...standalone && { standalone: true },
+    aliases: [
+      ...new Set(
+        (parent.aliases || []).filter((alias) => alias.name && alias.type !== "Search hint").map((alias) => alias.name).filter((name) => name !== englishTitle(parent))
+      )
+    ].slice(0, 20),
+    composers,
+    // MusicBrainz's own composer IDs tell same-named people apart.
+    composerIds: Object.fromEntries(
+      [...parent.relations || [], ...leaf.relations || []].filter((rel) => rel.type === "composer" && rel.artist?.id && rel.artist?.name).map((rel) => [rel.artist.name, rel.artist.id])
+    )
+  };
+}
 async function autoMatchWorks(ctx, actor3, albumId = null) {
   if (actor3?.role !== "admin")
     throw new Error("Automatic work matching requires a current host admin");
@@ -41879,9 +42071,7 @@ async function autoMatchWorks(ctx, actor3, albumId = null) {
     const local = autoMatchTaggedWorks(catalogue, {
       albumId,
       actor: String(actor3.id),
-      // This is an explicit admin action. A structured classical title may be
-      // accepted with matching composer, album, classification and ordering;
-      // unattended scans continue to require an embedded WORK or GROUPING tag.
+      // Structured classical titles count, as they do after every scan.
       allowStructuredTitles: true
     });
     const providerMatches = /* @__PURE__ */ new Map();
@@ -41895,38 +42085,8 @@ async function autoMatchWorks(ctx, actor3, albumId = null) {
     for (const row of rows) {
       const hints = JSON.parse(row.evidence).hints || {};
       try {
-        let workId = hints.workId;
-        let composers = hints.composer || [];
-        if (!workId && hints.recordingMbid) {
-          const fields = await ctx.resolver.resolve(hints.recordingMbid, {
-            confirmed: true
-          });
-          workId = fields?.workId;
-          if (!composers.length) composers = fields?.composers || [];
-        }
-        if (!workId) continue;
-        const inc = "aliases+artist-rels+work-rels";
-        const leaf = await arrangedWork(ctx.mb, await ctx.mb.get("work", workId, inc), inc);
-        const hasParts = (work) => (work.relations || []).some((rel) => rel.type === "parts" && rel.direction === "forward");
-        const parent = leaf && await topWork(ctx.mb, leaf, 0, inc, { stop: (above, below) => isCollectionLike(above.title) && hasParts(below) });
-        const standalone = parent?.id === leaf.id && !(leaf.relations || []).some((rel) => rel.type === "parts" && rel.direction === "backward") && !isCollectionLike(leaf.title) && !String(hints.title || "").includes(":") && !/^(?:[IVXLCDM]+|\d+)[.)]\s/i.test(String(hints.title || "").trim());
-        if (!parent?.id || parent.id === leaf.id && !standalone) continue;
-        providerMatches.set(row.id, {
-          workId: parent.id,
-          work: englishTitle(parent),
-          movement: standalone ? null : englishTitle(leaf, null),
-          ...standalone && { standalone: true },
-          aliases: [
-            ...new Set(
-              (parent.aliases || []).filter((alias) => alias.name && alias.type !== "Search hint").map((alias) => alias.name).filter((name) => name !== englishTitle(parent))
-            )
-          ].slice(0, 20),
-          composers,
-          // MusicBrainz's own composer IDs tell same-named people apart.
-          composerIds: Object.fromEntries(
-            [...parent.relations || [], ...leaf.relations || []].filter((rel) => rel.type === "composer" && rel.artist?.id && rel.artist?.name).map((rel) => [rel.artist.name, rel.artist.id])
-          )
-        });
+        const match2 = await identifyTrack(ctx, hints);
+        if (match2) providerMatches.set(row.id, match2);
       } catch (error) {
         ctx.log(`Classical work identification skipped: ${error.message}`);
       }
@@ -42060,7 +42220,7 @@ async function albumClassificationSummary(ctx, albumId) {
 }
 
 // src/store.js
-import { createHash as createHash4, randomUUID as randomUUID8 } from "node:crypto";
+import { createHash as createHash5, randomUUID as randomUUID8 } from "node:crypto";
 import fs5 from "node:fs/promises";
 import path9 from "node:path";
 var sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -42147,7 +42307,7 @@ var FileCache = class {
     this.folder = folder;
   }
   file(key) {
-    const hash = createHash4("sha1").update(key).digest("hex");
+    const hash = createHash5("sha1").update(key).digest("hex");
     return path9.join(this.folder, hash.slice(0, 2), `${hash}.json`);
   }
   async get(key, ttlMs) {
@@ -42269,7 +42429,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.24" : "dev";
+var VERSION = true ? "1.0.25" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js
@@ -43777,13 +43937,15 @@ var index_default = {
         throw new Error("Classical diagnostics require a host admin");
       const status = await modelStatus(makeContext(input));
       const indexed = status.tracks.reduce((sum, row) => sum + row.count, 0);
+      const id = status.identification;
+      const identification = id ? ` MusicBrainz identification: ${id.queued} album${id.queued === 1 ? "" : "s"} queued, ${id.done} done (${id.matched} work group${id.matched === 1 ? "" : "s"} made${id.errors ? `, ${id.errors} lookup${id.errors === 1 ? "" : "s"} failed` : ""})${id.failed ? `, ${id.failed} stopped after retries` : ""}${id.backlog ? `; ${id.backlog} earlier album${id.backlog === 1 ? "" : "s"} wait for the one-time lookup` : ""}.` : "";
       const scan = status.scan && {
         ...status.scan,
         // A running scan whose lease lapsed lost its process; say so.
         state: status.scan.state === "running" && status.scan.leaseUntil <= status.now ? "interrupted (run Scan again to resume)" : status.scan.state
       };
       return {
-        message: `Classical model schema ${status.schema}; indexed tracks: ${indexed}. ${scan ? `Scan ${scan.id}: ${scan.state}; processed ${scan.processed}/${scan.total} files.${scan.skipped ? ` ${scan.skipped} unreadable file${scan.skipped === 1 ? "" : "s"} skipped.` : ""}${scan.error ? ` Error: ${scan.error}` : ""}` : "No scan has been queued."}`.slice(
+        message: `Classical model schema ${status.schema}; indexed tracks: ${indexed}. ${scan ? `Scan ${scan.id}: ${scan.state}; processed ${scan.processed}/${scan.total} files.${scan.skipped ? ` ${scan.skipped} unreadable file${scan.skipped === 1 ? "" : "s"} skipped.` : ""}${scan.error ? ` Error: ${scan.error}` : ""}` : "No scan has been queued."}${identification}`.slice(
           0,
           500
         )
@@ -43815,7 +43977,13 @@ var index_default = {
     async "classical-auto-match-library"(input) {
       const result = await autoMatchLibrary(makeContext(input), input.user);
       return {
-        message: `Checked ${result.albums} album${result.albums === 1 ? "" : "s"} with unmatched classical tracks; created ${result.created} work group${result.created === 1 ? "" : "s"} from WORK and GROUPING tags and titles. MusicBrainz lookups run per album with Auto-match classical works.`
+        message: `Checked ${result.albums} album${result.albums === 1 ? "" : "s"} with unmatched classical tracks; created ${result.created} work group${result.created === 1 ? "" : "s"} from WORK and GROUPING tags and titles. Scans now do this by themselves, and look up new or changed albums on MusicBrainz in the background.`
+      };
+    },
+    async "classical-identify-backlog"(input) {
+      const result = await identifyBacklog(makeContext(input), input.user);
+      return {
+        message: result.albums ? `Queued ${result.albums} album${result.albums === 1 ? "" : "s"} (${result.tracks} track${result.tracks === 1 ? "" : "s"}) for a one-time MusicBrainz lookup. It runs in the background on the plugin schedule, one request a second on public MusicBrainz, and resumes after a restart. Classical model status shows its progress.` : "No album is waiting for its one-time MusicBrainz lookup: each was looked up already, or has no track with a recording ID outside a work."
       };
     },
     async "classical-auto-match"(input) {

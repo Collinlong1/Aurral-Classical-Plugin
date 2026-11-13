@@ -11,6 +11,7 @@ import {
   cancelModelScan,
   autoMatchWorks,
   autoMatchLibrary,
+  identifyBacklog,
   runModelJobs,
   requestModelSync,
   modelSyncDue,
@@ -197,6 +198,10 @@ export default {
         throw new Error("Classical diagnostics require a host admin");
       const status = await modelStatus(makeContext(input));
       const indexed = status.tracks.reduce((sum, row) => sum + row.count, 0);
+      const id = status.identification;
+      const identification = id
+        ? ` MusicBrainz identification: ${id.queued} album${id.queued === 1 ? "" : "s"} queued, ${id.done} done (${id.matched} work group${id.matched === 1 ? "" : "s"} made${id.errors ? `, ${id.errors} lookup${id.errors === 1 ? "" : "s"} failed` : ""})${id.failed ? `, ${id.failed} stopped after retries` : ""}${id.backlog ? `; ${id.backlog} earlier album${id.backlog === 1 ? "" : "s"} wait for the one-time lookup` : ""}.`
+        : "";
       const scan = status.scan && {
         ...status.scan,
         // A running scan whose lease lapsed lost its process; say so.
@@ -207,7 +212,7 @@ export default {
       };
       return {
         message:
-          `Classical model schema ${status.schema}; indexed tracks: ${indexed}. ${scan ? `Scan ${scan.id}: ${scan.state}; processed ${scan.processed}/${scan.total} files.${scan.skipped ? ` ${scan.skipped} unreadable file${scan.skipped === 1 ? "" : "s"} skipped.` : ""}${scan.error ? ` Error: ${scan.error}` : ""}` : "No scan has been queued."}`.slice(
+          `Classical model schema ${status.schema}; indexed tracks: ${indexed}. ${scan ? `Scan ${scan.id}: ${scan.state}; processed ${scan.processed}/${scan.total} files.${scan.skipped ? ` ${scan.skipped} unreadable file${scan.skipped === 1 ? "" : "s"} skipped.` : ""}${scan.error ? ` Error: ${scan.error}` : ""}` : "No scan has been queued."}${identification}`.slice(
             0,
             500,
           ),
@@ -241,7 +246,15 @@ export default {
     async "classical-auto-match-library"(input) {
       const result = await autoMatchLibrary(makeContext(input), input.user);
       return {
-        message: `Checked ${result.albums} album${result.albums === 1 ? "" : "s"} with unmatched classical tracks; created ${result.created} work group${result.created === 1 ? "" : "s"} from WORK and GROUPING tags and titles. MusicBrainz lookups run per album with Auto-match classical works.`,
+        message: `Checked ${result.albums} album${result.albums === 1 ? "" : "s"} with unmatched classical tracks; created ${result.created} work group${result.created === 1 ? "" : "s"} from WORK and GROUPING tags and titles. Scans now do this by themselves, and look up new or changed albums on MusicBrainz in the background.`,
+      };
+    },
+    async "classical-identify-backlog"(input) {
+      const result = await identifyBacklog(makeContext(input), input.user);
+      return {
+        message: result.albums
+          ? `Queued ${result.albums} album${result.albums === 1 ? "" : "s"} (${result.tracks} track${result.tracks === 1 ? "" : "s"}) for a one-time MusicBrainz lookup. It runs in the background on the plugin schedule, one request a second on public MusicBrainz, and resumes after a restart. Classical model status shows its progress.`
+          : "No album is waiting for its one-time MusicBrainz lookup: each was looked up already, or has no track with a recording ID outside a work.",
       };
     },
     async "classical-auto-match"(input) {

@@ -1,3 +1,15 @@
+# v0.1 completion, step 3: matching after every scan, MusicBrainz in the background
+
+Manifest 1.0.25, November 13, 2026. The user does not want to match albums by hand.
+
+- **After a scan** the library-wide match uses the full tag and title rules (`allowStructuredTitles: true`), as "Auto-match every album" does. No network. Before, scans read only WORK and GROUPING tags.
+- **Background identification** (`album_identify` jobs in `src/model/runtime.js`). After a scan, an album is queued when it has classical tracks outside every work with a recording or work ID, and that set of tracks is new: the job key is the album plus a hash of those tracks, and a key that ever ran is never queued again. A job looks each track up through `identifyTrack` (the per-album Auto-match lookup, now shared: shared throttle, disk cache, retries), saves progress after every track, resumes after a stop, and then matches the album with what MusicBrainz said. Three failures in a row stop the job and retry it later from the first failure (backoff `2^attempt` s, 5 attempts); a lone failure gets one more try before matching. Scans are claimed before identification jobs, and identification jobs follow each other while the run's budget lasts.
+- **Backlog (Option A).** The first time this runs, every album already pending is recorded as seen (done markers with `baseline: true`, plus an `album_identify_baseline` row) and nothing is looked up. The admin action "Identify earlier albums on MusicBrainz" (`classical-identify-backlog`) queues them once; it is the one exception to core rule 5, recorded in `AGENTS.md`. Not run by any session; the user starts it.
+- **Status.** "Classical model status" now reports queued, done and stopped albums, work groups made, failed lookups and albums waiting for the backlog. Markers are left out of job counts.
+- `ModelJobs`: `claim({ type })`, scans first; only scans are compacted when they finish.
+
+Tests: `test/background-matching.test.js` (a real scan of tagged files matches structured titles with no lookups; only a new album is looked up, once, resumably, a rescan repeats nothing, the backlog waits for the admin and is queued once; an unreachable MusicBrainz retries the album from the first failed track). The scan test fails with the 1.0.24 scan rule. 292 plugin tests pass. The corpus runner's simulated scan now uses the same rules; one messy-style album (1691120087) joins the shared Paganini Rhapsody work and takes its movement names (same blocks), baseline saved. Non-classical corpus unchanged. No core change.
+
 # v0.1 completion, step 2: incomplete works, other track divisions, opus slash numbers
 
 Manifest 1.0.24, November 13, 2026. From the 1.0.22 audit's 57 movement-mismatch groups (simulated): about 15 Liszt groups were catalogue-suffix collisions, fixed in 1.0.23; the rest are below. All rules in `src/model/auto-match.js`; albums appear only in tests.
