@@ -1,3 +1,17 @@
+# Second live-library audit: works that exist but would not take a second album
+
+Manifest 1.0.22, November 13, 2026. After 1.0.21 and "Auto-match every album" the user's library went from 12 to 28 fully matched albums (69 to 35 with nothing matched). 253 tracks still named a work but stayed out; nearly all hit `movement-mismatch` against a work another album had made (reviews 12 → 42). Running `mapToMovements` on the audit's own data (existing works' rows against pending tracks' titles) found the rules below; all general, albums appear only in tests.
+
+- **Repeated work names** ("Variations on a Theme of Chopin, Op. 22 : Rachmaninoff: Variations on a Theme of Chopin, Op. 22: Theme") strip to the movement.
+- **Sets' own numbering.** The set-name trim compares without accents ("24 Préludes" under "24 Preludes"). `movementParts` reads "No. 6 …" as piece 6, which lines up only with pieces numbered the same way (the gate caught Rubinstein's Op. 9 nocturnes joining a work of three recordings by position), and "XVIa." as part of movement 16 (only with its punctuation, so "La Mer" is no movement 50).
+- **The number veto** from 1.0.18 now applies only when the work holds the track's own name elsewhere (the suite's "Gavotte" vs the partita's "Gavotte en rondeau"); "III. Scherzo" under "III. Allegro" is the third movement.
+- **A movement over two tracks** (a finale split "IV. Presto", "IV. O Freunde…"; Richter's "Ia./Ib.") maps both to one movement, as its first and second occurrence; rows and work pages then name each track's own part.
+- **The audit simulates Auto-match.** It snapshots the catalogue with SQLite's online backup (`VACUUM INTO` on older Node) into the out dir, reads the snapshot, runs Auto-match for every album on it, and reports per track whether it would match, which review it would raise (for a movement mismatch, the existing work's movements) or that it is refused without a review (album-work identity already used). The snapshot is deleted after; the live file's hash is unchanged in tests.
+
+Still open from the audit: works first made from a partial album (Études-tableaux, Op. 39 with 2 of 9 pieces; Children's Corner with 2 of 6) refuse fuller albums; albums dividing a work into different tracks (one variation per track vs several) cannot share it; spelling variants of movement names (Columbine/Colombine). 1,413 tracks have only MusicBrainz to name their work and need per-album Auto-match.
+
+Validation: 284 plugin tests and both gates on Node 22; Apple baseline saved (two albums improved, none worse). The new test fails on 1.0.21. Compose/Chromium not rerun (no core or page-contract change).
+
 # Fixes from the first live-library audit
 
 Manifest 1.0.21, November 13, 2026. The user's server session ran `scripts/audit-catalogue.mjs` on their live catalogue (plugin 1.0.20, 97 classical albums). Findings: 69 albums had nothing matched; 1,432 tracks matched only by Auto-match (an explicit per-album action) and 2,244 more need its MusicBrainz lookup. Plugin only; core stays `66b54b5`. All changes are general rules; albums appear only as test cases.

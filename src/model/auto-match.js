@@ -492,12 +492,19 @@ function romanValue(value) {
 // "II. Andante con moto" -> { index: 2, text: "andante con moto" }
 export function movementParts(title) {
   const text = words(title);
-  const match = text.match(/^((?:[ivxlc]+)|\d+)\s+(.*)$/);
+  // "I. Allegro", a set's "No. 6 in B minor", and a part of a movement
+  // ("XVIa. Valse allemande") only with its punctuation, so "La Mer" is no
+  // fiftieth movement.
+  const part = clean(title).match(/^([ivxlc]+|\d+)[a-d][.)]\s+(.*)$/i);
+  const match = part ? [part[0], part[1].toLowerCase(), words(part[2])] : text.match(/^(no\s+)?((?:[ivxlc]+)|\d+)\s+(.*)$/)?.filter((_, i) => i !== 1);
   if (!match) return { index: null, text };
   const index = /^\d+$/.test(match[1])
     ? Number(match[1])
     : romanValue(match[1]);
-  return index ? { index, text: match[2] } : { index: null, text };
+  // "No. 2" numbers a piece of a set, not a movement: it lines up only with
+  // pieces numbered the same way.
+  const piece = !part && /^no\s/.test(text);
+  return index ? { index, text: match[2], ...(piece && { piece: true }) } : { index: null, text };
 }
 // The movement part of a structured track title or WORK tag.
 export function movementTitle(track, workTitle) {
@@ -517,7 +524,19 @@ const SEPARATOR = /[:;]\s*|\s+[–—-]\s+/g;
 const NICKNAME = /^["“„«'‘][^"”»'’]+["”»'’]\s*(?:[:;]|\s[–—-])\s*(.+)$/;
 // "Piano Sonata No. 29, Op. 106 - "Hammerklavier": Allegro" -> "Allegro".
 // A head names the work when it matches its words or catalogue number.
-export function stripWorkPrefix(title, workTitle) {
+export function stripWorkPrefix(title, workTitle, depth = 0) {
+  const stripped = stripWorkPrefixOnce(title, workTitle);
+  // Some stores repeat the work: "Variations on a Theme of Chopin, Op. 22 :
+  // Rachmaninoff: Variations on a Theme of Chopin, Op. 22: Theme".
+  const again = stripWorkPrefixOnce(withoutRepeatedComposer(stripped, workTitle), workTitle);
+  return depth < 2 && again !== stripped && words(stripped).includes(words(workTitle)) ? stripWorkPrefix(again, workTitle, depth + 1) : stripped;
+}
+// "Rachmaninoff: <the work>: …": a name before the work's own name.
+const withoutRepeatedComposer = (text, workTitle) => {
+  const match = clean(text).match(/^([^:]{2,60}):\s+(\S.*)$/);
+  return match && words(match[2]).startsWith(words(workTitle)) && words(match[1]).split(" ").length <= 3 ? match[2] : text;
+};
+function stripWorkPrefixOnce(title, workTitle) {
   const text = clean(title);
   const separators = [...text.matchAll(SEPARATOR)];
   const tailAt = (match) => clean(text.slice(match.index + match[0].length));
@@ -551,7 +570,7 @@ export function stripWorkPrefix(title, workTitle) {
   const set = clean(workTitle);
   // Only a set named in the plural: "Metamorphosis No. 1" is its own name.
   const rest =
-    set && NUMBERED_SET.test(set) && text.toLowerCase().startsWith(set.toLowerCase())
+    set && NUMBERED_SET.test(set) && normalized(text).startsWith(normalized(set))
       ? text.slice(set.length).match(/^[,\s]+(no\.?\s*\d+\b.*)$/i)
       : null;
   if (rest) return rest[1].charAt(0).toUpperCase() + rest[1].slice(1);
@@ -696,25 +715,45 @@ export function mapToMovements(movements, tracks) {
   const used = new Set(),
     result = [];
   const firstWord = (text) => text.split(" ")[0];
+  let previous = null;
   for (const track of tracks) {
     const parts = movementParts(track.movementTitle);
+    // A movement split over two tracks ("IV. Presto", then "IV. O Freunde…")
+    // is one movement in both.
+    if (previous && parts.index && parts.index === previous.index) {
+      result.push(previous.id);
+      continue;
+    }
     let found = movements.filter(
       (m) => !used.has(m.id) && m.text && m.text === parts.text,
     );
     if (found.length !== 1 && parts.index)
       found = movements.filter(
-        (m) => !used.has(m.id) && (m.index ?? m.position) === parts.index,
+        (m) =>
+          !used.has(m.id) &&
+          Boolean(m.piece) === Boolean(parts.piece) &&
+          (parts.piece ? m.index : (m.index ?? m.position)) === parts.index,
       );
-    // A number settles it only when the names don't disagree: an
-    // arrangement's "2. Gavotte" is not the partita's "II. Loure".
-    if (found.length === 1 && found[0].text && parts.text && firstWord(found[0].text) !== firstWord(parts.text))
+    // A number gives way only to a name the work holds elsewhere: an
+    // arrangement's "2. Gavotte" is the partita's "Gavotte en rondeau", not
+    // its "II. Loure". A different tempo ("III. Scherzo" for "III. Allegro")
+    // is still the third movement.
+    if (
+      found.length === 1 &&
+      found[0].text &&
+      parts.text &&
+      firstWord(found[0].text) !== firstWord(parts.text) &&
+      movements.some((m) => m.id !== found[0].id && m.text && firstWord(m.text) === firstWord(parts.text))
+    )
       found = [];
     if (found.length !== 1) {
       result.push(null);
+      previous = null;
       continue;
     }
     used.add(found[0].id);
     result.push(found[0].id);
+    previous = { id: found[0].id, index: parts.index };
   }
   if (result.every(Boolean)) return result;
   if (movements.length === tracks.length) return movements.map((m) => m.id);
@@ -1052,6 +1091,8 @@ function createGroup(catalogue, group, actor, index) {
       catalogue.realizationItem(realization, segment, {
         movement,
         sequence: i + 1,
+        // A movement split over two tracks is its first and second part.
+        occurrence: movement ? movements.slice(0, i).filter((id) => id === movement).length + 1 : 1,
       });
     });
     catalogue.audit(

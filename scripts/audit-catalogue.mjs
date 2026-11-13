@@ -1,25 +1,39 @@
 // Read-only audit of a classical catalogue: every album as its page shows
-// it, and what looks wrong. Opens the database read-only and never runs
-// migrations, matching or scans, so it is safe against a live install.
+// it, what looks wrong, and what Auto-match would do about it.
 //
 //   node scripts/audit-catalogue.mjs <plugin data folder>/model [out dir]
 //
+// The live database is only read: a consistent snapshot of it (SQLite's
+// online backup) goes to the out dir, the report reads the snapshot, and
+// Auto-match runs on the snapshot for every album to show what it would
+// match, send to review (and why) or refuse. The snapshot is deleted after.
+// The plugin catalogue holds no credentials; those live in Aurral's own
+// database, which this never opens.
+//
 // Writes audit.md (summary and flagged albums) and audit.json (every album).
-// For every classical track outside a work it says which work its tags name
-// and why Auto-match leaves it out, from the matcher's own rules.
 import fs from "node:fs/promises";
 import path from "node:path";
-import { DatabaseSync } from "node:sqlite";
+import { randomUUID } from "node:crypto";
+import sqlite, { DatabaseSync } from "node:sqlite";
 import { renderAlbumPresentation } from "../src/model/presentation.js";
-import { explainMatching, nameKey, workKey } from "../src/model/auto-match.js";
+import { autoMatchTaggedWorks, explainMatching, nameKey, workKey } from "../src/model/auto-match.js";
+import { openCatalogue } from "../src/model/catalogue.js";
 
 const [folder, outDir = "."] = process.argv.slice(2);
 if (!folder) {
   console.error("Usage: node scripts/audit-catalogue.mjs <model folder> [out dir]");
   process.exit(1);
 }
-const db = new DatabaseSync(path.join(folder, "classical.sqlite"), { readOnly: true });
-db.exec("PRAGMA query_only=ON");
+await fs.mkdir(outDir, { recursive: true });
+const snapshotFolder = path.join(path.resolve(outDir), `.audit-snapshot-${randomUUID()}`);
+await fs.mkdir(snapshotFolder);
+const snapshot = path.join(snapshotFolder, "classical.sqlite");
+const live = new DatabaseSync(path.join(folder, "classical.sqlite"), { readOnly: true });
+if (typeof sqlite.backup === "function") await sqlite.backup(live, snapshot);
+else live.exec(`VACUUM INTO '${snapshot.replaceAll("'", "''")}'`);
+live.close();
+try {
+const db = new DatabaseSync(snapshot, { readOnly: true });
 const c = { db };
 
 const words = (value) =>
@@ -151,6 +165,7 @@ for (const album of albums.values()) {
       const h = track.evidence.hints || {};
       const why = explained.get(track.id) || { work: null, reason: "not considered" };
       return {
+        id: track.id,
         title: h.title || "",
         disc: h.discNumber || 1,
         track: h.trackNumber || 0,
@@ -191,6 +206,64 @@ for (const album of albums.values()) {
 }
 report.sort((a, b) => b.flags.length - a.flags.length || a.title.localeCompare(b.title));
 
+// What Auto-match would do: run it on the snapshot for every album, in the
+// order "Auto-match every album" would, and see where each track ends up.
+const sim = await openCatalogue(snapshotFolder);
+const simulated = new Map();
+try {
+  for (const album of report)
+    if (album.unmatchedTracks.length)
+      autoMatchTaggedWorks(sim, { albumId: album.albumId, actor: "audit", allowStructuredTitles: true });
+  const nameOf = (id, field) => {
+    const row = sim.db
+      .prepare("SELECT a.value FROM field_resolution f JOIN assertion a ON a.id=f.assertion_id WHERE f.target_id=? AND f.field=?")
+      .get(id, field);
+    return row ? JSON.parse(row.value) : null;
+  };
+  const workOf = new Map(
+    sim.db
+      .prepare(
+        `SELECT s.track_link_id AS id,r.work_id FROM segment s JOIN realization_item i ON i.segment_id=s.id
+         JOIN realization r ON r.id=i.realization_id`,
+      )
+      .all()
+      .map((row) => [row.id, row.work_id]),
+  );
+  const reviewOf = new Map();
+  for (const row of sim.db.prepare("SELECT target_id,evidence FROM review_item WHERE status='open' AND kind='auto_match'").all()) {
+    const evidence = JSON.parse(row.evidence);
+    for (const id of evidence.tracks || [row.target_id]) reviewOf.set(id, evidence);
+  }
+  const movementsOf = (work) =>
+    sim.db
+      .prepare("SELECT target_id FROM relation WHERE kind='movement' AND source_id=? ORDER BY position")
+      .all(work)
+      .map((row) => nameOf(row.target_id, "title"));
+  for (const album of report)
+    for (const track of album.unmatchedTracks) {
+      const work = workOf.get(track.id);
+      const review = reviewOf.get(track.id);
+      track.autoMatch = work
+        ? `matches "${nameOf(work, "title")}"`
+        : review
+          ? `review: ${review.reason}${
+              review.reason === "movement-mismatch" && review.work
+                ? ` (existing work "${nameOf(review.work, "title")}" has ${movementsOf(review.work).length} movements: ${movementsOf(review.work).slice(0, 6).join(" / ")})`
+                : review.reason === "ambiguous-work"
+                  ? ` (${(review.candidates || []).length} works fit: ${(review.candidates || []).map((id) => nameOf(id, "title")).join(" / ")})`
+                  : ""
+            }`
+          : track.reason === "matches when Auto-match runs"
+            ? "refused without a review: this album already made this work once and its tracks were later taken out of it"
+            : track.proposedWork
+              ? "stays out: " + track.reason
+              : "stays out: nothing in its tags or title names a work";
+      simulated.set(track.autoMatch.replace(/ \(.*$/, "").replace(/"[^"]*"/, '"…"'), (simulated.get(track.autoMatch.replace(/ \(.*$/, "").replace(/"[^"]*"/, '"…"')) || 0) + 1);
+    }
+} finally {
+  sim.close();
+}
+
 const count = (test) => report.filter(test).length;
 const reasons = new Map();
 for (const review of reviews) {
@@ -222,6 +295,9 @@ const lines = [
     .sort((a, b) => b[1] - a[1])
     .map(([reason, n]) => `- ${reason}: ${n}`),
   "",
+  "What Auto-match every album would do with those tracks now (run on a snapshot):",
+  ...[...simulated].sort((a, b) => b[1] - a[1]).map(([outcome, n]) => `- ${outcome}: ${n}`),
+  "",
   "Open review items by reason:",
   ...[...reasons].sort((a, b) => b[1] - a[1]).map(([reason, n]) => `- ${reason}: ${n}`),
   "",
@@ -239,14 +315,16 @@ for (const album of report.filter((a) => a.flags.length)) {
     lines.push("  - unmatched tracks:");
     for (const t of album.unmatchedTracks.slice(0, 15))
       lines.push(
-        `    - ${t.disc}.${t.track} "${t.title}"${t.work ? `, WORK "${t.work}"` : ""}${t.grouping ? `, GROUPING "${t.grouping}"` : ""}, composer ${t.composer.length ? t.composer.join("; ") : "none"}${t.recordingId ? ", recording ID" : ""} → ${t.proposedWork ? `"${t.proposedWork}": ` : ""}${t.reason}`,
+        `    - ${t.disc}.${t.track} "${t.title}"${t.work ? `, WORK "${t.work}"` : ""}${t.grouping ? `, GROUPING "${t.grouping}"` : ""}, composer ${t.composer.length ? t.composer.join("; ") : "none"}${t.recordingId ? ", recording ID" : ""} → ${t.proposedWork ? `"${t.proposedWork}": ` : ""}${t.reason}${t.autoMatch && t.reason === "matches when Auto-match runs" ? `; Auto-match now: ${t.autoMatch}` : ""}`,
       );
     if (album.unmatchedTracks.length > 15) lines.push(`    - … ${album.unmatchedTracks.length - 15} more`);
   }
   if (!album.blocks.length && !album.unmatchedTracks.length) for (const s of album.sample) lines.push(`  - tags: title "${s.title}", work "${s.work}", grouping "${s.grouping}", composer ${JSON.stringify(s.composer)}, recording ID ${s.hasRecordingId ? "yes" : "no"}`);
 }
-await fs.mkdir(outDir, { recursive: true });
 await fs.writeFile(path.join(outDir, "audit.md"), `${lines.join("\n")}\n`);
 await fs.writeFile(path.join(outDir, "audit.json"), JSON.stringify({ albums: report, duplicateWorks, reviews: Object.fromEntries(reasons) }, null, 1));
 db.close();
 console.log(`Audited ${report.length} albums: ${path.join(outDir, "audit.md")}, ${path.join(outDir, "audit.json")}`);
+} finally {
+  await fs.rm(snapshotFolder, { recursive: true, force: true });
+}

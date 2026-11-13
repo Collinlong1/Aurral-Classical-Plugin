@@ -37617,10 +37617,12 @@ function romanValue(value) {
 }
 function movementParts(title) {
   const text4 = words(title);
-  const match2 = text4.match(/^((?:[ivxlc]+)|\d+)\s+(.*)$/);
+  const part = clean3(title).match(/^([ivxlc]+|\d+)[a-d][.)]\s+(.*)$/i);
+  const match2 = part ? [part[0], part[1].toLowerCase(), words(part[2])] : text4.match(/^(no\s+)?((?:[ivxlc]+)|\d+)\s+(.*)$/)?.filter((_, i) => i !== 1);
   if (!match2) return { index: null, text: text4 };
   const index = /^\d+$/.test(match2[1]) ? Number(match2[1]) : romanValue(match2[1]);
-  return index ? { index, text: match2[2] } : { index: null, text: text4 };
+  const piece = !part && /^no\s/.test(text4);
+  return index ? { index, text: match2[2], ...piece && { piece: true } } : { index: null, text: text4 };
 }
 function movementTitle(track, workTitle) {
   const fromTitle = stripWorkPrefix(clean3(track.title), workTitle);
@@ -37634,7 +37636,16 @@ function movementTitle(track, workTitle) {
 }
 var SEPARATOR = /[:;]\s*|\s+[–—-]\s+/g;
 var NICKNAME = /^["“„«'‘][^"”»'’]+["”»'’]\s*(?:[:;]|\s[–—-])\s*(.+)$/;
-function stripWorkPrefix(title, workTitle) {
+function stripWorkPrefix(title, workTitle, depth = 0) {
+  const stripped = stripWorkPrefixOnce(title, workTitle);
+  const again2 = stripWorkPrefixOnce(withoutRepeatedComposer(stripped, workTitle), workTitle);
+  return depth < 2 && again2 !== stripped && words(stripped).includes(words(workTitle)) ? stripWorkPrefix(again2, workTitle, depth + 1) : stripped;
+}
+var withoutRepeatedComposer = (text4, workTitle) => {
+  const match2 = clean3(text4).match(/^([^:]{2,60}):\s+(\S.*)$/);
+  return match2 && words(match2[2]).startsWith(words(workTitle)) && words(match2[1]).split(" ").length <= 3 ? match2[2] : text4;
+};
+function stripWorkPrefixOnce(title, workTitle) {
   const text4 = clean3(title);
   const separators = [...text4.matchAll(SEPARATOR)];
   const tailAt = (match2) => clean3(text4.slice(match2.index + match2[0].length));
@@ -37657,7 +37668,7 @@ function stripWorkPrefix(title, workTitle) {
     return clean3(tail.match(NICKNAME)?.[1] ?? tail);
   }
   const set = clean3(workTitle);
-  const rest = set && NUMBERED_SET.test(set) && text4.toLowerCase().startsWith(set.toLowerCase()) ? text4.slice(set.length).match(/^[,\s]+(no\.?\s*\d+\b.*)$/i) : null;
+  const rest = set && NUMBERED_SET.test(set) && normalized(text4).startsWith(normalized(set)) ? text4.slice(set.length).match(/^[,\s]+(no\.?\s*\d+\b.*)$/i) : null;
   if (rest) return rest[1].charAt(0).toUpperCase() + rest[1].slice(1);
   return text4;
 }
@@ -37755,23 +37766,30 @@ function workMovements(catalogue, work) {
 function mapToMovements(movements, tracks) {
   const used = /* @__PURE__ */ new Set(), result = [];
   const firstWord = (text4) => text4.split(" ")[0];
+  let previous = null;
   for (const track of tracks) {
     const parts = movementParts(track.movementTitle);
+    if (previous && parts.index && parts.index === previous.index) {
+      result.push(previous.id);
+      continue;
+    }
     let found = movements.filter(
       (m) => !used.has(m.id) && m.text && m.text === parts.text
     );
     if (found.length !== 1 && parts.index)
       found = movements.filter(
-        (m) => !used.has(m.id) && (m.index ?? m.position) === parts.index
+        (m) => !used.has(m.id) && Boolean(m.piece) === Boolean(parts.piece) && (parts.piece ? m.index : m.index ?? m.position) === parts.index
       );
-    if (found.length === 1 && found[0].text && parts.text && firstWord(found[0].text) !== firstWord(parts.text))
+    if (found.length === 1 && found[0].text && parts.text && firstWord(found[0].text) !== firstWord(parts.text) && movements.some((m) => m.id !== found[0].id && m.text && firstWord(m.text) === firstWord(parts.text)))
       found = [];
     if (found.length !== 1) {
       result.push(null);
+      previous = null;
       continue;
     }
     used.add(found[0].id);
     result.push(found[0].id);
+    previous = { id: found[0].id, index: parts.index };
   }
   if (result.every(Boolean)) return result;
   if (movements.length === tracks.length) return movements.map((m) => m.id);
@@ -38023,7 +38041,9 @@ function createGroup(catalogue, group, actor3, index) {
       catalogue.segmentContent(segment, content);
       catalogue.realizationItem(realization, segment, {
         movement,
-        sequence: i + 1
+        sequence: i + 1,
+        // A movement split over two tracks is its first and second part.
+        occurrence: movement ? movements.slice(0, i).filter((id) => id === movement).length + 1 : 1
       });
     });
     catalogue.audit(
@@ -40610,14 +40630,14 @@ function performerOf(hints) {
   const performers = artist.split(/\s+[—–]\s+|\s*;\s*/).filter((name) => name && !composers.has(words2(name)));
   return performers.length ? performers.join(", ") : artist;
 }
-function queueItem(metadata, row) {
+function queueItem(metadata, row, workTitle = null) {
   const evidence2 = evidenceOf(row);
   return {
     id: row.item_id,
     trackId: String(row.core_id),
     fileId: String(row.file_id),
     albumId: String(evidence2.albumId ?? ""),
-    title: row.movement_id ? entityValue(metadata, row.movement_id, "title", trackTitle2(evidence2)) : trackTitle2(evidence2),
+    title: workTitle ? movementTitle({ title: withoutComposer(trackTitle2(evidence2), composersOf(evidence2.hints || {})), work: evidence2.hints?.work }, workTitle) : row.movement_id ? entityValue(metadata, row.movement_id, "title", trackTitle2(evidence2)) : trackTitle2(evidence2),
     artist: text2(evidence2.hints?.artist, text2(evidence2.hints?.albumArtist, "")),
     performer: performerOf(evidence2.hints),
     album: text2(evidence2.hints?.album, ""),
@@ -40770,7 +40790,13 @@ function renderAlbumPresentation(c, albumId) {
       composer: credits2(c, metadata, workId).find(
         (credit) => credit.role === "composer"
       )?.name || "",
-      items: run.map((row) => queueItem(metadata, row)),
+      items: run.map(
+        (row) => queueItem(
+          metadata,
+          row,
+          row.movement_id && rows.filter((other) => other.movement_id === row.movement_id).length > 1 ? entityValue(metadata, workId, "title", "") : null
+        )
+      ),
       missing: index ? [] : movements.filter((movement) => !present.has(movement.id)),
       movementCount: Math.max(1, movements.length),
       first: albumPosition(run[0])
@@ -40839,7 +40865,13 @@ function renderWork(c, workId, user) {
         albumId: first.albumId == null ? null : String(first.albumId),
         recordingIds,
         credits: credits2(c, metadata, performanceId),
-        items: entries2.map((entry) => queueItem(metadata, entry)),
+        items: entries2.map(
+          (entry) => queueItem(
+            metadata,
+            entry,
+            entry.movement_id && entries2.filter((other) => other.movement_id === entry.movement_id).length > 1 ? entityValue(metadata, workId, "title", "") : null
+          )
+        ),
         missing: movements.filter((movement) => !present.has(movement.id)),
         complete: movements.length === 0 || movements.every((movement) => present.has(movement.id))
       };
@@ -42085,7 +42117,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.21" : "dev";
+var VERSION = true ? "1.0.22" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js

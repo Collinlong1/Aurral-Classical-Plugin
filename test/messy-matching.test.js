@@ -546,3 +546,34 @@ test("Auto-match every album matches each album from tags and titles, for admins
   // Matched albums have nothing left to check.
   assert.deepEqual(await autoMatchLibrary(ctx, { id: 1, role: "admin" }), { albums: 0, created: 0 });
 });
+
+test("matching: repeated work names, sets' own numbering and a movement over two tracks line up", async (t) => {
+  const tag = (composer) => (title) => ({ title, composer: [composer], genres: ["Classical"] });
+  const c = await catalogueWith(t, [
+    // The first album makes each work.
+    { id: "first", album: "First", albumArtist: "Orchestra", artist: "Orchestra", titles: [
+      ...["I. Allegro ma non troppo", "II. Molto vivace", "III. Adagio molto e cantabile", "IV. Presto"].map((m) => `Symphony No. 9 in D minor, op. 125: ${m}`),
+      ...["Theme: Largo", "I. Moderato", "II. L'istesso tempo"].map((m) => `Variations on a Theme of Chopin, op. 22: ${m}`),
+    ].map((title, i) => tag(i < 4 ? "Ludwig van Beethoven" : "Sergei Rachmaninoff")(title)) },
+    { id: "set", album: "Set", albumArtist: "Pianist", artist: "Pianist", titles: ["24 Preludes, op. 28: No.1 In C Major", "24 Preludes, op. 28: No.2 In A Minor", "24 Preludes, op. 28: No.3 In G Major"].map(tag("Frédéric Chopin")) },
+    // The finale over two tracks.
+    { id: "choral", album: "Choral", albumArtist: "Orchestra", artist: "Orchestra", titles: ["I. Allegro ma non troppo", "II. Molto vivace", "III. Adagio molto e cantabile", "IV. Presto", "IV. “O Freunde, nicht diese Töne!”. Allegro assai"].map((m) => `Symphony No. 9 in D minor, op. 125: ${m}`).map(tag("Ludwig van Beethoven")) },
+    // The store repeats the work after the composer.
+    { id: "doubled", album: "Piano Works", albumArtist: "Pianist", artist: "Pianist", titles: ["Theme: Largo", "I. Moderato", "II. L'istesso tempo"].map((m) => `Variations on a Theme of Chopin, op. 22 : Rachmaninoff: Variations on a Theme of Chopin, op. 22: ${m}`).map(tag("Sergei Rachmaninoff")) },
+    // The set spelled with its accent, its numbering its own.
+    { id: "history", album: "History", albumArtist: "Various", artist: "Pianist", titles: ["24 Préludes, op. 28 no. 1 in C major", "24 Préludes, op. 28 no. 3 in G major"].map(tag("Frédéric Chopin")) },
+  ]);
+  const match = (albumId) => autoMatchTaggedWorks(c, { albumId, actor: "admin", allowStructuredTitles: true });
+  for (const albumId of ["first", "set", "choral", "doubled", "history"]) match(albumId);
+  const blocks = (albumId) => renderAlbumPresentation(c, albumId).groups.map((group) => [group.workId, group.items.map((item) => item.title), group.missing.length]);
+  const [[ninth], [variations]] = blocks("first");
+  const [choral] = blocks("choral");
+  assert.equal(choral[0], ninth);
+  assert.deepEqual(choral[1], ["I. Allegro ma non troppo", "II. Molto vivace", "III. Adagio molto e cantabile", "IV. Presto", "IV. “O Freunde, nicht diese Töne!”. Allegro assai"]);
+  assert.equal(choral[2], 0);
+  assert.deepEqual(blocks("doubled"), [[variations, ["Theme: Largo", "I. Moderato", "II. L'istesso tempo"], 0]]);
+  const [[preludes]] = blocks("set");
+  const [history] = blocks("history");
+  assert.equal(history[0], preludes);
+  assert.deepEqual(history[1], ["No.1 In C Major", "No.3 In G Major"]);
+});

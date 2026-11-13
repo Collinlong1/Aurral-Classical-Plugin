@@ -71,16 +71,20 @@ function performerOf(hints) {
   return performers.length ? performers.join(", ") : artist;
 }
 
-function queueItem(metadata, row) {
+// `workTitle` is given when this track is one of several parts of one
+// movement ("Ia. Maestoso", "Ib. Allegro…"): the row names its own part.
+function queueItem(metadata, row, workTitle = null) {
   const evidence = evidenceOf(row);
   return {
     id: row.item_id,
     trackId: String(row.core_id),
     fileId: String(row.file_id),
     albumId: String(evidence.albumId ?? ""),
-    title: row.movement_id
-      ? entityValue(metadata, row.movement_id, "title", trackTitle(evidence))
-      : trackTitle(evidence),
+    title: workTitle
+      ? movementTitle({ title: withoutComposer(trackTitle(evidence), composersOf(evidence.hints || {})), work: evidence.hints?.work }, workTitle)
+      : row.movement_id
+        ? entityValue(metadata, row.movement_id, "title", trackTitle(evidence))
+        : trackTitle(evidence),
     artist: text(evidence.hints?.artist, text(evidence.hints?.albumArtist, "")),
     performer: performerOf(evidence.hints),
     album: text(evidence.hints?.album, ""),
@@ -287,7 +291,15 @@ export function renderAlbumPresentation(c, albumId) {
         credits(c, metadata, workId).find(
           (credit) => credit.role === "composer",
         )?.name || "",
-      items: run.map((row) => queueItem(metadata, row)),
+      items: run.map((row) =>
+        queueItem(
+          metadata,
+          row,
+          row.movement_id && rows.filter((other) => other.movement_id === row.movement_id).length > 1
+            ? entityValue(metadata, workId, "title", "")
+            : null,
+        ),
+      ),
       missing: index ? [] : movements.filter((movement) => !present.has(movement.id)),
       movementCount: Math.max(1, movements.length),
       first: albumPosition(run[0]),
@@ -380,7 +392,15 @@ export function renderWork(c, workId, user) {
         albumId: first.albumId == null ? null : String(first.albumId),
         recordingIds,
         credits: credits(c, metadata, performanceId),
-        items: entries.map((entry) => queueItem(metadata, entry)),
+        items: entries.map((entry) =>
+          queueItem(
+            metadata,
+            entry,
+            entry.movement_id && entries.filter((other) => other.movement_id === entry.movement_id).length > 1
+              ? entityValue(metadata, workId, "title", "")
+              : null,
+          ),
+        ),
         missing: movements.filter((movement) => !present.has(movement.id)),
         complete:
           movements.length === 0 ||
