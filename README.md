@@ -292,16 +292,32 @@ and after downloads. A download that arrives during a scan, or while the host
 can't be reached, still gets a fresh scan later. Files the tag reader rejects
 keep the tags an earlier scan read.
 
-**Automatic grouping.** After a scan, tracks marked classical are grouped into
-works when their tags agree: an explicit `WORK` tag, a composer and a clean
-album order. A single track counts as a whole work only when its `WORK` tag
-and title name the same piece with no movement part. **Auto-match classical
-works (read only)** on an album also accepts structured titles such as
-"Symphony No. 5: I. Allegro" and MusicBrainz work IDs, including standalone
-works. MusicBrainz IDs and the tags' own titles are reconciled into one work,
-and MusicBrainz composer IDs keep same-named composers apart. When more than
-one work or composer could fit, nothing is created: the album goes to the
-review queue.
+**Automatic grouping.** After every scan, tracks marked classical are grouped
+into works from their tags and titles, with no network: a `WORK` or
+`GROUPING` tag, or a structured title such as "Symphony No. 5: I. Allegro",
+with a composer and a clean album order. A catalogue number's suffix and
+piece number are part of the work ("S172a" is not "S172", "Op. 27/2" is
+Op. 27 No. 2). A work an earlier album made from part of a piece takes a
+fuller album's movements while nobody has edited it, and albums that divide
+a piece into more tracks line up with the movements they cover.
+
+Albums whose unmatched tracks carry MusicBrainz recording IDs and are new or
+changed since the last scan are then looked up on MusicBrainz in the
+background, one request a second on the public server, cached and resumable;
+**Classical model status** shows the queue. Albums already in the Library
+when this was installed are looked up only when an admin runs **Identify
+earlier albums on MusicBrainz** (once). **Auto-match classical works (read
+only)** still runs both for one album at once. MusicBrainz IDs and the tags'
+own titles are reconciled into one work, and MusicBrainz composer IDs keep
+same-named composers apart. When more than one work or composer could fit,
+nothing is created: the album goes to the review queue, and its review closes
+by itself once a later match puts every track in a work. Duplicate works
+merge only when their composers and number agree; works an older release
+joined across sibling numbers are separated again.
+
+To see what a release would change before installing it, run the read-only
+audit (`node scripts/audit-catalogue.mjs <model folder> <out dir>`): it runs
+the next scan on a snapshot and lists every split, merge and expansion.
 
 **Editor.** Settings → Plugins → Aurral Classical → Pages → **Classical
 metadata editor** (admins). Group albums into works (with Skip per track),

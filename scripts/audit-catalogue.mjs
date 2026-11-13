@@ -213,7 +213,7 @@ report.sort((a, b) => b.flags.length - a.flags.length || a.title.localeCompare(b
 // it makes is listed from the snapshot's audit trail.
 const sim = await openCatalogue(snapshotFolder);
 const simulated = new Map();
-const dryRun = { merges: [], splits: [], expansions: [], duplicateReviews: 0, duplicatesAfter: [] };
+const dryRun = { merges: [], splits: [], expansions: [], reviewsClosed: 0, duplicateReviews: 0, duplicatesAfter: [], openReviewsAfter: {} };
 try {
   const firstEvent = sim.db.prepare("SELECT coalesce(max(id),0) AS id FROM audit_event").get().id;
   const reviewsBefore = sim.db.prepare("SELECT count(*) AS n FROM review_item WHERE status='open' AND json_extract(evidence,'$.reason')='duplicate-work'").get().n;
@@ -241,6 +241,7 @@ try {
     const data = JSON.parse(event.data);
     if (event.action === "work.merge") dryRun.merges.push({ drop: titleOf(event.target_id), into: titleOf(data.into), reason: data.reason || "same identity" });
     if (event.action === "work.split_sibling") dryRun.splits.push({ work: titleOf(event.target_id), albumId: data.albumId, workIdentity: data.subject, tracksName: data.tracks });
+    if (event.action === "review.auto_resolve") dryRun.reviewsClosed++;
     if (event.action === "work.auto_match_expand") dryRun.expansions.push({ work: titleOf(event.target_id), albumId: data.albumId, from: data.from, to: data.to });
   }
   dryRun.duplicateReviews =
@@ -258,6 +259,8 @@ try {
     after.set(key, [...(after.get(key) || []), { id, title, composers }]);
   }
   dryRun.duplicatesAfter = [...after.values()].filter((list) => list.length > 1);
+  for (const row of sim.db.prepare("SELECT coalesce(json_extract(evidence,'$.reason'),kind) AS reason,count(*) AS n FROM review_item WHERE status='open' GROUP BY 1").all())
+    dryRun.openReviewsAfter[row.reason] = row.n;
   const reviewOf = new Map();
   for (const row of sim.db.prepare("SELECT target_id,evidence FROM review_item WHERE status='open' AND kind='auto_match'").all()) {
     const evidence = JSON.parse(row.evidence);
@@ -334,7 +337,9 @@ const lines = [
   ...dryRun.merges.slice(0, 40).map((x) => `  - "${x.drop}" into "${x.into}" (${x.reason})`),
   `- incomplete works expanded from a fuller album: ${dryRun.expansions.length}`,
   ...dryRun.expansions.slice(0, 40).map((x) => `  - "${x.work}": ${x.from} → ${x.to} movements, from album ${x.albumId}`),
+  `- Auto-match reviews closed because every track they name is in a work: ${dryRun.reviewsClosed}`,
   `- new duplicate-work reviews (same title, no number): ${dryRun.duplicateReviews}`,
+  `- open reviews after the run: ${Object.entries(dryRun.openReviewsAfter).sort((a, b) => b[1] - a[1]).map(([reason, n]) => `${reason} ${n}`).join(", ") || "none"}`,
   `- duplicate works left after the run: ${dryRun.duplicatesAfter.length}`,
   ...dryRun.duplicatesAfter.slice(0, 30).map((list) => `  - ${list.map((w) => w.title).join(" | ")} — ${list[0].composers.join(", ")}`),
   "",

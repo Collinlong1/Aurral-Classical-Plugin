@@ -38401,7 +38401,9 @@ function repairSiblingJoins(catalogue, albumId, actor3) {
        ${albumId == null ? "" : `JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
          JOIN track_link t ON t.id=s.track_link_id AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?`}
        JOIN entity e ON e.id=r.work_id AND e.deleted_at IS NULL
-       WHERE EXISTS(SELECT 1 FROM external_identity x WHERE x.entity_id=r.work_id AND x.record_kind='album-work')`
+       WHERE EXISTS(SELECT 1 FROM external_identity x WHERE x.entity_id=r.work_id AND x.record_kind='album-work')
+       -- A merge leaves its work two recordings or more.
+       AND (SELECT count(*) FROM realization r2 WHERE r2.work_id=r.work_id)>1`
   ).all(...albumId == null ? [] : [String(albumId)]);
   let repaired = 0;
   for (const { id: work } of works) {
@@ -38643,6 +38645,23 @@ function repairWorkTitles(catalogue) {
   }
   return repaired;
 }
+function resolveSettledReviews(catalogue, albumId, actor3) {
+  const db = catalogue.db;
+  const attached = db.prepare("SELECT 1 FROM segment s JOIN realization_item i ON i.segment_id=s.id WHERE s.track_link_id=? LIMIT 1");
+  let resolved = 0;
+  for (const review of db.prepare(
+    `SELECT id,target_id,evidence FROM review_item WHERE kind='auto_match' AND status='open'
+       ${albumId == null ? "" : "AND CAST(json_extract(evidence,'$.albumId') AS TEXT)=?"}`
+  ).all(...albumId == null ? [] : [String(albumId)])) {
+    const evidence2 = JSON.parse(review.evidence);
+    const tracks = Array.isArray(evidence2.tracks) && evidence2.tracks.length ? evidence2.tracks : [review.target_id];
+    if (!tracks.every((track) => attached.get(track))) continue;
+    db.prepare("UPDATE review_item SET status='resolved' WHERE id=?").run(review.id);
+    catalogue.audit("review.auto_resolve", review.target_id, { review: review.id, reason: evidence2.reason || null }, actor3);
+    resolved++;
+  }
+  return resolved;
+}
 function autoMatchTaggedWorks(catalogue, {
   albumId = null,
   actor: actor3 = null,
@@ -38671,6 +38690,7 @@ function autoMatchTaggedWorks(catalogue, {
   let created = 0;
   for (const group of groups)
     if (createGroup(catalogue, group, actor3, index)) created++;
+  resolveSettledReviews(catalogue, albumId, actor3);
   return { created, candidates: groups.length };
 }
 
@@ -42501,7 +42521,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.26" : "dev";
+var VERSION = true ? "1.0.27" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js

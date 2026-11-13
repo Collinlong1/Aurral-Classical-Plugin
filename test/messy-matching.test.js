@@ -874,3 +874,22 @@ test("matching: duplicate works merge on a number; a title with none goes to rev
   assert.deepEqual(prelude.map(live), [true, true]);
   assert.equal(c.db.prepare("SELECT json_extract(evidence,'$.reason') AS reason FROM review_item WHERE status='open' AND target_id=?").get(prelude[1])?.reason, "duplicate-work");
 });
+
+// From the 1.0.22 audit: 99 open movement-mismatch reviews, many for tracks
+// a later match had already put in a work. Only the editor closed them.
+test("reviews: an Auto-match review closes when every track it names is in a work; others stay open", async (t) => {
+  const debussy = (title) => ({ title, composer: ["Claude Debussy"], genres: ["Classical"] });
+  const c = await catalogueWith(t, [
+    { id: "excerpts", album: "Encores", albumArtist: "Pianist", artist: "Pianist", titles: ["Children’s Corner, L. 113: The Snow is dancing", "Children’s Corner, L. 113: Golliwogg's Cakewalk"].map(debussy) },
+    { id: "full", album: "Debussy", albumArtist: "Pianist", artist: "Pianist", titles: ["I. Doctor Gradus ad Parnassum", "II. Jimbo’s Lullaby", "III. Serenade for the Doll", "IV. The Snow is dancing", "V. The little Shepherd", "VI. Golliwogg’s Cakewalk"].map((m) => `Children’s Corner, L. 113: ${m}`).map(debussy) },
+    { id: "other", album: "Other", albumArtist: "Pianist", artist: "Pianist", titles: ["Prelude", "Fugue"].map(debussy) },
+  ]);
+  const ids = (album) => c.db.prepare("SELECT id FROM track_link WHERE core_id LIKE ? ORDER BY core_id").all(`${album}-%`).map((row) => row.id);
+  // Reviews an earlier release raised: one now settled, one not.
+  c.review("auto_match", ids("full")[0], { reason: "movement-mismatch", albumId: "full", tracks: ids("full") });
+  c.review("auto_match", ids("other")[0], { reason: "movement-mismatch", albumId: "other", tracks: ids("other") });
+  for (const albumId of ["excerpts", "full", "other"]) autoMatchTaggedWorks(c, { albumId, actor: "admin", allowStructuredTitles: true });
+  const open = c.db.prepare("SELECT target_id FROM review_item WHERE kind='auto_match' AND status='open'").all().map((row) => row.target_id);
+  assert.deepEqual(open, [ids("other")[0]]);
+  assert.equal(c.db.prepare("SELECT count(*) AS n FROM audit_event WHERE action='review.auto_resolve'").get().n, 1);
+});

@@ -1,3 +1,16 @@
+# v0.1 completion, step 5 (part): settled reviews close; box-set timing; ready for the re-audit
+
+Manifest 1.0.27, November 13, 2026.
+
+- **Settled Auto-match reviews close by themselves** (`resolveSettledReviews`, end of each match): an open `auto_match` review whose listed tracks are all in a work now is resolved, with a `review.auto_resolve` audit record. Only the editor closed them before, so the 1.0.22 audit's 99 open movement-mismatch reviews included tracks a later match had already placed. Reviews with any track still out stay open; no weak match is accepted to close one.
+- **Repair cost.** `repairSiblingJoins` only checks works with two or more recordings (a merge always leaves that). Synthetic 1,460-track Liszt-style box plus ten albums, library-wide scan pass: first pass 4.4 s creating 1,170 works (1.0.22: 0.66 s, but it collapsed them into 70); a rescan with nothing new 0.28–0.32 s (1.0.22: 0.05–0.07 s with 70 works).
+- **Audit dry run** also counts reviews it would close and the open reviews left by reason, to compare with the 1.0.22 baseline (classification 300, movement-mismatch 99, ambiguous-work 1).
+- README: the grouping section describes scan-time matching, background identification, the backlog action, expansion, repairs and the dry run.
+
+Not done in v0.1 so far: the 16-item legacy bug checklist (not supplied; nothing marked done without it); the 300 classification reviews (unsure classifications, not touched by matching); single tracks of a set that propose no work ("Prelude, Op. 32, No. 3"); a real-library re-audit on 1.0.27; the Compose/Chromium workflow against the current core head (`cc51a65`, a GitHub "Sync fork" merge of upstream through #1838 straight into `aurral-classical`; no core change in 1.0.23–1.0.27).
+
+Next: the user's server session runs the audit (brief in the session summary). Compare its counts and dry run with 36/33/28 and the review baseline before installing 1.0.27.
+
 # v0.1 completion, step 4: undo sibling-number merges; merge duplicates only on a number; dry run in the audit
 
 Manifest 1.0.26, November 13, 2026.
