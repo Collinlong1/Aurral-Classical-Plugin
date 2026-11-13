@@ -37850,31 +37850,28 @@ function namedMovement(movements, title, used, setSubject) {
   }
   return found.length === 1 ? found[0] : null;
 }
-function sectionWords(text4) {
-  const out = [];
-  for (const section of clean3(text4).split(/\s+\/\s+/)) {
-    let value = words(section).replace(/^(?:var(?:iation|iazione)?s?|variazioni)\s+(?:(?:no|nr|n)\s+)?/, "").replace(/\b(?:var(?:iation)?|variazione)\s+(?:(?:no|nr|n)\s+)?(?=\d)/g, "").replace(/\b(?:tema|thema)\b/g, "theme");
-    const roman = value.match(/^([ivxlc]+)\s+(.*)$/);
-    if (roman && romanValue(roman[1])) value = `${romanValue(roman[1])} ${roman[2]}`;
-    out.push(value.trim());
-  }
-  return out.join(" ");
+var VARIATION = /^(?:var(?:iation|iazione)?s?|variazioni)\s+(?:(?:no|nr|n)\s+)?(?=\d|[ivxlc]+\b)/;
+function sectionParts(section) {
+  let value = words(section).replace(/\b(?:tema|thema)\b/g, "theme");
+  const variation = VARIATION.test(value);
+  value = value.replace(VARIATION, "");
+  const numbered = value.match(/^(\d+|[ivxlc]+)(?:\s+(.*))?$/);
+  const number = numbered ? /^\d+$/.test(numbered[1]) ? Number(numbered[1]) : romanValue(numbered[1]) : null;
+  return number ? { number, variation, text: (numbered[2] || "").trim() } : { number: null, variation, text: value.trim() };
 }
+var sameSection = (a, b) => a.number != null || b.number != null ? a.number === b.number && (a.variation || b.variation || a.text === b.text) : a.text === b.text;
+var trackSections = (text4) => clean3(text4).split(/\s+\/\s+|\s+[–—-]\s+(?=var(?:iation|iazione)?\.?\s)/i).map(sectionParts);
 function mapBySections(movements, tracks) {
   if (!movements.some((m) => / \/ /.test(m.title || ""))) return null;
-  const sections = movements.map((m) => clean3(m.title).split(/\s+\/\s+/).map(sectionWords));
+  const sections = movements.map((m) => clean3(m.title).split(/\s+\/\s+/).map(sectionParts));
   const result = [];
   let at = 0, offset = 0;
   for (const track of tracks) {
-    const wanted = sectionWords(track.movementTitle);
+    const wanted = trackSections(track.movementTitle);
     let hit = null;
     for (let m = at; m < movements.length && !hit; m++)
-      for (let from = m === at ? offset : 0; from < sections[m].length && !hit; from++)
-        for (let to = from + 1; to <= sections[m].length; to++)
-          if (sections[m].slice(from, to).join(" ") === wanted) {
-            hit = { m, to };
-            break;
-          }
+      for (let from = m === at ? offset : 0; from + wanted.length <= sections[m].length && !hit; from++)
+        if (wanted.every((section, i) => sameSection(sections[m][from + i], section))) hit = { m, to: from + wanted.length };
     if (!hit) return null;
     result.push(movements[hit.m].id);
     [at, offset] = hit.to === sections[hit.m].length ? [hit.m + 1, 0] : [hit.m, hit.to];
@@ -37887,13 +37884,13 @@ function mapToMovements(movements, tracks, { setSubject = "" } = {}) {
   let previous = null;
   for (const track of tracks) {
     const parts = movementParts(track.movementTitle);
-    if (previous && parts.index && parts.index === previous.index) {
-      result.push(previous.id);
-      continue;
-    }
     let found = movements.filter(
       (m) => !used.has(m.id) && m.text && m.text === parts.text
     );
+    if (previous && parts.index && parts.index === previous.index && found.length !== 1) {
+      result.push(previous.id);
+      continue;
+    }
     if (found.length !== 1) {
       const named = namedMovement(movements, track.movementTitle, used, setSubject);
       if (named) found = [named];
@@ -37904,6 +37901,12 @@ function mapToMovements(movements, tracks, { setSubject = "" } = {}) {
       );
     if (found.length === 1 && found[0].text && parts.text && firstWord(found[0].text) !== firstWord(parts.text) && movements.some((m) => m.id !== found[0].id && m.text && firstWord(m.text) === firstWord(parts.text)))
       found = [];
+    if (found.length !== 1 && parts.index && parts.text) {
+      const shifted = movements.filter(
+        (m) => !used.has(m.id) && m.text && (parts.text === m.text || parts.text.startsWith(`${m.text} `)) && Math.abs((m.index ?? m.position) - parts.index) === 1
+      );
+      if (shifted.length === 1) found = shifted;
+    }
     if (found.length !== 1) {
       result.push(null);
       previous = null;
@@ -37912,6 +37915,15 @@ function mapToMovements(movements, tracks, { setSubject = "" } = {}) {
     used.add(found[0].id);
     result.push(found[0].id);
     previous = { id: found[0].id, index: parts.index };
+  }
+  const at = new Map(movements.map((m, i) => [m.id, i]));
+  for (let i = 1; i < result.length - 1; i++) {
+    if (result[i] || !result[i - 1] || !result[i + 1]) continue;
+    const [before, after] = [at.get(result[i - 1]), at.get(result[i + 1])];
+    if (after - before === 2 && !used.has(movements[before + 1].id)) {
+      result[i] = movements[before + 1].id;
+      used.add(result[i]);
+    }
   }
   if (result.every(Boolean)) return result;
   if (movements.length === tracks.length) return movements.map((m) => m.id);
@@ -38083,9 +38095,13 @@ function createGroup(catalogue, group, actor3, index) {
     let movements = null;
     if (work && unassignedByAdmin(catalogue, work, group.albumId)) return false;
     if (work) {
-      const existing = workMovements(catalogue, work);
+      let existing = workMovements(catalogue, work);
       const setSubject = catalogueSubject(String(resolvedName(catalogue, work, "title") || "")) || catalogueSubject(catalogued2 || group.work);
       movements = existing.length ? mapToMovements(existing, ordered, { setSubject }) : null;
+      if (!movements && existing.length > 1 && foldRepeatedMovements(catalogue, work, existing, setSubject, actor3)) {
+        existing = workMovements(catalogue, work);
+        movements = mapToMovements(existing, ordered, { setSubject });
+      }
       if (!movements && existing.length) movements = expandIncompleteWork(catalogue, metadata, work, existing, ordered, setSubject, group, actor3);
       if (!movements && existing.length) {
         catalogue.review("auto_match", ordered[0].id, {
@@ -38241,6 +38257,67 @@ function expandIncompleteWork(catalogue, metadata, work, existing, ordered, setS
   });
   catalogue.audit("work.auto_match_expand", work, { albumId: group.albumId, from: existing.length, to: result.length, tracks: ordered.map((t) => t.id) }, actor3);
   return result;
+}
+function foldRepeatedMovements(catalogue, work, existing, setSubject, actor3) {
+  const ids = [work, ...existing.map((m) => m.id)];
+  const madeByMatching = catalogue.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work'").get(work);
+  if (!madeByMatching || editedInEditor(catalogue, ids) || hasManualEdits(catalogue, ids)) return false;
+  const realizedBy = (movement) => catalogue.db.prepare("SELECT DISTINCT realization_id AS id FROM realization_item WHERE movement_id=? ORDER BY 1").all(movement).map((row) => row.id);
+  const runs = [];
+  for (const movement of existing) {
+    const by = realizedBy(movement.id);
+    if (!by.length) return false;
+    const key = by.join(" ");
+    if (runs.at(-1)?.key === key) runs.at(-1).movements.push(movement);
+    else runs.push({ key, by, movements: [movement] });
+  }
+  if (runs.length < 2) return false;
+  const seen = /* @__PURE__ */ new Set();
+  for (const run of runs) for (const id of run.by) {
+    if (seen.has(id)) return false;
+    seen.add(id);
+  }
+  const tokens = (text4) => words(text4).split(" ").filter(Boolean);
+  const within = (short, long) => {
+    const rest = [...long];
+    return short.length > 1 && short.every((token) => {
+      const at = rest.indexOf(token);
+      return at >= 0 && rest.splice(at, 1);
+    });
+  };
+  const same2 = (a, b) => {
+    const [pa, pb] = [pieceNumber(a.title, setSubject), pieceNumber(b.title, setSubject)];
+    if (pa != null && pb != null && pa !== pb) return false;
+    const [ca, cb] = [catalogueSubject(a.title), catalogueSubject(b.title)];
+    if (ca && cb && ca !== cb) return false;
+    if (a.index && b.index) return a.index === b.index && a.text.split(" ")[0] === b.text.split(" ")[0];
+    if (a.index || b.index) return false;
+    const [ta, tb] = [tokens(a.title), tokens(b.title)];
+    return a.text === b.text || (ta.length <= tb.length ? within(ta, tb) : within(tb, ta));
+  };
+  const [first, ...later] = runs;
+  const pairs = [];
+  for (const run of later) {
+    let from = 0;
+    for (const movement of run.movements) {
+      const match2 = first.movements.findIndex((m, i) => i >= from && same2(m, movement));
+      if (match2 < 0) return false;
+      pairs.push([movement.id, first.movements[match2].id]);
+      from = match2 + 1;
+    }
+  }
+  const db = catalogue.db;
+  transaction(db, () => {
+    for (const [drop, keep] of pairs) {
+      db.prepare("UPDATE realization_item SET movement_id=? WHERE movement_id=?").run(keep, drop);
+      db.prepare("UPDATE recording_content SET movement_id=? WHERE movement_id=?").run(keep, drop);
+      db.prepare("DELETE FROM relation WHERE kind='movement' AND source_id=? AND target_id=?").run(work, drop);
+      transferIdentities(db, keep, drop);
+      db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), drop);
+    }
+    catalogue.audit("work.fold_movements", work, { from: existing.length, to: existing.length - pairs.length }, actor3);
+  });
+  return true;
 }
 var PLACEMENT_ACTIONS = ["open", "choose-album-work", "assign-album", "unassign-album", "resolve-review", "classification", "set-classification"].map((a) => `editor.${a}`);
 function editedInEditor(catalogue, ids) {
@@ -42575,7 +42652,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.36" : "dev";
+var VERSION = true ? "1.0.37" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js

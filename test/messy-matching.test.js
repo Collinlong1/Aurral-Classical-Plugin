@@ -1041,3 +1041,78 @@ test("matching: one piece of a set on an album is matched to the set; its other 
   // movement still would.
   assert.equal(groups("full")[0][3], 0);
 });
+
+// From the 1.0.36 audit: fuller albums of a work turned away as
+// movement-mismatch reviews. Variation tracks named by number with other
+// tempo words than the album that made the work ("Variation 12: Tempo di
+// minuetto" for "XII. Tempo di menuetto"); an edition numbering Carnaval
+// without "Sphinxes" and spelling "Colombine"; a concerto work listing a
+// second recording's three movements again after the first's.
+test("matching: variations by number, editions numbered one apart, and a work listing its movements twice", async (t) => {
+  const tag = (composer) => (title) => ({ title, composer: [composer], genres: ["Classical"] });
+  const rach = tag("Sergei Rachmaninoff");
+  const schumann = tag("Robert Schumann");
+  const carnaval = ["Préambule", "Pierrot", "Arlequin", "Valse noble", "Eusebius", "Florestan", "Coquette", "Réplique", "Sphinxes", "Papillons", "A.S.C.H - S.C.H.A. (Lettres dansantes)", "Chiarina", "Chopin", "Estrella", "Reconnaissance", "Pantalon et Columbine", "Valse allemande", "Paganini: Intermezzo", "Aveu", "Promenade", "Pause", 'Marche des "Davidsbündler" contre les Philistins'];
+  const roman = (n) => ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX", "XXI", "XXII"][n - 1];
+  const concerto = (movements) => movements.map((m) => `Piano Concerto no. 2 in C minor, op. 18: ${m}`).map(rach);
+  const c = await catalogueWith(t, [
+    { id: "combined", album: "Rhapsody on a Theme of Paganini", albumArtist: "Pianist", artist: "Pianist", titles: ["Introduction: Allegro vivace / I. (Precedente)", "Theme: L'istesso tempo / II. L'istesso tempo", "X. Poco marcato / XI. Moderato / XII. Tempo di menuetto"].map((m) => `Rhapsody on a Theme of Paganini, op. 43: ${m}`).map(rach) },
+    { id: "complete", album: "The Complete Recordings", albumArtist: "Pianist", artist: "Pianist", titles: ["Introduction: Allegro vivace", "Variation 1: (Precedente)", "Tema: L'istesso tempo", "Variation 2: L'istesso tempo", "Variation 10: L'istesso tempo", "Variation 11: Moderato", "Variation 12: Tempo di minuetto"].map((m) => `Rhapsody on a Theme of Paganini, op. 43: ${m}`).map(rach) },
+    { id: "carnaval", album: "Schumann", albumArtist: "Pianist", artist: "Pianist", titles: carnaval.map((m, i) => `Carnaval, Op. 9: ${roman(i + 1)}. ${m}`).map(schumann) },
+    { id: "history", album: "The History of Classical Music", albumArtist: "Various Artists", artist: "Pianist", titles: ["I. Préambule", "II. Pierrot", "III. Arlequin", "IV. Valse noble", "V. Eusebius", "VI. Florestan", "VII. Coquette", "VIII. Réplique – (Sphinxes)", "IX. Papillons", "X. A.S.C.H. – S.C.H.A. (Lettres dansantes)", "XI. Chiarina", "XII. Chopin", "XIII. Estrella", "XIV. Reconnaissance", "XV. Pantalon et Colombine", "XVIa. Valse Allemande", "XVIb. Paganini. Intermezzo", "XVIII. Aveu. Passionato", "XIX. Promenade. Comodo", "XX. Pause. Vivo", "XXI. Marche des “Davidsbündler” contre les Philistins"].map((m) => `Carnaval, op. 9: ${m}`).map(schumann) },
+    { id: "first", album: "Rachmaninoff Plays", albumArtist: "Pianist", artist: "Pianist", titles: concerto(["I. Moderato; Allegro", "II. Adagio sostenuto", "III. Allegro scherzando"]) },
+    { id: "second", album: "Rachmaninoff with Stokowski", albumArtist: "Pianist", artist: "Pianist", titles: concerto(["I. Moderato - Allegro (Stokowski)", "II. Adagio sostenuto (Stokowski)", "III. Allegro scherzando (Stokowski)"]) },
+    { id: "later", album: "Piano Concertos nos. 1 & 2", albumArtist: "Pianist", artist: "Pianist", titles: concerto(["I. Moderato", "II. Adagio sostenuto", "III. Allegro scherzando"]) },
+  ]);
+  const match = (albumId) => autoMatchTaggedWorks(c, { albumId, actor: "admin", allowStructuredTitles: true });
+  const blocks = (albumId) => renderAlbumPresentation(c, albumId).groups.map((group) => [group.workId, group.items.length]);
+  const items = (albumId) =>
+    c.db
+      .prepare(
+        `SELECT i.movement_id FROM realization_item i JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id
+         WHERE CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=? ORDER BY i.sequence`,
+      )
+      .all(albumId)
+      .map((row) => row.movement_id);
+  const mismatches = () => c.db.prepare("SELECT COUNT(*) AS n FROM review_item WHERE status='open' AND json_extract(evidence,'$.reason')='movement-mismatch'").get().n;
+
+  match("combined");
+  match("complete");
+  const [[rhapsody]] = blocks("combined");
+  assert.deepEqual(blocks("complete"), [[rhapsody, 7]]);
+  const sections = workMovementTitles(c, rhapsody, true);
+  assert.deepEqual(items("complete").map((id) => sections.indexOf(id) + 1), [1, 1, 2, 2, 3, 3, 3]);
+
+  match("carnaval");
+  match("history");
+  const [[work]] = blocks("carnaval");
+  assert.deepEqual(blocks("history"), [[work, 21]]);
+  const pieces = workMovementTitles(c, work, true);
+  // Sphinxes (9) and Paganini's own number (18) are this edition's
+  // Réplique and XVIb; everything else by name.
+  assert.deepEqual(items("history").map((id) => pieces.indexOf(id) + 1), [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]);
+
+  match("first");
+  match("second");
+  const [[pc2]] = blocks("first");
+  assert.deepEqual(blocks("second"), [[pc2, 3]]);
+  // The 1.0.22 shape: the second recording's movements listed again.
+  const metadata = new Metadata(c);
+  const titles = ["I. Moderato - Allegro (Stokowski)", "II. Adagio sostenuto (Stokowski)", "III. Allegro scherzando (Stokowski)"];
+  const copies = titles.map((title, i) => {
+    const movement = c.createEntity("movement");
+    metadata.derived(movement, "title", title);
+    c.relate("movement", pc2, movement, { position: 4 + i });
+    return movement;
+  });
+  items("second").forEach((from, i) => {
+    c.db.prepare("UPDATE realization_item SET movement_id=? WHERE movement_id=? AND id IN (SELECT i.id FROM realization_item i JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id WHERE CAST(json_extract(t.evidence,'$.albumId') AS TEXT)='second')").run(copies[i], from);
+    c.db.prepare("UPDATE recording_content SET movement_id=? WHERE movement_id=? AND recording_id IN (SELECT c.recording_id FROM recording_content c JOIN segment_content x ON x.content_id=c.id JOIN segment s ON s.id=x.segment_id JOIN track_link t ON t.id=s.track_link_id WHERE CAST(json_extract(t.evidence,'$.albumId') AS TEXT)='second')").run(copies[i], from);
+  });
+  assert.equal(workMovementTitles(c, pc2).length, 6);
+  match("later");
+  assert.deepEqual(workMovementTitles(c, pc2), ["I. Moderato; Allegro", "II. Adagio sostenuto", "III. Allegro scherzando"]);
+  const three = workMovementTitles(c, pc2, true);
+  for (const albumId of ["first", "second", "later"]) assert.deepEqual(items(albumId), three);
+  assert.equal(mismatches(), 0);
+});
