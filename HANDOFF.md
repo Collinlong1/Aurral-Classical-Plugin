@@ -1,3 +1,16 @@
+# Fixes from the first live-library audit
+
+Manifest 1.0.21, November 13, 2026. The user's server session ran `scripts/audit-catalogue.mjs` on their live catalogue (plugin 1.0.20, 97 classical albums). Findings: 69 albums had nothing matched; 1,432 tracks matched only by Auto-match (an explicit per-album action) and 2,244 more need its MusicBrainz lookup. Plugin only; core stays `66b54b5`. All changes are general rules; albums appear only as test cases.
+
+- **Auto-match every album (tags and titles)**, a new admin action: the per-album local rules for every album with unmatched classical tracks, no network. MusicBrainz stays per album (a lookup for every track of a library is the load core's AGENTS.md rules out).
+- **A work in a title's head with its number in the next part** ("Années de pèlerinage, Deuxième année: Italie, S. 161, no. 4: …") matches like the WORK-tag form from 1.0.17, unless the head carries numbers of its own ("Book 1, BWV 846-869" names a set; the gate caught a false join on Grimaud's Bach). `catalogueNumber` reads Hyperion's "S161"/"S166r".
+- **Two recordings of one work on an album** (box sets) were rejected as duplicate titles. A group that would be rejected is split where its opening movements recur in order (or, for a whole piece, at each repeat); a movement repeated inside one work (the B minor Mass's second Kyrie) splits nothing.
+- **Whole pieces need no form word**: any title with its own catalogue number and nothing after it ("Tapiola, op. 112"), with the 1.0.20 exclusions (number within an opus, "from").
+- **Movement paths.** The scan-time movement-title repair cut stored "I. Inferno: 1. Lento" (Dante Symphony) at its inner colon; 1.0.19's guard stopped that, and matching an album now restores a name whenever the track's title gives a longer path ending in it. Matching also keeps that longer path over a shorter MusicBrainz name.
+- Audit dry run (`explainMatching`) reflects these rules automatically.
+
+Apple corpus: block matches 157/189/150 (work-tags −2: Segovia's two BWV 999 tracks are now two blocks of one work; a Mozart box fragment under a garbage WORK tag "W. A. Mozart" is now its own work), false joins unchanged, six albums closer; Nutcracker and a Mozart pantomime now show fuller or shorter real movement names. Baseline saved. Validation: 283 plugin tests and both gates on Node 22; each change has a test failing on 1.0.20. Compose/Chromium not rerun (no core or page-contract change).
+
 # Whole pieces, sets with their own opus, and a read-only audit
 
 Manifest 1.0.20, November 13, 2026, at the user's request ("a lot of things that should match but aren't"). Plugin only; core stays `66b54b5`.

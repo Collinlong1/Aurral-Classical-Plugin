@@ -613,6 +613,32 @@ export async function autoMatchWorks(ctx, actor, albumId = null) {
   }
 }
 
+// Auto-match for every album at once, from tags and titles only. MusicBrainz
+// stays per album: a lookup for every track of a library is the kind of
+// load the shared service can't take.
+export async function autoMatchLibrary(ctx, actor) {
+  if (actor?.role !== "admin")
+    throw new Error("Automatic work matching requires a current host admin");
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  try {
+    const albums = catalogue.db
+      .prepare(
+        `SELECT DISTINCT CAST(json_extract(t.evidence,'$.albumId') AS TEXT) AS id FROM track_link t
+         JOIN classification c ON c.target_id=t.id AND c.state='classical'
+         WHERE t.state='active' AND json_extract(t.evidence,'$.albumId') IS NOT NULL
+         AND NOT EXISTS(SELECT 1 FROM segment s JOIN realization_item i ON i.segment_id=s.id WHERE s.track_link_id=t.id)`,
+      )
+      .all()
+      .map((row) => row.id);
+    let created = 0;
+    for (const albumId of albums)
+      created += autoMatchTaggedWorks(catalogue, { albumId, actor: String(actor.id), allowStructuredTitles: true }).created;
+    return { albums: albums.length, created };
+  } finally {
+    catalogue.close();
+  }
+}
+
 export async function cancelModelScan(ctx, actor) {
   if (actor?.role !== "admin")
     throw new Error("Cancelling model scans requires a current host admin");

@@ -115,18 +115,14 @@ export function numberedPiece(title) {
   return { set: match[1].trim(), part: match[2].charAt(0).toUpperCase() + match[2].slice(1) };
 }
 
-// Forms of single pieces. A title that is one of these with a catalogue
-// number of its own ("Ballade No. 1 in G Minor, Op. 23", "Waltz in E-flat,
-// op. 18") names a whole piece on one track. A number within an opus ("Op.
-// 28 No. 3", "Op. 23/1") or none ("Capriccio No. 1") makes it one of a set,
-// which the album page groups instead, and "from" an excerpt.
-const PIECE_FORM =
-  /(?<!\p{L})(ballade|nocturne|waltz|valse|mazurka|polonaise|[eé]tude|pr[eé]lude|impromptu|scherzo|fantasie|fantasia|fantaisie|barcarolle|berceuse|rhapsody|rhapsodie|romance|intermezzo|capriccio|caprice|toccata|fugue|rondo|arabesque|gymnop[eé]die|bagatelle|consolation|liebestraum|polonaise-fantaisie)(?!\p{L})/iu;
+// A title with a catalogue number of its own and nothing after it names a
+// whole piece on one track: "Ballade No. 1 in G Minor, Op. 23", "Tapiola,
+// op. 112". A number within an opus ("Op. 28 No. 3", "Op. 23/1") makes it one
+// of a set, which the album page groups instead, and "from" an excerpt.
 const wholePiece = (title) =>
   !splitTitle(title).head &&
   !MOVEMENT_PREFIX.test(title) &&
   !NUMBERED_SET.test(title) &&
-  PIECE_FORM.test(title) &&
   catalogued(title) &&
   !/ no /.test(catalogueNumber(title)) &&
   !/\d+\s*\/\s*\d+/.test(title) &&
@@ -172,7 +168,19 @@ function proposedWork({ work, grouping, title }, allowStructuredTitles) {
   // Every track of a work shares the head, numbered or not ("Theme: Largo").
   const candidate = titleHead(title);
   if (readsAsWork(candidate)) return { title: candidate, evidence: "structured-title" };
-  if (candidate) return null;
+  if (candidate) {
+    // "Années de pèlerinage, Deuxième année: Italie, S. 161, no. 4: Sonetto
+    // 47": the head names the work and the next part its number, as a WORK
+    // tag with the number in the title does. A next part naming its own
+    // form ("Favourites: Symphony No. 5, Op. 67: I.") is that work instead.
+    const next = titleHead(splitTitle(title).tail) || splitTitle(title).tail;
+    const number = catalogueNumber(next);
+    // A head with numbers of its own ("Book 1, BWV 846-869") names a set of
+    // works, not one.
+    return number && !catalogueNumber(candidate) && !isCollectionLike(candidate) && !isCatalogueRange(next) && !MULTI_MOVEMENT.test(next)
+      ? { title: candidate, evidence: "structured-title", catalogue: catalogueText(number) }
+      : null;
+  }
   const set = numberedPiece(clean(title));
   if (set) return catalogueSet(set.set) ? { title: set.set, evidence: "structured-title" } : null;
   return wholePiece(clean(title)) ? { title: clean(title), evidence: "structured-title", standalone: true } : null;
@@ -311,7 +319,7 @@ function candidates(
       trackNumber,
     });
   }
-  return mergeCompletions([...groups.values()]).filter((group) => {
+  return separateRecordings(mergeCompletions([...groups.values()])).filter((group) => {
     // The title most of the work's tracks use, so one typo doesn't name it.
     group.work = [...group.titles].sort((a, b) => b[1] - a[1])[0][0];
     const positions = group.tracks.map(
@@ -382,6 +390,37 @@ function mergeCompletions(groups) {
     result.push(group);
   }
   return [...groups.filter((group) => !merged.has(group)), ...result];
+}
+
+// A box set can hold two recordings of one work (Capriccio espagnol on two
+// discs), which share every title. Only for such a group: in album order,
+// the work's opening movements coming round again, in order, start the next
+// recording, and each is matched on its own; a whole piece listed twice is
+// two recordings. A movement repeated inside one work (the B minor Mass
+// returns to "Kyrie eleison" after the Christe) starts nothing.
+function separateRecordings(groups) {
+  return groups.flatMap((group) => {
+    const titles = group.tracks.map((track) => normalized(track.title));
+    if (new Set(titles).size === titles.length) return [group];
+    const ordered = [...group.tracks].sort(albumOrder);
+    const title = (track) => normalized(track?.title);
+    const runs = [[]];
+    ordered.forEach((track, i) => {
+      const run = runs.at(-1);
+      const again =
+        run.length > 0 &&
+        title(run[0]) === title(track) &&
+        (group.standalone || (run.length > 1 && title(run[1]) === title(ordered[i + 1])));
+      if (again) runs.push([track]);
+      else run.push(track);
+    });
+    if (runs.length === 1) return [group];
+    return runs.map((tracks, i) => ({
+      ...group,
+      key: i ? JSON.stringify([...JSON.parse(group.key), `recording:${i + 1}`]) : group.key,
+      tracks,
+    }));
+  });
 }
 
 function knownComposerNames(catalogue) {
@@ -831,12 +870,10 @@ function createGroup(catalogue, group, actor, index) {
       )
       .map((track) => ({
         ...track,
-        movementTitle: track.providerMovement
-          ? stripWorkPrefix(track.providerMovement, group.work)
-          : movementTitle(
-              { title: track.parsedTitle, work: track.evidence.hints?.work },
-              group.work,
-            ),
+        movementTitle: fullerTitle(
+          movementTitle({ title: track.parsedTitle, work: track.evidence.hints?.work }, group.work),
+          track.providerMovement ? stripWorkPrefix(track.providerMovement, group.work) : null,
+        ),
       }));
     const key = group.providerWorkId
       ? JSON.stringify(["musicbrainz", group.providerWorkId])
@@ -1393,6 +1430,15 @@ export function deriveWorkFields(catalogue, work, metadata = new Metadata(catalo
 
 // Movement titles derived before stripWorkPrefix understood a title can
 // still carry the work's name. Manual and provider titles are left alone.
+// A movement inside a movement ("I. Inferno: 1. Lento") keeps its whole
+// path. When one name is the other's end, the longer one says more.
+function fullerTitle(fromTitle, shorter) {
+  if (!shorter) return fromTitle;
+  const long = words(fromTitle);
+  const short = words(shorter);
+  return short && long !== short && long.endsWith(` ${short}`) ? fromTitle : shorter;
+}
+
 export function repairMovementTitles(catalogue, { albumId = null } = {}) {
   const metadata = new Metadata(catalogue);
   // One album's match repairs only the works that album realizes.
@@ -1428,6 +1474,30 @@ export function repairMovementTitles(catalogue, { albumId = null } = {}) {
       repaired++;
     }
   }
+  // Earlier repairs cut "I. Inferno: 1. Lento" to "1. Lento". Where the
+  // album's track still spells out the longer path, it comes back.
+  if (albumId != null)
+    for (const row of catalogue.db
+      .prepare(
+        `SELECT DISTINCT i.movement_id AS movement,re.work_id AS work,t.evidence,a.value FROM realization_item i
+         JOIN realization re ON re.id=i.realization_id JOIN segment s ON s.id=i.segment_id
+         JOIN track_link t ON t.id=s.track_link_id
+         JOIN field_resolution f ON f.target_id=i.movement_id AND f.field='title'
+         JOIN assertion a ON a.id=f.assertion_id AND a.source='derived'
+         WHERE CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?`,
+      )
+      .all(String(albumId))) {
+      const workTitle = resolvedName(catalogue, row.work, "title");
+      const current = JSON.parse(row.value);
+      if (typeof workTitle !== "string" || typeof current !== "string") continue;
+      const hints = JSON.parse(row.evidence).hints || {};
+      const fromTitle = movementTitle({ title: withoutComposer(hints.title, hints.composer), work: hints.work }, workTitle);
+      const better = fullerTitle(fromTitle, current);
+      if (better !== current) {
+        metadata.derived(row.movement, "title", better);
+        repaired++;
+      }
+    }
   return repaired;
 }
 

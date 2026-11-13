@@ -10,6 +10,7 @@ import {
   enqueueModelScan,
   cancelModelScan,
   autoMatchWorks,
+  autoMatchLibrary,
   runModelJobs,
   requestModelSync,
   modelSyncDue,
@@ -235,6 +236,12 @@ export default {
       return {
         message:
           "Model scan cancellation requested; catalogue data is retained.",
+      };
+    },
+    async "classical-auto-match-library"(input) {
+      const result = await autoMatchLibrary(makeContext(input), input.user);
+      return {
+        message: `Checked ${result.albums} album${result.albums === 1 ? "" : "s"} with unmatched classical tracks; created ${result.created} work group${result.created === 1 ? "" : "s"} from WORK and GROUPING tags and titles. MusicBrainz lookups run per album with Auto-match classical works.`,
       };
     },
     async "classical-auto-match"(input) {

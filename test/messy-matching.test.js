@@ -14,6 +14,8 @@ import { Metadata } from "../src/model/metadata.js";
 import { reconcile, classify } from "../src/model/reconcile.js";
 import { renderAlbumPresentation } from "../src/model/presentation.js";
 import { renderV2 } from "../src/model/editor-v2.js";
+import { autoMatchLibrary } from "../src/model/runtime.js";
+import path from "node:path";
 
 const decide = (hints) => classificationEvidence(hints).decision;
 
@@ -467,4 +469,80 @@ test("matching: a title naming a whole piece is a work; a set with its own opus 
     ["Waltzes, op. 34", true, ["No. 1 in A-flat", "No. 2 in A minor"]],
     ["Waltz in A-flat, op. 42", true, ["Waltz in A-flat, op. 42"]],
   ]);
+});
+
+test("matching: cases from a real library's audit", async (t) => {
+  const tag = (composer) => (title) => ({ title, composer: [composer], genres: ["Classical"] });
+  const liszt = tag("Franz Liszt");
+  const c = await catalogueWith(t, [
+    // The work in the title's head, its number in the next part; no WORK tag.
+    { id: "kobayashi", album: "Chopin & Liszt", albumArtist: "Aimi Kobayashi", artist: "Aimi Kobayashi", titles: ["Années de pèlerinage, Deuxième année: Italie, S. 161, no. 4: Sonetto 47 del Petrarca", "Années de pèlerinage, Deuxième année: Italie, S. 161, no. 5: Sonetto 104 del Petrarca"].map(liszt) },
+    // Hyperion writes "S161", and a dash before the book.
+    { id: "howard", album: "The Complete Liszt Piano Music", albumArtist: "Leslie Howard", artist: "Leslie Howard", titles: ["Années de pèlerinage, deuxième année – Italie, S161: I. Sposalizio", "Années de pèlerinage, deuxième année – Italie, S161: II. Il pensero", "Années de pèlerinage, première année – Suisse, S160: I. Chapelle de Guillaume Tell", "Années de pèlerinage, première année – Suisse, S160: II. Au lac de Wallenstadt"].map(liszt) },
+    // A head with a catalogue range names a set of works, not one.
+    { id: "grimaud", album: "Bach", albumArtist: "Hélène Grimaud", artist: "Hélène Grimaud", titles: ["Book 1, BWV 846-869: 1. Prelude in C Minor BWV 847", "Book 1, BWV 846-869: 2. Fugue in C Minor BWV 847", "Book 1, BWV 846-869: 1. Prelude in C-Sharp Minor BWV 849", "Book 1, BWV 846-869: 2. Fugue in C-Sharp Minor BWV 849"].map(tag("Johann Sebastian Bach")) },
+    // Two recordings of one work in a box; a movement a work repeats is not one.
+    { id: "decca", album: "Decca Sound", albumArtist: "Various Artists", artist: "Orchestra", titles: [1, 2].flatMap(() => ["I. Alborada", "II. Variazioni", "III. Alborada"].map((m) => `Capriccio espagnol, op. 34: ${m}`)).map(tag("Nikolai Rimsky-Korsakov")) },
+    { id: "mass", album: "Mass in B minor", albumArtist: "Choir", artist: "Choir", titles: ["Kyrie eleison", "Christe eleison", "Kyrie eleison", "Gloria in excelsis Deo"].map((m) => `Mass in B Minor, BWV 232: ${m}`).map(tag("Johann Sebastian Bach")) },
+    // A whole piece with its own number and no form word.
+    { id: "sibelius", album: "Sibelius", albumArtist: "Orchestra", artist: "Orchestra", titles: ["Tapiola, op. 112", "Finlandia, op. 26"].map(tag("Jean Sibelius")) },
+    { id: "dante", album: "Dante Symphony", albumArtist: "Orchestra", artist: "Orchestra", titles: ["Dante Symphony: I. Inferno: 1. Lento", "Dante Symphony: I. Inferno: 2. Allegro frenetico", "Dante Symphony: II. Purgatorio: 1. Andante con moto"].map(liszt) },
+  ]);
+  const match = (albumId) => autoMatchTaggedWorks(c, { albumId, actor: "admin", allowStructuredTitles: true });
+  for (const albumId of ["kobayashi", "howard", "grimaud", "decca", "mass", "sibelius", "dante"]) match(albumId);
+  const blocks = (albumId) => renderAlbumPresentation(c, albumId).groups.map((group) => [group.title, group.workId, group.items.map((item) => item.title)]);
+  const [kobayashi] = blocks("kobayashi");
+  assert.deepEqual([kobayashi[0], Boolean(kobayashi[1])], ["Années de pèlerinage, Deuxième année", true]);
+  const howard = blocks("howard");
+  assert.deepEqual(howard.map(([title, workId]) => [title.toLowerCase(), Boolean(workId)]), [
+    ["années de pèlerinage, deuxième année", true],
+    ["années de pèlerinage, première année", true],
+  ]);
+  // S161 and S. 161 are one work; S160 another.
+  assert.equal(howard[0][1], kobayashi[1]);
+  assert.notEqual(howard[1][1], kobayashi[1]);
+  // No work named after the set; the preludes and fugues stay unmatched.
+  assert.ok(blocks("grimaud").every(([, workId]) => !workId));
+  const decca = blocks("decca");
+  assert.equal(decca.length, 2);
+  assert.ok(decca[0][1] && decca[0][1] === decca[1][1]);
+  assert.deepEqual(decca[1][2], ["I. Alborada", "II. Variazioni", "III. Alborada"]);
+  assert.deepEqual(blocks("mass").map(([, , rows]) => rows.length), [4]);
+  assert.deepEqual(blocks("sibelius").map(([title, workId]) => [title, Boolean(workId)]), [["Tapiola, op. 112", true], ["Finlandia, op. 26", true]]);
+  // A movement inside a movement keeps its path, and a name an earlier
+  // repair cut short comes back when the album is matched again.
+  const dante = () => blocks("dante")[0][2];
+  assert.deepEqual(dante(), ["I. Inferno: 1. Lento", "I. Inferno: 2. Allegro frenetico", "II. Purgatorio: 1. Andante con moto"]);
+  const workId = blocks("dante")[0][1];
+  const first = c.db.prepare("SELECT target_id FROM relation WHERE kind='movement' AND source_id=? ORDER BY position").get(workId).target_id;
+  new Metadata(c).derived(first, "title", "1. Lento");
+  assert.equal(dante()[0], "1. Lento");
+  match("dante");
+  assert.equal(dante()[0], "I. Inferno: 1. Lento");
+});
+
+test("Auto-match every album matches each album from tags and titles, for admins only", async (t) => {
+  const folders = await tempFolders();
+  t.after(() => fs.rm(folders.root, { recursive: true, force: true }));
+  const c = await openCatalogue(path.join(folders.dataFolder, "model"));
+  c.db.prepare("INSERT INTO core_instance VALUES ('i','e',0)").run();
+  const tracks = ["a", "b"].flatMap((album) =>
+    ["I. Allegro", "II. Adagio"].map((movement, i) => ({
+      coreId: `${album}-${i}`,
+      fileId: `${album}-${i}`,
+      path: `/library/${album}/${i}.flac`,
+      size: 1000,
+      durationMs: 60000,
+      fingerprint: `audio-sha256-v2:${album}-${i}`,
+      albumId: album,
+      hints: { title: `Piano Sonata No. ${album === "a" ? 8 : 14}, Op. ${album === "a" ? 13 : 27}: ${movement}`, album, albumArtist: "Pianist", artist: "Pianist", composer: ["Ludwig van Beethoven"], genres: ["Classical"], work: "", trackNumber: i + 1, discNumber: 1 },
+    })),
+  );
+  for (const row of reconcile(c, { version: 1, complete: true, instanceId: "i", epoch: "e", generation: 1, tracks })) classify(c, row.id, row.hints);
+  c.close();
+  const ctx = { dataFolder: folders.dataFolder };
+  await assert.rejects(autoMatchLibrary(ctx, { id: 2, role: "user" }));
+  assert.deepEqual(await autoMatchLibrary(ctx, { id: 1, role: "admin" }), { albums: 2, created: 2 });
+  // Matched albums have nothing left to check.
+  assert.deepEqual(await autoMatchLibrary(ctx, { id: 1, role: "admin" }), { albums: 0, created: 0 });
 });

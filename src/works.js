@@ -9,7 +9,8 @@ const CATALOGUES = [
   [/\bD\.?\s*(\d+[a-z]?)\b/, "D"],
   [/\bHob\.?\s*([IVXL]+[a-z]?:\s*\d+[a-z]?)/i, "Hob"],
   [/\bWoO\s*(\d+)/i, "WoO"],
-  [/\bS\.\s*(\d+)/, "S"],
+  // "S. 161", and Hyperion's "S161" or "S166r".
+  [/\bS(?:\.\s*|(?=\d))(\d+)/, "S"],
   [/\bSz\.?\s*(\d+)/i, "Sz"],
   [/\bBB\s*(\d+)/, "BB"],
   [/\bTrV\s*(\d+)/i, "TrV"],
