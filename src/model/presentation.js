@@ -283,10 +283,15 @@ export function renderAlbumPresentation(c, albumId) {
       if (run && (last === albumPosition(row) || following.get(last) === albumPosition(row))) run.push(row);
       else runs.push([row]);
     }
+    // A set of independent pieces ("13 Preludes, Op. 32") an album plays
+    // only a few of is no incomplete recording: its other pieces are not
+    // listed as missing on the album page (the work's own page has them).
+    const title = entityValue(metadata, workId, "title", "Untitled work");
+    const excerpts = NUMBERED_SET.test(title) && present.size * 2 < movements.length;
     return runs.map((run, index) => ({
       id: index ? `${realizationId}:${index}` : realizationId,
       workId,
-      title: entityValue(metadata, workId, "title", "Untitled work"),
+      title,
       composer:
         credits(c, metadata, workId).find(
           (credit) => credit.role === "composer",
@@ -300,7 +305,7 @@ export function renderAlbumPresentation(c, albumId) {
             : null,
         ),
       ),
-      missing: index ? [] : movements.filter((movement) => !present.has(movement.id)),
+      missing: index || excerpts ? [] : movements.filter((movement) => !present.has(movement.id)),
       movementCount: Math.max(1, movements.length),
       first: albumPosition(run[0]),
     }));

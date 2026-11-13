@@ -7,7 +7,7 @@ import { ModelJobs } from "./jobs.js";
 import { reconcile, classify } from "./reconcile.js";
 import { UserOperations } from "../user-operations.js";
 import { readTags } from "../tags.js";
-import { autoMatchTaggedWorks, isCollectionLike } from "./auto-match.js";
+import { autoMatchTaggedWorks, catalogueSubject, isCollectionLike, titleHead, withoutComposer } from "./auto-match.js";
 import { topWork } from "../works.js";
 import { ClassicalResolver, isLatin } from "../resolver.js";
 import { fingerprint, tagSensitive } from "./fingerprint.js";
@@ -357,7 +357,12 @@ async function scanFile(file, root, prior) {
 // them up; the one-time backfill of those (`identifyBacklog`) is an admin
 // action, never automatic.
 const IDENTIFY = "album_identify";
-const BASELINE_KEY = "album-identify-baseline";
+// The identification rules' version is part of every key. When the rules
+// change (1.0.35 accepted whole works in one movement), the next scan records
+// the albums still pending as seen again, without looking them up, and the
+// admin's backlog action asks MusicBrainz about them once more.
+const RULES = "r2";
+const BASELINE_KEY = `album-identify-baseline:${RULES}`;
 
 function pendingIdentification(catalogue) {
   const albums = new Map();
@@ -378,7 +383,7 @@ function pendingIdentification(catalogue) {
   return [...albums].map(([albumId, tracks]) => ({
     albumId,
     tracks: tracks.length,
-    key: `${IDENTIFY}:${albumId}:${createHash("sha256").update(tracks.join("\n")).digest("hex").slice(0, 32)}`,
+    key: `${IDENTIFY}:${RULES}:${albumId}:${createHash("sha256").update(tracks.join("\n")).digest("hex").slice(0, 32)}`,
   }));
 }
 
@@ -451,9 +456,9 @@ export function identificationStatus(catalogue) {
     .prepare(
       `SELECT state,json_extract(progress,'$.baseline') AS baseline,count(*) AS albums,
          coalesce(sum(json_extract(progress,'$.matched')),0) AS matched,coalesce(sum(json_extract(progress,'$.errors')),0) AS errors
-       FROM model_job WHERE type=? GROUP BY state,baseline`,
+       FROM model_job WHERE type=? AND key LIKE ? GROUP BY state,baseline`,
     )
-    .all(IDENTIFY);
+    .all(IDENTIFY, `${IDENTIFY}:${RULES}:%`);
   const sum = (test, field = "albums") => rows.filter(test).reduce((total, row) => total + row[field], 0);
   return {
     queued: sum((row) => ["queued", "running", "retry"].includes(row.state)),
@@ -772,12 +777,19 @@ async function identifyTrack(ctx, hints) {
   // A work with no parent is a whole piece only when the track's own
   // title reads as one, not as a movement of something MusicBrainz
   // hasn't linked up.
+  // A title's head naming this very work by its number, with a tempo or
+  // nickname after it, is the whole of a work in one movement: Scriabin's
+  // "Piano Sonata no. 7, op. 64 "Messe blanche": Allegro", which MusicBrainz
+  // knows as a work with no parts.
+  const title = withoutComposer(hints.title, hints.composer);
+  const headSubject = catalogueSubject(titleHead(title) || "");
+  const namesThisWork = Boolean(headSubject) && headSubject === catalogueSubject(leaf?.title || "");
   const standalone =
     parent?.id === leaf.id &&
     !(leaf.relations || []).some((rel) => rel.type === "parts" && rel.direction === "backward") &&
     !isCollectionLike(leaf.title) &&
-    !String(hints.title || "").includes(":") &&
-    !/^(?:[IVXLCDM]+|\d+)[.)]\s/i.test(String(hints.title || "").trim());
+    (!String(title).includes(":") || (namesThisWork && !hasParts(leaf))) &&
+    !/^(?:[IVXLCDM]+|\d+)[.)]\s/i.test(String(title).trim());
   // A set MusicBrainz identifies is a work like any other; only a
   // free-text set name in the tags ("Études") is too loose to be one.
   if (!parent?.id || (parent.id === leaf.id && !standalone)) return null;

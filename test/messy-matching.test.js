@@ -1014,3 +1014,30 @@ test("classification: a film score is not classical from a Classical tag; a clas
   // A word that only contains "ost" is no soundtrack.
   assert.equal(decide({ title: "Ghost Trio, Op. 70 No. 1: I. Allegro vivace", album: "Ghost Trio", composer: ["Ludwig van Beethoven"], composerDistinct: true, genres: ["Classical"] }), "classical");
 });
+
+// From the user's library: one piece of a set on a recital ("2 Poèmes, Op.
+// 69: no. 1, Allegretto", one prelude of Rachmaninoff's Op. 32) was refused
+// as "only one track of a work with movements". A piece of a set is a whole
+// piece; one movement of a sonata alone still is refused. The album page
+// lists no "missing" pieces for a set it plays only a few of.
+test("matching: one piece of a set on an album is matched to the set; its other pieces are not missing there", async (t) => {
+  const tag = (composer) => (title) => ({ title, composer: [composer], genres: ["Classical"] });
+  const c = await catalogueWith(t, [
+    { id: "poemes", album: "Scriabin", albumArtist: "Pianist", artist: "Pianist", titles: ["2 Poèmes, Op. 69: no. 1, Allegretto", "3 Morceaux, Op. 45: no. 1, Feuillet d'album", "Piano Sonata no. 3, op. 23: I. Drammatico"].map(tag("Alexander Scriabin")) },
+    { id: "full", album: "Rachmaninoff: Preludes", albumArtist: "Pianist", artist: "Pianist", titles: Array.from({ length: 13 }, (_, i) => `13 Preludes, Op. 32: No. ${i + 1}`).map(tag("Sergei Rachmaninoff")) },
+    { id: "recital", album: "Recital", albumArtist: "Pianist", artist: "Pianist", titles: ["13 Preludes, Op. 32: No. 12"].map(tag("Sergei Rachmaninoff")) },
+  ]);
+  for (const albumId of ["poemes", "full", "recital"]) autoMatchTaggedWorks(c, { albumId, actor: "admin", allowStructuredTitles: true });
+  const groups = (albumId) => renderAlbumPresentation(c, albumId).groups.map((group) => [group.title, Boolean(group.workId), group.items.map((item) => item.title), group.missing.length]);
+  assert.deepEqual(groups("poemes"), [
+    ["2 Poèmes, Op. 69", true, ["no. 1, Allegretto"], 0],
+    ["3 Morceaux, Op. 45", true, ["no. 1, Feuillet d'album"], 0],
+    // One movement of a sonata stays unmatched.
+    ["Piano Sonata no. 3, op. 23", false, ["I. Drammatico"], 0],
+  ]);
+  const [[, matched, rows, missing]] = groups("recital");
+  assert.deepEqual([matched, rows, missing], [true, ["No. 12"], 0]);
+  // The full album still lists nothing missing, and a sonata missing a
+  // movement still would.
+  assert.equal(groups("full")[0][3], 0);
+});

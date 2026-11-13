@@ -92,7 +92,7 @@ async function library(t) {
       c.close();
     }
   };
-  return { ctx, add, scan, view, lookups };
+  return { ctx, add, scan, view, lookups, works };
 }
 
 test("background matching: a scan applies the full title rules without MusicBrainz", async (t) => {
@@ -200,4 +200,24 @@ test("background matching: the backlog action looks the albums up itself, withou
   const { message } = await plugin.actions["classical-identify-backlog"](input);
   assert.match(message, /Queued 1 album \(2 tracks\).* 1 album looked up, 1 work group made/);
   assert.deepEqual(await lib.view("earlier"), [["Symphony No. 5 in C minor, op. 67", true, 2]]);
+});
+
+// From the user's library: Scriabin's late sonatas are one movement each,
+// titled "Piano Sonata no. 7, op. 64 "Messe blanche": Allegro". MusicBrainz
+// names the sonata itself, a work with no parts, but the colon made the track
+// read as one movement of a bigger work, and one movement alone is refused.
+test("background matching: a whole work in one movement, titled with its tempo, matches from MusicBrainz", async (t) => {
+  const lib = await library(t);
+  await lib.add("earlier", ["Prélude"], { recordings: [recording(1)] });
+  await lib.scan();
+  lib.works["work-7"] = { id: "work-7", title: "Piano Sonata no. 7, op. 64 “White Mass”", relations: [{ type: "composer", artist: { id: "artist-scriabin", name: "Alexander Scriabin" } }] };
+  // A symphony movement that MusicBrainz files under its symphony stays refused alone.
+  lib.works["work-8"] = { id: "work-8", title: "Symphony no. 5, op. 67: I. Allegro con brio", relations: [{ type: "parts", direction: "backward", work: { id: "work-sym" } }] };
+  lib.works["work-sym"] = { id: "work-sym", title: "Symphony no. 5, op. 67", relations: [{ type: "parts", direction: "forward", work: { id: "work-8" } }] };
+  await lib.add("scriabin", ['Piano Sonata no. 7, op. 64 "Messe blanche": Allegro', "Symphony no. 5, op. 67: Allegro con brio"], { composer: "Alexander Scriabin", recordings: [recording(7), recording(8)] });
+  await lib.scan();
+  await runModelJobs(lib.ctx, { budgetMs: 30_000 });
+  const groups = await lib.view("scriabin");
+  assert.deepEqual(groups.find(([title]) => /Sonata no\. 7/.test(title)), ['Piano Sonata no. 7, op. 64 "Messe blanche"', true, 1]);
+  assert.equal(groups.filter(([, matched]) => matched).length, 1);
 });

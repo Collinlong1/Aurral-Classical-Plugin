@@ -37359,7 +37359,7 @@ var sameCatalogue = (a, b) => {
   return Boolean(number) && number === catalogueNumber(b).toLowerCase();
 };
 var identity = (...values) => createHash2("sha256").update(JSON.stringify(values)).digest("hex");
-var NUMBERED_SET = new RegExp("(?<!\\p{L})(pr[e\xE9]ludes|[e\xE9]tudes|nocturnes|mazurkas|waltzes|valses|impromptus|ballades|polonaises|bagatelles|intermezzi|consolations|songs without words|lieder ohne worte)(?!\\p{L})", "iu");
+var NUMBERED_SET = new RegExp("(?<!\\p{L})(pr[e\xE9]ludes|[e\xE9]tudes|nocturnes|mazurkas|waltzes|valses|impromptus|ballades|polonaises|bagatelles|intermezzi|consolations|po[e\xE8]mes|morceaux|songs without words|lieder ohne worte)(?!\\p{L})", "iu");
 function withoutComposer(title, composers = []) {
   const text4 = clean3(title);
   const match2 = text4.match(/^([^:]{2,60}):\s+(\S.*)$/);
@@ -37538,7 +37538,11 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
     );
     const reason = group.tracks.every((track) => track.attached) ? "matched" : (
       // Whole pieces are one track each; anything else needs two movements.
-      group.standalone && group.tracks.length !== 1 ? "several tracks name the same whole piece" : !group.standalone && group.tracks.length < 2 ? "only one track of a work with movements on this album" : new Set(positions).size !== positions.length ? "two tracks share a disc and track number" : new Set(group.tracks.map((track) => normalized(track.title))).size !== group.tracks.length ? "two tracks share a title" : null
+      group.standalone && group.tracks.length !== 1 ? "several tracks name the same whole piece" : (
+        // One piece of a set ("Prelude, Op. 11, No. 8" in "24 Preludes,
+        // Op. 11") is a whole piece; one movement of a symphony is not.
+        !group.standalone && group.tracks.length < 2 && !catalogueSet(group.work) ? "only one track of a work with movements on this album" : new Set(positions).size !== positions.length ? "two tracks share a disc and track number" : new Set(group.tracks.map((track) => normalized(track.title))).size !== group.tracks.length ? "two tracks share a title" : null
+      )
     );
     if (explain)
       for (const track of group.tracks)
@@ -41061,10 +41065,12 @@ function renderAlbumPresentation(c, albumId) {
       if (run && (last === albumPosition(row) || following.get(last) === albumPosition(row))) run.push(row);
       else runs.push([row]);
     }
+    const title = entityValue(metadata, workId, "title", "Untitled work");
+    const excerpts = NUMBERED_SET.test(title) && present.size * 2 < movements.length;
     return runs.map((run, index) => ({
       id: index ? `${realizationId}:${index}` : realizationId,
       workId,
-      title: entityValue(metadata, workId, "title", "Untitled work"),
+      title,
       composer: credits2(c, metadata, workId).find(
         (credit) => credit.role === "composer"
       )?.name || "",
@@ -41075,7 +41081,7 @@ function renderAlbumPresentation(c, albumId) {
           row.movement_id && rows.filter((other) => other.movement_id === row.movement_id).length > 1 ? entityValue(metadata, workId, "title", "") : null
         )
       ),
-      missing: index ? [] : movements.filter((movement) => !present.has(movement.id)),
+      missing: index || excerpts ? [] : movements.filter((movement) => !present.has(movement.id)),
       movementCount: Math.max(1, movements.length),
       first: albumPosition(run[0])
     }));
@@ -41860,7 +41866,8 @@ async function scanFile(file, root, prior) {
   };
 }
 var IDENTIFY = "album_identify";
-var BASELINE_KEY = "album-identify-baseline";
+var RULES = "r2";
+var BASELINE_KEY = `album-identify-baseline:${RULES}`;
 function pendingIdentification(catalogue) {
   const albums2 = /* @__PURE__ */ new Map();
   for (const row of catalogue.db.prepare(
@@ -41878,7 +41885,7 @@ function pendingIdentification(catalogue) {
   return [...albums2].map(([albumId, tracks]) => ({
     albumId,
     tracks: tracks.length,
-    key: `${IDENTIFY}:${albumId}:${createHash4("sha256").update(tracks.join("\n")).digest("hex").slice(0, 32)}`
+    key: `${IDENTIFY}:${RULES}:${albumId}:${createHash4("sha256").update(tracks.join("\n")).digest("hex").slice(0, 32)}`
   }));
 }
 var keyRan = (catalogue, key) => Boolean(catalogue.db.prepare("SELECT 1 FROM model_job WHERE key=? LIMIT 1").get(key));
@@ -41933,8 +41940,8 @@ function identificationStatus(catalogue) {
   const rows = catalogue.db.prepare(
     `SELECT state,json_extract(progress,'$.baseline') AS baseline,count(*) AS albums,
          coalesce(sum(json_extract(progress,'$.matched')),0) AS matched,coalesce(sum(json_extract(progress,'$.errors')),0) AS errors
-       FROM model_job WHERE type=? GROUP BY state,baseline`
-  ).all(IDENTIFY);
+       FROM model_job WHERE type=? AND key LIKE ? GROUP BY state,baseline`
+  ).all(IDENTIFY, `${IDENTIFY}:${RULES}:%`);
   const sum = (test, field2 = "albums") => rows.filter(test).reduce((total, row) => total + row[field2], 0);
   return {
     queued: sum((row) => ["queued", "running", "retry"].includes(row.state)),
@@ -42179,7 +42186,10 @@ async function identifyTrack(ctx, hints) {
   const leaf = await arrangedWork(ctx.mb, await ctx.mb.get("work", workId, inc), inc);
   const hasParts = (work) => (work.relations || []).some((rel) => rel.type === "parts" && rel.direction === "forward");
   const parent = leaf && await topWork(ctx.mb, leaf, 0, inc, { stop: (above, below) => isCollectionLike(above.title) && hasParts(below) });
-  const standalone = parent?.id === leaf.id && !(leaf.relations || []).some((rel) => rel.type === "parts" && rel.direction === "backward") && !isCollectionLike(leaf.title) && !String(hints.title || "").includes(":") && !/^(?:[IVXLCDM]+|\d+)[.)]\s/i.test(String(hints.title || "").trim());
+  const title = withoutComposer(hints.title, hints.composer);
+  const headSubject = catalogueSubject(titleHead(title) || "");
+  const namesThisWork = Boolean(headSubject) && headSubject === catalogueSubject(leaf?.title || "");
+  const standalone = parent?.id === leaf.id && !(leaf.relations || []).some((rel) => rel.type === "parts" && rel.direction === "backward") && !isCollectionLike(leaf.title) && (!String(title).includes(":") || namesThisWork && !hasParts(leaf)) && !/^(?:[IVXLCDM]+|\d+)[.)]\s/i.test(String(title).trim());
   if (!parent?.id || parent.id === leaf.id && !standalone) return null;
   return {
     workId: parent.id,
@@ -42564,7 +42574,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.34" : "dev";
+var VERSION = true ? "1.0.35" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js

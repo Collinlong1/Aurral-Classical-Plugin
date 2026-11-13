@@ -157,7 +157,7 @@
   },
   "594180316": {
    "grouping": false,
-   "parts": 1,
+   "parts": 0.895,
    "falseJoins": 10
   },
   "642211702": {
@@ -252,7 +252,7 @@
   },
   "862972382": {
    "grouping": true,
-   "parts": 0.941,
+   "parts": 0.882,
    "falseJoins": 0
   },
   "881667897": {
@@ -822,7 +822,7 @@
   },
   "1481992380": {
    "grouping": false,
-   "parts": 1,
+   "parts": 0.979,
    "falseJoins": 3
   },
   "1499326494": {
@@ -832,7 +832,7 @@
   },
   "1511876052": {
    "grouping": true,
-   "parts": 0.929,
+   "parts": 0.893,
    "falseJoins": 0
   },
   "1513030530": {
@@ -892,7 +892,7 @@
   },
   "1613578929": {
    "grouping": true,
-   "parts": 1,
+   "parts": 0.875,
    "falseJoins": 0
   },
   "1630346272": {
@@ -1007,7 +1007,7 @@
   },
   "1834399557": {
    "grouping": true,
-   "parts": 1,
+   "parts": 0.969,
    "falseJoins": 0
   },
   "1855288176": {
@@ -1274,7 +1274,7 @@
   },
   "862972382": {
    "grouping": true,
-   "parts": 1,
+   "parts": 0.882,
    "falseJoins": 0
   },
   "881667897": {
@@ -1284,7 +1284,7 @@
   },
   "884005057": {
    "grouping": true,
-   "parts": 1,
+   "parts": 0.962,
    "falseJoins": 0
   },
   "890309051": {
@@ -1299,7 +1299,7 @@
   },
   "892617556": {
    "grouping": true,
-   "parts": 1,
+   "parts": 0.947,
    "falseJoins": 0
   },
   "905584086": {
@@ -1454,7 +1454,7 @@
   },
   "1440734550": {
    "grouping": true,
-   "parts": 1,
+   "parts": 0.958,
    "falseJoins": 0
   },
   "1440743651": {
@@ -1559,7 +1559,7 @@
   },
   "1452156896": {
    "grouping": true,
-   "parts": 1,
+   "parts": 0.917,
    "falseJoins": 0
   },
   "1452156898": {
@@ -1654,7 +1654,7 @@
   },
   "1452233586": {
    "grouping": false,
-   "parts": 1,
+   "parts": 0.963,
    "falseJoins": 21
   },
   "1452238911": {
@@ -1724,7 +1724,7 @@
   },
   "1452373339": {
    "grouping": true,
-   "parts": 0.04,
+   "parts": 0.12,
    "falseJoins": 0
   },
   "1452380844": {
@@ -1924,7 +1924,7 @@
   },
   "1639252048": {
    "grouping": true,
-   "parts": 1,
+   "parts": 0.958,
    "falseJoins": 0
   },
   "1640004922": {
@@ -2296,7 +2296,7 @@
   },
   "862972382": {
    "grouping": true,
-   "parts": 0.882,
+   "parts": 0.824,
    "falseJoins": 0
   },
   "881667897": {
@@ -2866,7 +2866,7 @@
   },
   "1481992380": {
    "grouping": false,
-   "parts": 0.936,
+   "parts": 0.915,
    "falseJoins": 3
   },
   "1499326494": {
@@ -2876,7 +2876,7 @@
   },
   "1511876052": {
    "grouping": true,
-   "parts": 0.821,
+   "parts": 0.75,
    "falseJoins": 0
   },
   "1513030530": {
@@ -2936,7 +2936,7 @@
   },
   "1613578929": {
    "grouping": true,
-   "parts": 1,
+   "parts": 0.875,
    "falseJoins": 0
   },
   "1630346272": {
@@ -3051,7 +3051,7 @@
   },
   "1834399557": {
    "grouping": true,
-   "parts": 0.938,
+   "parts": 0.906,
    "falseJoins": 0
   },
   "1855288176": {

@@ -26,7 +26,7 @@ const identity = (...values) =>
 // Sets named in the plural whose pieces are numbered, not Field's single
 // "Nocturne no. 10", which is a piece of its own.
 export const NUMBERED_SET =
-  /(?<!\p{L})(pr[eé]ludes|[eé]tudes|nocturnes|mazurkas|waltzes|valses|impromptus|ballades|polonaises|bagatelles|intermezzi|consolations|songs without words|lieder ohne worte)(?!\p{L})/iu;
+  /(?<!\p{L})(pr[eé]ludes|[eé]tudes|nocturnes|mazurkas|waltzes|valses|impromptus|ballades|polonaises|bagatelles|intermezzi|consolations|po[eè]mes|morceaux|songs without words|lieder ohne worte)(?!\p{L})/iu;
 // "Rachmaninoff: Piano Concerto No. 2…: I. Moderato" from a store that puts
 // the composer first: the title is what follows, when the prefix names one
 // of the track's composers in full or by surname.
@@ -342,7 +342,9 @@ function candidates(
       : // Whole pieces are one track each; anything else needs two movements.
         group.standalone && group.tracks.length !== 1
         ? "several tracks name the same whole piece"
-        : !group.standalone && group.tracks.length < 2
+        : // One piece of a set ("Prelude, Op. 11, No. 8" in "24 Preludes,
+          // Op. 11") is a whole piece; one movement of a symphony is not.
+          !group.standalone && group.tracks.length < 2 && !catalogueSet(group.work)
           ? "only one track of a work with movements on this album"
           : new Set(positions).size !== positions.length
             ? "two tracks share a disc and track number"

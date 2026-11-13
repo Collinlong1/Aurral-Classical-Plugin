@@ -233,7 +233,8 @@ export const recitalPicard = album("wang-vienna-recital-picard", {
       ["Études pour piano, deuxième livre", ["no. 13. L’Escalier du diable"]],
       ["Études", ["no. 6"]],
       ["Danzón no. 2", ["Danzón no. 2"]],
-      ["3 Intermezzi, op. 117", ["no. 3 in C-sharp minor: Andante con moto"]],
+      // One piece of a set is matched to the set, shared with the other copy.
+      ["3 Intermezzi, Op. 117", ["No. 3 in C-Sharp Minor. Andante con moto"]],
       ["Orfeo ed Euridice, Wq. 30", ["Melodie (arr. Sgambati)"]],
     ],
   },
