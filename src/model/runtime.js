@@ -551,6 +551,9 @@ export async function runModelJobs(
   { budgetMs = 5000, batchSize = 200, checkpointMs = 10_000 } = {},
 ) {
   const catalogue = await openCatalogue(modelFolder(ctx));
+  // Background work may wait for a page's or the editor's write; a minute,
+  // not the 5 seconds a request on the plugin's own thread can afford.
+  catalogue.db.exec("PRAGMA busy_timeout=60000");
   const jobs = new ModelJobs(catalogue),
     owner = randomUUID(),
     deadline = Date.now() + budgetMs;

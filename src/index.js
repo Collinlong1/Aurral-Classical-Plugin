@@ -362,6 +362,10 @@ export default {
     // Continue a queued scan, then start an incremental one when a download
     // asked for it or the last completed scan is older than the sync interval.
     try {
+      // A scan or lookup an admin started is still running: it carries on
+      // with the queue; a second run beside it would only contend for the
+      // database.
+      if (modelRun) throw Object.assign(new Error("busy"), { skip: true });
       await modelJobs(ctx, { budgetMs: SCHEDULE_BUDGET_MS });
       if (canReadHostLibrary(ctx) && (await modelSyncDue(ctx))) {
         await enqueueModelScan(ctx, null, { system: true });
@@ -372,7 +376,7 @@ export default {
       const left = deadline - Date.now();
       if (left > 0) await modelJobs(ctx, { budgetMs: left });
     } catch (error) {
-      log(`Classical model unavailable: ${error.message}`);
+      if (!error.skip) log(`Classical model unavailable: ${error.message}`);
     }
     if (ctx.settings.enableFileWrites !== true) return;
     const remainingMs = deadline - Date.now();
@@ -404,7 +408,19 @@ export default {
 // editor call waited behind them ("was busy and didn't answer within 15
 // seconds"). The worker opens the catalogue itself (SQLite WAL lets pages
 // read meanwhile) and builds its own MusicBrainz client from the settings.
+// One run at a time in this process: two workers writing to one catalogue
+// made a scan's final step fail with "database is locked". A later run waits
+// for the one before it.
+let modelRun = null;
 function modelJobs(ctx, options) {
+  const run = (modelRun || Promise.resolve()).catch(() => {}).then(() => modelJobsWorker(ctx, options));
+  const tracked = run.finally(() => {
+    if (modelRun === tracked) modelRun = null;
+  });
+  modelRun = tracked;
+  return run;
+}
+function modelJobsWorker(ctx, options) {
   const input = {
     settings: ctx.settings,
     dataFolder: ctx.dataFolder,

@@ -282,3 +282,31 @@ test("rescans reuse files whose inode number changed but which nothing wrote to"
   assert.equal(await scan(), 3);
   assert.equal(await evidenceRows(ctx), rows);
 });
+
+// On the user's server a scan's final step failed with "database is locked":
+// since 1.0.34 model jobs run on worker threads with their own connections,
+// and another writer held the lock past the 5-second wait. A background job
+// now waits up to a minute; scheduled runs skip while one is running.
+test("a scan waits for another connection's write instead of failing as locked", async (t) => {
+  const { ctx } = await library(t, 2);
+  await enqueueModelScan(ctx, { id: 1, role: "admin" });
+  const { Worker } = await import("node:worker_threads");
+  const file = path.join(ctx.dataFolder, "model", "classical.sqlite");
+  // Another writer: takes the write lock and holds it for six seconds.
+  const blocker = new Worker(
+    `const { DatabaseSync } = require("node:sqlite");
+     const { parentPort, workerData } = require("node:worker_threads");
+     const db = new DatabaseSync(workerData);
+     db.exec("BEGIN IMMEDIATE");
+     parentPort.postMessage("locked");
+     Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 6000);
+     db.exec("COMMIT");
+     db.close();`,
+    { eval: true, workerData: file },
+  );
+  await new Promise((resolve) => blocker.once("message", resolve));
+  const done = new Promise((resolve) => blocker.once("exit", resolve));
+  await runModelJobs(ctx, { budgetMs: 60_000 });
+  await done;
+  assert.equal((await modelStatus(ctx)).scan.state, "done");
+});

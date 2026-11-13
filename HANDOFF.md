@@ -1,3 +1,12 @@
+# 1.0.36: no "database is locked" between model workers
+
+November 13, 2026. On 1.0.35 the user's scan ended "interrupted" with "database is locked" in the log. Since 1.0.34 every model run is a worker thread with its own SQLite connection, and the scheduled hook started its own run while an admin's scan (or backlog lookup) was running; the scan's final write transaction waited the 5-second busy timeout behind the other run's writes and failed. The scan's saved progress is intact; running it again resumes and commits.
+
+- `modelJobs` (`src/index.js`) runs one model run at a time in the plugin process: a later call waits for the one before; `scheduled` skips its model work while a run is in progress (that run carries on with the queue).
+- `runModelJobs` sets `busy_timeout` to 60 s on its own connection: a background job may wait for a page's or the editor's write. The plugin's main thread keeps 5 s.
+
+Test: `test/sync.test.js` holds the write lock from another connection for six seconds while a scan finishes; it fails with "database is locked" without the longer timeout. 305 plugin tests pass; the bundle still starts its worker.
+
 # 1.0.35: whole works in one movement; one piece of a set
 
 November 13, 2026. Audit on 1.0.33 after a scan: matched 4,195 of 4,791 classical tracks (fewer classical tracks: the film scores left); albums 37/29/29; reviews classification 303, movement-mismatch 24, identity 11, duplicate-work 5. Film scores: Interstellar, both Hobbits and Lord of the Rings have no classical tracks (23 tracks unsure, crediting a second person; a stricter rule turned 4 corpus classical tracks in a mixed soundtrack not classical, so it was reverted); The Last Jedi left the list; Mulan stays classical (album titled "Mulan", nothing in its tags says soundtrack): an admin pin is the remedy. The user asked about Scriabin sonatas left unmatched:

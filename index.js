@@ -42018,6 +42018,7 @@ async function runIdentification(ctx, catalogue, jobs, first, owner, deadline) {
 }
 async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 200, checkpointMs = 1e4 } = {}) {
   const catalogue = await openCatalogue(modelFolder(ctx));
+  catalogue.db.exec("PRAGMA busy_timeout=60000");
   const jobs = new ModelJobs(catalogue), owner = randomUUID7(), deadline = Date.now() + budgetMs;
   try {
     const job = jobs.claim(owner, { leaseMs: 6e4 });
@@ -42574,7 +42575,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.35" : "dev";
+var VERSION = true ? "1.0.36" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js
@@ -44216,6 +44217,7 @@ var index_default = {
     const ctx = makeContext(input);
     const deadline = Date.now() + SCHEDULE_BUDGET_MS;
     try {
+      if (modelRun) throw Object.assign(new Error("busy"), { skip: true });
       await modelJobs(ctx, { budgetMs: SCHEDULE_BUDGET_MS });
       if (canReadHostLibrary(ctx) && await modelSyncDue(ctx)) {
         await enqueueModelScan(ctx, null, { system: true });
@@ -44225,7 +44227,7 @@ var index_default = {
       const left = deadline - Date.now();
       if (left > 0) await modelJobs(ctx, { budgetMs: left });
     } catch (error) {
-      log(`Classical model unavailable: ${error.message}`);
+      if (!error.skip) log(`Classical model unavailable: ${error.message}`);
     }
     if (ctx.settings.enableFileWrites !== true) return;
     const remainingMs = deadline - Date.now();
@@ -44246,7 +44248,17 @@ var index_default = {
     status: (input) => downloadStatus(makeContext(input), input.id, input.directory)
   }
 };
+var modelRun = null;
 function modelJobs(ctx, options) {
+  const run = (modelRun || Promise.resolve()).catch(() => {
+  }).then(() => modelJobsWorker(ctx, options));
+  const tracked = run.finally(() => {
+    if (modelRun === tracked) modelRun = null;
+  });
+  modelRun = tracked;
+  return run;
+}
+function modelJobsWorker(ctx, options) {
   const input = {
     settings: ctx.settings,
     dataFolder: ctx.dataFolder,
