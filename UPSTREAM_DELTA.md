@@ -1,3 +1,7 @@
+# Large album presentations
+
+Core bounds album-presentation groups and their items by album size (5,000) and the response by 5 MB instead of 200 groups, 500 items and 512 KB, so box sets keep their work view. The album is read once per response and tracks are checked through an ID set. A contribution that fails now answers 502 instead of `null`, and the album page shows a retryable "Couldn't load works" above the track list. No schema, API version or classical rule in core.
+
 # Album presentation detail line
 
 Core adds one optional, generic field to album-presentation groups: `detail`, a short note shown under the block heading (trimmed, at most 200 characters). Older cores drop it; older plugins omit it. The plugin uses it to say a block of several tracks is not matched to a work. No API version change, schema or classical rule in core.

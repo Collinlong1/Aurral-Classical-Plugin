@@ -20,8 +20,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: Collinlong1/aurral
-          # Core aurral-classical after the November 12 upstream sync (#1828).
-          ref: f444c963366bc2cfe8ede56de763ad5aa5b26a32
+          # Core aurral-classical with large album presentations (1.0.17).
+          ref: 66b54b5caec812aecb888bb50d7d6ceb0f2af2c0
           path: core
       - uses: actions/setup-node@v4
         with:

@@ -1,3 +1,18 @@
+# Grouping fixes and large box sets
+
+Manifest 1.0.17, November 12–13, 2026, at the user's request, picking up a Codex review whose unpushed work was lost. Companion core commit `66b54b5` on `aurral-classical`; integration CI pins it.
+
+- **Large box sets (core).** A 1,460-track recital renders about 1,040 groups and 600 KB; core rejected anything past 200 groups or 512 KB, so the album showed no works. Validation also reloaded the album once per group (2.1 s at 1,460 tracks with 150 groups). Core now bounds groups and items by album size (5,000) and 5 MB, reads the album once and checks tracks through an ID set (40–120 ms), and returns 502 when a contribution fails so the album page shows "Couldn't load works" with Try again.
+- **Requiem.** Movements crediting different completers made a work per credit combination. An album's groups that share a MusicBrainz work, or a catalogue number and a composer, now make one work credited to the shared composers; the other composers are credited on the recordings that name them. Existing splits are repaired during Auto-match when each work is an unedited auto work with one realization on that album and no conflicting verified identity; favourites and picks move to the kept work. The album page compares composers as sets.
+- **GROUPING whole pieces** match like WORK.
+- **Années / S. 161.** A WORK tag with neither form nor number matches when its titles share one catalogue number; the work keeps the WORK title, is found by that number (saved as an alias), so S. 160 and S. 161 stay apart. Work keys read S., L. and other punctuated systems through `catalogueNumber`.
+- **Composer-prefixed titles** ("Rachmaninoff: Piano Concerto No. 2…: I. Moderato") are read past a prefix naming one of the track's composers; recordings keep the tagged title.
+- **Numbered set pieces** ("24 Préludes, op. 28 no. 6 in B minor", Glass "Études no. 9") head as their set with rows "No. 6 in B minor"; display only. Singular names (Field's nocturnes) and titles with a key before the number stay single pieces. `isCollectionLike` missed names starting with "É" (`\b`), now fixed.
+
+Not changed, with reasons: Debussy's two Préludes books need disc subtitles, which scans don't pass to the plugin. Glassworks' "Opening" and its rework already share one unmatched block as two rows, which is right. The Lugansky Corelli split in the user's library matches a Corelli track tagged WORK = Paganini Rhapsody, a file tagging error; the corpus album tagged by title groups correctly. Unmatched Trifonov concertos with WORK tags match in a fresh catalogue, so in the user's library they are likely held by an open review item (ambiguous work or composer) from earlier duplicates; the editor's Review tab shows the reason.
+
+Validation: plugin tests and both corpus gates pass on Node 22 (Apple baseline saved for three improved études albums, no regressions; non-classical unchanged). Each fix has a regression test that fails on the previous source. Core: required checks (unsafe-any 1139 unchanged), plugin-host tests, full suite and frontend build; see below for the integration run.
+
 # Integration against the upstream-synced core
 
 Manifest 1.0.16. November 12, 2026: core `aurral-classical` merged fork `main`, now level with upstream lklynet/aurral through #1828 (core `f444c96`; backup `aurral-classical-backup-2026-11-12`). Integration CI now pins that core. Running the full workflow against it found two plugin-side issues, both fixed:
