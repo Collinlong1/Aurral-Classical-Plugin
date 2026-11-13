@@ -37263,6 +37263,7 @@ import path3 from "node:path";
 import { createHash as createHash2 } from "node:crypto";
 
 // src/works.js
+var SUFFIX = "(?:[a-z]{1,3}(?![a-z]))?";
 var CATALOGUES = [
   [/\bBWV\s*(\d+[a-z]?)/i, "BWV"],
   [/\bHWV\s*(\d+[a-z]?)/i, "HWV"],
@@ -37270,25 +37271,36 @@ var CATALOGUES = [
   [/\bK(?:V|\.)?\s*(\d+[a-z]?)\b/, "K"],
   [/\bD\.?\s*(\d+[a-z]?)\b/, "D"],
   [/\bHob\.?\s*([IVXL]+[a-z]?:\s*\d+[a-z]?)/i, "Hob"],
-  [/\bWoO\s*(\d+)/i, "WoO"],
-  // "S. 161", and Hyperion's "S161" or "S166r".
-  [/\bS(?:\.\s*|(?=\d))(\d+)/, "S"],
-  [/\bSz\.?\s*(\d+)/i, "Sz"],
-  [/\bBB\s*(\d+)/, "BB"],
-  [/\bTrV\s*(\d+)/i, "TrV"],
-  [/\bL\.\s*(\d+)/, "L"],
-  [/\bFP\s*(\d+)/, "FP"]
+  [new RegExp(`\\bWoO\\s*(\\d+${SUFFIX})`, "i"), "WoO"],
+  // "S. 161", and Hyperion's "S161", "S166r" or "S534ii/bis". Searle's own
+  // sub-numbers after a slash name a piece too ("S. 534/2b", "S. 385/3").
+  [new RegExp(`\\bS(?:\\.\\s*|(?=\\d))(\\d+${SUFFIX}(?:\\/(?:bis|\\d+${SUFFIX}))?)`), "S"],
+  [new RegExp(`\\bSz\\.?\\s*(\\d+${SUFFIX})`, "i"), "Sz"],
+  [new RegExp(`\\bBB\\s*(\\d+${SUFFIX})`), "BB"],
+  [new RegExp(`\\bTrV\\s*(\\d+${SUFFIX})`, "i"), "TrV"],
+  [new RegExp(`\\bL\\.\\s*(\\d+${SUFFIX})`), "L"],
+  [new RegExp(`\\bFP\\s*(\\d+${SUFFIX})`), "FP"]
 ];
 var OPUS = /\bop(?:us|\.)?\s*(\d+[a-z]?)(?:\s*,?\s*(?:no\.?|nr\.?|n°)\s*(\d+))?/i;
-function catalogueNumber(title) {
+var PIECE = /^\s*,?\s*(?:no\.?|nr\.?|n°)\s*(\d+[a-z]{0,3})(?![a-z\d])/i;
+function catalogueMatch(title) {
   const text4 = String(title || "");
   for (const [pattern, prefix] of CATALOGUES) {
     const match2 = text4.match(pattern);
-    if (match2) return `${prefix} ${match2[1].replace(/\s+/g, "")}`;
+    if (match2) return { prefix, number: match2[1].replace(/\s+/g, ""), end: match2.index + match2[0].length, text: text4 };
   }
-  const opus = text4.match(OPUS);
+  return null;
+}
+function catalogueNumber(title) {
+  const match2 = catalogueMatch(title);
+  if (match2) return `${match2.prefix} ${match2.number}`;
+  const opus = String(title || "").match(OPUS);
   if (opus) return `op ${opus[1]}${opus[2] ? ` no ${opus[2]}` : ""}`;
   return "";
+}
+function cataloguePiece(title) {
+  const match2 = catalogueMatch(title);
+  return match2 ? match2.text.slice(match2.end).match(PIECE)?.[1]?.toLowerCase() || "" : "";
 }
 function shortWorkTitle(title) {
   let text4 = String(title || "").split(":")[0];
@@ -37456,10 +37468,10 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
       });
       continue;
     }
-    const key = JSON.stringify([
+    const keyWith = (subjectOf) => JSON.stringify([
       row.instance_id,
       String(row.evidence.albumId),
-      proposal.identity || workKey(proposal.title, composers),
+      proposal.identity || subjectOf(proposal.title, composers),
       composers.map(normalized).sort(),
       proposal.evidence,
       // Appended only for whole pieces, so earlier groups keep their keys.
@@ -37469,9 +37481,12 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
       // And for a set named by WORK with its number in the titles.
       ...proposal.catalogue ? [`catalogue:${proposal.catalogue}`] : []
     ]);
+    const key = keyWith(workKey);
+    const legacy = keyWith(legacyWorkKey);
     if (!groups.has(key))
       groups.set(key, {
         key,
+        legacyKey: legacy !== key ? legacy : null,
         work: proposal.title,
         titles: /* @__PURE__ */ new Map(),
         evidence: proposal.evidence,
@@ -37565,6 +37580,7 @@ function separateRecordings(groups) {
     return runs.map((tracks, i) => ({
       ...group,
       key: i ? JSON.stringify([...JSON.parse(group.key), `recording:${i + 1}`]) : group.key,
+      legacyKey: group.legacyKey && i ? JSON.stringify([...JSON.parse(group.legacyKey), `recording:${i + 1}`]) : group.legacyKey,
       tracks
     }));
   });
@@ -37595,16 +37611,20 @@ function catalogueSubject(title) {
   if (cat)
     return `cat:${cat[1] === "opus" ? "op" : cat[1] === "kv" ? "k" : cat[1]}:${cat[2].replace(/\s+/g, "")}${cat[3] ? `:${cat[3]}` : ""}`;
   const number = catalogueNumber(title).toLowerCase();
-  return number ? `cat:${number.replace(/\s+/g, ":")}` : "";
+  const piece = number ? cataloguePiece(title) : "";
+  return number ? `cat:${number.replace(/\s+/g, ":")}${piece ? `:${piece}` : ""}` : "";
 }
-function workKey(title, composers) {
-  const text4 = words(title);
-  const subject = catalogueSubject(title) || `title:${text4.replace(KEY_PHRASE, " ").replace(/\s+/g, " ").trim()}`;
-  return JSON.stringify([
-    [...new Set(composers.map(words))].filter(Boolean).sort(),
-    subject
-  ]);
+function legacyCatalogueSubject(title) {
+  if (words(title).match(CATALOGUE)) return catalogueSubject(title);
+  const [system, number = ""] = catalogueNumber(title).toLowerCase().split(" ");
+  return system ? `cat:${system}:${number.match(/^\d+/)?.[0] ?? number}` : "";
 }
+var keyOf = (subjectOf) => (title, composers) => JSON.stringify([
+  [...new Set(composers.map(words))].filter(Boolean).sort(),
+  subjectOf(title) || `title:${words(title).replace(KEY_PHRASE, " ").replace(/\s+/g, " ").trim()}`
+]);
+var workKey = keyOf(catalogueSubject);
+var legacyWorkKey = keyOf(legacyCatalogueSubject);
 var ROMAN = { i: 1, v: 5, x: 10, l: 50, c: 100 };
 function romanValue(value) {
   let total = 0;
@@ -37874,6 +37894,14 @@ function unassignedByAdmin(catalogue, work, albumId) {
          AND CAST(json_extract(data,'$.values.albumId') AS TEXT)=? ORDER BY id DESC LIMIT 1`
   ).get(work, String(albumId))?.action === "editor.unassign-album";
 }
+function madeBeforeSuffixes(catalogue, group) {
+  if (!group.legacyKey) return false;
+  const made = existingIdentity(catalogue, "album-work", identity("album-work", group.legacyKey));
+  if (!made) return false;
+  const title = resolvedName(catalogue, made, "title");
+  const wanted = group.catalogue ? `${group.work}, ${group.catalogue}` : group.work;
+  return typeof title === "string" && catalogueSubject(title) === catalogueSubject(wanted);
+}
 function createGroup(catalogue, group, actor3, index) {
   if (group.composerSource?.confidence === "medium") {
     const tracks = [...group.tracks].sort(albumOrder);
@@ -37892,6 +37920,7 @@ function createGroup(catalogue, group, actor3, index) {
   const metadata = new Metadata(catalogue);
   const recordId = identity("album-work", group.key);
   if (existingIdentity(catalogue, "album-work", recordId)) return false;
+  if (madeBeforeSuffixes(catalogue, group)) return false;
   return transaction(catalogue.db, () => {
     const ordered = group.tracks.sort(
       (a, b) => a.discNumber - b.discNumber || a.trackNumber - b.trackNumber || a.id.localeCompare(b.id)
@@ -42117,7 +42146,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.22" : "dev";
+var VERSION = true ? "1.0.23" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js

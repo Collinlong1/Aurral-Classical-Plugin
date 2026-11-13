@@ -5,10 +5,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import fs from "node:fs/promises";
+import { createHash } from "node:crypto";
 import { tempFolders } from "./helpers.js";
 import { artistCredits, composersOf } from "../src/model/credits.js";
 import { classificationEvidence } from "../src/model/classify-evidence.js";
-import { splitTitle, stripWorkPrefix, autoMatchTaggedWorks, withoutComposer, mapToMovements, movementParts } from "../src/model/auto-match.js";
+import { splitTitle, stripWorkPrefix, autoMatchTaggedWorks, withoutComposer, mapToMovements, movementParts, catalogueSubject, workKey } from "../src/model/auto-match.js";
 import { openCatalogue } from "../src/model/catalogue.js";
 import { Metadata } from "../src/model/metadata.js";
 import { reconcile, classify } from "../src/model/reconcile.js";
@@ -576,4 +577,104 @@ test("matching: repeated work names, sets' own numbering and a movement over two
   const [history] = blocks("history");
   assert.equal(history[0], preludes);
   assert.deepEqual(history[1], ["No.1 In C Major", "No.3 In G Major"]);
+});
+
+// From the 1.0.22 audit of a real library: catalogue numbers that differ
+// only in a suffix ("S172a"), a Searle sub-number ("S. 534/2b") or a piece
+// number after them ("S164e No. 2") were read as the stem, so different
+// pieces shared one identity: on one album they were "several tracks naming
+// one piece", across albums one joined the other's work or was reviewed
+// against it, and the audit counted them as duplicate works.
+test("matching: a catalogue number's suffix and piece number are part of the work's identity", async (t) => {
+  const subjects = (titles) => titles.map(catalogueSubject);
+  assert.deepEqual(
+    subjects(["Ave Maria, S504i", "Ave Maria, S504ii", "Stabat mater, S172b", "Harmonies poétiques et religieuses, S172a", "Consolations, S172", "Ungarns Gott, S543bis", "Die Zelle in Nonnenwerth, S534ii/bis", "Feuille d'album no. 2, S. 534/2b", "Album-Leaf 'Magyar', S164e No. 2", "Au bord d'une source, S160 No. 4bis"]),
+    ["cat:s:504i", "cat:s:504ii", "cat:s:172b", "cat:s:172a", "cat:s:172", "cat:s:543bis", "cat:s:534ii/bis", "cat:s:534/2b", "cat:s:164e:2", "cat:s:160:4bis"],
+  );
+  // The same number written either way stays one identity.
+  assert.equal(workKey("Ungarns Gott, S543", ["Franz Liszt"]), workKey("Ungarns Gott, S. 543", ["Franz Liszt"]));
+  assert.equal(catalogueSubject("Années de pèlerinage, deuxième année – Italie, S161"), catalogueSubject("Italie, S. 161"));
+
+  const liszt = (title) => ({ title, composer: ["Franz Liszt"], genres: ["Classical"] });
+  const c = await catalogueWith(t, [
+    {
+      id: "howard",
+      album: "The Complete Liszt Piano Music",
+      albumArtist: "Leslie Howard",
+      artist: "Leslie Howard",
+      titles: [
+        "Harmonies poétiques et religieuses, S172a: I. Invocation",
+        "Harmonies poétiques et religieuses, S172a: II. Hymne du matin",
+        "Ave Maria, S504i",
+        "Ave Maria, S504ii",
+        "Klavierstück, S189",
+        "Klavierstück, S189a",
+        "Klavierstück, S189b",
+        "Album-Leaf 'Magyar', S164e No. 1",
+        "Album-Leaf 'Magyar', S164e No. 2",
+        "Ungarns Gott, S543",
+        "Ungarns Gott, S543bis",
+        "Années de pèlerinage, première année – Suisse, S160: I. Chapelle de Guillaume Tell",
+        "Années de pèlerinage, première année – Suisse, S160: II. Au lac de Wallenstadt",
+        "Au bord d'une source, S160 No. 4bis",
+      ].map(liszt),
+    },
+    {
+      id: "consolations",
+      album: "Liszt: Consolations",
+      albumArtist: "Pianist",
+      artist: "Pianist",
+      titles: ["Consolations, S172: I. E major", "Consolations, S172: II. E major", "Stabat mater, S172b", "Ungarns Gott, S. 543"].map(liszt),
+    },
+  ]);
+  for (const albumId of ["howard", "consolations"]) autoMatchTaggedWorks(c, { albumId, actor: "admin", allowStructuredTitles: true });
+  const blocks = (albumId) => renderAlbumPresentation(c, albumId).groups.map((group) => [group.title, group.workId, group.items.map((item) => item.title)]);
+  const howard = blocks("howard");
+  const titled = (rows, title) => rows.find(([heading]) => heading === title);
+  // Every piece is its own work, matched on its own.
+  for (const title of ["Ave Maria, S504i", "Ave Maria, S504ii", "Klavierstück, S189", "Klavierstück, S189a", "Klavierstück, S189b", "Album-Leaf 'Magyar', S164e No. 1", "Album-Leaf 'Magyar', S164e No. 2", "Ungarns Gott, S543", "Ungarns Gott, S543bis", "Au bord d'une source, S160 No. 4bis"])
+    assert.ok(titled(howard, title)?.[1], `${title} is matched`);
+  assert.equal(new Set(howard.map(([, workId]) => workId)).size, howard.length);
+  // The variant of a set's movement is no movement of the set.
+  assert.deepEqual(titled(howard, "Années de pèlerinage, première année")[2], ["I. Chapelle de Guillaume Tell", "II. Au lac de Wallenstadt"]);
+  // Across albums: S172 and S172b are not S172a; S. 543 is S543.
+  const other = blocks("consolations");
+  const harmonies = titled(howard, "Harmonies poétiques et religieuses, S172a")[1];
+  assert.deepEqual(other.map(([title, , rows]) => [title, rows]), [
+    ["Consolations, S172", ["I. E major", "II. E major"]],
+    ["Stabat mater, S172b", ["Stabat mater, S172b"]],
+    ["Ungarns Gott, S543", ["Ungarns Gott, S. 543"]],
+  ]);
+  assert.ok(other.every(([, workId]) => workId && workId !== harmonies));
+  assert.equal(other[2][1], titled(howard, "Ungarns Gott, S543")[1]);
+  const mismatches = c.db.prepare("SELECT COUNT(*) AS n FROM review_item WHERE status='open' AND json_extract(evidence,'$.reason')='movement-mismatch'").get().n;
+  assert.equal(mismatches, 0);
+});
+
+// An album that made a piece under its 1.0.22 key (the number without its
+// suffix) and later lost its tracks keeps them out only when that work has
+// the exact number. One made under a sibling number was the false join an
+// admin undid, so the piece now gets its own work.
+test("matching: tracks taken out under the old catalogue key stay out only for the same number", async (t) => {
+  const liszt = (title) => ({ title, composer: ["Franz Liszt"], genres: ["Classical"] });
+  const c = await catalogueWith(t, [
+    { id: "removed", album: "The Complete Liszt Piano Music", albumArtist: "Leslie Howard", artist: "Leslie Howard", titles: ["Ungarns Gott, S543bis", "Klavierstück, S189a"].map(liszt) },
+  ]);
+  const metadata = new Metadata(c);
+  const madeBefore = (title, oldSubject) => {
+    const work = c.createEntity("work");
+    metadata.derived(work, "title", title);
+    const key = JSON.stringify(["i", "removed", JSON.stringify([["franz liszt"], oldSubject]), ["franz liszt"], "structured-title", "standalone"]);
+    c.externalIdentity(work, "embedded-tags", "album-work", createHash("sha256").update(JSON.stringify(["album-work", key])).digest("hex"), { evidence: {} });
+    return work;
+  };
+  const same = madeBefore("Ungarns Gott, S543bis", "cat:s:543");
+  const sibling = madeBefore("Klavierstück, S189", "cat:s:189");
+  autoMatchTaggedWorks(c, { albumId: "removed", actor: "admin", allowStructuredTitles: true });
+  const groups = renderAlbumPresentation(c, "removed").groups.map((group) => [group.title, group.workId]);
+  const work = (title) => groups.find(([heading]) => heading === title)?.[1] ?? null;
+  assert.equal(work("Ungarns Gott, S543bis"), null);
+  assert.ok(work("Klavierstück, S189a"));
+  assert.notEqual(work("Klavierstück, S189a"), sibling);
+  assert.ok(same);
 });

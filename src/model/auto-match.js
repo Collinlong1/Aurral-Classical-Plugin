@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { Metadata } from "./metadata.js";
 import { transaction } from "./database.js";
-import { catalogueNumber } from "../works.js";
+import { catalogueNumber, cataloguePiece } from "../works.js";
 import { artistCredits } from "./credits.js";
 
 const MULTI_MOVEMENT =
@@ -275,22 +275,28 @@ function candidates(
       });
       continue;
     }
-    const key = JSON.stringify([
-      row.instance_id,
-      String(row.evidence.albumId),
-      proposal.identity || workKey(proposal.title, composers),
-      composers.map(normalized).sort(),
-      proposal.evidence,
-      // Appended only for whole pieces, so earlier groups keep their keys.
-      ...(proposal.standalone ? ["standalone"] : []),
-      // Likewise for composers read from the artist field.
-      ...(credit ? [`artist-field:${credit.confidence}`] : []),
-      // And for a set named by WORK with its number in the titles.
-      ...(proposal.catalogue ? [`catalogue:${proposal.catalogue}`] : []),
-    ]);
+    const keyWith = (subjectOf) =>
+      JSON.stringify([
+        row.instance_id,
+        String(row.evidence.albumId),
+        proposal.identity || subjectOf(proposal.title, composers),
+        composers.map(normalized).sort(),
+        proposal.evidence,
+        // Appended only for whole pieces, so earlier groups keep their keys.
+        ...(proposal.standalone ? ["standalone"] : []),
+        // Likewise for composers read from the artist field.
+        ...(credit ? [`artist-field:${credit.confidence}`] : []),
+        // And for a set named by WORK with its number in the titles.
+        ...(proposal.catalogue ? [`catalogue:${proposal.catalogue}`] : []),
+      ]);
+    const key = keyWith(workKey);
+    // The key before catalogue suffixes counted (1.0.22), whose album
+    // records still say what this album made.
+    const legacy = keyWith(legacyWorkKey);
     if (!groups.has(key))
       groups.set(key, {
         key,
+        legacyKey: legacy !== key ? legacy : null,
         work: proposal.title,
         titles: new Map(),
         evidence: proposal.evidence,
@@ -418,6 +424,7 @@ function separateRecordings(groups) {
     return runs.map((tracks, i) => ({
       ...group,
       key: i ? JSON.stringify([...JSON.parse(group.key), `recording:${i + 1}`]) : group.key,
+      legacyKey: group.legacyKey && i ? JSON.stringify([...JSON.parse(group.legacyKey), `recording:${i + 1}`]) : group.legacyKey,
       tracks,
     }));
   });
@@ -464,19 +471,26 @@ export function catalogueSubject(title) {
     return `cat:${cat[1] === "opus" ? "op" : cat[1] === "kv" ? "k" : cat[1]}:${cat[2].replace(/\s+/g, "")}${cat[3] ? `:${cat[3]}` : ""}`;
   // Systems the word form can't tell from ordinary words ("S. 161", "L. 109")
   // come from the catalogue reader, which needs their punctuation.
+  // The piece within it is part of the identity, as "op 10 no 3" is: Liszt's
+  // "S164e No. 1" and "S164e No. 2" are two album leaves.
   const number = catalogueNumber(title).toLowerCase();
-  return number ? `cat:${number.replace(/\s+/g, ":")}` : "";
+  const piece = number ? cataloguePiece(title) : "";
+  return number ? `cat:${number.replace(/\s+/g, ":")}${piece ? `:${piece}` : ""}` : "";
 }
-export function workKey(title, composers) {
-  const text = words(title);
-  const subject =
-    catalogueSubject(title) ||
-    `title:${text.replace(KEY_PHRASE, " ").replace(/\s+/g, " ").trim()}`;
-  return JSON.stringify([
+// Before 1.0.23 the systems read by `catalogueNumber` alone kept only the
+// digits: S172a and S172b were S172.
+function legacyCatalogueSubject(title) {
+  if (words(title).match(CATALOGUE)) return catalogueSubject(title);
+  const [system, number = ""] = catalogueNumber(title).toLowerCase().split(" ");
+  return system ? `cat:${system}:${number.match(/^\d+/)?.[0] ?? number}` : "";
+}
+const keyOf = (subjectOf) => (title, composers) =>
+  JSON.stringify([
     [...new Set(composers.map(words))].filter(Boolean).sort(),
-    subject,
+    subjectOf(title) || `title:${words(title).replace(KEY_PHRASE, " ").replace(/\s+/g, " ").trim()}`,
   ]);
-}
+export const workKey = keyOf(catalogueSubject);
+const legacyWorkKey = keyOf(legacyCatalogueSubject);
 
 const ROMAN = { i: 1, v: 5, x: 10, l: 50, c: 100 };
 function romanValue(value) {
@@ -879,6 +893,19 @@ function unassignedByAdmin(catalogue, work, albumId) {
   );
 }
 
+// This album made this piece under its 1.0.22 key, whose catalogue number
+// had lost its suffix, and its tracks were taken out since. That holds only
+// when the work it made has this exact number: one made under a sibling
+// number ("Klavierstück, S189" for S189a) was the false join being undone.
+function madeBeforeSuffixes(catalogue, group) {
+  if (!group.legacyKey) return false;
+  const made = existingIdentity(catalogue, "album-work", identity("album-work", group.legacyKey));
+  if (!made) return false;
+  const title = resolvedName(catalogue, made, "title");
+  const wanted = group.catalogue ? `${group.work}, ${group.catalogue}` : group.work;
+  return typeof title === "string" && catalogueSubject(title) === catalogueSubject(wanted);
+}
+
 function createGroup(catalogue, group, actor, index) {
   // A composer read from the artist field with nothing to back it up: an
   // admin confirms before any work is made.
@@ -899,6 +926,7 @@ function createGroup(catalogue, group, actor, index) {
   const metadata = new Metadata(catalogue);
   const recordId = identity("album-work", group.key);
   if (existingIdentity(catalogue, "album-work", recordId)) return false;
+  if (madeBeforeSuffixes(catalogue, group)) return false;
   return transaction(catalogue.db, () => {
     const ordered = group.tracks
       .sort(
