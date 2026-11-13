@@ -6,7 +6,8 @@ import { artistCredits } from "./credits.js";
 
 const MULTI_MOVEMENT =
   /\b(symphon(?:y|ie)|sinfonia|sonata|sonatina|concerto|suite|partita|quartet|quintet|sextet|septet|octet|nonet|trio|serenade|divertimento|cassation|mass|missa|requiem|stabat mater|magnificat|te deum|vespers|cantata|oratorio|passion|variations?|ballet)\b/i;
-const COLLECTION_LIKE = /\b(etudes?|études?|preludes?|préludes?|songs?|lieder)\b/i;
+// Letter boundaries, not \b, which doesn't see "É" as part of a word.
+const COLLECTION_LIKE = /(?<!\p{L})(etudes?|études?|preludes?|préludes?|songs?|lieder)(?!\p{L})/iu;
 export const isCollectionLike = (value) => COLLECTION_LIKE.test(clean(value));
 const MOVEMENT_PREFIX = /^(?:[IVXLCDM]+|\d+)[.)\s:-]/i;
 const clean = (value) => String(value || "").trim().replace(/\s+/g, " ");
@@ -21,6 +22,21 @@ const sameCatalogue = (a, b) => {
 };
 const identity = (...values) =>
   createHash("sha256").update(JSON.stringify(values)).digest("hex");
+
+// "Rachmaninoff: Piano Concerto No. 2…: I. Moderato" from a store that puts
+// the composer first: the title is what follows, when the prefix names one
+// of the track's composers in full or by surname.
+export function withoutComposer(title, composers = []) {
+  const text = clean(title);
+  const match = text.match(/^([^:]{2,60}):\s+(\S.*)$/);
+  if (!match) return text;
+  const prefix = normalized(match[1]).replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+  const named = (Array.isArray(composers) ? composers : [composers]).some((name) => {
+    const full = normalized(name).replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+    return Boolean(full) && (prefix === full || prefix === full.split(" ").at(-1));
+  });
+  return named ? clean(match[2]) : text;
+}
 
 // The work part of a structured title: text before the first ":", ";" or
 // spaced dash. "B-flat" has no spaces, so it stays in the work.
@@ -138,7 +154,8 @@ function candidates(
   // artist field.
   const knownComposers = rows.length ? knownComposerNames(catalogue) : new Set();
   for (const row of rows) {
-    const hints = row.evidence.hints || {};
+    const tagged = row.evidence.hints || {};
+    const hints = { ...tagged, title: withoutComposer(tagged.title, tagged.composer) };
     const provider = providerMatches.get(row.id);
     const local = proposedWork(hints, true);
     const proposal = provider
@@ -221,7 +238,9 @@ function candidates(
       ...row,
       composers,
       providerMovement: provider?.movement ? clean(provider.movement) : null,
-      title: clean(hints.title),
+      title: clean(tagged.title),
+      // The title without a "Composer: " prefix, for reading the movement.
+      parsedTitle: clean(hints.title),
       discNumber,
       trackNumber,
     });
@@ -637,7 +656,7 @@ function extendRealization(catalogue, group, actor, people) {
       metadata.derived(
         movement,
         "title",
-        movementTitle({ title: track.title, work: track.evidence.hints?.work }, workTitle) ||
+        movementTitle({ title: track.parsedTitle, work: track.evidence.hints?.work }, workTitle) ||
           `Movement ${position}`,
       );
       catalogue.relate("movement", realization.work_id, movement, { position });
@@ -710,7 +729,7 @@ function createGroup(catalogue, group, actor, index) {
         movementTitle: track.providerMovement
           ? stripWorkPrefix(track.providerMovement, group.work)
           : movementTitle(
-              { title: track.title, work: track.evidence.hints?.work },
+              { title: track.parsedTitle, work: track.evidence.hints?.work },
               group.work,
             ),
       }));

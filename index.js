@@ -37323,7 +37323,7 @@ function releaseYear(date) {
 
 // src/model/auto-match.js
 var MULTI_MOVEMENT = /\b(symphon(?:y|ie)|sinfonia|sonata|sonatina|concerto|suite|partita|quartet|quintet|sextet|septet|octet|nonet|trio|serenade|divertimento|cassation|mass|missa|requiem|stabat mater|magnificat|te deum|vespers|cantata|oratorio|passion|variations?|ballet)\b/i;
-var COLLECTION_LIKE = /\b(etudes?|études?|preludes?|préludes?|songs?|lieder)\b/i;
+var COLLECTION_LIKE = new RegExp("(?<!\\p{L})(etudes?|\xE9tudes?|preludes?|pr\xE9ludes?|songs?|lieder)(?!\\p{L})", "iu");
 var isCollectionLike = (value) => COLLECTION_LIKE.test(clean3(value));
 var MOVEMENT_PREFIX = /^(?:[IVXLCDM]+|\d+)[.)\s:-]/i;
 var clean3 = (value) => String(value || "").trim().replace(/\s+/g, " ");
@@ -37333,6 +37333,17 @@ var sameCatalogue = (a, b) => {
   return Boolean(number) && number === catalogueNumber(b).toLowerCase();
 };
 var identity = (...values) => createHash2("sha256").update(JSON.stringify(values)).digest("hex");
+function withoutComposer(title, composers = []) {
+  const text4 = clean3(title);
+  const match2 = text4.match(/^([^:]{2,60}):\s+(\S.*)$/);
+  if (!match2) return text4;
+  const prefix = normalized(match2[1]).replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+  const named = (Array.isArray(composers) ? composers : [composers]).some((name) => {
+    const full = normalized(name).replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+    return Boolean(full) && (prefix === full || prefix === full.split(" ").at(-1));
+  });
+  return named ? clean3(match2[2]) : text4;
+}
 var WORK_HEAD = /^(.+?)(?:\s*[:;]\s+|\s+[–—-]\s+|:(?=["“„'‘]))(.+)$/;
 var titleHead = (title) => splitTitle(title).head;
 var COMMA_MOVEMENT = /^(.{4,}?),\s+((?:[IVXLC]+|\d{1,2})\.\s+(?!\d)\S.*)$/;
@@ -37396,7 +37407,8 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
   const groups = /* @__PURE__ */ new Map();
   const knownComposers = rows.length ? knownComposerNames(catalogue) : /* @__PURE__ */ new Set();
   for (const row of rows) {
-    const hints = row.evidence.hints || {};
+    const tagged = row.evidence.hints || {};
+    const hints = { ...tagged, title: withoutComposer(tagged.title, tagged.composer) };
     const provider = providerMatches.get(row.id);
     const local = proposedWork(hints, true);
     const proposal = provider ? {
@@ -37455,7 +37467,9 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
       ...row,
       composers,
       providerMovement: provider?.movement ? clean3(provider.movement) : null,
-      title: clean3(hints.title),
+      title: clean3(tagged.title),
+      // The title without a "Composer: " prefix, for reading the movement.
+      parsedTitle: clean3(hints.title),
       discNumber,
       trackNumber
     });
@@ -37746,7 +37760,7 @@ function extendRealization(catalogue, group, actor3, people) {
       metadata.derived(
         movement,
         "title",
-        movementTitle({ title: track.title, work: track.evidence.hints?.work }, workTitle) || `Movement ${position}`
+        movementTitle({ title: track.parsedTitle, work: track.evidence.hints?.work }, workTitle) || `Movement ${position}`
       );
       catalogue.relate("movement", realization.work_id, movement, { position });
       const sequence = (before?.sequence || 0) + 1;
@@ -37801,7 +37815,7 @@ function createGroup(catalogue, group, actor3, index) {
     ).map((track) => ({
       ...track,
       movementTitle: track.providerMovement ? stripWorkPrefix(track.providerMovement, group.work) : movementTitle(
-        { title: track.title, work: track.evidence.hints?.work },
+        { title: track.parsedTitle, work: track.evidence.hints?.work },
         group.work
       )
     }));
@@ -40557,6 +40571,12 @@ function sameNamedWork(a, b) {
   const name = nameBeforeComma(long);
   return name.length >= 4 && words2(short) === name && long.includes(",");
 }
+var NUMBERED_SET = new RegExp("(?<!\\p{L})(pr[e\xE9]ludes|[e\xE9]tudes|nocturnes|mazurkas|waltzes|valses|impromptus|ballades|polonaises|bagatelles|intermezzi|consolations|songs without words|lieder ohne worte)(?!\\p{L})", "iu");
+function numberedPiece(title) {
+  const match2 = String(title).match(/^(.+?)[,\s]+(no\.?\s*\d+\b.*)$/i);
+  if (!match2 || !NUMBERED_SET.test(match2[1]) || /\bin\s+[a-h]\b/i.test(match2[1])) return null;
+  return { set: match2[1].trim(), part: match2[2].charAt(0).toUpperCase() + match2[2].slice(1) };
+}
 function sameCredits(last, heading, names) {
   const these = new Set(names.map(words2));
   if (last.names.length === these.size && last.names.every((name) => these.has(name))) return true;
@@ -40580,12 +40600,15 @@ function pieceGroups(c, album, following) {
     const evidence2 = evidenceOf(row);
     const workTag = text2(evidence2.hints?.work, "");
     const work = workTag.split(/\s*:\s*/)[0];
-    const split = splitTitle(trackTitle2(evidence2));
+    const title = withoutComposer(trackTitle2(evidence2), composersOf(evidence2.hints || {}));
+    const split = splitTitle(title);
     const fullHead = work || split.head;
-    const ownTail = work ? movementTitle({ title: trackTitle2(evidence2) }, work) : split.tail;
-    const taggedTail = work ? movementTitle({ title: trackTitle2(evidence2), work: workTag }, work) : ownTail;
-    const tail = words2(ownTail).endsWith(` ${words2(taggedTail)}`) ? taggedTail : ownTail;
-    const head = fullHead.replace(ACT, "");
+    const ownTail = work ? movementTitle({ title }, work) : split.tail;
+    const taggedTail = work ? movementTitle({ title, work: workTag }, work) : ownTail;
+    const fullTail = words2(ownTail).endsWith(` ${words2(taggedTail)}`) ? taggedTail : ownTail;
+    const numbered = fullHead ? null : numberedPiece(fullTail);
+    const tail = numbered?.part ?? fullTail;
+    const head = (numbered?.set ?? fullHead).replace(ACT, "");
     const heading = head || tail;
     const names = composersOf(evidence2.hints || {});
     const composer = names.join(", ");
@@ -40618,7 +40641,7 @@ function pieceGroups(c, album, following) {
     movementCount: items.length,
     // Several tracks under one heading look like a work; say when they are
     // not one yet. Sets such as "Études" are never made into works.
-    ...items.length > 1 && !isCollectionLike(piece.title) && { detail: "Not matched to a work" }
+    ...items.length > 1 && !isCollectionLike(piece.title) && !NUMBERED_SET.test(piece.title) && { detail: "Not matched to a work" }
   }));
 }
 function compareAlbumGroups(a, b) {

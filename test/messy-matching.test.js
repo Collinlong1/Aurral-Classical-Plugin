@@ -8,7 +8,7 @@ import fs from "node:fs/promises";
 import { tempFolders } from "./helpers.js";
 import { artistCredits, composersOf } from "../src/model/credits.js";
 import { classificationEvidence } from "../src/model/classify-evidence.js";
-import { splitTitle, stripWorkPrefix, autoMatchTaggedWorks } from "../src/model/auto-match.js";
+import { splitTitle, stripWorkPrefix, autoMatchTaggedWorks, withoutComposer } from "../src/model/auto-match.js";
 import { openCatalogue } from "../src/model/catalogue.js";
 import { reconcile, classify } from "../src/model/reconcile.js";
 import { renderAlbumPresentation } from "../src/model/presentation.js";
@@ -96,6 +96,26 @@ test("titles: comma-separated movements and colon-before-quote headings split", 
   assert.deepEqual(splitTitle("Hello, I. Goodbye"), { head: "", tail: "Hello, I. Goodbye" });
   assert.equal(splitTitle('Carmen, Act 1:"Avec la garde montante" (Enfants)').head, "Carmen, Act 1");
   assert.equal(splitTitle("Piano Sonata, Hob. XVI:52").head, "");
+  // A composer before the work, by surname or in full; any other prefix stays.
+  const concerto = "Piano Concerto No. 2 in C Minor, Op. 18: I. Moderato";
+  assert.equal(withoutComposer(`Rachmaninoff: ${concerto}`, ["Sergei Rachmaninoff"]), concerto);
+  assert.equal(withoutComposer(`Sergei Rachmaninoff: ${concerto}`, ["Sergei Rachmaninoff"]), concerto);
+  assert.equal(withoutComposer(`Italie: ${concerto}`, ["Franz Liszt"]), `Italie: ${concerto}`);
+});
+
+test("matching: a composer-prefixed title matches, and its rows name only the movement", async (t) => {
+  const concerto = "Piano Concerto No. 2 in C Minor, Op. 18";
+  const movements = ["I. Moderato", "II. Adagio sostenuto", "III. Allegro scherzando"];
+  const c = await catalogueWith(t, [
+    { id: "untagged", album: "Arrival", albumArtist: "Daniil Trifonov", artist: "Daniil Trifonov", titles: movements.map((m) => ({ title: `Rachmaninoff: ${concerto}: ${m}`, composer: ["Sergei Rachmaninoff"] })) },
+    { id: "tagged", album: "Arrival", albumArtist: "Daniil Trifonov", artist: "Daniil Trifonov", titles: movements.map((m) => ({ title: `Rachmaninoff: ${concerto}: ${m}`, work: concerto, composer: ["Sergei Rachmaninoff"] })) },
+  ]);
+  const rows = (albumId) => renderAlbumPresentation(c, albumId).groups.map((group) => [group.title, group.items.map((item) => item.title)]);
+  // Before matching, the page already reads the movement.
+  assert.deepEqual(rows("tagged"), [[concerto, movements]]);
+  autoMatchTaggedWorks(c, { albumId: "untagged", actor: "admin", allowStructuredTitles: true });
+  assert.deepEqual(rows("untagged"), [[concerto, movements]]);
+  assert.ok(renderAlbumPresentation(c, "untagged").groups[0].workId);
 });
 
 async function catalogueWith(t, albums) {
@@ -318,4 +338,38 @@ test("matching: a set WORK names is one work per catalogue number in its titles"
     renderAlbumPresentation(c, "kobayashi").groups[0].items.map((item) => item.title),
     ["Italie, S. 161, no. 4: Sonetto 47 del Petrarca", "Italie, S. 161, no. 5: Sonetto 104 del Petrarca"],
   );
+});
+
+test("album page: numbered pieces of a set head as the set; single numbered pieces stay apart", async (t) => {
+  const piece = (composer) => (title) => ({ title, composer: [composer], genres: ["Classical"] });
+  const c = await catalogueWith(t, [
+    {
+      id: "argerich",
+      album: "Chopin",
+      albumArtist: "Martha Argerich",
+      artist: "Martha Argerich",
+      titles: [
+        "24 Préludes, op. 28 no. 6 in B minor",
+        "24 Préludes, op. 28 no. 10 in C-sharp minor",
+        "Études in G-flat major, Op. 10 No. 5 \"Black Keys\"",
+        "Prelude in C-sharp minor, Op. 45",
+      ].map(piece("Frédéric Chopin")),
+    },
+    { id: "glass", album: "Glass", albumArtist: "Víkingur Ólafsson", artist: "Víkingur Ólafsson", titles: ["Études no. 9", "Études no. 2"].map(piece("Philip Glass")) },
+    { id: "field", album: "Field", albumArtist: "Benjamin Frith", artist: "Benjamin Frith", titles: ["Nocturne no. 10 in E minor", "Nocturne no. 11 in E-flat major"].map(piece("John Field")) },
+  ]);
+  const blocks = (albumId) =>
+    renderAlbumPresentation(c, albumId)?.groups.map((group) => [group.title, group.items.map((item) => item.title), group.detail ?? null]) ?? null;
+  assert.deepEqual(blocks("argerich"), [
+    ["24 Préludes, op. 28", ["No. 6 in B minor", "No. 10 in C-sharp minor"], null],
+    // A key before the number: one piece, whatever its plural.
+    ["Études in G-flat major, Op. 10 No. 5 \"Black Keys\"", ["Études in G-flat major, Op. 10 No. 5 \"Black Keys\""], null],
+    ["Prelude in C-sharp minor, Op. 45", ["Prelude in C-sharp minor, Op. 45"], null],
+  ]);
+  assert.deepEqual(blocks("glass"), [["Études", ["No. 9", "No. 2"], null]]);
+  // Field's nocturnes are pieces of their own: no set, so no work view.
+  assert.equal(blocks("field"), null);
+  // Display only: none of these becomes a work.
+  autoMatchTaggedWorks(c, { actor: "admin", allowStructuredTitles: true });
+  assert.equal(c.db.prepare("SELECT COUNT(*) AS n FROM entity WHERE kind='work' AND deleted_at IS NULL").get().n, 0);
 });

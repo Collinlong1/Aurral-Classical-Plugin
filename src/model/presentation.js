@@ -1,7 +1,7 @@
 import path from "node:path";
 import { openCatalogue } from "./catalogue.js";
 import { transaction } from "./database.js";
-import { isCollectionLike, movementTitle, splitTitle } from "./auto-match.js";
+import { isCollectionLike, movementTitle, splitTitle, withoutComposer } from "./auto-match.js";
 import { catalogueNumber } from "../works.js";
 import { composersOf } from "./credits.js";
 
@@ -145,6 +145,17 @@ function sameNamedWork(a, b) {
   return name.length >= 4 && words(short) === name && long.includes(",");
 }
 
+// Sets named in the plural whose pieces are numbered, not Field's single
+// "Nocturne no. 10", which is a piece of its own.
+const NUMBERED_SET =
+  /(?<!\p{L})(pr[eé]ludes|[eé]tudes|nocturnes|mazurkas|waltzes|valses|impromptus|ballades|polonaises|bagatelles|intermezzi|consolations|songs without words|lieder ohne worte)(?!\p{L})/iu;
+function numberedPiece(title) {
+  const match = String(title).match(/^(.+?)[,\s]+(no\.?\s*\d+\b.*)$/i);
+  // A key before the number names one piece: "Études in G-flat major, Op. 10 No. 5".
+  if (!match || !NUMBERED_SET.test(match[1]) || /\bin\s+[a-h]\b/i.test(match[1])) return null;
+  return { set: match[1].trim(), part: match[2].charAt(0).toUpperCase() + match[2].slice(1) };
+}
+
 // The same people in any order credit the same piece. One catalogue number
 // is one work even when its movements credit different completers, as long
 // as a composer runs through all of them.
@@ -181,14 +192,19 @@ function pieceGroups(c, album, following) {
     // A WORK tag names the work outright; otherwise the title's head does.
     const workTag = text(evidence.hints?.work, "");
     const work = workTag.split(/\s*:\s*/)[0];
-    const split = splitTitle(trackTitle(evidence));
+    const title = withoutComposer(trackTitle(evidence), composersOf(evidence.hints || {}));
+    const split = splitTitle(title);
     const fullHead = work || split.head;
-    const ownTail = work ? movementTitle({ title: trackTitle(evidence) }, work) : split.tail;
-    const taggedTail = work ? movementTitle({ title: trackTitle(evidence), work: workTag }, work) : ownTail;
-    const tail = words(ownTail).endsWith(` ${words(taggedTail)}`) ? taggedTail : ownTail;
+    const ownTail = work ? movementTitle({ title }, work) : split.tail;
+    const taggedTail = work ? movementTitle({ title, work: workTag }, work) : ownTail;
+    const fullTail = words(ownTail).endsWith(` ${words(taggedTail)}`) ? taggedTail : ownTail;
+    // "24 Préludes, op. 28 no. 6 in B minor" alone is one piece of a set:
+    // it heads as the set and reads as "No. 6 in B minor".
+    const numbered = fullHead ? null : numberedPiece(fullTail);
+    const tail = numbered?.part ?? fullTail;
     // An opera is one work across its acts: "La traviata, Act II" heads as
     // "La traviata", the way Apple Music Classical shows it.
-    const head = fullHead.replace(ACT, "");
+    const head = (numbered?.set ?? fullHead).replace(ACT, "");
     const heading = head || tail;
     const names = composersOf(evidence.hints || {});
     const composer = names.join(", ");
@@ -223,7 +239,7 @@ function pieceGroups(c, album, following) {
     movementCount: items.length,
     // Several tracks under one heading look like a work; say when they are
     // not one yet. Sets such as "Études" are never made into works.
-    ...(items.length > 1 && !isCollectionLike(piece.title) && { detail: "Not matched to a work" }),
+    ...(items.length > 1 && !isCollectionLike(piece.title) && !NUMBERED_SET.test(piece.title) && { detail: "Not matched to a work" }),
   }));
 }
 
