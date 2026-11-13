@@ -42,6 +42,11 @@ const CLASSICAL_NAMES = new Set(
   [...DEFAULT_CLASSICAL_GENRES, "romantic", "classical period", "early romantic", "late romantic", "contemporary", "modern composition", "avant garde"].map(normGenre),
 );
 const CLASSICAL_WORD = /(^|\s)classical(\s|$)/;
+// An album titled as a film, television or game soundtrack is that context
+// whatever its genre tags say ("Interstellar: Original Motion Picture
+// Soundtrack" tagged Classical).
+const SOUNDTRACK_ALBUM =
+  /(?<!\p{L})(?:(?:original\s+)?(?:motion\s+picture|film|movie|television|tv|series|game|video\s+game)\s+(?:soundtrack|score)|original\s+(?:soundtrack|score)|music\s+from\s+(?:and\s+inspired\s+by\s+)?the\s+(?:motion\s+picture|film|movie|series)|soundtrack|o\.?s\.?t\.?)(?!\p{L})/iu;
 
 export function genreKinds(genres = []) {
   const kinds = { classical: [], ordinary: [], context: [] };
@@ -93,6 +98,8 @@ export function classificationEvidence(hints = {}) {
   const album = clean(hints.album);
   const ownText = [title, work].filter(Boolean).join(" \n ");
   const kinds = genreKinds(hints.genres);
+  const soundtrackAlbum = album.match(SOUNDTRACK_ALBUM)?.[0];
+  if (soundtrackAlbum && !kinds.context.length) kinds.context.push(`album: ${soundtrackAlbum}`);
   const signals = [];
   const add = (points, signal, value) => signals.push({ points, signal, kind: STRONG.has(signal) ? "strong" : "supporting", ...(value != null && { value: String(value) }) });
 
@@ -147,14 +154,21 @@ export function classificationEvidence(hints = {}) {
       decision = "not_classical";
       reason = `${kinds.ordinary.join("; ")} genre and no verifiable classical evidence`;
     }
-  } else if (kinds.context.length && !kinds.classical.length) {
+  } else if (kinds.context.length) {
     // Soundtracks, game music, crossover: a verified classical work (a
     // catalogue number, movement or composer relation, credited to a composer
     // who isn't the performer), or a recording with three kinds of classical
-    // evidence, is classical; any other evidence leaves it for review.
-    if (credited && score >= 4 && (verified.length || supporting.length >= 2)) {
+    // evidence, is classical; any other evidence leaves it for review. A
+    // "Classical" genre tag is no such evidence here: taggers file film
+    // scores under it. A score its own composer is credited for, with nothing
+    // verifiable, is not classical.
+    const supportingNonGenre = supporting.length;
+    if (credited && (verified.length || supportingNonGenre >= 2) && score - (kinds.classical.length ? 4 : 0) >= 4) {
       decision = "classical";
       reason = `verified classical work in a ${kinds.context.join("; ")} release`;
+    } else if (!verified.length && !credited && hasComposer) {
+      decision = "not_classical";
+      reason = `${kinds.context.join("; ")}: nothing verifiably classical, credited to its own composer`;
     } else if (credited || score > 1) {
       decision = "unsure";
       reason = `${kinds.context.join("; ")} genre with some classical evidence`;
@@ -164,7 +178,7 @@ export function classificationEvidence(hints = {}) {
     }
   } else if (kinds.classical.length) {
     decision = "classical";
-    reason = kinds.context.length ? `classical genre beside ${kinds.context.join("; ")}` : "classical genre";
+    reason = "classical genre";
   } else if (score >= 4 && (strong.length || supporting.length >= 2)) {
     // Without a genre: something verifiable, or two independent signals from
     // the titles themselves. A composer credit adds weight but never counts

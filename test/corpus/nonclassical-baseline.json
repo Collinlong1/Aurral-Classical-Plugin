@@ -1,9 +1,9 @@
 {
  "summary": [
   "157 tracks on 32 albums (expected: 117 not classical, 20 classical, 20 unsure)",
-  "false classical positives 0/117; not-classical tracks left unsure 10",
+  "false classical positives 0/117; not-classical tracks left unsure 8",
   "classical recognised 9/20, unsure 11, false negatives 0",
-  "crossover tracks classified classical 0/20; overall unsure rate 20.4%",
+  "crossover tracks classified classical 0/20; overall unsure rate 19.1%",
   "non-classical or unsure tracks given classical behaviour 0"
  ],
  "metrics": {
@@ -15,11 +15,11 @@
   },
   "falsePositives": 0,
   "falseNegatives": 0,
-  "notClassicalUnsure": 10,
+  "notClassicalUnsure": 8,
   "classicalUnsure": 11,
   "classicalRecognised": 9,
   "crossoverClassical": 0,
-  "unsureRate": 0.20382165605095542,
+  "unsureRate": 0.1910828025477707,
   "leaks": 0
  },
  "tracks": {
@@ -102,9 +102,9 @@
   },
   "a-clockwork-orange-soundtrack#1-10": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 2,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "a-clockwork-orange-soundtrack#1-13": {
@@ -851,9 +851,9 @@
   },
   "nobuo-uematsu-final-fantasy-vii#1-1": {
    "expect": "not_classical",
-   "state": "unsure",
+   "state": "not_classical",
    "score": 2,
-   "outcome": "unsure",
+   "outcome": "match",
    "leaks": []
   },
   "nobuo-uematsu-final-fantasy-vii#1-2": {
@@ -1246,8 +1246,8 @@
   },
   "nobuo-uematsu-final-fantasy-vii": {
    "expect": "not_classical",
-   "state": "unsure",
-   "outcome": "unsure"
+   "state": "not_classical",
+   "outcome": "match"
   },
   "platoon-soundtrack": {
    "expect": "unsure",

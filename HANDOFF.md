@@ -1,3 +1,14 @@
+# 1.0.32: film scores are not classical from a Classical genre tag
+
+November 13, 2026. Audit on 1.0.31 after the scan: matched tracks 4,293 of 4,920; albums 38/31/27 (96 with classical tracks); the 10 refused split pieces matched; the dry run has nothing left; reviews classification 300, movement-mismatch 24, identity 11, duplicate-work 5. `explain-classification.mjs` on six film-score albums: no manual classification change ever, so the user's "not classical" marks never reached the plugin; the automatic classifier made Interstellar, both Hobbit scores, the Lord of the Rings trilogy and Mulan classical (The Last Jedi unsure, 20 reviews).
+
+Cause in `classify-evidence.js`: "classical genre beside soundtrack" decided classical on the genre alone, and an album titled "… Original Motion Picture Soundtrack" was no soundtrack context at all. Now:
+- An album titled as a soundtrack (motion picture / film / TV / game soundtrack or score, "Original Soundtrack/Score", "Music from the Motion Picture", "OST") is soundtrack context, like the genre.
+- In soundtrack context a Classical genre tag is not evidence. A verified classical work (catalogue number, movement tag or composer relation, or two independent title signals) credited apart from its performers stays classical (Amadeus's K. 466). A track with a composer who is its own credited artist and nothing verifiable is not classical. Anything else is unsure, as before (a track with no composer and a WORK tag; a score credited apart from an orchestra).
+- A rescan reclassifies every unpinned track; reviews close when a track stops being unsure.
+
+Corpora: non-classical unsure 10 → 8 (a game-score and a soundtrack track now not classical; the mixed soundtrack album keeps its 5 classical tracks), no false negatives, baseline saved; Apple unchanged. Test in `test/messy-matching.test.js` with the six albums' shapes, Amadeus and a "Ghost Trio"; fails on 1.0.31. 301 plugin tests pass.
+
 # 1.0.31: rescans stat unchanged files instead of reading them
 
 November 13, 2026. A scan of the user's library takes about an hour. Every rescan opened every file again to re-read its tags and audio properties (`readTags`), although only changed files were re-hashed. Now `scanFile` returns the last scan's evidence for a file nothing wrote to since: same real path, size, modified time and inode, the same ctime (stored as `ctimeMs`; any write moves it, including a tag editor that keeps the modified time), the host placing it the same way (title, album, artist, album ID, track and disc number, recording ID), and tags that were readable last time. Such a file is only stat'ed. The first scan on 1.0.31 has no stored ctime and reads everything once more. `reconcile` compares evidence without `ctimeMs`, so a ctime-only change refreshes the stored row in place and adds no evidence row or audit event. Scan progress counts reused files (`progress.reused`, kept by compaction).

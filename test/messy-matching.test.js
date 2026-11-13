@@ -995,3 +995,22 @@ test("matching: an album record left on another number's work does not keep a sp
   autoMatchTaggedWorks(c, { albumId: "howard", actor: "admin", allowStructuredTitles: true });
   assert.equal(groups().filter(([, work]) => work).length, 1);
 });
+
+// From the user's library: film scores tagged Classical (Interstellar, The
+// Hobbit, The Lord of the Rings, Mulan) were classical, because a classical
+// genre beside a soundtrack decided alone, and an album titled "Original
+// Motion Picture Soundtrack" was no soundtrack at all to the classifier.
+test("classification: a film score is not classical from a Classical tag; a classical work in a soundtrack still is", () => {
+  const score = (album, composer, genres, extra = {}) => decide({ title: "Main Title", album, albumArtist: composer, artist: composer, composer: [composer], genres, ...extra });
+  assert.equal(score("Interstellar: Original Motion Picture Soundtrack", "Hans Zimmer", ["Classical"]), "not_classical");
+  assert.equal(score("The Hobbit: An Unexpected Journey: Original Motion Picture Soundtrack", "Howard Shore", ["Classical", "Soundtrack"]), "not_classical");
+  assert.equal(score("Star Wars: The Last Jedi: Original Motion Picture Soundtrack", "John Williams", []), "not_classical");
+  assert.equal(score("Mulan", "Harry Gregson-Williams", ["Classical", "Film Score"]), "not_classical");
+  // Credited apart from its performers, with nothing verifiable: review.
+  assert.equal(score("The Hobbit: Original Motion Picture Soundtrack", "Howard Shore", ["Classical"], { artist: "London Philharmonic Orchestra", composerDistinct: true }), "unsure");
+  // A verified classical work on a soundtrack, and a classical album, stay.
+  assert.equal(decide({ title: "Piano Concerto No. 20 in D minor, K. 466: II. Romance", album: "Amadeus (Original Soundtrack)", artist: "Academy of St Martin in the Fields", composer: ["Wolfgang Amadeus Mozart"], composerDistinct: true, genres: ["Classical", "Soundtrack"] }), "classical");
+  assert.equal(decide({ title: "Symphony No. 5 in C minor, Op. 67: I. Allegro con brio", album: "Beethoven: Symphonies", artist: "Berliner Philharmoniker", composer: ["Ludwig van Beethoven"], composerDistinct: true, genres: ["Classical"] }), "classical");
+  // A word that only contains "ost" is no soundtrack.
+  assert.equal(decide({ title: "Ghost Trio, Op. 70 No. 1: I. Allegro vivace", album: "Ghost Trio", composer: ["Ludwig van Beethoven"], composerDistinct: true, genres: ["Classical"] }), "classical");
+});

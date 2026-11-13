@@ -36968,6 +36968,7 @@ var CLASSICAL_NAMES = new Set(
   [...DEFAULT_CLASSICAL_GENRES, "romantic", "classical period", "early romantic", "late romantic", "contemporary", "modern composition", "avant garde"].map(normGenre)
 );
 var CLASSICAL_WORD2 = /(^|\s)classical(\s|$)/;
+var SOUNDTRACK_ALBUM = new RegExp("(?<!\\p{L})(?:(?:original\\s+)?(?:motion\\s+picture|film|movie|television|tv|series|game|video\\s+game)\\s+(?:soundtrack|score)|original\\s+(?:soundtrack|score)|music\\s+from\\s+(?:and\\s+inspired\\s+by\\s+)?the\\s+(?:motion\\s+picture|film|movie|series)|soundtrack|o\\.?s\\.?t\\.?)(?!\\p{L})", "iu");
 function genreKinds(genres = []) {
   const kinds2 = { classical: [], ordinary: [], context: [] };
   for (const raw of genres) {
@@ -36994,6 +36995,8 @@ function classificationEvidence(hints = {}) {
   const album = clean2(hints.album);
   const ownText = [title, work].filter(Boolean).join(" \n ");
   const kinds2 = genreKinds(hints.genres);
+  const soundtrackAlbum = album.match(SOUNDTRACK_ALBUM)?.[0];
+  if (soundtrackAlbum && !kinds2.context.length) kinds2.context.push(`album: ${soundtrackAlbum}`);
   const signals = [];
   const add = (points, signal, value) => signals.push({ points, signal, kind: STRONG.has(signal) ? "strong" : "supporting", ...value != null && { value: String(value) } });
   if (kinds2.classical.length) add(4, "classical genre", kinds2.classical.join("; "));
@@ -37034,10 +37037,14 @@ function classificationEvidence(hints = {}) {
       decision = "not_classical";
       reason = `${kinds2.ordinary.join("; ")} genre and no verifiable classical evidence`;
     }
-  } else if (kinds2.context.length && !kinds2.classical.length) {
-    if (credited && score >= 4 && (verified2.length || supporting.length >= 2)) {
+  } else if (kinds2.context.length) {
+    const supportingNonGenre = supporting.length;
+    if (credited && (verified2.length || supportingNonGenre >= 2) && score - (kinds2.classical.length ? 4 : 0) >= 4) {
       decision = "classical";
       reason = `verified classical work in a ${kinds2.context.join("; ")} release`;
+    } else if (!verified2.length && !credited && hasComposer) {
+      decision = "not_classical";
+      reason = `${kinds2.context.join("; ")}: nothing verifiably classical, credited to its own composer`;
     } else if (credited || score > 1) {
       decision = "unsure";
       reason = `${kinds2.context.join("; ")} genre with some classical evidence`;
@@ -37047,7 +37054,7 @@ function classificationEvidence(hints = {}) {
     }
   } else if (kinds2.classical.length) {
     decision = "classical";
-    reason = kinds2.context.length ? `classical genre beside ${kinds2.context.join("; ")}` : "classical genre";
+    reason = "classical genre";
   } else if (score >= 4 && (strong.length || supporting.length >= 2)) {
     decision = "classical";
     reason = "corroborated classical evidence";
@@ -42556,7 +42563,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.31" : "dev";
+var VERSION = true ? "1.0.32" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js
