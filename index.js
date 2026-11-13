@@ -37136,8 +37136,8 @@ function reconcile(catalogue, snapshot) {
       if (items.length === 1 && demand.get(items[0]) === 1) {
         const item = items[0];
         claimed.add(item);
-        if (old.state === "active" && old.core_id === item.coreId && old.file_id === item.fileId && old.evidence === json(item)) {
-          db.prepare("UPDATE track_link SET state='active' WHERE id=?").run(old.id);
+        if (old.state === "active" && old.core_id === item.coreId && old.file_id === item.fileId && withoutCtime(old.evidence) === withoutCtime(json(item))) {
+          db.prepare("UPDATE track_link SET state='active',evidence=? WHERE id=?").run(json(item), old.id);
           rows.push({ ...item, id: old.id });
           continue;
         }
@@ -37194,6 +37194,10 @@ function reconcile(catalogue, snapshot) {
     }
     return rows;
   });
+}
+function withoutCtime(evidence2) {
+  const { ctimeMs, ...rest } = JSON.parse(evidence2);
+  return JSON.stringify(rest);
 }
 function classify(catalogue, target, hints, { manual = null, actor: actor3 = null, inherited = null } = {}) {
   return transaction(catalogue.db, () => {
@@ -41291,6 +41295,7 @@ var ModelJobs = class _ModelJobs {
           input=json_object('instanceId',json_extract(input,'$.instanceId'),'epoch',json_extract(input,'$.epoch'),
             'generation',json_extract(input,'$.generation'),'total',coalesce(json_extract(input,'$.total'),json_array_length(input,'$.files'))),
           progress=json_object('cursor',coalesce(json_extract(progress,'$.cursor'),0),'errorCount',coalesce(json_extract(progress,'$.errorCount'),0),
+            'reused',coalesce(json_extract(progress,'$.reused'),0),
             'errors',json(coalesce(json_extract(progress,'$.errors'),'[]')))
          WHERE id=?`
     ).run(id);
@@ -41781,6 +41786,7 @@ async function enqueueModelScan(ctx, actor3, { system = false } = {}) {
     catalogue.close();
   }
 }
+var REUSED = Symbol("reused");
 async function scanFile(file, root, prior) {
   const real = await fs4.realpath(file.readPath);
   const relative = path7.relative(root, real);
@@ -41788,6 +41794,8 @@ async function scanFile(file, root, prior) {
     throw new Error("Indexed model file is outside the configured library");
   const before = await fs4.stat(real);
   const unchanged = prior?.fingerprint && prior.observedRealPath === real && prior.size === before.size && prior.mtimeMs === before.mtimeMs && prior.ino === before.ino;
+  if (unchanged && prior.hints && !prior.hints.tagsUnreadable && prior.ctimeMs != null && prior.ctimeMs === before.ctimeMs && ["title", "album", "artist", "albumId", "trackNumber", "discNumber", "recordingMbid"].every((key) => prior[key] === file[key]))
+    return { ...prior, ...file, durationMs: prior.durationMs, [REUSED]: true };
   const hash = unchanged ? prior.fingerprint : await fingerprint(real);
   const parsed = readModelTags(real);
   const tags = parsed || emptyTags();
@@ -41805,6 +41813,7 @@ async function scanFile(file, root, prior) {
       size: after.size,
       mtimeMs: after.mtimeMs,
       ino: after.ino,
+      ctimeMs: after.ctimeMs,
       durationMs,
       fingerprint: hash,
       hints: {
@@ -41821,6 +41830,7 @@ async function scanFile(file, root, prior) {
     size: after.size,
     mtimeMs: after.mtimeMs,
     ino: after.ino,
+    ctimeMs: after.ctimeMs,
     durationMs,
     fingerprint: hash,
     hints: {
@@ -42012,7 +42022,7 @@ async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 200, checkpointMs
         const items = collected.slice(saved);
         const ok = jobs.checkpoint(
           job,
-          { cursor, chunks: chunks + (items.length && !extra.done ? 1 : 0), errors, errorCount, total: input.files.length },
+          { cursor, chunks: chunks + (items.length && !extra.done ? 1 : 0), errors, errorCount, reused, total: input.files.length },
           { leaseMs: 6e4, chunk: { seq: chunks, items }, ...extra }
         );
         if (ok && items.length && !extra.done) {
@@ -42023,6 +42033,7 @@ async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 200, checkpointMs
       };
       const errors = job.progress.errors || [];
       let errorCount = job.progress.errorCount || 0;
+      let reused = job.progress.reused || 0;
       const root = await fs4.realpath(ctx.libraryFolder);
       const previous = new Map(
         catalogue.db.prepare(
@@ -42059,7 +42070,9 @@ async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 200, checkpointMs
           const file = input.files[cursor];
           const prior = previous.get(JSON.stringify([file.coreId, file.fileId]));
           try {
-            collected.push(await scanFile(file, root, prior));
+            const evidence2 = await scanFile(file, root, prior);
+            if (evidence2[REUSED]) reused++;
+            collected.push(evidence2);
           } catch (error) {
             skip(file, error, prior);
           }
@@ -42543,7 +42556,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.30" : "dev";
+var VERSION = true ? "1.0.31" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js

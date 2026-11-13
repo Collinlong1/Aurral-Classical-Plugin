@@ -248,6 +248,7 @@ export async function enqueueModelScan(ctx, actor, { system = false } = {}) {
   }
 }
 
+const REUSED = Symbol("reused");
 async function scanFile(file, root, prior) {
   const real = await fs.realpath(file.readPath);
   const relative = path.relative(root, real);
@@ -265,6 +266,20 @@ async function scanFile(file, root, prior) {
     prior.size === before.size &&
     prior.mtimeMs === before.mtimeMs &&
     prior.ino === before.ino;
+  // Nothing wrote to the file since the last scan read it: any write,
+  // a tag edit that keeps the modified time included, moves its ctime. And
+  // the host still places it the same way. What that scan read still holds,
+  // so the file is not opened again; a rescan of an unchanged library only
+  // stats its files.
+  if (
+    unchanged &&
+    prior.hints &&
+    !prior.hints.tagsUnreadable &&
+    prior.ctimeMs != null &&
+    prior.ctimeMs === before.ctimeMs &&
+    ["title", "album", "artist", "albumId", "trackNumber", "discNumber", "recordingMbid"].every((key) => prior[key] === file[key])
+  )
+    return { ...prior, ...file, durationMs: prior.durationMs, [REUSED]: true };
   const hash = unchanged ? prior.fingerprint : await fingerprint(real);
   const parsed = readModelTags(real);
   const tags = parsed || emptyTags();
@@ -288,6 +303,7 @@ async function scanFile(file, root, prior) {
       size: after.size,
       mtimeMs: after.mtimeMs,
       ino: after.ino,
+      ctimeMs: after.ctimeMs,
       durationMs,
       fingerprint: hash,
       hints: {
@@ -304,6 +320,7 @@ async function scanFile(file, root, prior) {
     size: after.size,
     mtimeMs: after.mtimeMs,
     ino: after.ino,
+    ctimeMs: after.ctimeMs,
     durationMs,
     fingerprint: hash,
     hints: {
@@ -549,7 +566,7 @@ export async function runModelJobs(
         const items = collected.slice(saved);
         const ok = jobs.checkpoint(
           job,
-          { cursor, chunks: chunks + (items.length && !extra.done ? 1 : 0), errors, errorCount, total: input.files.length },
+          { cursor, chunks: chunks + (items.length && !extra.done ? 1 : 0), errors, errorCount, reused, total: input.files.length },
           { leaseMs: 60_000, chunk: { seq: chunks, items }, ...extra },
         );
         if (ok && items.length && !extra.done) {
@@ -560,6 +577,8 @@ export async function runModelJobs(
       };
       const errors = job.progress.errors || [];
       let errorCount = job.progress.errorCount || 0;
+      // Files an earlier scan read that were not opened again.
+      let reused = job.progress.reused || 0;
       const root = await fs.realpath(ctx.libraryFolder);
       // Last known evidence per host file: unchanged files skip re-hashing,
       // and a file that can't be read this time keeps its previous evidence.
@@ -609,7 +628,9 @@ export async function runModelJobs(
           const file = input.files[cursor];
           const prior = previous.get(JSON.stringify([file.coreId, file.fileId]));
           try {
-            collected.push(await scanFile(file, root, prior));
+            const evidence = await scanFile(file, root, prior);
+            if (evidence[REUSED]) reused++;
+            collected.push(evidence);
           } catch (error) {
             skip(file, error, prior);
           }

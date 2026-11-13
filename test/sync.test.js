@@ -187,3 +187,44 @@ test("#10 a sync request survives a failed snapshot, a pending scan and a resume
   await enqueueModelScan(ctx, admin);
   assert.equal(snapshots(), 3);
 });
+
+// A scan took about an hour on the user's library: every unchanged file was
+// opened again to re-read its tags. Now a file nothing wrote to since the
+// last scan (same path, size, modified time, inode and ctime, placed the same
+// way by the host) is only stat'ed. A tag edit that keeps the modified time
+// still moves ctime, so it is read again.
+test("rescans open only files written since the last scan, even when a tag edit kept the modified time", async (t) => {
+  const { ctx, files } = await library(t, 3);
+  const scan = async () => {
+    const id = await enqueueModelScan(ctx, { id: 1, role: "admin" });
+    await runModelJobs(ctx, { budgetMs: 30_000 });
+    const c = await openCatalogue(path.join(ctx.dataFolder, "model"));
+    try {
+      return {
+        reused: JSON.parse(c.db.prepare("SELECT progress FROM model_job WHERE id=?").get(id).progress).reused,
+        titles: c.db.prepare("SELECT json_extract(evidence,'$.hints.title') AS title FROM track_link ORDER BY core_id").all().map((row) => row.title),
+      };
+    } finally {
+      c.close();
+    }
+  };
+  // The first scan after this change has no ctime to compare: it reads all.
+  assert.equal((await scan()).reused, 0);
+  assert.equal((await scan()).reused, 3);
+  const { writeTags } = await import("../src/tags.js");
+  const { mtime, atime } = await fs.stat(files[1]);
+  await writeTags(files[1], { title: ["Retagged"] });
+  await fs.utimes(files[1], atime, mtime);
+  const after = await scan();
+  assert.equal(after.reused, 2);
+  assert.equal(after.titles[1], "Retagged");
+  // Written in place, same size, inode and modified time: only ctime tells.
+  const before = await fs.stat(files[2]);
+  const fd = await fs.open(files[2], "r+");
+  await fd.write(Buffer.from([0x55]), 0, 1, before.size - 60);
+  await fd.close();
+  await fs.utimes(files[2], before.atime, before.mtime);
+  const inPlace = await fs.stat(files[2]);
+  assert.deepEqual([inPlace.size, inPlace.ino, inPlace.mtimeMs], [before.size, before.ino, before.mtimeMs]);
+  assert.equal((await scan()).reused, 2);
+});

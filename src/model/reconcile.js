@@ -145,13 +145,15 @@ export function reconcile(catalogue, snapshot) {
         claimed.add(item);
         // An unchanged file needs no new evidence row or audit event; repeated
         // scans otherwise grow the database by one of each per track.
+        // The ctime a scan keeps only says whether the file was written
+        // since; a new ctime alone is refreshed in place, not new evidence.
         if (
           old.state === "active" &&
           old.core_id === item.coreId &&
           old.file_id === item.fileId &&
-          old.evidence === json(item)
+          withoutCtime(old.evidence) === withoutCtime(json(item))
         ) {
-          db.prepare("UPDATE track_link SET state='active' WHERE id=?").run(old.id);
+          db.prepare("UPDATE track_link SET state='active',evidence=? WHERE id=?").run(json(item), old.id);
           rows.push({ ...item, id: old.id });
           continue;
         }
@@ -211,6 +213,11 @@ export function reconcile(catalogue, snapshot) {
     }
     return rows;
   });
+}
+
+function withoutCtime(evidence) {
+  const { ctimeMs, ...rest } = JSON.parse(evidence);
+  return JSON.stringify(rest);
 }
 
 // Model-only decision; this function never writes tags or changes stock search/playback.

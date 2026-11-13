@@ -1264,7 +1264,11 @@ test("#9 a rescan that can't parse a file keeps the tag evidence an earlier scan
     genres: ["Classical"],
     composerDistinct: true,
   };
-  await stored((evidence) => Object.assign(evidence.hints, tags));
+  await stored((evidence) => {
+    Object.assign(evidence.hints, tags);
+    // Written since: the next scan opens it again (and its parser fails).
+    evidence.ctimeMs = 0;
+  });
   await scan();
   const { evidence, state } = await stored();
   for (const [key, value] of Object.entries(tags)) assert.deepEqual(evidence.hints[key], value, key);

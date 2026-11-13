@@ -98,6 +98,7 @@ export class ModelJobs {
           input=json_object('instanceId',json_extract(input,'$.instanceId'),'epoch',json_extract(input,'$.epoch'),
             'generation',json_extract(input,'$.generation'),'total',coalesce(json_extract(input,'$.total'),json_array_length(input,'$.files'))),
           progress=json_object('cursor',coalesce(json_extract(progress,'$.cursor'),0),'errorCount',coalesce(json_extract(progress,'$.errorCount'),0),
+            'reused',coalesce(json_extract(progress,'$.reused'),0),
             'errors',json(coalesce(json_extract(progress,'$.errors'),'[]')))
          WHERE id=?`,
       )

@@ -145,7 +145,7 @@ test("old finished scans are compacted and stop growing the database", async (t)
     const row = c.db.prepare("SELECT length(input) AS i,length(progress) AS p,input,progress FROM model_job WHERE id=?").get(bloated);
     assert.ok(row.i < 300 && row.p < 300, `compact sizes ${row.i}/${row.p}`);
     assert.equal(JSON.parse(row.input).total, 2000);
-    assert.deepEqual(JSON.parse(row.progress), { cursor: 2000, errorCount: 0, errors: [] });
+    assert.deepEqual(JSON.parse(row.progress), { cursor: 2000, errorCount: 0, reused: 0, errors: [] });
   });
 });
 
