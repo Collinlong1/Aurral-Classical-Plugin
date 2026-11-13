@@ -206,11 +206,18 @@ for (const album of albums.values()) {
 }
 report.sort((a, b) => b.flags.length - a.flags.length || a.title.localeCompare(b.title));
 
-// What Auto-match would do: run it on the snapshot for every album, in the
-// order "Auto-match every album" would, and see where each track ends up.
+// What the next scan and Auto-match would do: run them on the snapshot (the
+// scan's library-wide pass, then every album with unmatched tracks, in the
+// order "Auto-match every album" would) and see where each track ends up.
+// This is the dry run of the repairs too: every merge, split and expansion
+// it makes is listed from the snapshot's audit trail.
 const sim = await openCatalogue(snapshotFolder);
 const simulated = new Map();
+const dryRun = { merges: [], splits: [], expansions: [], duplicateReviews: 0, duplicatesAfter: [] };
 try {
+  const firstEvent = sim.db.prepare("SELECT coalesce(max(id),0) AS id FROM audit_event").get().id;
+  const reviewsBefore = sim.db.prepare("SELECT count(*) AS n FROM review_item WHERE status='open' AND json_extract(evidence,'$.reason')='duplicate-work'").get().n;
+  autoMatchTaggedWorks(sim, { actor: "audit", allowStructuredTitles: true });
   for (const album of report)
     if (album.unmatchedTracks.length)
       autoMatchTaggedWorks(sim, { albumId: album.albumId, actor: "audit", allowStructuredTitles: true });
@@ -229,6 +236,28 @@ try {
       .all()
       .map((row) => [row.id, row.work_id]),
   );
+  const titleOf = (id) => nameOf(id, "title") ?? id;
+  for (const event of sim.db.prepare("SELECT action,target_id,data FROM audit_event WHERE id>? ORDER BY id").all(firstEvent)) {
+    const data = JSON.parse(event.data);
+    if (event.action === "work.merge") dryRun.merges.push({ drop: titleOf(event.target_id), into: titleOf(data.into), reason: data.reason || "same identity" });
+    if (event.action === "work.split_sibling") dryRun.splits.push({ work: titleOf(event.target_id), albumId: data.albumId, workIdentity: data.subject, tracksName: data.tracks });
+    if (event.action === "work.auto_match_expand") dryRun.expansions.push({ work: titleOf(event.target_id), albumId: data.albumId, from: data.from, to: data.to });
+  }
+  dryRun.duplicateReviews =
+    sim.db.prepare("SELECT count(*) AS n FROM review_item WHERE status='open' AND json_extract(evidence,'$.reason')='duplicate-work'").get().n - reviewsBefore;
+  const after = new Map();
+  for (const { id } of sim.db.prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL").all()) {
+    const title = nameOf(id, "title");
+    const composers = sim.db
+      .prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer' ORDER BY position")
+      .all(id)
+      .map((row) => nameOf(row.contributor_id, "name"))
+      .filter((name) => typeof name === "string");
+    if (typeof title !== "string") continue;
+    const key = workKey(title, composers);
+    after.set(key, [...(after.get(key) || []), { id, title, composers }]);
+  }
+  dryRun.duplicatesAfter = [...after.values()].filter((list) => list.length > 1);
   const reviewOf = new Map();
   for (const row of sim.db.prepare("SELECT target_id,evidence FROM review_item WHERE status='open' AND kind='auto_match'").all()) {
     const evidence = JSON.parse(row.evidence);
@@ -295,8 +324,19 @@ const lines = [
     .sort((a, b) => b[1] - a[1])
     .map(([reason, n]) => `- ${reason}: ${n}`),
   "",
-  "What Auto-match every album would do with those tracks now (run on a snapshot):",
+  "What the next scan and Auto-match every album would do with those tracks now (run on a snapshot):",
   ...[...simulated].sort((a, b) => b[1] - a[1]).map(([outcome, n]) => `- ${outcome}: ${n}`),
+  "",
+  "Dry run of the repairs (on the snapshot; nothing was written to the catalogue):",
+  `- works split from a work an old merge joined across sibling numbers: ${dryRun.splits.length}`,
+  ...dryRun.splits.slice(0, 40).map((x) => `  - album ${x.albumId}: "${x.work}" (${x.workIdentity}) gives back tracks naming ${x.tracksName}`),
+  `- duplicate works merged: ${dryRun.merges.length}`,
+  ...dryRun.merges.slice(0, 40).map((x) => `  - "${x.drop}" into "${x.into}" (${x.reason})`),
+  `- incomplete works expanded from a fuller album: ${dryRun.expansions.length}`,
+  ...dryRun.expansions.slice(0, 40).map((x) => `  - "${x.work}": ${x.from} → ${x.to} movements, from album ${x.albumId}`),
+  `- new duplicate-work reviews (same title, no number): ${dryRun.duplicateReviews}`,
+  `- duplicate works left after the run: ${dryRun.duplicatesAfter.length}`,
+  ...dryRun.duplicatesAfter.slice(0, 30).map((list) => `  - ${list.map((w) => w.title).join(" | ")} — ${list[0].composers.join(", ")}`),
   "",
   "Open review items by reason:",
   ...[...reasons].sort((a, b) => b[1] - a[1]).map(([reason, n]) => `- ${reason}: ${n}`),
@@ -322,7 +362,7 @@ for (const album of report.filter((a) => a.flags.length)) {
   if (!album.blocks.length && !album.unmatchedTracks.length) for (const s of album.sample) lines.push(`  - tags: title "${s.title}", work "${s.work}", grouping "${s.grouping}", composer ${JSON.stringify(s.composer)}, recording ID ${s.hasRecordingId ? "yes" : "no"}`);
 }
 await fs.writeFile(path.join(outDir, "audit.md"), `${lines.join("\n")}\n`);
-await fs.writeFile(path.join(outDir, "audit.json"), JSON.stringify({ albums: report, duplicateWorks, reviews: Object.fromEntries(reasons) }, null, 1));
+await fs.writeFile(path.join(outDir, "audit.json"), JSON.stringify({ albums: report, duplicateWorks, dryRun, reviews: Object.fromEntries(reasons) }, null, 1));
 db.close();
 console.log(`Audited ${report.length} albums: ${path.join(outDir, "audit.md")}, ${path.join(outDir, "audit.json")}`);
 } finally {

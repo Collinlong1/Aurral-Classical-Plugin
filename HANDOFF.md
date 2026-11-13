@@ -1,3 +1,16 @@
+# v0.1 completion, step 4: undo sibling-number merges; merge duplicates only on a number; dry run in the audit
+
+Manifest 1.0.26, November 13, 2026.
+
+**What the 1.0.22 audit's "duplicates" were.** Of 47 groups, 45 were different pieces sharing a catalogue stem (fixed in 1.0.23) and 2 real duplicates (Vocalise, op. 34 no. 14; The Fairy Queen, Z. 629). `mergeDuplicateAutoWorks`, which runs with every match, merges auto-made unedited works sharing a `workKey`; under the 1.0.22 stem key it folded standalone works such as "Valse oubliée, S215 No. 1–4" into one. That is where the stored false joins came from (about 9 in the audit: S215, S214, S225, S406i/ii, S385i/a, S388/b, S172/S172a).
+
+- **Repair** (`repairSiblingJoins`, runs before each match, library-wide on scans): a recording whose tracks all name a catalogue number `provablyDifferent` from its work's is detached, and the same match gives it its own work (or the right one). Provably different: same system, and the base numbers differ, the letters after them differ, or both give a sub-number and those differ, under every reading of Liszt's three notations ("S443i", "S. 443/1", "S443 No. 1") and of a lone "i" (letter or roman). Not different: a set and its numbered piece ("S145" / "S145 No. 1"), notation twins, two systems ("Sz. 107" / "BB 105"). Only works matching made, nobody edited (no manual assertion, no `editor.*` event), on albums nobody assigned by hand. The album's moved `album-work` record for that piece is marked stale. Audited as `work.split_sibling`. Favourites stay on the work they are on (a merged work's state cannot be told apart).
+- **MusicBrainz rejoin guard.** The old merges also moved the dropped works' MusicBrainz work IDs. When a MusicBrainz match points at a work whose title names a number provably different from the tags', the match does not join it; the ID conflict goes to identity review.
+- **Duplicates merge only on a number.** Same composers and a key with no digit ("Prelude", "Ave Maria") go to an `identity` review (`duplicate-work`) instead of merging. A catalogue number, or a title with a number ("Symphony No. 5", "Z. 629"), still merges, transactionally, keeping favourites, picks and identities (`mergeWork`, unchanged).
+- **Dry run.** `scripts/audit-catalogue.mjs` now runs the next scan's library-wide pass on the snapshot, then every album with unmatched tracks, and lists from the snapshot's audit trail every split, merge and expansion it would make, new duplicate reviews, and the duplicates left; `audit.json` has them under `dryRun`. The live catalogue is never written.
+
+Tests: in `test/messy-matching.test.js`, an old merge of four valses (with MusicBrainz IDs, a favourite, an edited sibling, notation twins and a set) comes apart exactly where it should, twice-run idempotent; duplicates merge on a number and review without one. `test/audit-catalogue.test.js` runs the audit on a synthetic catalogue: the dry run lists the two splits, the live file's hash is unchanged and the snapshot is removed. Each fails with its rule switched off. 295 plugin tests pass; Apple and non-classical corpora unchanged.
+
 # v0.1 completion, step 3: matching after every scan, MusicBrainz in the background
 
 Manifest 1.0.25, November 13, 2026. The user does not want to match albums by hand.

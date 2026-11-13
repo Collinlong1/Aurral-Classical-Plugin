@@ -1070,7 +1070,7 @@ function createGroup(catalogue, group, actor, index) {
     const key = group.providerWorkId
       ? JSON.stringify(["musicbrainz", group.providerWorkId])
       : workKey(group.work, group.composers);
-    const providerWork =
+    let providerWork =
       group.providerWorkId &&
       catalogue.db
         .prepare(
@@ -1079,6 +1079,15 @@ function createGroup(catalogue, group, actor, index) {
            AND x.state='active' AND e.deleted_at IS NULL`,
         )
         .get(group.providerWorkId)?.entity_id;
+    // An old merge across sibling numbers left this MusicBrainz work on
+    // another piece's work: the tags' number says which piece this is, and
+    // the identity conflict goes to review.
+    if (
+      providerWork &&
+      group.localTitle &&
+      provablyDifferent(catalogueSubject(group.localTitle), catalogueSubject(String(resolvedName(catalogue, providerWork, "title") || "")))
+    )
+      providerWork = null;
     // A same-titled work by a same-named but differently verified composer
     // is someone else's work.
     const otherComposer = (id) =>
@@ -1514,8 +1523,15 @@ export function mergeDuplicateAutoWorks(catalogue, { actor = null } = {}) {
     const people = mergeDuplicateComposers(catalogue, index, actor);
     if (people) index = catalogueIndex(catalogue);
     let works = 0;
-    for (const ids of index.works.values()) {
+    for (const [key, ids] of index.works) {
       if (ids.length < 2) continue;
+      // Same composers and a title with no number ("Prelude", "Ave Maria")
+      // can be two pieces: an admin decides. A catalogue number, or a title
+      // with a number of its own ("Symphony No. 5", "Z. 629"), is identity.
+      if (!/\d/.test(JSON.parse(key)[1])) {
+        for (const id of ids.slice(1)) catalogue.review("identity", id, { reason: "duplicate-work", keep: ids[0], evidence: "same title, no number" });
+        continue;
+      }
       const auto = (id) =>
         catalogue.db
           .prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work'")
@@ -1530,6 +1546,96 @@ export function mergeDuplicateAutoWorks(catalogue, { actor = null } = {}) {
     }
     return { people, works };
   });
+}
+
+// Two catalogue identities that cannot be one piece under any reading.
+// Liszt's numbers write a version or piece three ways ("S443i", "S. 443/1",
+// "S443 No. 1"), and a lone "i" may be a letter, so each reading is tried:
+// different when the base numbers differ, the letters after the number
+// differ, or both give a sub-number and those differ. A set and its
+// numbered piece ("S145" and "S145 No. 1"), notation twins ("S. 443/1" and
+// "S443i") and two systems ("Sz. 107", "BB 105") are not.
+const ROMAN_SUFFIX = /^(?:i{1,3}|iv|v|vi{1,3}|ix|x)$/;
+function catalogueReadings(subject) {
+  const match = subject.match(/^cat:([a-z]+):(\d+)([a-z]*)(?:\/([0-9a-z]+))?(?::([0-9a-z/]+))?$/);
+  if (!match) return null;
+  const [, system, base, suffix, slash, piece] = match;
+  const sub = piece || (slash && /^\d/.test(slash) ? slash : "") || "";
+  const readings = [];
+  const add = (letters, number) => readings.push({ system, base, letters, sub: number });
+  if (ROMAN_SUFFIX.test(suffix) && !sub) {
+    add("", String(romanValue(suffix)));
+    if (suffix.length === 1) add(suffix, "");
+  } else add(suffix, sub.replace(/[a-z]+$/, ""));
+  return readings;
+}
+export function provablyDifferent(a, b) {
+  const x = catalogueReadings(a),
+    y = catalogueReadings(b);
+  if (!x || !y || x[0].system !== y[0].system) return false;
+  const differ = (p, q) =>
+    p.base !== q.base || p.letters !== q.letters || (p.sub && q.sub && p.sub !== q.sub);
+  return x.every((p) => y.every((q) => differ(p, q)));
+}
+
+// Repairs works that an earlier rule joined across sibling numbers: under
+// 1.0.22 keys S215 No. 1–4 were one identity, so the duplicate merge folded
+// four valses into one work. A recording whose own tracks all name a number
+// that is provably another piece than its work's is detached, and this
+// match then gives it its own work (or the right one). Only works matching
+// made that nobody edited, and albums nobody assigned by hand.
+function repairSiblingJoins(catalogue, albumId, actor) {
+  const db = catalogue.db;
+  const works = db
+    .prepare(
+      `SELECT DISTINCT r.work_id AS id FROM realization r
+       ${albumId == null ? "" : `JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
+         JOIN track_link t ON t.id=s.track_link_id AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?`}
+       JOIN entity e ON e.id=r.work_id AND e.deleted_at IS NULL
+       WHERE EXISTS(SELECT 1 FROM external_identity x WHERE x.entity_id=r.work_id AND x.record_kind='album-work')`,
+    )
+    .all(...(albumId == null ? [] : [String(albumId)]));
+  let repaired = 0;
+  for (const { id: work } of works) {
+    const subject = catalogueSubject(String(resolvedName(catalogue, work, "title") || ""));
+    if (!subject) continue;
+    const ids = [work, ...workMovements(catalogue, work).map((m) => m.id)];
+    if (hasManualEdits(catalogue, ids)) continue;
+    if (db.prepare(`SELECT 1 FROM audit_event WHERE action LIKE 'editor.%' AND target_id IN (${ids.map(() => "?").join(",")}) LIMIT 1`).get(...ids)) continue;
+    for (const realization of db.prepare("SELECT id FROM realization WHERE work_id=?").all(work)) {
+      const items = db
+        .prepare(
+          `SELECT i.id,t.evidence FROM realization_item i JOIN segment s ON s.id=i.segment_id
+           JOIN track_link t ON t.id=s.track_link_id WHERE i.realization_id=?`,
+        )
+        .all(realization.id);
+      if (!items.length) continue;
+      const named = new Set(
+        items.map(({ evidence }) => {
+          const tagged = JSON.parse(evidence).hints || {};
+          const proposal = proposedWork({ ...tagged, title: withoutComposer(tagged.title, tagged.composer) }, true);
+          return proposal ? catalogueSubject(proposal.catalogue ? `${proposal.title}, ${proposal.catalogue}` : proposal.title) : "";
+        }),
+      );
+      const [own] = named;
+      if (named.size !== 1 || !own || !provablyDifferent(own, subject)) continue;
+      const album = String(JSON.parse(items[0].evidence).albumId);
+      if (db.prepare(`SELECT 1 FROM audit_event WHERE target_id=? AND action='editor.assign-album' AND CAST(json_extract(data,'$.values.albumId') AS TEXT)=?`).get(work, album)) continue;
+      transaction(db, () => {
+        for (const item of items) catalogue.detachItem(item.id, { dropRecording: true });
+        // The merge moved the album's record of making that piece here; it
+        // no longer says this album made this work.
+        for (const record of db
+          .prepare("SELECT record_id,evidence FROM external_identity WHERE entity_id=? AND record_kind='album-work' AND state='active' AND CAST(json_extract(evidence,'$.albumId') AS TEXT)=?")
+          .all(work, album))
+          if (catalogueSubject(String(JSON.parse(record.evidence).work || "")) === own)
+            db.prepare("UPDATE external_identity SET state='stale' WHERE entity_id=? AND record_kind='album-work' AND record_id=?").run(work, record.record_id);
+        catalogue.audit("work.split_sibling", work, { albumId: album, subject, tracks: own }, actor);
+      });
+      repaired++;
+    }
+  }
+  return repaired;
 }
 
 // Repairs albums matched before completer credits were merged: one auto-made
@@ -1797,6 +1903,7 @@ export function autoMatchTaggedWorks(
   } = {},
 ) {
   repairCompletionSplits(catalogue, albumId, actor);
+  repairSiblingJoins(catalogue, albumId, actor);
   const groups = candidates(
     catalogue,
     albumId,

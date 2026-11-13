@@ -9,7 +9,7 @@ import { createHash } from "node:crypto";
 import { tempFolders } from "./helpers.js";
 import { artistCredits, composersOf } from "../src/model/credits.js";
 import { classificationEvidence } from "../src/model/classify-evidence.js";
-import { splitTitle, stripWorkPrefix, autoMatchTaggedWorks, withoutComposer, mapToMovements, movementParts, catalogueSubject, workKey } from "../src/model/auto-match.js";
+import { splitTitle, stripWorkPrefix, autoMatchTaggedWorks, withoutComposer, mapToMovements, movementParts, catalogueSubject, workKey, mergeWork, provablyDifferent } from "../src/model/auto-match.js";
 import { openCatalogue } from "../src/model/catalogue.js";
 import { Metadata } from "../src/model/metadata.js";
 import { reconcile, classify } from "../src/model/reconcile.js";
@@ -786,3 +786,91 @@ function workMovementTitles(c, work, ids = false) {
     `SELECT a.value FROM field_resolution f JOIN assertion a ON a.id=f.assertion_id JOIN metadata_target m ON m.id=f.target_id WHERE m.entity_id=? AND f.field='title'`,
   ).get(row.target_id)?.value?.replace(/^"|"$/g, ""));
 }
+
+// From the 1.0.22 audit: the duplicate merge that runs with every match
+// folded works that shared a stem key, so "Valse oubliée No. 2, S215 No. 2"
+// held Nos. 1, 3 and 4. A match now detaches a recording whose tracks name
+// a provably different number from an unedited auto-made work; a set and
+// its numbered pieces, notation twins and edited works stay.
+test("matching: works an old merge joined across sibling numbers come apart; twins, sets and edits stay", async (t) => {
+  assert.equal(provablyDifferent("cat:s:215:1", "cat:s:215:2"), true);
+  assert.equal(provablyDifferent("cat:s:406i", "cat:s:406ii"), true);
+  assert.equal(provablyDifferent("cat:s:385i", "cat:s:385a"), true);
+  assert.equal(provablyDifferent("cat:s:443/1", "cat:s:443i"), false);
+  assert.equal(provablyDifferent("cat:s:443:1", "cat:s:443i"), false);
+  assert.equal(provablyDifferent("cat:s:145", "cat:s:145:1"), false);
+  assert.equal(provablyDifferent("cat:sz:107", "cat:bb:105"), false);
+  const liszt = (title) => ({ title, composer: ["Franz Liszt"], genres: ["Classical"] });
+  const valses = [1, 2, 3, 4].map((n) => `Valse oubliée No. ${n}, S215 No. ${n}`);
+  const c = await catalogueWith(t, [
+    { id: "howard", album: "The Complete Liszt Piano Music", albumArtist: "Leslie Howard", artist: "Leslie Howard", titles: [...valses, "Marche des Tcherkesses, S406i", "Tscherkessenmarsch, S406ii", "Pilgerchor (Tannhäuser), S443 No. 1", "Chor der älteren Pilger, S443i", "Capriccio alla turca, S388", "Fantasie über Motive von Beethoven, S388b"].map(liszt) },
+    { id: "etudes", album: "Liszt: Études", albumArtist: "Pianist", artist: "Pianist", titles: ["Waldesrauschen, S. 145 no. 1", "Gnomenreigen, S. 145 no. 2"].map((title) => ({ ...liszt(title), work: "Zwei Konzertetüden, S. 145" })) },
+  ]);
+  const match = () => autoMatchTaggedWorks(c, { albumId: null, actor: "admin", allowStructuredTitles: true });
+  for (const albumId of ["howard", "etudes"]) autoMatchTaggedWorks(c, { albumId, actor: "admin", allowStructuredTitles: true });
+  const workOf = (title) => renderAlbumPresentation(c, "howard").groups.find((group) => group.items.some((item) => item.title === title))?.workId;
+  // Rebuild what 1.0.22's merge made, MusicBrainz identities and all.
+  const no2 = workOf(valses[1]);
+  valses.forEach((title, i) => c.externalIdentity(workOf(title), "musicbrainz", "work", `mb-valse-${i + 1}`, { evidence: {} }));
+  for (const title of [valses[0], valses[2], valses[3]]) assert.ok(mergeWork(c, no2, workOf(title), "model-scan"));
+  assert.ok(mergeWork(c, workOf("Pilgerchor (Tannhäuser), S443 No. 1"), workOf("Chor der älteren Pilger, S443i"), "model-scan"));
+  assert.ok(mergeWork(c, workOf("Capriccio alla turca, S388"), workOf("Fantasie über Motive von Beethoven, S388b"), "model-scan"));
+  assert.ok(mergeWork(c, workOf("Marche des Tcherkesses, S406i"), workOf("Tscherkessenmarsch, S406ii"), "model-scan"));
+  // A listener's favourite and an admin's edit on two of them.
+  c.db.prepare("INSERT INTO user_work_state VALUES (7,?,1,NULL,?)").run(no2, Date.now());
+  new Metadata(c).manual(workOf("Marche des Tcherkesses, S406i"), "description", "Checked by hand.", { actor: "admin" });
+  const etudes = renderAlbumPresentation(c, "etudes").groups.map((group) => [group.workId, group.items.length]);
+  assert.deepEqual(etudes.map(([, n]) => n), [2]);
+
+  match();
+  // Each valse is its own work again; No. 2 keeps its work and favourite.
+  const valseWorks = valses.map(workOf);
+  assert.ok(valseWorks.every(Boolean));
+  assert.equal(new Set(valseWorks).size, 4);
+  assert.equal(valseWorks[1], no2);
+  assert.equal(c.db.prepare("SELECT favourite FROM user_work_state WHERE user_id=7 AND work_id=?").get(no2).favourite, 1);
+  assert.notEqual(workOf("Fantasie über Motive von Beethoven, S388b"), workOf("Capriccio alla turca, S388"));
+  // Twins, the edited work and the set stay as they were.
+  assert.equal(workOf("Chor der älteren Pilger, S443i"), workOf("Pilgerchor (Tannhäuser), S443 No. 1"));
+  assert.equal(workOf("Tscherkessenmarsch, S406ii"), workOf("Marche des Tcherkesses, S406i"));
+  assert.deepEqual(renderAlbumPresentation(c, "etudes").groups.map((group) => [group.workId, group.items.length]), etudes);
+  assert.equal(c.db.prepare("SELECT COUNT(*) AS n FROM audit_event WHERE action='work.split_sibling'").get().n, 4);
+  // MusicBrainz naming No. 1's work, which the merge left on No. 2's, does
+  // not put it back; the identity conflict is an admin's.
+  const no1Track = c.db.prepare("SELECT id FROM track_link WHERE core_id='howard-0'").get().id;
+  const no1 = valseWorks[0];
+  c.detachItem(c.db.prepare("SELECT i.id FROM realization_item i JOIN segment s ON s.id=i.segment_id WHERE s.track_link_id=?").get(no1Track).id, { dropRecording: true });
+  c.db.prepare("UPDATE entity SET deleted_at=? WHERE id=?").run(Date.now(), no1);
+  autoMatchTaggedWorks(c, {
+    albumId: "howard",
+    actor: "admin",
+    allowStructuredTitles: true,
+    providerMatches: new Map([[no1Track, { workId: "mb-valse-1", work: "Valse oubliée No. 1, S. 215/1", movement: null, standalone: true, aliases: [], composers: ["Franz Liszt"], composerIds: {} }]]),
+  });
+  assert.ok(workOf(valses[0]));
+  assert.notEqual(workOf(valses[0]), no2);
+  // A second match repairs nothing more.
+  match();
+  assert.equal(c.db.prepare("SELECT COUNT(*) AS n FROM audit_event WHERE action='work.split_sibling'").get().n, 4);
+});
+
+test("matching: duplicate works merge on a number; a title with none goes to review", async (t) => {
+  const c = await catalogueWith(t, []);
+  const metadata = new Metadata(c);
+  const composer = c.createEntity("person", { roles: ["composer"] });
+  metadata.derived(composer, "name", "Sergei Rachmaninoff");
+  const work = (title, album) => {
+    const id = c.createEntity("work");
+    metadata.derived(id, "title", title);
+    c.credit(id, composer, "composer", { position: 1 });
+    c.externalIdentity(id, "embedded-tags", "album-work", `${title}-${album}`, { evidence: { albumId: album } });
+    return id;
+  };
+  const vocalise = [work("Vocalise, op. 34 no. 14", "a"), work("Vocalise, Op. 34 No. 14", "b")];
+  const prelude = [work("Prelude", "a"), work("Prelude", "b")];
+  autoMatchTaggedWorks(c, { actor: "model-scan", allowStructuredTitles: true });
+  const live = (id) => c.db.prepare("SELECT deleted_at FROM entity WHERE id=?").get(id).deleted_at == null;
+  assert.deepEqual(vocalise.map(live), [true, false]);
+  assert.deepEqual(prelude.map(live), [true, true]);
+  assert.equal(c.db.prepare("SELECT json_extract(evidence,'$.reason') AS reason FROM review_item WHERE status='open' AND target_id=?").get(prelude[1])?.reason, "duplicate-work");
+});

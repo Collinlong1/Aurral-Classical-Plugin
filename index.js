@@ -38014,11 +38014,13 @@ function createGroup(catalogue, group, actor3, index) {
       )
     }));
     const key = group.providerWorkId ? JSON.stringify(["musicbrainz", group.providerWorkId]) : workKey(group.work, group.composers);
-    const providerWork = group.providerWorkId && catalogue.db.prepare(
+    let providerWork = group.providerWorkId && catalogue.db.prepare(
       `SELECT x.entity_id FROM external_identity x JOIN entity e ON e.id=x.entity_id
            WHERE x.provider='musicbrainz' AND x.record_kind='work' AND x.record_id=?
            AND x.state='active' AND e.deleted_at IS NULL`
     ).get(group.providerWorkId)?.entity_id;
+    if (providerWork && group.localTitle && provablyDifferent(catalogueSubject(group.localTitle), catalogueSubject(String(resolvedName(catalogue, providerWork, "title") || ""))))
+      providerWork = null;
     const otherComposer = (id) => catalogue.db.prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer'").all(id).some(({ contributor_id: person }) => {
       const mbid = group.composerIds?.[resolvedName(catalogue, person, "name")];
       const held2 = artistIdOf(catalogue, person);
@@ -38355,8 +38357,12 @@ function mergeDuplicateAutoWorks(catalogue, { actor: actor3 = null } = {}) {
     const people = mergeDuplicateComposers(catalogue, index, actor3);
     if (people) index = catalogueIndex(catalogue);
     let works = 0;
-    for (const ids of index.works.values()) {
+    for (const [key, ids] of index.works) {
       if (ids.length < 2) continue;
+      if (!/\d/.test(JSON.parse(key)[1])) {
+        for (const id of ids.slice(1)) catalogue.review("identity", id, { reason: "duplicate-work", keep: ids[0], evidence: "same title, no number" });
+        continue;
+      }
       const auto = (id) => catalogue.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work'").get(id) && !hasManualEdits(catalogue, [id, ...workMovements(catalogue, id).map((m) => m.id)]);
       const keep = ids.find((id) => !auto(id)) || ids[0];
       if (ids.filter((id) => !auto(id)).length > 1) continue;
@@ -38367,6 +38373,71 @@ function mergeDuplicateAutoWorks(catalogue, { actor: actor3 = null } = {}) {
     }
     return { people, works };
   });
+}
+var ROMAN_SUFFIX = /^(?:i{1,3}|iv|v|vi{1,3}|ix|x)$/;
+function catalogueReadings(subject) {
+  const match2 = subject.match(/^cat:([a-z]+):(\d+)([a-z]*)(?:\/([0-9a-z]+))?(?::([0-9a-z/]+))?$/);
+  if (!match2) return null;
+  const [, system, base, suffix, slash, piece] = match2;
+  const sub = piece || (slash && /^\d/.test(slash) ? slash : "") || "";
+  const readings = [];
+  const add = (letters, number) => readings.push({ system, base, letters, sub: number });
+  if (ROMAN_SUFFIX.test(suffix) && !sub) {
+    add("", String(romanValue(suffix)));
+    if (suffix.length === 1) add(suffix, "");
+  } else add(suffix, sub.replace(/[a-z]+$/, ""));
+  return readings;
+}
+function provablyDifferent(a, b) {
+  const x = catalogueReadings(a), y = catalogueReadings(b);
+  if (!x || !y || x[0].system !== y[0].system) return false;
+  const differ = (p, q) => p.base !== q.base || p.letters !== q.letters || p.sub && q.sub && p.sub !== q.sub;
+  return x.every((p) => y.every((q) => differ(p, q)));
+}
+function repairSiblingJoins(catalogue, albumId, actor3) {
+  const db = catalogue.db;
+  const works = db.prepare(
+    `SELECT DISTINCT r.work_id AS id FROM realization r
+       ${albumId == null ? "" : `JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
+         JOIN track_link t ON t.id=s.track_link_id AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?`}
+       JOIN entity e ON e.id=r.work_id AND e.deleted_at IS NULL
+       WHERE EXISTS(SELECT 1 FROM external_identity x WHERE x.entity_id=r.work_id AND x.record_kind='album-work')`
+  ).all(...albumId == null ? [] : [String(albumId)]);
+  let repaired = 0;
+  for (const { id: work } of works) {
+    const subject = catalogueSubject(String(resolvedName(catalogue, work, "title") || ""));
+    if (!subject) continue;
+    const ids = [work, ...workMovements(catalogue, work).map((m) => m.id)];
+    if (hasManualEdits(catalogue, ids)) continue;
+    if (db.prepare(`SELECT 1 FROM audit_event WHERE action LIKE 'editor.%' AND target_id IN (${ids.map(() => "?").join(",")}) LIMIT 1`).get(...ids)) continue;
+    for (const realization of db.prepare("SELECT id FROM realization WHERE work_id=?").all(work)) {
+      const items = db.prepare(
+        `SELECT i.id,t.evidence FROM realization_item i JOIN segment s ON s.id=i.segment_id
+           JOIN track_link t ON t.id=s.track_link_id WHERE i.realization_id=?`
+      ).all(realization.id);
+      if (!items.length) continue;
+      const named = new Set(
+        items.map(({ evidence: evidence2 }) => {
+          const tagged = JSON.parse(evidence2).hints || {};
+          const proposal = proposedWork({ ...tagged, title: withoutComposer(tagged.title, tagged.composer) }, true);
+          return proposal ? catalogueSubject(proposal.catalogue ? `${proposal.title}, ${proposal.catalogue}` : proposal.title) : "";
+        })
+      );
+      const [own] = named;
+      if (named.size !== 1 || !own || !provablyDifferent(own, subject)) continue;
+      const album = String(JSON.parse(items[0].evidence).albumId);
+      if (db.prepare(`SELECT 1 FROM audit_event WHERE target_id=? AND action='editor.assign-album' AND CAST(json_extract(data,'$.values.albumId') AS TEXT)=?`).get(work, album)) continue;
+      transaction(db, () => {
+        for (const item of items) catalogue.detachItem(item.id, { dropRecording: true });
+        for (const record of db.prepare("SELECT record_id,evidence FROM external_identity WHERE entity_id=? AND record_kind='album-work' AND state='active' AND CAST(json_extract(evidence,'$.albumId') AS TEXT)=?").all(work, album))
+          if (catalogueSubject(String(JSON.parse(record.evidence).work || "")) === own)
+            db.prepare("UPDATE external_identity SET state='stale' WHERE entity_id=? AND record_kind='album-work' AND record_id=?").run(work, record.record_id);
+        catalogue.audit("work.split_sibling", work, { albumId: album, subject, tracks: own }, actor3);
+      });
+      repaired++;
+    }
+  }
+  return repaired;
 }
 function repairCompletionSplits(catalogue, albumId, actor3) {
   const db = catalogue.db;
@@ -38579,6 +38650,7 @@ function autoMatchTaggedWorks(catalogue, {
   providerMatches = /* @__PURE__ */ new Map()
 } = {}) {
   repairCompletionSplits(catalogue, albumId, actor3);
+  repairSiblingJoins(catalogue, albumId, actor3);
   const groups = candidates(
     catalogue,
     albumId,
@@ -42429,7 +42501,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.25" : "dev";
+var VERSION = true ? "1.0.26" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js
