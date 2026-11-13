@@ -963,3 +963,32 @@ test("matching: the works the first 1.0.27 audit left are repaired; conflicting 
   assert.ok(queens.every((id) => c.db.prepare("SELECT deleted_at FROM entity WHERE id=?").get(id).deleted_at == null));
   assert.equal(c.db.prepare("SELECT json_extract(evidence,'$.reason') AS reason FROM review_item WHERE status='open' AND kind='identity' AND target_id=?").get(queens[1])?.reason, "duplicate-work");
 });
+
+// From the first scan on 1.0.28: the repair took Liszt's S121 concerto out of
+// the S121a work, but under the 1.0.22 stem key both were one group, so the
+// album's record of making "S121" sat on the S121a work and refused it.
+test("matching: an album record left on another number's work does not keep a split piece out", async (t) => {
+  const liszt = (title) => ({ title, composer: ["Franz Liszt"], genres: ["Classical"] });
+  const c = await catalogueWith(t, [
+    { id: "howard", album: "Liszt", albumArtist: "Leslie Howard", artist: "Leslie Howard", titles: ["De profundis, S121a: I. Andante", "De profundis, S121a: II. Allegro", "Concerto 'Malédiction', S121: I. Quasi moderato", "Concerto 'Malédiction', S121: II. Un poco più animato"].map(liszt) },
+  ]);
+  const key = (subject) => JSON.stringify(["i", "howard", JSON.stringify([["franz liszt"], subject]), ["franz liszt"], "structured-title"]);
+  const record = (subject) => createHash("sha256").update(JSON.stringify(["album-work", key(subject)])).digest("hex");
+  // The S121a work made first, holding the record the S121 group now has.
+  autoMatchTaggedWorks(c, { albumId: "howard", actor: "admin", allowStructuredTitles: true });
+  const groups = () => renderAlbumPresentation(c, "howard").groups.map((group) => [group.title, group.workId]);
+  const [[, profundis], [, concerto]] = groups();
+  for (const item of c.db.prepare("SELECT i.id FROM realization_item i JOIN realization r ON r.id=i.realization_id WHERE r.work_id=?").all(concerto)) c.detachItem(item.id, { dropRecording: true });
+  c.db.prepare("UPDATE external_identity SET entity_id=? WHERE record_id=?").run(profundis, record("cat:s:121"));
+  c.db.prepare("UPDATE entity SET deleted_at=? WHERE id=?").run(Date.now(), concerto);
+  autoMatchTaggedWorks(c, { albumId: "howard", actor: "admin", allowStructuredTitles: true });
+  const after = groups();
+  assert.equal(after.length, 2);
+  assert.ok(after[1][1] && after[1][1] !== profundis);
+  assert.equal(c.db.prepare("SELECT state FROM external_identity WHERE entity_id=? AND record_id=?").get(profundis, record("cat:s:121")).state, "stale");
+  assert.equal(c.db.prepare("SELECT count(*) AS n FROM review_item WHERE status='open' AND kind='identity'").get().n, 0);
+  // The same record on a work with this number still keeps the tracks out.
+  for (const item of c.db.prepare("SELECT i.id FROM realization_item i JOIN realization r ON r.id=i.realization_id WHERE r.work_id=?").all(after[1][1])) c.detachItem(item.id, { dropRecording: true });
+  autoMatchTaggedWorks(c, { albumId: "howard", actor: "admin", allowStructuredTitles: true });
+  assert.equal(groups().filter(([, work]) => work).length, 1);
+});

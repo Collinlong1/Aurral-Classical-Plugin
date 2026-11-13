@@ -6,7 +6,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { tempFolders, copyFixture, json as response } from "./helpers.js";
+import { tempFolders, copyFixture, json as response, fakeFetch, symphonyEntities, MB } from "./helpers.js";
+import plugin from "../src/index.js";
 import { writeTags } from "../src/tags.js";
 import { openCatalogue } from "../src/model/catalogue.js";
 import { renderAlbumPresentation } from "../src/model/presentation.js";
@@ -166,4 +167,27 @@ test("background matching: an unreachable MusicBrainz retries the album later in
   lib.ctx.resolver.resolve = working;
   await runModelJobs(lib.ctx, { budgetMs: 30_000 });
   assert.deepEqual(await lib.view("later"), [["Suite bergamasque", true, 4]]);
+});
+
+// On the user's server the backlog stayed "queued": the action only queued
+// it, and the plugin schedule runs the queue. The action now works the
+// queue itself, in its background budget.
+test("background matching: the backlog action looks the albums up itself, without the schedule", async (t) => {
+  const lib = await library(t);
+  await lib.add("earlier", ["I. Allegro con brio", "II. Andante con moto"], { composer: "Ludwig van Beethoven", recordings: [recording(1), recording(2)] });
+  await lib.scan();
+  // MusicBrainz as the plugin's own client reads it, through the mirror setting.
+  const entities = symphonyEntities(recording(1));
+  entities[`recording:${recording(2)}`] = {
+    ...entities[`recording:${recording(1)}`],
+    id: recording(2),
+    relations: [{ type: "performance", "target-type": "work", direction: "forward", work: { id: "mvt2", title: "Symphony No. 5: II" } }],
+  };
+  entities["work:mvt2"] = { ...entities["work:mvt1"], id: "mvt2", title: "Symphony No. 5 in C minor, op. 67: II. Andante con moto" };
+  const musicbrainz = fakeFetch({ entities });
+  t.mock.method(globalThis, "fetch", (url, init) => (String(url).startsWith(MB) ? musicbrainz(url, init) : lib.ctx.fetch(url, init)));
+  const input = { ...lib.ctx, settings: { mbMirror: MB }, user: { id: 1, role: "admin" } };
+  const { message } = await plugin.actions["classical-identify-backlog"](input);
+  assert.match(message, /Queued 1 album \(2 tracks\).* 1 album looked up, 1 work group made/);
+  assert.deepEqual(await lib.view("earlier"), [["Symphony No. 5 in C minor, op. 67", true, 2]]);
 });

@@ -1056,9 +1056,21 @@ function createGroup(catalogue, group, actor, index) {
     return extendRealization(catalogue, group, actor, index);
   const metadata = new Metadata(catalogue);
   const recordId = identity("album-work", group.key);
-  if (existingIdentity(catalogue, "album-work", recordId)) return false;
+  // This album made this piece before and its tracks were taken out: they
+  // stay out. Unless the work that record is on has a number provably
+  // another piece than this one (under the 1.0.22 stem key S121 and S121a
+  // were one group, so S121's record sits on the S121a work the repair just
+  // took it out of): that record was the false join, and is retired.
+  const madeHere = existingIdentity(catalogue, "album-work", recordId);
+  const wanted = catalogueSubject(group.catalogue ? `${group.work}, ${group.catalogue}` : group.work);
+  const falseJoin = (work) => Boolean(wanted) && provablyDifferent(wanted, catalogueSubject(String(resolvedName(catalogue, work, "title") || "")));
+  if (madeHere && !falseJoin(madeHere)) return false;
   if (madeBeforeSuffixes(catalogue, group)) return false;
   return transaction(catalogue.db, () => {
+    if (madeHere)
+      catalogue.db
+        .prepare("UPDATE external_identity SET state='stale' WHERE entity_id=? AND provider='embedded-tags' AND record_kind='album-work' AND record_id=?")
+        .run(madeHere, recordId);
     const ordered = group.tracks
       .sort(
         (a, b) =>

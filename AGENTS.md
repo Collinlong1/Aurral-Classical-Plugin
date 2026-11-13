@@ -4,7 +4,7 @@ Status, November 12, 2026 (America/Chicago): Phase 4 (authorized November 10) is
 
 Branches and sync:
 - Develop on `aurral-classical`. The companion core is Collinlong1/aurral `aurral-classical`; `.github/workflows/phase3-integration.yml` pins the core commit the browser workflow runs against.
-- The core last synced with upstream lklynet/aurral through #1828 on November 12 (core `55e7fa1`). Plugin 1.0.16 passes the full Compose/Chromium/restart workflow against it; 1.0.17–1.0.28 pair with core `66b54b5`.
+- The core last synced with upstream lklynet/aurral through #1828 on November 12 (core `55e7fa1`). Plugin 1.0.16 passes the full Compose/Chromium/restart workflow against it; 1.0.17–1.0.29 pair with core `66b54b5`.
 - `dev/seed.mjs` and `dev/smoke.mjs` import core internals; after a core sync, rerun that workflow. Locally, `CHROMIUM_PATH` points `dev/editor-browser.mjs` at a preinstalled Chromium.
 
 Tooling: plugin tests run on Node 22.16+ (CI: 22, 24, 26); the core uses Node 26.12 and pnpm 12.15. Rebuild `index.js` (`npm run build`) after any `src/` change; CI checks the bundle matches.

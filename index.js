@@ -38004,9 +38004,14 @@ function createGroup(catalogue, group, actor3, index) {
     return extendRealization(catalogue, group, actor3, index);
   const metadata = new Metadata(catalogue);
   const recordId = identity("album-work", group.key);
-  if (existingIdentity(catalogue, "album-work", recordId)) return false;
+  const madeHere = existingIdentity(catalogue, "album-work", recordId);
+  const wanted = catalogueSubject(group.catalogue ? `${group.work}, ${group.catalogue}` : group.work);
+  const falseJoin = (work) => Boolean(wanted) && provablyDifferent(wanted, catalogueSubject(String(resolvedName(catalogue, work, "title") || "")));
+  if (madeHere && !falseJoin(madeHere)) return false;
   if (madeBeforeSuffixes(catalogue, group)) return false;
   return transaction(catalogue.db, () => {
+    if (madeHere)
+      catalogue.db.prepare("UPDATE external_identity SET state='stale' WHERE entity_id=? AND provider='embedded-tags' AND record_kind='album-work' AND record_id=?").run(madeHere, recordId);
     const ordered = group.tracks.sort(
       (a, b) => a.discNumber - b.discNumber || a.trackNumber - b.trackNumber || a.id.localeCompare(b.id)
     ).map((track) => ({
@@ -38023,8 +38028,8 @@ function createGroup(catalogue, group, actor3, index) {
            AND x.state='active' AND e.deleted_at IS NULL`
     ).get(group.providerWorkId)?.entity_id;
     const heldElsewhere = (id) => {
-      const wanted = group.ownSubject || (group.localTitle ? catalogueSubject(group.localTitle) : "");
-      return Boolean(wanted) && provablyDifferent(wanted, catalogueSubject(String(resolvedName(catalogue, id, "title") || "")));
+      const wanted2 = group.ownSubject || (group.localTitle ? catalogueSubject(group.localTitle) : "");
+      return Boolean(wanted2) && provablyDifferent(wanted2, catalogueSubject(String(resolvedName(catalogue, id, "title") || "")));
     };
     if (providerWork && heldElsewhere(providerWork)) providerWork = null;
     const otherComposer = (id) => catalogue.db.prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer'").all(id).some(({ contributor_id: person }) => {
@@ -42537,7 +42542,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.28" : "dev";
+var VERSION = true ? "1.0.29" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js
@@ -44089,9 +44094,13 @@ var index_default = {
       };
     },
     async "classical-identify-backlog"(input) {
-      const result = await identifyBacklog(makeContext(input), input.user);
+      const ctx = makeContext(input);
+      const result = await identifyBacklog(ctx, input.user);
+      await runModelJobs(ctx, { budgetMs: ACTION_BUDGET_MS });
+      const { identification: id } = await modelStatus(ctx);
+      const progress = `${id.done} album${id.done === 1 ? "" : "s"} looked up, ${id.matched} work group${id.matched === 1 ? "" : "s"} made${id.queued ? `; ${id.queued} still queued: run this again, or enable the plugin schedule, to continue` : ""}.`;
       return {
-        message: result.albums ? `Queued ${result.albums} album${result.albums === 1 ? "" : "s"} (${result.tracks} track${result.tracks === 1 ? "" : "s"}) for a one-time MusicBrainz lookup. It runs in the background on the plugin schedule, one request a second on public MusicBrainz, and resumes after a restart. Classical model status shows its progress.` : "No album is waiting for its one-time MusicBrainz lookup: each was looked up already, or has no track with a recording ID outside a work."
+        message: result.albums ? `Queued ${result.albums} album${result.albums === 1 ? "" : "s"} (${result.tracks} track${result.tracks === 1 ? "" : "s"}) for a one-time MusicBrainz lookup, one request a second on public MusicBrainz. ${progress}` : id.queued ? `Continuing the MusicBrainz lookup. ${progress}` : "No album is waiting for its one-time MusicBrainz lookup: each was looked up already, or has no track with a recording ID outside a work."
       };
     },
     async "classical-auto-match"(input) {
@@ -44178,9 +44187,11 @@ var index_default = {
       await runModelJobs(ctx, { budgetMs: SCHEDULE_BUDGET_MS });
       if (canReadHostLibrary(ctx) && await modelSyncDue(ctx)) {
         await enqueueModelScan(ctx, null, { system: true });
-        const left = deadline - Date.now();
-        if (left > 0) await runModelJobs(ctx, { budgetMs: left });
+        const left2 = deadline - Date.now();
+        if (left2 > 0) await runModelJobs(ctx, { budgetMs: left2 });
       }
+      const left = deadline - Date.now();
+      if (left > 0) await runModelJobs(ctx, { budgetMs: left });
     } catch (error) {
       log(`Classical model unavailable: ${error.message}`);
     }

@@ -250,11 +250,19 @@ export default {
       };
     },
     async "classical-identify-backlog"(input) {
-      const result = await identifyBacklog(makeContext(input), input.user);
+      const ctx = makeContext(input);
+      const result = await identifyBacklog(ctx, input.user);
+      // Work the queue now, in this action's budget, rather than waiting for
+      // the plugin schedule (which may be off).
+      await runModelJobs(ctx, { budgetMs: ACTION_BUDGET_MS });
+      const { identification: id } = await modelStatus(ctx);
+      const progress = `${id.done} album${id.done === 1 ? "" : "s"} looked up, ${id.matched} work group${id.matched === 1 ? "" : "s"} made${id.queued ? `; ${id.queued} still queued: run this again, or enable the plugin schedule, to continue` : ""}.`;
       return {
         message: result.albums
-          ? `Queued ${result.albums} album${result.albums === 1 ? "" : "s"} (${result.tracks} track${result.tracks === 1 ? "" : "s"}) for a one-time MusicBrainz lookup. It runs in the background on the plugin schedule, one request a second on public MusicBrainz, and resumes after a restart. Classical model status shows its progress.`
-          : "No album is waiting for its one-time MusicBrainz lookup: each was looked up already, or has no track with a recording ID outside a work.",
+          ? `Queued ${result.albums} album${result.albums === 1 ? "" : "s"} (${result.tracks} track${result.tracks === 1 ? "" : "s"}) for a one-time MusicBrainz lookup, one request a second on public MusicBrainz. ${progress}`
+          : id.queued
+            ? `Continuing the MusicBrainz lookup. ${progress}`
+            : "No album is waiting for its one-time MusicBrainz lookup: each was looked up already, or has no track with a recording ID outside a work.",
       };
     },
     async "classical-auto-match"(input) {
@@ -359,6 +367,9 @@ export default {
         const left = deadline - Date.now();
         if (left > 0) await runModelJobs(ctx, { budgetMs: left });
       }
+      // A run that finished a scan goes on with MusicBrainz identification.
+      const left = deadline - Date.now();
+      if (left > 0) await runModelJobs(ctx, { budgetMs: left });
     } catch (error) {
       log(`Classical model unavailable: ${error.message}`);
     }
