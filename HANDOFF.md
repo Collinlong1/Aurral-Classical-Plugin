@@ -1,3 +1,7 @@
+# Audit on 1.0.28 (before any scan): dry run reviewed, cleared to scan
+
+November 13, 2026. Dry run: 46 splits, every one checked against the works' rows in `audit.json`, all different Searle numbers or versions (S125/125a, S365/365a/365b, S367/367a, S464 Nos. 2/4 transcriptions, S498a/b/c, S69 holding S508, S507a and S692e, S215 Nos. 1–4, S214, S225, S385i/a, S406i/ii, S388/b, …), plus Schubert D.899 Nos. 2/3 and D.780 Nos. 2/5 held as two movements of one work on album 2072, and Corelli Variations op. 42 tracks inside the Paganini Rhapsody op. 43 on album 831. 0 merges. Expansions: Études-tableaux op. 33 2 → 8, op. 39 2 → 9, Children's Corner 2 → 6. 62 reviews closed; open after: classification 300, movement-mismatch 38 (from 99), duplicate-work 4 (Vocalise and Fairy Queen with different MusicBrainz works; Beethoven Symphonies 5 and 6 beside Liszt's transcriptions S463a/b, which share the opus key: answer "not duplicates"). Tracks matched by the run: 132. The user is cleared to scan; the backlog lookup is their call.
+
 # 1.0.28: the works the first 1.0.27 audit left
 
 Manifest 1.0.28, November 13, 2026. `scripts/explain-works.mjs` on the user's server showed why the 1.0.27 dry run left these works:
