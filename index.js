@@ -37273,8 +37273,9 @@ var CATALOGUES = [
   [/\bHob\.?\s*([IVXL]+[a-z]?:\s*\d+[a-z]?)/i, "Hob"],
   [new RegExp(`\\bWoO\\s*(\\d+${SUFFIX})`, "i"), "WoO"],
   // "S. 161", and Hyperion's "S161", "S166r" or "S534ii/bis". Searle's own
-  // sub-numbers after a slash name a piece too ("S. 534/2b", "S. 385/3").
-  [new RegExp(`\\bS(?:\\.\\s*|(?=\\d))(\\d+${SUFFIX}(?:\\/(?:bis|\\d+${SUFFIX}))?)`), "S"],
+  // sub-numbers after a slash name a piece too ("S. 534/2b", "S. 385/3",
+  // "S163d/ii").
+  [new RegExp(`\\bS(?:\\.\\s*|(?=\\d))(\\d+${SUFFIX}(?:\\/(?:bis|[ivx]{1,4}(?![a-z])|\\d+${SUFFIX}))?)`), "S"],
   [new RegExp(`\\bSz\\.?\\s*(\\d+${SUFFIX})`, "i"), "Sz"],
   [new RegExp(`\\bBB\\s*(\\d+${SUFFIX})`), "BB"],
   [new RegExp(`\\bTrV\\s*(\\d+${SUFFIX})`, "i"), "TrV"],
@@ -42542,7 +42543,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.29" : "dev";
+var VERSION = true ? "1.0.30" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js

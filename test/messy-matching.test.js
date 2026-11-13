@@ -798,6 +798,9 @@ test("matching: works an old merge joined across sibling numbers come apart; twi
   assert.equal(provablyDifferent("cat:s:385i", "cat:s:385a"), true);
   assert.equal(provablyDifferent("cat:s:443/1", "cat:s:443i"), false);
   assert.equal(provablyDifferent("cat:s:443:1", "cat:s:443i"), false);
+  assert.equal(catalogueSubject("Album-Leaf 'Andantino in E major', S163d/ii"), "cat:s:163d/ii");
+  assert.notEqual(catalogueSubject("Album-Leaf in E major 'Leipzig', S163d"), catalogueSubject("Album-Leaf 'Andantino in E major', S163d/ii"));
+  assert.equal(provablyDifferent("cat:s:163d", "cat:s:163d/ii"), false);
   assert.equal(provablyDifferent("cat:s:145", "cat:s:145:1"), false);
   assert.equal(provablyDifferent("cat:sz:107", "cat:bb:105"), false);
   const liszt = (title) => ({ title, composer: ["Franz Liszt"], genres: ["Classical"] });

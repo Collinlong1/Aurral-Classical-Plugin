@@ -1,3 +1,10 @@
+# 1.0.30: after the backlog lookup on 1.0.28; film scores in Classical
+
+November 13, 2026. Audit after "Identify earlier albums on MusicBrainz" ran on 1.0.28 (before 1.0.29): matched tracks 4,259 → 4,287 of 4,931; albums 38/32/27; reviews classification 300, movement-mismatch 24, identity 7, duplicate-work 5. The 10 refused split pieces remain until 1.0.29+ is installed and scanned. 313 tracks with recording IDs still name no work; not yet analysed.
+
+- **"S163d/ii"** read as S163d, so "Album-Leaf 'Andantino in E major', S163d/ii" and "Album-Leaf in E major 'Leipzig', S163d" counted as one identity (a fifth "duplicate"). A roman number after a slash is now part of the number; the two are not `provablyDifferent` (a version and its parent), so nothing is split.
+- **Film scores in Classical.** The user says they marked several soundtracks not classical; the audit has six classified classical, four with works: Interstellar (Zimmer, 24), The Last Jedi (Williams, 20 unsure), The Hobbit: Five Armies (Shore, 23), The Lord of the Rings Trilogy (Shore, 56), Mulan (Gregson-Williams, 26), The Hobbit: An Unexpected Journey (Shore, 26). Nothing in 1.0.23–1.0.30 touches classification; a track pin (editor "Remove from Classical") is never changed by a scan, and an album pin passes down at every scan. `scripts/explain-classification.mjs` (read-only) prints, per album, the album's classification, track states and pins, and every manual classification change with its time. Waiting on its output.
+
 # 1.0.29: after the first real scan on 1.0.28
 
 November 13, 2026. Audit after the scan: albums 38 fully / 32 partly / 27 not matched (baseline 36/33/28); matched tracks 4,154 → 4,259 of 4,931; open reviews classification 300, movement-mismatch 38 (from 99), duplicate-work 4; the dry run now has nothing left (0 splits, merges, expansions). Two problems:
