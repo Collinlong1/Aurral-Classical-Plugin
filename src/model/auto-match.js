@@ -219,7 +219,12 @@ function candidates(
   for (const row of rows) {
     const tagged = row.evidence.hints || {};
     const hints = { ...tagged, title: withoutComposer(tagged.title, tagged.composer) };
-    const provider = providerMatches.get(row.id);
+    // MusicBrainz naming a work whose number is provably another piece than
+    // the one the track's own title names (an old merge's identity, or a
+    // recording linked to a sibling version) is not taken.
+    const offered = providerMatches.get(row.id);
+    const own = offered ? trackSubject(tagged) : "";
+    const provider = offered && own && provablyDifferent(own, catalogueSubject(clean(offered.work))) ? null : offered;
     const local = proposedWork(hints, true);
     const proposal = provider
       ? {
@@ -304,6 +309,7 @@ function candidates(
         standalone: !!proposal.standalone,
         providerWorkId: proposal.identity || null,
         localTitle: provider && local ? local.title : null,
+        ownSubject: provider ? own : "",
         providerAliases: provider?.aliases || [],
         composers,
         composerIds: provider?.composerIds || {},
@@ -1082,12 +1088,11 @@ function createGroup(catalogue, group, actor, index) {
     // An old merge across sibling numbers left this MusicBrainz work on
     // another piece's work: the tags' number says which piece this is, and
     // the identity conflict goes to review.
-    if (
-      providerWork &&
-      group.localTitle &&
-      provablyDifferent(catalogueSubject(group.localTitle), catalogueSubject(String(resolvedName(catalogue, providerWork, "title") || "")))
-    )
-      providerWork = null;
+    const heldElsewhere = (id) => {
+      const wanted = group.ownSubject || (group.localTitle ? catalogueSubject(group.localTitle) : "");
+      return Boolean(wanted) && provablyDifferent(wanted, catalogueSubject(String(resolvedName(catalogue, id, "title") || "")));
+    };
+    if (providerWork && heldElsewhere(providerWork)) providerWork = null;
     // A same-titled work by a same-named but differently verified composer
     // is someone else's work.
     const otherComposer = (id) =>
@@ -1122,6 +1127,7 @@ function createGroup(catalogue, group, actor, index) {
         ].filter(
           (id) =>
             !otherComposer(id) &&
+            !heldElsewhere(id) &&
             // A work already tied to a different MusicBrainz work is another piece.
             !(group.providerWorkId &&
               catalogue.db
@@ -1288,10 +1294,7 @@ function expandIncompleteWork(catalogue, metadata, work, existing, ordered, setS
   if (ordered.length <= existing.length) return null;
   const ids = [work, ...existing.map((m) => m.id)];
   const madeByMatching = catalogue.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work'").get(work);
-  const edited = catalogue.db
-    .prepare(`SELECT 1 FROM audit_event WHERE action LIKE 'editor.%' AND target_id IN (${ids.map(() => "?").join(",")}) LIMIT 1`)
-    .get(...ids);
-  if (!madeByMatching || edited || hasManualEdits(catalogue, ids)) return null;
+  if (!madeByMatching || editedInEditor(catalogue, ids) || hasManualEdits(catalogue, ids)) return null;
   const used = new Set();
   const mapped = ordered.map((track) => {
     const movement = namedMovement(existing, track.movementTitle, used, setSubject);
@@ -1328,6 +1331,21 @@ function expandIncompleteWork(catalogue, metadata, work, existing, ordered, setS
   });
   catalogue.audit("work.auto_match_expand", work, { albumId: group.albumId, from: existing.length, to: result.length, tracks: ordered.map((t) => t.id) }, actor);
   return result;
+}
+
+// Editor actions that change what a work is. Choosing which work an album
+// belongs to, assigning or unassigning an album, reviews and classification
+// say where recordings go, not what the work holds.
+const PLACEMENT_ACTIONS = ["open", "choose-album-work", "assign-album", "unassign-album", "resolve-review", "classification", "set-classification"].map((a) => `editor.${a}`);
+function editedInEditor(catalogue, ids) {
+  return Boolean(
+    catalogue.db
+      .prepare(
+        `SELECT 1 FROM audit_event WHERE action LIKE 'editor.%' AND action NOT IN (${PLACEMENT_ACTIONS.map(() => "?").join(",")})
+         AND target_id IN (${ids.map(() => "?").join(",")}) LIMIT 1`,
+      )
+      .get(...PLACEMENT_ACTIONS, ...ids),
+  );
 }
 
 const hasManualEdits = (catalogue, ids) =>
@@ -1540,7 +1558,9 @@ export function mergeDuplicateAutoWorks(catalogue, { actor = null } = {}) {
       const keep = ids.find((id) => !auto(id)) || ids[0];
       if (ids.filter((id) => !auto(id)).length > 1) continue;
       for (const id of ids.filter((id) => id !== keep))
-        if (!compatibleAutoWorks(catalogue, keep, id)) continue;
+        // Same title and number, different verified MusicBrainz works or
+        // composers: kept apart, for an admin to decide.
+        if (!compatibleAutoWorks(catalogue, keep, id)) catalogue.review("identity", id, { reason: "duplicate-work", keep, evidence: "different MusicBrainz identities" });
         else if (mergeWork(catalogue, keep, id, actor)) works++;
         else catalogue.review("identity", id, { reason: "duplicate-work", keep });
     }
@@ -1578,12 +1598,25 @@ export function provablyDifferent(a, b) {
   return x.every((p) => y.every((q) => differ(p, q)));
 }
 
-// Repairs works that an earlier rule joined across sibling numbers: under
-// 1.0.22 keys S215 No. 1–4 were one identity, so the duplicate merge folded
-// four valses into one work. A recording whose own tracks all name a number
-// that is provably another piece than its work's is detached, and this
-// match then gives it its own work (or the right one). Only works matching
-// made that nobody edited, and albums nobody assigned by hand.
+// The catalogue identity a track's own tags give: the work its tags or title
+// propose, or, for a title that is a whole piece with nothing before it
+// ("Tyrolean Melody from the opera … by Auber, S385a", which the excerpt
+// rule keeps from proposing a work), the number in that title.
+function trackSubject(hints) {
+  const title = withoutComposer(hints.title, hints.composer);
+  const proposal = proposedWork({ ...hints, title }, true);
+  if (proposal) return catalogueSubject(proposal.catalogue ? `${proposal.title}, ${proposal.catalogue}` : proposal.title);
+  return splitTitle(title).head || MOVEMENT_PREFIX.test(title) ? "" : catalogueSubject(title);
+}
+
+// Repairs works that an earlier rule joined across sibling numbers. Under
+// 1.0.22 keys S215 No. 1–4 were one identity: the duplicate merge folded
+// such works together, and one album's pieces became one work's movements
+// ("Valse oubliée No. 2" holding Nos. 1–4). A track whose own tags name a
+// number provably another piece than its work's is detached, and this match
+// then gives it its own work (or the right one); movements left with no
+// recording go. Only works matching made that nobody edited, and albums
+// nobody assigned by hand.
 function repairSiblingJoins(catalogue, albumId, actor) {
   const db = catalogue.db;
   const works = db
@@ -1593,8 +1626,8 @@ function repairSiblingJoins(catalogue, albumId, actor) {
          JOIN track_link t ON t.id=s.track_link_id AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?`}
        JOIN entity e ON e.id=r.work_id AND e.deleted_at IS NULL
        WHERE EXISTS(SELECT 1 FROM external_identity x WHERE x.entity_id=r.work_id AND x.record_kind='album-work')
-       -- A merge leaves its work two recordings or more.
-       AND (SELECT count(*) FROM realization r2 WHERE r2.work_id=r.work_id)>1`,
+       -- A merge leaves its work two recordings or more, a joined album two tracks.
+       AND (SELECT count(*) FROM realization_item i2 JOIN realization r2 ON r2.id=i2.realization_id WHERE r2.work_id=r.work_id)>1`,
     )
     .all(...(albumId == null ? [] : [String(albumId)]));
   let repaired = 0;
@@ -1602,40 +1635,44 @@ function repairSiblingJoins(catalogue, albumId, actor) {
     const subject = catalogueSubject(String(resolvedName(catalogue, work, "title") || ""));
     if (!subject) continue;
     const ids = [work, ...workMovements(catalogue, work).map((m) => m.id)];
-    if (hasManualEdits(catalogue, ids)) continue;
-    if (db.prepare(`SELECT 1 FROM audit_event WHERE action LIKE 'editor.%' AND target_id IN (${ids.map(() => "?").join(",")}) LIMIT 1`).get(...ids)) continue;
-    for (const realization of db.prepare("SELECT id FROM realization WHERE work_id=?").all(work)) {
-      const items = db
-        .prepare(
-          `SELECT i.id,t.evidence FROM realization_item i JOIN segment s ON s.id=i.segment_id
-           JOIN track_link t ON t.id=s.track_link_id WHERE i.realization_id=?`,
-        )
-        .all(realization.id);
-      if (!items.length) continue;
-      const named = new Set(
-        items.map(({ evidence }) => {
-          const tagged = JSON.parse(evidence).hints || {};
-          const proposal = proposedWork({ ...tagged, title: withoutComposer(tagged.title, tagged.composer) }, true);
-          return proposal ? catalogueSubject(proposal.catalogue ? `${proposal.title}, ${proposal.catalogue}` : proposal.title) : "";
-        }),
+    if (hasManualEdits(catalogue, ids) || editedInEditor(catalogue, ids)) continue;
+    const items = db
+      .prepare(
+        `SELECT i.id,i.movement_id,t.evidence FROM realization_item i JOIN realization r ON r.id=i.realization_id
+         JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id WHERE r.work_id=?`,
+      )
+      .all(work)
+      .map((item) => ({ ...item, evidence: JSON.parse(item.evidence) }))
+      .map((item) => ({ ...item, own: trackSubject(item.evidence.hints || {}) }))
+      .filter((item) => item.own && provablyDifferent(item.own, subject))
+      .filter(
+        (item) =>
+          !db
+            .prepare(`SELECT 1 FROM audit_event WHERE target_id=? AND action='editor.assign-album' AND CAST(json_extract(data,'$.values.albumId') AS TEXT)=?`)
+            .get(work, String(item.evidence.albumId)),
       );
-      const [own] = named;
-      if (named.size !== 1 || !own || !provablyDifferent(own, subject)) continue;
-      const album = String(JSON.parse(items[0].evidence).albumId);
-      if (db.prepare(`SELECT 1 FROM audit_event WHERE target_id=? AND action='editor.assign-album' AND CAST(json_extract(data,'$.values.albumId') AS TEXT)=?`).get(work, album)) continue;
-      transaction(db, () => {
-        for (const item of items) catalogue.detachItem(item.id, { dropRecording: true });
-        // The merge moved the album's record of making that piece here; it
-        // no longer says this album made this work.
+    if (!items.length) continue;
+    transaction(db, () => {
+      for (const item of items) catalogue.detachItem(item.id, { dropRecording: true });
+      // Movements that only those tracks realized were the other pieces.
+      const now = Date.now();
+      for (const movement of new Set(items.map((item) => item.movement_id).filter(Boolean)))
+        if (!db.prepare("SELECT 1 FROM realization_item WHERE movement_id=?").get(movement)) {
+          db.prepare("DELETE FROM relation WHERE kind='movement' AND source_id=? AND target_id=?").run(work, movement);
+          db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(now, now, movement);
+        }
+      // A merge moved the album's record of making that piece here; it no
+      // longer says this album made this work.
+      for (const item of items)
         for (const record of db
           .prepare("SELECT record_id,evidence FROM external_identity WHERE entity_id=? AND record_kind='album-work' AND state='active' AND CAST(json_extract(evidence,'$.albumId') AS TEXT)=?")
-          .all(work, album))
-          if (catalogueSubject(String(JSON.parse(record.evidence).work || "")) === own)
+          .all(work, String(item.evidence.albumId)))
+          if (catalogueSubject(String(JSON.parse(record.evidence).work || "")) === item.own)
             db.prepare("UPDATE external_identity SET state='stale' WHERE entity_id=? AND record_kind='album-work' AND record_id=?").run(work, record.record_id);
-        catalogue.audit("work.split_sibling", work, { albumId: album, subject, tracks: own }, actor);
-      });
-      repaired++;
-    }
+      for (const own of new Set(items.map((item) => item.own)))
+        catalogue.audit("work.split_sibling", work, { albumId: String(items.find((item) => item.own === own).evidence.albumId), subject, tracks: own }, actor);
+    });
+    repaired += items.length;
   }
   return repaired;
 }

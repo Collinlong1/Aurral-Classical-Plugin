@@ -37442,7 +37442,9 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
   for (const row of rows) {
     const tagged = row.evidence.hints || {};
     const hints = { ...tagged, title: withoutComposer(tagged.title, tagged.composer) };
-    const provider = providerMatches.get(row.id);
+    const offered = providerMatches.get(row.id);
+    const own = offered ? trackSubject(tagged) : "";
+    const provider = offered && own && provablyDifferent(own, catalogueSubject(clean3(offered.work))) ? null : offered;
     const local = proposedWork(hints, true);
     const proposal = provider ? {
       // The tags' own title wins when it names the same catalogue number.
@@ -37494,6 +37496,7 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
         standalone: !!proposal.standalone,
         providerWorkId: proposal.identity || null,
         localTitle: provider && local ? local.title : null,
+        ownSubject: provider ? own : "",
         providerAliases: provider?.aliases || [],
         composers,
         composerIds: provider?.composerIds || {},
@@ -38019,8 +38022,11 @@ function createGroup(catalogue, group, actor3, index) {
            WHERE x.provider='musicbrainz' AND x.record_kind='work' AND x.record_id=?
            AND x.state='active' AND e.deleted_at IS NULL`
     ).get(group.providerWorkId)?.entity_id;
-    if (providerWork && group.localTitle && provablyDifferent(catalogueSubject(group.localTitle), catalogueSubject(String(resolvedName(catalogue, providerWork, "title") || ""))))
-      providerWork = null;
+    const heldElsewhere = (id) => {
+      const wanted = group.ownSubject || (group.localTitle ? catalogueSubject(group.localTitle) : "");
+      return Boolean(wanted) && provablyDifferent(wanted, catalogueSubject(String(resolvedName(catalogue, id, "title") || "")));
+    };
+    if (providerWork && heldElsewhere(providerWork)) providerWork = null;
     const otherComposer = (id) => catalogue.db.prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer'").all(id).some(({ contributor_id: person }) => {
       const mbid = group.composerIds?.[resolvedName(catalogue, person, "name")];
       const held2 = artistIdOf(catalogue, person);
@@ -38039,7 +38045,7 @@ function createGroup(catalogue, group, actor3, index) {
         })
       )
     ].filter(
-      (id) => !otherComposer(id) && // A work already tied to a different MusicBrainz work is another piece.
+      (id) => !otherComposer(id) && !heldElsewhere(id) && // A work already tied to a different MusicBrainz work is another piece.
       !(group.providerWorkId && catalogue.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='work' AND state='active' AND record_id!=?").get(id, group.providerWorkId))
     );
     if (known.length > 1) {
@@ -38180,8 +38186,7 @@ function expandIncompleteWork(catalogue, metadata, work, existing, ordered, setS
   if (ordered.length <= existing.length) return null;
   const ids = [work, ...existing.map((m) => m.id)];
   const madeByMatching = catalogue.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work'").get(work);
-  const edited = catalogue.db.prepare(`SELECT 1 FROM audit_event WHERE action LIKE 'editor.%' AND target_id IN (${ids.map(() => "?").join(",")}) LIMIT 1`).get(...ids);
-  if (!madeByMatching || edited || hasManualEdits(catalogue, ids)) return null;
+  if (!madeByMatching || editedInEditor(catalogue, ids) || hasManualEdits(catalogue, ids)) return null;
   const used = /* @__PURE__ */ new Set();
   const mapped = ordered.map((track) => {
     const movement = namedMovement(existing, track.movementTitle, used, setSubject);
@@ -38214,6 +38219,15 @@ function expandIncompleteWork(catalogue, metadata, work, existing, ordered, setS
   });
   catalogue.audit("work.auto_match_expand", work, { albumId: group.albumId, from: existing.length, to: result.length, tracks: ordered.map((t) => t.id) }, actor3);
   return result;
+}
+var PLACEMENT_ACTIONS = ["open", "choose-album-work", "assign-album", "unassign-album", "resolve-review", "classification", "set-classification"].map((a) => `editor.${a}`);
+function editedInEditor(catalogue, ids) {
+  return Boolean(
+    catalogue.db.prepare(
+      `SELECT 1 FROM audit_event WHERE action LIKE 'editor.%' AND action NOT IN (${PLACEMENT_ACTIONS.map(() => "?").join(",")})
+         AND target_id IN (${ids.map(() => "?").join(",")}) LIMIT 1`
+    ).get(...PLACEMENT_ACTIONS, ...ids)
+  );
 }
 var hasManualEdits = (catalogue, ids) => ids.some(
   (id) => catalogue.db.prepare(
@@ -38367,7 +38381,7 @@ function mergeDuplicateAutoWorks(catalogue, { actor: actor3 = null } = {}) {
       const keep = ids.find((id) => !auto(id)) || ids[0];
       if (ids.filter((id) => !auto(id)).length > 1) continue;
       for (const id of ids.filter((id2) => id2 !== keep))
-        if (!compatibleAutoWorks(catalogue, keep, id)) continue;
+        if (!compatibleAutoWorks(catalogue, keep, id)) catalogue.review("identity", id, { reason: "duplicate-work", keep, evidence: "different MusicBrainz identities" });
         else if (mergeWork(catalogue, keep, id, actor3)) works++;
         else catalogue.review("identity", id, { reason: "duplicate-work", keep });
     }
@@ -38394,6 +38408,12 @@ function provablyDifferent(a, b) {
   const differ = (p, q) => p.base !== q.base || p.letters !== q.letters || p.sub && q.sub && p.sub !== q.sub;
   return x.every((p) => y.every((q) => differ(p, q)));
 }
+function trackSubject(hints) {
+  const title = withoutComposer(hints.title, hints.composer);
+  const proposal = proposedWork({ ...hints, title }, true);
+  if (proposal) return catalogueSubject(proposal.catalogue ? `${proposal.title}, ${proposal.catalogue}` : proposal.title);
+  return splitTitle(title).head || MOVEMENT_PREFIX.test(title) ? "" : catalogueSubject(title);
+}
 function repairSiblingJoins(catalogue, albumId, actor3) {
   const db = catalogue.db;
   const works = db.prepare(
@@ -38402,42 +38422,38 @@ function repairSiblingJoins(catalogue, albumId, actor3) {
          JOIN track_link t ON t.id=s.track_link_id AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?`}
        JOIN entity e ON e.id=r.work_id AND e.deleted_at IS NULL
        WHERE EXISTS(SELECT 1 FROM external_identity x WHERE x.entity_id=r.work_id AND x.record_kind='album-work')
-       -- A merge leaves its work two recordings or more.
-       AND (SELECT count(*) FROM realization r2 WHERE r2.work_id=r.work_id)>1`
+       -- A merge leaves its work two recordings or more, a joined album two tracks.
+       AND (SELECT count(*) FROM realization_item i2 JOIN realization r2 ON r2.id=i2.realization_id WHERE r2.work_id=r.work_id)>1`
   ).all(...albumId == null ? [] : [String(albumId)]);
   let repaired = 0;
   for (const { id: work } of works) {
     const subject = catalogueSubject(String(resolvedName(catalogue, work, "title") || ""));
     if (!subject) continue;
     const ids = [work, ...workMovements(catalogue, work).map((m) => m.id)];
-    if (hasManualEdits(catalogue, ids)) continue;
-    if (db.prepare(`SELECT 1 FROM audit_event WHERE action LIKE 'editor.%' AND target_id IN (${ids.map(() => "?").join(",")}) LIMIT 1`).get(...ids)) continue;
-    for (const realization of db.prepare("SELECT id FROM realization WHERE work_id=?").all(work)) {
-      const items = db.prepare(
-        `SELECT i.id,t.evidence FROM realization_item i JOIN segment s ON s.id=i.segment_id
-           JOIN track_link t ON t.id=s.track_link_id WHERE i.realization_id=?`
-      ).all(realization.id);
-      if (!items.length) continue;
-      const named = new Set(
-        items.map(({ evidence: evidence2 }) => {
-          const tagged = JSON.parse(evidence2).hints || {};
-          const proposal = proposedWork({ ...tagged, title: withoutComposer(tagged.title, tagged.composer) }, true);
-          return proposal ? catalogueSubject(proposal.catalogue ? `${proposal.title}, ${proposal.catalogue}` : proposal.title) : "";
-        })
-      );
-      const [own] = named;
-      if (named.size !== 1 || !own || !provablyDifferent(own, subject)) continue;
-      const album = String(JSON.parse(items[0].evidence).albumId);
-      if (db.prepare(`SELECT 1 FROM audit_event WHERE target_id=? AND action='editor.assign-album' AND CAST(json_extract(data,'$.values.albumId') AS TEXT)=?`).get(work, album)) continue;
-      transaction(db, () => {
-        for (const item of items) catalogue.detachItem(item.id, { dropRecording: true });
-        for (const record of db.prepare("SELECT record_id,evidence FROM external_identity WHERE entity_id=? AND record_kind='album-work' AND state='active' AND CAST(json_extract(evidence,'$.albumId') AS TEXT)=?").all(work, album))
-          if (catalogueSubject(String(JSON.parse(record.evidence).work || "")) === own)
+    if (hasManualEdits(catalogue, ids) || editedInEditor(catalogue, ids)) continue;
+    const items = db.prepare(
+      `SELECT i.id,i.movement_id,t.evidence FROM realization_item i JOIN realization r ON r.id=i.realization_id
+         JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id WHERE r.work_id=?`
+    ).all(work).map((item) => ({ ...item, evidence: JSON.parse(item.evidence) })).map((item) => ({ ...item, own: trackSubject(item.evidence.hints || {}) })).filter((item) => item.own && provablyDifferent(item.own, subject)).filter(
+      (item) => !db.prepare(`SELECT 1 FROM audit_event WHERE target_id=? AND action='editor.assign-album' AND CAST(json_extract(data,'$.values.albumId') AS TEXT)=?`).get(work, String(item.evidence.albumId))
+    );
+    if (!items.length) continue;
+    transaction(db, () => {
+      for (const item of items) catalogue.detachItem(item.id, { dropRecording: true });
+      const now = Date.now();
+      for (const movement of new Set(items.map((item) => item.movement_id).filter(Boolean)))
+        if (!db.prepare("SELECT 1 FROM realization_item WHERE movement_id=?").get(movement)) {
+          db.prepare("DELETE FROM relation WHERE kind='movement' AND source_id=? AND target_id=?").run(work, movement);
+          db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(now, now, movement);
+        }
+      for (const item of items)
+        for (const record of db.prepare("SELECT record_id,evidence FROM external_identity WHERE entity_id=? AND record_kind='album-work' AND state='active' AND CAST(json_extract(evidence,'$.albumId') AS TEXT)=?").all(work, String(item.evidence.albumId)))
+          if (catalogueSubject(String(JSON.parse(record.evidence).work || "")) === item.own)
             db.prepare("UPDATE external_identity SET state='stale' WHERE entity_id=? AND record_kind='album-work' AND record_id=?").run(work, record.record_id);
-        catalogue.audit("work.split_sibling", work, { albumId: album, subject, tracks: own }, actor3);
-      });
-      repaired++;
-    }
+      for (const own of new Set(items.map((item) => item.own)))
+        catalogue.audit("work.split_sibling", work, { albumId: String(items.find((item) => item.own === own).evidence.albumId), subject, tracks: own }, actor3);
+    });
+    repaired += items.length;
   }
   return repaired;
 }
@@ -42521,7 +42537,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.27" : "dev";
+var VERSION = true ? "1.0.28" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js

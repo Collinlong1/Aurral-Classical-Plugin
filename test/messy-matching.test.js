@@ -893,3 +893,73 @@ test("reviews: an Auto-match review closes when every track it names is in a wor
   assert.deepEqual(open, [ids("other")[0]]);
   assert.equal(c.db.prepare("SELECT count(*) AS n FROM audit_event WHERE action='review.auto_resolve'").get().n, 1);
 });
+
+// From the first 1.0.27 audit of the real library, and the works it left:
+// an album choice in the editor kept Études-tableaux op. 39 from expanding;
+// one album's sibling pieces were one work's movements (S215 No. 2 holding
+// Nos. 1–4); a recording titled as an excerpt ("Tyrolean Melody from the
+// opera…, S385a") proposed no work, so the repair could not read its
+// number; and two same-numbered works with different MusicBrainz works
+// stayed apart with no review.
+test("matching: the works the first 1.0.27 audit left are repaired; conflicting duplicates are reviewed", async (t) => {
+  const tag = (composer, extra = {}) => (title) => ({ title, composer: [composer], genres: ["Classical"], ...extra });
+  const liszt = tag("Franz Liszt");
+  const valses = [2, 3, 4, 1].map((n) => `Valse oubliée No. ${n}, S215 No. ${n}`);
+  const c = await catalogueWith(t, [
+    { id: "ampico", album: "Rachmaninov plays Rachmaninov", albumArtist: "Sergei Rachmaninoff", artist: "Sergei Rachmaninoff", titles: ["Etude‐tableau in B minor, op. 39 no. 4", "Etude‐tableau in A minor, op. 39 no. 6"].map(tag("Sergei Rachmaninoff", { work: "Études-tableaux, op. 39" })) },
+    { id: "lugansky", album: "Lugansky", albumArtist: "Nikolai Lugansky", artist: "Nikolai Lugansky", titles: ["Allegro agitato in C minor", "Lento assai in A minor", "Allegro molto in F-sharp minor", "Allegro assai in B minor", "Appassionato in E-flat minor", "Allegro in A minor", "Lento lugubre in C minor", "Allegro moderato in D minor", "Allegro moderato - tempo di marcia in D major"].map((piece, i) => `Études-tableaux op. 39: ${piece}, no. ${i + 1}`).map(tag("Sergei Rachmaninoff")) },
+    // The old key's grouping, rebuilt with a GROUPING tag the real tracks lack.
+    { id: "valses", album: "The Complete Liszt Piano Music", albumArtist: "Leslie Howard", artist: "Leslie Howard", titles: valses.map(tag("Franz Liszt", { grouping: "Valses oubliées, S215 No. 2" })) },
+    { id: "fiancee", album: "The Complete Liszt Piano Music 2", albumArtist: "Leslie Howard", artist: "Leslie Howard", titles: ['Grande fantaisie sur la tyrolienne de "La fiancée", S385i', 'Tyrolean Melody from the opera "La fiancée" by Auber, S385a'].map(liszt) },
+  ]);
+  const match = (albumId, providerMatches) => autoMatchTaggedWorks(c, { albumId, actor: "admin", allowStructuredTitles: true, ...(providerMatches && { providerMatches }) });
+  const track = (core) => c.db.prepare("SELECT id FROM track_link WHERE core_id=?").get(core).id;
+  const groups = (albumId) => renderAlbumPresentation(c, albumId).groups.map((group) => [group.title, group.workId, group.items.map((item) => item.title)]);
+  for (const albumId of ["ampico", "valses", "fiancee"]) match(albumId);
+  // The editor's album choice on op. 39.
+  const [[, etudes]] = groups("ampico");
+  c.audit("editor.choose-album-work", etudes, { values: { albumId: "fantasia", work: etudes } }, "1");
+  // One work of four valses, as the real tracks (no GROUPING) now read.
+  const [[, valse2, rows]] = groups("valses");
+  assert.equal(rows.length, 4);
+  c.db.prepare("UPDATE track_link SET evidence=json_remove(evidence,'$.hints.grouping') WHERE core_id LIKE 'valses-%'").run();
+  // S385a joined S385i's work, as a MusicBrainz match did under 1.0.22 keys.
+  const fiancee = groups("fiancee")[0][1];
+  c.externalIdentity(fiancee, "musicbrainz", "work", "mb-385i", { evidence: {} });
+  match("fiancee", new Map([[track("fiancee-1"), { workId: "mb-385a", work: "Tyrolean Melody, S385a", movement: null, standalone: true, aliases: [], composers: ["Franz Liszt"], composerIds: {} }]]));
+  assert.ok(mergeWork(c, fiancee, groups("fiancee").find(([title]) => /S385a/.test(title))[1], "model-scan"));
+  assert.equal(groups("fiancee").filter(([, work]) => work === fiancee).length, 2);
+  // Two Fairy Queens, MusicBrainz says two works.
+  const purcell = c.createEntity("person", { roles: ["composer"] });
+  new Metadata(c).derived(purcell, "name", "Henry Purcell");
+  const queens = ["mb-queen-1", "mb-queen-2"].map((mbid, i) => {
+    const id = c.createEntity("work");
+    new Metadata(c).derived(id, "title", "The Fairy Queen, Z. 629");
+    c.credit(id, purcell, "composer", { position: 1 });
+    c.externalIdentity(id, "embedded-tags", "album-work", `queen-${i}`, { evidence: { albumId: "queen" } });
+    c.externalIdentity(id, "musicbrainz", "work", mbid, { evidence: {} });
+    return id;
+  });
+
+  autoMatchTaggedWorks(c, { actor: "model-scan", allowStructuredTitles: true });
+  // Op. 39 took the fuller album despite the album choice.
+  assert.deepEqual(groups("lugansky").map(([, work, items]) => [work, items.length]), [[etudes, 9]]);
+  // Each valse is its own work; No. 2 keeps its work, with only its movement.
+  const valseWorks = groups("valses");
+  assert.equal(new Set(valseWorks.map(([, work]) => work)).size, 4);
+  assert.ok(valseWorks.every(([, work]) => work));
+  assert.equal(valseWorks.find(([, , items]) => items.includes(valses[0]))[1], valse2);
+  assert.ok(workMovementTitles(c, valse2).length <= 1);
+  // S385a comes off, and MusicBrainz naming S385i's work for it later does
+  // not put it back or make a second S385i.
+  assert.notEqual(groups("fiancee").find(([, , items]) => items.some((item) => /S385a/.test(item)))?.[1], fiancee);
+  match("fiancee", new Map([[track("fiancee-1"), { workId: "mb-385i", work: 'Grande fantaisie sur la tyrolienne de "La fiancée", S385i', movement: null, standalone: true, aliases: [], composers: ["Franz Liszt"], composerIds: {} }]]));
+  assert.notEqual(groups("fiancee").find(([, , items]) => items.some((item) => /S385a/.test(item)))?.[1], fiancee);
+  const titled385i = c.db
+    .prepare("SELECT count(*) AS n FROM entity e JOIN metadata_target m ON m.entity_id=e.id JOIN field_resolution f ON f.target_id=m.id AND f.field='title' JOIN assertion a ON a.id=f.assertion_id WHERE e.kind='work' AND e.deleted_at IS NULL AND a.value LIKE '%S385i%'")
+    .get().n;
+  assert.equal(titled385i, 1);
+  // The Fairy Queens stay two works, and an admin is asked.
+  assert.ok(queens.every((id) => c.db.prepare("SELECT deleted_at FROM entity WHERE id=?").get(id).deleted_at == null));
+  assert.equal(c.db.prepare("SELECT json_extract(evidence,'$.reason') AS reason FROM review_item WHERE status='open' AND kind='identity' AND target_id=?").get(queens[1])?.reason, "duplicate-work");
+});
