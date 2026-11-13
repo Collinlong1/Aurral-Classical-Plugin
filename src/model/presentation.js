@@ -156,6 +156,21 @@ function numberedPiece(title) {
   return { set: match[1].trim(), part: match[2].charAt(0).toUpperCase() + match[2].slice(1) };
 }
 
+// A disc that holds one book of a set titles it, as Picard writes the
+// release's medium title: "Préludes, Book I" outright, or a book in one or
+// several languages ("Livre - Heft - Book I") under a set-named album.
+const BOOK = /^(?:book|livre|heft|band|cahier|libro|vol(?:ume|\.)?|teil|part)\s+(?:[ivxlc]+|\d+)\.?$/i;
+const namesSet = (value) => isCollectionLike(value) || NUMBERED_SET.test(value);
+function discSet(hints, composers) {
+  const subtitle = text(hints?.discSubtitle, "");
+  if (!subtitle) return null;
+  if (namesSet(subtitle)) return subtitle;
+  const parts = subtitle.split(/\s+[-–—/]\s+|\s*[;|]\s*/).map((part) => part.trim());
+  const book = parts.find((part) => /^book\b/i.test(part) && BOOK.test(part)) ?? parts.find((part) => BOOK.test(part));
+  const album = withoutComposer(text(hints?.album, ""), composers);
+  return book && namesSet(album) ? `${album}, ${book}` : null;
+}
+
 // The same people in any order credit the same piece. One catalogue number
 // is one work even when its movements credit different completers, as long
 // as a composer runs through all of them.
@@ -202,11 +217,14 @@ function pieceGroups(c, album, following) {
     // it heads as the set and reads as "No. 6 in B minor".
     const numbered = fullHead ? null : numberedPiece(fullTail);
     const tail = numbered?.part ?? fullTail;
+    const names = composersOf(evidence.hints || {});
+    // A piece with nothing in its own tags but a name ("Voiles") heads as
+    // the book its disc holds.
+    const book = fullHead || numbered ? null : discSet(evidence.hints, names);
     // An opera is one work across its acts: "La traviata, Act II" heads as
     // "La traviata", the way Apple Music Classical shows it.
-    const head = (numbered?.set ?? fullHead).replace(ACT, "");
+    const head = numbered?.set ?? book ?? fullHead.replace(ACT, "");
     const heading = head || tail;
-    const names = composersOf(evidence.hints || {});
     const composer = names.join(", ");
     const last = pieces.at(-1);
     const item = {

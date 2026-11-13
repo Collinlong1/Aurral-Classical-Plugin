@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { afterEach, beforeEach, test } from "node:test";
-import { File, TagTypes, Id3v2UserTextInformationFrame } from "node-taglib-sharp";
+import { File, TagTypes, Id3v2FrameIdentifiers, Id3v2UserTextInformationFrame } from "node-taglib-sharp";
 import plugin, { makeContext, waitForBackgroundTagging } from "../src/index.js";
 import { readTags, readValues, writeTags } from "../src/tags.js";
 import { enqueue, readProcessed, runQueue, withTagging } from "../src/tagger.js";
@@ -87,6 +87,13 @@ for (const ext of ["flac", "mp3", "m4a", "opus"]) {
     const grouped = File.createFromPath(file);
     try {
       grouped.tag.grouping = "Symphony No. 5 in C minor, op. 67";
+      // The disc's title, where Picard writes it in each format.
+      const xiph = grouped.getTag(TagTypes.Xiph, false);
+      const id3 = grouped.getTag(TagTypes.Id3v2, false);
+      const apple = grouped.getTag(TagTypes.Apple, false);
+      if (xiph) xiph.setFieldAsStrings("DISCSUBTITLE", "Livre - Heft - Book I");
+      if (id3) id3.setTextFrame(Id3v2FrameIdentifiers.TSST, "Livre - Heft - Book I");
+      if (apple) apple.setItunesStrings("com.apple.iTunes", "DISCSUBTITLE", "Livre - Heft - Book I");
       grouped.save();
     } finally {
       grouped.dispose();
@@ -102,6 +109,7 @@ for (const ext of ["flac", "mp3", "m4a", "opus"]) {
     assert.equal(tags.work, "Symphony No. 5 in C minor, op. 67: I. Allegro con brio");
     assert.equal(tags.workId, "mvt1");
     assert.equal(tags.grouping, "Symphony No. 5 in C minor, op. 67");
+    assert.equal(tags.discSubtitle, "Livre - Heft - Book I");
     assert.equal(tags.recordingMbid, RECORDING);
     assert.equal(tags.title, "Symphony No. 5: I.");
     assert.deepEqual(otherTags(file), before);

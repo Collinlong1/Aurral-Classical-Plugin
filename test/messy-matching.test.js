@@ -8,7 +8,7 @@ import fs from "node:fs/promises";
 import { tempFolders } from "./helpers.js";
 import { artistCredits, composersOf } from "../src/model/credits.js";
 import { classificationEvidence } from "../src/model/classify-evidence.js";
-import { splitTitle, stripWorkPrefix, autoMatchTaggedWorks, withoutComposer } from "../src/model/auto-match.js";
+import { splitTitle, stripWorkPrefix, autoMatchTaggedWorks, withoutComposer, mapToMovements, movementParts } from "../src/model/auto-match.js";
 import { openCatalogue } from "../src/model/catalogue.js";
 import { reconcile, classify } from "../src/model/reconcile.js";
 import { renderAlbumPresentation } from "../src/model/presentation.js";
@@ -372,4 +372,79 @@ test("album page: numbered pieces of a set head as the set; single numbered piec
   // Display only: none of these becomes a work.
   autoMatchTaggedWorks(c, { actor: "admin", allowStructuredTitles: true });
   assert.equal(c.db.prepare("SELECT COUNT(*) AS n FROM entity WHERE kind='work' AND deleted_at IS NULL").get().n, 0);
+});
+
+test("album page: a disc that holds one book of a set heads its untitled pieces", async (t) => {
+  const debussy = ["Claude Debussy"];
+  const book = (subtitle, titles, disc) =>
+    titles.map((title, i) => ({ title, composer: debussy, genres: ["Classical"], discNumber: disc, trackNumber: i + 1, discSubtitle: subtitle }));
+  const c = await catalogueWith(t, [
+    {
+      id: "zimerman",
+      album: "Préludes",
+      albumArtist: "Krystian Zimerman",
+      artist: "Claude Debussy — Krystian Zimerman",
+      titles: [
+        ...book("Livre - Heft - Book I", ["Danseuses de Delphes", "Voiles"], 1),
+        ...book("Livre - Heft - Book II", ["Brouillards", "Feuilles mortes"], 2),
+      ],
+    },
+    // The disc names the book itself.
+    { id: "named", album: "Debussy: Piano Works", albumArtist: "Pianist", artist: "Pianist", titles: book("Préludes, Book I", ["Voiles", "Le vent dans la plaine"], 1) },
+    // A disc title that names no book, or a book under an album that names no set, heads nothing.
+    { id: "live", album: "Préludes", albumArtist: "Pianist", artist: "Pianist", titles: book("Live in Vienna", ["Voiles", "Le vent dans la plaine"], 1) },
+    { id: "images", album: "Recital", albumArtist: "Pianist", artist: "Pianist", titles: book("Book I", ["Reflets dans l'eau", "Mouvement"], 1) },
+  ]);
+  const blocks = (albumId) =>
+    renderAlbumPresentation(c, albumId)?.groups.map((group) => [group.title, group.items.map((item) => item.title), group.detail ?? null]) ?? null;
+  assert.deepEqual(blocks("zimerman"), [
+    ["Préludes, Book I", ["Danseuses de Delphes", "Voiles"], null],
+    ["Préludes, Book II", ["Brouillards", "Feuilles mortes"], null],
+  ]);
+  assert.deepEqual(blocks("named"), [["Préludes, Book I", ["Voiles", "Le vent dans la plaine"], null]]);
+  assert.equal(blocks("live"), null);
+  assert.equal(blocks("images"), null);
+  // Display only: a book of a set never becomes a work.
+  autoMatchTaggedWorks(c, { actor: "admin", allowStructuredTitles: true });
+  assert.equal(c.db.prepare("SELECT COUNT(*) AS n FROM entity WHERE kind='work' AND deleted_at IS NULL").get().n, 0);
+});
+
+test("matching: a movement an earlier pass left out fills the work's missing movement", async (t) => {
+  const rach = "Sergei Rachmaninoff";
+  const work = "Piano Concerto no. 4 in G minor, op. 40";
+  const album = (id, titles) => ({ id, album: id, albumArtist: "Daniil Trifonov", artist: "Daniil Trifonov", titles });
+  const c = await catalogueWith(t, [
+    album("other", ["I. Allegro vivace", "II. Largo", "III. Allegro vivace"].map((title) => ({ title, work, composer: [rach], genres: ["Classical"] }))),
+    // The first movement credits another composer too, and spells its work differently.
+    album("departure", [
+      { title: "1. Allegro vivace", work: "Concerto for Piano and Orchestra no. 4 in G minor, op. 40", composer: ["Camille Saint-Saëns", rach], genres: ["Classical"] },
+      ...["II. Largo", "III. Allegro vivace"].map((title) => ({ title, work, composer: [rach], genres: ["Classical"] })),
+    ]),
+  ]);
+  autoMatchTaggedWorks(c, { albumId: "other", actor: "admin", allowStructuredTitles: true });
+  // An earlier version matched the album without its first movement.
+  const first = c.db.prepare("SELECT id FROM track_link WHERE core_id='departure-0'").get().id;
+  c.db.prepare("UPDATE classification SET state='not_classical' WHERE target_id=?").run(first);
+  autoMatchTaggedWorks(c, { albumId: "departure", actor: "admin", allowStructuredTitles: true });
+  c.db.prepare("UPDATE classification SET state='classical' WHERE target_id=?").run(first);
+  assert.deepEqual(renderAlbumPresentation(c, "departure").groups.map((group) => group.missing.map((m) => m.title)), [[], ["I. Allegro vivace"]]);
+
+  autoMatchTaggedWorks(c, { albumId: "departure", actor: "admin", allowStructuredTitles: true });
+  const [group, ...rest] = renderAlbumPresentation(c, "departure").groups;
+  assert.equal(rest.length, 0);
+  assert.deepEqual([group.title, group.missing, group.items.map((item) => item.title)], [work, [], ["I. Allegro vivace", "II. Largo", "III. Allegro vivace"]]);
+  assert.equal(c.db.prepare("SELECT COUNT(*) AS n FROM relation WHERE kind='movement' AND source_id=?").get(group.workId).n, 3);
+});
+
+test("matching: a movement number never maps a track onto a differently named movement", () => {
+  const partita = ["Preludio", "Loure", "Gavotte en rondeau", "Menuet I", "Menuet II", "Bourrée", "Gigue"].map((name, i) => ({
+    id: `m${i + 1}`,
+    position: i + 1,
+    ...movementParts(`${["I", "II", "III", "IV", "V", "VI", "VII"][i]}. ${name}`),
+  }));
+  const tracks = (...titles) => titles.map((movementTitle) => ({ movementTitle }));
+  // Rachmaninoff's suite from the partita: "2. Gavotte" is not "II. Loure".
+  assert.equal(mapToMovements(partita, tracks("1. Preludio. Non allegro", "2. Gavotte", "3. Gigue")), null);
+  // The same number with the same first word still maps.
+  assert.deepEqual(mapToMovements(partita, tracks("I. Preludio (Live)", "VII. Gigue")), ["m1", "m7"]);
 });

@@ -35,6 +35,7 @@ const emptyTags = () => ({
   work: "",
   grouping: "",
   workId: "",
+  discSubtitle: "",
   trackNumber: 0,
   discNumber: 0,
   durationMs: 0,
@@ -312,6 +313,7 @@ async function scanFile(file, root, prior) {
       work: tags.work,
       // Only when set, so files without it keep their stored evidence.
       ...(tags.grouping && { grouping: tags.grouping }),
+      ...(tags.discSubtitle && { discSubtitle: tags.discSubtitle }),
       workId: tags.workId,
       recordingMbid: tags.recordingMbid || file.recordingMbid || "",
       composerDistinct:

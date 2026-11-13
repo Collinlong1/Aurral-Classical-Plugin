@@ -37699,6 +37699,7 @@ function workMovements(catalogue, work) {
 }
 function mapToMovements(movements, tracks) {
   const used = /* @__PURE__ */ new Set(), result = [];
+  const firstWord = (text4) => text4.split(" ")[0];
   for (const track of tracks) {
     const parts = movementParts(track.movementTitle);
     let found = movements.filter(
@@ -37708,6 +37709,8 @@ function mapToMovements(movements, tracks) {
       found = movements.filter(
         (m) => !used.has(m.id) && (m.index ?? m.position) === parts.index
       );
+    if (found.length === 1 && found[0].text && parts.text && firstWord(found[0].text) !== firstWord(parts.text))
+      found = [];
     if (found.length !== 1) {
       result.push(null);
       continue;
@@ -37751,18 +37754,25 @@ function extendRealization(catalogue, group, actor3, people) {
     );
     const ordered = [...group.tracks].sort(albumOrder);
     let added = 0;
+    const held2 = new Set(
+      catalogue.db.prepare("SELECT movement_id FROM realization_item WHERE realization_id=?").all(realization.id).map((row) => row.movement_id)
+    );
     for (const [index, track] of ordered.entries()) {
       if (track.attached) continue;
       const before = ordered.slice(0, index).reverse().map((other) => itemOf.get(realization.id, other.id)).find(Boolean);
-      const position = before?.movement_id ? catalogue.db.prepare("SELECT position FROM relation WHERE kind='movement' AND source_id=? AND target_id=?").get(realization.work_id, before.movement_id).position + 1 : 1;
-      shiftUp(catalogue, "relation", "position", "kind='movement' AND source_id=?", [realization.work_id], position);
-      const movement = catalogue.createEntity("movement");
-      metadata.derived(
-        movement,
-        "title",
-        movementTitle({ title: track.parsedTitle, work: track.evidence.hints?.work }, workTitle) || `Movement ${position}`
-      );
-      catalogue.relate("movement", realization.work_id, movement, { position });
+      const named = movementTitle({ title: track.parsedTitle, work: track.evidence.hints?.work }, workTitle);
+      const parts = movementParts(named);
+      const sameName = workMovements(catalogue, realization.work_id).filter((m) => !held2.has(m.id) && parts.text && m.text === parts.text);
+      const existing = sameName.length === 1 ? sameName[0] : sameName.find((m) => parts.index && (m.index ?? m.position) === parts.index);
+      let movement = existing?.id;
+      if (!movement) {
+        const position = before?.movement_id ? catalogue.db.prepare("SELECT position FROM relation WHERE kind='movement' AND source_id=? AND target_id=?").get(realization.work_id, before.movement_id).position + 1 : 1;
+        shiftUp(catalogue, "relation", "position", "kind='movement' AND source_id=?", [realization.work_id], position);
+        movement = catalogue.createEntity("movement");
+        metadata.derived(movement, "title", named || `Movement ${position}`);
+        catalogue.relate("movement", realization.work_id, movement, { position });
+      }
+      held2.add(movement);
       const sequence = (before?.sequence || 0) + 1;
       shiftUp(catalogue, "realization_item", "sequence", "realization_id=?", [realization.id], sequence);
       const recording = catalogue.createEntity("recording", { durationMs: track.evidence.durationMs });
@@ -40577,6 +40587,17 @@ function numberedPiece(title) {
   if (!match2 || !NUMBERED_SET.test(match2[1]) || /\bin\s+[a-h]\b/i.test(match2[1])) return null;
   return { set: match2[1].trim(), part: match2[2].charAt(0).toUpperCase() + match2[2].slice(1) };
 }
+var BOOK = /^(?:book|livre|heft|band|cahier|libro|vol(?:ume|\.)?|teil|part)\s+(?:[ivxlc]+|\d+)\.?$/i;
+var namesSet = (value) => isCollectionLike(value) || NUMBERED_SET.test(value);
+function discSet(hints, composers) {
+  const subtitle = text2(hints?.discSubtitle, "");
+  if (!subtitle) return null;
+  if (namesSet(subtitle)) return subtitle;
+  const parts = subtitle.split(/\s+[-–—/]\s+|\s*[;|]\s*/).map((part) => part.trim());
+  const book = parts.find((part) => /^book\b/i.test(part) && BOOK.test(part)) ?? parts.find((part) => BOOK.test(part));
+  const album = withoutComposer(text2(hints?.album, ""), composers);
+  return book && namesSet(album) ? `${album}, ${book}` : null;
+}
 function sameCredits(last, heading, names) {
   const these = new Set(names.map(words2));
   if (last.names.length === these.size && last.names.every((name) => these.has(name))) return true;
@@ -40608,9 +40629,10 @@ function pieceGroups(c, album, following) {
     const fullTail = words2(ownTail).endsWith(` ${words2(taggedTail)}`) ? taggedTail : ownTail;
     const numbered = fullHead ? null : numberedPiece(fullTail);
     const tail = numbered?.part ?? fullTail;
-    const head = (numbered?.set ?? fullHead).replace(ACT, "");
-    const heading = head || tail;
     const names = composersOf(evidence2.hints || {});
+    const book = fullHead || numbered ? null : discSet(evidence2.hints, names);
+    const head = numbered?.set ?? book ?? fullHead.replace(ACT, "");
+    const heading = head || tail;
     const composer = names.join(", ");
     const last = pieces.at(-1);
     const item = {
@@ -41070,6 +41092,11 @@ var workField = textField("WORK", "WORK", { box: "\xA9wrk" });
 var workIdField = textField("MUSICBRAINZ_WORKID", "MusicBrainz Work Id", { name: "MusicBrainz Work Id" });
 var artistIdsField = textField("MUSICBRAINZ_ARTISTID", "MusicBrainz Artist Id", { name: "MusicBrainz Artist Id" });
 var albumArtistIdsField = textField("MUSICBRAINZ_ALBUMARTISTID", "MusicBrainz Album Artist Id", { name: "MusicBrainz Album Artist Id" });
+var discSubtitleField = textField("DISCSUBTITLE", "DISCSUBTITLE", { name: "DISCSUBTITLE" });
+function readDiscSubtitle(file) {
+  const tsst = id3Of(file)?.getTextAsString(import_node_taglib_sharp.Id3v2FrameIdentifiers.TSST);
+  return text3(tsst) || (discSubtitleField.read(file)[0] ?? "");
+}
 var WRITERS = {
   title: {
     read: (file) => texts(file.tag.title),
@@ -41161,6 +41188,7 @@ function readTags(filePath) {
       // Some taggers put the work here and leave WORK empty.
       grouping: text3(tag.grouping),
       workId: workIdField.read(file)[0] ?? "",
+      discSubtitle: readDiscSubtitle(file),
       trackNumber: positive2(tag.track),
       discNumber: positive2(tag.disc),
       durationMs: Math.round(file.properties?.durationMilliseconds || 0)
@@ -41233,6 +41261,7 @@ var emptyTags = () => ({
   work: "",
   grouping: "",
   workId: "",
+  discSubtitle: "",
   trackNumber: 0,
   discNumber: 0,
   durationMs: 0
@@ -41441,6 +41470,7 @@ async function scanFile(file, root, prior) {
       work: tags.work,
       // Only when set, so files without it keep their stored evidence.
       ...tags.grouping && { grouping: tags.grouping },
+      ...tags.discSubtitle && { discSubtitle: tags.discSubtitle },
       workId: tags.workId,
       recordingMbid: tags.recordingMbid || file.recordingMbid || "",
       composerDistinct: tags.composer.length > 0 && !tags.composer.includes(tags.artist)
@@ -41976,7 +42006,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.17" : "dev";
+var VERSION = true ? "1.0.18" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js

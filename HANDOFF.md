@@ -1,3 +1,14 @@
+# Debussy's books, a left-out movement and arrangement mapping
+
+Manifest 1.0.18, November 13, 2026, at the user's request. Plugin only; the companion core stays `66b54b5`.
+
+- **Disc subtitles.** The model scan reads each file's disc title as Picard writes it (`DISCSUBTITLE`, ID3v2.4 `TSST` or `TXXX:DISCSUBTITLE`, iTunes `DISCSUBTITLE`) into the hints. The 1.0.17 note that this needed core was wrong: the plugin reads tags itself.
+- **Books of a set.** On the album page, a piece with nothing in its tags but a name ("Voiles") heads as the book its disc holds: the disc title itself when it names a set ("Préludes, Book I"), or the album's set name with the book from a multilingual disc title ("Préludes" + "Livre - Heft - Book I" → "Préludes, Book I"). Each book is its own block; display only, never a work. Disc titles that name no book, or books under albums that name no set, change nothing.
+- **A left-out movement fills its slot.** Extending an album's recording with a track an earlier pass left out (Trifonov's Rachmaninoff Op. 40, whose first movement also credits Saint-Saëns) now uses the work's movement this recording lacks when the names agree, instead of adding a duplicate movement and still reporting it missing.
+- **Movement numbers never override names.** `mapToMovements` rejects a unique numbered match whose name starts differently, so Rachmaninoff's suite from Bach's BWV 1006 ("2. Gavotte") no longer lands on the partita's "II. Loure"; the album goes to review (movement-mismatch), which is what the user's screenshot showed as unmatched.
+
+Validation: 278 plugin tests and both corpus gates pass on Node 22 with the Apple baseline unchanged (a broader name-prefix rule was tried and dropped after the gate caught a false join on Argerich's Teatro Colón recital). Each change has a regression test that fails on 1.0.17. Disc subtitles are read in FLAC, MP3, M4A and Opus. The Compose/Chromium workflow was not rerun (no core or page-contract change). Existing installs need a library scan to read disc titles.
+
 # Grouping fixes and large box sets
 
 Manifest 1.0.17, November 12–13, 2026, at the user's request, picking up a Codex review whose unpushed work was lost. Companion core commit `66b54b5` on `aurral-classical`; integration CI pins it.

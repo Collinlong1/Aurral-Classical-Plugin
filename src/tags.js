@@ -9,6 +9,7 @@ import {
   ByteVector,
   File,
   Id3v2FrameClassType,
+  Id3v2FrameIdentifiers,
   Id3v2Settings,
   Id3v2UserTextInformationFrame,
   ReadStyle,
@@ -90,6 +91,15 @@ const workField = textField("WORK", "WORK", { box: "©wrk" });
 const workIdField = textField("MUSICBRAINZ_WORKID", "MusicBrainz Work Id", { name: "MusicBrainz Work Id" });
 const artistIdsField = textField("MUSICBRAINZ_ARTISTID", "MusicBrainz Artist Id", { name: "MusicBrainz Artist Id" });
 const albumArtistIdsField = textField("MUSICBRAINZ_ALBUMARTISTID", "MusicBrainz Album Artist Id", { name: "MusicBrainz Album Artist Id" });
+
+// The disc's own title ("Livre - Heft - Book I"), as Picard writes it: a
+// DISCSUBTITLE comment or iTunes atom, or the ID3v2.4 TSST frame (TXXX in
+// files from taggers that keep to ID3v2.3).
+const discSubtitleField = textField("DISCSUBTITLE", "DISCSUBTITLE", { name: "DISCSUBTITLE" });
+function readDiscSubtitle(file) {
+  const tsst = id3Of(file)?.getTextAsString(Id3v2FrameIdentifiers.TSST);
+  return text(tsst) || (discSubtitleField.read(file)[0] ?? "");
+}
 
 // Fields the plugin writes. Each value is a list of strings.
 const WRITERS = {
@@ -192,6 +202,7 @@ export function readTags(filePath) {
       // Some taggers put the work here and leave WORK empty.
       grouping: text(tag.grouping),
       workId: workIdField.read(file)[0] ?? "",
+      discSubtitle: readDiscSubtitle(file),
       trackNumber: positive(tag.track),
       discNumber: positive(tag.disc),
       durationMs: Math.round(file.properties?.durationMilliseconds || 0),

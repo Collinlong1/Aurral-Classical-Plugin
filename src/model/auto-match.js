@@ -565,6 +565,7 @@ export function workMovements(catalogue, work) {
 export function mapToMovements(movements, tracks) {
   const used = new Set(),
     result = [];
+  const firstWord = (text) => text.split(" ")[0];
   for (const track of tracks) {
     const parts = movementParts(track.movementTitle);
     let found = movements.filter(
@@ -574,6 +575,10 @@ export function mapToMovements(movements, tracks) {
       found = movements.filter(
         (m) => !used.has(m.id) && (m.index ?? m.position) === parts.index,
       );
+    // A number settles it only when the names don't disagree: an
+    // arrangement's "2. Gavotte" is not the partita's "II. Loure".
+    if (found.length === 1 && found[0].text && parts.text && firstWord(found[0].text) !== firstWord(parts.text))
+      found = [];
     if (found.length !== 1) {
       result.push(null);
       continue;
@@ -639,6 +644,9 @@ function extendRealization(catalogue, group, actor, people) {
     );
     const ordered = [...group.tracks].sort(albumOrder);
     let added = 0;
+    const held = new Set(
+      catalogue.db.prepare("SELECT movement_id FROM realization_item WHERE realization_id=?").all(realization.id).map((row) => row.movement_id),
+    );
     for (const [index, track] of ordered.entries()) {
       if (track.attached) continue;
       const before = ordered
@@ -646,20 +654,26 @@ function extendRealization(catalogue, group, actor, people) {
         .reverse()
         .map((other) => itemOf.get(realization.id, other.id))
         .find(Boolean);
-      const position = before?.movement_id
-        ? catalogue.db
-            .prepare("SELECT position FROM relation WHERE kind='movement' AND source_id=? AND target_id=?")
-            .get(realization.work_id, before.movement_id).position + 1
-        : 1;
-      shiftUp(catalogue, "relation", "position", "kind='movement' AND source_id=?", [realization.work_id], position);
-      const movement = catalogue.createEntity("movement");
-      metadata.derived(
-        movement,
-        "title",
-        movementTitle({ title: track.parsedTitle, work: track.evidence.hints?.work }, workTitle) ||
-          `Movement ${position}`,
-      );
-      catalogue.relate("movement", realization.work_id, movement, { position });
+      const named = movementTitle({ title: track.parsedTitle, work: track.evidence.hints?.work }, workTitle);
+      // A movement the work has and this recording lacks ("Missing I.
+      // Allegro vivace") takes the track when their names agree; the number
+      // alone only settles which of two same-named movements it is.
+      const parts = movementParts(named);
+      const sameName = workMovements(catalogue, realization.work_id).filter((m) => !held.has(m.id) && parts.text && m.text === parts.text);
+      const existing = sameName.length === 1 ? sameName[0] : sameName.find((m) => parts.index && (m.index ?? m.position) === parts.index);
+      let movement = existing?.id;
+      if (!movement) {
+        const position = before?.movement_id
+          ? catalogue.db
+              .prepare("SELECT position FROM relation WHERE kind='movement' AND source_id=? AND target_id=?")
+              .get(realization.work_id, before.movement_id).position + 1
+          : 1;
+        shiftUp(catalogue, "relation", "position", "kind='movement' AND source_id=?", [realization.work_id], position);
+        movement = catalogue.createEntity("movement");
+        metadata.derived(movement, "title", named || `Movement ${position}`);
+        catalogue.relate("movement", realization.work_id, movement, { position });
+      }
+      held.add(movement);
       const sequence = (before?.sequence || 0) + 1;
       shiftUp(catalogue, "realization_item", "sequence", "realization_id=?", [realization.id], sequence);
       const recording = catalogue.createEntity("recording", { durationMs: track.evidence.durationMs });
