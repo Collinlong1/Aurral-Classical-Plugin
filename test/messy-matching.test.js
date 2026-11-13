@@ -383,9 +383,17 @@ test("album page: numbered pieces of a set head as the set; single numbered piec
   assert.deepEqual(blocks("glass"), [["Études", ["No. 9", "No. 2"], null]]);
   // Field's nocturnes are pieces of their own: no set, so no work view.
   assert.equal(blocks("field"), null);
-  // Display only: none of these becomes a work.
+  // A set with its own opus and a piece with its own opus are works; a set
+  // without a number, a piece within an opus and Field's nocturnes are not.
   autoMatchTaggedWorks(c, { actor: "admin", allowStructuredTitles: true });
-  assert.equal(c.db.prepare("SELECT COUNT(*) AS n FROM entity WHERE kind='work' AND deleted_at IS NULL").get().n, 0);
+  const works = (albumId) => renderAlbumPresentation(c, albumId)?.groups.map((group) => [group.title, Boolean(group.workId)]) ?? null;
+  assert.deepEqual(works("argerich"), [
+    ["24 Préludes, op. 28", true],
+    ["Études in G-flat major, Op. 10 No. 5 \"Black Keys\"", false],
+    ["Prelude in C-sharp minor, Op. 45", true],
+  ]);
+  assert.deepEqual(works("glass"), [["Études", false]]);
+  assert.equal(works("field"), null);
 });
 
 test("matching: a movement an earlier pass left out fills the work's missing movement", async (t) => {
@@ -426,4 +434,37 @@ test("matching: a movement number never maps a track onto a differently named mo
   assert.equal(mapToMovements(partita, tracks("1. Preludio. Non allegro", "2. Gavotte", "3. Gigue")), null);
   // The same number with the same first word still maps.
   assert.deepEqual(mapToMovements(partita, tracks("I. Preludio (Live)", "VII. Gigue")), ["m1", "m7"]);
+});
+
+test("matching: a title naming a whole piece is a work; a set with its own opus is one work", async (t) => {
+  const chopin = (title) => ({ title, composer: ["Frédéric Chopin"], genres: ["Classical"] });
+  const c = await catalogueWith(t, [
+    {
+      id: "zimerman",
+      album: "Chopin: Ballades; Barcarolle; Fantaisie",
+      albumArtist: "Krystian Zimerman",
+      artist: "Frédéric Chopin — Krystian Zimerman",
+      titles: ["Ballade No. 1 in G Minor, Op. 23", "Ballade No. 2 in F Major, Op. 38", "Barcarolle in F sharp, Op. 60", "Fantaisie in F minor, Op. 49"].map(chopin),
+    },
+    {
+      id: "fliter",
+      album: "Chopin: Waltzes",
+      albumArtist: "Ingrid Fliter",
+      artist: "Ingrid Fliter",
+      titles: ["Waltz in E-flat, op. 18", "Waltzes, op. 34 no. 1 in A-flat", "Waltzes, op. 34 no. 2 in A minor", "Waltz in A-flat, op. 42"].map(chopin),
+    },
+  ]);
+  for (const albumId of ["zimerman", "fliter"]) autoMatchTaggedWorks(c, { albumId, actor: "admin", allowStructuredTitles: true });
+  const blocks = (albumId) => renderAlbumPresentation(c, albumId).groups.map((group) => [group.title, Boolean(group.workId), group.items.map((item) => item.title)]);
+  assert.deepEqual(blocks("zimerman"), [
+    ["Ballade No. 1 in G Minor, Op. 23", true, ["Ballade No. 1 in G Minor, Op. 23"]],
+    ["Ballade No. 2 in F Major, Op. 38", true, ["Ballade No. 2 in F Major, Op. 38"]],
+    ["Barcarolle in F sharp, Op. 60", true, ["Barcarolle in F sharp, Op. 60"]],
+    ["Fantaisie in F minor, Op. 49", true, ["Fantaisie in F minor, Op. 49"]],
+  ]);
+  assert.deepEqual(blocks("fliter"), [
+    ["Waltz in E-flat, op. 18", true, ["Waltz in E-flat, op. 18"]],
+    ["Waltzes, op. 34", true, ["No. 1 in A-flat", "No. 2 in A minor"]],
+    ["Waltz in A-flat, op. 42", true, ["Waltz in A-flat, op. 42"]],
+  ]);
 });

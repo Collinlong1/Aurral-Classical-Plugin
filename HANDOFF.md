@@ -1,3 +1,15 @@
+# Whole pieces, sets with their own opus, and a read-only audit
+
+Manifest 1.0.20, November 13, 2026, at the user's request ("a lot of things that should match but aren't"). Plugin only; core stays `66b54b5`.
+
+- **Whole pieces from the title.** Under Auto-match, a track whose whole title is a single-piece form with its own catalogue number ("Ballade No. 1 in G Minor, Op. 23", "Waltz in E-flat, op. 18", "Barcarolle in F sharp, Op. 60") is a one-track work. A number within an opus ("Op. 28 No. 3", "Op. 23/1"), no catalogue number ("Capriccio No. 1") or "from" (an excerpt) keeps it a piece the album page groups with its set; the Apple gate caught all three.
+- **A set named in the plural with its own catalogue number is a work** ("Waltzes, op. 34", "24 Préludes, op. 28", "Transcendental Etudes, S. 139"), from WORK, a structured title or a numbered title ("Waltzes, op. 34 no. 1 in A-flat"). A set's name alone ("Études") and singular pieces ("Prelude No. 1, Op. 23/1") are not. Apple corpus: block matches and false joins unchanged; six albums closer to Apple; four (Sokolov's Salzburg Recital, Ashkenazy's Chopin Études, Lim's Transcendental Études, Aimard's Debussy Préludes) now join a shared work and take its movement names, as accepted before for Scheherazade. Baseline saved.
+- **`scripts/audit-catalogue.mjs`** audits a live catalogue read-only (SQLite read-only and `query_only`; no migrations, matching, scans or network): every album as its page renders, flags (no work view, unmatched multi-track blocks, works missing movements, repeated headings, rows that restart their numbering or start with the composer, unsure tracks, open review items, duplicate works), and for every classical track outside a work the work its tags name and why Auto-match leaves it out, from the matcher's own rules (`explainMatching`, a dry run of `candidates`). Tested on a corpus-built catalogue whose file hash is unchanged after the run.
+
+Open: the user's Dante Symphony shows numbered sections of two movements as one list restarting at 1; the user's Kobayashi Années still shows unmatched on their server. Both need the audit's tags from the live catalogue before changing anything.
+
+Validation: 281 plugin tests and both corpus gates pass on Node 22; each matching change has a test that fails on 1.0.19. The Compose/Chromium workflow was not rerun (no core or page-contract change).
+
 # Sets MusicBrainz identifies, composer spellings, a left-out movement and arrangement mapping
 
 Manifests 1.0.18–1.0.19, November 13, 2026, at the user's request. Plugin only; the companion core stays `66b54b5`.

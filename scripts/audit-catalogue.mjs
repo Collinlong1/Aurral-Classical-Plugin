@@ -5,11 +5,13 @@
 //   node scripts/audit-catalogue.mjs <plugin data folder>/model [out dir]
 //
 // Writes audit.md (summary and flagged albums) and audit.json (every album).
+// For every classical track outside a work it says which work its tags name
+// and why Auto-match leaves it out, from the matcher's own rules.
 import fs from "node:fs/promises";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { renderAlbumPresentation } from "../src/model/presentation.js";
-import { nameKey, workKey } from "../src/model/auto-match.js";
+import { explainMatching, nameKey, workKey } from "../src/model/auto-match.js";
 
 const [folder, outDir = "."] = process.argv.slice(2);
 if (!folder) {
@@ -45,6 +47,16 @@ for (const track of tracks) {
   album.tracks.push(track);
   albums.set(String(id), album);
 }
+
+const attachedTo = new Map(
+  db
+    .prepare(
+      `SELECT s.track_link_id AS id,r.work_id FROM segment s JOIN realization_item i ON i.segment_id=s.id
+       JOIN realization r ON r.id=i.realization_id`,
+    )
+    .all()
+    .map((row) => [row.id, row.work_id]),
+);
 
 const reviews = db
   .prepare("SELECT kind,target_id,evidence FROM review_item WHERE status='open'")
@@ -124,6 +136,41 @@ for (const album of albums.values()) {
   );
   if (wordy.length) flags.push(`${wordy.length} row(s) repeat their heading or start with the composer`);
   if (states.unsure) flags.push(`${states.unsure} track(s) unsure whether classical`);
+  // Numbered rows that start again inside one work ("1. Lento … 1.
+  // Andante"): sections of movements read as movements.
+  const restarts = blocks.filter((block) => {
+    const numbers = block.rows.map((row) => Number(row.match(/^(\d+)\.\s/)?.[1] || 0)).filter(Boolean);
+    return numbers.some((n, i) => i > 0 && n <= numbers[i - 1]);
+  });
+  if (restarts.length) flags.push(`${restarts.length} work(s) whose row numbers start again`);
+  // Why each classical track outside a work stays out.
+  const explained = explainMatching(c, album.id);
+  const unmatchedTracks = album.tracks
+    .filter((track) => track.state === "classical" && !attachedTo.get(track.id))
+    .map((track) => {
+      const h = track.evidence.hints || {};
+      const why = explained.get(track.id) || { work: null, reason: "not considered" };
+      return {
+        title: h.title || "",
+        disc: h.discNumber || 1,
+        track: h.trackNumber || 0,
+        work: h.work || "",
+        grouping: h.grouping || "",
+        composer: h.composer || [],
+        recordingId: Boolean(h.recordingMbid),
+        proposedWork: why.work,
+        // The dry run makes no MusicBrainz requests; Auto-match does.
+        reason:
+          !why.work && h.recordingMbid
+            ? `${why.reason}; it has a recording ID, so MusicBrainz may still name its work when Auto-match runs`
+            : why.reason,
+      };
+    })
+    .sort((a, b) => a.disc - b.disc || a.track - b.track);
+  const ready = unmatchedTracks.filter((track) => track.reason === "matches when Auto-match runs").length;
+  if (ready) flags.push(`${ready} track(s) match as soon as Auto-match runs on this album`);
+  const named = unmatchedTracks.filter((track) => track.proposedWork && track.reason !== "matches when Auto-match runs").length;
+  if (named) flags.push(`${named} track(s) name a work but stay unmatched`);
   const albumReviews = reviewsByAlbum.get(album.id) || [];
   if (albumReviews.length) flags.push(`open review: ${[...new Set(albumReviews.map((r) => r.evidence.reason || r.kind))].join(", ")}`);
   report.push({
@@ -136,6 +183,7 @@ for (const album of albums.values()) {
     flags,
     blocks,
     review: albumReviews.map((r) => ({ kind: r.kind, reason: r.evidence.reason || null })),
+    unmatchedTracks,
     sample: hints
       .slice(0, 3)
       .map((h) => ({ title: h.title, work: h.work || "", grouping: h.grouping || "", composer: h.composer || [], hasRecordingId: Boolean(h.recordingMbid) })),
@@ -169,6 +217,11 @@ const lines = [
   `Duplicate works (same title and composers, made more than once): ${duplicateWorks.length}`,
   ...duplicateWorks.slice(0, 30).map((list) => `- ${list[0].title} — ${list[0].composers.join(", ")} (${list.length})`),
   "",
+  "Classical tracks outside every work, by why Auto-match leaves them out:",
+  ...[...report.flatMap((a) => a.unmatchedTracks).reduce((m, t) => m.set(t.reason, (m.get(t.reason) || 0) + 1), new Map())]
+    .sort((a, b) => b[1] - a[1])
+    .map(([reason, n]) => `- ${reason}: ${n}`),
+  "",
   "Open review items by reason:",
   ...[...reasons].sort((a, b) => b[1] - a[1]).map(([reason, n]) => `- ${reason}: ${n}`),
   "",
@@ -182,7 +235,15 @@ for (const album of report.filter((a) => a.flags.length)) {
       `  - [${block.matched ? "work" : "piece"}] ${block.composer} | ${block.title}${block.detail ? ` (${block.detail})` : ""}${block.missing.length ? ` — missing ${block.missing.length}` : ""}: ${block.rows.slice(0, 4).join(" / ")}${block.rows.length > 4 ? " / …" : ""}`,
     );
   if (album.blocks.length > 12) lines.push(`  - … ${album.blocks.length - 12} more blocks`);
-  if (!album.blocks.length) for (const s of album.sample) lines.push(`  - tags: title "${s.title}", work "${s.work}", grouping "${s.grouping}", composer ${JSON.stringify(s.composer)}, recording ID ${s.hasRecordingId ? "yes" : "no"}`);
+  if (album.unmatchedTracks.length) {
+    lines.push("  - unmatched tracks:");
+    for (const t of album.unmatchedTracks.slice(0, 15))
+      lines.push(
+        `    - ${t.disc}.${t.track} "${t.title}"${t.work ? `, WORK "${t.work}"` : ""}${t.grouping ? `, GROUPING "${t.grouping}"` : ""}, composer ${t.composer.length ? t.composer.join("; ") : "none"}${t.recordingId ? ", recording ID" : ""} → ${t.proposedWork ? `"${t.proposedWork}": ` : ""}${t.reason}`,
+      );
+    if (album.unmatchedTracks.length > 15) lines.push(`    - … ${album.unmatchedTracks.length - 15} more`);
+  }
+  if (!album.blocks.length && !album.unmatchedTracks.length) for (const s of album.sample) lines.push(`  - tags: title "${s.title}", work "${s.work}", grouping "${s.grouping}", composer ${JSON.stringify(s.composer)}, recording ID ${s.hasRecordingId ? "yes" : "no"}`);
 }
 await fs.mkdir(outDir, { recursive: true });
 await fs.writeFile(path.join(outDir, "audit.md"), `${lines.join("\n")}\n`);

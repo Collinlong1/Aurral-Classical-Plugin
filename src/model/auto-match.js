@@ -97,10 +97,40 @@ const isCatalogueRange = (text) =>
   [...String(text).matchAll(/\b(\d+)\s*\/\s*(\d+)\b(?![a-z])/gi)].some(([, a, b]) => Number(b) > Number(a));
 // A name reads as a work when it names a form ("Sonata") or carries a
 // catalogue number ("The Bells, op. 35"); a set such as "Études" never does.
+const catalogued = (text) => Boolean(catalogueNumber(text)) && !isCatalogueRange(text);
+// A set named in the plural with its own catalogue number ("Waltzes, op.
+// 34", "24 Préludes, op. 28") is one work; a set's name alone ("Études") is
+// not, and "Prelude No. 1, Op. 23/1" is one piece of a set.
+const catalogueSet = (text) => NUMBERED_SET.test(text) && catalogued(text);
 const readsAsWork = (text) =>
   Boolean(text) &&
-  !isCollectionLike(text) &&
-  (MULTI_MOVEMENT.test(text) || (Boolean(catalogueNumber(text)) && !isCatalogueRange(text)));
+  ((!isCollectionLike(text) && (MULTI_MOVEMENT.test(text) || catalogued(text))) || catalogueSet(text));
+
+// "24 Préludes, op. 28 no. 6 in B minor": a numbered piece of a set named in
+// the plural. A key before the number names one piece instead ("Études in
+// G-flat major, Op. 10 No. 5").
+export function numberedPiece(title) {
+  const match = String(title).match(/^(.+?)[,\s]+(no\.?\s*\d+\b.*)$/i);
+  if (!match || !NUMBERED_SET.test(match[1]) || /\bin\s+[a-h]\b/i.test(match[1])) return null;
+  return { set: match[1].trim(), part: match[2].charAt(0).toUpperCase() + match[2].slice(1) };
+}
+
+// Forms of single pieces. A title that is one of these with a catalogue
+// number of its own ("Ballade No. 1 in G Minor, Op. 23", "Waltz in E-flat,
+// op. 18") names a whole piece on one track. A number within an opus ("Op.
+// 28 No. 3", "Op. 23/1") or none ("Capriccio No. 1") makes it one of a set,
+// which the album page groups instead, and "from" an excerpt.
+const PIECE_FORM =
+  /(?<!\p{L})(ballade|nocturne|waltz|valse|mazurka|polonaise|[eé]tude|pr[eé]lude|impromptu|scherzo|fantasie|fantasia|fantaisie|barcarolle|berceuse|rhapsody|rhapsodie|romance|intermezzo|capriccio|caprice|toccata|fugue|rondo|arabesque|gymnop[eé]die|bagatelle|consolation|liebestraum|polonaise-fantaisie)(?!\p{L})/iu;
+const wholePiece = (title) =>
+  !splitTitle(title).head &&
+  !MOVEMENT_PREFIX.test(title) &&
+  !NUMBERED_SET.test(title) &&
+  PIECE_FORM.test(title) &&
+  catalogued(title) &&
+  !/ no /.test(catalogueNumber(title)) &&
+  !/\d+\s*\/\s*\d+/.test(title) &&
+  !/(?<!\p{L})(?:from|aus|extrait)(?!\p{L})/iu.test(title);
 
 // GROUPING is free text in some taggers ("Favourite Sonatas"), so without a
 // catalogue number it counts only when the track's title names it too.
@@ -118,7 +148,7 @@ const catalogueText = (number) => number.replace(/^([A-Z])\s/, "$1. ");
 
 function proposedWork({ work, grouping, title }, allowStructuredTitles) {
   const tagged = clean(work);
-  if (tagged && !isCollectionLike(tagged)) {
+  if (tagged && (!isCollectionLike(tagged) || catalogueSet(clean(tagged.split(/\s*:\s*/, 1)[0])))) {
     const parent = clean(tagged.split(/\s*:\s*/, 1)[0]);
     // A WORK tag names a work outright when it reads like one or carries
     // a catalogue number, as song cycles do ("Winterreise, D. 911").
@@ -131,7 +161,7 @@ function proposedWork({ work, grouping, title }, allowStructuredTitles) {
     // that work, whatever label WORK carries.
     const head = titleHead(title) || title;
     const number = catalogueNumber(head);
-    if (number && !isCatalogueRange(head) && !MULTI_MOVEMENT.test(head))
+    if (number && !isCatalogueRange(head) && !MULTI_MOVEMENT.test(head) && !isCollectionLike(parent))
       return { title: parent, evidence: "work-tag", catalogue: catalogueText(number) };
   }
   if (!tagged && grouping) {
@@ -141,14 +171,21 @@ function proposedWork({ work, grouping, title }, allowStructuredTitles) {
   if (!allowStructuredTitles) return null;
   // Every track of a work shares the head, numbered or not ("Theme: Largo").
   const candidate = titleHead(title);
-  return readsAsWork(candidate) ? { title: candidate, evidence: "structured-title" } : null;
+  if (readsAsWork(candidate)) return { title: candidate, evidence: "structured-title" };
+  if (candidate) return null;
+  const set = numberedPiece(clean(title));
+  if (set) return catalogueSet(set.set) ? { title: set.set, evidence: "structured-title" } : null;
+  return wholePiece(clean(title)) ? { title: clean(title), evidence: "structured-title", standalone: true } : null;
 }
 
+// `explain`, when given, gets each track's proposed work and why it was
+// left out (the audit's dry run); matching itself never passes one.
 function candidates(
   catalogue,
   albumId = null,
   allowStructuredTitles = false,
   providerMatches = new Map(),
+  explain = null,
 ) {
   // One album's match reads only that album's tracks, through its index.
   const rows = catalogue.db
@@ -217,8 +254,19 @@ function candidates(
       !composers.length ||
       !Number.isSafeInteger(trackNumber) ||
       trackNumber < 1
-    )
+    ) {
+      explain?.set(row.id, {
+        work: proposal?.title ?? null,
+        reason: !proposal
+          ? "no work named: no WORK or GROUPING tag, and the title names no work"
+          : !composers.length
+            ? credit?.confidence === "medium"
+              ? "composer only guessed from the artist field"
+              : "no composer tag"
+            : "no track number",
+      });
       continue;
+    }
     const key = JSON.stringify([
       row.instance_id,
       String(row.evidence.albumId),
@@ -266,18 +314,34 @@ function candidates(
   return mergeCompletions([...groups.values()]).filter((group) => {
     // The title most of the work's tracks use, so one typo doesn't name it.
     group.work = [...group.titles].sort((a, b) => b[1] - a[1])[0][0];
-    if (group.tracks.every((track) => track.attached)) return false;
-    // Whole pieces are one track each; anything else needs two movements.
-    if (group.standalone ? group.tracks.length !== 1 : group.tracks.length < 2) return false;
     const positions = group.tracks.map(
       (track) => `${track.discNumber}:${track.trackNumber}`,
     );
-    return (
-      new Set(positions).size === positions.length &&
-      new Set(group.tracks.map((track) => normalized(track.title))).size ===
-        group.tracks.length
-    );
+    const reason = group.tracks.every((track) => track.attached)
+      ? "matched"
+      : // Whole pieces are one track each; anything else needs two movements.
+        group.standalone && group.tracks.length !== 1
+        ? "several tracks name the same whole piece"
+        : !group.standalone && group.tracks.length < 2
+          ? "only one track of a work with movements on this album"
+          : new Set(positions).size !== positions.length
+            ? "two tracks share a disc and track number"
+            : new Set(group.tracks.map((track) => normalized(track.title))).size !== group.tracks.length
+              ? "two tracks share a title"
+              : null;
+    if (explain)
+      for (const track of group.tracks)
+        explain.set(track.id, { work: group.work, evidence: group.evidence, reason: reason ?? "matches when Auto-match runs" });
+    return !reason;
   });
+}
+
+// What Auto-match would make of each classical track on an album, and why a
+// track stays out of every work. Reads only.
+export function explainMatching(catalogue, albumId) {
+  const explain = new Map();
+  candidates(catalogue, albumId, true, new Map(), explain);
+  return explain;
 }
 
 // One work whose movements credit different people: Mozart's Requiem names

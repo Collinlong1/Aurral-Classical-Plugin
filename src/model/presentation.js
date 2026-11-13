@@ -1,7 +1,7 @@
 import path from "node:path";
 import { openCatalogue } from "./catalogue.js";
 import { transaction } from "./database.js";
-import { NUMBERED_SET, isCollectionLike, movementTitle, splitTitle, withoutComposer } from "./auto-match.js";
+import { NUMBERED_SET, isCollectionLike, numberedPiece, movementTitle, splitTitle, withoutComposer } from "./auto-match.js";
 import { catalogueNumber } from "../works.js";
 import { composersOf } from "./credits.js";
 
@@ -143,13 +143,6 @@ function sameNamedWork(a, b) {
   const [short, long] = a.length <= b.length ? [a, b] : [b, a];
   const name = nameBeforeComma(long);
   return name.length >= 4 && words(short) === name && long.includes(",");
-}
-
-function numberedPiece(title) {
-  const match = String(title).match(/^(.+?)[,\s]+(no\.?\s*\d+\b.*)$/i);
-  // A key before the number names one piece: "Études in G-flat major, Op. 10 No. 5".
-  if (!match || !NUMBERED_SET.test(match[1]) || /\bin\s+[a-h]\b/i.test(match[1])) return null;
-  return { set: match[1].trim(), part: match[2].charAt(0).toUpperCase() + match[2].slice(1) };
 }
 
 // The same people in any order credit the same piece. One catalogue number

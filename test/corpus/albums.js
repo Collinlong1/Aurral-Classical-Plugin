@@ -225,7 +225,8 @@ export const recitalPicard = album("wang-vienna-recital-picard", {
       // Both sonatas join the works the store-tagged copy created: one work,
       // one title and one set of movement names across the library.
       [scriabin3, ["I. Drammatico", "II. Allegretto", "III. Andante", "IV. Presto con fuoco"]],
-      ["24 Jazz Preludes, op. 53", ["no. 11", "no. 10"]],
+      // A set with its own opus is a work, shared with the other copy of the recital.
+      ["24 Jazz Preludes, Op. 53", ["No. 11", "No. 10"]],
       ["Iberia, B. 47", ["no. 9, Lavapiés"]],
       [hunt, ["I. Allegro", "II. Scherzo. Allegretto vivace", "III. Minuet. Moderato e grazioso - Trio", "IV. Presto con fuoco"]],
       ["Études pour piano, premier livre", ["no. 6. Automne à Varsovie"]],

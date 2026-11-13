@@ -37368,7 +37368,16 @@ function standalonePiece(hints, workTitle, tag = hints.work) {
   return text4 === head || text4.startsWith(`${head} `) && splitTitle(title).head === "" && !MOVEMENT_PREFIX.test(stripWorkPrefix(title, workTitle));
 }
 var isCatalogueRange = (text4) => /\d+[a-z]?\s*[-–—]\s*\d+/i.test(text4) || [...String(text4).matchAll(/\b(\d+)\s*\/\s*(\d+)\b(?![a-z])/gi)].some(([, a, b]) => Number(b) > Number(a));
-var readsAsWork = (text4) => Boolean(text4) && !isCollectionLike(text4) && (MULTI_MOVEMENT.test(text4) || Boolean(catalogueNumber(text4)) && !isCatalogueRange(text4));
+var catalogued = (text4) => Boolean(catalogueNumber(text4)) && !isCatalogueRange(text4);
+var catalogueSet = (text4) => NUMBERED_SET.test(text4) && catalogued(text4);
+var readsAsWork = (text4) => Boolean(text4) && (!isCollectionLike(text4) && (MULTI_MOVEMENT.test(text4) || catalogued(text4)) || catalogueSet(text4));
+function numberedPiece(title) {
+  const match2 = String(title).match(/^(.+?)[,\s]+(no\.?\s*\d+\b.*)$/i);
+  if (!match2 || !NUMBERED_SET.test(match2[1]) || /\bin\s+[a-h]\b/i.test(match2[1])) return null;
+  return { set: match2[1].trim(), part: match2[2].charAt(0).toUpperCase() + match2[2].slice(1) };
+}
+var PIECE_FORM = new RegExp("(?<!\\p{L})(ballade|nocturne|waltz|valse|mazurka|polonaise|[e\xE9]tude|pr[e\xE9]lude|impromptu|scherzo|fantasie|fantasia|fantaisie|barcarolle|berceuse|rhapsody|rhapsodie|romance|intermezzo|capriccio|caprice|toccata|fugue|rondo|arabesque|gymnop[e\xE9]die|bagatelle|consolation|liebestraum|polonaise-fantaisie)(?!\\p{L})", "iu");
+var wholePiece = (title) => !splitTitle(title).head && !MOVEMENT_PREFIX.test(title) && !NUMBERED_SET.test(title) && PIECE_FORM.test(title) && catalogued(title) && !/ no /.test(catalogueNumber(title)) && !/\d+\s*\/\s*\d+/.test(title) && !new RegExp("(?<!\\p{L})(?:from|aus|extrait)(?!\\p{L})", "iu").test(title);
 function groupingWork(grouping, title) {
   const parent = clean3(clean3(grouping).split(/\s*:\s*/, 1)[0]);
   if (!readsAsWork(parent)) return null;
@@ -37380,13 +37389,13 @@ function groupingWork(grouping, title) {
 var catalogueText = (number) => number.replace(/^([A-Z])\s/, "$1. ");
 function proposedWork({ work, grouping, title }, allowStructuredTitles) {
   const tagged = clean3(work);
-  if (tagged && !isCollectionLike(tagged)) {
+  if (tagged && (!isCollectionLike(tagged) || catalogueSet(clean3(tagged.split(/\s*:\s*/, 1)[0])))) {
     const parent = clean3(tagged.split(/\s*:\s*/, 1)[0]);
     if (MULTI_MOVEMENT.test(parent) || catalogueNumber(parent))
       return { title: parent, evidence: "work-tag" };
     const head = titleHead(title) || title;
     const number = catalogueNumber(head);
-    if (number && !isCatalogueRange(head) && !MULTI_MOVEMENT.test(head))
+    if (number && !isCatalogueRange(head) && !MULTI_MOVEMENT.test(head) && !isCollectionLike(parent))
       return { title: parent, evidence: "work-tag", catalogue: catalogueText(number) };
   }
   if (!tagged && grouping) {
@@ -37395,9 +37404,13 @@ function proposedWork({ work, grouping, title }, allowStructuredTitles) {
   }
   if (!allowStructuredTitles) return null;
   const candidate = titleHead(title);
-  return readsAsWork(candidate) ? { title: candidate, evidence: "structured-title" } : null;
+  if (readsAsWork(candidate)) return { title: candidate, evidence: "structured-title" };
+  if (candidate) return null;
+  const set = numberedPiece(clean3(title));
+  if (set) return catalogueSet(set.set) ? { title: set.set, evidence: "structured-title" } : null;
+  return wholePiece(clean3(title)) ? { title: clean3(title), evidence: "structured-title", standalone: true } : null;
 }
-function candidates(catalogue, albumId = null, allowStructuredTitles = false, providerMatches = /* @__PURE__ */ new Map()) {
+function candidates(catalogue, albumId = null, allowStructuredTitles = false, providerMatches = /* @__PURE__ */ new Map(), explain = null) {
   const rows = catalogue.db.prepare(
     `SELECT t.id,t.instance_id,t.evidence,
         EXISTS(SELECT 1 FROM segment s JOIN realization_item i ON i.segment_id=s.id WHERE s.track_link_id=t.id) AS attached
@@ -37432,8 +37445,13 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
     ];
     const trackNumber = Number(hints.trackNumber);
     const discNumber = Number(hints.discNumber) || 1;
-    if (!proposal || !composers.length || !Number.isSafeInteger(trackNumber) || trackNumber < 1)
+    if (!proposal || !composers.length || !Number.isSafeInteger(trackNumber) || trackNumber < 1) {
+      explain?.set(row.id, {
+        work: proposal?.title ?? null,
+        reason: !proposal ? "no work named: no WORK or GROUPING tag, and the title names no work" : !composers.length ? credit?.confidence === "medium" ? "composer only guessed from the artist field" : "no composer tag" : "no track number"
+      });
       continue;
+    }
     const key = JSON.stringify([
       row.instance_id,
       String(row.evidence.albumId),
@@ -37480,12 +37498,17 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
   }
   return mergeCompletions([...groups.values()]).filter((group) => {
     group.work = [...group.titles].sort((a, b) => b[1] - a[1])[0][0];
-    if (group.tracks.every((track) => track.attached)) return false;
-    if (group.standalone ? group.tracks.length !== 1 : group.tracks.length < 2) return false;
     const positions = group.tracks.map(
       (track) => `${track.discNumber}:${track.trackNumber}`
     );
-    return new Set(positions).size === positions.length && new Set(group.tracks.map((track) => normalized(track.title))).size === group.tracks.length;
+    const reason = group.tracks.every((track) => track.attached) ? "matched" : (
+      // Whole pieces are one track each; anything else needs two movements.
+      group.standalone && group.tracks.length !== 1 ? "several tracks name the same whole piece" : !group.standalone && group.tracks.length < 2 ? "only one track of a work with movements on this album" : new Set(positions).size !== positions.length ? "two tracks share a disc and track number" : new Set(group.tracks.map((track) => normalized(track.title))).size !== group.tracks.length ? "two tracks share a title" : null
+    );
+    if (explain)
+      for (const track of group.tracks)
+        explain.set(track.id, { work: group.work, evidence: group.evidence, reason: reason ?? "matches when Auto-match runs" });
+    return !reason;
   });
 }
 function mergeCompletions(groups) {
@@ -37847,8 +37870,8 @@ function createGroup(catalogue, group, actor3, index) {
       const held2 = artistIdOf(catalogue, person);
       return mbid && held2 && held2 !== mbid;
     });
-    const catalogued = group.catalogue && `${group.work}, ${group.catalogue}`;
-    const titles = catalogued ? [catalogued] : [
+    const catalogued2 = group.catalogue && `${group.work}, ${group.catalogue}`;
+    const titles = catalogued2 ? [catalogued2] : [
       group.work,
       ...group.providerWorkId ? [group.localTitle, ...group.providerAliases || []] : []
     ].filter(Boolean);
@@ -37918,9 +37941,9 @@ function createGroup(catalogue, group, actor3, index) {
       );
       if (group.providerAliases?.length)
         metadata.derived(work, "aliases", group.providerAliases);
-      else if (catalogued) {
-        metadata.derived(work, "aliases", [catalogued]);
-        index.aliases.set(workKey(catalogued, group.composers), [work]);
+      else if (catalogued2) {
+        metadata.derived(work, "aliases", [catalogued2]);
+        index.aliases.set(workKey(catalogued2, group.composers), [work]);
       }
       if (group.providerWorkId)
         catalogue.externalIdentity(
@@ -37930,7 +37953,7 @@ function createGroup(catalogue, group, actor3, index) {
           group.providerWorkId,
           { evidence: { source: "parent-work" } }
         );
-      if (!catalogued) index.works.set(workKey(group.work, group.composers), [work]);
+      if (!catalogued2) index.works.set(workKey(group.work, group.composers), [work]);
     }
     if (group.standalone && !workMovements(catalogue, work).length) movements = [null];
     if (!movements)
@@ -40593,11 +40616,6 @@ function sameNamedWork(a, b) {
   const name = nameBeforeComma(long);
   return name.length >= 4 && words2(short) === name && long.includes(",");
 }
-function numberedPiece(title) {
-  const match2 = String(title).match(/^(.+?)[,\s]+(no\.?\s*\d+\b.*)$/i);
-  if (!match2 || !NUMBERED_SET.test(match2[1]) || /\bin\s+[a-h]\b/i.test(match2[1])) return null;
-  return { set: match2[1].trim(), part: match2[2].charAt(0).toUpperCase() + match2[2].slice(1) };
-}
 function sameCredits(last, heading, names) {
   const these = new Set(names.map(words2));
   if (last.names.length === these.size && last.names.every((name) => these.has(name))) return true;
@@ -41997,7 +42015,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.19" : "dev";
+var VERSION = true ? "1.0.20" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js
