@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { Metadata } from "./metadata.js";
 import { transaction } from "./database.js";
 import { catalogueNumber, cataloguePiece } from "../works.js";
-import { artistCredits } from "./credits.js";
+import { artistCredits, composersOf } from "./credits.js";
 
 const MULTI_MOVEMENT =
   /\b(symphon(?:y|ie)|sinfonia|sonata|sonatina|concerto|suite|partita|quartet|quintet|sextet|septet|octet|nonet|trio|serenade|divertimento|cassation|mass|missa|requiem|stabat mater|magnificat|te deum|vespers|cantata|oratorio|passion|variations?|ballet)\b/i;
@@ -806,6 +806,18 @@ function namedMovement(movements, title, used, setSubject) {
   return found.length === 1 ? found[0] : null;
 }
 
+// A title naming several sections of a work, each its own movement:
+// "Theme: L'istesso tempo / II. L'istesso tempo / III. L'istesso tempo",
+// "XIII. Agitato / Intermezzo: A tempo rubato". Only when every part starts
+// as a section does (a number, a variation, theme, coda, intermezzo,
+// introduction), so "Return Home / Heimkehr" stays one song.
+const SECTION_START = /^(?:(?:[ivxlc]+|\d+)[a-d]?[.)]\s|(?:var(?:iation|iazione)?\.?|theme|thema|tema|coda|intermezzo|introduction|introduzione)(?![\p{L}]))/iu;
+export function sectionTitles(title) {
+  const parts = clean(title).split(/\s+\/\s+|\s+[–—-]\s+(?=var(?:iation|iazione)?\.?\s)/i);
+  return parts.length > 1 && parts.every((part) => SECTION_START.test(part)) ? parts : [clean(title)];
+}
+const combined = (movement) => sectionTitles(movement.title || "").length > 1;
+
 // A movement that names several sections ("Theme: L'istesso tempo / II.
 // L'istesso tempo / III. L'istesso tempo", from an album that gave them one
 // track) and an album that gives each section, or a run of them, its own
@@ -856,7 +868,42 @@ function mapBySections(movements, tracks) {
 // Map an album's tracks to an existing work's movements: by title, then by
 // numbered prefix, then by order when the counts agree. Null when unsure.
 // `setSubject` is the work's catalogue identity, for pieces numbered within it.
-export function mapToMovements(movements, tracks, { setSubject = "" } = {}) {
+// With `sections`, a track naming several sections ("Theme: L'istesso tempo
+// / II. L'istesso tempo") maps to each of them: its entry is then a list.
+export function mapToMovements(movements, tracks, { setSubject = "", sections = false } = {}) {
+  if (!sections || !tracks.some((track) => sectionTitles(track.movementTitle).length > 1)) return mapEach(movements, tracks, setSubject);
+  const owners = [],
+    parts = [];
+  tracks.forEach((track, i) =>
+    sectionTitles(track.movementTitle).forEach((movementTitle) => {
+      owners.push(i);
+      parts.push({ ...track, movementTitle });
+    }),
+  );
+  const mapped = mapEach(movements, parts, setSubject);
+  if (!mapped) return null;
+  const result = tracks.map(() => []);
+  mapped.forEach((id, i) => result[owners[i]].push(id));
+  return result.map((ids) => (ids.length === 1 ? ids[0] : [...new Set(ids)].length === 1 ? ids[0] : ids));
+}
+// "Variation 12: Tempo di minuetto", "Variation No. 10 L'istesso tempo" and
+// "XII. Tempo di menuetto" are variation twelve and ten whatever tempo words
+// follow; "Tema" and "Thema" are "Theme".
+const VARIATION_TITLE = /^var(?:iation|iazione)?\.?\s*(?:(?:no|nr|n)\.?\s*)?(\d+|[ivxlc]+)(?![\p{L}\d])[\s:.,]*(.*)$/iu;
+function asVariation(title) {
+  const text = clean(title).replace(/^(?:tema|thema)(?![\p{L}])/iu, "Theme");
+  const variation = text.match(VARIATION_TITLE);
+  return variation ? { title: `${variation[1]}. ${variation[2]}`, variation: true } : { title: text, variation: false };
+}
+function mapEach(rawMovements, rawTracks, setSubject) {
+  const movements = rawMovements.map((m) => {
+    const { title, variation } = asVariation(m.title || "");
+    return variation || title !== clean(m.title) ? { ...m, ...movementParts(title), variation } : m;
+  });
+  const tracks = rawTracks.map((track) => {
+    const { title, variation } = asVariation(track.movementTitle || "");
+    return { ...track, movementTitle: title, variation };
+  });
   const used = new Set(),
     result = [];
   const firstWord = (text) => text.split(" ")[0];
@@ -879,12 +926,14 @@ export function mapToMovements(movements, tracks, { setSubject = "" } = {}) {
       const named = namedMovement(movements, track.movementTitle, used, setSubject);
       if (named) found = [named];
     }
+    // A variation's number is its index alone, never a position.
+    const variation = track.variation || movements.some((m) => m.variation);
     if (found.length !== 1 && parts.index)
       found = movements.filter(
         (m) =>
           !used.has(m.id) &&
           Boolean(m.piece) === Boolean(parts.piece) &&
-          (parts.piece ? m.index : (m.index ?? m.position)) === parts.index,
+          (parts.piece || variation ? m.index : (m.index ?? m.position)) === parts.index,
       );
     // A number gives way only to a name the work holds elsewhere: an
     // arrangement's "2. Gavotte" is the partita's "Gavotte en rondeau", not
@@ -892,6 +941,7 @@ export function mapToMovements(movements, tracks, { setSubject = "" } = {}) {
     // is still the third movement.
     if (
       found.length === 1 &&
+      !variation &&
       found[0].text &&
       parts.text &&
       firstWord(found[0].text) !== firstWord(parts.text) &&
@@ -933,7 +983,7 @@ export function mapToMovements(movements, tracks, { setSubject = "" } = {}) {
   }
   if (result.every(Boolean)) return result;
   if (movements.length === tracks.length) return movements.map((m) => m.id);
-  return mapBySections(movements, tracks);
+  return mapBySections(rawMovements, rawTracks);
 }
 
 const albumOrder = (a, b) =>
@@ -941,12 +991,12 @@ const albumOrder = (a, b) =>
 
 // Moves rows at or after `from` up one, through a gap, so unique positions
 // never collide mid-update.
-function shiftUp(catalogue, table, column, where, args, from) {
+function shiftUp(catalogue, table, column, where, args, from, by = 1) {
   catalogue.db
     .prepare(`UPDATE ${table} SET ${column}=${column}+1000000 WHERE ${where} AND ${column}>=?`)
     .run(...args, from);
   catalogue.db
-    .prepare(`UPDATE ${table} SET ${column}=${column}-999999 WHERE ${where} AND ${column}>=1000000`)
+    .prepare(`UPDATE ${table} SET ${column}=${column}-${1000000 - by} WHERE ${where} AND ${column}>=1000000`)
     .run(...args);
 }
 
@@ -985,7 +1035,7 @@ function extendRealization(catalogue, group, actor, people) {
       .get(realization.performance_work_id).source_id;
     const itemOf = catalogue.db.prepare(
       `SELECT i.movement_id,i.sequence FROM realization_item i JOIN segment s ON s.id=i.segment_id
-       WHERE i.realization_id=? AND s.track_link_id=?`,
+       WHERE i.realization_id=? AND s.track_link_id=? ORDER BY i.sequence DESC`,
     );
     const ordered = [...group.tracks].sort(albumOrder);
     let added = 0;
@@ -1000,35 +1050,44 @@ function extendRealization(catalogue, group, actor, people) {
         .map((other) => itemOf.get(realization.id, other.id))
         .find(Boolean);
       const named = movementTitle({ title: track.parsedTitle, work: track.evidence.hints?.work }, workTitle);
-      // A movement the work has and this recording lacks ("Missing I.
-      // Allegro vivace") takes the track when their names agree; the number
-      // alone only settles which of two same-named movements it is.
-      const parts = movementParts(named);
-      const sameName = workMovements(catalogue, realization.work_id).filter((m) => !held.has(m.id) && parts.text && m.text === parts.text);
-      const existing = sameName.length === 1 ? sameName[0] : sameName.find((m) => parts.index && (m.index ?? m.position) === parts.index);
-      let movement = existing?.id;
-      if (!movement) {
-        const position = before?.movement_id
-          ? catalogue.db
-              .prepare("SELECT position FROM relation WHERE kind='movement' AND source_id=? AND target_id=?")
-              .get(realization.work_id, before.movement_id).position + 1
-          : 1;
-        shiftUp(catalogue, "relation", "position", "kind='movement' AND source_id=?", [realization.work_id], position);
-        movement = catalogue.createEntity("movement");
-        metadata.derived(movement, "title", named || `Movement ${position}`);
-        catalogue.relate("movement", realization.work_id, movement, { position });
-      }
-      held.add(movement);
-      const sequence = (before?.sequence || 0) + 1;
-      shiftUp(catalogue, "realization_item", "sequence", "realization_id=?", [realization.id], sequence);
+      // A track naming several sections ("XVI. Allegro vivace / XVII. Meno
+      // mosso") takes a movement for each, in turn.
+      let after = before?.movement_id || null;
+      const movements = sectionTitles(named || "").map((section) => {
+        // A movement the work has and this recording lacks ("Missing I.
+        // Allegro vivace") takes the track when their names agree; the number
+        // alone only settles which of two same-named movements it is.
+        const parts = movementParts(section);
+        const sameName = workMovements(catalogue, realization.work_id).filter((m) => !held.has(m.id) && parts.text && m.text === parts.text);
+        const existing = sameName.length === 1 ? sameName[0] : sameName.find((m) => parts.index && (m.index ?? m.position) === parts.index);
+        let movement = existing?.id;
+        if (!movement) {
+          const position = after
+            ? catalogue.db
+                .prepare("SELECT position FROM relation WHERE kind='movement' AND source_id=? AND target_id=?")
+                .get(realization.work_id, after).position + 1
+            : 1;
+          shiftUp(catalogue, "relation", "position", "kind='movement' AND source_id=?", [realization.work_id], position);
+          movement = catalogue.createEntity("movement");
+          metadata.derived(movement, "title", section || `Movement ${position}`);
+          catalogue.relate("movement", realization.work_id, movement, { position });
+        }
+        held.add(movement);
+        after = movement;
+        return movement;
+      });
       const recording = catalogue.createEntity("recording", { durationMs: track.evidence.durationMs });
       metadata.derived(recording, "title", track.title);
       creditMovementComposers(catalogue, metadata, people, recording, track, group);
       catalogue.relate("recording_performance", recording, performance);
-      const content = catalogue.recordingContent(recording, realization.performance_work_id, { movement });
       const segment = catalogue.segment(track.id, { kind: "whole" });
-      catalogue.segmentContent(segment, content);
-      catalogue.realizationItem(realization.id, segment, { movement, sequence });
+      let sequence = before?.sequence || 0;
+      shiftUp(catalogue, "realization_item", "sequence", "realization_id=?", [realization.id], sequence + 1, movements.length);
+      movements.forEach((movement, j) => {
+        const content = catalogue.recordingContent(recording, realization.performance_work_id, { movement, position: j + 1 });
+        catalogue.segmentContent(segment, content);
+        catalogue.realizationItem(realization.id, segment, { movement, sequence: ++sequence, intentionalOverlap: j > 0 });
+      });
       track.attached = 1;
       added++;
     }
@@ -1194,15 +1253,18 @@ function createGroup(catalogue, group, actor, index) {
     if (work && unassignedByAdmin(catalogue, work, group.albumId)) return false;
     if (work) {
       let existing = workMovements(catalogue, work);
+      // A work an album made with several variations a movement gets one
+      // movement each before another album joins it.
+      if (existing.some(combined) && splitCombinedMovements(catalogue, work, actor)) existing = workMovements(catalogue, work);
       const setSubject = catalogueSubject(String(resolvedName(catalogue, work, "title") || "")) || catalogueSubject(catalogued || group.work);
       movements = existing.length
-        ? mapToMovements(existing, ordered, { setSubject })
+        ? mapToMovements(existing, ordered, { setSubject, sections: true })
         : null;
       // An old match listed a second recording's movements again after the
       // first's (six movements for a three-movement concerto): one set.
       if (!movements && existing.length > 1 && foldRepeatedMovements(catalogue, work, existing, setSubject, actor)) {
         existing = workMovements(catalogue, work);
-        movements = mapToMovements(existing, ordered, { setSubject });
+        movements = mapToMovements(existing, ordered, { setSubject, sections: true });
       }
       // A work an earlier album made from part of a piece takes the rest
       // from this fuller album.
@@ -1269,14 +1331,21 @@ function createGroup(catalogue, group, actor, index) {
     }
     // A whole piece has no movements; its one track realizes the work.
     if (group.standalone && !workMovements(catalogue, work).length) movements = [null];
-    if (!movements)
-      movements = ordered.map((track, i) => {
-        const movement = catalogue.createEntity("movement");
-        metadata.derived(movement, "title", track.movementTitle || `Movement ${i + 1}`);
-        metadata.derived(movement, "movementNumber", String(i + 1));
-        catalogue.relate("movement", work, movement, { position: i + 1 });
-        return movement;
+    if (!movements) {
+      // A track naming several sections gives each its own movement.
+      let position = 0;
+      movements = ordered.map((track) => {
+        const made = sectionTitles(track.movementTitle || `Movement ${position + 1}`).map((title) => {
+          const movement = catalogue.createEntity("movement");
+          position++;
+          metadata.derived(movement, "title", title);
+          metadata.derived(movement, "movementNumber", String(position));
+          catalogue.relate("movement", work, movement, { position });
+          return movement;
+        });
+        return made.length === 1 ? made[0] : made;
       });
+    }
     catalogue.externalIdentity(work, "embedded-tags", "album-work", recordId, {
       evidence: {
         albumId: group.albumId,
@@ -1297,24 +1366,14 @@ function createGroup(catalogue, group, actor, index) {
       group.album || null,
     );
     ordered.forEach((track, i) => {
-      const movement = movements[i];
       const recording = catalogue.createEntity("recording", {
         durationMs: track.evidence.durationMs,
       });
       metadata.derived(recording, "title", track.title || track.movementTitle);
       creditMovementComposers(catalogue, metadata, index, recording, track, group);
       catalogue.relate("recording_performance", recording, performance);
-      const content = catalogue.recordingContent(recording, performanceWork, {
-        movement,
-      });
       const segment = catalogue.segment(track.id, { kind: "whole" });
-      catalogue.segmentContent(segment, content);
-      catalogue.realizationItem(realization, segment, {
-        movement,
-        sequence: i + 1,
-        // A movement split over two tracks is its first and second part.
-        occurrence: movement ? movements.slice(0, i).filter((id) => id === movement).length + 1 : 1,
-      });
+      placeTrack(catalogue, realization, performanceWork, recording, segment, movements[i]);
     });
     catalogue.audit(
       "work.auto_match",
@@ -1332,6 +1391,22 @@ function createGroup(catalogue, group, actor, index) {
   });
 }
 
+// A track's recording and segment on its movements: one, or each section
+// it names in turn ("Theme / II. / III." on one track). The next sequence
+// in the realization; a movement it already has is its next part.
+function placeTrack(catalogue, realization, performanceWork, recording, segment, movement) {
+  const db = catalogue.db;
+  const list = Array.isArray(movement) ? movement : [movement];
+  let sequence = db.prepare("SELECT coalesce(max(sequence),0) AS n FROM realization_item WHERE realization_id=?").get(realization).n;
+  let position = db.prepare("SELECT coalesce(max(position),0) AS n FROM recording_content WHERE recording_id=?").get(recording).n;
+  list.forEach((id, j) => {
+    const content = catalogue.recordingContent(recording, performanceWork, { movement: id, position: ++position });
+    catalogue.segmentContent(segment, content);
+    const occurrence = id ? db.prepare("SELECT count(*) AS n FROM realization_item WHERE realization_id=? AND movement_id=?").get(realization, id).n + 1 : 1;
+    catalogue.realizationItem(realization, segment, { movement: id, sequence: ++sequence, occurrence, intentionalOverlap: j > 0 });
+  });
+}
+
 // An auto-made work holding only part of a piece (two of Debussy's six
 // Children's Corner pieces, two of nine Études-tableaux) takes a fuller
 // album's movements. Only when nobody edited the work or its movements,
@@ -1340,7 +1415,7 @@ function createGroup(catalogue, group, actor, index) {
 // names its movement. The work's movements then follow the album; the
 // movements it had keep their recordings. Null when any of that fails.
 function expandIncompleteWork(catalogue, metadata, work, existing, ordered, setSubject, group, actor) {
-  if (ordered.length <= existing.length) return null;
+  if (ordered.length <= existing.length || ordered.some((track) => sectionTitles(track.movementTitle).length > 1)) return null;
   const ids = [work, ...existing.map((m) => m.id)];
   const madeByMatching = catalogue.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work'").get(work);
   if (!madeByMatching || editedInEditor(catalogue, ids) || hasManualEdits(catalogue, ids)) return null;
@@ -1395,6 +1470,90 @@ function expandIncompleteWork(catalogue, metadata, work, existing, ordered, setS
   });
   catalogue.audit("work.auto_match_expand", work, { albumId: group.albumId, from: existing.length, to: result.length, tracks: ordered.map((t) => t.id) }, actor);
   return result;
+}
+
+// A work an album made with several sections a movement ("Theme / II. /
+// III."; Rachmaninoff's variation sets, from an album giving several
+// variations a track) gets one movement per section. Every recording of
+// the work is placed again on the new movements from its tracks' titles;
+// when any recording can't be, nothing changes. Only works matching made
+// and nobody edited.
+export function splitCombinedMovements(catalogue, work, actor = null) {
+  const db = catalogue.db;
+  const existing = workMovements(catalogue, work);
+  if (!existing.some(combined)) return false;
+  const ids = [work, ...existing.map((m) => m.id)];
+  const madeByMatching = db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work'").get(work);
+  if (!madeByMatching || editedInEditor(catalogue, ids) || hasManualEdits(catalogue, ids)) return false;
+  const workTitle = resolvedName(catalogue, work, "title") || "";
+  const setSubject = catalogueSubject(workTitle);
+  const realizations = db.prepare("SELECT id,performance_work_id FROM realization WHERE work_id=? ORDER BY rowid").all(work);
+  // Each realization's tracks, in order, with their recordings.
+  const placed = realizations.map((realization) => {
+    const tracks = [];
+    for (const item of db
+      .prepare(
+        `SELECT i.id,i.segment_id,i.movement_id,s.track_link_id,t.evidence FROM realization_item i JOIN segment s ON s.id=i.segment_id
+         JOIN track_link t ON t.id=s.track_link_id WHERE i.realization_id=? ORDER BY i.sequence`,
+      )
+      .all(realization.id)) {
+      if (tracks.at(-1)?.segment === item.segment_id) continue;
+      const hints = JSON.parse(item.evidence).hints || {};
+      const recording = db
+        .prepare(
+          `SELECT c.recording_id AS id FROM segment_content x JOIN recording_content c ON c.id=x.content_id
+           WHERE x.segment_id=? AND c.performance_work_id=? LIMIT 1`,
+        )
+        .get(item.segment_id, realization.performance_work_id)?.id;
+      tracks.push({
+        segment: item.segment_id,
+        recording,
+        movement: item.movement_id,
+        movementTitle: movementTitle({ title: withoutComposer(hints.title || "", composersOf(hints)), work: hints.work }, workTitle),
+      });
+    }
+    return { realization, tracks };
+  });
+  if (placed.some(({ tracks }) => tracks.some((track) => !track.recording))) return false;
+  const metadata = new Metadata(catalogue);
+  try {
+    transaction(db, () => {
+      // The new movements, in order; a combined movement keeps its id as its
+      // first section.
+      db.prepare("UPDATE relation SET position=position+1000000 WHERE kind='movement' AND source_id=?").run(work);
+      let position = 0;
+      for (const movement of existing) {
+        const titles = sectionTitles(movement.title);
+        titles.forEach((title, j) => {
+          const id = j ? catalogue.createEntity("movement") : movement.id;
+          position++;
+          if (j) catalogue.relate("movement", work, id, { position });
+          else db.prepare("UPDATE relation SET position=? WHERE kind='movement' AND source_id=? AND target_id=?").run(position, work, id);
+          if (titles.length > 1) metadata.derived(id, "title", title);
+          metadata.derived(id, "movementNumber", String(position));
+        });
+      }
+      const fine = workMovements(catalogue, work);
+      for (const { realization, tracks } of placed) {
+        const mapped = mapToMovements(fine, tracks, { setSubject, sections: true });
+        if (!mapped) throw new Error("unplaced");
+        const items = db.prepare("SELECT id,segment_id FROM realization_item WHERE realization_id=?").all(realization.id);
+        for (const item of items) {
+          db.prepare("DELETE FROM realization_item WHERE id=?").run(item.id);
+          for (const { content_id: content } of db.prepare("SELECT content_id FROM segment_content WHERE segment_id=?").all(item.segment_id)) {
+            db.prepare("DELETE FROM segment_content WHERE segment_id=? AND content_id=?").run(item.segment_id, content);
+            db.prepare("DELETE FROM recording_content WHERE id=? AND performance_work_id=?").run(content, realization.performance_work_id);
+          }
+        }
+        tracks.forEach((track, i) => placeTrack(catalogue, realization.id, realization.performance_work_id, track.recording, track.segment, mapped[i]));
+      }
+      catalogue.audit("work.split_sections", work, { from: existing.length, to: fine.length }, actor);
+    });
+  } catch (error) {
+    if (error.message === "unplaced") return false;
+    throw error;
+  }
+  return true;
 }
 
 // A work whose movements run twice ("I. Moderato / II. Adagio sostenuto /
@@ -2061,7 +2220,9 @@ export function repairMovementTitles(catalogue, { albumId = null } = {}) {
          JOIN track_link t ON t.id=s.track_link_id
          JOIN field_resolution f ON f.target_id=i.movement_id AND f.field='title'
          JOIN assertion a ON a.id=f.assertion_id AND a.source='derived'
-         WHERE CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?`,
+         WHERE CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?
+         -- A track holding several sections names none of them alone.
+         AND NOT EXISTS(SELECT 1 FROM realization_item o WHERE o.segment_id=i.segment_id AND o.id!=i.id)`,
       )
       .all(String(albumId))) {
       const workTitle = resolvedName(catalogue, row.work, "title");
@@ -2162,6 +2323,15 @@ export function autoMatchTaggedWorks(
   if (albumId == null) {
     repairWorkTitles(catalogue);
     repairMovementTitles(catalogue);
+    // Works an album made with several variations a movement.
+    for (const { work } of catalogue.db
+      .prepare(
+        `SELECT DISTINCT r.source_id AS work FROM relation r JOIN metadata_target m ON m.entity_id=r.target_id
+         JOIN field_resolution f ON f.target_id=m.id AND f.field='title' JOIN assertion a ON a.id=f.assertion_id
+         WHERE r.kind='movement' AND a.value LIKE '% / %'`,
+      )
+      .all())
+      splitCombinedMovements(catalogue, work, actor);
     const metadata = new Metadata(catalogue);
     for (const { id } of catalogue.db
       .prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL")

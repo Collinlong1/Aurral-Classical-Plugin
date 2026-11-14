@@ -45,7 +45,7 @@ function realizationRows(c, realizationId = null, workId = null, albumId = null)
   return c.db
     .prepare(
       `SELECT r.id AS realization_id,r.work_id,r.performance_work_id,r.label AS realization_label,
-        i.id AS item_id,i.movement_id,i.sequence,i.occurrence,s.start_ms,s.end_ms,s.kind AS segment_kind,
+        i.id AS item_id,i.movement_id,i.sequence,i.occurrence,i.segment_id,s.start_ms,s.end_ms,s.kind AS segment_kind,
         t.id AS track_link_id,t.core_id,t.file_id,t.evidence
       FROM realization r
       JOIN realization_item i ON i.realization_id=r.id
@@ -55,7 +55,15 @@ function realizationRows(c, realizationId = null, workId = null, albumId = null)
       ${filters.length ? `WHERE ${filters.map(([, sql]) => sql).join(" AND ")}` : ""}
       ORDER BY r.id,i.sequence,i.occurrence,i.id`,
     )
-    .all(...filters.map(([value]) => value));
+    .all(...filters.map(([value]) => value))
+    .reduce((rows, row) => {
+      // A track holding several movements in turn ("Theme / II. / III.") is
+      // one row and is played once.
+      const last = rows.at(-1);
+      if (last && last.realization_id === row.realization_id && last.segment_id === row.segment_id) last.movement_ids.push(row.movement_id);
+      else rows.push({ ...row, movement_ids: [row.movement_id] });
+      return rows;
+    }, []);
 }
 
 const words = (value) =>
@@ -82,9 +90,11 @@ function queueItem(metadata, row, workTitle = null) {
     albumId: String(evidence.albumId ?? ""),
     title: workTitle
       ? movementTitle({ title: withoutComposer(trackTitle(evidence), composersOf(evidence.hints || {})), work: evidence.hints?.work }, workTitle)
-      : row.movement_id
-        ? entityValue(metadata, row.movement_id, "title", trackTitle(evidence))
-        : trackTitle(evidence),
+      : row.movement_ids?.length > 1
+        ? row.movement_ids.map((id) => entityValue(metadata, id, "title", "")).filter(Boolean).join(" / ")
+        : row.movement_id
+          ? entityValue(metadata, row.movement_id, "title", trackTitle(evidence))
+          : trackTitle(evidence),
     artist: text(evidence.hints?.artist, text(evidence.hints?.albumArtist, "")),
     performer: performerOf(evidence.hints),
     album: text(evidence.hints?.album, ""),
@@ -275,7 +285,7 @@ export function renderAlbumPresentation(c, albumId) {
   const works = [...grouped.entries()].flatMap(([realizationId, rows]) => {
     const workId = rows[0].work_id;
     const movements = workMovements(c, metadata, workId);
-    const present = new Set(rows.map((row) => row.movement_id).filter(Boolean));
+    const present = new Set(rows.flatMap((row) => row.movement_ids).filter(Boolean));
     const runs = [];
     for (const row of [...rows].sort((a, b) => albumPosition(a) - albumPosition(b))) {
       const run = runs.at(-1);
@@ -370,7 +380,7 @@ export function renderWork(c, workId, user) {
         : null,
     recordings: [...byRealization.entries()].map(([id, entries], index) => {
       const present = new Set(
-        entries.map((entry) => entry.movement_id).filter(Boolean),
+        entries.flatMap((entry) => entry.movement_ids).filter(Boolean),
       );
       const performanceId = c.db
         .prepare("SELECT source_id FROM relation WHERE id=?")

@@ -213,7 +213,7 @@ report.sort((a, b) => b.flags.length - a.flags.length || a.title.localeCompare(b
 // it makes is listed from the snapshot's audit trail.
 const sim = await openCatalogue(snapshotFolder);
 const simulated = new Map();
-const dryRun = { merges: [], splits: [], expansions: [], folds: [], reviewsClosed: 0, duplicateReviews: 0, duplicatesAfter: [], openReviewsAfter: {} };
+const dryRun = { merges: [], splits: [], expansions: [], folds: [], sections: [], reviewsClosed: 0, duplicateReviews: 0, duplicatesAfter: [], openReviewsAfter: {} };
 try {
   const firstEvent = sim.db.prepare("SELECT coalesce(max(id),0) AS id FROM audit_event").get().id;
   const reviewsBefore = sim.db.prepare("SELECT count(*) AS n FROM review_item WHERE status='open' AND json_extract(evidence,'$.reason')='duplicate-work'").get().n;
@@ -242,6 +242,7 @@ try {
     if (event.action === "work.merge") dryRun.merges.push({ drop: titleOf(event.target_id), into: titleOf(data.into), reason: data.reason || "same identity" });
     if (event.action === "work.split_sibling") dryRun.splits.push({ work: titleOf(event.target_id), albumId: data.albumId, workIdentity: data.subject, tracksName: data.tracks });
     if (event.action === "review.auto_resolve") dryRun.reviewsClosed++;
+    if (event.action === "work.split_sections") dryRun.sections.push({ work: titleOf(event.target_id), from: data.from, to: data.to });
     if (event.action === "work.fold_movements") dryRun.folds.push({ work: titleOf(event.target_id), from: data.from, to: data.to });
     if (event.action === "work.auto_match_expand") dryRun.expansions.push({ work: titleOf(event.target_id), albumId: data.albumId, from: data.from, to: data.to });
   }
@@ -338,6 +339,8 @@ const lines = [
   ...dryRun.merges.slice(0, 40).map((x) => `  - "${x.drop}" into "${x.into}" (${x.reason})`),
   `- incomplete works expanded from a fuller album: ${dryRun.expansions.length}`,
   ...dryRun.expansions.slice(0, 40).map((x) => `  - "${x.work}": ${x.from} → ${x.to} movements, from album ${x.albumId}`),
+  `- works given one movement per variation or section: ${dryRun.sections.length}`,
+  ...dryRun.sections.slice(0, 40).map((x) => `  - "${x.work}": ${x.from} → ${x.to} movements`),
   `- works listing a second recording's movements again, folded into one set: ${dryRun.folds.length}`,
   ...dryRun.folds.slice(0, 40).map((x) => `  - "${x.work}": ${x.from} → ${x.to} movements`),
   `- Auto-match reviews closed because every track they name is in a work: ${dryRun.reviewsClosed}`,
