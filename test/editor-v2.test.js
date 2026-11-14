@@ -65,7 +65,7 @@ test("browse tabs, lookups and an album turned into a work in one step", async (
   const s = await setup(t);
   const page = await s.read();
   assert.equal(page.version, 2);
-  assert.deepEqual(page.tabs.map((tab) => tab.id), ["works", "composers", "performers", "albums", "review"]);
+  assert.deepEqual(page.tabs.map((tab) => tab.id), ["works", "composers", "performers", "albums", "review", "search"]);
   assert.equal(page.tab, "works");
   // Albums list shows albums with classical tracks; others are found by search.
   const albums = await s.read({ tab: "albums" });

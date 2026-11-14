@@ -24,6 +24,7 @@ import {
 import { readValues } from "./tags.js";
 import { albumClassificationSummary } from "./model/classification-report.js";
 import { compareRecordings } from "./compare.js";
+import { search } from "./search/provider.js";
 import { MusicBrainz, mbBaseUrl, TTL } from "./mb.js";
 import { ClassicalResolver } from "./resolver.js";
 import { parseOrder, parseSeparator, slskdSettings } from "./settings.js";
@@ -168,6 +169,7 @@ export default {
       input.pageId === "work" ? mutateWork(input) : mutateEditor(input),
   },
   albumPresentation,
+  search,
   async test(input) {
     const ctx = makeContext(input);
     const parts = [];

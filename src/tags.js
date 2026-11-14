@@ -195,6 +195,8 @@ export function readTags(filePath) {
       trackNumber: positive(tag.track),
       discNumber: positive(tag.disc),
       durationMs: Math.round(file.properties?.durationMilliseconds || 0),
+      year: Number.isSafeInteger(tag.year) && tag.year > 0 ? tag.year : null,
+      label: text(tag.publisher),
     };
   } finally {
     file.dispose();

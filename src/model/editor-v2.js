@@ -5,6 +5,7 @@ import { CREDIT_ROLES } from "./catalogue.js";
 import { Metadata } from "./metadata.js";
 import { classify } from "./reconcile.js";
 import { searchText, matchesSearch, ownedTracks } from "./editor-search.js";
+import { searchCatalogue } from "../search/engine.js";
 import {
   mapToMovements,
   mergeContributor,
@@ -979,8 +980,29 @@ function newView(kind) {
 
 // ---- page ----------------------------------------------------------------
 
-const TABS = ["works", "composers", "performers", "albums", "review"];
+const TABS = ["works", "composers", "performers", "albums", "review", "search"];
+const SEARCH_KIND = { work: "Work", movement: "Movement", recording: "Recording", composer: "Composer", performer: "Performer", release: "Album" };
+
+// The classical search engine, for hosts without Aurral's search hook: every
+// kind of result, ranked, each opening its editor entry.
+function searchList(c, q) {
+  if (!q.trim()) return [];
+  const result = searchCatalogue(c, { q, limit: 100 });
+  return result.sections.flatMap((section) =>
+    section.items.map((item) => {
+      const selection = item.kind === "release" ? `album:${item.ref}` : item.kind === "recording" ? item.workId : item.ref;
+      return {
+        id: item.id,
+        label: item.title,
+        detail: [item.subtitle, item.detail].filter(Boolean).join(" · ").slice(0, 500),
+        badge: { label: SEARCH_KIND[item.kind] || item.kind, tone: "muted" },
+        ...(selection && { selection }),
+      };
+    }),
+  );
+}
 function listFor(c, tab, q) {
+  if (tab === "search") return searchList(c, q);
   if (tab === "works")
     return entities(c, ["work"]).map((work) => {
       const composers = composerNames(c, work.id);
@@ -1054,7 +1076,7 @@ export function renderV2(c, query, revision) {
               : "works";
   }
   const all = listFor(c, tab, q);
-  const filtered = q ? all.filter((item) => matchesSearch(item.search, q)) : all;
+  const filtered = q && tab !== "search" ? all.filter((item) => matchesSearch(item.search, q)) : all;
   let view = null;
   if (selection.startsWith("album:")) {
     const [albumId, work] = selection.slice(6).split("@");
@@ -1100,10 +1122,11 @@ export function renderV2(c, query, revision) {
       { id: "performers", label: "Performers" },
       { id: "albums", label: "Albums" },
       { id: "review", label: "Review", count: reviews },
+      { id: "search", label: "Search" },
     ],
     tab,
     list: {
-      placeholder: { works: "Search works or composers", composers: "Search composers", performers: "Search performers", albums: "Search albums, tracks or performers", review: "Search review items" }[tab],
+      placeholder: { works: "Search works or composers", composers: "Search composers", performers: "Search performers", albums: "Search albums, tracks or performers", review: "Search review items", search: "Works, catalogue numbers, performers, albums…" }[tab],
       items: filtered.slice(offset, offset + PAGE).map(({ search, classical, ...item }) => item),
       total: filtered.length,
       offset,
@@ -1113,6 +1136,7 @@ export function renderV2(c, query, revision) {
         performers: "No performers or ensembles yet.",
         albums: q ? "No matching albums." : "No albums with classical tracks yet. Search to find any album.",
         review: "Nothing needs review.",
+        search: q ? "Nothing matches. Try another spelling, a catalogue number like Op. 27 No. 2, or fewer words." : "Search every work, movement, recording, composer, performer and album.",
       }[tab],
       actions: listActions,
     },

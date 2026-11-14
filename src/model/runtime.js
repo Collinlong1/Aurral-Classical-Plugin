@@ -1,3 +1,4 @@
+import { ensureSearchIndex } from "../search/engine.js";
 import { createHash, randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -340,6 +341,8 @@ async function scanFile(file, root, prior) {
       work: tags.work,
       // Only when set, so files without it keep their stored evidence.
       ...(tags.grouping && { grouping: tags.grouping }),
+      ...(tags.year && { year: tags.year }),
+      ...(tags.label && { label: tags.label }),
       workId: tags.workId,
       recordingMbid: tags.recordingMbid || file.recordingMbid || "",
       composerDistinct:
@@ -930,6 +933,13 @@ export async function runModelJobs(
       throw error;
     }
   } finally {
+    // The search index follows the catalogue here, on the worker, so the
+    // first search after a scan or a lookup doesn't rebuild it.
+    try {
+      ensureSearchIndex(catalogue);
+    } catch (error) {
+      ctx.log?.(`Classical search index not rebuilt: ${error.message}`);
+    }
     catalogue.close();
   }
 }

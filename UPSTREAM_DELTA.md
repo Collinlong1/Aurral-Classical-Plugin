@@ -1,3 +1,7 @@
+# v0.2 search hook
+
+Core adds one generic, opt-in capability: `"search": true` in a plugin manifest and a `search(input)` export (`backend/services/plugins/pluginSearch.ts`, about 150 lines; route `GET /api/plugins/search`; `frontend/src/pages/PluginSearchResults.tsx` and a few lines in `SearchResultsPage.tsx`). Each provider answers with typed sections, an optional best result and facets, bounded by schema (10 sections of 50 items, 12 facets of 50 options) and 3 seconds. Plugins send link descriptors (`resource`, `album`, `filter`), never URLs or markup; core builds every path. A failing provider shows a one-line "Couldn’t load" notice and never blocks the rest of search. The capability can be turned off per plugin; with it off, or on stock Aurral, the search page is unchanged. No database, no API version change, no classical rule in core. Test: `.tests/plugins/plugins.test.ts` "search providers answer the search page…". PR-readiness: draft. The plugin's fallback without the hook is the editor's Search tab (admins). See `SEARCH.md`.
+
 # Large album presentations
 
 Core bounds album-presentation groups and their items by album size (5,000) and the response by 5 MB instead of 200 groups, 500 items and 512 KB, so box sets keep their work view. The album is read once per response and tracks are checked through an ID set. A contribution that fails now answers 502 instead of `null`, and the album page shows a retryable "Couldn't load works" above the track list. No schema, API version or classical rule in core.

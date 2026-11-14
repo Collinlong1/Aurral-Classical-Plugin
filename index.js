@@ -4056,8 +4056,8 @@ var require_byteVector = __commonJS({
         }
         return IConv.decode(data, this._encoding);
       }
-      encode(text4) {
-        return IConv.encode(text4, this._encoding);
+      encode(text5) {
+        return IConv.encode(text5, this._encoding);
       }
     };
     exports.Encoding = Encoding;
@@ -4235,9 +4235,9 @@ var require_byteVector = __commonJS({
        * Creates a {@link ByteVector} using the contents of a file as the data
        * @param path Path to the file to store in the ByteVector
        */
-      static fromPath(path16) {
-        utils_1.Guards.truthy(path16, "path");
-        const fileBuffer = fs9.readFileSync(path16);
+      static fromPath(path17) {
+        utils_1.Guards.truthy(path17, "path");
+        const fileBuffer = fs9.readFileSync(path17);
         return _ByteVector.fromByteArray(fileBuffer);
       }
       /**
@@ -4298,19 +4298,19 @@ var require_byteVector = __commonJS({
        * @param length Number of characters from the string to store in the ByteVector. Must be a
        *        positive 32-bit integer.
        */
-      static fromString(text4, type, length = Number.MAX_SAFE_INTEGER) {
-        utils_1.Guards.notNullOrUndefined(text4, "text");
+      static fromString(text5, type, length = Number.MAX_SAFE_INTEGER) {
+        utils_1.Guards.notNullOrUndefined(text5, "text");
         if (!Number.isInteger(length) || !Number.isSafeInteger(length) || length < 0) {
           throw new Error("Argument out of range exception: length is invalid");
         }
         const vector = type === StringType2.UTF16 ? new _ByteVector(new Uint8Array([255, 254])) : _ByteVector.empty();
-        if (!text4) {
+        if (!text5) {
           return vector;
         }
-        if (text4.length > length) {
-          text4 = text4.substring(0, length);
+        if (text5.length > length) {
+          text5 = text5.substring(0, length);
         }
-        const textBytes = Encoding.getEncoding(type, vector).encode(text4);
+        const textBytes = Encoding.getEncoding(type, vector).encode(text5);
         vector.addByteArray(textBytes);
         return vector;
       }
@@ -5269,12 +5269,12 @@ var require_stream = __commonJS({
         this._position = 0;
         this._length = fs9.fstatSync(fd).size;
       }
-      static createAsRead(path16) {
-        const fd = fs9.openSync(path16, "r");
+      static createAsRead(path17) {
+        const fd = fs9.openSync(path17, "r");
         return new _Stream(fd, false);
       }
-      static createAsReadWrite(path16) {
-        const fd = fs9.openSync(path16, "r+");
+      static createAsReadWrite(path17) {
+        const fd = fs9.openSync(path17, "r+");
         return new _Stream(fd, true);
       }
       // #endregion
@@ -5373,9 +5373,9 @@ var require_fileAbstraction = __commonJS({
        * @param path Path of the file to use in the new instance
        * @throws Error Thrown if `path` is falsy
        */
-      constructor(path16) {
-        utils_1.Guards.truthy(path16, "path");
-        this._name = path16;
+      constructor(path17) {
+        utils_1.Guards.truthy(path17, "path");
+        this._name = path17;
       }
       /** @inheritDoc */
       get name() {
@@ -7416,7 +7416,7 @@ var init_v1 = __esm({
 });
 
 // node_modules/uuid/dist/esm-node/parse.js
-function parse2(uuid) {
+function parse3(uuid) {
   if (!validate_default(uuid)) {
     throw TypeError("Invalid UUID");
   }
@@ -7444,7 +7444,7 @@ var parse_default;
 var init_parse = __esm({
   "node_modules/uuid/dist/esm-node/parse.js"() {
     init_validate();
-    parse_default = parse2;
+    parse_default = parse3;
   }
 });
 
@@ -8440,12 +8440,12 @@ var require_genres = __commonJS({
         const index = _Genres.VIDEO_GENRES.indexOf(name);
         return index < 0 ? 255 : index;
       }
-      static stringToByte(text4, allowParenthesis) {
+      static stringToByte(text5, allowParenthesis) {
         if (allowParenthesis) {
           const trimRegex = /^\(+|\)+$/g;
-          text4 = text4.replace(trimRegex, "");
+          text5 = text5.replace(trimRegex, "");
         }
-        const normalized3 = text4.trim();
+        const normalized3 = text5.trim();
         if (!/^\d+$/.test(normalized3)) {
           return 255;
         }
@@ -8655,7 +8655,7 @@ var require_picture = __commonJS({
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PictureLazy = exports.Picture = exports.PictureType = void 0;
-    var path16 = __require("path");
+    var path17 = __require("path");
     var byteVector_1 = require_byteVector();
     var fileAbstraction_1 = require_fileAbstraction();
     var utils_1 = require_utils();
@@ -8700,7 +8700,7 @@ var require_picture = __commonJS({
         utils_1.Guards.truthy(filePath, "filePath");
         const picture = new _Picture();
         picture.data = byteVector_1.ByteVector.fromPath(filePath);
-        picture.filename = path16.basename(filePath);
+        picture.filename = path17.basename(filePath);
         picture.description = picture.filename;
         picture.mimeType = _Picture.getMimeTypeFromFilename(picture.filename);
         picture.type = picture.mimeType.startsWith("image/") ? PictureType.FrontCover : PictureType.NotAPicture;
@@ -9049,7 +9049,7 @@ var require_picture = __commonJS({
         utils_1.Guards.truthy(filePath, "path");
         const picture = new _PictureLazy();
         picture._file = new fileAbstraction_1.LocalFileAbstraction(filePath);
-        picture._filename = path16.basename(filePath);
+        picture._filename = path17.basename(filePath);
         picture._description = picture._filename;
         picture._mimeType = Picture.getMimeTypeFromFilename(picture._filename);
         picture._type = picture._mimeType.startsWith("image/") ? PictureType.FrontCover : PictureType.NotAPicture;
@@ -9990,14 +9990,14 @@ var require_apeTag = __commonJS({
        * @remarks Stored in the `Year` item
        */
       get year() {
-        let text4 = this.getStringValue("Year");
-        if (!text4) {
+        let text5 = this.getStringValue("Year");
+        if (!text5) {
           return 0;
         }
-        let asInt = Number.parseInt(text4, 10);
+        let asInt = Number.parseInt(text5, 10);
         if (Number.isNaN(asInt)) {
-          text4 = text4.substring(0, 4);
-          asInt = Number.parseInt(text4, 10);
+          text5 = text5.substring(0, 4);
+          asInt = Number.parseInt(text5, 10);
           if (Number.isNaN(asInt)) {
             return 0;
           }
@@ -10315,14 +10315,14 @@ var require_apeTag = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_TRACK_GAIN` item
        */
       get replayGainTrackGain() {
-        let text4 = this.getStringValue("REPLAYGAIN_TRACK_GAIN");
-        if (!text4) {
+        let text5 = this.getStringValue("REPLAYGAIN_TRACK_GAIN");
+        if (!text5) {
           return NaN;
         }
-        if (text4.toLowerCase().endsWith("db")) {
-          text4 = text4.substring(0, text4.length - 2).trim();
+        if (text5.toLowerCase().endsWith("db")) {
+          text5 = text5.substring(0, text5.length - 2).trim();
         }
-        return Number.parseFloat(text4);
+        return Number.parseFloat(text5);
       }
       /**
        * @inheritDoc
@@ -10332,8 +10332,8 @@ var require_apeTag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.removeItem("REPLAYGAIN_TRACK_GAIN");
         } else {
-          const text4 = `${value.toFixed(2)} dB`;
-          this.setStringValue("REPLAYGAIN_TRACK_GAIN", text4);
+          const text5 = `${value.toFixed(2)} dB`;
+          this.setStringValue("REPLAYGAIN_TRACK_GAIN", text5);
         }
       }
       /**
@@ -10341,8 +10341,8 @@ var require_apeTag = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_TRACK_PEAK` item
        */
       get replayGainTrackPeak() {
-        const text4 = this.getStringValue("REPLAYGAIN_TRACK_PEAK");
-        return text4 ? Number.parseFloat(text4) : NaN;
+        const text5 = this.getStringValue("REPLAYGAIN_TRACK_PEAK");
+        return text5 ? Number.parseFloat(text5) : NaN;
       }
       /**
        * @inheritDoc
@@ -10352,8 +10352,8 @@ var require_apeTag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.removeItem("REPLAYGAIN_TRACK_PEAK");
         } else {
-          const text4 = value.toFixed(6).toString();
-          this.setStringValue("REPLAYGAIN_TRACK_PEAK", text4);
+          const text5 = value.toFixed(6).toString();
+          this.setStringValue("REPLAYGAIN_TRACK_PEAK", text5);
         }
       }
       /**
@@ -10361,14 +10361,14 @@ var require_apeTag = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_ALBUM_GAIN` item
        */
       get replayGainAlbumGain() {
-        let text4 = this.getStringValue("REPLAYGAIN_ALBUM_GAIN");
-        if (!text4) {
+        let text5 = this.getStringValue("REPLAYGAIN_ALBUM_GAIN");
+        if (!text5) {
           return NaN;
         }
-        if (text4.toLowerCase().endsWith("db")) {
-          text4 = text4.substring(0, text4.length - 2).trim();
+        if (text5.toLowerCase().endsWith("db")) {
+          text5 = text5.substring(0, text5.length - 2).trim();
         }
-        return Number.parseFloat(text4);
+        return Number.parseFloat(text5);
       }
       /**
        * @inheritDoc
@@ -10378,8 +10378,8 @@ var require_apeTag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.removeItem("REPLAYGAIN_ALBUM_GAIN");
         } else {
-          const text4 = `${value.toFixed(2).toString()} dB`;
-          this.setStringValue("REPLAYGAIN_ALBUM_GAIN", text4);
+          const text5 = `${value.toFixed(2).toString()} dB`;
+          this.setStringValue("REPLAYGAIN_ALBUM_GAIN", text5);
         }
       }
       /**
@@ -10387,8 +10387,8 @@ var require_apeTag = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_ALBUM_PEAK` item
        */
       get replayGainAlbumPeak() {
-        const text4 = this.getStringValue("REPLAYGAIN_ALBUM_PEAK");
-        return text4 ? Number.parseFloat(text4) : NaN;
+        const text5 = this.getStringValue("REPLAYGAIN_ALBUM_PEAK");
+        return text5 ? Number.parseFloat(text5) : NaN;
       }
       /**
        * @inheritDoc
@@ -10398,8 +10398,8 @@ var require_apeTag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.removeItem("REPLAYGAIN_ALBUM_PEAK");
         } else {
-          const text4 = value.toFixed(6).toString();
-          this.setStringValue("REPLAYGAIN_ALBUM_PEAK", text4);
+          const text5 = value.toFixed(6).toString();
+          this.setStringValue("REPLAYGAIN_ALBUM_PEAK", text5);
         }
       }
       /**
@@ -10631,11 +10631,11 @@ var require_apeTag = __commonJS({
         return item ? item.text : [];
       }
       getUint32Value(key, index) {
-        const text4 = this.getStringValue(key);
-        if (!text4) {
+        const text5 = this.getStringValue(key);
+        if (!text5) {
           return 0;
         }
-        const values = text4.split("/", index + 2);
+        const values = text5.split("/", index + 2);
         if (values.length < index + 1) {
           return 0;
         }
@@ -14597,9 +14597,9 @@ var require_synchronizedLyricsFrame = __commonJS({
        *     displayed. See {@link TimestampFormat} for possible values.
        * @param text Text for the point in time
        */
-      constructor(time, text4) {
+      constructor(time, text5) {
         utils_1.Guards.uint(time, "time");
-        this.text = text4;
+        this.text = text5;
         this._time = time;
       }
       /**
@@ -14879,13 +14879,13 @@ var require_synchronizedLyricsFrame = __commonJS({
           if (lyricsLength < 0) {
             throw new errors_1.CorruptFileError("Text delimiter for synchronized lyric not found");
           }
-          const text4 = data.subarray(offset, lyricsLength).toString(this.textEncoding);
+          const text5 = data.subarray(offset, lyricsLength).toString(this.textEncoding);
           offset += lyricsLength + delim.length;
           if (offset + 4 > data.length) {
             break;
           }
           const time = data.subarray(offset, 4).toUint();
-          l.push(new SynchronizedText(time, text4));
+          l.push(new SynchronizedText(time, text5));
           offset += 4;
         }
         this._text = l;
@@ -15034,22 +15034,22 @@ var require_textInformationFrame = __commonJS({
         if (version2 !== 3 || this.frameId !== frameIdentifiers_1.FrameIdentifiers.TDRC) {
           return super.render(version2);
         }
-        const text4 = this.toString();
-        if (text4.length < 10 || text4[4] !== "-" || text4[7] !== "-") {
+        const text5 = this.toString();
+        if (text5.length < 10 || text5[4] !== "-" || text5[7] !== "-") {
           return super.render(version2);
         }
         const output = byteVector_1.ByteVector.empty();
         let frame = new _TextInformationFrame(new frameHeader_1.Id3v2FrameHeader(frameIdentifiers_1.FrameIdentifiers.TYER));
-        frame.text = [text4.substring(0, 4)];
+        frame.text = [text5.substring(0, 4)];
         output.addByteVector(frame.render(version2));
         frame = new _TextInformationFrame(new frameHeader_1.Id3v2FrameHeader(frameIdentifiers_1.FrameIdentifiers.TDAT));
-        frame.text = [text4.substring(5, 7) + text4.substring(8, 10)];
+        frame.text = [text5.substring(5, 7) + text5.substring(8, 10)];
         output.addByteVector(frame.render(version2));
-        if (text4.length < 16 || text4[10] !== "T" || text4[13] !== ":") {
+        if (text5.length < 16 || text5[10] !== "T" || text5[13] !== ":") {
           return output;
         }
         frame = new _TextInformationFrame(new frameHeader_1.Id3v2FrameHeader(frameIdentifiers_1.FrameIdentifiers.TIME));
-        frame.text = [text4.substring(11, 13) + text4.substring(14, 16)];
+        frame.text = [text5.substring(11, 13) + text5.substring(14, 16)];
         output.addByteVector(frame.render(version2));
         return output;
       }
@@ -15140,10 +15140,10 @@ var require_textInformationFrame = __commonJS({
         }
         const encoding = _TextInformationFrame.correctEncoding(this.textEncoding, version2);
         const v = byteVector_1.ByteVector.empty();
-        let text4 = this._textFields;
+        let text5 = this._textFields;
         v.addByte(encoding);
         if (version2 > 3 && this.frameId === frameIdentifiers_1.FrameIdentifiers.TCON) {
-          text4 = text4.map((g) => {
+          text5 = text5.map((g) => {
             switch (g) {
               case _TextInformationFrame.COVER_STRING:
                 return _TextInformationFrame.COVER_ABBREV;
@@ -15161,24 +15161,24 @@ var require_textInformationFrame = __commonJS({
         const isTxxx = this.frameId === frameIdentifiers_1.FrameIdentifiers.TXXX;
         if (version2 > 3 || isTxxx) {
           if (isTxxx) {
-            if (text4.length === 0) {
-              text4 = [null, null];
-            } else if (text4.length === 1) {
-              text4 = [text4[0], null];
+            if (text5.length === 0) {
+              text5 = [null, null];
+            } else if (text5.length === 1) {
+              text5 = [text5[0], null];
             }
           }
-          for (let i = 0; i < text4.length; i++) {
+          for (let i = 0; i < text5.length; i++) {
             if (i !== 0) {
               v.addByteVector(byteVector_1.ByteVector.getTextDelimiter(encoding));
             }
-            if (text4[i]) {
-              v.addByteVector(byteVector_1.ByteVector.fromString(text4[i], encoding));
+            if (text5[i]) {
+              v.addByteVector(byteVector_1.ByteVector.fromString(text5[i], encoding));
             }
           }
         } else if (this.frameId === frameIdentifiers_1.FrameIdentifiers.TCON) {
           const numericGenres = [];
           const textGenres = [];
-          for (const s of text4) {
+          for (const s of text5) {
             if (id3v2Settings_1.default.useNumericGenres) {
               switch (s) {
                 case _TextInformationFrame.COVER_STRING:
@@ -15202,7 +15202,7 @@ var require_textInformationFrame = __commonJS({
           const genreString = `${numericGenres.join("")}${textGenres.join(";")}`;
           v.addByteVector(byteVector_1.ByteVector.fromString(genreString, encoding));
         } else {
-          v.addByteVector(byteVector_1.ByteVector.fromString(text4.join("/"), encoding));
+          v.addByteVector(byteVector_1.ByteVector.fromString(text5.join("/"), encoding));
         }
         return v;
       }
@@ -15341,8 +15341,8 @@ var require_textInformationFrame = __commonJS({
        * Gets the description stored in the current instance.
        */
       get description() {
-        const text4 = super.text;
-        return text4.length > 0 ? text4[0] : void 0;
+        const text5 = super.text;
+        return text5.length > 0 ? text5[0] : void 0;
       }
       /**
        * Sets the description stored in the current instance.
@@ -15350,13 +15350,13 @@ var require_textInformationFrame = __commonJS({
        * @param value Description to store in the current instance.
        */
       set description(value) {
-        let text4 = super.text;
-        if (text4.length > 0) {
-          text4[0] = value;
+        let text5 = super.text;
+        if (text5.length > 0) {
+          text5[0] = value;
         } else {
-          text4 = [value];
+          text5 = [value];
         }
-        super.text = text4;
+        super.text = text5;
       }
       /**
        * Gets the text contained in the current instance.
@@ -15364,11 +15364,11 @@ var require_textInformationFrame = __commonJS({
        * current instance. The value must be reassigned for the value to change.
        */
       get text() {
-        const text4 = super.text;
-        if (text4.length < 2) {
+        const text5 = super.text;
+        if (text5.length < 2) {
           return [];
         }
-        return text4.slice(1);
+        return text5.slice(1);
       }
       /**
        * Sets the text contained in the current instance.
@@ -15593,8 +15593,8 @@ var require_urlLinkFrame = __commonJS({
             }
           }
         }
-        const text4 = textFields.join("/");
-        return byteVector_1.ByteVector.concatenate(isWxxx ? encoding : void 0, byteVector_1.ByteVector.fromString(text4, byteVector_1.StringType.Latin1));
+        const text5 = textFields.join("/");
+        return byteVector_1.ByteVector.concatenate(isWxxx ? encoding : void 0, byteVector_1.ByteVector.fromString(text5, byteVector_1.StringType.Latin1));
       }
     };
     exports.UrlLinkFrame = UrlLinkFrame;
@@ -15653,8 +15653,8 @@ var require_urlLinkFrame = __commonJS({
        * Gets the description stored in the current instance.
        */
       get description() {
-        const text4 = super.text;
-        return text4.length > 0 ? text4[0] : void 0;
+        const text5 = super.text;
+        return text5.length > 0 ? text5[0] : void 0;
       }
       /**
        * Sets the description stored in the current instance.
@@ -15662,13 +15662,13 @@ var require_urlLinkFrame = __commonJS({
        */
       set description(value) {
         const normalizedValue = value || void 0;
-        let text4 = super.text;
-        if (text4.length > 0) {
-          text4[0] = normalizedValue;
+        let text5 = super.text;
+        if (text5.length > 0) {
+          text5[0] = normalizedValue;
         } else {
-          text4 = [normalizedValue];
+          text5 = [normalizedValue];
         }
-        super.text = text4;
+        super.text = text5;
       }
       /**
        * Gets the text contained in the current instance.
@@ -15676,13 +15676,13 @@ var require_urlLinkFrame = __commonJS({
        * current instance. The value must be reassigned for the value to change.
        */
       get text() {
-        const text4 = super.text;
-        if (text4.length < 2) {
+        const text5 = super.text;
+        if (text5.length < 2) {
           return [];
         }
-        const newText = new Array(text4.length - 1);
+        const newText = new Array(text5.length - 1);
         for (let i = 0; i < newText.length; i++) {
-          newText[i] = text4[i + 1];
+          newText[i] = text5[i + 1];
         }
         return newText;
       }
@@ -16522,11 +16522,11 @@ var require_id3v2Tag = __commonJS({
        * @remarks Stored in the `TBPM` frame
        */
       get beatsPerMinute() {
-        const text4 = this.getTextAsString(frameIdentifiers_1.FrameIdentifiers.TBPM);
-        if (!text4) {
+        const text5 = this.getTextAsString(frameIdentifiers_1.FrameIdentifiers.TBPM);
+        if (!text5) {
           return 0;
         }
-        const num = Number.parseFloat(text4);
+        const num = Number.parseFloat(text5);
         return Number.isNaN(num) || num < 0 ? 0 : Math.round(num);
       }
       /**
@@ -16742,14 +16742,14 @@ var require_id3v2Tag = __commonJS({
        * @remarks via a TXXX `REPLAY_GAIN_TRACK_GAIN` frame
        */
       get replayGainTrackGain() {
-        let text4 = this.getUserTextAsString("REPLAYGAIN_TRACK_GAIN", false);
-        if (!text4) {
+        let text5 = this.getUserTextAsString("REPLAYGAIN_TRACK_GAIN", false);
+        if (!text5) {
           return NaN;
         }
-        if (text4.toLowerCase().endsWith("db")) {
-          text4 = text4.substring(0, text4.length - 2).trim();
+        if (text5.toLowerCase().endsWith("db")) {
+          text5 = text5.substring(0, text5.length - 2).trim();
         }
-        return Number.parseFloat(text4);
+        return Number.parseFloat(text5);
       }
       /**
        * @inheritDoc
@@ -16759,8 +16759,8 @@ var require_id3v2Tag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.setUserTextAsString("REPLAYGAIN_TRACK_GAIN", void 0, false);
         } else {
-          const text4 = `${value.toFixed(2).toString()} dB`;
-          this.setUserTextAsString("REPLAYGAIN_TRACK_GAIN", text4, false);
+          const text5 = `${value.toFixed(2).toString()} dB`;
+          this.setUserTextAsString("REPLAYGAIN_TRACK_GAIN", text5, false);
         }
       }
       /**
@@ -16768,8 +16768,8 @@ var require_id3v2Tag = __commonJS({
        * @remarks via a TXXX `REPLAYGAIN_TRACK_PEAK` frame
        */
       get replayGainTrackPeak() {
-        const text4 = this.getUserTextAsString("REPLAYGAIN_TRACK_PEAK", false);
-        return text4 ? Number.parseFloat(text4) : NaN;
+        const text5 = this.getUserTextAsString("REPLAYGAIN_TRACK_PEAK", false);
+        return text5 ? Number.parseFloat(text5) : NaN;
       }
       /**
        * @inheritDoc
@@ -16779,8 +16779,8 @@ var require_id3v2Tag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.setUserTextAsString("REPLAYGAIN_TRACK_PEAK", void 0, false);
         } else {
-          const text4 = value.toFixed(6).toString();
-          this.setUserTextAsString("REPLAYGAIN_TRACK_PEAK", text4, false);
+          const text5 = value.toFixed(6).toString();
+          this.setUserTextAsString("REPLAYGAIN_TRACK_PEAK", text5, false);
         }
       }
       /**
@@ -16788,14 +16788,14 @@ var require_id3v2Tag = __commonJS({
        * @remarks via a TXXX `REPLAYGAIN_ALBUM_GAIN` frame
        */
       get replayGainAlbumGain() {
-        let text4 = this.getUserTextAsString("REPLAYGAIN_ALBUM_GAIN", false);
-        if (!text4) {
+        let text5 = this.getUserTextAsString("REPLAYGAIN_ALBUM_GAIN", false);
+        if (!text5) {
           return NaN;
         }
-        if (text4.toLowerCase().endsWith("db")) {
-          text4 = text4.substring(0, text4.length - 2).trim();
+        if (text5.toLowerCase().endsWith("db")) {
+          text5 = text5.substring(0, text5.length - 2).trim();
         }
-        return Number.parseFloat(text4);
+        return Number.parseFloat(text5);
       }
       /**
        * @inheritDoc
@@ -16805,8 +16805,8 @@ var require_id3v2Tag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.setUserTextAsString("REPLAYGAIN_ALBUM_GAIN", void 0, false);
         } else {
-          const text4 = `${value.toFixed(2).toString()} dB`;
-          this.setUserTextAsString("REPLAYGAIN_ALBUM_GAIN", text4, false);
+          const text5 = `${value.toFixed(2).toString()} dB`;
+          this.setUserTextAsString("REPLAYGAIN_ALBUM_GAIN", text5, false);
         }
       }
       /**
@@ -16814,8 +16814,8 @@ var require_id3v2Tag = __commonJS({
        * @remarks via a TXXX `REPLAYGAIN_ALBUM_PEAK` frame
        */
       get replayGainAlbumPeak() {
-        const text4 = this.getUserTextAsString("REPLAYGAIN_ALBUM_PEAK", false);
-        return text4 ? Number.parseFloat(text4) : NaN;
+        const text5 = this.getUserTextAsString("REPLAYGAIN_ALBUM_PEAK", false);
+        return text5 ? Number.parseFloat(text5) : NaN;
       }
       /**
        * @inheritDoc
@@ -16825,8 +16825,8 @@ var require_id3v2Tag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.setUserTextAsString("REPLAYGAIN_ALBUM_PEAK", void 0, false);
         } else {
-          const text4 = value.toFixed(6).toString();
-          this.setUserTextAsString("REPLAYGAIN_ALBUM_PEAK", text4, false);
+          const text5 = value.toFixed(6).toString();
+          this.setUserTextAsString("REPLAYGAIN_ALBUM_PEAK", text5, false);
         }
       }
       /**
@@ -17161,12 +17161,12 @@ var require_id3v2Tag = __commonJS({
        * @param text Text to set for the specified frame or `undefined`/`null`/`""` to remove all
        *     frames with that identifier.
        */
-      setTextFrame(ident, ...text4) {
+      setTextFrame(ident, ...text5) {
         utils_1.Guards.truthy(ident, "ident");
         let empty = true;
-        if (text4) {
-          for (let i = 0; empty && i < text4.length; i++) {
-            if (text4[i]) {
+        if (text5) {
+          for (let i = 0; empty && i < text5.length; i++) {
+            if (text5[i]) {
               empty = false;
             }
           }
@@ -17182,7 +17182,7 @@ var require_id3v2Tag = __commonJS({
             urlFrame = urlLinkFrame_1.UrlLinkFrame.fromIdentity(ident);
             this.addFrame(urlFrame);
           }
-          urlFrame.text = text4;
+          urlFrame.text = text5;
           urlFrame.textEncoding = id3v2Settings_1.default.defaultEncoding;
         } else {
           const frames = this.getFramesByClassType(frame_1.FrameClassType.TextInformationFrame);
@@ -17191,7 +17191,7 @@ var require_id3v2Tag = __commonJS({
             frame = textInformationFrame_1.TextInformationFrame.fromIdentifier(ident);
             this.addFrame(frame);
           }
-          frame.text = text4;
+          frame.text = text5;
           frame.textEncoding = id3v2Settings_1.default.defaultEncoding;
         }
       }
@@ -17256,11 +17256,11 @@ var require_id3v2Tag = __commonJS({
         return frame ? frame.text : [];
       }
       getTextAsUint32(ident, index) {
-        const text4 = this.getTextAsString(ident);
-        if (text4 === null || text4 === void 0) {
+        const text5 = this.getTextAsString(ident);
+        if (text5 === null || text5 === void 0) {
           return 0;
         }
-        const values = text4.split("/", index + 2);
+        const values = text5.split("/", index + 2);
         if (values.length < index + 1) {
           return 0;
         }
@@ -17282,21 +17282,21 @@ var require_id3v2Tag = __commonJS({
         const result = frame ? frame.text.join(";") : void 0;
         return result || void 0;
       }
-      setUfidText(owner, text4) {
+      setUfidText(owner, text5) {
         const frames = this.getFramesByClassType(frame_1.FrameClassType.UniqueFileIdentifierFrame);
         let frame = uniqueFileIdentifierFrame_1.default.find(frames, owner);
-        if (!text4 && frame) {
+        if (!text5 && frame) {
           this.removeFrame(frame);
         } else {
-          const identifier = byteVector_1.ByteVector.fromString(text4, byteVector_1.StringType.UTF8);
+          const identifier = byteVector_1.ByteVector.fromString(text5, byteVector_1.StringType.UTF8);
           frame = uniqueFileIdentifierFrame_1.default.fromData(owner, identifier);
           this.addFrame(frame);
         }
       }
-      setUserTextAsString(description, text4, caseSensitive = true) {
+      setUserTextAsString(description, text5, caseSensitive = true) {
         const frames = this.getFramesByClassType(frame_1.FrameClassType.UserTextInformationFrame);
         let frame = textInformationFrame_1.UserTextInformationFrame.findUserTextInformationFrame(frames, description, caseSensitive);
-        if (!text4) {
+        if (!text5) {
           if (frame) {
             this.removeFrame(frame);
           }
@@ -17305,7 +17305,7 @@ var require_id3v2Tag = __commonJS({
             frame = textInformationFrame_1.UserTextInformationFrame.fromDescription(description, id3v2Settings_1.default.defaultEncoding);
             this.addFrame(frame);
           }
-          frame.text = text4.split(";");
+          frame.text = text5.split(";");
         }
       }
     };
@@ -19969,11 +19969,11 @@ var require_asfTag = __commonJS({
        *     https://docs.microsoft.com/en-us/windows/win32/wmformat/wm-year
        */
       get year() {
-        const text4 = this.getDescriptorString("WM/Year");
-        if (!text4 || text4.length < 4) {
+        const text5 = this.getDescriptorString("WM/Year");
+        if (!text5 || text5.length < 4) {
           return 0;
         }
-        const parsed = Number.parseInt(text4.substring(0, 4), 10);
+        const parsed = Number.parseInt(text5.substring(0, 4), 10);
         return Number.isNaN(parsed) ? 0 : parsed;
       }
       /**
@@ -20349,8 +20349,8 @@ var require_asfTag = __commonJS({
         if (Number.isNaN(value)) {
           this.removeDescriptors("ReplayGain/Track");
         } else {
-          const text4 = value.toFixed(2);
-          this.setDescriptorString(`${text4} dB`, "ReplayGain/Track");
+          const text5 = value.toFixed(2);
+          this.setDescriptorString(`${text5} dB`, "ReplayGain/Track");
         }
       }
       /**
@@ -20369,8 +20369,8 @@ var require_asfTag = __commonJS({
         if (Number.isNaN(value)) {
           this.removeDescriptors("ReplayGain/Track Peak");
         } else {
-          const text4 = value.toFixed(6);
-          this.setDescriptorString(text4, "ReplayGain/Track Peak");
+          const text5 = value.toFixed(6);
+          this.setDescriptorString(text5, "ReplayGain/Track Peak");
         }
       }
       /**
@@ -20396,8 +20396,8 @@ var require_asfTag = __commonJS({
         if (Number.isNaN(value)) {
           this.removeDescriptors("ReplayGain/Album");
         } else {
-          const text4 = value.toFixed(2);
-          this.setDescriptorString(`${text4} dB`, "ReplayGain/Album");
+          const text5 = value.toFixed(2);
+          this.setDescriptorString(`${text5} dB`, "ReplayGain/Album");
         }
       }
       /**
@@ -20416,8 +20416,8 @@ var require_asfTag = __commonJS({
         if (Number.isNaN(value)) {
           this.removeDescriptors("ReplayGain/Album Peak");
         } else {
-          const text4 = value.toFixed(6);
-          this.setDescriptorString(text4, "ReplayGain/Album Peak");
+          const text5 = value.toFixed(6);
+          this.setDescriptorString(text5, "ReplayGain/Album Peak");
         }
       }
       /**
@@ -24175,11 +24175,11 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `DATE` field
        */
       get year() {
-        const text4 = this.getFieldFirstValue("DATE");
-        if (!text4) {
+        const text5 = this.getFieldFirstValue("DATE");
+        if (!text5) {
           return 0;
         }
-        const parsedText = Number.parseInt(text4.substring(0, 4), 10);
+        const parsedText = Number.parseInt(text5.substring(0, 4), 10);
         return Number.isNaN(parsedText) ? 0 : parsedText;
       }
       /**
@@ -24199,11 +24199,11 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `TRACKNUMBER` field
        */
       get track() {
-        const text4 = this.getFieldFirstValue("TRACKNUMBER");
-        if (!text4) {
+        const text5 = this.getFieldFirstValue("TRACKNUMBER");
+        if (!text5) {
           return 0;
         }
-        const splitText = text4.split("/");
+        const splitText = text5.split("/");
         const parsedText = Number.parseInt(splitText[0], 10);
         return Number.isNaN(parsedText) ? 0 : parsedText;
       }
@@ -24222,16 +24222,16 @@ var require_xiphComment = __commonJS({
        *     used if `TRACKTOTAL` is not available.
        */
       get trackCount() {
-        let text4 = this.getFieldFirstValue("TRACKTOTAL");
-        if (text4) {
-          const parsedValue = Number.parseInt(text4, 10);
+        let text5 = this.getFieldFirstValue("TRACKTOTAL");
+        if (text5) {
+          const parsedValue = Number.parseInt(text5, 10);
           if (!Number.isNaN(parsedValue)) {
             return parsedValue;
           }
         }
-        text4 = this.getFieldFirstValue("TRACKNUMBER");
-        if (text4) {
-          const textSplit = text4.split("/");
+        text5 = this.getFieldFirstValue("TRACKNUMBER");
+        if (text5) {
+          const textSplit = text5.split("/");
           if (textSplit.length > 1) {
             const parsedValue = Number.parseInt(textSplit[1], 10);
             if (!Number.isNaN(parsedValue)) {
@@ -24254,11 +24254,11 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `DISCNUMBER` field
        */
       get disc() {
-        const text4 = this.getFieldFirstValue("DISCNUMBER");
-        if (!text4) {
+        const text5 = this.getFieldFirstValue("DISCNUMBER");
+        if (!text5) {
           return 0;
         }
-        const splitText = text4.split("/");
+        const splitText = text5.split("/");
         const parsedText = Number.parseInt(splitText[0], 10);
         return Number.isNaN(parsedText) ? 0 : parsedText;
       }
@@ -24277,16 +24277,16 @@ var require_xiphComment = __commonJS({
        *     used if `DISCTOTAL` is not available.
        */
       get discCount() {
-        let text4 = this.getFieldFirstValue("DISCTOTAL");
-        if (text4) {
-          const parsedValue = Number.parseInt(text4, 10);
+        let text5 = this.getFieldFirstValue("DISCTOTAL");
+        if (text5) {
+          const parsedValue = Number.parseInt(text5, 10);
           if (!Number.isNaN(parsedValue)) {
             return parsedValue;
           }
         }
-        text4 = this.getFieldFirstValue("DISCNUMBER");
-        if (text4) {
-          const textSplit = text4.split("/");
+        text5 = this.getFieldFirstValue("DISCNUMBER");
+        if (text5) {
+          const textSplit = text5.split("/");
           if (textSplit.length > 1) {
             const parsedValue = Number.parseInt(textSplit[1], 10);
             if (!Number.isNaN(parsedValue)) {
@@ -24340,11 +24340,11 @@ var require_xiphComment = __commonJS({
        *     behavior can be controlled Stored in the {@link XiphSettings.useTempoToStoreBpm}.
        */
       get beatsPerMinute() {
-        let text4 = this.getFieldFirstValue("TEMPO");
-        if (!text4) {
-          text4 = this.getFieldFirstValue("BPM");
+        let text5 = this.getFieldFirstValue("TEMPO");
+        if (!text5) {
+          text5 = this.getFieldFirstValue("BPM");
         }
-        const parsedNumber = Number.parseInt(text4, 10);
+        const parsedNumber = Number.parseInt(text5, 10);
         return Number.isNaN(parsedNumber) ? 0 : parsedNumber;
       }
       /**
@@ -24396,8 +24396,8 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `DATETAGGED` field
        */
       get dateTagged() {
-        const text4 = this.getFieldFirstValue("DATETAGGED");
-        const date = new Date(text4);
+        const text5 = this.getFieldFirstValue("DATETAGGED");
+        const date = new Date(text5);
         return Number.isNaN(date.getTime()) ? void 0 : date;
       }
       /**
@@ -24601,8 +24601,8 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_TRACK_GAIN` field
        */
       get replayGainTrackGain() {
-        const text4 = this.getFieldFirstValue("REPLAYGAIN_TRACK_GAIN");
-        return Number.parseFloat(text4);
+        const text5 = this.getFieldFirstValue("REPLAYGAIN_TRACK_GAIN");
+        return Number.parseFloat(text5);
       }
       /**
        * @inheritDoc
@@ -24620,8 +24620,8 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_TRACK_PEAK` field
        */
       get replayGainTrackPeak() {
-        const text4 = this.getFieldFirstValue("REPLAYGAIN_TRACK_PEAK");
-        return Number.parseFloat(text4);
+        const text5 = this.getFieldFirstValue("REPLAYGAIN_TRACK_PEAK");
+        return Number.parseFloat(text5);
       }
       /**
        * @inheritDoc
@@ -24639,8 +24639,8 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_ALBUM_GAIN` field
        */
       get replayGainAlbumGain() {
-        const text4 = this.getFieldFirstValue("REPLAYGAIN_ALBUM_GAIN");
-        return Number.parseFloat(text4);
+        const text5 = this.getFieldFirstValue("REPLAYGAIN_ALBUM_GAIN");
+        return Number.parseFloat(text5);
       }
       /**
        * @inheritDoc
@@ -24658,8 +24658,8 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_ALBUM_PEAK` field
        */
       get replayGainAlbumPeak() {
-        const text4 = this.getFieldFirstValue("REPLAYGAIN_ALBUM_PEAK");
-        return Number.parseFloat(text4);
+        const text5 = this.getFieldFirstValue("REPLAYGAIN_ALBUM_PEAK");
+        return Number.parseFloat(text5);
       }
       /**
        * @inheritDoc
@@ -29424,8 +29424,8 @@ var require_appleTag = __commonJS({
       }
       /** @inheritDoc */
       get genres() {
-        let text4 = this.getQuickTimeStrings(mpeg4BoxType_1.default.GEN);
-        if (text4.length === 0) {
+        let text5 = this.getQuickTimeStrings(mpeg4BoxType_1.default.GEN);
+        if (text5.length === 0) {
           for (const data of this.getQuickTimeData(mpeg4BoxType_1.default.GNRE)) {
             const index = data.toUshort(true);
             if (index === 0) {
@@ -29435,11 +29435,11 @@ var require_appleTag = __commonJS({
             if (!str2) {
               continue;
             }
-            text4 = [str2];
+            text5 = [str2];
             break;
           }
         }
-        return text4;
+        return text5;
       }
       /** @inheritDoc */
       set genres(v) {
@@ -29548,8 +29548,8 @@ var require_appleTag = __commonJS({
       }
       /** @inheritDoc */
       get dateTagged() {
-        for (const text4 of this.getQuickTimeStrings(mpeg4BoxType_1.default.DTAG)) {
-          const date = new Date(text4);
+        for (const text5 of this.getQuickTimeStrings(mpeg4BoxType_1.default.DTAG)) {
+          const date = new Date(text5);
           if (!isNaN(date.getTime())) {
             return date;
           }
@@ -29694,14 +29694,14 @@ var require_appleTag = __commonJS({
       }
       /** @inheritDoc */
       get replayGainTrackGain() {
-        let text4 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_TRACK_GAIN");
-        if (!text4) {
+        let text5 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_TRACK_GAIN");
+        if (!text5) {
           return NaN;
         }
-        if (text4.toLowerCase().endsWith("db")) {
-          text4 = text4.substring(0, text4.length - 2).trim();
+        if (text5.toLowerCase().endsWith("db")) {
+          text5 = text5.substring(0, text5.length - 2).trim();
         }
-        return Number.parseFloat(text4);
+        return Number.parseFloat(text5);
       }
       /** @inheritDoc */
       set replayGainTrackGain(v) {
@@ -29710,24 +29710,24 @@ var require_appleTag = __commonJS({
       }
       /** @inheritDoc */
       get replayGainTrackPeak() {
-        const text4 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_TRACK_PEAK");
-        return text4 ? Number.parseFloat(text4) : NaN;
+        const text5 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_TRACK_PEAK");
+        return text5 ? Number.parseFloat(text5) : NaN;
       }
       /** @inheritDoc */
       set replayGainTrackPeak(v) {
-        const text4 = Number.isNaN(v) ? void 0 : v.toFixed(6);
-        this.setItunesStrings("com.apple.iTunes", "REPLAYGAIN_TRACK_PEAK", text4);
+        const text5 = Number.isNaN(v) ? void 0 : v.toFixed(6);
+        this.setItunesStrings("com.apple.iTunes", "REPLAYGAIN_TRACK_PEAK", text5);
       }
       /** @inheritDoc */
       get replayGainAlbumGain() {
-        let text4 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_ALBUM_GAIN");
-        if (!text4) {
+        let text5 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_ALBUM_GAIN");
+        if (!text5) {
           return NaN;
         }
-        if (text4.toLowerCase().endsWith("db")) {
-          text4 = text4.substring(0, text4.length - 2).trim();
+        if (text5.toLowerCase().endsWith("db")) {
+          text5 = text5.substring(0, text5.length - 2).trim();
         }
-        return Number.parseFloat(text4);
+        return Number.parseFloat(text5);
       }
       set replayGainAlbumGain(v) {
         const value = Number.isNaN(v) ? void 0 : `${v.toFixed(2)} dB`;
@@ -29735,13 +29735,13 @@ var require_appleTag = __commonJS({
       }
       /** @inheritDoc */
       get replayGainAlbumPeak() {
-        const text4 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_ALBUM_PEAK");
-        return text4 ? Number.parseFloat(text4) : NaN;
+        const text5 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_ALBUM_PEAK");
+        return text5 ? Number.parseFloat(text5) : NaN;
       }
       /** @inheritDoc */
       set replayGainAlbumPeak(v) {
-        const text4 = Number.isNaN(v) ? void 0 : v.toFixed(6);
-        this.setItunesStrings("com.apple.iTunes", "REPLAYGAIN_ALBUM_PEAK", text4);
+        const text5 = Number.isNaN(v) ? void 0 : v.toFixed(6);
+        this.setItunesStrings("com.apple.iTunes", "REPLAYGAIN_ALBUM_PEAK", text5);
       }
       /** @inheritDoc */
       get initialKey() {
@@ -29855,8 +29855,8 @@ var require_appleTag = __commonJS({
       getQuickTimeStrings(boxType) {
         return this._ilstBox.getQuickTimeDataBoxes(boxType).filter((b) => utils_1.NumberUtils.hasFlag(b.flags, appleDataBox_1.AppleDataBoxFlagType.ContainsText, true)).reduce((accum, b) => {
           if (b.text) {
-            for (const text4 of b.text.split(";")) {
-              utils_1.ArrayUtils.safePush(accum, text4.trim());
+            for (const text5 of b.text.split(";")) {
+              utils_1.ArrayUtils.safePush(accum, text5.trim());
             }
           }
           return accum;
@@ -32942,12 +32942,12 @@ var require_aviStream = __commonJS({
        * Constructs and initializes a new instance with a specified stream header.
        * @param list RiffList containing the stream headers
        */
-      constructor(list) {
-        utils_1.Guards.truthy(list, "list");
-        if (list.type !== _AviStream.LIST_TYPE) {
+      constructor(list2) {
+        utils_1.Guards.truthy(list2, "list");
+        if (list2.type !== _AviStream.LIST_TYPE) {
           throw new errors_1.CorruptFileError("Stream header list does not have correct type");
         }
-        const streamHeaderData = list.getValues(_AviStream.HEADER_CHUNK_ID);
+        const streamHeaderData = list2.getValues(_AviStream.HEADER_CHUNK_ID);
         if (streamHeaderData.length !== 1) {
           throw new errors_1.CorruptFileError("Stream header list does not contain valid stream header chunks");
         }
@@ -32972,7 +32972,7 @@ var require_aviStream = __commonJS({
         this._top = streamHeaderDatum.subarray(50, 2).toUshort(false);
         this._right = streamHeaderDatum.subarray(52, 2).toUshort(false);
         this._bottom = streamHeaderDatum.subarray(54, 2).toUshort(false);
-        const streamFormatData = list.getValues(_AviStream.FORMAT_CHUNK_ID);
+        const streamFormatData = list2.getValues(_AviStream.FORMAT_CHUNK_ID);
         if (streamFormatData.length !== 1) {
           throw new errors_1.CorruptFileError("Stream header list is missing stream format chunk");
         }
@@ -33147,12 +33147,12 @@ var require_aviHeader = __commonJS({
        * Constructs and initializes a new instance by reading information from a RIFF list.
        * @param list List containing the data for the AVI headers
        */
-      constructor(list) {
-        utils_1.Guards.truthy(list, "list");
-        if (list.type !== _AviHeader.HEADER_LIST_TYPE) {
-          throw new errors_1.CorruptFileError(`Expected ${_AviHeader.HEADER_LIST_TYPE} list but got ${list.type}`);
+      constructor(list2) {
+        utils_1.Guards.truthy(list2, "list");
+        if (list2.type !== _AviHeader.HEADER_LIST_TYPE) {
+          throw new errors_1.CorruptFileError(`Expected ${_AviHeader.HEADER_LIST_TYPE} list but got ${list2.type}`);
         }
-        const mainHeaderValues = list.getValues(_AviHeader.HEADER_CHUNK_ID);
+        const mainHeaderValues = list2.getValues(_AviHeader.HEADER_CHUNK_ID);
         if (mainHeaderValues.length === 0) {
           throw new errors_1.CorruptFileError("Could not find AVI main header data");
         }
@@ -33170,7 +33170,7 @@ var require_aviHeader = __commonJS({
         this._width = mainHeaderData.subarray(32, 4).toUint(false);
         this._height = mainHeaderData.subarray(36, 4).toUint(false);
         this._durationMilliseconds = this._totalFrames * this._microsecondsPerFrame / 1e3;
-        const streamHeaderLists = list.getLists(aviStream_1.AviStream.LIST_TYPE);
+        const streamHeaderLists = list2.getLists(aviStream_1.AviStream.LIST_TYPE);
         this._streams = streamHeaderLists.map((l) => new aviStream_1.AviStream(l));
         this._codecs = this._streams.map((s) => s.codec).filter((c) => !!c);
       }
@@ -33410,11 +33410,11 @@ var require_riffList = __commonJS({
        * @param type Type ID of the list
        */
       static fromEmpty(type) {
-        const list = new _RiffList();
-        list._isLoaded = true;
-        list._type = type;
-        list._originalDataSize = 4;
-        return list;
+        const list2 = new _RiffList();
+        list2._isLoaded = true;
+        list2._type = type;
+        list2._originalDataSize = 4;
+        return list2;
       }
       /**
        * Constructs and initializes a new instance, lazily, from a position in a file.
@@ -33432,13 +33432,13 @@ var require_riffList = __commonJS({
         if (listHeader.subarray(0, 4).toString(byteVector_1.StringType.Latin1) !== _RiffList.IDENTIFIER_FOURCC) {
           throw new Error("Cannot read RIFF list from non-list chunk");
         }
-        const list = new _RiffList();
-        list._chunkStart = position;
-        list._originalDataSize = listHeader.subarray(4, 4).toUint(false);
-        list._file = file;
-        list._isLoaded = false;
-        list._type = listHeader.subarray(8, 4).toString(byteVector_1.StringType.Latin1);
-        return list;
+        const list2 = new _RiffList();
+        list2._chunkStart = position;
+        list2._originalDataSize = listHeader.subarray(4, 4).toUint(false);
+        list2._file = file;
+        list2._isLoaded = false;
+        list2._type = listHeader.subarray(8, 4).toString(byteVector_1.StringType.Latin1);
+        return list2;
       }
       // #endregion
       // #region Properties
@@ -33630,10 +33630,10 @@ var require_riffListTag = __commonJS({
     var utils_1 = require_utils();
     var RiffListTag = class extends tag_1.Tag {
       // #region Constructors
-      constructor(list) {
+      constructor(list2) {
         super();
         this._stringType = byteVector_1.StringType.UTF8;
-        this._list = list;
+        this._list = list2;
       }
       // #endregion
       // #region Properties
@@ -33769,8 +33769,8 @@ var require_infoTag = __commonJS({
     var utils_1 = require_utils();
     var InfoTag = class _InfoTag extends riffListTag_1.default {
       // #region Constructors
-      constructor(list) {
-        super(list);
+      constructor(list2) {
+        super(list2);
       }
       /**
        * Constructs and initializes a new, empty instance.
@@ -33783,9 +33783,9 @@ var require_infoTag = __commonJS({
        * a file.
        * @param list List that contains the contents of the tag
        */
-      static fromList(list) {
-        utils_1.Guards.truthy(list, "list");
-        return new _InfoTag(list);
+      static fromList(list2) {
+        utils_1.Guards.truthy(list2, "list");
+        return new _InfoTag(list2);
       }
       // #endregion
       // #region Properties
@@ -34000,17 +34000,17 @@ var require_movieIdTag = __commonJS({
     var utils_1 = require_utils();
     var MovieIdTag = class _MovieIdTag extends riffListTag_1.default {
       // #region Constructors
-      constructor(list) {
-        super(list);
+      constructor(list2) {
+        super(list2);
       }
       /**
        * Constructs and initializes a new instance by reading the contents of a raw RIFF list stored
        * a file.
        * @param list List that contains the contents of the tag
        */
-      static fromList(list) {
-        utils_1.Guards.truthy(list, "list");
-        return new _MovieIdTag(list);
+      static fromList(list2) {
+        utils_1.Guards.truthy(list2, "list");
+        return new _MovieIdTag(list2);
       }
       /**
        * Constructs and initializes a new, empty instance.
@@ -35206,7 +35206,7 @@ var require_dist = __commonJS({
 });
 
 // src/index.js
-import path15 from "node:path";
+import path16 from "node:path";
 import { Worker, isMainThread, parentPort, workerData } from "node:worker_threads";
 
 // src/model/editor.js
@@ -35390,11 +35390,42 @@ CREATE INDEX realization_item_segment ON realization_item(segment_id);
 CREATE INDEX relation_target ON relation(kind,target_id);
 CREATE INDEX realization_work ON realization(work_id);
 `
+  },
+  {
+    // v0.2. The search index is derived from the catalogue and rebuilt when
+    // the catalogue changes; dropping its tables loses nothing. change_set
+    // keeps what a merge or deletion removed, so it can be undone, and
+    // match_suppression keeps background matching from making a deleted
+    // work again before an admin says so.
+    version: 4,
+    sql: `
+CREATE TABLE search_doc (
+ id INTEGER PRIMARY KEY, kind TEXT NOT NULL, ref TEXT NOT NULL, work_id TEXT, title TEXT NOT NULL,
+ subtitle TEXT NOT NULL DEFAULT '', detail TEXT NOT NULL DEFAULT '', owned INTEGER NOT NULL DEFAULT 0,
+ boost REAL NOT NULL DEFAULT 0, data TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(data)), UNIQUE(kind,ref)
+);
+CREATE TABLE search_term (
+ term TEXT NOT NULL, doc INTEGER NOT NULL, field INTEGER NOT NULL, PRIMARY KEY(term,doc,field)
+) WITHOUT ROWID;
+CREATE TABLE search_key (key TEXT NOT NULL, doc INTEGER NOT NULL, PRIMARY KEY(key,doc)) WITHOUT ROWID;
+CREATE TABLE search_facet (
+ facet TEXT NOT NULL, value TEXT NOT NULL, doc INTEGER NOT NULL, label TEXT NOT NULL, PRIMARY KEY(facet,value,doc)
+) WITHOUT ROWID;
+CREATE INDEX search_facet_doc ON search_facet(doc);
+CREATE TABLE search_state (id INTEGER PRIMARY KEY CHECK(id=1), stamp TEXT NOT NULL, built_at INTEGER NOT NULL, docs INTEGER NOT NULL);
+CREATE TABLE change_set (
+ id TEXT PRIMARY KEY, kind TEXT NOT NULL, actor TEXT, summary TEXT NOT NULL,
+ data TEXT NOT NULL CHECK(json_valid(data)), created_at INTEGER NOT NULL, undone_at INTEGER
+);
+CREATE TABLE match_suppression (
+ key TEXT PRIMARY KEY, title TEXT NOT NULL, reason TEXT NOT NULL, actor TEXT, created_at INTEGER NOT NULL
+);
+`
   }
 ];
 
 // src/model/database.js
-var SCHEMA_VERSION = 3;
+var SCHEMA_VERSION = 4;
 function validateDatabase(db) {
   if (db.prepare("PRAGMA integrity_check").get().integrity_check !== "ok" || db.prepare("PRAGMA foreign_key_check").all().length)
     throw new Error("Classical database integrity check failed");
@@ -35820,16 +35851,16 @@ var Catalogue = class {
       return true;
     });
   }
-  alias(entity, text4, { language = null, kind = "alternate", assertionId = null } = {}) {
+  alias(entity, text5, { language = null, kind = "alternate", assertionId = null } = {}) {
     this.entity(entity);
-    if (typeof text4 !== "string" || !text4.trim())
+    if (typeof text5 !== "string" || !text5.trim())
       throw new Error("Invalid alias");
     const id = randomUUID2();
     this.db.prepare("INSERT INTO alias VALUES (?,?,?,?,?,?,?)").run(
       id,
       entity,
-      text4,
-      text4.normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase(),
+      text5,
+      text5.normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase(),
       language,
       kind,
       assertionId
@@ -36418,11 +36449,11 @@ function isSoloistRelation(rel) {
 }
 var unique = (values) => [...new Set(values.filter(Boolean))];
 function isPlaceholder(name) {
-  const text4 = String(name || "").trim();
-  return text4.startsWith("[") && text4.endsWith("]");
+  const text5 = String(name || "").trim();
+  return text5.startsWith("[") && text5.endsWith("]");
 }
-function isLatin(text4) {
-  for (const ch of String(text4 || "")) {
+function isLatin(text5) {
+  for (const ch of String(text5 || "")) {
     if (new RegExp("\\p{L}", "u").test(ch) && !new RegExp("\\p{Script=Latin}", "u").test(ch)) return false;
   }
   return true;
@@ -36436,7 +36467,7 @@ function genreNames(entity) {
   names.delete("");
   return names;
 }
-var escapeRegex = (text4) => text4.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+var escapeRegex = (text5) => text5.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 function addPerson(people, person) {
   if (person && people.every((p) => p.id !== person.id)) people.push(person);
 }
@@ -36525,10 +36556,10 @@ var ClassicalResolver = class _ClassicalResolver {
   // classical genre wins over "pop" or "rock" on the same entity, but not
   // over Christmas, soundtrack or crossover genres.
   classifyGenres(genres) {
-    const list = [...genres];
-    if (list.some((g) => this.isHardNonClassicalGenre(g))) return false;
-    if (list.some((g) => this.isClassicalGenre(g))) return true;
-    if (list.some((g) => this.isNonClassicalGenre(g))) return false;
+    const list2 = [...genres];
+    if (list2.some((g) => this.isHardNonClassicalGenre(g))) return false;
+    if (list2.some((g) => this.isClassicalGenre(g))) return true;
+    if (list2.some((g) => this.isNonClassicalGenre(g))) return false;
     return null;
   }
   async isNonClassicalArtist(artist) {
@@ -36907,12 +36938,12 @@ var CATALOGUE_OWNERS = [
   [/,\s*Z\.?\s*\d/, "purcell"]
 ];
 var surnameOf = (name) => plain(name).split(" ").filter(Boolean).at(-1) || "";
-var hasWord = (text4, word) => word.length >= 3 && ` ${plain(text4)} `.includes(` ${word} `);
+var hasWord = (text5, word) => word.length >= 3 && ` ${plain(text5)} `.includes(` ${word} `);
 function performerLike(part, albumArtists) {
-  const words3 = plain(part);
-  if (!words3) return true;
+  const words4 = plain(part);
+  if (!words4) return true;
   if (ENSEMBLE.test(part) || LIST.test(part)) return true;
-  return albumArtists.some((artist) => artist === words3 || ` ${artist} `.includes(` ${words3} `) || ` ${words3} `.includes(` ${artist} `));
+  return albumArtists.some((artist) => artist === words4 || ` ${artist} `.includes(` ${words4} `) || ` ${words4} `.includes(` ${artist} `));
 }
 function artistCredits(hints = {}, { knownComposers = null } = {}) {
   if (Array.isArray(hints.composer) && hints.composer.length) return null;
@@ -36920,8 +36951,8 @@ function artistCredits(hints = {}, { knownComposers = null } = {}) {
   if (parts.length < 2) return null;
   const albumArtists = clean(hints.albumArtist).split(/\s*(?:;|,|&|\/|\s+(?:and|und|with)\s+)\s*/i).map(plain).filter((name) => name.length >= 3);
   const candidates2 = parts.filter((part) => !performerLike(part, albumArtists)).filter((name) => {
-    const words3 = name.split(/\s+/);
-    return words3.length <= 5 && !/\d|:/.test(name) && NAME.test(name) && parts.filter((part) => plain(part) === plain(name)).length === 1;
+    const words4 = name.split(/\s+/);
+    return words4.length <= 5 && !/\d|:/.test(name) && NAME.test(name) && parts.filter((part) => plain(part) === plain(name)).length === 1;
   }).map((name) => ({ name, evidence: corroboration(name, hints, knownComposers) }));
   const backed = candidates2.filter((candidate) => candidate.evidence.length);
   const chosen = candidates2.length === 1 ? candidates2[0] : backed.length === 1 ? backed[0] : null;
@@ -36950,7 +36981,7 @@ function composersOf(hints = {}, options) {
 }
 
 // src/model/classify-evidence.js
-var escape = (text4) => text4.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+var escape = (text5) => text5.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 var wordList = (terms) => new RegExp(
   `(?<![\\p{L}\\p{N}_])(?:${[...new Set(terms.map(normGenre))].sort((a, b) => b.length - a.length).map(escape).join("|")})(?![\\p{L}\\p{N}_])`,
   "u"
@@ -37271,6 +37302,656 @@ function ownedTracks(catalogue) {
 // src/model/editor-v2.js
 import path3 from "node:path";
 
+// src/search/normalize.js
+var LETTERS = { \u00F8: "o", \u00E6: "ae", \u0153: "oe", \u00DF: "ss", \u0142: "l", \u0111: "d", \u00F0: "d", \u00FE: "th", \u0131: "i", \u0127: "h", \u014B: "n" };
+var CYRILLIC = {
+  \u0430: "a",
+  \u0431: "b",
+  \u0432: "v",
+  \u0433: "g",
+  \u0434: "d",
+  \u0435: "e",
+  \u0451: "e",
+  \u0436: "zh",
+  \u0437: "z",
+  \u0438: "i",
+  \u0439: "i",
+  \u043A: "k",
+  \u043B: "l",
+  \u043C: "m",
+  \u043D: "n",
+  \u043E: "o",
+  \u043F: "p",
+  \u0440: "r",
+  \u0441: "s",
+  \u0442: "t",
+  \u0443: "u",
+  \u0444: "f",
+  \u0445: "kh",
+  \u0446: "ts",
+  \u0447: "ch",
+  \u0448: "sh",
+  \u0449: "shch",
+  \u044A: "",
+  \u044B: "y",
+  \u044C: "",
+  \u044D: "e",
+  \u044E: "yu",
+  \u044F: "ya",
+  \u0456: "i",
+  \u0457: "i",
+  \u0454: "e",
+  \u0491: "g"
+};
+function fold(value) {
+  return String(value ?? "").toLowerCase().replace(/[^\u0000-\u007f]/g, (ch) => LETTERS[ch] ?? CYRILLIC[ch] ?? ch).normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+}
+var words = (value) => fold(value).split(" ").filter(Boolean);
+function skeleton(word) {
+  if (word.length < 4 || /\d/.test(word)) return "";
+  return word.replace(/t?sch|tch|kh|ch|zh|sh/g, "h").replace(/ph/g, "f").replace(/w/g, "v").replace(/v/g, "f").replace(/ck|c|q/g, "k").replace(/x/g, "ks").replace(/[yj]/g, "i").replace(/(.)\1+/g, "$1").replace(/ii$/, "i");
+}
+var SYSTEMS = [
+  ["bwv", "bwv"],
+  ["buxwv", "buxwv"],
+  ["swv", "swv"],
+  ["hwv", "hwv"],
+  ["fp", "fp"],
+  ["jb", "jb"],
+  ["cd", "cd"],
+  ["z", "z"],
+  ["twv", "twv"],
+  ["wwv", "wwv"],
+  ["rv", "rv"],
+  ["hob", "hob"],
+  ["wab", "wab"],
+  ["woo", "woo"],
+  ["kv", "k"],
+  ["k", "k"],
+  ["d", "d"],
+  ["s", "s"],
+  ["sz", "sz"],
+  ["bb", "bb"],
+  ["trv", "trv"],
+  ["fs", "fs"],
+  ["l", "l"],
+  ["kk", "kk"],
+  ["jw", "jw"],
+  ["op", "op"],
+  ["opus", "op"],
+  ["opp", "op"]
+];
+var PREFIX = SYSTEMS.map(([written]) => written).sort((a, b) => b.length - a.length).join("|");
+var ROMAN = "(?:x{0,3})(?:ix|iv|v?i{0,3})";
+var HOBOKEN = new RegExp(`\\bhob\\.?\\s*(${ROMAN}[a-z]?)\\s*[:/.\\s]\\s*(\\d+[a-z]?)`, "giu");
+var NUMBERED = new RegExp(
+  `(?<![\\p{L}\\p{N}])(${PREFIX})\\.?\\s*(\\d+[a-z]?)(?:\\s*(?:,\\s*|\\/|\\s+)(?:(?:no|nr|n\xB0|num|number|#)\\.?\\s*)?(\\d+[a-z]?)(?![\\p{L}\\p{N}]))?`,
+  "giu"
+);
+var SYSTEM = new Map(SYSTEMS);
+var SUBNUMBERED = /* @__PURE__ */ new Set(["op", "hob", "woo", "s", "d", "k"]);
+var NO_BEFORE = /(?:no|nr|n°|num|number|#)\.?\s*$|\/\s*$/i;
+function catalogueKeys(text5) {
+  const source = String(text5 ?? "").normalize("NFC");
+  const found = [];
+  for (const match2 of source.matchAll(HOBOKEN)) {
+    if (!match2[1]) continue;
+    found.push({ key: `hob:${match2[1].toLowerCase()}:${match2[2].toLowerCase()}`, system: "hob", start: match2.index, end: match2.index + match2[0].length });
+  }
+  for (const match2 of source.matchAll(NUMBERED)) {
+    const written = match2[1].toLowerCase();
+    if (written === "hob") continue;
+    const system = SYSTEM.get(written);
+    if (written.length === 1 && !/^[a-z]\.\s*\d|^[a-z]\s*\d{2}/i.test(match2[0])) continue;
+    if (found.some((item) => match2.index < item.end && match2.index + match2[0].length > item.start)) continue;
+    let sub = match2[3]?.toLowerCase() || "";
+    if (sub && !SUBNUMBERED.has(system)) {
+      const between = match2[0].slice(match2[0].indexOf(match2[2]) + match2[2].length, match2[0].lastIndexOf(match2[3]));
+      if (!NO_BEFORE.test(between)) sub = "";
+    }
+    const end = sub ? match2.index + match2[0].length : match2.index + match2[0].indexOf(match2[2]) + match2[2].length;
+    found.push({ key: [system, match2[2].toLowerCase(), sub].filter(Boolean).join(":"), system, start: match2.index, end });
+  }
+  return found.sort((a, b) => a.start - b.start);
+}
+var keyMatches = (query, key) => key === query || key.startsWith(`${query}:`);
+var STOP = /* @__PURE__ */ new Set(["no", "nr", "num", "number", "in", "the", "a", "an", "of", "and", "de", "la", "le", "der", "die", "das", "von", "van", "op", "opus"]);
+function parseQuery(text5) {
+  let rest = String(text5 ?? "");
+  const keys = catalogueKeys(rest);
+  for (const item of [...keys].reverse()) rest = `${rest.slice(0, item.start)} ${rest.slice(item.end)}`;
+  const all = words(rest);
+  return {
+    keys: [...new Set(keys.map((item) => item.key))],
+    words: [...new Set(all.filter((word) => !STOP.has(word)))],
+    optional: [...new Set(all.filter((word) => STOP.has(word)))]
+  };
+}
+
+// src/search/engine.js
+var FIELD = { primary: 0, secondary: 1, skeleton: 2 };
+var KIND_BOOST = { work: 12, recording: 6, composer: 7, performer: 5, release: 3, movement: 1 };
+var SECTIONS = [
+  ["work", "Works"],
+  ["recording", "Recordings"],
+  ["composer", "Composers"],
+  ["performer", "Performers"],
+  ["release", "Albums"],
+  ["movement", "Movements"]
+];
+var FACETS = [
+  ["composer", "Composer"],
+  ["performer", "Performer"],
+  ["conductor", "Conductor"],
+  ["ensemble", "Ensemble"],
+  ["period", "Period"],
+  ["form", "Form"],
+  ["instrument", "Instrument"],
+  ["type", "Recording type"],
+  ["year", "Year"],
+  ["owned", "Library"]
+];
+var FACET_KEYS = new Set(FACETS.map(([key]) => key));
+var PERFORMER_ROLES = /* @__PURE__ */ new Set(["soloist", "performer", "conductor", "orchestra", "ensemble", "choir"]);
+var ENSEMBLE_ROLES2 = /* @__PURE__ */ new Set(["orchestra", "ensemble", "choir"]);
+var ROLE_LABEL = { soloist: "Soloist", performer: "Performer", conductor: "Conductor", orchestra: "Orchestra", ensemble: "Ensemble", choir: "Choir", composer: "Composer", arranger: "Arranger", lyricist: "Lyricist" };
+var LIVE = /\b(live|concert|recital|broadcast|in concert|konzert)\b/i;
+var text = (value) => typeof value === "string" ? value.trim() : Array.isArray(value) ? value.filter((v) => typeof v === "string").join("; ") : "";
+var list = (value) => Array.isArray(value) ? value.filter((v) => typeof v === "string" && v.trim()).map((v) => v.trim()) : typeof value === "string" && value.trim() ? [value.trim()] : [];
+var parse2 = (value, fallback) => {
+  try {
+    return JSON.parse(value);
+  } catch {
+    return fallback;
+  }
+};
+function catalogueStamp(c) {
+  const row = c.db.prepare(
+    `SELECT (SELECT coalesce(max(id),0) FROM audit_event) AS a,
+        (SELECT coalesce(max(rowid),0) FROM assertion) AS b,
+        (SELECT count(*) FROM entity WHERE deleted_at IS NULL) AS c,
+        (SELECT coalesce(max(updated_at),0) FROM entity) AS d,
+        (SELECT count(*)||':'||coalesce(max(rowid),0) FROM realization_item) AS e,
+        (SELECT coalesce(max(updated_at),0)||':'||count(*) FROM classification WHERE state='classical') AS f,
+        (SELECT coalesce(max(updated_at),0)||':'||count(*) FROM track_link WHERE state='active') AS g,
+        (SELECT count(*)||':'||coalesce(max(rowid),0) FROM credit) AS h,
+        (SELECT count(*)||':'||coalesce(max(rowid),0) FROM relation) AS i`
+  ).get();
+  return `v2|${Object.values(row).join("|")}`;
+}
+function resolvedValues(c) {
+  const values = /* @__PURE__ */ new Map();
+  for (const row of c.db.prepare(
+    `SELECT f.target_id,f.field,a.value FROM field_resolution f JOIN assertion a ON a.id=f.assertion_id
+       WHERE f.field IN ('title','name','nickname','aliases','catalogue','key','form','period','instrumentation','date')`
+  ).iterate()) {
+    if (!values.has(row.target_id)) values.set(row.target_id, {});
+    values.get(row.target_id)[row.field] = parse2(row.value, null);
+  }
+  return values;
+}
+function classicalTracks(c) {
+  const tracks = /* @__PURE__ */ new Map();
+  for (const row of c.db.prepare(
+    `SELECT t.id,t.core_id,t.evidence FROM track_link t JOIN classification k ON k.target_id=t.id
+       WHERE t.state='active' AND k.state='classical'`
+  ).iterate()) {
+    const evidence2 = parse2(row.evidence, {});
+    tracks.set(row.id, { id: row.id, coreId: String(row.core_id), albumId: evidence2.albumId == null ? null : String(evidence2.albumId), durationMs: Number(evidence2.durationMs) || 0, hints: evidence2.hints || {} });
+  }
+  return tracks;
+}
+var yearOf = (value) => {
+  const match2 = String(value || "").match(/\b(1[5-9]\d\d|20\d\d)\b/);
+  return match2 ? Number(match2[1]) : null;
+};
+function ownedRecordings(c, tracks = classicalTracks(c), values = resolvedValues(c), { workId = null } = {}) {
+  const rows = c.db.prepare(
+    `SELECT r.id AS realization,r.work_id,r.performance_work_id,r.label,i.movement_id,i.sequence,s.track_link_id,s.start_ms,s.end_ms
+       FROM realization r JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
+       JOIN entity w ON w.id=r.work_id AND w.deleted_at IS NULL
+       ${workId ? "WHERE r.work_id=?" : ""}
+       ORDER BY r.id,i.sequence,i.occurrence,i.id`
+  ).all(...workId ? [workId] : []);
+  const credits3 = c.db.prepare(
+    `SELECT k.role,k.contributor_id FROM relation pw JOIN credit k ON k.target_id=pw.source_id
+     JOIN entity e ON e.id=k.contributor_id AND e.deleted_at IS NULL WHERE pw.id=? ORDER BY k.position,k.id`
+  );
+  const byRealization = /* @__PURE__ */ new Map();
+  for (const row of rows) {
+    const track = tracks.get(row.track_link_id);
+    if (!track) continue;
+    if (!byRealization.has(row.realization)) byRealization.set(row.realization, { id: row.realization, workId: row.work_id, performanceWorkId: row.performance_work_id, label: row.label, items: [] });
+    byRealization.get(row.realization).items.push({ movementId: row.movement_id, sequence: row.sequence, track, startMs: row.start_ms, endMs: row.end_ms });
+  }
+  const recordings = [];
+  for (const recording of byRealization.values()) {
+    const first = recording.items[0].track;
+    const people = credits3.all(recording.performanceWorkId).map((row) => ({ id: row.contributor_id, role: row.role, name: text(values.get(row.contributor_id)?.name) || "Unknown" }));
+    const performers = people.filter((p) => PERFORMER_ROLES.has(p.role));
+    const tagged = performers.length ? [] : text(first.hints.artist || first.hints.albumArtist).split(/\s+[—–]\s+|\s*;\s*/).map((name) => name.trim()).filter((name) => name && !list(first.hints.composer).some((composer) => fold(composer) === fold(name)));
+    const albums2 = [...new Set(recording.items.map((item) => item.track.albumId).filter(Boolean))];
+    const mbids = [...new Set(recording.items.map((item) => item.track.hints.recordingMbid).filter(Boolean))].sort();
+    const parts = /* @__PURE__ */ new Map();
+    for (const item of recording.items) {
+      const ms = item.endMs != null ? item.endMs - item.startMs : Math.max(0, item.track.durationMs - (item.startMs || 0));
+      const key = item.movementId || `seq:${item.sequence}`;
+      parts.set(key, (parts.get(key) || 0) + ms);
+    }
+    recordings.push({
+      ...recording,
+      people: performers,
+      taggedPerformers: tagged,
+      performerNames: performers.length ? performers.map((p) => p.name) : tagged,
+      albums: albums2,
+      album: text(recording.label) || text(first.hints.album),
+      label: text(first.hints.label),
+      year: yearOf(first.hints.date) ?? yearOf(first.hints.year),
+      mbids,
+      parts,
+      durationMs: [...parts.values()].reduce((sum, ms) => sum + ms, 0),
+      live: LIVE.test(`${first.hints.album || ""} ${recording.label || ""}`)
+    });
+  }
+  return recordings;
+}
+function sameRecording(a, b) {
+  if (a.workId !== b.workId || a.id === b.id) return false;
+  if (a.albums.some((album) => b.albums.includes(album))) return false;
+  if (a.mbids.length && b.mbids.length) return a.mbids.length === b.mbids.length && a.mbids.every((id, i) => id === b.mbids[i]);
+  const names = (r) => r.performerNames.map(fold).filter(Boolean).sort().join("|");
+  if (!names(a) || names(a) !== names(b)) return false;
+  if (a.parts.size !== b.parts.size || a.parts.size === 0) return false;
+  for (const [key, ms] of a.parts) {
+    const other = b.parts.get(key);
+    if (other == null || Math.abs(other - ms) > 2e3) return false;
+  }
+  return true;
+}
+function groupRecordings(recordings) {
+  const groups = [];
+  for (const recording of recordings) {
+    const group = groups.find((g) => g.realizations.some((other) => sameRecording(recording, other)));
+    if (group) group.realizations.push(recording);
+    else groups.push({ key: recording.id, realizations: [recording] });
+  }
+  return groups;
+}
+function addTerms(terms, doc, value, field2) {
+  for (const word of words(value)) {
+    terms.add(`${word}\0${doc}\0${field2}`);
+    const skel = field2 === FIELD.primary ? skeleton(word) : "";
+    if (skel) terms.add(`${skel}\0${doc}\0${FIELD.skeleton}`);
+  }
+}
+function ensureSearchIndex(c, { force = false } = {}) {
+  const started = performance.now();
+  const stamp = catalogueStamp(c);
+  const state = c.db.prepare("SELECT stamp,docs FROM search_state WHERE id=1").get();
+  if (!force && state?.stamp === stamp) return { rebuilt: false, docs: state.docs, ms: performance.now() - started };
+  const docs = buildDocuments(c);
+  transaction(c.db, () => {
+    for (const table of ["search_term", "search_key", "search_facet", "search_doc"]) c.db.exec(`DELETE FROM ${table}`);
+    const insertDoc = c.db.prepare("INSERT INTO search_doc(id,kind,ref,work_id,title,subtitle,detail,owned,boost,data) VALUES (?,?,?,?,?,?,?,?,?,?)");
+    const insertTerm = c.db.prepare("INSERT OR IGNORE INTO search_term VALUES (?,?,?)");
+    const insertKey = c.db.prepare("INSERT OR IGNORE INTO search_key VALUES (?,?)");
+    const insertFacet = c.db.prepare("INSERT OR IGNORE INTO search_facet VALUES (?,?,?,?)");
+    docs.forEach((doc, index) => {
+      const id = index + 1;
+      insertDoc.run(id, doc.kind, doc.ref, doc.workId ?? null, doc.title.slice(0, 500), doc.subtitle.slice(0, 500), doc.detail.slice(0, 500), doc.owned ? 1 : 0, doc.boost || 0, JSON.stringify(doc.data || {}));
+      const terms = /* @__PURE__ */ new Set();
+      for (const value of doc.primary) addTerms(terms, id, value, FIELD.primary);
+      for (const value of doc.secondary) addTerms(terms, id, value, FIELD.secondary);
+      for (const entry of terms) {
+        const [term, , field2] = entry.split("\0");
+        insertTerm.run(term, id, Number(field2));
+      }
+      for (const key of doc.keys) insertKey.run(key, id);
+      for (const [facet, value, label] of doc.facets) insertFacet.run(facet, String(value).slice(0, 200), id, String(label).slice(0, 200));
+    });
+    c.db.prepare("INSERT INTO search_state VALUES (1,?,?,?) ON CONFLICT(id) DO UPDATE SET stamp=excluded.stamp,built_at=excluded.built_at,docs=excluded.docs").run(stamp, Date.now(), docs.length);
+  });
+  return { rebuilt: true, docs: docs.length, ms: performance.now() - started };
+}
+var keysOf = (...sources) => [...new Set(sources.flat().flatMap((value) => catalogueKeys(value).map((item) => item.key)))];
+function buildDocuments(c) {
+  const values = resolvedValues(c);
+  const tracks = classicalTracks(c);
+  const name = (id) => text(values.get(id)?.name) || text(values.get(id)?.title) || "";
+  const entities2 = c.db.prepare("SELECT id,kind FROM entity WHERE deleted_at IS NULL AND kind IN ('work','movement','person','ensemble','collection')").all();
+  const kindOf = new Map(entities2.map((e) => [e.id, e.kind]));
+  const creditsOf = /* @__PURE__ */ new Map();
+  for (const row of c.db.prepare("SELECT target_id,contributor_id,role FROM credit ORDER BY position,id").iterate()) {
+    if (!kindOf.has(row.contributor_id)) continue;
+    if (!creditsOf.has(row.target_id)) creditsOf.set(row.target_id, []);
+    creditsOf.get(row.target_id).push({ id: row.contributor_id, role: row.role });
+  }
+  const movementsOf = /* @__PURE__ */ new Map();
+  const workOfMovement = /* @__PURE__ */ new Map();
+  for (const row of c.db.prepare("SELECT source_id,target_id FROM relation WHERE kind='movement' ORDER BY position,occurrence,id").iterate()) {
+    if (kindOf.get(row.source_id) !== "work" || !kindOf.has(row.target_id)) continue;
+    if (!movementsOf.has(row.source_id)) movementsOf.set(row.source_id, []);
+    movementsOf.get(row.source_id).push(row.target_id);
+    workOfMovement.set(row.target_id, row.source_id);
+  }
+  const collectionsOf = /* @__PURE__ */ new Map();
+  for (const row of c.db.prepare("SELECT source_id,target_id FROM relation WHERE kind='collection_member'").iterate()) {
+    if (!collectionsOf.has(row.target_id)) collectionsOf.set(row.target_id, []);
+    collectionsOf.get(row.target_id).push(row.source_id);
+  }
+  const recordings = ownedRecordings(c, tracks, values);
+  const groups = groupRecordings(recordings);
+  const recordingsOf = /* @__PURE__ */ new Map();
+  for (const group of groups) {
+    const workId = group.realizations[0].workId;
+    if (!recordingsOf.has(workId)) recordingsOf.set(workId, []);
+    recordingsOf.get(workId).push(group);
+  }
+  const composersOf2 = (workId) => (creditsOf.get(workId) || []).filter((k) => k.role === "composer");
+  const workTitle = (workId) => text(values.get(workId)?.title) || "Untitled work";
+  const docs = [];
+  const workFacets = /* @__PURE__ */ new Map();
+  const workKeys = /* @__PURE__ */ new Map();
+  for (const { id } of entities2.filter((e) => e.kind === "work")) {
+    const v = values.get(id) || {};
+    const title = workTitle(id);
+    const composers = composersOf2(id);
+    const facets = [];
+    for (const k of composers) facets.push(["composer", k.id, name(k.id)]);
+    if (text(v.period)) facets.push(["period", fold(v.period), text(v.period)]);
+    if (text(v.form)) facets.push(["form", fold(v.form), text(v.form)]);
+    for (const instrument of list(v.instrumentation)) facets.push(["instrument", fold(instrument), instrument]);
+    workFacets.set(id, facets);
+    const groupsHere = recordingsOf.get(id) || [];
+    const recordingFacets = groupsHere.flatMap((group) => recordingGroupFacets(group, name));
+    const owned = groupsHere.length > 0;
+    docs.push({
+      kind: "work",
+      ref: id,
+      workId: id,
+      title,
+      subtitle: composers.map((k) => name(k.id)).filter(Boolean).join(", "),
+      detail: [text(v.nickname) && `\u201C${text(v.nickname)}\u201D`, owned ? `${groupsHere.length} recording${groupsHere.length === 1 ? "" : "s"}` : "Not in your library"].filter(Boolean).join(" \xB7 "),
+      owned,
+      boost: KIND_BOOST.work,
+      primary: [title, text(v.nickname), ...list(v.aliases), ...list(v.catalogue)],
+      secondary: [...composers.map((k) => name(k.id)), ...composers.flatMap((k) => list(values.get(k.id)?.aliases)), text(v.key), text(v.form), ...(collectionsOf.get(id) || []).map(name)],
+      keys: workKeys.set(id, keysOf(title, list(v.catalogue), list(v.aliases), text(v.nickname))).get(id),
+      facets: [...facets, ...dedupeFacets(recordingFacets.filter(([facet]) => facet !== "year" && facet !== "type")), ["owned", owned ? "owned" : "missing", owned ? "In your library" : "Not in your library"]],
+      data: { nickname: text(v.nickname) }
+    });
+  }
+  for (const [workId, movements] of movementsOf) {
+    const title = workTitle(workId);
+    const composers = composersOf2(workId).map((k) => name(k.id));
+    const owned = (recordingsOf.get(workId) || []).length > 0;
+    movements.forEach((movement, index) => {
+      const v = values.get(movement) || {};
+      const movementTitle2 = text(v.title) || `Movement ${index + 1}`;
+      docs.push({
+        kind: "movement",
+        ref: movement,
+        workId,
+        title: movementTitle2,
+        subtitle: [title, composers.join(", ")].filter(Boolean).join(" \xB7 "),
+        detail: "",
+        owned,
+        boost: KIND_BOOST.movement,
+        primary: [movementTitle2, ...list(v.aliases)],
+        secondary: [title, text(values.get(workId)?.nickname), ...composers],
+        keys: keysOf(title),
+        facets: [...workFacets.get(workId) || [], ["owned", owned ? "owned" : "missing", owned ? "In your library" : "Not in your library"]],
+        data: { position: index + 1 }
+      });
+    });
+  }
+  for (const group of groups) {
+    const lead = group.realizations[0];
+    const work = values.get(lead.workId) || {};
+    const title = workTitle(lead.workId);
+    const composers = composersOf2(lead.workId).map((k) => name(k.id));
+    const albums3 = [...new Set(group.realizations.map((r) => r.album).filter(Boolean))];
+    const years = group.realizations.map((r) => r.year).filter(Boolean);
+    const complete = (movementsOf.get(lead.workId) || []).every((m) => group.realizations.some((r) => r.parts.has(m)));
+    docs.push({
+      kind: "recording",
+      ref: group.key,
+      workId: lead.workId,
+      title: lead.performerNames.join(", ") || albums3[0] || "Recording",
+      subtitle: [title, composers.join(", ")].filter(Boolean).join(" \xB7 "),
+      detail: [albums3.join(" / "), years.length ? Math.min(...years) : null, group.realizations.length > 1 ? `${group.realizations.length} releases` : null].filter(Boolean).join(" \xB7 "),
+      owned: true,
+      boost: KIND_BOOST.recording,
+      primary: [...lead.performerNames, ...lead.people.flatMap((p) => list(values.get(p.id)?.aliases))],
+      secondary: [title, text(work.nickname), ...list(work.aliases), ...composers, ...albums3],
+      keys: keysOf(title, list(work.catalogue), list(work.aliases)),
+      facets: [...workFacets.get(lead.workId) || [], ...recordingGroupFacets(group, name), ["type", complete ? "complete" : "partial", complete ? "Complete work" : "Excerpt or incomplete"], ["owned", "owned", "In your library"]],
+      data: {
+        realizations: group.realizations.map((r) => r.id),
+        albums: [...new Set(group.realizations.flatMap((r) => r.albums))],
+        roles: Object.fromEntries(lead.people.map((p) => [p.id, p.role]))
+      }
+    });
+  }
+  const roles2 = /* @__PURE__ */ new Map();
+  for (const [target, list_] of creditsOf)
+    for (const k of list_) {
+      if (!roles2.has(k.id)) roles2.set(k.id, { roles: /* @__PURE__ */ new Set(), works: 0, recordings: 0 });
+      const entry = roles2.get(k.id);
+      entry.roles.add(k.role);
+      if (kindOf.get(target) === "work") entry.works++;
+      else entry.recordings++;
+    }
+  for (const [id, entry] of roles2) {
+    const v = values.get(id) || {};
+    const display2 = name(id);
+    if (!display2) continue;
+    const isComposer2 = entry.roles.has("composer");
+    const performerRoles = [...entry.roles].filter((role) => PERFORMER_ROLES.has(role));
+    const facets = [];
+    if (isComposer2) facets.push(["composer", id, display2]);
+    for (const role of performerRoles) {
+      facets.push(["performer", id, display2]);
+      if (role === "conductor") facets.push(["conductor", id, display2]);
+      if (ENSEMBLE_ROLES2.has(role)) facets.push(["ensemble", id, display2]);
+    }
+    const common = { ref: id, title: display2, owned: true, primary: [display2, ...list(v.aliases)], secondary: [], keys: [], facets: dedupeFacets(facets) };
+    const label = [...entry.roles].map((role) => ROLE_LABEL[role] || role).join(" \xB7 ");
+    if (isComposer2) docs.push({ ...common, kind: "composer", subtitle: "Composer", detail: `${entry.works} work${entry.works === 1 ? "" : "s"}`, boost: KIND_BOOST.composer, data: { roles: [...entry.roles] } });
+    if (performerRoles.length) docs.push({ ...common, kind: "performer", subtitle: label, detail: "", boost: KIND_BOOST.performer, data: { roles: performerRoles } });
+  }
+  const albums2 = /* @__PURE__ */ new Map();
+  for (const track of tracks.values()) {
+    if (!track.albumId) continue;
+    if (!albums2.has(track.albumId)) albums2.set(track.albumId, { title: text(track.hints.album) || "Unknown album", artist: text(track.hints.albumArtist || track.hints.artist), year: yearOf(track.hints.date) ?? yearOf(track.hints.year), tracks: 0, works: /* @__PURE__ */ new Set() });
+    albums2.get(track.albumId).tracks++;
+  }
+  for (const recording of recordings) for (const album of recording.albums) albums2.get(album)?.works.add(recording.workId);
+  for (const [albumId, album] of albums2) {
+    const works = [...album.works];
+    docs.push({
+      kind: "release",
+      ref: albumId,
+      title: album.title,
+      subtitle: album.artist,
+      detail: [album.year, `${album.tracks} track${album.tracks === 1 ? "" : "s"}`].filter(Boolean).join(" \xB7 "),
+      owned: true,
+      boost: KIND_BOOST.release,
+      primary: [album.title],
+      secondary: [album.artist, ...works.map(workTitle)],
+      keys: [.../* @__PURE__ */ new Set([...keysOf(album.title), ...works.flatMap((w) => workKeys.get(w) || [])])],
+      facets: dedupeFacets([...works.flatMap((w) => workFacets.get(w) || []), ...album.year ? [["year", String(album.year), String(album.year)]] : [], ["owned", "owned", "In your library"]]),
+      data: { works }
+    });
+  }
+  return docs;
+}
+function recordingGroupFacets(group, name) {
+  const facets = [];
+  for (const recording of group.realizations) {
+    for (const person of recording.people) {
+      facets.push(["performer", person.id, person.name || name(person.id)]);
+      if (person.role === "conductor") facets.push(["conductor", person.id, person.name]);
+      if (ENSEMBLE_ROLES2.has(person.role)) facets.push(["ensemble", person.id, person.name]);
+    }
+    for (const performer of recording.taggedPerformers) facets.push(["performer", `name:${fold(performer)}`, performer]);
+    if (recording.year) facets.push(["year", String(recording.year), String(recording.year)]);
+    if (recording.live) facets.push(["type", "live", "Live"]);
+  }
+  return dedupeFacets(facets);
+}
+function dedupeFacets(facets) {
+  const seen = /* @__PURE__ */ new Set();
+  return facets.filter(([facet, value]) => !seen.has(`${facet}\0${value}`) && seen.add(`${facet}\0${value}`));
+}
+var PREFIX_END = "\u{10FFFF}";
+function wordMatches(c, word) {
+  const out = /* @__PURE__ */ new Map();
+  const better = (doc, weight) => out.set(doc, Math.max(out.get(doc) || 0, weight));
+  const rows = word.length >= 2 ? c.db.prepare("SELECT term,doc,field FROM search_term WHERE term>=? AND term<? AND field<2").all(word, word + PREFIX_END) : c.db.prepare("SELECT term,doc,field FROM search_term WHERE term=? AND field<2").all(word);
+  for (const row of rows) {
+    const exact = row.term === word;
+    better(row.doc, row.field === FIELD.primary ? exact ? 10 : 6 : exact ? 4 : 2.5);
+  }
+  const skel = skeleton(word);
+  if (skel) for (const row of c.db.prepare("SELECT doc FROM search_term WHERE term=? AND field=2").all(skel)) better(row.doc, 5);
+  return out;
+}
+function keyMatchesDocs(c, key) {
+  const out = /* @__PURE__ */ new Map();
+  for (const row of c.db.prepare("SELECT key,doc FROM search_key WHERE key>=? AND key<?").all(key, key + PREFIX_END)) {
+    if (!keyMatches(key, row.key)) continue;
+    out.set(row.doc, Math.max(out.get(row.doc) || 0, row.key === key ? 40 : 18));
+  }
+  return out;
+}
+var intersect = (a, b) => {
+  const out = /* @__PURE__ */ new Map();
+  for (const [doc, weight] of a) if (b.has(doc)) out.set(doc, weight + b.get(doc));
+  return out;
+};
+function normalizeFilters(raw) {
+  const filters = {};
+  for (const [key, value] of Object.entries(raw || {})) {
+    if (!FACET_KEYS.has(key)) continue;
+    const values = [].concat(value).filter((v) => typeof v === "string" && v && v.length <= 200).slice(0, 10);
+    if (values.length) filters[key] = values;
+  }
+  return filters;
+}
+function searchCatalogue(c, { q = "", filters = {}, kinds: kinds2 = null, limit = 8, offset = 0 } = {}) {
+  const started = performance.now();
+  const index = ensureSearchIndex(c);
+  const query = parseQuery(String(q).slice(0, 200));
+  const wanted = normalizeFilters(filters);
+  let scores = null;
+  for (const key of query.keys) scores = scores ? intersect(scores, keyMatchesDocs(c, key)) : keyMatchesDocs(c, key);
+  for (const word of query.words) {
+    if (scores && !scores.size) break;
+    const found = wordMatches(c, word);
+    scores = scores ? intersect(scores, found) : found;
+  }
+  if (scores) {
+    for (const word of query.optional) for (const [doc, weight] of wordMatches(c, word)) if (scores.has(doc)) scores.set(doc, scores.get(doc) + weight * 0.1);
+  }
+  if (!scores) {
+    if (!Object.keys(wanted).length) return emptyResult(q, index, started);
+    scores = new Map(c.db.prepare("SELECT id FROM search_doc").all().map((row) => [row.id, 0]));
+  }
+  for (const [facet, values] of Object.entries(wanted)) {
+    const allowed = new Set(
+      c.db.prepare(`SELECT doc FROM search_facet WHERE facet=? AND value IN (${values.map(() => "?").join(",")})`).all(facet, ...values).map((row) => row.doc)
+    );
+    for (const doc of [...scores.keys()]) if (!allowed.has(doc)) scores.delete(doc);
+  }
+  const ids = [...scores.keys()];
+  const docs = /* @__PURE__ */ new Map();
+  for (let i = 0; i < ids.length; i += 500) {
+    const chunk = ids.slice(i, i + 500);
+    for (const row of c.db.prepare(`SELECT * FROM search_doc WHERE id IN (${chunk.map(() => "?").join(",")})`).all(...chunk)) docs.set(row.id, row);
+  }
+  const folded = fold(q);
+  const ranked = [];
+  for (const [id, weight] of scores) {
+    const doc = docs.get(id);
+    if (!doc || kinds2 && !kinds2.includes(doc.kind)) continue;
+    const data = parse2(doc.data, {});
+    const exact = folded && (fold(doc.title) === folded || fold(data.nickname) === folded) ? 25 : 0;
+    ranked.push({ doc, data, score: weight + doc.boost + exact + (doc.owned ? 2 : 0) });
+  }
+  const workDocs = new Map(ranked.filter((r) => r.doc.kind === "work").map((r) => [r.doc.ref, r]));
+  const viaRecording = /* @__PURE__ */ new Map();
+  for (const r of ranked) {
+    if (r.doc.kind !== "recording" || workDocs.has(r.doc.work_id)) continue;
+    const best = viaRecording.get(r.doc.work_id);
+    if (!best || best.score < r.score) viaRecording.set(r.doc.work_id, r);
+  }
+  if (viaRecording.size && (!kinds2 || kinds2.includes("work"))) {
+    const ids2 = [...viaRecording.keys()];
+    for (let i = 0; i < ids2.length; i += 500) {
+      const chunk = ids2.slice(i, i + 500);
+      for (const doc of c.db.prepare(`SELECT * FROM search_doc WHERE kind='work' AND ref IN (${chunk.map(() => "?").join(",")})`).all(...chunk))
+        ranked.push({ doc, data: parse2(doc.data, {}), score: viaRecording.get(doc.ref).score - KIND_BOOST.recording + KIND_BOOST.work - 4, via: "recording" });
+    }
+  }
+  ranked.sort((a, b) => b.score - a.score || a.doc.title.localeCompare(b.doc.title) || a.doc.id - b.doc.id);
+  const sections = [];
+  for (const [kind, title] of SECTIONS) {
+    const all = ranked.filter((r) => r.doc.kind === kind);
+    if (!all.length) continue;
+    sections.push({ id: kind, title, total: all.length, items: all.slice(offset, offset + limit).map(resultItem) });
+  }
+  const facets = facetCounts(c, ranked.map((r) => r.doc.id), wanted);
+  return {
+    version: 1,
+    query: String(q),
+    filters: wanted,
+    keys: query.keys,
+    total: ranked.length,
+    // The best match leads, whatever its kind: works rank first among equals.
+    best: ranked[0] ? resultItem(ranked[0]) : null,
+    sections,
+    facets,
+    index: { docs: index.docs, rebuilt: index.rebuilt, buildMs: Math.round(index.ms) },
+    ms: Math.round(performance.now() - started)
+  };
+}
+function emptyResult(q, index, started) {
+  return { version: 1, query: String(q), filters: {}, keys: [], total: 0, best: null, sections: [], facets: [], index: { docs: index.docs, rebuilt: index.rebuilt, buildMs: Math.round(index.ms) }, ms: Math.round(performance.now() - started) };
+}
+function resultItem({ doc, data, via }) {
+  return {
+    id: `${doc.kind}:${doc.ref}`,
+    kind: doc.kind,
+    ref: doc.ref,
+    workId: doc.work_id || null,
+    title: doc.title,
+    subtitle: doc.subtitle,
+    detail: via === "recording" ? [doc.detail, "Matched through a recording"].filter(Boolean).join(" \xB7 ") : doc.detail,
+    owned: doc.owned === 1,
+    ...doc.kind === "recording" && { realizations: data.realizations || [], albums: data.albums || [] },
+    ...doc.kind === "release" && { albumId: doc.ref }
+  };
+}
+function facetCounts(c, docIds, wanted) {
+  if (!docIds.length) return [];
+  const counts = /* @__PURE__ */ new Map();
+  for (let i = 0; i < docIds.length; i += 500) {
+    const chunk = docIds.slice(i, i + 500);
+    for (const row of c.db.prepare(`SELECT facet,value,label,count(*) AS n FROM search_facet WHERE doc IN (${chunk.map(() => "?").join(",")}) GROUP BY facet,value`).all(...chunk)) {
+      const key = `${row.facet}\0${row.value}`;
+      const prior = counts.get(key);
+      counts.set(key, { facet: row.facet, value: row.value, label: row.label, count: (prior?.count || 0) + row.n });
+    }
+  }
+  return FACETS.map(([key, label]) => ({
+    key,
+    label,
+    selected: wanted[key] || [],
+    options: [...counts.values()].filter((entry) => entry.facet === key).sort((a, b) => key === "year" ? Number(b.value) - Number(a.value) : b.count - a.count || a.label.localeCompare(b.label)).slice(0, 50).map(({ value, label: optionLabel, count }) => ({ value, label: optionLabel, count }))
+  })).filter((facet) => facet.options.length || facet.selected.length);
+}
+
 // src/model/auto-match.js
 import { createHash as createHash2 } from "node:crypto";
 
@@ -37300,10 +37981,10 @@ var CATALOGUES = [
 var OPUS = /\bop(?:us|\.)?\s*(\d+[a-z]?)(?:\s*,?\s*(?:no\.?|nr\.?|n°)\s*(\d+))?/i;
 var PIECE = /^\s*,?\s*(?:no\.?|nr\.?|n°)\s*(\d+[a-z]{0,3})(?![a-z\d])/i;
 function catalogueMatch(title) {
-  const text4 = String(title || "");
+  const text5 = String(title || "");
   for (const [pattern, prefix] of CATALOGUES) {
-    const match2 = text4.match(pattern);
-    if (match2) return { prefix, number: match2[1].replace(/\s+/g, ""), end: match2.index + match2[0].length, text: text4 };
+    const match2 = text5.match(pattern);
+    if (match2) return { prefix, number: match2[1].replace(/\s+/g, ""), end: match2.index + match2[0].length, text: text5 };
   }
   return null;
 }
@@ -37319,14 +38000,14 @@ function cataloguePiece(title) {
   return match2 ? match2.text.slice(match2.end).match(PIECE)?.[1]?.toLowerCase() || "" : "";
 }
 function shortWorkTitle(title) {
-  let text4 = String(title || "").split(":")[0];
-  text4 = text4.replace(OPUS, " ");
-  for (const [pattern] of CATALOGUES) text4 = text4.replace(pattern, " ");
-  text4 = text4.replace(/\bin\s+[A-G](?:[- ]?(?:flat|sharp|♭|♯|b|#))?\s*(?:major|minor|maj|min|dur|moll)\b/gi, " ").replace(/\b(?:no|nr|n°)\.?\s*(?=\d)/gi, " ").replace(/[“”"'’,;()[\]]/g, " ");
-  return searchWords(text4);
+  let text5 = String(title || "").split(":")[0];
+  text5 = text5.replace(OPUS, " ");
+  for (const [pattern] of CATALOGUES) text5 = text5.replace(pattern, " ");
+  text5 = text5.replace(/\bin\s+[A-G](?:[- ]?(?:flat|sharp|♭|♯|b|#))?\s*(?:major|minor|maj|min|dur|moll)\b/gi, " ").replace(/\b(?:no|nr|n°)\.?\s*(?=\d)/gi, " ").replace(/[“”"'’,;()[\]]/g, " ");
+  return searchWords(text5);
 }
-function searchWords(text4) {
-  return String(text4 || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim().split(/\s+/).filter(Boolean).join(" ");
+function searchWords(text5) {
+  return String(text5 || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim().split(/\s+/).filter(Boolean).join(" ");
 }
 function surname(person) {
   if (!person) return "";
@@ -37364,15 +38045,15 @@ var sameCatalogue = (a, b) => {
 var identity = (...values) => createHash2("sha256").update(JSON.stringify(values)).digest("hex");
 var NUMBERED_SET = new RegExp("(?<!\\p{L})(pr[e\xE9]ludes|[e\xE9]tudes|nocturnes|mazurkas|waltzes|valses|impromptus|ballades|polonaises|bagatelles|intermezzi|consolations|po[e\xE8]mes|morceaux|songs without words|lieder ohne worte)(?!\\p{L})", "iu");
 function withoutComposer(title, composers = []) {
-  const text4 = clean3(title);
-  const match2 = text4.match(/^([^:]{2,60}):\s+(\S.*)$/);
-  if (!match2) return text4;
+  const text5 = clean3(title);
+  const match2 = text5.match(/^([^:]{2,60}):\s+(\S.*)$/);
+  if (!match2) return text5;
   const prefix = nameKey(match2[1]);
   const named = (Array.isArray(composers) ? composers : [composers]).some((name) => {
     const full = nameKey(name);
     return Boolean(full) && (prefix === full || prefix === full.split(" ").at(-1));
   });
-  return named ? clean3(match2[2]) : text4;
+  return named ? clean3(match2[2]) : text5;
 }
 function nameKey(name) {
   return normalized(name).replace(/[^\p{L}\p{N}]+/gu, " ").trim().replace(/ts?ch/g, "ch").replace(/ff\b/g, "v").replace(/w/g, "v").replace(/[yj]/g, "i").replace(/kh/g, "h");
@@ -37381,27 +38062,27 @@ var WORK_HEAD = /^(.+?)(?:\s*[:;]\s+|\s+[–—-]\s+|:(?=["“„'‘]))(.+)$/;
 var titleHead = (title) => splitTitle(title).head;
 var COMMA_MOVEMENT = /^(.{4,}?),\s+((?:[IVXLC]+|\d{1,2})\.\s+(?!\d)\S.*)$/;
 function splitTitle(title) {
-  const text4 = clean3(title);
-  const match2 = text4.match(WORK_HEAD);
-  const comma = text4.match(COMMA_MOVEMENT);
+  const text5 = clean3(title);
+  const match2 = text5.match(WORK_HEAD);
+  const comma = text5.match(COMMA_MOVEMENT);
   if (comma && (!match2 || comma[1].length < match2[1].length) && (catalogueNumber(comma[1]) || MULTI_MOVEMENT.test(comma[1])))
     return { head: clean3(comma[1]), tail: clean3(comma[2]) };
-  return match2 ? { head: clean3(match2[1]), tail: clean3(match2[2]) } : { head: "", tail: text4 };
+  return match2 ? { head: clean3(match2[1]), tail: clean3(match2[2]) } : { head: "", tail: text5 };
 }
 function standalonePiece(hints, workTitle, tag = hints.work) {
   const tagged = clean3(tag);
   const title = clean3(hints.title);
   if (!tagged || tagged.includes(":") || isCollectionLike(tagged) || title.includes(":")) return false;
-  const head = words(workTitle);
-  const text4 = words(title);
-  return text4 === head || text4.startsWith(`${head} `) && splitTitle(title).head === "" && !MOVEMENT_PREFIX.test(stripWorkPrefix(title, workTitle));
+  const head = words2(workTitle);
+  const text5 = words2(title);
+  return text5 === head || text5.startsWith(`${head} `) && splitTitle(title).head === "" && !MOVEMENT_PREFIX.test(stripWorkPrefix(title, workTitle));
 }
-var isCatalogueRange = (text4) => /\d+[a-z]?\s*[-–—]\s*\d+/i.test(text4) || [...String(text4).matchAll(/\b(\d+)\s*\/\s*(\d+)\b(?![a-z])/gi)].some(([, a, b]) => Number(b) > Number(a));
-var catalogued = (text4) => Boolean(catalogueNumber(text4)) && !isCatalogueRange(text4);
-var catalogueSet = (text4) => NUMBERED_SET.test(text4) && catalogued(text4);
+var isCatalogueRange = (text5) => /\d+[a-z]?\s*[-–—]\s*\d+/i.test(text5) || [...String(text5).matchAll(/\b(\d+)\s*\/\s*(\d+)\b(?![a-z])/gi)].some(([, a, b]) => Number(b) > Number(a));
+var catalogued = (text5) => Boolean(catalogueNumber(text5)) && !isCatalogueRange(text5);
+var catalogueSet = (text5) => NUMBERED_SET.test(text5) && catalogued(text5);
 var COUNTED_COLLECTION = new RegExp("(?<!\\p{L})(?:\\d+|zwei|drei|vier|f\xFCnf|sechs|sieben|acht|neun|zehn|elf|zw\xF6lf|dreizehn|vierzehn|deux|trois|quatre|cinq|six|sept|huit|neuf|dix|douze|two|three|four|five|six|seven|eight|nine|ten|twelve)\\s+(?:\\p{L}+\\s+)?(?:lieder|songs?|m\xE9lodies|melodies|chants|ges\xE4nge)(?!\\p{L})", "iu");
 var WITH_FUGUE = new RegExp("(?<!\\p{L})(?:fugue|fuga|fuge|fughetta)(?!\\p{L})", "iu");
-var readsAsWork = (text4) => Boolean(text4) && (!isCollectionLike(text4) && (MULTI_MOVEMENT.test(text4) || catalogued(text4)) || catalogueSet(text4) || (COUNTED_COLLECTION.test(text4) || WITH_FUGUE.test(text4)) && catalogued(text4));
+var readsAsWork = (text5) => Boolean(text5) && (!isCollectionLike(text5) && (MULTI_MOVEMENT.test(text5) || catalogued(text5)) || catalogueSet(text5) || (COUNTED_COLLECTION.test(text5) || WITH_FUGUE.test(text5)) && catalogued(text5));
 var BOOK_IN_BRACKETS = /\s*\(([^()]*?(?:book|livre|teil|heft|vol\.?|volume)\s+(?:[ivx]+|\d+))(?:[^()]*)\)/iu;
 function withBook(title) {
   const book = title.match(BOOK_IN_BRACKETS);
@@ -37417,8 +38098,8 @@ function groupingWork(grouping, title) {
   const parent = clean3(clean3(grouping).split(/\s*:\s*/, 1)[0]);
   if (!readsAsWork(parent)) return null;
   if (catalogueNumber(parent) && !isCatalogueRange(parent)) return parent;
-  const named = words(parent);
-  const head = words(titleHead(title) || title);
+  const named = words2(parent);
+  const head = words2(titleHead(title) || title);
   return head === named || head.startsWith(`${named} `) || named.startsWith(`${head} `) ? parent : null;
 }
 var catalogueText = (number) => number.replace(/^([A-Z])\s/, "$1. ");
@@ -37618,7 +38299,7 @@ function mergeCompletions(groups) {
   }
   return [...groups.filter((group) => !merged.has(group)), ...result];
 }
-var recordingTitle = (title) => words(clean3(title).replace(new RegExp("\\s*[([][^()[\\]]*\\p{L}[^()[\\]]*[)\\]]\\s*$", "u"), ""));
+var recordingTitle = (title) => words2(clean3(title).replace(new RegExp("\\s*[([][^()[\\]]*\\p{L}[^()[\\]]*[)\\]]\\s*$", "u"), ""));
 var FIRST_NUMERAL = /(?:^|:\s+)([IVXLC]+)[.)]\s/;
 function numberedRuns(rows) {
   const heads = /* @__PURE__ */ new Set();
@@ -37702,7 +38383,7 @@ function knownComposerNames(catalogue) {
        WHERE c.role='composer' AND e.deleted_at IS NULL`
   ).all()) {
     const name = resolvedName(catalogue, id, "name");
-    if (typeof name === "string" && words(name)) names.add(words(name));
+    if (typeof name === "string" && words2(name)) names.add(words2(name));
   }
   return names;
 }
@@ -37713,13 +38394,13 @@ function existingIdentity(catalogue, recordKind, recordId) {
        AND x.state='active' AND e.deleted_at IS NULL`
   ).get(recordKind, recordId)?.entity_id;
 }
-var words = (value) => normalized(value).replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+var words2 = (value) => normalized(value).replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 var CATALOGUE = /\b(op|opus|bwv|kv|k|d|hob|rv|woo|hwv|sz|twv|bb)\s*((?:[ivxlc]+\s+)?\d+[a-z]?)(?:\s+(?:no|nr|n)\s*(\d+))?\b/;
 var KEY_PHRASE = /\bin\s+[a-h](?:\s*(?:flat|sharp|b|#))?(?:\s+(?:major|minor|dur|moll))?\b/g;
 function catalogueSubject(title) {
   const slashed = String(title || "").match(/\bop(?:us|\.)?\s*(\d+[a-z]?)\s*\/\s*(\d+)\b(?![a-z])/i);
   if (slashed && (Number(slashed[2]) < Number.parseInt(slashed[1], 10) || Number(slashed[2]) <= 12)) return `cat:op:${slashed[1].toLowerCase()}:${slashed[2]}`;
-  const cat = words(title).match(CATALOGUE);
+  const cat = words2(title).match(CATALOGUE);
   if (cat)
     return `cat:${cat[1] === "opus" ? "op" : cat[1] === "kv" ? "k" : cat[1]}:${cat[2].replace(/\s+/g, "")}${cat[3] ? `:${cat[3]}` : ""}`;
   const number = catalogueNumber(title).toLowerCase();
@@ -37727,34 +38408,34 @@ function catalogueSubject(title) {
   return number ? `cat:${number.replace(/\s+/g, ":")}${piece ? `:${piece}` : ""}` : "";
 }
 function legacyCatalogueSubject(title) {
-  if (words(title).match(CATALOGUE)) return catalogueSubject(title);
+  if (words2(title).match(CATALOGUE)) return catalogueSubject(title);
   const [system, number = ""] = catalogueNumber(title).toLowerCase().split(" ");
   return system ? `cat:${system}:${number.match(/^\d+/)?.[0] ?? number}` : "";
 }
 var keyOf = (subjectOf) => (title, composers) => JSON.stringify([
-  [...new Set(composers.map(words))].filter(Boolean).sort(),
-  subjectOf(title) || `title:${words(title).replace(KEY_PHRASE, " ").replace(/\s+/g, " ").trim()}`
+  [...new Set(composers.map(words2))].filter(Boolean).sort(),
+  subjectOf(title) || `title:${words2(title).replace(KEY_PHRASE, " ").replace(/\s+/g, " ").trim()}`
 ]);
 var workKey = keyOf(catalogueSubject);
 var legacyWorkKey = keyOf(legacyCatalogueSubject);
-var ROMAN = { i: 1, v: 5, x: 10, l: 50, c: 100 };
+var ROMAN2 = { i: 1, v: 5, x: 10, l: 50, c: 100 };
 function romanValue(value) {
   let total = 0;
   for (let i = 0; i < value.length; i++) {
-    const n = ROMAN[value[i]], next = ROMAN[value[i + 1]] || 0;
+    const n = ROMAN2[value[i]], next = ROMAN2[value[i + 1]] || 0;
     if (!n) return null;
     total += n < next ? -n : n;
   }
   return total || null;
 }
 function movementParts(title) {
-  const text4 = words(title);
+  const text5 = words2(title);
   const part = clean3(title).match(/^([ivxlc]+|\d+)[a-d][.)]\s+(.*)$/i);
-  const match2 = part ? [part[0], part[1].toLowerCase(), words(part[2])] : text4.match(/^(no\s+)?((?:[ivxlc]+)|\d+)\s+(.*)$/)?.filter((_, i) => i !== 1);
-  if (!match2) return { index: null, text: text4 };
+  const match2 = part ? [part[0], part[1].toLowerCase(), words2(part[2])] : text5.match(/^(no\s+)?((?:[ivxlc]+)|\d+)\s+(.*)$/)?.filter((_, i) => i !== 1);
+  if (!match2) return { index: null, text: text5 };
   const index = /^\d+$/.test(match2[1]) ? Number(match2[1]) : romanValue(match2[1]);
-  const piece = !part && /^no\s/.test(text4);
-  return index ? { index, text: match2[2], ...piece && { piece: true } } : { index: null, text: text4 };
+  const piece = !part && /^no\s/.test(text5);
+  return index ? { index, text: match2[2], ...piece && { piece: true } } : { index: null, text: text5 };
 }
 function movementTitle(track, workTitle) {
   const fromTitle = stripWorkPrefix(clean3(track.title), workTitle);
@@ -37771,38 +38452,38 @@ var NICKNAME = /^["“„«'‘][^"”»'’]+["”»'’]\s*(?:[:;]|\s[–—-]
 function stripWorkPrefix(title, workTitle, depth = 0) {
   const stripped = stripWorkPrefixOnce(title, workTitle);
   const again2 = stripWorkPrefixOnce(withoutRepeatedComposer(stripped, workTitle), workTitle);
-  return depth < 2 && again2 !== stripped && words(stripped).includes(words(workTitle)) ? stripWorkPrefix(again2, workTitle, depth + 1) : stripped;
+  return depth < 2 && again2 !== stripped && words2(stripped).includes(words2(workTitle)) ? stripWorkPrefix(again2, workTitle, depth + 1) : stripped;
 }
-var withoutRepeatedComposer = (text4, workTitle) => {
-  const match2 = clean3(text4).match(/^([^:]{2,60}):\s+(\S.*)$/);
-  return match2 && words(match2[2]).startsWith(words(workTitle)) && words(match2[1]).split(" ").length <= 3 ? match2[2] : text4;
+var withoutRepeatedComposer = (text5, workTitle) => {
+  const match2 = clean3(text5).match(/^([^:]{2,60}):\s+(\S.*)$/);
+  return match2 && words2(match2[2]).startsWith(words2(workTitle)) && words2(match2[1]).split(" ").length <= 3 ? match2[2] : text5;
 };
 function stripWorkPrefixOnce(title, workTitle) {
-  const text4 = clean3(title);
-  const separators = [...text4.matchAll(SEPARATOR)];
-  const tailAt = (match2) => clean3(text4.slice(match2.index + match2[0].length));
+  const text5 = clean3(title);
+  const separators = [...text5.matchAll(SEPARATOR)];
+  const tailAt = (match2) => clean3(text5.slice(match2.index + match2[0].length));
   for (const match2 of separators) {
     const tail = tailAt(match2);
     if (tail && MOVEMENT_PREFIX.test(tail)) return tail;
   }
-  const workWords = words(workTitle);
+  const workWords = words2(workTitle);
   const workCatalogue = catalogueNumber(workTitle).toLowerCase();
-  const comma = splitTitle(text4);
-  if (comma.head && text4.startsWith(`${comma.head},`) && (workWords && words(comma.head) === workWords || workCatalogue && catalogueNumber(comma.head).toLowerCase() === workCatalogue))
+  const comma = splitTitle(text5);
+  if (comma.head && text5.startsWith(`${comma.head},`) && (workWords && words2(comma.head) === workWords || workCatalogue && catalogueNumber(comma.head).toLowerCase() === workCatalogue))
     return comma.tail;
-  const workName = words(String(workTitle).split(",")[0]);
+  const workName = words2(String(workTitle).split(",")[0]);
   for (const match2 of separators) {
-    const head = text4.slice(0, match2.index);
+    const head = text5.slice(0, match2.index);
     const tail = tailAt(match2);
-    const headWords = words(head);
-    const namesWork = workWords && (headWords === workWords || headWords.startsWith(`${workWords} `) || workWords.startsWith(`${headWords} `)) || workCatalogue && catalogueNumber(head).toLowerCase() === workCatalogue || workName.length >= 4 && words(head.split(",")[0]) === workName;
+    const headWords = words2(head);
+    const namesWork = workWords && (headWords === workWords || headWords.startsWith(`${workWords} `) || workWords.startsWith(`${headWords} `)) || workCatalogue && catalogueNumber(head).toLowerCase() === workCatalogue || workName.length >= 4 && words2(head.split(",")[0]) === workName;
     if (!tail || !namesWork) continue;
     return clean3(tail.match(NICKNAME)?.[1] ?? tail);
   }
   const set = clean3(workTitle);
-  const rest = set && NUMBERED_SET.test(set) && normalized(text4).startsWith(normalized(set)) ? text4.slice(set.length).match(/^[,\s]+(no\.?\s*\d+\b.*)$/i) : null;
+  const rest = set && NUMBERED_SET.test(set) && normalized(text5).startsWith(normalized(set)) ? text5.slice(set.length).match(/^[,\s]+(no\.?\s*\d+\b.*)$/i) : null;
   if (rest) return rest[1].charAt(0).toUpperCase() + rest[1].slice(1);
-  return text4;
+  return text5;
 }
 function resolvedName(catalogue, id, field2) {
   const row = catalogue.db.prepare(
@@ -37820,9 +38501,9 @@ function composerNames(catalogue, work) {
 function similarWorks(catalogue, title, composers = []) {
   const subject = (key) => JSON.parse(key)[1];
   const wanted = workKey(title, composers);
-  const named = composers.map(words).filter(Boolean).length > 0;
+  const named = composers.map(words2).filter(Boolean).length > 0;
   const people = (key) => JSON.parse(key)[0].join("|");
-  const bare = (text4) => words(text4).replace(KEY_PHRASE, " ").replace(new RegExp(CATALOGUE.source, "g"), " ").replace(/\s+/g, " ").trim();
+  const bare = (text5) => words2(text5).replace(KEY_PHRASE, " ").replace(new RegExp(CATALOGUE.source, "g"), " ").replace(/\s+/g, " ").trim();
   return catalogue.db.prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL ORDER BY created_at,id").all().map((row) => row.id).filter((id) => {
     const existing = resolvedName(catalogue, id, "title");
     if (typeof existing !== "string" || !existing.trim()) return false;
@@ -37853,14 +38534,14 @@ function catalogueIndex(catalogue) {
        ORDER BY created_at,id`
   ).all()) {
     const name = resolvedName(catalogue, id, "name");
-    if (typeof name !== "string" || !words(name)) continue;
-    people.set(words(name), [...people.get(words(name)) || [], id]);
+    if (typeof name !== "string" || !words2(name)) continue;
+    people.set(words2(name), [...people.get(words2(name)) || [], id]);
   }
   return { works, aliases, people };
 }
 var artistIdOf = (catalogue, person) => catalogue.db.prepare("SELECT record_id FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='artist' AND state='active'").get(person)?.record_id;
 function composerEntity(catalogue, metadata, index, name, mbid = null) {
-  const key = words(name);
+  const key = words2(name);
   if (mbid) {
     const known = catalogue.db.prepare(
       `SELECT x.entity_id FROM external_identity x JOIN entity e ON e.id=x.entity_id
@@ -37915,7 +38596,7 @@ function abbreviates(short, long) {
   return at === short.length;
 }
 function sameNameAbbreviated(a, b) {
-  const tokens = (text4) => normalized(text4).replace(/^(?:[ivxlc]+|\d+)[.)]\s+/, "").replace(/[^\p{L}\p{N}.]+/gu, " ").trim().split(" ").filter(Boolean);
+  const tokens = (text5) => normalized(text5).replace(/^(?:[ivxlc]+|\d+)[.)]\s+/, "").replace(/[^\p{L}\p{N}.]+/gu, " ").trim().split(" ").filter(Boolean);
   const [x, y] = [tokens(a), tokens(b)];
   if (!x.length || x.length !== y.length) return false;
   let abbreviated = 0;
@@ -37929,9 +38610,9 @@ function sameNameAbbreviated(a, b) {
   return abbreviated > 0;
 }
 function namedMovement(movements, title, used, setSubject) {
-  const text4 = movementParts(title).text;
+  const text5 = movementParts(title).text;
   const free = movements.filter((m) => !used.has(m.id));
-  let found = free.filter((m) => m.text && m.text === text4);
+  let found = free.filter((m) => m.text && m.text === text5);
   if (found.length !== 1) found = free.filter((m) => m.title && sameNameAbbreviated(m.title, title));
   if (found.length !== 1) {
     const piece = pieceNumber(title, setSubject);
@@ -37947,7 +38628,7 @@ function sectionTitles(title) {
 var combined = (movement) => sectionTitles(movement.title || "").length > 1;
 var VARIATION = /^(?:var(?:iation|iazione)?s?|variazioni)\s+(?:(?:no|nr|n)\s+)?(?=\d|[ivxlc]+\b)/;
 function sectionParts(section) {
-  let value = words(section).replace(/\b(?:tema|thema)\b/g, "theme");
+  let value = words2(section).replace(/\b(?:tema|thema)\b/g, "theme");
   const variation = VARIATION.test(value);
   value = value.replace(VARIATION, "");
   const numbered = value.match(/^(\d+|[ivxlc]+)(?:\s+(.*))?$/);
@@ -37955,7 +38636,7 @@ function sectionParts(section) {
   return number ? { number, variation, text: (numbered[2] || "").trim() } : { number: null, variation, text: value.trim() };
 }
 var sameSection = (a, b) => a.number != null || b.number != null ? a.number === b.number && (a.variation || b.variation || a.text === b.text) : a.text === b.text;
-var trackSections = (text4) => clean3(text4).split(/\s+\/\s+|\s+[–—-]\s+(?=var(?:iation|iazione)?\.?\s)/i).map(sectionParts);
+var trackSections = (text5) => clean3(text5).split(/\s+\/\s+|\s+[–—-]\s+(?=var(?:iation|iazione)?\.?\s)/i).map(sectionParts);
 function mapBySections(movements, tracks) {
   if (!movements.some((m) => / \/ /.test(m.title || ""))) return null;
   const sections = movements.map((m) => clean3(m.title).split(/\s+\/\s+/).map(sectionParts));
@@ -37990,9 +38671,9 @@ function mapToMovements(movements, tracks, { setSubject = "", sections = false }
 }
 var VARIATION_TITLE = /^var(?:iation|iazione)?\.?\s*(?:(?:no|nr|n)\.?\s*)?(\d+|[ivxlc]+)(?![\p{L}\d])[\s:.,]*(.*)$/iu;
 function asVariation(title) {
-  const text4 = clean3(title).replace(/^(?:tema|thema)(?![\p{L}])/iu, "Theme");
-  const variation = text4.match(VARIATION_TITLE);
-  return variation ? { title: `${variation[1]}. ${variation[2]}`, variation: true } : { title: text4, variation: false };
+  const text5 = clean3(title).replace(/^(?:tema|thema)(?![\p{L}])/iu, "Theme");
+  const variation = text5.match(VARIATION_TITLE);
+  return variation ? { title: `${variation[1]}. ${variation[2]}`, variation: true } : { title: text5, variation: false };
 }
 function mapEach(rawMovements, rawTracks, setSubject) {
   const movements = rawMovements.map((m) => {
@@ -38004,7 +38685,7 @@ function mapEach(rawMovements, rawTracks, setSubject) {
     return { ...track, movementTitle: title, variation };
   });
   const used = /* @__PURE__ */ new Set(), result = [];
-  const firstWord = (text4) => text4.split(" ")[0];
+  const firstWord = (text5) => text5.split(" ")[0];
   let previous = null;
   for (const track of tracks) {
     const parts = movementParts(track.movementTitle);
@@ -38079,7 +38760,7 @@ function extendRealization(catalogue, group, actor3, people) {
   const metadata = new Metadata(catalogue);
   return transaction(catalogue.db, () => {
     const workTitle = resolvedName(catalogue, realization.work_id, "title") || group.work;
-    const performance = catalogue.db.prepare("SELECT source_id FROM relation WHERE id=?").get(realization.performance_work_id).source_id;
+    const performance2 = catalogue.db.prepare("SELECT source_id FROM relation WHERE id=?").get(realization.performance_work_id).source_id;
     const itemOf = catalogue.db.prepare(
       `SELECT i.movement_id,i.sequence FROM realization_item i JOIN segment s ON s.id=i.segment_id
        WHERE i.realization_id=? AND s.track_link_id=? ORDER BY i.sequence DESC`
@@ -38113,7 +38794,7 @@ function extendRealization(catalogue, group, actor3, people) {
       const recording = catalogue.createEntity("recording", { durationMs: track.evidence.durationMs });
       metadata.derived(recording, "title", track.title);
       creditMovementComposers(catalogue, metadata, people, recording, track, group);
-      catalogue.relate("recording_performance", recording, performance);
+      catalogue.relate("recording_performance", recording, performance2);
       const segment = catalogue.segment(track.id, { kind: "whole" });
       let sequence = before?.sequence || 0;
       shiftUp(catalogue, "realization_item", "sequence", "realization_id=?", [realization.id], sequence + 1, movements.length);
@@ -38267,7 +38948,7 @@ function createGroup(catalogue, group, actor3, index) {
       if (group.providerWorkId) catalogue.externalIdentity(work, "musicbrainz", "work", group.providerWorkId, { evidence: { source: "parent-work" } });
     } else {
       const ambiguous = group.composers.filter((name) => {
-        const sameName = index.people.get(words(name)) || [];
+        const sameName = index.people.get(words2(name)) || [];
         const mbid = group.composerIds?.[name];
         if (!mbid) return sameName.length > 1;
         if (sameName.some((id) => artistIdOf(catalogue, id) === mbid)) return false;
@@ -38277,7 +38958,7 @@ function createGroup(catalogue, group, actor3, index) {
         catalogue.review("auto_match", ordered[0].id, {
           reason: "ambiguous-composer",
           composers: ambiguous,
-          candidates: ambiguous.flatMap((name) => index.people.get(words(name))),
+          candidates: ambiguous.flatMap((name) => index.people.get(words2(name))),
           albumId: group.albumId,
           tracks: ordered.map((t) => t.id)
         });
@@ -38335,10 +39016,10 @@ function createGroup(catalogue, group, actor3, index) {
         ...group.excerpt && { excerpt: true }
       }
     });
-    const performance = catalogue.createEntity("performance");
+    const performance2 = catalogue.createEntity("performance");
     const performanceWork = catalogue.relate(
       "performance_work",
-      performance,
+      performance2,
       work
     );
     const realization = catalogue.realization(
@@ -38352,7 +39033,7 @@ function createGroup(catalogue, group, actor3, index) {
       });
       metadata.derived(recording, "title", track.title || track.movementTitle);
       creditMovementComposers(catalogue, metadata, index, recording, track, group);
-      catalogue.relate("recording_performance", recording, performance);
+      catalogue.relate("recording_performance", recording, performance2);
       const segment = catalogue.segment(track.id, { kind: "whole" });
       placeTrack(catalogue, realization, performanceWork, recording, segment, movements[i]);
     });
@@ -38374,10 +39055,10 @@ function createGroup(catalogue, group, actor3, index) {
 }
 function placeTrack(catalogue, realization, performanceWork, recording, segment, movement) {
   const db = catalogue.db;
-  const list = Array.isArray(movement) ? movement : [movement];
+  const list2 = Array.isArray(movement) ? movement : [movement];
   let sequence = db.prepare("SELECT coalesce(max(sequence),0) AS n FROM realization_item WHERE realization_id=?").get(realization).n;
   let position = db.prepare("SELECT coalesce(max(position),0) AS n FROM recording_content WHERE recording_id=?").get(recording).n;
-  list.forEach((id, j) => {
+  list2.forEach((id, j) => {
     const content = catalogue.recordingContent(recording, performanceWork, { movement: id, position: ++position });
     catalogue.segmentContent(segment, content);
     const occurrence = id ? db.prepare("SELECT count(*) AS n FROM realization_item WHERE realization_id=? AND movement_id=?").get(realization, id).n + 1 : 1;
@@ -38434,7 +39115,7 @@ function releaseRangeWorks(catalogue, { actor: actor3 = null } = {}) {
   }
   return released;
 }
-var bookName = (title) => words(String(title || "")).replace(/^(?:the|das|der|die|le|la|les|il)\s+/, "");
+var bookName = (title) => words2(String(title || "")).replace(/^(?:the|das|der|die|le|la|les|il)\s+/, "");
 function joinCollection(catalogue, metadata, work, { id: mbid, title }, actor3) {
   const db = catalogue.db;
   if (!title || db.prepare("SELECT 1 FROM relation WHERE kind='collection_member' AND target_id=?").get(work)) return;
@@ -38511,10 +39192,10 @@ function excerptsOnly(catalogue, work) {
 }
 var ACT_WORD = /^(?:act|atto|akt|acte|aufzug|scene|scena|szene|prologue|prolog|prologo)$/;
 function namesWithin(a, b, workTitle) {
-  const strip = (text4) => {
-    const list = words(text4).split(" ").filter(Boolean).filter((word, i, all) => !ACT_WORD.test(word) && !(i > 0 && ACT_WORD.test(all[i - 1]) && romanValue(word)));
-    for (const word of words(workTitle).split(" ")) if (list.includes(word) && list.length > 1) list.splice(list.indexOf(word), 1);
-    return list;
+  const strip = (text5) => {
+    const list2 = words2(text5).split(" ").filter(Boolean).filter((word, i, all) => !ACT_WORD.test(word) && !(i > 0 && ACT_WORD.test(all[i - 1]) && romanValue(word)));
+    for (const word of words2(workTitle).split(" ")) if (list2.includes(word) && list2.length > 1) list2.splice(list2.indexOf(word), 1);
+    return list2;
   };
   const [x, y] = [strip(a), strip(b)];
   const [short, long] = x.length <= y.length ? [x, y] : [y, x];
@@ -38563,13 +39244,13 @@ function expandIncompleteWork(catalogue, metadata, work, existing, ordered, setS
       used.add(movement.id);
     }
   }
-  const workWords = words(resolvedName(catalogue, work, "title") || "").split(" ");
+  const workWords = words2(resolvedName(catalogue, work, "title") || "").split(" ");
   for (const movement of existing) {
     if (used.has(movement.id)) continue;
-    const rest = words(movement.title).split(" ").filter(Boolean);
+    const rest = words2(movement.title).split(" ").filter(Boolean);
     for (const word of workWords) if (rest.includes(word)) rest.splice(rest.indexOf(word), 1);
     if (rest.length < 2) continue;
-    const named = ordered.map((track, i) => [i, words(movementParts(track.movementTitle).text).split(" ")]).filter(([i, text4]) => !mapped[i] && rest.every((word) => text4.includes(word)));
+    const named = ordered.map((track, i) => [i, words2(movementParts(track.movementTitle).text).split(" ")]).filter(([i, text5]) => !mapped[i] && rest.every((word) => text5.includes(word)));
     if (named.length !== 1) continue;
     mapped[named[0][0]] = movement;
     used.add(movement.id);
@@ -38676,7 +39357,7 @@ function foldRepeatedMovements(catalogue, work, existing, setSubject, actor3) {
   const ids = [work, ...existing.map((m) => m.id)];
   const madeByMatching = catalogue.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work'").get(work);
   if (!madeByMatching || editedInEditor(catalogue, ids) || hasManualEdits(catalogue, ids)) return false;
-  const tokens = (text4) => words(text4).split(" ").filter(Boolean);
+  const tokens = (text5) => words2(text5).split(" ").filter(Boolean);
   const within = (short, long) => {
     const rest = [...long];
     return short.length > 1 && short.every((token) => {
@@ -38751,7 +39432,7 @@ function foldRepeatedMovements(catalogue, work, existing, setSubject, actor3) {
   transaction(db, () => {
     if (split) {
       const original = db.prepare("SELECT * FROM realization WHERE id=?").get(split);
-      const performance = db.prepare("SELECT source_id FROM relation WHERE id=?").get(original.performance_work_id).source_id;
+      const performance2 = db.prepare("SELECT source_id FROM relation WHERE id=?").get(original.performance_work_id).source_id;
       for (const run of later) {
         const own = catalogue.createEntity("performance");
         const performanceWork = catalogue.relate("performance_work", own, work);
@@ -38764,7 +39445,7 @@ function foldRepeatedMovements(catalogue, work, existing, setSubject, actor3) {
                WHERE x.segment_id=? AND c.performance_work_id=?`
           ).all(item.segment_id, original.performance_work_id)) {
             db.prepare("UPDATE recording_content SET performance_work_id=? WHERE id=?").run(performanceWork, id);
-            db.prepare("UPDATE relation SET target_id=? WHERE kind='recording_performance' AND source_id=? AND target_id=?").run(own, recording, performance);
+            db.prepare("UPDATE relation SET target_id=? WHERE kind='recording_performance' AND source_id=? AND target_id=?").run(own, recording, performance2);
           }
         });
       }
@@ -38917,7 +39598,7 @@ function compatibleAutoWorks(catalogue, a, b) {
   const composers = (work) => {
     const identities = /* @__PURE__ */ new Map();
     for (const { contributor_id: person } of catalogue.db.prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer'").all(work)) {
-      const name = words(resolvedName(catalogue, person, "name"));
+      const name = words2(resolvedName(catalogue, person, "name"));
       identities.set(name, /* @__PURE__ */ new Set([...identities.get(name) || [], ...verifiedIdentities(catalogue, person, "artist")]));
     }
     return identities;
@@ -39043,9 +39724,9 @@ function repairCompletionSplits(catalogue, albumId, actor3) {
            JOIN track_link t ON t.id=s.track_link_id WHERE r.work_id=? GROUP BY r.id`
       ).all(album, work)
     );
-    const names = (work) => composerNames(catalogue, work).map(words);
+    const names = (work) => composerNames(catalogue, work).map(words2);
     const shared = names(works[0]).filter((name) => works.every((work) => names(work).includes(name)));
-    if (!shared.length || realizations2.some((list) => list.length !== 1 || list[0].elsewhere > 0) || works.some((work) => hasManualEdits(catalogue, [work, ...workMovements(catalogue, work).map((m) => m.id)])))
+    if (!shared.length || realizations2.some((list2) => list2.length !== 1 || list2[0].elsewhere > 0) || works.some((work) => hasManualEdits(catalogue, [work, ...workMovements(catalogue, work).map((m) => m.id)])))
       continue;
     const order = works.map((work, i) => ({ work, realization: realizations2[i][0] })).sort((a, b) => a.realization.first - b.realization.first);
     const [keep, ...drops] = order;
@@ -39092,7 +39773,7 @@ function repairCompletionSplits(catalogue, albumId, actor3) {
       const group = { composers: [], composerIds: {} };
       for (const credit of db.prepare("SELECT id,contributor_id FROM credit WHERE target_id=? AND role='composer'").all(keep.work)) {
         const name = resolvedName(catalogue, credit.contributor_id, "name");
-        if (shared.includes(words(name))) group.composers.push(name);
+        if (shared.includes(words2(name))) group.composers.push(name);
         else db.prepare("DELETE FROM credit WHERE id=?").run(credit.id);
       }
       for (const row of db.prepare(
@@ -39111,18 +39792,18 @@ var KEY = /\bin\s+([a-h])(?:[\s-]?(flat|sharp|♭|♯))?\s+(major|minor)\b/i;
 var CATALOGUE_TEXT = /\b(?:op(?:us|\.)?\s*\d+[a-z]?(?:\s*,?\s*no\.?\s*\d+)?|(?:BWV|HWV|RV|WoO|TWV|K(?:V|\.)?|D\.?|Hob\.?\s*[IVXL]+[a-z]?:?)\s*\d+[a-z]?)/gi;
 var tidyCatalogue = (value) => clean3(value).replace(/^op(?:us|\.)?\s*/i, "Op. ").replace(/\s*,?\s*no\.?\s*(\d)/i, " No. $1");
 function workFieldsFromTitle(title) {
-  const text4 = clean3(title);
+  const text5 = clean3(title);
   const fields = {};
-  const key = text4.match(KEY);
+  const key = text5.match(KEY);
   if (key)
     fields.key = `${key[1].toUpperCase()}${key[2] ? `-${key[2].toLowerCase().replace("\u266D", "flat").replace("\u266F", "sharp")}` : ""} ${key[3].toLowerCase()}`;
-  const catalogue = [...new Set((text4.match(CATALOGUE_TEXT) || []).map(tidyCatalogue))];
+  const catalogue = [...new Set((text5.match(CATALOGUE_TEXT) || []).map(tidyCatalogue))];
   if (catalogue.length) fields.catalogue = catalogue;
-  const form2 = text4.match(MULTI_MOVEMENT);
+  const form2 = text5.match(MULTI_MOVEMENT);
   if (form2) fields.form = form2[1].toLowerCase();
-  const nickname = text4.match(/["“„«]([^"”»]+)["”»]/);
+  const nickname = text5.match(/["“„«]([^"”»]+)["”»]/);
   if (nickname) fields.nickname = clean3(nickname[1]);
-  const instrument = text4.match(INSTRUMENT);
+  const instrument = text5.match(INSTRUMENT);
   if (instrument)
     fields.instrumentation = instrument[1].toLowerCase().split(/\s+and\s+/).map((name) => name[0].toUpperCase() + name.slice(1));
   return fields;
@@ -39141,8 +39822,8 @@ function deriveWorkFields(catalogue, work, metadata = new Metadata(catalogue)) {
 }
 function fullerTitle(fromTitle, shorter) {
   if (!shorter) return fromTitle;
-  const long = words(fromTitle);
-  const short = words(shorter);
+  const long = words2(fromTitle);
+  const short = words2(shorter);
   return short && long !== short && long.endsWith(` ${short}`) ? fromTitle : shorter;
 }
 function repairMovementTitles(catalogue, { albumId = null } = {}) {
@@ -39163,7 +39844,7 @@ function repairMovementTitles(catalogue, { albumId = null } = {}) {
     const workTitle = titles.get(row.work);
     const current = JSON.parse(row.value);
     if (typeof workTitle !== "string" || typeof current !== "string") continue;
-    if (!words(current).includes(words(workTitle))) continue;
+    if (!words2(current).includes(words2(workTitle))) continue;
     const stripped = stripWorkPrefix(current, workTitle);
     if (stripped && stripped !== current) {
       metadata.derived(row.movement, "title", stripped);
@@ -39580,19 +40261,19 @@ function workView(c, work) {
   const movements = workMovements(c, work);
   const performances = realizations(c, work);
   const coverage = /* @__PURE__ */ new Map();
-  for (const performance of performances)
-    for (const item of realizationTracks(c, performance.id))
+  for (const performance2 of performances)
+    for (const item of realizationTracks(c, performance2.id))
       if (item.movement_id) coverage.set(item.movement_id, (coverage.get(item.movement_id) || 0) + 1);
-  const recordingRows = performances.map((performance) => {
-    const tracks = realizationTracks(c, performance.id);
+  const recordingRows = performances.map((performance2) => {
+    const tracks = realizationTracks(c, performance2.id);
     const album = tracks[0]?.evidence.albumId;
-    const performers = c.db.prepare("SELECT source_id FROM relation WHERE id=?").get(performance.performance_work_id)?.source_id;
+    const performers = c.db.prepare("SELECT source_id FROM relation WHERE id=?").get(performance2.performance_work_id)?.source_id;
     const names = performers ? credits(c, performers).map((credit) => credit.name) : [];
-    const complete = movements.length && performance.covered >= movements.length;
+    const complete = movements.length && performance2.covered >= movements.length;
     return {
-      id: performance.id,
-      label: [names.join(", ") || tracks[0]?.evidence.hints?.artist, performance.label || tracks[0]?.evidence.hints?.album].filter(Boolean).join(" \xB7 ") || "Recording",
-      detail: movements.length ? `${performance.covered} of ${movements.length} movements` : `${performance.items} tracks`,
+      id: performance2.id,
+      label: [names.join(", ") || tracks[0]?.evidence.hints?.artist, performance2.label || tracks[0]?.evidence.hints?.album].filter(Boolean).join(" \xB7 ") || "Recording",
+      detail: movements.length ? `${performance2.covered} of ${movements.length} movements` : `${performance2.items} tracks`,
       badge: movements.length ? complete ? { label: "Complete", tone: "success" } : { label: "Incomplete", tone: "warning" } : void 0,
       ...album != null && { selection: `album:${album}` }
     };
@@ -40144,8 +40825,26 @@ function newView(kind) {
   if (!forms) fail("Unknown item type");
   return { crumbs: [], title: forms.title, badges: [], actions: [], sections: [forms.section] };
 }
-var TABS = ["works", "composers", "performers", "albums", "review"];
+var TABS = ["works", "composers", "performers", "albums", "review", "search"];
+var SEARCH_KIND = { work: "Work", movement: "Movement", recording: "Recording", composer: "Composer", performer: "Performer", release: "Album" };
+function searchList(c, q) {
+  if (!q.trim()) return [];
+  const result = searchCatalogue(c, { q, limit: 100 });
+  return result.sections.flatMap(
+    (section) => section.items.map((item) => {
+      const selection = item.kind === "release" ? `album:${item.ref}` : item.kind === "recording" ? item.workId : item.ref;
+      return {
+        id: item.id,
+        label: item.title,
+        detail: [item.subtitle, item.detail].filter(Boolean).join(" \xB7 ").slice(0, 500),
+        badge: { label: SEARCH_KIND[item.kind] || item.kind, tone: "muted" },
+        ...selection && { selection }
+      };
+    })
+  );
+}
 function listFor(c, tab, q) {
+  if (tab === "search") return searchList(c, q);
   if (tab === "works")
     return entities(c, ["work"]).map((work) => {
       const composers = composerNames2(c, work.id);
@@ -40201,7 +40900,7 @@ function renderV2(c, query, revision2) {
     tab = selection.startsWith("album:") || selection.startsWith("track:") ? "albums" : selection.startsWith("review:") ? "review" : selection.startsWith("new:") ? { work: "works", composer: "composers", performer: "performers" }[selection.slice(4)] || "works" : kind?.kind === "person" ? isComposer(c, { id: selection, data: JSON.parse(kind.data) }) ? "composers" : "performers" : kind?.kind === "ensemble" ? "performers" : "works";
   }
   const all = listFor(c, tab, q);
-  const filtered = q ? all.filter((item) => matchesSearch(item.search, q)) : all;
+  const filtered = q && tab !== "search" ? all.filter((item) => matchesSearch(item.search, q)) : all;
   let view = null;
   if (selection.startsWith("album:")) {
     const [albumId, work] = selection.slice(6).split("@");
@@ -40239,12 +40938,13 @@ function renderV2(c, query, revision2) {
       { id: "composers", label: "Composers" },
       { id: "performers", label: "Performers" },
       { id: "albums", label: "Albums" },
-      { id: "review", label: "Review", count: reviews }
+      { id: "review", label: "Review", count: reviews },
+      { id: "search", label: "Search" }
     ],
     tab,
     list: {
-      placeholder: { works: "Search works or composers", composers: "Search composers", performers: "Search performers", albums: "Search albums, tracks or performers", review: "Search review items" }[tab],
-      items: filtered.slice(offset, offset + PAGE).map(({ search, classical, ...item }) => item),
+      placeholder: { works: "Search works or composers", composers: "Search composers", performers: "Search performers", albums: "Search albums, tracks or performers", review: "Search review items", search: "Works, catalogue numbers, performers, albums\u2026" }[tab],
+      items: filtered.slice(offset, offset + PAGE).map(({ search: search2, classical, ...item }) => item),
       total: filtered.length,
       offset,
       empty: {
@@ -40252,7 +40952,8 @@ function renderV2(c, query, revision2) {
         composers: "No composers yet.",
         performers: "No performers or ensembles yet.",
         albums: q ? "No matching albums." : "No albums with classical tracks yet. Search to find any album.",
-        review: "Nothing needs review."
+        review: "Nothing needs review.",
+        search: q ? "Nothing matches. Try another spelling, a catalogue number like Op. 27 No. 2, or fewer words." : "Search every work, movement, recording, composer, performer and album."
       }[tab],
       actions: listActions
     },
@@ -40317,15 +41018,15 @@ function assignTracks(c, m, who, work, tracks, mapping) {
   }
   const seen = chosen.map((entry) => entry.movement).filter((movement) => movement !== "whole");
   if (new Set(seen).size !== seen.length) fail("Each movement can only be chosen once per album");
-  const performance = c.createEntity("performance");
-  const performanceWork = c.relate("performance_work", performance, work);
+  const performance2 = c.createEntity("performance");
+  const performanceWork = c.relate("performance_work", performance2, work);
   const first = JSON.parse(c.db.prepare("SELECT evidence FROM track_link WHERE id=?").get(chosen[0].track).evidence);
   const realization = c.realization(work, performanceWork, first.hints?.album || null);
   chosen.forEach(({ track, movement }, index) => {
     const evidence2 = JSON.parse(c.db.prepare("SELECT evidence FROM track_link WHERE id=?").get(track).evidence);
     const recording = c.createEntity("recording", { durationMs: evidence2.durationMs });
     m.manual(recording, "title", trackTitle(evidence2), { actor: who });
-    c.relate("recording_performance", recording, performance);
+    c.relate("recording_performance", recording, performance2);
     const content = c.recordingContent(recording, performanceWork, { movement: movement === "whole" ? null : movement });
     const segment = c.segment(track, { kind: "whole" });
     c.segmentContent(segment, content);
@@ -40559,7 +41260,7 @@ var actor = (input) => {
     );
   return String(input.user.id);
 };
-function text(value, label, { optional = false, max = 1e4 } = {}) {
+function text2(value, label, { optional = false, max = 1e4 } = {}) {
   if (typeof value !== "string" || value.length > max || !optional && !value.trim())
     fail2(`Enter a valid ${label}`);
   return value;
@@ -40670,7 +41371,7 @@ var movementRows = (c, work) => c.db.prepare(
   "SELECT * FROM relation WHERE kind='movement' AND source_id=? ORDER BY position"
 ).all(work);
 function render(c, input) {
-  const m = new Metadata(c), all = entries(c), query = input.query || {}, q = normalized2(text(query.q || "", "search", { optional: true, max: 200 }));
+  const m = new Metadata(c), all = entries(c), query = input.query || {}, q = normalized2(text2(query.q || "", "search", { optional: true, max: 200 }));
   const offset = Number(query.offset || 0);
   if (!Number.isSafeInteger(offset) || offset < 0 || offset > 1e7)
     fail2("Invalid page offset");
@@ -41164,7 +41865,7 @@ function apply(c, input, who) {
   let selection;
   switch (request.command) {
     case "attach-found-track": {
-      const parts = text(v.choice, "recording and performance", {
+      const parts = text2(v.choice, "recording and performance", {
         max: 200
       }).split("|");
       if (parts.length !== 2)
@@ -41189,7 +41890,7 @@ function apply(c, input, who) {
       );
     }
     case "create-contributor": {
-      const name = text(v.name, "contributor name", { max: 500 }).trim();
+      const name = text2(v.name, "contributor name", { max: 500 }).trim();
       if (!["person", "ensemble"].includes(v.kind))
         fail2("Select a valid contributor type");
       selection = c.createEntity(v.kind, {
@@ -41199,9 +41900,9 @@ function apply(c, input, who) {
       break;
     }
     case "add-credit": {
-      selection = text(v.target, "entry", { max: 200 });
+      selection = text2(v.target, "entry", { max: 200 });
       c.entity(selection, ["work", "recording", "performance", "release"]);
-      const contributor = text(v.contributor, "contributor", { max: 200 }), role = text(v.role, "role", { max: 80 }), instrument = text(v.instrument, "instrument", {
+      const contributor = text2(v.contributor, "contributor", { max: 200 }), role = text2(v.role, "role", { max: 80 }), instrument = text2(v.instrument, "instrument", {
         optional: true,
         max: 200
       }).trim() || null;
@@ -41220,28 +41921,28 @@ function apply(c, input, who) {
       break;
     }
     case "remove-credit": {
-      selection = text(v.target, "entry", { max: 200 });
+      selection = text2(v.target, "entry", { max: 200 });
       c.entity(selection);
-      const credit = text(v.credit, "credit", { max: 200 });
+      const credit = text2(v.credit, "credit", { max: 200 });
       if (!c.db.prepare("SELECT 1 FROM credit WHERE id=? AND target_id=?").get(credit, selection))
         fail2("Credit does not belong to this entry");
       c.db.prepare("DELETE FROM credit WHERE id=?").run(credit);
       break;
     }
     case "create-composer": {
-      const name = text(v.name, "composer name", { max: 500 }).trim();
+      const name = text2(v.name, "composer name", { max: 500 }).trim();
       selection = c.createEntity("person", { roles: ["composer"] });
       manual(selection, "name", name);
       break;
     }
     case "create-work": {
-      const title = text(v.title, "work title", { max: 2e3 }).trim();
-      const composer = text(v.composer ?? "", "composer", {
+      const title = text2(v.title, "work title", { max: 2e3 }).trim();
+      const composer = text2(v.composer ?? "", "composer", {
         optional: true,
         max: 200
       });
       if (composer) c.entity(composer, "person");
-      const movements = (Array.isArray(v.movements) ? v.movements.join("\n") : text(v.movements ?? "", "movement titles", { optional: true })).split("\n").map((s) => s.trim()).filter(Boolean);
+      const movements = (Array.isArray(v.movements) ? v.movements.join("\n") : text2(v.movements ?? "", "movement titles", { optional: true })).split("\n").map((s) => s.trim()).filter(Boolean);
       if (movements.length > 100)
         fail2("Create no more than 100 movements at a time");
       warnDuplicate(c, title, composer ? [m.resolve(composer, "name").value].filter(Boolean) : [], v.createAnyway);
@@ -41256,12 +41957,12 @@ function apply(c, input, who) {
       break;
     }
     case "edit-field": {
-      const target = text(v.target, "entry", { max: 200 }), key = text(v.field, "field", { max: 80 });
+      const target = text2(v.target, "entry", { max: 200 }), key = text2(v.field, "field", { max: 80 });
       c.entity(target);
       const definition = c.db.prepare("SELECT type FROM field_definition WHERE key=?").get(key);
       if (!definition || !["string", "array"].includes(definition.type))
         fail2("This field is not editable");
-      const raw = text(v.value, "value", { optional: true });
+      const raw = text2(v.value, "value", { optional: true });
       if (typeof v.blank !== "boolean" || typeof v.pin !== "boolean")
         fail2("Invalid override options");
       const value = v.blank ? null : definition.type === "array" ? raw.split("\n").map((s) => s.trim()).filter(Boolean) : raw;
@@ -41272,9 +41973,9 @@ function apply(c, input, who) {
       break;
     }
     case "use-provider": {
-      selection = text(v.target, "entry", { max: 200 });
+      selection = text2(v.target, "entry", { max: 200 });
       c.entity(selection);
-      const field2 = text(v.field, "field", { max: 80 });
+      const field2 = text2(v.field, "field", { max: 80 });
       if (!c.db.prepare("SELECT 1 FROM field_definition WHERE key=?").get(field2))
         fail2("Unknown metadata field");
       m.useProvider(selection, field2, {
@@ -41283,9 +41984,9 @@ function apply(c, input, who) {
       break;
     }
     case "add-movement": {
-      selection = text(v.work, "work", { max: 200 });
+      selection = text2(v.work, "work", { max: 200 });
       c.entity(selection, "work");
-      const titles = (Array.isArray(v.title) ? v.title : [text(v.title, "movement title", { max: 2e3 })]).map((title) => String(title).trim()).filter(Boolean);
+      const titles = (Array.isArray(v.title) ? v.title : [text2(v.title, "movement title", { max: 2e3 })]).map((title) => String(title).trim()).filter(Boolean);
       if (!titles.length) fail2("Enter a movement title");
       if (titles.length > 100) fail2("Add no more than 100 movements at a time");
       for (const title of titles) {
@@ -41299,7 +42000,7 @@ function apply(c, input, who) {
       break;
     }
     case "reorder-movements": {
-      selection = text(v.work, "work", { max: 200 });
+      selection = text2(v.work, "work", { max: 200 });
       c.entity(selection, "work");
       const rows = movementRows(c, selection), ids = rows.map((r) => r.target_id);
       if (!Array.isArray(v.order) || v.order.length !== ids.length || new Set(v.order).size !== ids.length || v.order.some((id) => !ids.includes(id)))
@@ -41316,9 +42017,9 @@ function apply(c, input, who) {
       break;
     }
     case "create-broadcast": {
-      const work = text(v.work, "work", { max: 200 });
+      const work = text2(v.work, "work", { max: 200 });
       c.entity(work, "work");
-      const title = text(v.title, "recording title", { max: 2e3 }).trim(), date = text(v.date, "broadcast date", {
+      const title = text2(v.title, "recording title", { max: 2e3 }).trim(), date = text2(v.date, "broadcast date", {
         optional: true,
         max: 10
       }).trim();
@@ -41336,25 +42037,25 @@ function apply(c, input, who) {
       c.relate("recording_performance", selection, p);
       manual(selection, "title", title);
       if (date) manual(selection, "date", date);
-      const description = text(v.description, "recording notes", {
+      const description = text2(v.description, "recording notes", {
         optional: true
       });
       if (description) manual(selection, "description", description);
       break;
     }
     case "attach-track": {
-      selection = text(v.recording, "recording", { max: 200 });
+      selection = text2(v.recording, "recording", { max: 200 });
       c.entity(selection, "recording");
       const pw = c.performanceWork(
-        text(v.performanceWork, "work performance", { max: 200 })
+        text2(v.performanceWork, "work performance", { max: 200 })
       );
       if (!c.db.prepare(
         "SELECT 1 FROM relation WHERE kind='recording_performance' AND source_id=? AND target_id=?"
       ).get(selection, pw.source_id))
         fail2("This recording does not capture that performance");
-      const movement = text(v.movement, "movement", { optional: true, max: 200 }) || null;
+      const movement = text2(v.movement, "movement", { optional: true, max: 200 }) || null;
       c.checkMovement(pw.target_id, movement);
-      const track = text(v.track, "owned track", { max: 200 }), link2 = c.db.prepare("SELECT * FROM track_link WHERE id=? AND state='active'").get(track);
+      const track = text2(v.track, "owned track", { max: 200 }), link2 = c.db.prepare("SELECT * FROM track_link WHERE id=? AND state='active'").get(track);
       if (!link2) fail2("This owned track is missing or requires review");
       const state = c.db.prepare("SELECT state FROM classification WHERE target_id=?").get(track)?.state;
       if (state !== "classical" && v.confirmClassical !== true)
@@ -41379,9 +42080,9 @@ function apply(c, input, who) {
       break;
     }
     case "detach-track": {
-      selection = text(v.recording, "recording", { max: 200 });
+      selection = text2(v.recording, "recording", { max: 200 });
       c.entity(selection, "recording");
-      const item = text(v.item, "attachment", { max: 200 });
+      const item = text2(v.item, "attachment", { max: 200 });
       const owned = c.db.prepare(
         `SELECT 1 FROM realization_item i JOIN realization r ON r.id=i.realization_id JOIN relation pw ON pw.id=r.performance_work_id
         JOIN relation rp ON rp.target_id=pw.source_id AND rp.kind='recording_performance' WHERE rp.source_id=? AND i.id=?`
@@ -41440,7 +42141,7 @@ async function mutateEditor(input) {
 
 // src/model/presentation.js
 import path5 from "node:path";
-var text2 = (value, fallback) => typeof value === "string" && value.trim() ? value.trim() : fallback;
+var text3 = (value, fallback) => typeof value === "string" && value.trim() ? value.trim() : fallback;
 var DisplayValues = class {
   constructor(c) {
     this.statement = c.db.prepare(
@@ -41453,9 +42154,9 @@ var DisplayValues = class {
     return { value: row ? JSON.parse(row.value) : void 0 };
   }
 };
-var entityValue = (metadata, id, field2, fallback) => text2(metadata.resolve(id, field2).value, fallback);
+var entityValue = (metadata, id, field2, fallback) => text3(metadata.resolve(id, field2).value, fallback);
 var evidenceOf = (row) => JSON.parse(row.evidence);
-var trackTitle2 = (evidence2) => text2(evidence2.hints?.title, path5.basename(evidence2.path || "Track"));
+var trackTitle2 = (evidence2) => text3(evidence2.hints?.title, path5.basename(evidence2.path || "Track"));
 function actor2(input) {
   const user = input?.user;
   if (!Number.isSafeInteger(user?.id) || user.id <= 0)
@@ -41486,11 +42187,11 @@ function realizationRows(c, realizationId = null, workId = null, albumId = null)
     return rows;
   }, []);
 }
-var words2 = (value) => String(value || "").normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+var words3 = (value) => String(value || "").normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 function performerOf(hints) {
-  const artist = text2(hints?.artist, text2(hints?.albumArtist, ""));
-  const composers = new Set(composersOf(hints || {}).map(words2));
-  const performers = artist.split(/\s+[—–]\s+|\s*;\s*/).filter((name) => name && !composers.has(words2(name)));
+  const artist = text3(hints?.artist, text3(hints?.albumArtist, ""));
+  const composers = new Set(composersOf(hints || {}).map(words3));
+  const performers = artist.split(/\s+[—–]\s+|\s*;\s*/).filter((name) => name && !composers.has(words3(name)));
   return performers.length ? performers.join(", ") : artist;
 }
 function queueItem(metadata, row, workTitle = null) {
@@ -41501,9 +42202,9 @@ function queueItem(metadata, row, workTitle = null) {
     fileId: String(row.file_id),
     albumId: String(evidence2.albumId ?? ""),
     title: workTitle ? movementTitle({ title: withoutComposer(trackTitle2(evidence2), composersOf(evidence2.hints || {})), work: evidence2.hints?.work }, workTitle) : row.movement_ids?.length > 1 ? row.movement_ids.map((id) => entityValue(metadata, id, "title", "")).filter(Boolean).join(" / ") : row.movement_id ? entityValue(metadata, row.movement_id, "title", trackTitle2(evidence2)) : trackTitle2(evidence2),
-    artist: text2(evidence2.hints?.artist, text2(evidence2.hints?.albumArtist, "")),
+    artist: text3(evidence2.hints?.artist, text3(evidence2.hints?.albumArtist, "")),
     performer: performerOf(evidence2.hints),
-    album: text2(evidence2.hints?.album, ""),
+    album: text3(evidence2.hints?.album, ""),
     durationMs: Number(evidence2.durationMs) || null,
     startMs: row.start_ms,
     endMs: row.end_ms
@@ -41540,7 +42241,7 @@ var albumPosition = (row) => {
   return (Number(hints.discNumber) || 1) * 1e4 + (Number(hints.trackNumber) || 9999);
 };
 var ACT = /,\s*(?:act|akt|atto|acte|part|pt\.?|teil|scene|szene)\s*[ivxlc\d]+\b.*$/i;
-var nameBeforeComma = (title) => words2(String(title).split(",")[0]);
+var nameBeforeComma = (title) => words3(String(title).split(",")[0]);
 function sameNamedWork(a, b) {
   if (a === b) return true;
   const catalogueA = catalogueNumber(a).toLowerCase();
@@ -41548,15 +42249,15 @@ function sameNamedWork(a, b) {
   if (catalogueA && catalogueB) return catalogueA === catalogueB;
   const [short, long] = a.length <= b.length ? [a, b] : [b, a];
   const name = nameBeforeComma(long);
-  return name.length >= 4 && words2(short) === name && long.includes(",");
+  return name.length >= 4 && words3(short) === name && long.includes(",");
 }
 function sameCredits(last, heading, names) {
-  const these = new Set(names.map(words2));
+  const these = new Set(names.map(words3));
   if (last.names.length === these.size && last.names.every((name) => these.has(name))) return true;
   const shared = last.names.filter((name) => these.has(name));
   const same2 = shared.length > 0 && Boolean(catalogueNumber(last.title)) && catalogueNumber(last.title) === catalogueNumber(heading);
   if (same2) {
-    last.composer = last.credited.filter((name) => shared.includes(words2(name))).join(", ");
+    last.composer = last.credited.filter((name) => shared.includes(words3(name))).join(", ");
     last.names = shared;
   }
   return same2;
@@ -41571,14 +42272,14 @@ function pieceGroups(c, album, following) {
   const pieces = [];
   for (const row of rows) {
     const evidence2 = evidenceOf(row);
-    const workTag = text2(evidence2.hints?.work, "");
+    const workTag = text3(evidence2.hints?.work, "");
     const work = workTag.split(/\s*:\s*/)[0];
     const title = withoutComposer(trackTitle2(evidence2), composersOf(evidence2.hints || {}));
     const split = splitTitle(title);
     const fullHead = work || split.head;
     const ownTail = work ? movementTitle({ title }, work) : split.tail;
     const taggedTail = work ? movementTitle({ title, work: workTag }, work) : ownTail;
-    const fullTail = words2(ownTail).endsWith(` ${words2(taggedTail)}`) ? taggedTail : ownTail;
+    const fullTail = words3(ownTail).endsWith(` ${words3(taggedTail)}`) ? taggedTail : ownTail;
     const numbered = fullHead ? null : numberedPiece(fullTail);
     const tail = numbered?.part ?? fullTail;
     const names = composersOf(evidence2.hints || {});
@@ -41592,9 +42293,9 @@ function pieceGroups(c, album, following) {
       fileId: String(row.file_id),
       albumId: String(evidence2.albumId ?? ""),
       title: tail,
-      artist: text2(evidence2.hints?.artist, text2(evidence2.hints?.albumArtist, "")),
+      artist: text3(evidence2.hints?.artist, text3(evidence2.hints?.albumArtist, "")),
       performer: performerOf(evidence2.hints),
-      album: text2(evidence2.hints?.album, ""),
+      album: text3(evidence2.hints?.album, ""),
       durationMs: Number(evidence2.durationMs) || null,
       startMs: 0,
       endMs: null,
@@ -41604,7 +42305,7 @@ function pieceGroups(c, album, following) {
     if (head && sameWork && sameCredits(last, heading, names) && following.get(last.next) === item.position)
       last.items.push(item);
     else
-      pieces.push({ id: item.id, workId: null, title: heading, composer, names: names.map(words2), credited: names, items: [item], missing: [] });
+      pieces.push({ id: item.id, workId: null, title: heading, composer, names: names.map(words3), credited: names, items: [item], missing: [] });
     pieces.at(-1).next = item.position;
   }
   return pieces.map(({ next, names, credited, items, ...piece }) => ({
@@ -41649,7 +42350,7 @@ function renderAlbumPresentation(c, albumId) {
     const name = entityValue(metadata, workId, "title", "Untitled work");
     const collections = c.db.prepare("SELECT source_id FROM relation WHERE kind='collection_member' AND target_id=?").all(workId);
     const book = collections.length === 1 ? entityValue(metadata, collections[0].source_id, "title", "") : "";
-    const title = book && !` ${words2(name)} `.includes(` ${words2(book)} `) ? `${name} \xB7 \u201C${book}\u201D` : name;
+    const title = book && !` ${words3(name)} `.includes(` ${words3(book)} `) ? `${name} \xB7 \u201C${book}\u201D` : name;
     const excerpts = NUMBERED_SET.test(name) && present.size * 2 < movements.length || Boolean(
       c.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work' AND json_extract(evidence,'$.albumId')=? AND json_extract(evidence,'$.excerpt')=1").get(workId, album)
     );
@@ -41727,8 +42428,8 @@ function renderWork(c, workId, user) {
         (credit) => credit.role !== "composer"
       );
       const first = evidenceOf(entries2[0]);
-      const album = text2(entries2[0].realization_label, text2(first.hints?.album, ""));
-      const artist = performers.length ? performers.map((credit) => credit.name).join(", ") : text2(first.hints?.artist, text2(first.hints?.albumArtist, ""));
+      const album = text3(entries2[0].realization_label, text3(first.hints?.album, ""));
+      const artist = performers.length ? performers.map((credit) => credit.name).join(", ") : text3(first.hints?.artist, text3(first.hints?.albumArtist, ""));
       return {
         id,
         label: [artist, album].filter(Boolean).join(" \xB7 ") || `Recording ${index + 1}`,
@@ -42011,8 +42712,8 @@ var ITUNES_MEAN = "com.apple.iTunes";
 var MUSICBRAINZ_UFID_OWNER = "http://musicbrainz.org";
 var AUDIO_EXTENSIONS = /* @__PURE__ */ new Set([".flac", ".mp3", ".m4a", ".mp4", ".ogg", ".oga", ".opus"]);
 var isAudioPath = (file) => AUDIO_EXTENSIONS.has(path6.extname(file).toLowerCase());
-var text3 = (value) => value == null ? "" : String(value).trim();
-var texts = (value) => (Array.isArray(value) ? value : [value]).map(text3).filter(Boolean);
+var text4 = (value) => value == null ? "" : String(value).trim();
+var texts = (value) => (Array.isArray(value) ? value : [value]).map(text4).filter(Boolean);
 var positive2 = (value) => {
   const number = Number(value);
   return Number.isSafeInteger(number) && number > 0 ? number : 0;
@@ -42140,25 +42841,27 @@ function readTags(filePath) {
   try {
     const tag = file.tag;
     return {
-      title: text3(tag.title),
-      artist: text3(tag.performers?.[0]),
-      albumArtist: text3(tag.albumArtists?.[0]),
-      album: text3(tag.album),
-      recordingMbid: text3(tag.musicBrainzTrackId),
-      releaseMbid: text3(tag.musicBrainzReleaseId),
-      releaseGroupMbid: text3(tag.musicBrainzReleaseGroupId),
+      title: text4(tag.title),
+      artist: text4(tag.performers?.[0]),
+      albumArtist: text4(tag.albumArtists?.[0]),
+      album: text4(tag.album),
+      recordingMbid: text4(tag.musicBrainzTrackId),
+      releaseMbid: text4(tag.musicBrainzReleaseId),
+      releaseGroupMbid: text4(tag.musicBrainzReleaseGroupId),
       // Every album artist ID: taglib's own property has only the first.
-      albumArtistMbids: [...new Set([...albumArtistIdsField.read(file), text3(tag.musicBrainzReleaseArtistId)].flatMap((v) => texts(v.split(/[;/]/))))],
+      albumArtistMbids: [...new Set([...albumArtistIdsField.read(file), text4(tag.musicBrainzReleaseArtistId)].flatMap((v) => texts(v.split(/[;/]/))))],
       artistMbids: artistIdsField.read(file).flatMap((value) => texts(value.split(/[;/]/))),
       genres: texts(tag.genres ?? []).flatMap((genre) => texts(genre.split(";"))),
       composer: texts(tag.composers ?? []),
       work: workField.read(file)[0] ?? "",
       // Some taggers put the work here and leave WORK empty.
-      grouping: text3(tag.grouping),
+      grouping: text4(tag.grouping),
       workId: workIdField.read(file)[0] ?? "",
       trackNumber: positive2(tag.track),
       discNumber: positive2(tag.disc),
-      durationMs: Math.round(file.properties?.durationMilliseconds || 0)
+      durationMs: Math.round(file.properties?.durationMilliseconds || 0),
+      year: Number.isSafeInteger(tag.year) && tag.year > 0 ? tag.year : null,
+      label: text4(tag.publisher)
     };
   } finally {
     file.dispose();
@@ -42444,6 +43147,8 @@ async function scanFile(file, root, prior) {
       work: tags.work,
       // Only when set, so files without it keep their stored evidence.
       ...tags.grouping && { grouping: tags.grouping },
+      ...tags.year && { year: tags.year },
+      ...tags.label && { label: tags.label },
       workId: tags.workId,
       recordingMbid: tags.recordingMbid || file.recordingMbid || "",
       composerDistinct: tags.composer.length > 0 && !tags.composer.includes(tags.artist)
@@ -42895,6 +43600,11 @@ async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 200, checkpointMs
       throw error;
     }
   } finally {
+    try {
+      ensureSearchIndex(catalogue);
+    } catch (error) {
+      ctx.log?.(`Classical search index not rebuilt: ${error.message}`);
+    }
     catalogue.close();
   }
 }
@@ -43276,11 +43986,58 @@ function summarize(lines2) {
   return message.length > 500 ? `${message.slice(0, 497)}...` : message;
 }
 
-// src/mb.js
+// src/search/provider.js
 import path11 from "node:path";
+var SECTION_IDS = new Set(SECTIONS.map(([id]) => id));
+function linkFor(item) {
+  if (item.kind === "work") return { type: "resource", pageId: "work", resourceId: item.ref };
+  if ((item.kind === "movement" || item.kind === "recording") && item.workId) return { type: "resource", pageId: "work", resourceId: item.workId };
+  if (item.kind === "release") return { type: "album", albumId: item.ref };
+  if (item.kind === "composer") return { type: "filter", filters: { composer: [item.ref] } };
+  if (item.kind === "performer") return { type: "filter", filters: { performer: [item.ref] } };
+  return null;
+}
+var asItem = (item) => ({
+  id: item.id,
+  kind: item.kind,
+  title: item.title,
+  subtitle: item.subtitle || "",
+  detail: item.detail || "",
+  link: linkFor(item)
+});
+function searchResult(c, query) {
+  const section = SECTION_IDS.has(query?.section) ? query.section : null;
+  const limit = Math.min(50, Math.max(1, Number(query?.limit) || 4));
+  const result = searchCatalogue(c, {
+    q: typeof query?.q === "string" ? query.q : "",
+    filters: query?.filters || {},
+    kinds: section ? [section] : null,
+    limit: section ? 50 : limit,
+    offset: Math.max(0, Number(query?.offset) || 0)
+  });
+  return {
+    version: 1,
+    total: result.total,
+    best: result.best ? asItem(result.best) : null,
+    sections: result.sections.map((part) => ({ id: part.id, title: part.title, total: part.total, items: part.items.map(asItem) })),
+    facets: result.facets.map((facet) => ({ key: facet.key, label: facet.label, selected: facet.selected, options: facet.options }))
+  };
+}
+async function search(input) {
+  if (!Number.isSafeInteger(input?.user?.id) || input.user.id <= 0) throw new Error("A real user account is required");
+  const c = await openCatalogue(path11.join(input.dataFolder, "model"));
+  try {
+    return searchResult(c, input.query);
+  } finally {
+    c.close();
+  }
+}
+
+// src/mb.js
+import path12 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.48" : "dev";
+var VERSION = true ? "1.0.49" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js
@@ -43300,7 +44057,7 @@ var MusicBrainz = class {
     this.userAgent = `AurralClassical/${VERSION} ( ${REPOSITORY} )`;
     this.fetch = fetchImpl;
     this.log = log2;
-    this.cache = new FileCache(path11.join(dataFolder, "mb-cache"));
+    this.cache = new FileCache(path12.join(dataFolder, "mb-cache"));
     const isPublic = this.base === PUBLIC_MB;
     this.throttle = new Throttle(dataFolder, intervalMs ?? (isPublic ? 1e3 : 0));
     this.maxRetries = maxRetries;
@@ -43518,7 +44275,7 @@ var isSucceeded = (state) => /Completed/i.test(state) && /Succeeded/i.test(state
 // src/source.js
 import { randomUUID as randomUUID10 } from "node:crypto";
 import fs6 from "node:fs/promises";
-import path12 from "node:path";
+import path13 from "node:path";
 var LENGTH_TOLERANCE_MS = 2e3;
 var SEARCH_BUDGET_MS = 5e4;
 var SEARCH_TIMEOUT_MS = 12e3;
@@ -43855,7 +44612,7 @@ async function searchAlbum(ctx, album) {
     }
   }));
 }
-var downloadsDir = (ctx) => path12.join(ctx.dataFolder, "downloads");
+var downloadsDir = (ctx) => path13.join(ctx.dataFolder, "downloads");
 async function startDownload(ctx, result, kind) {
   const data = result?.data;
   if (!data?.username || !Array.isArray(data.files) || !data.files.length) throw new Error("The result has no files to download");
@@ -43870,7 +44627,7 @@ async function startDownload(ctx, result, kind) {
   const slskd = slskdFor(ctx);
   await slskd.enqueue(data.username, data.files.map((f) => ({ filename: f.filename, size: f.size })));
   const id = randomUUID10();
-  await writeJson(path12.join(downloadsDir(ctx), `${id}.json`), { kind, key, username: data.username, files: data.files, startedAt: Date.now() });
+  await writeJson(path13.join(downloadsDir(ctx), `${id}.json`), { kind, key, username: data.username, files: data.files, startedAt: Date.now() });
   return { pending: id };
 }
 var downloadKey = (username, files) => `${username}\0${files.map((f) => f.filename).sort().join("\0")}`;
@@ -43880,9 +44637,9 @@ async function findDownload(ctx, key) {
   const dir = downloadsDir(ctx);
   for (const name of await fs6.readdir(dir).catch(() => [])) {
     if (!name.endsWith(".json")) continue;
-    const record = await readJson(path12.join(dir, name), null);
+    const record = await readJson(path13.join(dir, name), null);
     if (!record || Date.now() - (record.startedAt || 0) > KEEP_DOWNLOADS_MS) {
-      await fs6.rm(path12.join(dir, name), { force: true });
+      await fs6.rm(path13.join(dir, name), { force: true });
       continue;
     }
     if (record.key === key && !record.failed) return name.replace(/\.json$/, "");
@@ -43891,7 +44648,7 @@ async function findDownload(ctx, key) {
 }
 async function locate(downloadFolder, file) {
   const base = remoteBase(file.filename);
-  const direct = path12.join(downloadFolder, remoteBase(remoteDir(file.filename)), base);
+  const direct = path13.join(downloadFolder, remoteBase(remoteDir(file.filename)), base);
   const stat = await fs6.stat(direct).catch(() => null);
   if (stat?.isFile()) return direct;
   let seen = 0;
@@ -43899,7 +44656,7 @@ async function locate(downloadFolder, file) {
     if (depth > 4) return null;
     for (const entry of await fs6.readdir(dir, { withFileTypes: true }).catch(() => [])) {
       if (++seen > 5e4) return null;
-      const full = path12.join(dir, entry.name);
+      const full = path13.join(dir, entry.name);
       if (entry.isDirectory()) {
         const found = await walk(full, depth + 1);
         if (found) return found;
@@ -43913,7 +44670,7 @@ async function locate(downloadFolder, file) {
   return walk(downloadFolder, 0);
 }
 async function downloadStatus(ctx, id, directory) {
-  const record = await readJson(path12.join(downloadsDir(ctx), `${id}.json`), null);
+  const record = await readJson(path13.join(downloadsDir(ctx), `${id}.json`), null);
   if (!record) throw new Error("This download is unknown to the plugin");
   const slskd = slskdFor(ctx);
   const transfers = await slskd.downloads(record.username);
@@ -43932,7 +44689,7 @@ async function downloadStatus(ctx, id, directory) {
     }
   }
   const failed = states.find((state) => FAILED_STATES.test(state));
-  if (failed) await writeJson(path12.join(downloadsDir(ctx), `${id}.json`), { ...record, failed: true });
+  if (failed) await writeJson(path13.join(downloadsDir(ctx), `${id}.json`), { ...record, failed: true });
   if (failed) throw new Error(`slskd: ${remoteBase(record.files[states.indexOf(failed)].filename)} ${failed.replace(/^Completed,\s*/, "").toLowerCase()}`);
   if (!states.every(isSucceeded)) return { done: false };
   return finishDownload(ctx, id, record, directory);
@@ -43964,10 +44721,10 @@ async function finishDownload(ctx, id, record, directory) {
 var formatBytes = (bytes) => bytes >= 1024 ** 3 ? `${(bytes / 1024 ** 3).toFixed(1)} GB` : `${Math.max(1, Math.round(bytes / 1024 ** 2))} MB`;
 async function freeBytes(ctx, dir) {
   if (ctx.freeBytes) return ctx.freeBytes(dir);
-  for (let at = dir; ; at = path12.dirname(at)) {
+  for (let at = dir; ; at = path13.dirname(at)) {
     const stats = await fs6.statfs(at).catch(() => null);
     if (stats) return stats.bavail * stats.bsize;
-    if (path12.dirname(at) === at) return Infinity;
+    if (path13.dirname(at) === at) return Infinity;
   }
 }
 var link = (ctx, local, target) => (ctx.linkFile ?? fs6.link)(local, target);
@@ -43989,7 +44746,7 @@ async function moveIntoPlace(ctx, id, record, directory) {
     const local = await locate(downloadFolder, file);
     if (!local) throw new Error(`Couldn't find ${remoteBase(file.filename)} in slskd's download folder`);
     const name = `${String(file.disc || 1).padStart(2, "0")}-${String(i + 1).padStart(3, "0")} ${remoteBase(file.filename)}`.replace(/[\\/]/g, "_");
-    const target = path12.join(directory, record.kind === "album" ? name : remoteBase(file.filename));
+    const target = path13.join(directory, record.kind === "album" ? name : remoteBase(file.filename));
     files.push({ local, target, file, size: (await fs6.stat(local)).size });
   }
   await fs6.mkdir(directory, { recursive: true });
@@ -44035,11 +44792,11 @@ async function moveIntoPlace(ctx, id, record, directory) {
       await writeTags(target, { title: [file.title], artist: [file.artist].filter(Boolean), recordingMbid: [file.recordingId] });
       tagged++;
     } catch (error) {
-      ctx.log(`Couldn't tag ${path12.basename(target)}: ${error.message}`);
+      ctx.log(`Couldn't tag ${path13.basename(target)}: ${error.message}`);
     }
   }
   ctx.log(`Download ${id}: ${files.length} file(s) ${linked ? "linked" : "copied"}, ${tagged} identified and tagged`);
-  return record.kind === "album" ? { done: true } : { done: true, path: path12.basename(files[0].target) };
+  return record.kind === "album" ? { done: true } : { done: true, path: path13.basename(files[0].target) };
 }
 
 // src/tagger.js
@@ -44047,9 +44804,9 @@ import { randomUUID as randomUUID11 } from "node:crypto";
 
 // src/model/write-guard.js
 import fs7 from "node:fs/promises";
-import path13 from "node:path";
+import path14 from "node:path";
 async function modelAllowsTagging(ctx, realPath) {
-  const filename = path13.join(ctx.dataFolder, "model", "classical.sqlite");
+  const filename = path14.join(ctx.dataFolder, "model", "classical.sqlite");
   try {
     await fs7.access(filename);
   } catch (error) {
@@ -44078,7 +44835,7 @@ async function modelAllowsTagging(ctx, realPath) {
 
 // src/tagger.js
 import fs8 from "node:fs/promises";
-import path14 from "node:path";
+import path15 from "node:path";
 
 // src/aurral.js
 var Aurral = class {
@@ -44124,16 +44881,16 @@ var Aurral = class {
 // src/tagger.js
 var LOCK_STALE_MS = 2 * 6e4;
 var SAVE_EVERY_MS = 3e4;
-var queueDir = (ctx) => path14.join(ctx.dataFolder, "queue");
-var processedFile = (ctx) => path14.join(ctx.dataFolder, "processed.json");
-var indexFile = (ctx) => path14.join(ctx.dataFolder, "library-index.json");
-var originalsFile = (ctx) => path14.join(ctx.dataFolder, "originals.json");
-var excludedFile = (ctx) => path14.join(ctx.dataFolder, "excluded.json");
+var queueDir = (ctx) => path15.join(ctx.dataFolder, "queue");
+var processedFile = (ctx) => path15.join(ctx.dataFolder, "processed.json");
+var indexFile = (ctx) => path15.join(ctx.dataFolder, "library-index.json");
+var originalsFile = (ctx) => path15.join(ctx.dataFolder, "originals.json");
+var excludedFile = (ctx) => path15.join(ctx.dataFolder, "excluded.json");
 var TAG_FIELDS = ["artist", "albumArtist", "composer", "work", "workId"];
 var TAGGING_VERSION = 2;
 var outdated = (record) => record && (record.status === "tagged" || record.status === "unchanged") && (record.v ?? 1) < TAGGING_VERSION;
-var lockDir = (ctx) => path14.join(ctx.dataFolder, "tagging.lock");
-var yieldFile = (ctx) => path14.join(ctx.dataFolder, "tagging.yield");
+var lockDir = (ctx) => path15.join(ctx.dataFolder, "tagging.lock");
+var yieldFile = (ctx) => path15.join(ctx.dataFolder, "tagging.yield");
 var YIELD_FRESH_MS = 10 * 6e4;
 var PRIORITY_WAIT_MS = 5 * 6e4;
 var ACTION_CLAIM_MS = 2 * 6e4;
@@ -44143,14 +44900,14 @@ async function enqueue(ctx, filePaths, { force = false, source = null } = {}) {
   for (const filePath of filePaths) {
     if (!filePath) continue;
     const id = `${Date.now().toString().padStart(15, "0")}-${randomUUID11()}`;
-    await writeJson(path14.join(queueDir(ctx), `${id}.json`), { path: filePath, force, source, at: Date.now() });
+    await writeJson(path15.join(queueDir(ctx), `${id}.json`), { path: filePath, force, source, at: Date.now() });
     ids.push(id);
   }
   return ids;
 }
 async function queuedEntries(ctx) {
   const names = (await fs8.readdir(queueDir(ctx)).catch(() => [])).filter((n) => n.endsWith(".json")).sort();
-  return names.map((name) => ({ name, file: path14.join(queueDir(ctx), name) }));
+  return names.map((name) => ({ name, file: path15.join(queueDir(ctx), name) }));
 }
 var queueLength = async (ctx) => (await queuedEntries(ctx)).length;
 async function allowedPath(ctx, filePath) {
@@ -44160,8 +44917,8 @@ async function allowedPath(ctx, filePath) {
     if (!root) continue;
     const base = await fs8.realpath(root).catch(() => null);
     if (!base) continue;
-    const relative = path14.relative(base, real);
-    if (relative && !relative.startsWith("..") && !path14.isAbsolute(relative)) return real;
+    const relative = path15.relative(base, real);
+    if (relative && !relative.startsWith("..") && !path15.isAbsolute(relative)) return real;
   }
   return null;
 }
@@ -44362,7 +45119,7 @@ var Session = class {
     });
     if (changed.length) {
       this.changedFiles++;
-      ctx.log(`Tagged ${path14.basename(real)}: ${fields.artist}`);
+      ctx.log(`Tagged ${path15.basename(real)}: ${fields.artist}`);
     }
     return true;
   }
@@ -44404,7 +45161,7 @@ var Session = class {
     this.stats.skipped["classical tags removed"]--;
     if (changed.length) {
       this.changedFiles++;
-      ctx.log(`Removed classical tags from ${path14.basename(real)}`);
+      ctx.log(`Removed classical tags from ${path15.basename(real)}`);
     }
     return changed.length ? original && mode !== "clear" ? "restored" : "cleared" : "unchanged";
   }
@@ -44472,7 +45229,7 @@ var Session = class {
           return;
         }
         if (entry.name.startsWith(".")) continue;
-        const full = path14.join(dir, entry.name);
+        const full = path15.join(dir, entry.name);
         if (entry.isDirectory()) await walk(full);
         else if (entry.isFile() && isAudioPath(full)) {
           seen.add(full);
@@ -44526,7 +45283,7 @@ async function openState(ctx, priority) {
   return state;
 }
 async function withTagging(ctx, work, { priority = false } = {}) {
-  const key = path14.resolve(ctx.dataFolder);
+  const key = path15.resolve(ctx.dataFolder);
   let entry;
   for (; ; ) {
     entry = held.get(key);
@@ -44756,6 +45513,7 @@ var index_default = {
     mutate: (input) => input.pageId === "work" ? mutateWork(input) : mutateEditor(input)
   },
   albumPresentation,
+  search,
   async test(input) {
     const ctx = makeContext(input);
     const parts = [];
@@ -44951,7 +45709,7 @@ var index_default = {
     if (remainingMs <= 0) return;
     const stats = await runScheduled(ctx, remainingMs);
     if (stats) log(`Scheduled tagging: ${describeStats(stats)}`);
-    await pruneCache(path15.join(ctx.dataFolder, "mb-cache"), TTL.default).catch(
+    await pruneCache(path16.join(ctx.dataFolder, "mb-cache"), TTL.default).catch(
       () => {
       }
     );

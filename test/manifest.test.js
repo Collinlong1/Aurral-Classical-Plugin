@@ -62,3 +62,9 @@ test("every manifest action has a handler in the built bundle", async () => {
   const missing = (manifest.actions || []).map((action) => action.id).filter((id) => typeof plugin.actions?.[id] !== "function");
   assert.deepEqual(missing, []);
 });
+
+test("a declared search provider is exported by the built bundle", async () => {
+  const { default: plugin } = await import("../index.js");
+  assert.equal(manifest.search, true);
+  assert.equal(typeof plugin.search, "function");
+});

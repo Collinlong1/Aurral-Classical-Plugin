@@ -168,4 +168,35 @@ CREATE INDEX relation_target ON relation(kind,target_id);
 CREATE INDEX realization_work ON realization(work_id);
 `,
   },
+  {
+    // v0.2. The search index is derived from the catalogue and rebuilt when
+    // the catalogue changes; dropping its tables loses nothing. change_set
+    // keeps what a merge or deletion removed, so it can be undone, and
+    // match_suppression keeps background matching from making a deleted
+    // work again before an admin says so.
+    version: 4,
+    sql: `
+CREATE TABLE search_doc (
+ id INTEGER PRIMARY KEY, kind TEXT NOT NULL, ref TEXT NOT NULL, work_id TEXT, title TEXT NOT NULL,
+ subtitle TEXT NOT NULL DEFAULT '', detail TEXT NOT NULL DEFAULT '', owned INTEGER NOT NULL DEFAULT 0,
+ boost REAL NOT NULL DEFAULT 0, data TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(data)), UNIQUE(kind,ref)
+);
+CREATE TABLE search_term (
+ term TEXT NOT NULL, doc INTEGER NOT NULL, field INTEGER NOT NULL, PRIMARY KEY(term,doc,field)
+) WITHOUT ROWID;
+CREATE TABLE search_key (key TEXT NOT NULL, doc INTEGER NOT NULL, PRIMARY KEY(key,doc)) WITHOUT ROWID;
+CREATE TABLE search_facet (
+ facet TEXT NOT NULL, value TEXT NOT NULL, doc INTEGER NOT NULL, label TEXT NOT NULL, PRIMARY KEY(facet,value,doc)
+) WITHOUT ROWID;
+CREATE INDEX search_facet_doc ON search_facet(doc);
+CREATE TABLE search_state (id INTEGER PRIMARY KEY CHECK(id=1), stamp TEXT NOT NULL, built_at INTEGER NOT NULL, docs INTEGER NOT NULL);
+CREATE TABLE change_set (
+ id TEXT PRIMARY KEY, kind TEXT NOT NULL, actor TEXT, summary TEXT NOT NULL,
+ data TEXT NOT NULL CHECK(json_valid(data)), created_at INTEGER NOT NULL, undone_at INTEGER
+);
+CREATE TABLE match_suppression (
+ key TEXT PRIMARY KEY, title TEXT NOT NULL, reason TEXT NOT NULL, actor TEXT, created_at INTEGER NOT NULL
+);
+`,
+  },
 ];

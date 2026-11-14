@@ -828,11 +828,11 @@ test("failed migrations roll back DDL and versions; consistent backups restore a
   await c.backup(backup);
   c.close();
   const bad = {
-    version: 4,
+    version: 5,
     sql: "CREATE TABLE should_rollback(id); INSERT INTO no_such_table VALUES (1);",
   };
   await assert.rejects(
-    openDatabase(folders.dataFolder, { migrations: [bad], maxVersion: 4 }),
+    openDatabase(folders.dataFolder, { migrations: [bad], maxVersion: 5 }),
     /no such table/,
   );
   const restored = await openCatalogue(folders.dataFolder);
@@ -847,12 +847,12 @@ test("failed migrations roll back DDL and versions; consistent backups restore a
   );
   assert.equal(
     restored.db.prepare("PRAGMA user_version").get().user_version,
-    3,
+    4,
   );
   restored.close();
   const upgraded = await openDatabase(folders.dataFolder, {
-    migrations: [{ version: 4, sql: "CREATE TABLE future(id);" }],
-    maxVersion: 4,
+    migrations: [{ version: 5, sql: "CREATE TABLE future(id);" }],
+    maxVersion: 5,
   });
   upgraded.db.close();
   await assert.rejects(openCatalogue(folders.dataFolder), /newer/);
@@ -878,9 +878,12 @@ test("schema 1 upgrades to user-scoped Phase 4 state without changing catalogue 
   const upgraded = await openCatalogue(folders.dataFolder);
   assert.equal(
     upgraded.db.prepare("PRAGMA user_version").get().user_version,
-    3,
+    4,
   );
   assert.equal(upgraded.entity(work).kind, "work");
+  // v0.2 (schema 4): the derived search index and the undo/suppression tables.
+  for (const table of ["search_doc", "search_term", "change_set", "match_suppression"])
+    assert.ok(upgraded.db.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?").get(table), table);
   assert.ok(
     upgraded.db
       .prepare(
@@ -894,12 +897,13 @@ test("schema 1 upgrades to user-scoped Phase 4 state without changing catalogue 
       file.startsWith("before-v2-"),
     ),
   );
+  assert.ok((await fs.readdir(path.join(folders.dataFolder, "backups"))).some((file) => file.startsWith("before-v4-")));
 });
 
 test("process death during DDL leaves the old schema recoverable", async (t) => {
   const { c, folders } = await setup(t);
   c.close();
-  const script = `import { DatabaseSync } from 'node:sqlite';const d=new DatabaseSync(${JSON.stringify(c.filename)});d.exec('BEGIN IMMEDIATE; CREATE TABLE interrupted(id); PRAGMA user_version=4');process.kill(process.pid,'SIGKILL');`;
+  const script = `import { DatabaseSync } from 'node:sqlite';const d=new DatabaseSync(${JSON.stringify(c.filename)});d.exec('BEGIN IMMEDIATE; CREATE TABLE interrupted(id); PRAGMA user_version=5');process.kill(process.pid,'SIGKILL');`;
   const child = spawnSync(
     process.execPath,
     ["--input-type=module", "-e", script],
@@ -909,7 +913,7 @@ test("process death during DDL leaves the old schema recoverable", async (t) => 
   const reopened = await openCatalogue(folders.dataFolder);
   assert.equal(
     reopened.db.prepare("PRAGMA user_version").get().user_version,
-    3,
+    4,
   );
   assert.equal(
     reopened.db
