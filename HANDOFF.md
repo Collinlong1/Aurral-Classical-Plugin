@@ -1,3 +1,9 @@
+# v0.1 release gate: 1.0.48 against core cc51a65
+
+November 14, 2026. The work-view integration workflow (Compose, Chromium, restart) had last run on November 11 against core `66b54b5`, from `phase4-review`. Its core pin is now `cc51a65`, core `aurral-classical` after the Sync-fork merge of upstream through #1838, and it ran on `aurral-classical` at `ddb4acf` (plugin 1.0.48) by workflow_dispatch: run 43617362225, every step passed (synthetic instance and comparisons, browser editor and permissions, restart persistence with media unchanged). Rerun it after any core sync (`dev/seed.mjs` and `dev/smoke.mjs` import core internals).
+
+Left for the user, not blocking: the review queues (classification 302, duplicate-work 11, identity 12, movement-mismatch 6); pinning Mulan "Remove from Classical"; the 16-item legacy bug checklist, never supplied.
+
 # 1.0.48: preludes and fugues named by their tracks, with their keys
 
 November 14, 2026. On 1.0.47 (scan of 12,802 tracks, 0 errors; "Work names and books from MusicBrainz" looked up 1,357 works, renamed 63, filed 7) the user's Bach album still had "The Well-Tempered Clavier, BWV 846–893" as one recording of BWV 855, 850 and 847, re-identified into the same shape; BWV 902 took its English title. Its tracks read "Prelude & Fugue in E minor (Well‐Tempered Clavier, Book I, no. 10), BWV 855: I. Prelude": "Prelude" made the heading a loose collection to the title rules, so no local work, and the guard against a MusicBrainz work with another number took the track's number from that same rule, so it never fired. The user also asked for keys in the movements, as Apple writes "I. Prelude in C Minor".
