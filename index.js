@@ -37417,8 +37417,13 @@ function groupingWork(grouping, title) {
 }
 var catalogueText = (number) => number.replace(/^([A-Z])\s/, "$1. ");
 function proposedWork({ work, grouping, title }, allowStructuredTitles) {
-  const tagged = clean3(work);
-  if (tagged && (!isCollectionLike(tagged) || catalogueSet(clean3(tagged.split(/\s*:\s*/, 1)[0])))) {
+  let tagged = clean3(work);
+  if (tagged && CATALOGUE_RANGE.test(clean3(tagged.split(/\s*:\s*/, 1)[0]))) {
+    const parts = tagged.split(/\s*:\s*/);
+    const at = parts.findIndex((part, i) => i > 0 && i < parts.length - 1 && catalogued(part) && !CATALOGUE_RANGE.test(part));
+    if (at > 0) tagged = parts.slice(at).join(": ");
+  }
+  if (tagged && (!isCollectionLike(tagged) || catalogueSet(clean3(tagged.split(/\s*:\s*/, 1)[0])) || catalogued(clean3(tagged.split(/\s*:\s*/, 1)[0])))) {
     const parent = clean3(tagged.split(/\s*:\s*/, 1)[0]);
     if (MULTI_MOVEMENT.test(parent) || catalogueNumber(parent))
       return { title: parent, evidence: "work-tag" };
@@ -38376,6 +38381,15 @@ function releaseRangeWorks(catalogue, { actor: actor3 = null } = {}) {
          GROUP BY CAST(json_extract(t.evidence,'$.albumId') AS TEXT) HAVING count(DISTINCT r.id)>1 LIMIT 1`
     ).get(id);
     if (!stacked) continue;
+    const again2 = db.prepare(
+      `SELECT DISTINCT t.evidence FROM realization r JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
+         JOIN track_link t ON t.id=s.track_link_id WHERE r.work_id=?`
+    ).all(id).some((row) => {
+      const hints = JSON.parse(row.evidence).hints || {};
+      const proposal = proposedWork({ ...hints, title: withoutComposer(hints.title, hints.composer) }, true);
+      return proposal && CATALOGUE_RANGE.test(proposal.title);
+    });
+    if (again2) continue;
     const ids = [id, ...workMovements(catalogue, id).map((m) => m.id)];
     const madeByMatching = db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work'").get(id);
     if (!madeByMatching || editedInEditor(catalogue, ids) || hasManualEdits(catalogue, ids)) continue;
@@ -42446,11 +42460,106 @@ async function englishWorkTitles(ctx, catalogue, albumId) {
     if (!current || current.source !== "derived") continue;
     try {
       const data = await ctx.mb.get("work", mbid, "aliases+artist-rels+work-rels");
-      const english = data && ClassicalResolver.bestEnglishAlias(data.aliases)?.name;
+      const english = data && ClassicalResolver.bestEnglishAlias(data.aliases)?.name || headingFor(catalogue, work, albumId, JSON.parse(current.value));
       if (english && english !== JSON.parse(current.value)) metadata.derived(work, "title", english);
     } catch (error) {
       ctx.log(`English work title skipped: ${error.message}`);
     }
+  }
+}
+function headingFor(catalogue, work, albumId, title) {
+  const subject = catalogueSubject(title);
+  if (!subject) return null;
+  const counts = /* @__PURE__ */ new Map();
+  for (const { evidence: evidence2 } of catalogue.db.prepare(
+    `SELECT t.evidence FROM realization r JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
+       JOIN track_link t ON t.id=s.track_link_id WHERE r.work_id=? AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?`
+  ).all(work, String(albumId))) {
+    const hints = JSON.parse(evidence2).hints || {};
+    const head = splitTitle(withoutComposer(hints.title, hints.composer)).head;
+    if (head && catalogueSubject(head) === subject) counts.set(head, (counts.get(head) || 0) + 1);
+  }
+  return [...counts].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+}
+var ENGLISH = "work_english";
+var ENGLISH_KEY = `${ENGLISH}:v1`;
+async function queueEnglishNames(ctx, actor3) {
+  if (actor3?.role !== "admin") throw new Error("English work names require a current host admin");
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  try {
+    const prior = catalogue.db.prepare("SELECT state,progress FROM model_job WHERE key=?").get(ENGLISH_KEY);
+    if (prior) return { queued: false, state: prior.state, ...JSON.parse(prior.progress || "{}") };
+    new ModelJobs(catalogue).enqueue(ENGLISH, ENGLISH_KEY, {}, { maxAttempts: 5 });
+    return { queued: true };
+  } finally {
+    catalogue.close();
+  }
+}
+async function englishNamesStatus(ctx) {
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  try {
+    const row = catalogue.db.prepare("SELECT state,progress FROM model_job WHERE key=?").get(ENGLISH_KEY);
+    return row ? { state: row.state, ...JSON.parse(row.progress || "{}") } : null;
+  } finally {
+    catalogue.close();
+  }
+}
+async function englishEntryFor(ctx, catalogue, work) {
+  const inc = "aliases+artist-rels+work-rels";
+  const known = catalogue.db.prepare("SELECT record_id FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='work' AND state='active'").get(work)?.record_id;
+  if (known) return { entry: await ctx.mb.get("work", known, inc), verified: true };
+  const tracks = catalogue.db.prepare(
+    `SELECT i.movement_id AS movement,json_extract(t.evidence,'$.hints.workId') AS tag FROM realization r JOIN realization_item i ON i.realization_id=r.id
+       JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id
+       WHERE r.work_id=? AND coalesce(json_extract(t.evidence,'$.hints.workId'),'')!='' LIMIT 5`
+  ).all(work);
+  for (const { movement, tag } of tracks) {
+    const leaf = await ctx.mb.get("work", tag, inc);
+    if (!leaf) continue;
+    if (!movement) return { entry: leaf, verified: false };
+    const parent = (leaf.relations || []).find((rel) => rel.type === "parts" && rel.direction === "backward" && rel.work?.id);
+    if (parent) return { entry: await ctx.mb.get("work", parent.work.id, inc), verified: false };
+  }
+  return { entry: null, verified: false };
+}
+async function runEnglishNames(ctx, catalogue, jobs, job, deadline) {
+  try {
+    const works = catalogue.db.prepare(
+      `SELECT e.id FROM entity e JOIN metadata_target m ON m.entity_id=e.id JOIN field_resolution f ON f.target_id=m.id AND f.field='title'
+         JOIN assertion a ON a.id=f.assertion_id AND a.source='derived'
+         WHERE e.kind='work' AND e.deleted_at IS NULL ORDER BY e.id`
+    ).all().map((row) => row.id);
+    const progress = { cursor: 0, renamed: 0, total: works.length, ...job.progress };
+    const metadata = new Metadata(catalogue);
+    while (progress.cursor < works.length) {
+      if (Date.now() >= deadline) {
+        jobs.checkpoint(job, progress, { leaseMs: 6e4 });
+        jobs.yield(job);
+        return;
+      }
+      const work = works[progress.cursor];
+      try {
+        const current = catalogue.db.prepare("SELECT a.value,a.source FROM field_resolution f JOIN assertion a ON a.id=f.assertion_id JOIN metadata_target m ON m.id=f.target_id WHERE m.entity_id=? AND f.field='title'").get(work);
+        const title = current?.source === "derived" ? JSON.parse(current.value) : null;
+        if (typeof title === "string") {
+          const { entry, verified: verified2 } = await englishEntryFor(ctx, catalogue, work);
+          const english = entry && ClassicalResolver.bestEnglishAlias(entry.aliases)?.name;
+          const same2 = verified2 || catalogueSubject(title) && [entry?.title, english].some((name) => catalogueSubject(name || "") === catalogueSubject(title));
+          if (english && same2 && english !== title) {
+            metadata.derived(work, "title", english);
+            progress.renamed++;
+          }
+        }
+      } catch (error) {
+        ctx.log(`English work name skipped: ${error.message}`);
+      }
+      progress.cursor++;
+      jobs.checkpoint(job, progress, { leaseMs: 6e4 });
+    }
+    jobs.checkpoint(job, progress, { done: true, leaseMs: 6e4 });
+  } catch (error) {
+    jobs.fail(job, error.message);
+    ctx.log(`English work names failed: ${error.message}`);
   }
 }
 async function runIdentification(ctx, catalogue, jobs, first, owner, deadline) {
@@ -42526,6 +42635,7 @@ async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 200, checkpointMs
     const job = jobs.claim(owner, { leaseMs: 6e4 });
     if (!job) return;
     if (job.type === IDENTIFY) return await runIdentification(ctx, catalogue, jobs, job, owner, deadline);
+    if (job.type === ENGLISH) return await runEnglishNames(ctx, catalogue, jobs, job, deadline);
     try {
       if (job.type !== "library_scan")
         throw new Error("Unknown model job type");
@@ -43039,7 +43149,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.43" : "dev";
+var VERSION = true ? "1.0.44" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js
@@ -44598,6 +44708,17 @@ var index_default = {
       const progress = `${id.done} album${id.done === 1 ? "" : "s"} looked up, ${id.matched} work group${id.matched === 1 ? "" : "s"} made${id.queued ? `; ${id.queued} still queued: run this again, or enable the plugin schedule, to continue` : ""}.`;
       return {
         message: result.albums ? `Queued ${result.albums} album${result.albums === 1 ? "" : "s"} (${result.tracks} track${result.tracks === 1 ? "" : "s"}) for a one-time MusicBrainz lookup, one request a second on public MusicBrainz. ${progress}` : id.queued ? `Continuing the MusicBrainz lookup. ${progress}` : "No album is waiting for its one-time MusicBrainz lookup: each was looked up already, or has no track with a recording ID outside a work."
+      };
+    },
+    async "classical-english-names"(input) {
+      const ctx = makeContext(input);
+      const queued = await queueEnglishNames(ctx, input.user);
+      if (!queued.queued && queued.state === "done")
+        return { message: `English work names were looked up already: ${queued.renamed} of ${queued.total} works renamed.` };
+      await modelJobs(ctx, { budgetMs: ACTION_BUDGET_MS });
+      const status = await englishNamesStatus(ctx);
+      return {
+        message: status?.state === "done" ? `Looked up ${status.total} works on MusicBrainz: ${status.renamed} renamed to their English names. Titles you set yourself were left alone.` : `Looked up ${status?.cursor ?? 0} of ${status?.total ?? "?"} works so far (${status?.renamed ?? 0} renamed): run this again, or enable the plugin schedule, to continue.`
       };
     },
     async "classical-auto-match"(input) {

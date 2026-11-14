@@ -25,7 +25,7 @@ async function library(t) {
   const folders = await tempFolders();
   t.after(() => fs.rm(folders.root, { recursive: true, force: true }));
   const tracks = [];
-  const add = async (album, titles, { composer = DEBUSSY, recordings = [] } = {}) => {
+  const add = async (album, titles, { composer = DEBUSSY, recordings = [], workIds = [] } = {}) => {
     for (const [i, title] of titles.entries()) {
       const id = tracks.length;
       const file = await copyFixture("sine.flac", path.join(folders.libraryFolder, `${id}.flac`));
@@ -34,7 +34,7 @@ async function library(t) {
       const fd = await fs.open(file, "r+");
       await fd.write(Buffer.from([id + 1]), 0, 1, size - 50);
       await fd.close();
-      await writeTags(file, { title: [title], composer: [composer], artist: ["Pianist"], ...(recordings[i] && { recordingMbid: [recordings[i]] }) });
+      await writeTags(file, { title: [title], composer: [composer], artist: ["Pianist"], ...(recordings[i] && { recordingMbid: [recordings[i]] }), ...(workIds[i] && { workId: [workIds[i]] }) });
       tracks.push({ id, title, album, file, trackNumber: i + 1 });
     }
   };
@@ -278,4 +278,47 @@ test("background matching: no climbing into a range of works; English names; the
   const { message } = await plugin.actions["classical-auto-match"]({ ...lib.ctx, settings, user: admin, album: { id: "bach" } });
   assert.match(message, /No new groups|Created/);
   assert.equal((await lib.view("bach"))[0][0], "Prelude and Fugue in E minor, BWV 855");
+});
+
+// The user's 1.0.43 audit: about a hundred works matched from Hyperion's tags
+// kept German names ("Zwei Konzertetüden, S. 145"); MusicBrainz was never
+// asked about them. The admin's one-time action finds each work's
+// MusicBrainz entry through its tracks' Work Id tags and takes the English
+// name only when that entry carries the work's own number.
+test("background matching: English work names from MusicBrainz, once, for works matched from tags", async (t) => {
+  const lib = await library(t);
+  await lib.add("liszt", ["Zwei Konzertetüden, S. 145: I. Waldesrauschen", "Zwei Konzertetüden, S. 145: II. Gnomenreigen", "Trauervorspiel und Trauermarsch, S206: I. Trauervorspiel", "Trauervorspiel und Trauermarsch, S206: II. Trauermarsch", "Scherzo und Marsch, S177: I. Scherzo", "Scherzo und Marsch, S177: II. Marsch"], {
+    composer: "Franz Liszt",
+    workIds: ["mb-wald", "mb-gnom", "mb-vorspiel", "mb-marsch", "mb-scherzo", "mb-m"],
+  });
+  await lib.scan();
+  const part = (id, title, parent) => ({ id, title, relations: [{ type: "parts", direction: "backward", work: { id: parent } }] });
+  const entities = {
+    "mb-wald": part("mb-wald", "Waldesrauschen", "mb-s145"),
+    "mb-s145": { id: "mb-s145", title: "Zwei Konzertetüden, S. 145", aliases: [{ locale: "en", name: "Two Concert Études, S. 145", type: "Work name" }], relations: [] },
+    // MusicBrainz files this movement under another number: no rename.
+    "mb-vorspiel": part("mb-vorspiel", "Trauervorspiel", "mb-other"),
+    "mb-other": { id: "mb-other", title: "Trauerode, S. 112", aliases: [{ locale: "en", name: "Funeral Ode, S. 112", type: "Work name" }], relations: [] },
+    "mb-scherzo": part("mb-scherzo", "Scherzo", "mb-s177"),
+    "mb-s177": { id: "mb-s177", title: "Scherzo und Marsch, S. 177", aliases: [{ locale: "en", name: "Scherzo and March, S. 177", type: "Work name" }], relations: [] },
+  };
+  const server = http.createServer((request, response) => {
+    const [, , , entity, id] = new URL(request.url, "http://mirror").pathname.split("/");
+    const data = entity === "work" ? entities[id] : null;
+    response.writeHead(data ? 200 : 404, { "content-type": "application/json" });
+    response.end(JSON.stringify(data || { error: "Not Found" }));
+  });
+  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  t.after(() => server.close());
+  // An admin named this one: theirs stays.
+  const c = await openCatalogue(path.join(lib.ctx.dataFolder, "model"));
+  const work = (title) => renderAlbumPresentation(c, "liszt").groups.find((group) => group.title === title).workId;
+  new Metadata(c).manual(work("Scherzo und Marsch, S177"), "title", "Scherzo und Marsch, S. 177", { actor: "admin" });
+  c.close();
+  const input = { ...lib.ctx, settings: { mbMirror: `http://127.0.0.1:${server.address().port}` }, user: admin };
+  const { message } = await plugin.actions["classical-english-names"](input);
+  assert.match(message, /renamed/);
+  assert.deepEqual((await lib.view("liszt")).map(([title]) => title), ["Two Concert Études, S. 145", "Trauervorspiel und Trauermarsch, S206", "Scherzo und Marsch, S. 177"]);
+  // Once: a second run looks nothing up.
+  assert.match((await plugin.actions["classical-english-names"](input)).message, /already/);
 });

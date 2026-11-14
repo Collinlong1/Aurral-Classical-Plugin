@@ -1,7 +1,7 @@
 {
   "id": "aurral-classical",
   "name": "Aurral Classical",
-  "version": "1.0.43",
+  "version": "1.0.44",
   "api": 1,
   "description": "Tags classical music as Composer \u2014 Soloist \u2014 Ensemble \u2014 Conductor from MusicBrainz, compares recordings of a movement, and downloads classical albums from slskd.",
   "repository": "https://github.com/Collinlong1/Aurral-Classical-Plugin",
@@ -159,6 +159,13 @@
     {
       "id": "classical-identify-backlog",
       "label": "Identify earlier albums on MusicBrainz",
+      "target": "album",
+      "admin": true,
+      "background": true
+    },
+    {
+      "id": "classical-english-names",
+      "label": "English work names from MusicBrainz",
       "target": "album",
       "admin": true,
       "background": true

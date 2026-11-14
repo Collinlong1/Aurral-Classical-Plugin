@@ -147,8 +147,19 @@ function groupingWork(grouping, title) {
 const catalogueText = (number) => number.replace(/^([A-Z])\s/, "$1. ");
 
 function proposedWork({ work, grouping, title }, allowStructuredTitles) {
-  const tagged = clean(work);
-  if (tagged && (!isCollectionLike(tagged) || catalogueSet(clean(tagged.split(/\s*:\s*/, 1)[0])))) {
+  let tagged = clean(work);
+  // A WORK tag that starts at a collection of works ("The Well-Tempered
+  // Clavier, BWV 846–893: Book I, BWV 846–869: Prelude and Fugue in E minor,
+  // BWV 855: Prelude") names its work further on: the first part with a
+  // number of its own that isn't a range and has movements after it. A
+  // madrigal last in its book's tag ("…, SV 75–93: Sfogava…, SV 78") stays
+  // with the book.
+  if (tagged && CATALOGUE_RANGE.test(clean(tagged.split(/\s*:\s*/, 1)[0]))) {
+    const parts = tagged.split(/\s*:\s*/);
+    const at = parts.findIndex((part, i) => i > 0 && i < parts.length - 1 && catalogued(part) && !CATALOGUE_RANGE.test(part));
+    if (at > 0) tagged = parts.slice(at).join(": ");
+  }
+  if (tagged && (!isCollectionLike(tagged) || catalogueSet(clean(tagged.split(/\s*:\s*/, 1)[0])) || catalogued(clean(tagged.split(/\s*:\s*/, 1)[0])))) {
     const parent = clean(tagged.split(/\s*:\s*/, 1)[0]);
     // A WORK tag names a work outright when it reads like one or carries
     // a catalogue number, as song cycles do ("Winterreise, D. 911").
@@ -1550,6 +1561,20 @@ export function releaseRangeWorks(catalogue, { actor = null } = {}) {
       )
       .get(id);
     if (!stacked) continue;
+    // Tags that would make the same collection again on the next pass keep
+    // it: letting it go would only repeat at every scan.
+    const again = db
+      .prepare(
+        `SELECT DISTINCT t.evidence FROM realization r JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
+         JOIN track_link t ON t.id=s.track_link_id WHERE r.work_id=?`,
+      )
+      .all(id)
+      .some((row) => {
+        const hints = JSON.parse(row.evidence).hints || {};
+        const proposal = proposedWork({ ...hints, title: withoutComposer(hints.title, hints.composer) }, true);
+        return proposal && CATALOGUE_RANGE.test(proposal.title);
+      });
+    if (again) continue;
     const ids = [id, ...workMovements(catalogue, id).map((m) => m.id)];
     const madeByMatching = db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work'").get(id);
     if (!madeByMatching || editedInEditor(catalogue, ids) || hasManualEdits(catalogue, ids)) continue;

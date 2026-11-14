@@ -12,6 +12,8 @@ import {
   cancelModelScan,
   queueAlbumMatch,
   albumMatchResult,
+  queueEnglishNames,
+  englishNamesStatus,
   autoMatchLibrary,
   identifyBacklog,
   runModelJobs,
@@ -265,6 +267,22 @@ export default {
           : id.queued
             ? `Continuing the MusicBrainz lookup. ${progress}`
             : "No album is waiting for its one-time MusicBrainz lookup: each was looked up already, or has no track with a recording ID outside a work.",
+      };
+    },
+    async "classical-english-names"(input) {
+      // Once: a lookup per work, one request a second on public MusicBrainz,
+      // on the model worker; run again to continue.
+      const ctx = makeContext(input);
+      const queued = await queueEnglishNames(ctx, input.user);
+      if (!queued.queued && queued.state === "done")
+        return { message: `English work names were looked up already: ${queued.renamed} of ${queued.total} works renamed.` };
+      await modelJobs(ctx, { budgetMs: ACTION_BUDGET_MS });
+      const status = await englishNamesStatus(ctx);
+      return {
+        message:
+          status?.state === "done"
+            ? `Looked up ${status.total} works on MusicBrainz: ${status.renamed} renamed to their English names. Titles you set yourself were left alone.`
+            : `Looked up ${status?.cursor ?? 0} of ${status?.total ?? "?"} works so far (${status?.renamed ?? 0} renamed): run this again, or enable the plugin schedule, to continue.`,
       };
     },
     async "classical-auto-match"(input) {

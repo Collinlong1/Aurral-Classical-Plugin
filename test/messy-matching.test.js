@@ -1441,3 +1441,23 @@ test("matching: counted song sets with numbers, Ravel's numbers, numbered runs; 
   // Matching the album again with what MusicBrainz says now leaves nothing on it.
   assert.equal(releaseRangeWorks(c), 0);
 });
+
+// The user's 1.0.43 audit: the Well-Tempered Clavier work came back after
+// the repair let it go, because the tracks' WORK tags (Picard's MusicBrainz
+// path, "The Well-Tempered Clavier, BWV 846–893: Book I…: Prelude and Fugue
+// …, BWV 855: Prelude") named the collection before the colon. The tag now
+// names the prelude and fugue; a madrigal stays with its book.
+test("matching: a WORK tag starting at a collection of works names the work further on", async (t) => {
+  const bach = (pf, movement) => ({ title: movement, composer: ["Johann Sebastian Bach"], genres: ["Classical"], work: `The Well-Tempered Clavier, BWV 846–893: Book I, BWV 846–869: ${pf}: ${movement}` });
+  const madrigal = (piece) => ({ title: piece, composer: ["Claudio Monteverdi"], genres: ["Classical"], work: `Quarto libro de madrigali, SV 75–93: ${piece}` });
+  const c = await catalogueWith(t, [
+    { id: "bach", album: "Johann Sebastian Bach", albumArtist: "Pianist", artist: "Pianist", titles: [bach("Prelude and Fugue no. 10 in E minor, BWV 855", "Prelude"), bach("Prelude and Fugue no. 10 in E minor, BWV 855", "Fugue"), bach("Prelude and Fugue no. 8 in E-flat minor, BWV 853", "Prelude"), bach("Prelude and Fugue no. 8 in E-flat minor, BWV 853", "Fugue")] },
+    { id: "monteverdi", album: "Madrigals", albumArtist: "Ensemble", artist: "Ensemble", titles: [madrigal("Sfogava con le stelle, SV 78"), madrigal("Cor mio, mentre vi miro, SV 79")] },
+  ]);
+  for (const albumId of ["bach", "monteverdi"]) autoMatchTaggedWorks(c, { albumId, actor: "admin", allowStructuredTitles: true });
+  const blocks = (albumId) => renderAlbumPresentation(c, albumId).groups.map((group) => [group.title, group.items.length]);
+  assert.deepEqual(blocks("bach"), [["Prelude and Fugue no. 10 in E minor, BWV 855", 2], ["Prelude and Fugue no. 8 in E-flat minor, BWV 853", 2]]);
+  assert.deepEqual(blocks("monteverdi"), [["Quarto libro de madrigali, SV 75–93", 2]]);
+  // Nothing for the repair to let go, and nothing made again.
+  assert.equal(releaseRangeWorks(c), 0);
+});

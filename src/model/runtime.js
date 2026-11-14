@@ -8,7 +8,7 @@ import { ModelJobs } from "./jobs.js";
 import { reconcile, classify } from "./reconcile.js";
 import { UserOperations } from "../user-operations.js";
 import { readTags } from "../tags.js";
-import { autoMatchTaggedWorks, catalogueSubject, isCollectionLike, namesCatalogueRange, titleHead, withoutComposer } from "./auto-match.js";
+import { autoMatchTaggedWorks, catalogueSubject, isCollectionLike, namesCatalogueRange, splitTitle, titleHead, withoutComposer } from "./auto-match.js";
 import { topWork } from "../works.js";
 import { ClassicalResolver } from "../resolver.js";
 import { fingerprint, tagSensitive } from "./fingerprint.js";
@@ -519,11 +519,128 @@ async function englishWorkTitles(ctx, catalogue, albumId) {
     if (!current || current.source !== "derived") continue;
     try {
       const data = await ctx.mb.get("work", mbid, "aliases+artist-rels+work-rels");
-      const english = data && ClassicalResolver.bestEnglishAlias(data.aliases)?.name;
+      const english = (data && ClassicalResolver.bestEnglishAlias(data.aliases)?.name) || headingFor(catalogue, work, albumId, JSON.parse(current.value));
       if (english && english !== JSON.parse(current.value)) metadata.derived(work, "title", english);
     } catch (error) {
       ctx.log(`English work title skipped: ${error.message}`);
     }
+  }
+}
+
+// With no English name on MusicBrainz ("Präludium und Fughetta G-Dur, BWV
+// 902"): the heading this album's tracks give the work, when it carries the
+// same catalogue number ("Prelude & Fughetta in G major, BWV 902").
+function headingFor(catalogue, work, albumId, title) {
+  const subject = catalogueSubject(title);
+  if (!subject) return null;
+  const counts = new Map();
+  for (const { evidence } of catalogue.db
+    .prepare(
+      `SELECT t.evidence FROM realization r JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
+       JOIN track_link t ON t.id=s.track_link_id WHERE r.work_id=? AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?`,
+    )
+    .all(work, String(albumId))) {
+    const hints = JSON.parse(evidence).hints || {};
+    const head = splitTitle(withoutComposer(hints.title, hints.composer)).head;
+    if (head && catalogueSubject(head) === subject) counts.set(head, (counts.get(head) || 0) + 1);
+  }
+  return [...counts].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+}
+
+// The admin's one-time "Look up English work names on MusicBrainz": works
+// matching titled from tags in their own language (Hyperion's Liszt titles,
+// "Zwei Konzertetüden, S. 145") take MusicBrainz's English name. A work's
+// MusicBrainz entry is its recorded identity, or found through its tracks'
+// MusicBrainz Work Id tags (the work itself for a whole piece, the parent of
+// a movement); a name is taken only when that entry carries the work's own
+// catalogue number, or is the work's recorded identity. Never a title an
+// admin set. Paced and cached through src/mb.js, resumable; once per version.
+const ENGLISH = "work_english";
+const ENGLISH_KEY = `${ENGLISH}:v1`;
+export async function queueEnglishNames(ctx, actor) {
+  if (actor?.role !== "admin") throw new Error("English work names require a current host admin");
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  try {
+    const prior = catalogue.db.prepare("SELECT state,progress FROM model_job WHERE key=?").get(ENGLISH_KEY);
+    if (prior) return { queued: false, state: prior.state, ...JSON.parse(prior.progress || "{}") };
+    new ModelJobs(catalogue).enqueue(ENGLISH, ENGLISH_KEY, {}, { maxAttempts: 5 });
+    return { queued: true };
+  } finally {
+    catalogue.close();
+  }
+}
+export async function englishNamesStatus(ctx) {
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  try {
+    const row = catalogue.db.prepare("SELECT state,progress FROM model_job WHERE key=?").get(ENGLISH_KEY);
+    return row ? { state: row.state, ...JSON.parse(row.progress || "{}") } : null;
+  } finally {
+    catalogue.close();
+  }
+}
+async function englishEntryFor(ctx, catalogue, work) {
+  const inc = "aliases+artist-rels+work-rels";
+  const known = catalogue.db.prepare("SELECT record_id FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='work' AND state='active'").get(work)?.record_id;
+  if (known) return { entry: await ctx.mb.get("work", known, inc), verified: true };
+  const tracks = catalogue.db
+    .prepare(
+      `SELECT i.movement_id AS movement,json_extract(t.evidence,'$.hints.workId') AS tag FROM realization r JOIN realization_item i ON i.realization_id=r.id
+       JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id
+       WHERE r.work_id=? AND coalesce(json_extract(t.evidence,'$.hints.workId'),'')!='' LIMIT 5`,
+    )
+    .all(work);
+  for (const { movement, tag } of tracks) {
+    const leaf = await ctx.mb.get("work", tag, inc);
+    if (!leaf) continue;
+    if (!movement) return { entry: leaf, verified: false };
+    const parent = (leaf.relations || []).find((rel) => rel.type === "parts" && rel.direction === "backward" && rel.work?.id);
+    if (parent) return { entry: await ctx.mb.get("work", parent.work.id, inc), verified: false };
+  }
+  return { entry: null, verified: false };
+}
+async function runEnglishNames(ctx, catalogue, jobs, job, deadline) {
+  try {
+    const works = catalogue.db
+      .prepare(
+        `SELECT e.id FROM entity e JOIN metadata_target m ON m.entity_id=e.id JOIN field_resolution f ON f.target_id=m.id AND f.field='title'
+         JOIN assertion a ON a.id=f.assertion_id AND a.source='derived'
+         WHERE e.kind='work' AND e.deleted_at IS NULL ORDER BY e.id`,
+      )
+      .all()
+      .map((row) => row.id);
+    const progress = { cursor: 0, renamed: 0, total: works.length, ...job.progress };
+    const metadata = new Metadata(catalogue);
+    while (progress.cursor < works.length) {
+      if (Date.now() >= deadline) {
+        jobs.checkpoint(job, progress, { leaseMs: 60_000 });
+        jobs.yield(job);
+        return;
+      }
+      const work = works[progress.cursor];
+      try {
+        const current = catalogue.db
+          .prepare("SELECT a.value,a.source FROM field_resolution f JOIN assertion a ON a.id=f.assertion_id JOIN metadata_target m ON m.id=f.target_id WHERE m.entity_id=? AND f.field='title'")
+          .get(work);
+        const title = current?.source === "derived" ? JSON.parse(current.value) : null;
+        if (typeof title === "string") {
+          const { entry, verified } = await englishEntryFor(ctx, catalogue, work);
+          const english = entry && ClassicalResolver.bestEnglishAlias(entry.aliases)?.name;
+          const same = verified || (catalogueSubject(title) && [entry?.title, english].some((name) => catalogueSubject(name || "") === catalogueSubject(title)));
+          if (english && same && english !== title) {
+            metadata.derived(work, "title", english);
+            progress.renamed++;
+          }
+        }
+      } catch (error) {
+        ctx.log(`English work name skipped: ${error.message}`);
+      }
+      progress.cursor++;
+      jobs.checkpoint(job, progress, { leaseMs: 60_000 });
+    }
+    jobs.checkpoint(job, progress, { done: true, leaseMs: 60_000 });
+  } catch (error) {
+    jobs.fail(job, error.message);
+    ctx.log(`English work names failed: ${error.message}`);
   }
 }
 
@@ -619,6 +736,7 @@ export async function runModelJobs(
     const job = jobs.claim(owner, { leaseMs: 60_000 });
     if (!job) return;
     if (job.type === IDENTIFY) return await runIdentification(ctx, catalogue, jobs, job, owner, deadline);
+    if (job.type === ENGLISH) return await runEnglishNames(ctx, catalogue, jobs, job, deadline);
     try {
       if (job.type !== "library_scan")
         throw new Error("Unknown model job type");
