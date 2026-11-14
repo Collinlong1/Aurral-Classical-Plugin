@@ -1456,7 +1456,13 @@ test("matching: a WORK tag starting at a collection of works names the work furt
   ]);
   for (const albumId of ["bach", "monteverdi"]) autoMatchTaggedWorks(c, { albumId, actor: "admin", allowStructuredTitles: true });
   const blocks = (albumId) => renderAlbumPresentation(c, albumId).groups.map((group) => [group.title, group.items.length]);
-  assert.deepEqual(blocks("bach"), [["Prelude and Fugue no. 10 in E minor, BWV 855", 2], ["Prelude and Fugue no. 8 in E-flat minor, BWV 853", 2]]);
+  // Each subtitled with its book, the parts of the tag it skipped.
+  assert.deepEqual(blocks("bach"), [
+    ["Prelude and Fugue no. 10 in E minor, BWV 855 · “The Well-Tempered Clavier, Book I”", 2],
+    ["Prelude and Fugue no. 8 in E-flat minor, BWV 853 · “The Well-Tempered Clavier, Book I”", 2],
+  ]);
+  // One collection for both.
+  assert.equal(c.db.prepare("SELECT count(*) AS n FROM entity WHERE kind='collection' AND deleted_at IS NULL").get().n, 1);
   assert.deepEqual(blocks("monteverdi"), [["Quarto libro de madrigali, SV 75–93", 2]]);
   // Nothing for the repair to let go, and nothing made again.
   assert.equal(releaseRangeWorks(c), 0);

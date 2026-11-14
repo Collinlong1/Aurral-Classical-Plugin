@@ -1,3 +1,13 @@
+# 1.0.46: a prelude and fugue is subtitled with its book, as Apple Music Classical shows it
+
+November 14, 2026. The user asked how Apple Music Classical groups preludes and fugues. Its page for Keith Jarrett's Book 1 (classical.music.apple.com/us/album/1452667337) lists 24 works, one per prelude and fugue ("Prelude & Fugue No. 2 in C Minor, BWV 847 · “The Well-tempered Clavier, Book 1”"), each with "I. Prelude … / II. Fugue …" under it; no work holds the book. 1.0.45 already makes each its own work; the user asked for Apple's subtitle.
+
+- The book a work belongs to becomes a collection (`collection_member`, which the work page already lists as "Part of …"): from MusicBrainz, the parent identification stops below (a range or collection of works; English name, its range of numbers dropped by `collectionTitle`); from a WORK tag that starts at a collection, the parts it skips ("The Well-Tempered Clavier, Book I"). `joinCollection` finds the collection by its MusicBrainz work or its name, or makes it; a work already in a collection keeps it.
+- The album page titles a work in one collection "Prelude and Fugue in E minor, BWV 855 · “The Well-Tempered Clavier, Book I”", unless the title names the collection already (Debussy's "Préludes, Livre I" in "Préludes").
+- Works matched before keep no collection until matched again; the Well-Tempered Clavier pieces on album 12814 get theirs when 1.0.45 lets the old work go and identification places them.
+
+Tests: the two Well-Tempered Clavier tests now expect the subtitle (and one collection for both, and the work page's "Part of"); they fail on 1.0.45. Debussy's Préludes keep their corpus layout. 316 plugin tests pass; corpora unchanged; the bundle runs its worker.
+
 # 1.0.45: a collection held as one recording is let go; English names fall back to the tracks' heading
 
 November 14, 2026. Audit on 1.0.44: 4,582 of 4,765 (96.2%), unchanged; the dry run let no collection go, and 109 work titles still read German. `explain-works.mjs`: "The Well-Tempered Clavier, BWV 846–893" is one recording (album 12814) of six movements, "I. Prelude / II. Fugue" three times, its tracks naming BWV 855, 850 and 847: the 1.0.22 shape. `releaseRangeWorks` only looked for several recordings on one album. "Präludium und Fughetta G-Dur, BWV 902" has a MusicBrainz identity and no English alias there.

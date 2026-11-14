@@ -37418,15 +37418,19 @@ function groupingWork(grouping, title) {
 var catalogueText = (number) => number.replace(/^([A-Z])\s/, "$1. ");
 function proposedWork({ work, grouping, title }, allowStructuredTitles) {
   let tagged = clean3(work);
+  let collection = null;
   if (tagged && CATALOGUE_RANGE.test(clean3(tagged.split(/\s*:\s*/, 1)[0]))) {
     const parts = tagged.split(/\s*:\s*/);
     const at = parts.findIndex((part, i) => i > 0 && i < parts.length - 1 && catalogued(part) && !CATALOGUE_RANGE.test(part));
-    if (at > 0) tagged = parts.slice(at).join(": ");
+    if (at > 0) {
+      tagged = parts.slice(at).join(": ");
+      collection = collectionTitle(parts.slice(0, at).map(collectionTitle).filter(Boolean).join(", ")) || null;
+    }
   }
   if (tagged && (!isCollectionLike(tagged) || catalogueSet(clean3(tagged.split(/\s*:\s*/, 1)[0])) || catalogued(clean3(tagged.split(/\s*:\s*/, 1)[0])))) {
     const parent = clean3(tagged.split(/\s*:\s*/, 1)[0]);
     if (MULTI_MOVEMENT.test(parent) || catalogueNumber(parent))
-      return { title: parent, evidence: "work-tag" };
+      return { title: parent, evidence: "work-tag", ...collection && { collection } };
     const head = titleHead(title) || title;
     const number = catalogueNumber(head);
     if (number && !isCatalogueRange(head) && !MULTI_MOVEMENT.test(head) && !isCollectionLike(parent))
@@ -37525,6 +37529,7 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
         localTitle: provider && local ? local.title : null,
         ownSubject: provider ? own : "",
         providerAliases: provider?.aliases || [],
+        collection: provider?.collection || (proposal.collection ? { id: null, title: proposal.collection } : null),
         composers,
         composerIds: provider?.composerIds || {},
         composerSource: credit ? { field: "artist", confidence: credit.confidence, evidence: credit.evidence } : null,
@@ -38340,6 +38345,7 @@ function createGroup(catalogue, group, actor3, index) {
       const segment = catalogue.segment(track.id, { kind: "whole" });
       placeTrack(catalogue, realization, performanceWork, recording, segment, movements[i]);
     });
+    if (group.collection) joinCollection(catalogue, metadata, work, group.collection, actor3);
     catalogue.audit(
       "work.auto_match",
       work,
@@ -38369,6 +38375,9 @@ function placeTrack(catalogue, realization, performanceWork, recording, segment,
 }
 var CATALOGUE_RANGE = new RegExp("(?<!\\p{L})(?:BWV|HWV|SV|K|KV|D|Op\\.?|RV|S|Hob\\.?)\\s*\\d+[a-z]?\\s*[-\u2013\u2014]\\s*\\d+", "iu");
 var namesCatalogueRange = (title) => CATALOGUE_RANGE.test(String(title || ""));
+var collectionTitle = (title) => clean3(
+  String(title || "").replace(new RegExp(",?\\s*(?<!\\p{L})(?:BWV|HWV|SV|K|KV|D|Op\\.?|RV|S|Hob\\.?)\\s*\\d+[a-z]?\\s*[-\u2013\u2014]\\s*\\d+[a-z]?", "giu"), "").replace(/[,\s]+$/, "")
+);
 function releaseRangeWorks(catalogue, { actor: actor3 = null } = {}) {
   const db = catalogue.db;
   let released = 0;
@@ -38413,6 +38422,22 @@ function releaseRangeWorks(catalogue, { actor: actor3 = null } = {}) {
     released++;
   }
   return released;
+}
+function joinCollection(catalogue, metadata, work, { id: mbid, title }, actor3) {
+  const db = catalogue.db;
+  if (!title || db.prepare("SELECT 1 FROM relation WHERE kind='collection_member' AND target_id=?").get(work)) return;
+  let collection = mbid ? db.prepare("SELECT entity_id AS id FROM external_identity WHERE provider='musicbrainz' AND record_kind='collection' AND record_id=? AND state='active'").get(mbid)?.id : null;
+  if (!collection)
+    collection = db.prepare("SELECT id FROM entity WHERE kind='collection' AND deleted_at IS NULL ORDER BY created_at").all().map((row) => row.id).find((id) => words(resolvedName(catalogue, id, "title") || "") === words(title));
+  if (!collection) {
+    collection = catalogue.createEntity("collection");
+    metadata.derived(collection, "title", title);
+    if (mbid) catalogue.externalIdentity(collection, "musicbrainz", "collection", mbid, { evidence: { source: "parent-work" } });
+  } else if (mbid && !db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='collection'").get(collection))
+    catalogue.externalIdentity(collection, "musicbrainz", "collection", mbid, { evidence: { source: "parent-work" } });
+  const position = (db.prepare("SELECT max(position) AS n FROM relation WHERE kind='collection_member' AND source_id=?").get(collection).n || 0) + 1;
+  catalogue.relate("collection_member", collection, work, { position });
+  catalogue.audit("work.join_collection", work, { collection, title }, actor3);
 }
 var LEAF = "movement-work";
 function movementWithLeaf(catalogue, work, leaf) {
@@ -41562,8 +41587,11 @@ function renderAlbumPresentation(c, albumId) {
       if (run && (last === albumPosition(row) || following.get(last) === albumPosition(row))) run.push(row);
       else runs.push([row]);
     }
-    const title = entityValue(metadata, workId, "title", "Untitled work");
-    const excerpts = NUMBERED_SET.test(title) && present.size * 2 < movements.length || Boolean(
+    const name = entityValue(metadata, workId, "title", "Untitled work");
+    const collections = c.db.prepare("SELECT source_id FROM relation WHERE kind='collection_member' AND target_id=?").all(workId);
+    const book = collections.length === 1 ? entityValue(metadata, collections[0].source_id, "title", "") : "";
+    const title = book && !` ${words2(name)} `.includes(` ${words2(book)} `) ? `${name} \xB7 \u201C${book}\u201D` : name;
+    const excerpts = NUMBERED_SET.test(name) && present.size * 2 < movements.length || Boolean(
       c.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work' AND json_extract(evidence,'$.albumId')=? AND json_extract(evidence,'$.excerpt')=1").get(workId, album)
     );
     return runs.map((run, index) => ({
@@ -42822,7 +42850,14 @@ async function identifyTrack(ctx, hints) {
   const inc = "aliases+artist-rels+work-rels";
   const leaf = await arrangedWork(ctx.mb, await ctx.mb.get("work", workId, inc), inc);
   const hasParts = (work) => (work.relations || []).some((rel) => rel.type === "parts" && rel.direction === "forward");
-  const parent = leaf && await topWork(ctx.mb, leaf, 0, inc, { stop: (above, below) => (isCollectionLike(above.title) || namesCatalogueRange(above.title)) && hasParts(below) });
+  let book = null;
+  const parent = leaf && await topWork(ctx.mb, leaf, 0, inc, {
+    stop: (above, below) => {
+      const stops = (isCollectionLike(above.title) || namesCatalogueRange(above.title)) && hasParts(below);
+      if (stops) book = above;
+      return stops;
+    }
+  });
   const title = withoutComposer(hints.title, hints.composer);
   const headSubject = catalogueSubject(titleHead(title) || "");
   const namesThisWork = Boolean(headSubject) && headSubject === catalogueSubject(leaf?.title || "");
@@ -42831,6 +42866,7 @@ async function identifyTrack(ctx, hints) {
   return {
     workId: parent.id,
     work: englishTitle(parent),
+    ...book && book.id !== parent.id && { collection: { id: book.id, title: collectionTitle(englishTitle(book)) } },
     ...!ClassicalResolver.bestEnglishAlias(parent.aliases) && { untranslated: true },
     movement: standalone ? null : englishTitle(leaf, null),
     ...standalone && { standalone: true },
@@ -43173,7 +43209,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.45" : "dev";
+var VERSION = true ? "1.0.46" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js

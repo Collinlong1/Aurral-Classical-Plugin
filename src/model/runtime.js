@@ -8,7 +8,7 @@ import { ModelJobs } from "./jobs.js";
 import { reconcile, classify } from "./reconcile.js";
 import { UserOperations } from "../user-operations.js";
 import { readTags } from "../tags.js";
-import { autoMatchTaggedWorks, catalogueSubject, isCollectionLike, namesCatalogueRange, splitTitle, titleHead, withoutComposer } from "./auto-match.js";
+import { autoMatchTaggedWorks, catalogueSubject, collectionTitle, isCollectionLike, namesCatalogueRange, splitTitle, titleHead, withoutComposer } from "./auto-match.js";
 import { topWork } from "../works.js";
 import { ClassicalResolver } from "../resolver.js";
 import { fingerprint, tagSensitive } from "./fingerprint.js";
@@ -957,7 +957,19 @@ export async function identifyTrack(ctx, hints) {
   // Nor into a range of works once the work below has parts of its own
   // ("The Well-Tempered Clavier, BWV 846–893" above "Prelude and Fugue in E
   // minor, BWV 855"); a madrigal goes on up to its book.
-  const parent = leaf && (await topWork(ctx.mb, leaf, 0, inc, { stop: (above, below) => (isCollectionLike(above.title) || namesCatalogueRange(above.title)) && hasParts(below) }));
+  // The book it stops below is the work's collection, as Apple Music
+  // Classical subtitles "Prelude & Fugue No. 10 … · The Well-tempered
+  // Clavier, Book 1".
+  let book = null;
+  const parent =
+    leaf &&
+    (await topWork(ctx.mb, leaf, 0, inc, {
+      stop: (above, below) => {
+        const stops = (isCollectionLike(above.title) || namesCatalogueRange(above.title)) && hasParts(below);
+        if (stops) book = above;
+        return stops;
+      },
+    }));
   // A work with no parent is a whole piece only when the track's own
   // title reads as one, not as a movement of something MusicBrainz
   // hasn't linked up.
@@ -980,6 +992,7 @@ export async function identifyTrack(ctx, hints) {
   return {
     workId: parent.id,
     work: englishTitle(parent),
+    ...(book && book.id !== parent.id && { collection: { id: book.id, title: collectionTitle(englishTitle(book)) } }),
     ...(!ClassicalResolver.bestEnglishAlias(parent.aliases) && { untranslated: true }),
     movement: standalone ? null : englishTitle(leaf, null),
     ...(standalone && { standalone: true }),

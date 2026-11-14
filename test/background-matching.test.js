@@ -11,7 +11,7 @@ import { tempFolders, copyFixture, json as response, symphonyEntities } from "./
 import plugin from "../src/index.js";
 import { writeTags } from "../src/tags.js";
 import { openCatalogue } from "../src/model/catalogue.js";
-import { renderAlbumPresentation } from "../src/model/presentation.js";
+import { renderAlbumPresentation, renderWork } from "../src/model/presentation.js";
 import { Metadata } from "../src/model/metadata.js";
 import { enqueueModelScan, identifyBacklog, modelStatus, runModelJobs } from "../src/model/runtime.js";
 
@@ -246,7 +246,7 @@ test("background matching: no climbing into a range of works; English names; the
         { type: "parts", direction: "forward", work: { id: "work-32" } },
       ],
     },
-    wtc1: part("wtc1", "Das Wohltemperierte Klavier I, BWV 846–869", "wtc"),
+    wtc1: { ...part("wtc1", "Das Wohltemperierte Klavier I, BWV 846–869", "wtc"), aliases: [{ locale: "en", name: "The Well-Tempered Clavier, Book I, BWV 846–869", type: "Work name" }] },
     wtc: { id: "wtc", title: "The Well-Tempered Clavier, BWV 846–893", relations: [] },
     "work-33": part("work-33", "Präludium", "pf902"),
     pf902: { id: "pf902", title: "Präludium und Fughetta G-Dur, BWV 902", relations: [] },
@@ -254,8 +254,9 @@ test("background matching: no climbing into a range of works; English names; the
   await lib.add("bach", ["Prelude", "Fugue", "Prelude & Fughetta in G major, BWV 902: I. Prelude"], { composer: "Johann Sebastian Bach", recordings: [recording(31), recording(32), recording(33)] });
   await lib.scan();
   await runModelJobs(lib.ctx, { budgetMs: 30_000 });
+  // Subtitled with the book it belongs to, as Apple Music Classical shows it.
   assert.deepEqual(await lib.view("bach"), [
-    ["Prelude and Fugue in E minor, BWV 855", true, 2],
+    ["Prelude and Fugue in E minor, BWV 855 · “The Well-Tempered Clavier, Book I”", true, 2],
     ["Prelude & Fughetta in G major, BWV 902", true, 1],
   ]);
 
@@ -277,7 +278,10 @@ test("background matching: no climbing into a range of works; English names; the
   const settings = { mbMirror: `http://127.0.0.1:${server.address().port}` };
   const { message } = await plugin.actions["classical-auto-match"]({ ...lib.ctx, settings, user: admin, album: { id: "bach" } });
   assert.match(message, /No new groups|Created/);
-  assert.equal((await lib.view("bach"))[0][0], "Prelude and Fugue in E minor, BWV 855");
+  assert.equal((await lib.view("bach"))[0][0], "Prelude and Fugue in E minor, BWV 855 · “The Well-Tempered Clavier, Book I”");
+  const d = await openCatalogue(path.join(lib.ctx.dataFolder, "model"));
+  assert.deepEqual(renderWork(d, work, admin).work.collections.map((collection) => collection.title), ["The Well-Tempered Clavier, Book I"]);
+  d.close();
 });
 
 // The user's 1.0.43 audit: about a hundred works matched from Hyperion's tags

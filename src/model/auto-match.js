@@ -154,17 +154,23 @@ function proposedWork({ work, grouping, title }, allowStructuredTitles) {
   // number of its own that isn't a range and has movements after it. A
   // madrigal last in its book's tag ("…, SV 75–93: Sfogava…, SV 78") stays
   // with the book.
+  let collection = null;
   if (tagged && CATALOGUE_RANGE.test(clean(tagged.split(/\s*:\s*/, 1)[0]))) {
     const parts = tagged.split(/\s*:\s*/);
     const at = parts.findIndex((part, i) => i > 0 && i < parts.length - 1 && catalogued(part) && !CATALOGUE_RANGE.test(part));
-    if (at > 0) tagged = parts.slice(at).join(": ");
+    if (at > 0) {
+      tagged = parts.slice(at).join(": ");
+      // The parts it skipped are the collection: "The Well-Tempered
+      // Clavier, Book I".
+      collection = collectionTitle(parts.slice(0, at).map(collectionTitle).filter(Boolean).join(", ")) || null;
+    }
   }
   if (tagged && (!isCollectionLike(tagged) || catalogueSet(clean(tagged.split(/\s*:\s*/, 1)[0])) || catalogued(clean(tagged.split(/\s*:\s*/, 1)[0])))) {
     const parent = clean(tagged.split(/\s*:\s*/, 1)[0]);
     // A WORK tag names a work outright when it reads like one or carries
     // a catalogue number, as song cycles do ("Winterreise, D. 911").
     if (MULTI_MOVEMENT.test(parent) || catalogueNumber(parent))
-      return { title: parent, evidence: "work-tag" };
+      return { title: parent, evidence: "work-tag", ...(collection && { collection }) };
     // A set's name with its catalogue number only in the titles: WORK
     // "Années de pèlerinage, Deuxième année" on "Italie, S. 161, no. 4:
     // Sonetto 47 del Petrarca". The number, not the name, is its identity.
@@ -331,6 +337,7 @@ function candidates(
         localTitle: provider && local ? local.title : null,
         ownSubject: provider ? own : "",
         providerAliases: provider?.aliases || [],
+        collection: provider?.collection || (proposal.collection ? { id: null, title: proposal.collection } : null),
         composers,
         composerIds: provider?.composerIds || {},
         composerSource: credit ? { field: "artist", confidence: credit.confidence, evidence: credit.evidence } : null,
@@ -1506,6 +1513,7 @@ function createGroup(catalogue, group, actor, index) {
       const segment = catalogue.segment(track.id, { kind: "whole" });
       placeTrack(catalogue, realization, performanceWork, recording, segment, movements[i]);
     });
+    if (group.collection) joinCollection(catalogue, metadata, work, group.collection, actor);
     catalogue.audit(
       "work.auto_match",
       work,
@@ -1547,6 +1555,14 @@ function placeTrack(catalogue, realization, performanceWork, recording, segment,
 // madrigals, one recording of several of its pieces, stays.
 const CATALOGUE_RANGE = /(?<!\p{L})(?:BWV|HWV|SV|K|KV|D|Op\.?|RV|S|Hob\.?)\s*\d+[a-z]?\s*[-–—]\s*\d+/iu;
 export const namesCatalogueRange = (title) => CATALOGUE_RANGE.test(String(title || ""));
+// A collection's name without its range of numbers: "The Well-Tempered
+// Clavier, Book I, BWV 846–869" is "The Well-Tempered Clavier, Book I".
+export const collectionTitle = (title) =>
+  clean(
+    String(title || "")
+      .replace(/,?\s*(?<!\p{L})(?:BWV|HWV|SV|K|KV|D|Op\.?|RV|S|Hob\.?)\s*\d+[a-z]?\s*[-–—]\s*\d+[a-z]?/giu, "")
+      .replace(/[,\s]+$/, ""),
+  );
 export function releaseRangeWorks(catalogue, { actor = null } = {}) {
   const db = catalogue.db;
   let released = 0;
@@ -1604,6 +1620,33 @@ export function releaseRangeWorks(catalogue, { actor = null } = {}) {
     released++;
   }
   return released;
+}
+
+// A work goes into the collection matching found above it ("The
+// Well-Tempered Clavier, Book I"): the one with that MusicBrainz work, else
+// the one of that name, else a new one. A work already in a collection keeps
+// it (an admin may have chosen it).
+function joinCollection(catalogue, metadata, work, { id: mbid, title }, actor) {
+  const db = catalogue.db;
+  if (!title || db.prepare("SELECT 1 FROM relation WHERE kind='collection_member' AND target_id=?").get(work)) return;
+  let collection = mbid
+    ? db.prepare("SELECT entity_id AS id FROM external_identity WHERE provider='musicbrainz' AND record_kind='collection' AND record_id=? AND state='active'").get(mbid)?.id
+    : null;
+  if (!collection)
+    collection = db
+      .prepare("SELECT id FROM entity WHERE kind='collection' AND deleted_at IS NULL ORDER BY created_at")
+      .all()
+      .map((row) => row.id)
+      .find((id) => words(resolvedName(catalogue, id, "title") || "") === words(title));
+  if (!collection) {
+    collection = catalogue.createEntity("collection");
+    metadata.derived(collection, "title", title);
+    if (mbid) catalogue.externalIdentity(collection, "musicbrainz", "collection", mbid, { evidence: { source: "parent-work" } });
+  } else if (mbid && !db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='collection'").get(collection))
+    catalogue.externalIdentity(collection, "musicbrainz", "collection", mbid, { evidence: { source: "parent-work" } });
+  const position = (db.prepare("SELECT max(position) AS n FROM relation WHERE kind='collection_member' AND source_id=?").get(collection).n || 0) + 1;
+  catalogue.relate("collection_member", collection, work, { position });
+  catalogue.audit("work.join_collection", work, { collection, title }, actor);
 }
 
 // A movement's own MusicBrainz work, so another album's recording of

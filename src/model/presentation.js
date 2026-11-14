@@ -296,10 +296,16 @@ export function renderAlbumPresentation(c, albumId) {
     // A set of independent pieces ("13 Preludes, Op. 32") an album plays
     // only a few of is no incomplete recording: its other pieces are not
     // listed as missing on the album page (the work's own page has them).
-    const title = entityValue(metadata, workId, "title", "Untitled work");
+    // The collection a work belongs to subtitles it, as Apple Music Classical
+    // shows "Prelude & Fugue No. 10 … · “The Well-tempered Clavier, Book 1”".
+    const name = entityValue(metadata, workId, "title", "Untitled work");
+    const collections = c.db.prepare("SELECT source_id FROM relation WHERE kind='collection_member' AND target_id=?").all(workId);
+    const book = collections.length === 1 ? entityValue(metadata, collections[0].source_id, "title", "") : "";
+    // Not when the title says it already ("Préludes, Livre I" in "Préludes").
+    const title = book && !` ${words(name)} `.includes(` ${words(book)} `) ? `${name} · “${book}”` : name;
     // Nor is one excerpt (an overture, an aria) a recording of the rest.
     const excerpts =
-      (NUMBERED_SET.test(title) && present.size * 2 < movements.length) ||
+      (NUMBERED_SET.test(name) && present.size * 2 < movements.length) ||
       Boolean(
         c.db
           .prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work' AND json_extract(evidence,'$.albumId')=? AND json_extract(evidence,'$.excerpt')=1")
