@@ -4,6 +4,7 @@ import path from "node:path";
 import { afterEach, beforeEach, test } from "node:test";
 import plugin, { makeContext } from "../src/index.js";
 import { readTags } from "../src/tags.js";
+import { searchLadder, scoreFolder } from "../src/slskd-ranking.js";
 import { acquisitionIdentity, classicalInfo, searchQueries, performerMatches, downloadStatus, groupFolders, KEEP_FREE_BYTES, linesUp } from "../src/source.js";
 import { catalogueNumber, shortWorkTitle } from "../src/works.js";
 import { baseSettings, copyFixture, fakeFetch, json, RECORDING, SLSKD, symphonyEntities, tempFolders } from "./helpers.js";
@@ -98,7 +99,14 @@ test("Liszt display credit does not replace Trifonov as acquisition performer", 
   const ctx = { resolver: { resolve: async () => fields }, mb: { get: async () => null } };
   const info = await classicalInfo(ctx, "liszt-recording");
   assert.equal(info.performer, soloist);
-  assert.ok(searchQueries(info).every((query) => query.startsWith("Trifonov ")));
+  // Every step leads with the performer but the last, a broad work search,
+  // whose results must still name the performer to be kept.
+  const ladder = searchLadder(info, { albumTitle: "Transcendental" });
+  assert.deepEqual(ladder.map((s) => s.step), [1, 2, 3, 4, 5]);
+  assert.ok(ladder.filter((s) => [1, 2, 4].includes(s.step)).every((s) => s.query.startsWith("Trifonov ")), JSON.stringify(ladder));
+  assert.ok(ladder.every((s) => s.step === 5 || !s.query.startsWith("Liszt")));
+  assert.equal(ladder[2].query, "Wrong priority conductor Transcendental");
+  assert.equal(scoreFolder({ directory: "Liszt - Transcendental Etudes (Horowitz)", files: [] }, info).rejected, "names the composer but none of the performers");
   assert.equal((await acquisitionIdentity(ctx, { artist: "Franz Liszt", trackMbid: "liszt-recording" })).artist, "Daniil Trifonov");
   assert.equal(performerMatches({ directory: "Liszt Horowitz", files: [] }, info), false);
   assert.equal(performerMatches({ directory: "Liszt Trifonov", files: [] }, info), true);
@@ -146,7 +154,8 @@ test("track search returns files from folders that line up with the release", as
     assert.equal(r.durationMs, 2000);
     assert.equal(r.data.files[0].recordingId, RECORDING);
   }
-  assert.equal(state.searches[0], "Karajan Berlin Philharmonic Beethoven Symphony 5 op 67");
+  // The v0.2 ladder starts with performer + album.
+  assert.equal(state.searches[0], "Karajan Symphonies 5 7");
 });
 
 test("a request without a recording ID uses the release's track at its position", async () => {
@@ -230,6 +239,42 @@ test("album search needs every disc, from one or several folders", async () => {
   assert.equal(results[0].trackCount, 4);
   assert.deepEqual(results[0].data.files.map((f) => f.disc), [1, 1, 2, 2]);
   assert.equal(results[0].title, album.title);
+});
+
+test("album search ranks by performer and release, keeps copies as fallbacks, and leaves ambiguous folders to a person", async () => {
+  const bob = state.responses.find((r) => r.username === "bob");
+  // The same folder shared by another user, and a folder that lines up but
+  // names only the orchestra.
+  state.responses.push({ ...JSON.parse(JSON.stringify(bob)), username: "frank", queueLength: 9 });
+  state.responses.push({ username: "gina", hasFreeUploadSlot: true, files: bob.files.map((f) => ({ ...f, filename: f.filename.replace("@@b\\Karajan 1963", "@@g\\Berlin Philharmonic live") })) });
+  // A folder naming only the composer is rejected with its reason.
+  state.responses.push({ username: "hank", files: bob.files.map((f) => ({ ...f, filename: f.filename.replace("@@b\\Karajan 1963", "@@h\\Beethoven Symphonies") })) });
+  const album = { artist: "Ludwig van Beethoven", title: "Symphonies 5 & 7", releaseMbid: "rel1", releaseGroupMbid: "rg1", tracks: [] };
+  const automatic = await plugin.downloadSource.searchAlbum(input({ album }));
+  assert.deepEqual(automatic.map((r) => r.data.username), ["alice", "bob", "frank"], "frank's copy follows bob's; gina's is left to a person");
+  const manual = await plugin.downloadSource.searchAlbum(input({ album, manual: true }));
+  assert.deepEqual(manual.map((r) => r.data.username), ["alice", "bob", "frank", "gina"]);
+  const [latest] = JSON.parse(await fs.readFile(path.join(folders.dataFolder, "slskd-searches.json"), "utf8"));
+  assert.equal(latest.manual, true);
+  assert.equal(latest.steps[0].label, "Performer + album");
+  assert.equal(latest.steps[0].query, "Karajan Symphonies 5 7");
+  assert.ok(latest.steps[0].stopped, "a good, complete folder stops the ladder");
+  const byUser = Object.fromEntries(latest.candidates.map((c) => [c.username, c]));
+  assert.ok(byUser.alice.score > byUser.bob.score, "lossless and the release title rank alice first");
+  assert.match(byUser.alice.reasons.join(", "), /performer Karajan.*every track lines up/);
+  assert.equal(byUser.frank.duplicateOf, "bob:@@b\\Karajan 1963");
+  assert.equal(byUser.gina.review, true);
+  // The editor's Downloads tab shows the same log.
+  const { readEditor } = await import("../src/model/editor.js");
+  const editorInput = { dataFolder: folders.dataFolder, user: { id: 1, role: "admin" }, pageId: "editor", capabilities: { adminForms: 2 } };
+  const list = await readEditor({ ...editorInput, query: { tab: "downloads" } });
+  assert.equal(list.list.items[0].badge.label, "Manual");
+  const view = (await readEditor({ ...editorInput, query: { selection: "slskd:0" } })).view;
+  assert.deepEqual(view.sections.map((section) => section.id), ["steps", "candidates", "rejected"]);
+  assert.match(view.sections[0].rows[0].label, /^1\. Performer \+ album: “Karajan Symphonies 5 7”/);
+  assert.equal(view.sections[1].rows.find((row) => row.label.includes("gina")).badge.label, "Needs a person");
+  assert.ok(view.sections[2].rows.some((row) => row.label.startsWith("hank:") && /names the composer but none of the performers/.test(row.detail)));
+  assert.deepEqual(latest.rejected.find((r) => r.username === "hank"), { username: "hank", directory: "@@h\\Beethoven Symphonies", reason: "names the composer but none of the performers", step: 1 });
 });
 
 test("a pending track download is copied in and tagged once slskd finishes", async () => {

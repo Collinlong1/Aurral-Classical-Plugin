@@ -7416,7 +7416,7 @@ var init_v1 = __esm({
 });
 
 // node_modules/uuid/dist/esm-node/parse.js
-function parse3(uuid) {
+function parse2(uuid) {
   if (!validate_default(uuid)) {
     throw TypeError("Invalid UUID");
   }
@@ -7444,7 +7444,7 @@ var parse_default;
 var init_parse = __esm({
   "node_modules/uuid/dist/esm-node/parse.js"() {
     init_validate();
-    parse_default = parse3;
+    parse_default = parse2;
   }
 });
 
@@ -35210,8 +35210,8 @@ import path16 from "node:path";
 import { Worker, isMainThread, parentPort, workerData } from "node:worker_threads";
 
 // src/model/editor.js
-import path4 from "node:path";
-import { createHash as createHash3 } from "node:crypto";
+import path7 from "node:path";
+import { createHash as createHash4 } from "node:crypto";
 
 // src/model/catalogue.js
 import { randomUUID as randomUUID2 } from "node:crypto";
@@ -37299,8 +37299,551 @@ function ownedTracks(catalogue) {
   });
 }
 
-// src/model/editor-v2.js
+// src/source.js
+import { randomUUID as randomUUID8 } from "node:crypto";
+import fs5 from "node:fs/promises";
+import path5 from "node:path";
+
+// src/slskd.js
+import { randomUUID as randomUUID6 } from "node:crypto";
+
+// src/store.js
+import { createHash as createHash2, randomUUID as randomUUID5 } from "node:crypto";
+import fs3 from "node:fs/promises";
 import path3 from "node:path";
+var sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+async function readJson(file, fallback) {
+  try {
+    return JSON.parse(await fs3.readFile(file, "utf8"));
+  } catch {
+    return fallback;
+  }
+}
+async function writeJson(file, value) {
+  await fs3.mkdir(path3.dirname(file), { recursive: true });
+  const temp = `${file}.${process.pid}.${randomUUID5()}.tmp`;
+  await fs3.writeFile(temp, JSON.stringify(value));
+  await fs3.rename(temp, file);
+}
+async function tryLock(dir, staleMs) {
+  try {
+    await fs3.mkdir(dir);
+  } catch (error) {
+    if (error.code !== "EEXIST") throw error;
+    const stat = await fs3.stat(dir).catch(() => null);
+    if (stat && Date.now() - stat.mtimeMs < staleMs) return null;
+    await fs3.rm(dir, { recursive: true, force: true });
+    try {
+      await fs3.mkdir(dir);
+    } catch {
+      return null;
+    }
+  }
+  let released = false;
+  return {
+    async touch() {
+      if (released) return;
+      const now = /* @__PURE__ */ new Date();
+      await fs3.utimes(dir, now, now).catch(() => {
+      });
+    },
+    async release() {
+      released = true;
+      await fs3.rm(dir, { recursive: true, force: true }).catch(() => {
+      });
+    }
+  };
+}
+async function withLock(dir, staleMs, run, { waitMs = 3e4 } = {}) {
+  const until = Date.now() + waitMs;
+  for (; ; ) {
+    const lock = await tryLock(dir, staleMs);
+    if (lock) {
+      try {
+        return await run(lock);
+      } finally {
+        await lock.release();
+      }
+    }
+    if (Date.now() > until) throw new Error(`Timed out waiting for ${path3.basename(dir)}`);
+    await sleep(50 + Math.random() * 100);
+  }
+}
+var Throttle = class {
+  constructor(folder, intervalMs) {
+    this.lockDir = path3.join(folder, "mb-throttle.lock");
+    this.stateFile = path3.join(folder, "mb-throttle.json");
+    this.intervalMs = intervalMs;
+  }
+  async run(dispatch) {
+    if (!this.intervalMs) return dispatch();
+    return withLock(this.lockDir, 12e4, async () => {
+      const state = await readJson(this.stateFile, { next: 0 });
+      const wait = (Number(state.next) || 0) - Date.now();
+      if (wait > 0) await sleep(wait);
+      await writeJson(this.stateFile, { next: Date.now() + this.intervalMs });
+      try {
+        return await dispatch();
+      } finally {
+        await writeJson(this.stateFile, { next: Date.now() + this.intervalMs });
+      }
+    }, { waitMs: 12e4 });
+  }
+};
+var FileCache = class {
+  constructor(folder) {
+    this.folder = folder;
+  }
+  file(key) {
+    const hash = createHash2("sha1").update(key).digest("hex");
+    return path3.join(this.folder, hash.slice(0, 2), `${hash}.json`);
+  }
+  async get(key, ttlMs) {
+    const entry = await readJson(this.file(key), null);
+    if (!entry || Date.now() - entry.time > ttlMs) return null;
+    return entry.value;
+  }
+  async set(key, value) {
+    await writeJson(this.file(key), { time: Date.now(), key, value }).catch(() => {
+    });
+  }
+};
+async function pruneCache(folder, maxAgeMs) {
+  const stamp = path3.join(folder, ".pruned");
+  const last = (await fs3.stat(stamp).catch(() => null))?.mtimeMs ?? 0;
+  if (Date.now() - last < 24 * 60 * 6e4) return 0;
+  await fs3.mkdir(folder, { recursive: true });
+  await fs3.writeFile(stamp, "");
+  let removed = 0;
+  for (const dir of await fs3.readdir(folder).catch(() => [])) {
+    const sub = path3.join(folder, dir);
+    for (const name of await fs3.readdir(sub).catch(() => [])) {
+      const file = path3.join(sub, name);
+      const stat = await fs3.stat(file).catch(() => null);
+      if (stat && Date.now() - stat.mtimeMs > maxAgeMs) {
+        await fs3.rm(file, { force: true });
+        removed++;
+      }
+    }
+  }
+  return removed;
+}
+
+// src/slskd.js
+var Slskd = class {
+  constructor({ url, apiKey }, fetchImpl = fetch) {
+    if (!url || !apiKey) throw new Error("Set the slskd URL and API key on the plugin's page");
+    this.url = url.replace(/\/+$/, "");
+    this.apiKey = apiKey;
+    this.fetch = fetchImpl;
+  }
+  // slskd answers 429 while it's busy with another request; those wait and
+  // try again.
+  async request(method, route, body, options = {}) {
+    for (let attempt = 0; ; attempt++) {
+      try {
+        return await this.requestOnce(method, route, body, options);
+      } catch (error) {
+        if (!/answered 429/.test(error.message) || attempt >= 10) throw error;
+        await sleep(250 + attempt * 150);
+      }
+    }
+  }
+  async requestOnce(method, route, body, { timeoutMs = 15e3 } = {}) {
+    let response;
+    try {
+      response = await this.fetch(`${this.url}/api/v0${route}`, {
+        method,
+        headers: { "X-API-Key": this.apiKey, ...body !== void 0 && { "Content-Type": "application/json" } },
+        body: body === void 0 ? void 0 : JSON.stringify(body),
+        signal: AbortSignal.timeout(timeoutMs)
+      });
+    } catch (error) {
+      throw new Error(`Couldn't reach slskd: ${error.cause?.code || error.message}`);
+    }
+    if (response.status === 401 || response.status === 403) throw new Error("slskd refused the API key");
+    if (!response.ok) {
+      const detail = (await response.text().catch(() => "")).slice(0, 200);
+      throw new Error(`slskd answered ${response.status} for ${route}${detail ? `: ${detail}` : ""}`);
+    }
+    const textBody = await response.text();
+    return textBody ? JSON.parse(textBody) : null;
+  }
+  application() {
+    return this.request("GET", "/application");
+  }
+  // Starts a search and returns its id.
+  async startSearch(searchText2, searchTimeoutMs) {
+    const id = randomUUID6();
+    const body = { id, searchText: searchText2, searchTimeout: searchTimeoutMs, filterResponses: true, minimumResponseFileCount: 1, responseLimit: 200, fileLimit: 2e4 };
+    await this.request("POST", "/searches", body, { timeoutMs: searchTimeoutMs + 15e3 });
+    return id;
+  }
+  // Waits for a search to finish, never past `deadline`, and returns its
+  // responses.
+  async searchResults(id, deadline) {
+    try {
+      while (Date.now() < deadline) {
+        await sleep(1e3);
+        const state = await this.request("GET", `/searches/${id}`);
+        if (state?.isComplete || String(state?.state || "").startsWith("Completed")) break;
+      }
+      return await this.request("GET", `/searches/${id}/responses`) ?? [];
+    } finally {
+      this.request("DELETE", `/searches/${id}`).catch(() => {
+      });
+    }
+  }
+  async search(searchText2, { searchTimeoutMs = 1e4, deadline = Date.now() + 2e4 } = {}) {
+    return this.searchResults(await this.startSearch(searchText2, searchTimeoutMs), deadline);
+  }
+  enqueue(username, files) {
+    return this.request("POST", `/transfers/downloads/${encodeURIComponent(username)}`, files);
+  }
+  // Every download from one user, as a flat list of files.
+  async downloads(username) {
+    let data;
+    try {
+      data = await this.request("GET", `/transfers/downloads/${encodeURIComponent(username)}`);
+    } catch (error) {
+      if (/answered 404/.test(error.message)) return [];
+      throw error;
+    }
+    return (data?.directories ?? []).flatMap((dir) => dir.files ?? []);
+  }
+};
+var FAILED_STATES = /Errored|Rejected|Cancelled|TimedOut|Aborted|Failed/i;
+var isSucceeded = (state) => /Completed/i.test(state) && /Succeeded/i.test(state);
+
+// src/tags.js
+var import_node_taglib_sharp = __toESM(require_dist(), 1);
+import { randomUUID as randomUUID7 } from "node:crypto";
+import { closeSync, fstatSync, openSync, readSync } from "node:fs";
+import fs4 from "node:fs/promises";
+import path4 from "node:path";
+import_node_taglib_sharp.Id3v2Settings.useNumericGenres = false;
+var READ_STYLE = import_node_taglib_sharp.ReadStyle.None | import_node_taglib_sharp.ReadStyle.PictureLazy;
+var READ_WITH_PROPERTIES = import_node_taglib_sharp.ReadStyle.Average | import_node_taglib_sharp.ReadStyle.PictureLazy;
+var ADDED_TAG_TYPES = import_node_taglib_sharp.TagTypes.Id3v1 | import_node_taglib_sharp.TagTypes.Ape | import_node_taglib_sharp.TagTypes.MovieId | import_node_taglib_sharp.TagTypes.DivX;
+var ITUNES_MEAN = "com.apple.iTunes";
+var MUSICBRAINZ_UFID_OWNER = "http://musicbrainz.org";
+var AUDIO_EXTENSIONS = /* @__PURE__ */ new Set([".flac", ".mp3", ".m4a", ".mp4", ".ogg", ".oga", ".opus"]);
+var isAudioPath = (file) => AUDIO_EXTENSIONS.has(path4.extname(file).toLowerCase());
+var text = (value) => value == null ? "" : String(value).trim();
+var texts = (value) => (Array.isArray(value) ? value : [value]).map(text).filter(Boolean);
+var positive2 = (value) => {
+  const number = Number(value);
+  return Number.isSafeInteger(number) && number > 0 ? number : 0;
+};
+var xiphOf = (file) => file.getTag(import_node_taglib_sharp.TagTypes.Xiph, false);
+var id3Of = (file) => file.getTag(import_node_taglib_sharp.TagTypes.Id3v2, false);
+var appleOf = (file) => file.getTag(import_node_taglib_sharp.TagTypes.Apple, false);
+function userTextFrames(id3, description) {
+  const wanted = description.toLowerCase();
+  return id3.getFramesByClassType(import_node_taglib_sharp.Id3v2FrameClassType.UserTextInformationFrame).filter((frame) => frame.description.toLowerCase() === wanted);
+}
+function textField(xiphName, id3Description, apple) {
+  const box = apple.box ? import_node_taglib_sharp.ByteVector.fromString(apple.box, import_node_taglib_sharp.StringType.Latin1) : null;
+  return {
+    read(file) {
+      const xiph = xiphOf(file);
+      const id3 = id3Of(file);
+      const appleTag = appleOf(file);
+      for (const values of [
+        xiph?.getField(xiphName),
+        id3 && userTextFrames(id3, id3Description).flatMap((frame) => frame.text || []),
+        appleTag && (box ? appleTag.getQuickTimeStrings(box) : appleTag.getItunesStrings(ITUNES_MEAN, apple.name))
+      ]) {
+        const found = texts(values ?? []);
+        if (found.length) return found;
+      }
+      return [];
+    },
+    write(file, values) {
+      const xiph = xiphOf(file);
+      if (xiph) xiph.setFieldAsStrings(xiphName, ...values);
+      const appleTag = appleOf(file);
+      if (appleTag) {
+        if (box) appleTag.setQuickTimeStrings(box, values);
+        else appleTag.setItunesStrings(ITUNES_MEAN, apple.name, ...values);
+      }
+      const id3 = id3Of(file);
+      if (id3) {
+        for (const frame of userTextFrames(id3, id3Description)) id3.removeFrame(frame);
+        if (values.length) {
+          const frame = import_node_taglib_sharp.Id3v2UserTextInformationFrame.fromDescription(id3Description);
+          frame.text = values;
+          id3.addFrame(frame);
+        }
+      }
+    }
+  };
+}
+var workField = textField("WORK", "WORK", { box: "\xA9wrk" });
+var workIdField = textField("MUSICBRAINZ_WORKID", "MusicBrainz Work Id", { name: "MusicBrainz Work Id" });
+var artistIdsField = textField("MUSICBRAINZ_ARTISTID", "MusicBrainz Artist Id", { name: "MusicBrainz Artist Id" });
+var albumArtistIdsField = textField("MUSICBRAINZ_ALBUMARTISTID", "MusicBrainz Album Artist Id", { name: "MusicBrainz Album Artist Id" });
+var WRITERS = {
+  title: {
+    read: (file) => texts(file.tag.title),
+    write: (file, values) => file.tag.title = values[0] ?? void 0
+  },
+  artist: {
+    read: (file) => texts(file.tag.performers),
+    write: (file, values) => file.tag.performers = values
+  },
+  albumArtist: {
+    read: (file) => texts(file.tag.albumArtists),
+    write: (file, values) => file.tag.albumArtists = values
+  },
+  composer: {
+    read: (file) => texts(file.tag.composers),
+    write: (file, values) => file.tag.composers = values
+  },
+  work: { read: (file) => workField.read(file), write: (file, values) => workField.write(file, values) },
+  workId: { read: (file) => workIdField.read(file), write: (file, values) => workIdField.write(file, values) },
+  recordingMbid: {
+    read: (file) => texts(file.tag.musicBrainzTrackId),
+    write: (file, values) => {
+      const id3 = id3Of(file);
+      for (const frame of id3?.getFramesByClassType(import_node_taglib_sharp.Id3v2FrameClassType.UniqueFileIdentifierFrame) || []) {
+        if (frame.owner === MUSICBRAINZ_UFID_OWNER) id3.removeFrame(frame);
+      }
+      file.tag.musicBrainzTrackId = values[0] ?? void 0;
+    }
+  }
+};
+function isFragmentedMp4(filePath) {
+  const fd = openSync(filePath, "r");
+  try {
+    const size = fstatSync(fd).size;
+    const header = Buffer.alloc(16);
+    for (let offset = 0; offset + 8 <= size; ) {
+      readSync(fd, header, 0, 16, offset);
+      const type = header.toString("latin1", 4, 8);
+      if (offset === 0 && type !== "ftyp") return false;
+      if (type === "moof") return true;
+      const boxSize = header.readUInt32BE(0);
+      const length = boxSize === 1 ? Number(header.readBigUInt64BE(8)) : boxSize === 0 ? size - offset : boxSize;
+      if (length < 8) return false;
+      offset += length;
+    }
+    return false;
+  } finally {
+    closeSync(fd);
+  }
+}
+var UnsupportedFormat = class extends Error {
+};
+function openFile(filePath, readStyle = READ_STYLE, asPath = filePath) {
+  if (!isAudioPath(asPath)) throw new UnsupportedFormat(`can't tag ${path4.extname(asPath) || "this kind of"} files`);
+  if (isFragmentedMp4(filePath)) throw new UnsupportedFormat("can't tag fragmented MP4 files");
+  try {
+    return import_node_taglib_sharp.File.createFromPath(filePath, `taglib/${path4.extname(asPath).slice(1).toLowerCase()}`, readStyle);
+  } catch (error) {
+    if (/unsupported format/i.test(String(error?.message))) throw new UnsupportedFormat("can't tag this kind of file");
+    throw error;
+  }
+}
+function readValues(filePath, fields) {
+  const file = openFile(filePath);
+  try {
+    return Object.fromEntries(fields.map((field2) => [field2, WRITERS[field2].read(file)]));
+  } finally {
+    file.dispose();
+  }
+}
+function readTags(filePath) {
+  const file = openFile(filePath, READ_WITH_PROPERTIES);
+  try {
+    const tag = file.tag;
+    return {
+      title: text(tag.title),
+      artist: text(tag.performers?.[0]),
+      albumArtist: text(tag.albumArtists?.[0]),
+      album: text(tag.album),
+      recordingMbid: text(tag.musicBrainzTrackId),
+      releaseMbid: text(tag.musicBrainzReleaseId),
+      releaseGroupMbid: text(tag.musicBrainzReleaseGroupId),
+      // Every album artist ID: taglib's own property has only the first.
+      albumArtistMbids: [...new Set([...albumArtistIdsField.read(file), text(tag.musicBrainzReleaseArtistId)].flatMap((v) => texts(v.split(/[;/]/))))],
+      artistMbids: artistIdsField.read(file).flatMap((value) => texts(value.split(/[;/]/))),
+      genres: texts(tag.genres ?? []).flatMap((genre) => texts(genre.split(";"))),
+      composer: texts(tag.composers ?? []),
+      work: workField.read(file)[0] ?? "",
+      // Some taggers put the work here and leave WORK empty.
+      grouping: text(tag.grouping),
+      workId: workIdField.read(file)[0] ?? "",
+      trackNumber: positive2(tag.track),
+      discNumber: positive2(tag.disc),
+      durationMs: Math.round(file.properties?.durationMilliseconds || 0),
+      year: Number.isSafeInteger(tag.year) && tag.year > 0 ? tag.year : null,
+      label: text(tag.publisher)
+    };
+  } finally {
+    file.dispose();
+  }
+}
+var same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+async function writeTags(filePath, values) {
+  const source = path4.resolve(filePath);
+  const preview = openFile(source);
+  let changed;
+  try {
+    changed = Object.keys(values).filter((field2) => !same(WRITERS[field2].read(preview), texts(values[field2])));
+  } finally {
+    preview.dispose();
+  }
+  if (!changed.length) return [];
+  const extension = path4.extname(source);
+  const working = path4.join(path4.dirname(source), `.${path4.basename(source, extension)}.${randomUUID7()}.tagging`);
+  await fs4.copyFile(source, working, fs4.constants.COPYFILE_FICLONE);
+  try {
+    const file = openFile(working, READ_STYLE, source);
+    try {
+      file.removeTags(ADDED_TAG_TYPES & ~file.tagTypesOnDisk);
+      const id3 = id3Of(file);
+      if (id3 && !(file.tagTypesOnDisk & import_node_taglib_sharp.TagTypes.Id3v2)) id3.version = 4;
+      for (const field2 of changed) WRITERS[field2].write(file, texts(values[field2]));
+      file.save();
+    } finally {
+      file.dispose();
+    }
+    const verified2 = openFile(working, READ_STYLE, source);
+    try {
+      for (const field2 of changed) {
+        if (!same(WRITERS[field2].read(verified2), texts(values[field2])))
+          throw new Error(`Tag verification failed for ${field2}`);
+      }
+    } finally {
+      verified2.dispose();
+    }
+    await fs4.rename(working, source);
+  } catch (error) {
+    await fs4.rm(working, { force: true }).catch(() => {
+    });
+    throw error;
+  }
+  return changed;
+}
+
+// src/works.js
+var SUFFIX = "(?:[a-z]{1,3}(?![a-z]))?";
+var CATALOGUES = [
+  [/\bBWV\s*(\d+[a-z]?)/i, "BWV"],
+  [/\bHWV\s*(\d+[a-z]?)/i, "HWV"],
+  [/\bRV\s*(\d+[a-z]?)/i, "RV"],
+  [/\bK(?:V|\.)?\s*(\d+[a-z]?)\b/, "K"],
+  [/\bD\.?\s*(\d+[a-z]?)\b/, "D"],
+  [/\bHob\.?\s*([IVXL]+[a-z]?:\s*\d+[a-z]?)/i, "Hob"],
+  [new RegExp(`\\bWoO\\s*(\\d+${SUFFIX})`, "i"), "WoO"],
+  // "S. 161", and Hyperion's "S161", "S166r" or "S534ii/bis". Searle's own
+  // sub-numbers after a slash name a piece too ("S. 534/2b", "S. 385/3",
+  // "S163d/ii").
+  [new RegExp(`\\bS(?:\\.\\s*|(?=\\d))(\\d+${SUFFIX}(?:\\/(?:bis|[ivx]{1,4}(?![a-z])|\\d+${SUFFIX}))?)`), "S"],
+  [new RegExp(`\\bSz\\.?\\s*(\\d+${SUFFIX})`, "i"), "Sz"],
+  [new RegExp(`\\bBB\\s*(\\d+${SUFFIX})`), "BB"],
+  [new RegExp(`\\bTrV\\s*(\\d+${SUFFIX})`, "i"), "TrV"],
+  [new RegExp(`\\bL\\.\\s*(\\d+${SUFFIX})`), "L"],
+  [new RegExp(`\\bFP\\s*(\\d+${SUFFIX})`), "FP"],
+  // Ravel's (Marnat): "Boléro, M 81", "Pavane…, M.19". Capital M only.
+  // "M. 63/2" is the second of M. 63's pieces.
+  [new RegExp(`(?<![\\p{L}\\d])M(?:\\.\\s*|\\s+)(\\d+${SUFFIX}(?:\\/\\d+)?)(?![\\d])`, "u"), "M"]
+];
+var OPUS = /\bop(?:us|\.)?\s*(\d+[a-z]?)(?:\s*,?\s*(?:no\.?|nr\.?|n°)\s*(\d+))?/i;
+var PIECE = /^\s*,?\s*(?:no\.?|nr\.?|n°)\s*(\d+[a-z]{0,3})(?![a-z\d])/i;
+function catalogueMatch(title) {
+  const text5 = String(title || "");
+  for (const [pattern, prefix] of CATALOGUES) {
+    const match2 = text5.match(pattern);
+    if (match2) return { prefix, number: match2[1].replace(/\s+/g, ""), end: match2.index + match2[0].length, text: text5 };
+  }
+  return null;
+}
+function catalogueNumber(title) {
+  const match2 = catalogueMatch(title);
+  if (match2) return `${match2.prefix} ${match2.number}`;
+  const opus = String(title || "").match(OPUS);
+  if (opus) return `op ${opus[1]}${opus[2] ? ` no ${opus[2]}` : ""}`;
+  return "";
+}
+function cataloguePiece(title) {
+  const match2 = catalogueMatch(title);
+  return match2 ? match2.text.slice(match2.end).match(PIECE)?.[1]?.toLowerCase() || "" : "";
+}
+function shortWorkTitle(title) {
+  let text5 = String(title || "").split(":")[0];
+  text5 = text5.replace(OPUS, " ");
+  for (const [pattern] of CATALOGUES) text5 = text5.replace(pattern, " ");
+  text5 = text5.replace(/\bin\s+[A-G](?:[- ]?(?:flat|sharp|♭|♯|b|#))?\s*(?:major|minor|maj|min|dur|moll)\b/gi, " ").replace(/\b(?:no|nr|n°)\.?\s*(?=\d)/gi, " ").replace(/[“”"'’,;()[\]]/g, " ");
+  return searchWords(text5);
+}
+function searchWords(text5) {
+  return String(text5 || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim().split(/\s+/).filter(Boolean).join(" ");
+}
+function surname(person) {
+  if (!person) return "";
+  const sort = String(person.sortName || "");
+  if (sort.includes(",")) return searchWords(sort.split(",")[0]);
+  return searchWords(person.name);
+}
+function creditString(credit) {
+  return (credit || []).map((entry) => `${entry.name ?? entry.artist?.name ?? ""}${entry.joinphrase ?? ""}`).join("").trim();
+}
+async function topWork(mb, work, depth = 0, inc = "artist-rels+work-rels", { stop = () => false } = {}) {
+  if (!work || depth >= 3) return work;
+  const parent = (work.relations || []).find((rel) => rel.type === "parts" && rel.direction === "backward" && rel.work?.id);
+  if (!parent) return work;
+  const data = await mb.get("work", parent.work.id, inc);
+  return data && !stop(data, work) ? topWork(mb, data, depth + 1, inc, { stop }) : work;
+}
+var RELEASE_INC = "recordings+artist-credits+release-groups+media";
+function releaseYear(date) {
+  const year = Number(String(date || "").slice(0, 4));
+  return Number.isInteger(year) && year > 0 ? year : null;
+}
+
+// src/settings.js
+var DEFAULT_SEPARATOR = " \u2014 ";
+var ROLE_ALIASES = {
+  composer: "composers",
+  composers: "composers",
+  arranger: "arrangers",
+  arrangers: "arrangers",
+  soloist: "soloists",
+  soloists: "soloists",
+  ensemble: "ensembles",
+  ensembles: "ensembles",
+  orchestra: "ensembles",
+  orchestras: "ensembles",
+  conductor: "conductors",
+  conductors: "conductors",
+  credited: "credited"
+};
+function parseOrder(value) {
+  const raw = String(value ?? "").trim();
+  if (!raw) return [...DEFAULT_ORDER];
+  const roles2 = [];
+  for (const word of raw.toLowerCase().split(/[\s,;>|/]+/).filter(Boolean)) {
+    const role = ROLE_ALIASES[word];
+    if (!role) throw new Error(`Name order: "${word}" isn't a role. Use ${ROLES.slice(0, 5).join(", ")}.`);
+    if (!roles2.includes(role)) roles2.push(role);
+  }
+  if (!roles2.includes("credited")) roles2.push("credited");
+  return roles2;
+}
+function parseSeparator(value) {
+  const raw = String(value ?? "");
+  if (!raw.trim()) return DEFAULT_SEPARATOR;
+  if (raw !== raw.trim()) return raw;
+  return /^[,;]$/.test(raw) ? `${raw} ` : ` ${raw} `;
+}
+function slskdSettings(settings) {
+  const url = String(settings.slskdUrl || "").trim().replace(/\/+$/, "");
+  const apiKey = String(settings.slskdApiKey || "").trim();
+  const downloadFolder = String(settings.slskdDownloadFolder || "").trim();
+  return { url, apiKey, downloadFolder, configured: Boolean(url && apiKey) };
+}
 
 // src/search/normalize.js
 var LETTERS = { \u00F8: "o", \u00E6: "ae", \u0153: "oe", \u00DF: "ss", \u0142: "l", \u0111: "d", \u00F0: "d", \u00FE: "th", \u0131: "i", \u0127: "h", \u014B: "n" };
@@ -37428,6 +37971,656 @@ function parseQuery(text5) {
   };
 }
 
+// src/slskd-ranking.js
+var GOOD_SCORE = 60;
+var REVIEW_SCORE = 45;
+function searchLadder(info, { albumTitle = "" } = {}) {
+  if (!info?.performer) return [];
+  const performer = surname(info.performer);
+  const conductor = info.conductor && info.conductor !== info.performer ? surname(info.conductor) : "";
+  const ensemble = info.ensemble && info.ensemble !== info.performer ? surname(info.ensemble) : "";
+  const composer = surname(info.composer);
+  const work = shortWorkTitle(info.workTitle);
+  const catalogue = catalogueNumber(info.workTitle) || catalogueNumber(info.movementTitle);
+  const album = searchWords(albumTitle);
+  const steps = [
+    { step: 1, label: "Performer + album", parts: [performer, album] },
+    { step: 2, label: "Performer + work", parts: [performer, work, catalogue] },
+    { step: 3, label: "Conductor or orchestra + album", parts: [conductor || ensemble, album], skip: !(conductor || ensemble) },
+    { step: 4, label: "Performer + composer + work", parts: [performer, composer, work] },
+    { step: 5, label: "Broad work search", parts: [composer, work, catalogue] }
+  ];
+  const seen = /* @__PURE__ */ new Set();
+  const ladder = [];
+  for (const { step, label, parts, skip } of steps) {
+    if (skip) continue;
+    const query = searchWords(parts.filter(Boolean).join(" "));
+    if (query.split(" ").length < 2 || seen.has(query.toLowerCase())) continue;
+    seen.add(query.toLowerCase());
+    ladder.push({ step, label, query });
+  }
+  return ladder;
+}
+var haystackOf = (folder) => ` ${words([folder.directory, ...folder.files.map((f) => f.filename)].join(" ")).join(" ")} `;
+var has = (haystack, name) => {
+  const wanted = words(name);
+  return wanted.length > 0 && wanted.every((word) => haystack.includes(` ${word} `));
+};
+var coverage = (haystack, text5) => {
+  const wanted = words(text5).filter((word) => word.length > 1);
+  return wanted.length ? wanted.filter((word) => haystack.includes(` ${word} `)).length / wanted.length : 0;
+};
+function scoreFolder(folder, info, { albumTitle = "", movements = [] } = {}) {
+  const haystack = haystackOf(folder);
+  const reasons = [];
+  let score = 0;
+  const performer = surname(info.performer);
+  const conductor = info.conductor && info.conductor !== info.performer ? surname(info.conductor) : "";
+  const ensemble = info.ensemble && info.ensemble !== info.performer ? surname(info.ensemble) : "";
+  const hasPerformer = has(haystack, performer);
+  const hasConductor = Boolean(conductor) && has(haystack, conductor);
+  const hasEnsemble = Boolean(ensemble) && has(haystack, ensemble);
+  if (!hasPerformer && !hasConductor && !hasEnsemble)
+    return {
+      score: 0,
+      rejected: info.composer && has(haystack, surname(info.composer)) ? "names the composer but none of the performers" : "names none of the performers",
+      reasons
+    };
+  if (hasPerformer) score += 30, reasons.push(`performer ${performer}`);
+  if (hasConductor) score += 12, reasons.push(`conductor ${conductor}`);
+  if (hasEnsemble) score += 12, reasons.push(`ensemble ${ensemble}`);
+  const album = coverage(haystack, albumTitle);
+  if (album > 0) score += Math.round(album * 20), reasons.push(`release title ${Math.round(album * 100)}%`);
+  const work = coverage(haystack, shortWorkTitle(info.workTitle));
+  if (work > 0) score += Math.round(work * 10), reasons.push(`work ${Math.round(work * 100)}%`);
+  const catalogue = catalogueNumber(info.workTitle) || catalogueNumber(info.movementTitle);
+  if (catalogue && coverage(haystack, catalogue) === 1) score += 10, reasons.push(`catalogue ${catalogue}`);
+  if (movements.length) {
+    const named = movements.filter((title) => coverage(haystack, title) >= 0.5).length / movements.length;
+    if (named > 0) score += Math.round(named * 8), reasons.push(`movements ${Math.round(named * 100)}%`);
+  }
+  if (folder.format === "flac") score += 5, reasons.push("lossless");
+  return { score: Math.min(score, 100), rejected: null, reasons };
+}
+var folderKey = (folder) => `${fold(folder.directory.split(/[\\/]/).pop())}|${folder.files.map((f) => f.size).join(",")}`;
+function rankCandidates(candidates2) {
+  const sorted = [...candidates2].sort((a, b) => b.match.score - a.match.score || a.availability - b.availability);
+  const firstOf = /* @__PURE__ */ new Map();
+  for (const candidate of sorted) {
+    const key = candidate.folders.map(folderKey).join("||");
+    if (firstOf.has(key)) candidate.duplicateOf = firstOf.get(key);
+    else firstOf.set(key, `${candidate.username}:${candidate.folders[0].directory}`);
+  }
+  const unique2 = sorted.filter((c) => !c.duplicateOf);
+  return unique2.flatMap((c) => [c, ...sorted.filter((d) => d.duplicateOf === `${c.username}:${c.folders[0].directory}`)]);
+}
+var isAmbiguous = (candidate) => candidate.match.score < REVIEW_SCORE;
+function withLineUp(match2, { whole }) {
+  return {
+    ...match2,
+    score: Math.min(100, match2.score + (whole ? 25 : 20)),
+    reasons: [...match2.reasons, whole ? "every track lines up with the release" : "the track lines up with an edition of the release"]
+  };
+}
+
+// src/source.js
+var LENGTH_TOLERANCE_MS = 2e3;
+var SEARCH_BUDGET_MS = 5e4;
+var SEARCH_TIMEOUT_MS = 12e3;
+var MAX_RESULTS = 50;
+var SOURCE_EXTENSIONS = /* @__PURE__ */ new Set(["flac", "mp3", "m4a"]);
+var LOSSLESS = /* @__PURE__ */ new Set(["flac"]);
+async function loadRelease(mb, releaseMbid) {
+  if (!releaseMbid) return null;
+  const release = await mb.get("release", releaseMbid, RELEASE_INC);
+  if (!release) return null;
+  const discs = (release.media || []).map((medium) => ({
+    position: medium.position,
+    tracks: (medium.tracks || []).map((track) => ({
+      position: track.position,
+      number: track.number,
+      title: track.title || track.recording?.title || "",
+      lengthMs: track.length ?? track.recording?.length ?? null,
+      recordingId: track.recording?.id ?? null,
+      artist: creditString(track["artist-credit"] || track.recording?.["artist-credit"])
+    }))
+  })).filter((disc) => disc.tracks.length > 0);
+  const groupId = release["release-group"]?.id;
+  const editions = groupId ? await mb.query("release", { "release-group": groupId, inc: "recordings", limit: "100" }) : null;
+  const flat = (r) => (r.media || []).flatMap((m) => (m.tracks || []).map((t) => ({ title: t.title || t.recording?.title || "", length: t.length, recordingId: t.recording?.id })));
+  const order = (tracks) => tracks.map((t) => normalizeTitle(t.title)).join("\n");
+  const own = flat(release);
+  const others = (editions?.releases || []).filter((r) => r.id !== release.id);
+  const officialOnly = others.some((r) => r.status === "Official") || release.status === "Official";
+  const pressings = others.filter((r) => !officialOnly || r.status === "Official").map(flat).filter((tracks) => tracks.length === own.length && order(tracks) === order(own));
+  const byRecording = /* @__PURE__ */ new Map();
+  for (const tracks of (editions?.releases || []).map(flat))
+    for (const t of tracks)
+      if (t.recordingId && t.length > 0) byRecording.set(t.recordingId, [...byRecording.get(t.recordingId) ?? [], t.length]);
+  let index = 0;
+  for (const disc of discs)
+    for (const track of disc.tracks) {
+      const i = index++;
+      const lengths = pressings.map((tracks) => tracks[i]).filter((t) => t?.recordingId === track.recordingId && t.length > 0).map((t) => t.length);
+      if (track.lengthMs == null && lengths.length) track.lengthMs = [...lengths].sort((a, b) => a - b)[Math.floor(lengths.length / 2)];
+      track.lengthsMs = [...new Set([track.lengthMs, ...lengths].filter((l) => l != null))];
+      track.anyLengthsMs = [.../* @__PURE__ */ new Set([...track.lengthsMs, ...byRecording.get(track.recordingId) ?? []])];
+    }
+  return {
+    id: release.id,
+    title: release.title,
+    artist: creditString(release["artist-credit"]),
+    artistCredit: release["artist-credit"] || [],
+    year: releaseYear(release.date),
+    releaseGroupId: release["release-group"]?.id ?? null,
+    discs
+  };
+}
+function normalizeTitle(value) {
+  return String(value || "").normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").replace(/\s+/g, " ").trim();
+}
+var extensionOf = (filename) => (filename.match(/\.([a-z0-9]+)$/i)?.[1] || "").toLowerCase();
+var remoteDir = (filename) => filename.replace(/[\\/][^\\/]*$/, "");
+var remoteBase = (filename) => filename.split(/[\\/]/).pop();
+var naturalCompare = new Intl.Collator("en", { numeric: true, sensitivity: "base" }).compare;
+function groupFolders(responses) {
+  const folders = /* @__PURE__ */ new Map();
+  for (const response of responses || []) {
+    for (const file of response.files || []) {
+      const extension = extensionOf(file.filename || "");
+      if (!SOURCE_EXTENSIONS.has(extension) || file.isLocked) continue;
+      const directory = remoteDir(file.filename);
+      const key = `${response.username}\0${directory}`;
+      if (!folders.has(key))
+        folders.set(key, {
+          username: response.username,
+          directory,
+          files: [],
+          freeSlot: response.hasFreeUploadSlot !== false,
+          queueLength: Number(response.queueLength) || 0,
+          speed: Number(response.uploadSpeed) || 0
+        });
+      folders.get(key).files.push({
+        filename: file.filename,
+        size: file.size,
+        lengthMs: Number.isFinite(file.length) ? file.length * 1e3 : null,
+        bitRate: file.bitRate ?? null,
+        extension
+      });
+    }
+  }
+  for (const folder of folders.values()) {
+    folder.files.sort((a, b) => naturalCompare(remoteBase(a.filename), remoteBase(b.filename)));
+    const extensions = new Set(folder.files.map((f) => f.extension));
+    folder.format = extensions.size === 1 ? [...extensions][0] : null;
+  }
+  return [...folders.values()];
+}
+function lengthGap(lengthMs, track, { anyEdition = false } = {}) {
+  const lengths = anyEdition && track.anyLengthsMs?.length ? track.anyLengthsMs : track.lengthsMs?.length ? track.lengthsMs : [track.lengthMs];
+  const gaps = lengths.filter((l) => l != null).map((l) => Math.abs(lengthMs - l));
+  return gaps.length ? Math.min(...gaps) : Infinity;
+}
+function linesUp(files, tracks, options = {}) {
+  if (files.length !== tracks.length) return false;
+  return files.every((file, i) => file.lengthMs != null && lengthGap(file.lengthMs, tracks[i], options) <= LENGTH_TOLERANCE_MS);
+}
+function folderDiscs(folder, release, options = {}) {
+  const all = release.discs.flatMap((disc2) => disc2.tracks);
+  if (release.discs.length > 1 && linesUp(folder.files, all, options)) return release.discs.map((d) => d.position);
+  const disc = release.discs.find((d) => linesUp(folder.files, d.tracks, options));
+  return disc ? [disc.position] : null;
+}
+var folderScore = (folder) => (folder.freeSlot ? 0 : 1e9) + folder.queueLength * 1e6 + (LOSSLESS.has(folder.format) ? 0 : 1e5) - Math.min(folder.speed, 99999);
+function mapFiles(folder, release, discPositions) {
+  const tracks = discPositions.flatMap((position) => {
+    const disc = release.discs.find((d) => d.position === position);
+    return disc.tracks.map((track) => ({ disc: position, track }));
+  });
+  return folder.files.map((file, i) => ({ file, ...tracks[i] }));
+}
+function albumCandidates(folders, release) {
+  const byUser = /* @__PURE__ */ new Map();
+  for (const folder of folders) {
+    const discs = folderDiscs(folder, release);
+    if (!discs) continue;
+    if (!byUser.has(folder.username)) byUser.set(folder.username, []);
+    byUser.get(folder.username).push({ folder, discs });
+  }
+  const wanted = release.discs.map((d) => d.position);
+  const candidates2 = [];
+  for (const [username, matches] of byUser) {
+    matches.sort((a, b) => b.discs.length - a.discs.length || folderScore(a.folder) - folderScore(b.folder));
+    const chosen = [];
+    const covered = /* @__PURE__ */ new Set();
+    for (const match2 of matches) {
+      if (match2.discs.some((d) => covered.has(d))) continue;
+      chosen.push(match2);
+      match2.discs.forEach((d) => covered.add(d));
+    }
+    if (!wanted.every((d) => covered.has(d))) continue;
+    const files = chosen.flatMap(({ folder, discs }) => mapFiles(folder, release, discs));
+    const first = chosen[0].folder;
+    candidates2.push({ username, folders: chosen.map((c) => c.folder), files, score: Math.max(...chosen.map((c) => folderScore(c.folder))), format: first.format, bitRate: first.files[0]?.bitRate ?? null });
+  }
+  return candidates2.sort((a, b) => a.score - b.score);
+}
+function trackCandidates(folders, release, discPosition, trackIndexInDisc) {
+  const out = [];
+  for (const folder of folders) {
+    const discs = folderDiscs(folder, release, { anyEdition: true });
+    if (!discs?.includes(discPosition)) continue;
+    const mapped = mapFiles(folder, release, discs);
+    const hit = mapped.find((m) => m.disc === discPosition && m.track === release.discs.find((d) => d.position === discPosition).tracks[trackIndexInDisc]);
+    if (hit) out.push({ folder, ...hit, score: folderScore(folder) });
+  }
+  return out.sort((a, b) => a.score - b.score);
+}
+function describeMisses(folders, release, options = {}) {
+  const counts = new Set(release.discs.map((d) => d.tracks.length));
+  counts.add(release.discs.reduce((n, d) => n + d.tracks.length, 0));
+  let noLengths = 0;
+  let wrongCount = 0;
+  let wrongLengths = 0;
+  let closest = null;
+  for (const folder of folders) {
+    if (folderDiscs(folder, release, options)) continue;
+    if (!counts.has(folder.files.length)) wrongCount++;
+    else if (folder.files.some((f) => f.lengthMs == null)) noLengths++;
+    else {
+      wrongLengths++;
+      const tracks = release.discs.find((d) => d.tracks.length === folder.files.length)?.tracks ?? release.discs.flatMap((d) => d.tracks);
+      const offs = folder.files.map((f, i) => tracks[i] ? lengthGap(f.lengthMs, tracks[i], options) : Infinity);
+      const worst = Math.max(...offs);
+      if (!closest || worst < closest.worst) closest = { worst, at: offs.indexOf(worst) + 1, over: offs.filter((o) => o > LENGTH_TOLERANCE_MS).length };
+    }
+  }
+  const near = closest ? ` (closest: ${closest.over} track(s) off, worst ${(closest.worst / 1e3).toFixed(1)}s at track ${closest.at})` : "";
+  return `${folders.length} folders: ${wrongCount} with another track count, ${noLengths} without lengths, ${wrongLengths} with lengths off by more than 2s${near}`;
+}
+async function classicalInfo(ctx, recordingId, { albumArtistIds = [], releaseGroupId = null } = {}) {
+  if (!recordingId) return null;
+  const fields = await ctx.resolver.resolve(recordingId, { albumArtistIds, releaseGroupId });
+  if (!fields) return null;
+  const movement = fields.workId ? await ctx.mb.get("work", fields.workId, "artist-rels+work-rels") : null;
+  const work = movement ? await topWork(ctx.mb, movement) : null;
+  const people = fields.people;
+  const performer = people.soloists[0] || people.conductors[0] || people.ensembles[0] || null;
+  return {
+    fields,
+    composer: people.composers[0] || null,
+    performer,
+    conductor: people.conductors[0] || null,
+    ensemble: people.ensembles[0] || null,
+    workTitle: work?.title || fields.work || "",
+    movementTitle: fields.work || ""
+  };
+}
+async function acquisitionIdentity(ctx, track) {
+  const info = await classicalInfo(ctx, track.trackMbid);
+  if (!info) return null;
+  if (!info.performer) return { blocked: true };
+  return { artist: [info.performer.name, info.performer !== info.ensemble && info.ensemble?.name].filter(Boolean).join(" "), aliases: [], requiredTerms: [surname(info.performer)] };
+}
+async function searchFolders(ctx, slskd, ladder, { info, albumTitle, movements, accept }, started) {
+  const deadline = started + SEARCH_BUDGET_MS;
+  const kept = /* @__PURE__ */ new Map();
+  const rejected = [];
+  const steps = [];
+  for (const { step, label, query } of ladder) {
+    const listenMs = Math.min(SEARCH_TIMEOUT_MS, deadline - Date.now() - 3e3);
+    if (listenMs < 5e3) {
+      ctx.log(`Out of time before searching for "${query}"`);
+      steps.push({ step, label, query, skipped: "out of time" });
+      break;
+    }
+    ctx.log(`Searching Soulseek for "${query}" (${label}, ${Math.round(listenMs / 1e3)}s)`);
+    let found = [];
+    try {
+      const responses = await slskd.search(query, { searchTimeoutMs: listenMs, deadline: Math.min(deadline, Date.now() + listenMs + 4e3) });
+      found = groupFolders(responses);
+    } catch (error) {
+      if (!kept.size && step === ladder.at(-1).step) throw error;
+      ctx.log(`A Soulseek search failed: ${error.message}`);
+      steps.push({ step, label, query, error: error.message });
+      continue;
+    }
+    let qualified = 0;
+    for (const folder of found) {
+      const key = `${folder.username}\0${folder.directory}`;
+      if (kept.has(key)) continue;
+      const match2 = scoreFolder(folder, info, { albumTitle, movements });
+      if (match2.rejected) {
+        if (rejected.length < 200) rejected.push({ username: folder.username, directory: folder.directory, reason: match2.rejected, step });
+        continue;
+      }
+      qualified++;
+      kept.set(key, Object.assign(folder, { match: match2, step }));
+    }
+    const done = accept([...kept.values()]);
+    steps.push({ step, label, query, folders: found.length, qualified, stopped: done });
+    if (done) break;
+  }
+  return { folders: [...kept.values()], rejected, steps };
+}
+var DIAGNOSTICS = "slskd-searches.json";
+var KEEP_DIAGNOSTICS = 25;
+async function recordSearch(ctx, record) {
+  const file = path5.join(ctx.dataFolder, DIAGNOSTICS);
+  const previous = await readJson(file, []);
+  await writeJson(file, [{ at: Date.now(), ...record }, ...Array.isArray(previous) ? previous : []].slice(0, KEEP_DIAGNOSTICS)).catch((error) => ctx.log(`Couldn't save slskd diagnostics: ${error.message}`));
+}
+var searchDiagnostics = (ctx) => readJson(path5.join(ctx.dataFolder, DIAGNOSTICS), []);
+var describe = (candidate) => ({
+  username: candidate.username,
+  directory: candidate.folders?.[0]?.directory ?? candidate.folder?.directory,
+  score: candidate.match.score,
+  reasons: candidate.match.reasons,
+  step: candidate.step,
+  ...candidate.duplicateOf && { duplicateOf: candidate.duplicateOf },
+  ...isAmbiguous(candidate) && { review: true }
+});
+function chooseCandidates(candidates2, { manual }) {
+  const ranked = rankCandidates(candidates2);
+  return { ranked, offered: manual ? ranked : ranked.filter((candidate) => !isAmbiguous(candidate)) };
+}
+function slskdFor(ctx) {
+  const settings = slskdSettings(ctx.settings);
+  if (!settings.configured) throw new Error("Set the slskd URL and API key on the plugin's page");
+  return new Slskd(settings, ctx.fetch);
+}
+function locateTrack(release, track) {
+  for (const disc2 of release.discs) {
+    const index2 = disc2.tracks.findIndex((t) => t.recordingId === track.trackMbid);
+    if (index2 >= 0) return { discPosition: disc2.position, index: index2 };
+  }
+  const disc = release.discs.find((d) => d.position === (track.discNumber || 1));
+  const index = disc ? disc.tracks.findIndex((t) => t.position === track.trackNumber) : -1;
+  return { discPosition: disc?.position ?? null, index };
+}
+async function searchTrack(ctx, track, { manual = false } = {}) {
+  const started = Date.now();
+  if (!track?.releaseMbid) return [];
+  const release = await loadRelease(ctx.mb, track.releaseMbid);
+  if (!release) return [];
+  const { discPosition, index } = locateTrack(release, track);
+  if (index < 0) return [];
+  const recordingId = track.trackMbid || release.discs.find((d) => d.position === discPosition).tracks[index].recordingId;
+  const info = await classicalInfo(ctx, recordingId, { releaseGroupId: release.releaseGroupId });
+  if (!info) return [];
+  const slskd = slskdFor(ctx);
+  const target = release.discs.find((d) => d.position === discPosition).tracks[index];
+  const ladder = searchLadder(info, { albumTitle: release.title });
+  const withScore = (found) => trackCandidates(found, release, discPosition, index).map((c) => ({ ...c, username: c.folder.username, folders: [c.folder], match: withLineUp(c.folder.match, { whole: false }), step: c.folder.step, availability: c.score }));
+  const { folders, rejected, steps } = await searchFolders(
+    ctx,
+    slskd,
+    ladder,
+    { info, albumTitle: release.title, movements: [target.title], accept: (found) => withScore(found).some((c) => c.match.score >= GOOD_SCORE) },
+    started
+  );
+  ctx.log(`Release ${release.id}: ${describeMisses(folders, release, { anyEdition: true })}`);
+  const seen = /* @__PURE__ */ new Set();
+  const unique2 = withScore(folders).filter((c) => !seen.has(`${c.folder.username}\0${c.file.filename}`) && seen.add(`${c.folder.username}\0${c.file.filename}`));
+  const { ranked, offered } = chooseCandidates(unique2, { manual });
+  await recordSearch(ctx, { kind: "track", manual, release: { id: release.id, title: release.title }, track: target.title, performer: info.performer?.name || null, steps, candidates: ranked.slice(0, 30).map(describe), rejected: rejected.slice(0, 30), offered: offered.length });
+  return offered.slice(0, MAX_RESULTS).map((c) => ({
+    id: `${c.folder.username}:${c.file.filename}`.slice(0, 500),
+    title: track.title || target.title,
+    artist: track.artist || release.artist,
+    album: track.album || release.title,
+    durationMs: c.file.lengthMs,
+    format: c.file.extension,
+    bitrate: c.file.bitRate,
+    data: {
+      username: c.folder.username,
+      files: [{ filename: c.file.filename, size: c.file.size, title: target.title, artist: target.artist, recordingId: target.recordingId, lengthMs: target.lengthMs, lengthsMs: target.anyLengthsMs }]
+    }
+  }));
+}
+async function searchAlbum(ctx, album, { manual = false } = {}) {
+  const started = Date.now();
+  if (!album?.releaseMbid) return [];
+  const release = await loadRelease(ctx.mb, album.releaseMbid);
+  if (!release) return [];
+  const firstTracks = release.discs.flatMap((d) => d.tracks).slice(0, 3);
+  let info = null;
+  const albumArtistIds = release.artistCredit.map((c) => c.artist?.id).filter(Boolean);
+  for (const t of firstTracks) {
+    info = await classicalInfo(ctx, t.recordingId, { albumArtistIds, releaseGroupId: release.releaseGroupId });
+    if (info) break;
+  }
+  if (!info) return [];
+  const slskd = slskdFor(ctx);
+  const ladder = searchLadder(info, { albumTitle: release.title });
+  const movements = release.discs.flatMap((d) => d.tracks.map((t) => t.title)).slice(0, 60);
+  const withScore = (found) => albumCandidates(found, release).map((c) => {
+    const lead = [...c.folders].sort((a, b) => a.match.score - b.match.score)[0];
+    return { ...c, match: withLineUp(lead.match, { whole: true }), step: lead.step, availability: c.score };
+  });
+  const { folders, rejected, steps } = await searchFolders(
+    ctx,
+    slskd,
+    ladder,
+    { info, albumTitle: release.title, movements, accept: (found) => withScore(found).some((c) => c.match.score >= GOOD_SCORE) },
+    started
+  );
+  ctx.log(`Release ${release.id}: ${describeMisses(folders, release)}`);
+  const { ranked, offered } = chooseCandidates(withScore(folders), { manual });
+  await recordSearch(ctx, { kind: "album", manual, release: { id: release.id, title: release.title }, performer: info.performer?.name || null, steps, candidates: ranked.slice(0, 30).map(describe), rejected: rejected.slice(0, 30), offered: offered.length });
+  return offered.slice(0, MAX_RESULTS).map((c) => ({
+    id: `${c.username}:${c.folders.map((f) => f.directory).join("|")}`.slice(0, 500),
+    title: album.title || release.title,
+    artist: album.artist || release.artist,
+    year: release.year,
+    trackCount: c.files.length,
+    format: c.format,
+    bitrate: c.bitRate,
+    data: {
+      username: c.username,
+      files: c.files.map((m) => ({
+        filename: m.file.filename,
+        size: m.file.size,
+        disc: m.disc,
+        title: m.track.title,
+        artist: m.track.artist,
+        recordingId: m.track.recordingId,
+        lengthMs: m.track.lengthMs,
+        lengthsMs: m.track.lengthsMs
+      }))
+    }
+  }));
+}
+var downloadsDir = (ctx) => path5.join(ctx.dataFolder, "downloads");
+async function startDownload(ctx, result, kind) {
+  const data = result?.data;
+  if (!data?.username || !Array.isArray(data.files) || !data.files.length) throw new Error("The result has no files to download");
+  const { downloadFolder } = slskdSettings(ctx.settings);
+  if (!downloadFolder) throw new Error("Set slskd's download folder on the plugin's page");
+  const key = downloadKey(data.username, data.files);
+  const existing = await findDownload(ctx, key);
+  if (existing) {
+    ctx.log(`Joining the download already running for ${remoteBase(remoteDir(data.files[0].filename))}`);
+    return { pending: existing };
+  }
+  const slskd = slskdFor(ctx);
+  await slskd.enqueue(data.username, data.files.map((f) => ({ filename: f.filename, size: f.size })));
+  const id = randomUUID8();
+  await writeJson(path5.join(downloadsDir(ctx), `${id}.json`), { kind, key, username: data.username, files: data.files, startedAt: Date.now() });
+  return { pending: id };
+}
+var downloadKey = (username, files) => `${username}\0${files.map((f) => f.filename).sort().join("\0")}`;
+var KEEP_DOWNLOADS_MS = 2 * 24 * 60 * 6e4;
+var MISSING_GRACE_MS = 2 * 6e4;
+async function findDownload(ctx, key) {
+  const dir = downloadsDir(ctx);
+  for (const name of await fs5.readdir(dir).catch(() => [])) {
+    if (!name.endsWith(".json")) continue;
+    const record = await readJson(path5.join(dir, name), null);
+    if (!record || Date.now() - (record.startedAt || 0) > KEEP_DOWNLOADS_MS) {
+      await fs5.rm(path5.join(dir, name), { force: true });
+      continue;
+    }
+    if (record.key === key && !record.failed) return name.replace(/\.json$/, "");
+  }
+  return null;
+}
+async function locate(downloadFolder, file) {
+  const base = remoteBase(file.filename);
+  const direct = path5.join(downloadFolder, remoteBase(remoteDir(file.filename)), base);
+  const stat = await fs5.stat(direct).catch(() => null);
+  if (stat?.isFile()) return direct;
+  let seen = 0;
+  const walk = async (dir, depth) => {
+    if (depth > 4) return null;
+    for (const entry of await fs5.readdir(dir, { withFileTypes: true }).catch(() => [])) {
+      if (++seen > 5e4) return null;
+      const full = path5.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        const found = await walk(full, depth + 1);
+        if (found) return found;
+      } else if (entry.isFile() && (entry.name === base || entry.name.replace(/_\d{15,}(?=\.[^.]+$)/, "") === base)) {
+        const s = await fs5.stat(full).catch(() => null);
+        if (s && (!file.size || s.size === file.size)) return full;
+      }
+    }
+    return null;
+  };
+  return walk(downloadFolder, 0);
+}
+async function downloadStatus(ctx, id, directory) {
+  const record = await readJson(path5.join(downloadsDir(ctx), `${id}.json`), null);
+  if (!record) throw new Error("This download is unknown to the plugin");
+  const slskd = slskdFor(ctx);
+  const transfers = await slskd.downloads(record.username);
+  const rank = (state) => isSucceeded(state) ? 0 : FAILED_STATES.test(state) ? 2 : 1;
+  const states = record.files.map((file) => {
+    const matches = transfers.filter((t) => t.filename === file.filename);
+    return matches.map((t) => t.state || "").sort((a, b) => rank(a) - rank(b))[0] ?? null;
+  });
+  if (states.includes(null)) {
+    const { downloadFolder } = slskdSettings(ctx.settings);
+    for (const [i, file] of record.files.entries()) {
+      if (states[i] !== null) continue;
+      if (await locate(downloadFolder, file)) states[i] = "Completed, Succeeded";
+      else if (Date.now() - (record.startedAt || 0) < (ctx.missingGraceMs ?? MISSING_GRACE_MS)) states[i] = "";
+      else states[i] = "Completed, Failed (slskd no longer has this transfer)";
+    }
+  }
+  const failed = states.find((state) => FAILED_STATES.test(state));
+  if (failed) await writeJson(path5.join(downloadsDir(ctx), `${id}.json`), { ...record, failed: true });
+  if (failed) throw new Error(`slskd: ${remoteBase(record.files[states.indexOf(failed)].filename)} ${failed.replace(/^Completed,\s*/, "").toLowerCase()}`);
+  if (!states.every(isSucceeded)) return { done: false };
+  return finishDownload(ctx, id, record, directory);
+}
+var finishing = /* @__PURE__ */ new Map();
+var FINISH_WAIT_MS = 4e4;
+var KEEP_FREE_BYTES = 1024 ** 3;
+async function finishDownload(ctx, id, record, directory) {
+  const key = `${id}\0${directory}`;
+  let job = finishing.get(key);
+  if (!job) {
+    job = { promise: moveIntoPlace(ctx, id, record, directory) };
+    job.promise.then(
+      (value) => job.value = value,
+      (error) => job.error = error
+    );
+    finishing.set(key, job);
+  }
+  const waitMs = ctx.finishWaitMs ?? FINISH_WAIT_MS;
+  let timer;
+  await Promise.race([job.promise.catch(() => {
+  }), new Promise((r) => timer = setTimeout(r, waitMs))]);
+  clearTimeout(timer);
+  if (!job.value && !job.error) return { done: false };
+  finishing.delete(key);
+  if (job.error) throw job.error;
+  return job.value;
+}
+var formatBytes = (bytes) => bytes >= 1024 ** 3 ? `${(bytes / 1024 ** 3).toFixed(1)} GB` : `${Math.max(1, Math.round(bytes / 1024 ** 2))} MB`;
+async function freeBytes(ctx, dir) {
+  if (ctx.freeBytes) return ctx.freeBytes(dir);
+  for (let at = dir; ; at = path5.dirname(at)) {
+    const stats = await fs5.statfs(at).catch(() => null);
+    if (stats) return stats.bavail * stats.bsize;
+    if (path5.dirname(at) === at) return Infinity;
+  }
+}
+var link = (ctx, local, target) => (ctx.linkFile ?? fs5.link)(local, target);
+async function copyInto(local, target) {
+  const temp = `${target}.${randomUUID8()}.part`;
+  try {
+    await fs5.copyFile(local, temp);
+    await fs5.rename(temp, target);
+  } catch (error) {
+    await fs5.rm(temp, { force: true }).catch(() => {
+    });
+    throw error;
+  }
+}
+async function moveIntoPlace(ctx, id, record, directory) {
+  const { downloadFolder } = slskdSettings(ctx.settings);
+  const files = [];
+  for (const [i, file] of record.files.entries()) {
+    const local = await locate(downloadFolder, file);
+    if (!local) throw new Error(`Couldn't find ${remoteBase(file.filename)} in slskd's download folder`);
+    const name = `${String(file.disc || 1).padStart(2, "0")}-${String(i + 1).padStart(3, "0")} ${remoteBase(file.filename)}`.replace(/[\\/]/g, "_");
+    const target = path5.join(directory, record.kind === "album" ? name : remoteBase(file.filename));
+    files.push({ local, target, file, size: (await fs5.stat(local)).size });
+  }
+  await fs5.mkdir(directory, { recursive: true });
+  const todo = [];
+  for (const entry of files) {
+    const there = await fs5.stat(entry.target).catch(() => null);
+    if (!there || there.size !== entry.size) {
+      await fs5.rm(entry.target, { force: true });
+      todo.push(entry);
+    }
+  }
+  let linked = false;
+  if (todo.length) {
+    linked = await link(ctx, todo[0].local, todo[0].target).then(
+      () => true,
+      () => false
+    );
+  }
+  if (!linked && todo.length) {
+    const needed = todo.reduce((sum, entry) => sum + entry.size, 0);
+    const free = await freeBytes(ctx, directory);
+    if (needed + KEEP_FREE_BYTES > free) {
+      throw new Error(
+        `Not enough room for this download in Aurral's data folder, where Aurral keeps it until import: it needs ${formatBytes(needed)} and ${formatBytes(free)} is free, and at least ${formatBytes(KEEP_FREE_BYTES)} must stay free. Free some space and search again.`
+      );
+    }
+  }
+  for (const entry of linked ? todo.slice(1) : todo) {
+    if (linked) await link(ctx, entry.local, entry.target).catch(() => copyInto(entry.local, entry.target));
+    else await copyInto(entry.local, entry.target);
+  }
+  let tagged = 0;
+  for (const { target, file } of files) {
+    let identified = false;
+    try {
+      const { durationMs } = readTags(target);
+      identified = Boolean(file.recordingId) && durationMs > 0 && lengthGap(durationMs, file) <= LENGTH_TOLERANCE_MS;
+    } catch {
+      identified = false;
+    }
+    if (!identified) continue;
+    try {
+      await writeTags(target, { title: [file.title], artist: [file.artist].filter(Boolean), recordingMbid: [file.recordingId] });
+      tagged++;
+    } catch (error) {
+      ctx.log(`Couldn't tag ${path5.basename(target)}: ${error.message}`);
+    }
+  }
+  ctx.log(`Download ${id}: ${files.length} file(s) ${linked ? "linked" : "copied"}, ${tagged} identified and tagged`);
+  return record.kind === "album" ? { done: true } : { done: true, path: path5.basename(files[0].target) };
+}
+
+// src/model/editor-v2.js
+import path6 from "node:path";
+
 // src/search/engine.js
 var FIELD = { primary: 0, secondary: 1, skeleton: 2 };
 var KIND_BOOST = { work: 12, recording: 6, composer: 7, performer: 5, release: 3, movement: 1 };
@@ -37456,9 +38649,9 @@ var PERFORMER_ROLES = /* @__PURE__ */ new Set(["soloist", "performer", "conducto
 var ENSEMBLE_ROLES2 = /* @__PURE__ */ new Set(["orchestra", "ensemble", "choir"]);
 var ROLE_LABEL = { soloist: "Soloist", performer: "Performer", conductor: "Conductor", orchestra: "Orchestra", ensemble: "Ensemble", choir: "Choir", composer: "Composer", arranger: "Arranger", lyricist: "Lyricist" };
 var LIVE = /\b(live|concert|recital|broadcast|in concert|konzert)\b/i;
-var text = (value) => typeof value === "string" ? value.trim() : Array.isArray(value) ? value.filter((v) => typeof v === "string").join("; ") : "";
+var text2 = (value) => typeof value === "string" ? value.trim() : Array.isArray(value) ? value.filter((v) => typeof v === "string").join("; ") : "";
 var list = (value) => Array.isArray(value) ? value.filter((v) => typeof v === "string" && v.trim()).map((v) => v.trim()) : typeof value === "string" && value.trim() ? [value.trim()] : [];
-var parse2 = (value, fallback) => {
+var parse3 = (value, fallback) => {
   try {
     return JSON.parse(value);
   } catch {
@@ -37486,7 +38679,7 @@ function resolvedValues(c) {
        WHERE f.field IN ('title','name','nickname','aliases','catalogue','key','form','period','instrumentation','date')`
   ).iterate()) {
     if (!values.has(row.target_id)) values.set(row.target_id, {});
-    values.get(row.target_id)[row.field] = parse2(row.value, null);
+    values.get(row.target_id)[row.field] = parse3(row.value, null);
   }
   return values;
 }
@@ -37496,7 +38689,7 @@ function classicalTracks(c) {
     `SELECT t.id,t.core_id,t.evidence FROM track_link t JOIN classification k ON k.target_id=t.id
        WHERE t.state='active' AND k.state='classical'`
   ).iterate()) {
-    const evidence2 = parse2(row.evidence, {});
+    const evidence2 = parse3(row.evidence, {});
     tracks.set(row.id, { id: row.id, coreId: String(row.core_id), albumId: evidence2.albumId == null ? null : String(evidence2.albumId), durationMs: Number(evidence2.durationMs) || 0, hints: evidence2.hints || {} });
   }
   return tracks;
@@ -37527,9 +38720,9 @@ function ownedRecordings(c, tracks = classicalTracks(c), values = resolvedValues
   const recordings = [];
   for (const recording of byRealization.values()) {
     const first = recording.items[0].track;
-    const people = credits3.all(recording.performanceWorkId).map((row) => ({ id: row.contributor_id, role: row.role, name: text(values.get(row.contributor_id)?.name) || "Unknown" }));
+    const people = credits3.all(recording.performanceWorkId).map((row) => ({ id: row.contributor_id, role: row.role, name: text2(values.get(row.contributor_id)?.name) || "Unknown" }));
     const performers = people.filter((p) => PERFORMER_ROLES.has(p.role));
-    const tagged = performers.length ? [] : text(first.hints.artist || first.hints.albumArtist).split(/\s+[—–]\s+|\s*;\s*/).map((name) => name.trim()).filter((name) => name && !list(first.hints.composer).some((composer) => fold(composer) === fold(name)));
+    const tagged = performers.length ? [] : text2(first.hints.artist || first.hints.albumArtist).split(/\s+[—–]\s+|\s*;\s*/).map((name) => name.trim()).filter((name) => name && !list(first.hints.composer).some((composer) => fold(composer) === fold(name)));
     const albums2 = [...new Set(recording.items.map((item) => item.track.albumId).filter(Boolean))];
     const mbids = [...new Set(recording.items.map((item) => item.track.hints.recordingMbid).filter(Boolean))].sort();
     const parts = /* @__PURE__ */ new Map();
@@ -37544,8 +38737,8 @@ function ownedRecordings(c, tracks = classicalTracks(c), values = resolvedValues
       taggedPerformers: tagged,
       performerNames: performers.length ? performers.map((p) => p.name) : tagged,
       albums: albums2,
-      album: text(recording.label) || text(first.hints.album),
-      label: text(first.hints.label),
+      album: text2(recording.label) || text2(first.hints.album),
+      label: text2(first.hints.label),
       year: yearOf(first.hints.date) ?? yearOf(first.hints.year),
       mbids,
       parts,
@@ -37617,7 +38810,7 @@ var keysOf = (...sources) => [...new Set(sources.flat().flatMap((value) => catal
 function buildDocuments(c) {
   const values = resolvedValues(c);
   const tracks = classicalTracks(c);
-  const name = (id) => text(values.get(id)?.name) || text(values.get(id)?.title) || "";
+  const name = (id) => text2(values.get(id)?.name) || text2(values.get(id)?.title) || "";
   const entities2 = c.db.prepare("SELECT id,kind FROM entity WHERE deleted_at IS NULL AND kind IN ('work','movement','person','ensemble','collection')").all();
   const kindOf = new Map(entities2.map((e) => [e.id, e.kind]));
   const creditsOf = /* @__PURE__ */ new Map();
@@ -37648,7 +38841,7 @@ function buildDocuments(c) {
     recordingsOf.get(workId).push(group);
   }
   const composersOf2 = (workId) => (creditsOf.get(workId) || []).filter((k) => k.role === "composer");
-  const workTitle = (workId) => text(values.get(workId)?.title) || "Untitled work";
+  const workTitle = (workId) => text2(values.get(workId)?.title) || "Untitled work";
   const docs = [];
   const workFacets = /* @__PURE__ */ new Map();
   const workKeys = /* @__PURE__ */ new Map();
@@ -37658,8 +38851,8 @@ function buildDocuments(c) {
     const composers = composersOf2(id);
     const facets = [];
     for (const k of composers) facets.push(["composer", k.id, name(k.id)]);
-    if (text(v.period)) facets.push(["period", fold(v.period), text(v.period)]);
-    if (text(v.form)) facets.push(["form", fold(v.form), text(v.form)]);
+    if (text2(v.period)) facets.push(["period", fold(v.period), text2(v.period)]);
+    if (text2(v.form)) facets.push(["form", fold(v.form), text2(v.form)]);
     for (const instrument of list(v.instrumentation)) facets.push(["instrument", fold(instrument), instrument]);
     workFacets.set(id, facets);
     const groupsHere = recordingsOf.get(id) || [];
@@ -37671,14 +38864,14 @@ function buildDocuments(c) {
       workId: id,
       title,
       subtitle: composers.map((k) => name(k.id)).filter(Boolean).join(", "),
-      detail: [text(v.nickname) && `\u201C${text(v.nickname)}\u201D`, owned ? `${groupsHere.length} recording${groupsHere.length === 1 ? "" : "s"}` : "Not in your library"].filter(Boolean).join(" \xB7 "),
+      detail: [text2(v.nickname) && `\u201C${text2(v.nickname)}\u201D`, owned ? `${groupsHere.length} recording${groupsHere.length === 1 ? "" : "s"}` : "Not in your library"].filter(Boolean).join(" \xB7 "),
       owned,
       boost: KIND_BOOST.work,
-      primary: [title, text(v.nickname), ...list(v.aliases), ...list(v.catalogue)],
-      secondary: [...composers.map((k) => name(k.id)), ...composers.flatMap((k) => list(values.get(k.id)?.aliases)), text(v.key), text(v.form), ...(collectionsOf.get(id) || []).map(name)],
-      keys: workKeys.set(id, keysOf(title, list(v.catalogue), list(v.aliases), text(v.nickname))).get(id),
+      primary: [title, text2(v.nickname), ...list(v.aliases), ...list(v.catalogue)],
+      secondary: [...composers.map((k) => name(k.id)), ...composers.flatMap((k) => list(values.get(k.id)?.aliases)), text2(v.key), text2(v.form), ...(collectionsOf.get(id) || []).map(name)],
+      keys: workKeys.set(id, keysOf(title, list(v.catalogue), list(v.aliases), text2(v.nickname))).get(id),
       facets: [...facets, ...dedupeFacets(recordingFacets.filter(([facet]) => facet !== "year" && facet !== "type")), ["owned", owned ? "owned" : "missing", owned ? "In your library" : "Not in your library"]],
-      data: { nickname: text(v.nickname) }
+      data: { nickname: text2(v.nickname) }
     });
   }
   for (const [workId, movements] of movementsOf) {
@@ -37687,7 +38880,7 @@ function buildDocuments(c) {
     const owned = (recordingsOf.get(workId) || []).length > 0;
     movements.forEach((movement, index) => {
       const v = values.get(movement) || {};
-      const movementTitle2 = text(v.title) || `Movement ${index + 1}`;
+      const movementTitle2 = text2(v.title) || `Movement ${index + 1}`;
       docs.push({
         kind: "movement",
         ref: movement,
@@ -37698,7 +38891,7 @@ function buildDocuments(c) {
         owned,
         boost: KIND_BOOST.movement,
         primary: [movementTitle2, ...list(v.aliases)],
-        secondary: [title, text(values.get(workId)?.nickname), ...composers],
+        secondary: [title, text2(values.get(workId)?.nickname), ...composers],
         keys: keysOf(title),
         facets: [...workFacets.get(workId) || [], ["owned", owned ? "owned" : "missing", owned ? "In your library" : "Not in your library"]],
         data: { position: index + 1 }
@@ -37723,7 +38916,7 @@ function buildDocuments(c) {
       owned: true,
       boost: KIND_BOOST.recording,
       primary: [...lead.performerNames, ...lead.people.flatMap((p) => list(values.get(p.id)?.aliases))],
-      secondary: [title, text(work.nickname), ...list(work.aliases), ...composers, ...albums3],
+      secondary: [title, text2(work.nickname), ...list(work.aliases), ...composers, ...albums3],
       keys: keysOf(title, list(work.catalogue), list(work.aliases)),
       facets: [...workFacets.get(lead.workId) || [], ...recordingGroupFacets(group, name), ["type", complete ? "complete" : "partial", complete ? "Complete work" : "Excerpt or incomplete"], ["owned", "owned", "In your library"]],
       data: {
@@ -37763,7 +38956,7 @@ function buildDocuments(c) {
   const albums2 = /* @__PURE__ */ new Map();
   for (const track of tracks.values()) {
     if (!track.albumId) continue;
-    if (!albums2.has(track.albumId)) albums2.set(track.albumId, { title: text(track.hints.album) || "Unknown album", artist: text(track.hints.albumArtist || track.hints.artist), year: yearOf(track.hints.date) ?? yearOf(track.hints.year), tracks: 0, works: /* @__PURE__ */ new Set() });
+    if (!albums2.has(track.albumId)) albums2.set(track.albumId, { title: text2(track.hints.album) || "Unknown album", artist: text2(track.hints.albumArtist || track.hints.artist), year: yearOf(track.hints.date) ?? yearOf(track.hints.year), tracks: 0, works: /* @__PURE__ */ new Set() });
     albums2.get(track.albumId).tracks++;
   }
   for (const recording of recordings) for (const album of recording.albums) albums2.get(album)?.works.add(recording.workId);
@@ -37875,7 +39068,7 @@ function searchCatalogue(c, { q = "", filters = {}, kinds: kinds2 = null, limit 
   for (const [id, weight] of scores) {
     const doc = docs.get(id);
     if (!doc || kinds2 && !kinds2.includes(doc.kind)) continue;
-    const data = parse2(doc.data, {});
+    const data = parse3(doc.data, {});
     const exact = folded && (fold(doc.title) === folded || fold(data.nickname) === folded) ? 25 : 0;
     ranked.push({ doc, data, score: weight + doc.boost + exact + (doc.owned ? 2 : 0) });
   }
@@ -37891,7 +39084,7 @@ function searchCatalogue(c, { q = "", filters = {}, kinds: kinds2 = null, limit 
     for (let i = 0; i < ids2.length; i += 500) {
       const chunk = ids2.slice(i, i + 500);
       for (const doc of c.db.prepare(`SELECT * FROM search_doc WHERE kind='work' AND ref IN (${chunk.map(() => "?").join(",")})`).all(...chunk))
-        ranked.push({ doc, data: parse2(doc.data, {}), score: viaRecording.get(doc.ref).score - KIND_BOOST.recording + KIND_BOOST.work - 4, via: "recording" });
+        ranked.push({ doc, data: parse3(doc.data, {}), score: viaRecording.get(doc.ref).score - KIND_BOOST.recording + KIND_BOOST.work - 4, via: "recording" });
     }
   }
   ranked.sort((a, b) => b.score - a.score || a.doc.title.localeCompare(b.doc.title) || a.doc.id - b.doc.id);
@@ -37953,85 +39146,7 @@ function facetCounts(c, docIds, wanted) {
 }
 
 // src/model/auto-match.js
-import { createHash as createHash2 } from "node:crypto";
-
-// src/works.js
-var SUFFIX = "(?:[a-z]{1,3}(?![a-z]))?";
-var CATALOGUES = [
-  [/\bBWV\s*(\d+[a-z]?)/i, "BWV"],
-  [/\bHWV\s*(\d+[a-z]?)/i, "HWV"],
-  [/\bRV\s*(\d+[a-z]?)/i, "RV"],
-  [/\bK(?:V|\.)?\s*(\d+[a-z]?)\b/, "K"],
-  [/\bD\.?\s*(\d+[a-z]?)\b/, "D"],
-  [/\bHob\.?\s*([IVXL]+[a-z]?:\s*\d+[a-z]?)/i, "Hob"],
-  [new RegExp(`\\bWoO\\s*(\\d+${SUFFIX})`, "i"), "WoO"],
-  // "S. 161", and Hyperion's "S161", "S166r" or "S534ii/bis". Searle's own
-  // sub-numbers after a slash name a piece too ("S. 534/2b", "S. 385/3",
-  // "S163d/ii").
-  [new RegExp(`\\bS(?:\\.\\s*|(?=\\d))(\\d+${SUFFIX}(?:\\/(?:bis|[ivx]{1,4}(?![a-z])|\\d+${SUFFIX}))?)`), "S"],
-  [new RegExp(`\\bSz\\.?\\s*(\\d+${SUFFIX})`, "i"), "Sz"],
-  [new RegExp(`\\bBB\\s*(\\d+${SUFFIX})`), "BB"],
-  [new RegExp(`\\bTrV\\s*(\\d+${SUFFIX})`, "i"), "TrV"],
-  [new RegExp(`\\bL\\.\\s*(\\d+${SUFFIX})`), "L"],
-  [new RegExp(`\\bFP\\s*(\\d+${SUFFIX})`), "FP"],
-  // Ravel's (Marnat): "Boléro, M 81", "Pavane…, M.19". Capital M only.
-  // "M. 63/2" is the second of M. 63's pieces.
-  [new RegExp(`(?<![\\p{L}\\d])M(?:\\.\\s*|\\s+)(\\d+${SUFFIX}(?:\\/\\d+)?)(?![\\d])`, "u"), "M"]
-];
-var OPUS = /\bop(?:us|\.)?\s*(\d+[a-z]?)(?:\s*,?\s*(?:no\.?|nr\.?|n°)\s*(\d+))?/i;
-var PIECE = /^\s*,?\s*(?:no\.?|nr\.?|n°)\s*(\d+[a-z]{0,3})(?![a-z\d])/i;
-function catalogueMatch(title) {
-  const text5 = String(title || "");
-  for (const [pattern, prefix] of CATALOGUES) {
-    const match2 = text5.match(pattern);
-    if (match2) return { prefix, number: match2[1].replace(/\s+/g, ""), end: match2.index + match2[0].length, text: text5 };
-  }
-  return null;
-}
-function catalogueNumber(title) {
-  const match2 = catalogueMatch(title);
-  if (match2) return `${match2.prefix} ${match2.number}`;
-  const opus = String(title || "").match(OPUS);
-  if (opus) return `op ${opus[1]}${opus[2] ? ` no ${opus[2]}` : ""}`;
-  return "";
-}
-function cataloguePiece(title) {
-  const match2 = catalogueMatch(title);
-  return match2 ? match2.text.slice(match2.end).match(PIECE)?.[1]?.toLowerCase() || "" : "";
-}
-function shortWorkTitle(title) {
-  let text5 = String(title || "").split(":")[0];
-  text5 = text5.replace(OPUS, " ");
-  for (const [pattern] of CATALOGUES) text5 = text5.replace(pattern, " ");
-  text5 = text5.replace(/\bin\s+[A-G](?:[- ]?(?:flat|sharp|♭|♯|b|#))?\s*(?:major|minor|maj|min|dur|moll)\b/gi, " ").replace(/\b(?:no|nr|n°)\.?\s*(?=\d)/gi, " ").replace(/[“”"'’,;()[\]]/g, " ");
-  return searchWords(text5);
-}
-function searchWords(text5) {
-  return String(text5 || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim().split(/\s+/).filter(Boolean).join(" ");
-}
-function surname(person) {
-  if (!person) return "";
-  const sort = String(person.sortName || "");
-  if (sort.includes(",")) return searchWords(sort.split(",")[0]);
-  return searchWords(person.name);
-}
-function creditString(credit) {
-  return (credit || []).map((entry) => `${entry.name ?? entry.artist?.name ?? ""}${entry.joinphrase ?? ""}`).join("").trim();
-}
-async function topWork(mb, work, depth = 0, inc = "artist-rels+work-rels", { stop = () => false } = {}) {
-  if (!work || depth >= 3) return work;
-  const parent = (work.relations || []).find((rel) => rel.type === "parts" && rel.direction === "backward" && rel.work?.id);
-  if (!parent) return work;
-  const data = await mb.get("work", parent.work.id, inc);
-  return data && !stop(data, work) ? topWork(mb, data, depth + 1, inc, { stop }) : work;
-}
-var RELEASE_INC = "recordings+artist-credits+release-groups+media";
-function releaseYear(date) {
-  const year = Number(String(date || "").slice(0, 4));
-  return Number.isInteger(year) && year > 0 ? year : null;
-}
-
-// src/model/auto-match.js
+import { createHash as createHash3 } from "node:crypto";
 var MULTI_MOVEMENT = /\b(symphon(?:y|ie)|sinfonia|sonata|sonatina|concerto|suite|partita|quartet|quintet|sextet|septet|octet|nonet|trio|serenade|divertimento|cassation|mass|missa|requiem|stabat mater|magnificat|te deum|vespers|cantata|oratorio|passion|variations?|ballet)\b/i;
 var COLLECTION_LIKE = new RegExp("(?<!\\p{L})(etudes?|\xE9tudes?|preludes?|pr\xE9ludes?|songs?|lieder)(?!\\p{L})", "iu");
 var isCollectionLike = (value) => COLLECTION_LIKE.test(clean3(value));
@@ -38042,7 +39157,7 @@ var sameCatalogue = (a, b) => {
   const number = catalogueNumber(a).toLowerCase();
   return Boolean(number) && number === catalogueNumber(b).toLowerCase();
 };
-var identity = (...values) => createHash2("sha256").update(JSON.stringify(values)).digest("hex");
+var identity = (...values) => createHash3("sha256").update(JSON.stringify(values)).digest("hex");
 var NUMBERED_SET = new RegExp("(?<!\\p{L})(pr[e\xE9]ludes|[e\xE9]tudes|nocturnes|mazurkas|waltzes|valses|impromptus|ballades|polonaises|bagatelles|intermezzi|consolations|po[e\xE8]mes|morceaux|songs without words|lieder ohne worte)(?!\\p{L})", "iu");
 function withoutComposer(title, composers = []) {
   const text5 = clean3(title);
@@ -40096,7 +41211,7 @@ function realizationTracks(c, realization) {
        WHERE i.realization_id=? ORDER BY i.sequence,i.id`
   ).all(realization).map((row) => ({ ...row, evidence: JSON.parse(row.evidence) }));
 }
-var trackTitle = (evidence2) => evidence2.hints?.title || evidence2.title || path3.basename(evidence2.path || "Track");
+var trackTitle = (evidence2) => evidence2.hints?.title || evidence2.title || path6.basename(evidence2.path || "Track");
 function albums(c) {
   const map = /* @__PURE__ */ new Map();
   for (const track of ownedTracks(c)) {
@@ -40260,10 +41375,10 @@ function workView(c, work) {
   const composers = credits(c, work).filter((credit) => credit.role === "composer");
   const movements = workMovements(c, work);
   const performances = realizations(c, work);
-  const coverage = /* @__PURE__ */ new Map();
+  const coverage2 = /* @__PURE__ */ new Map();
   for (const performance2 of performances)
     for (const item of realizationTracks(c, performance2.id))
-      if (item.movement_id) coverage.set(item.movement_id, (coverage.get(item.movement_id) || 0) + 1);
+      if (item.movement_id) coverage2.set(item.movement_id, (coverage2.get(item.movement_id) || 0) + 1);
   const recordingRows = performances.map((performance2) => {
     const tracks = realizationTracks(c, performance2.id);
     const album = tracks[0]?.evidence.albumId;
@@ -40302,12 +41417,12 @@ function workView(c, work) {
         rows: movements.map((movement, index) => ({
           id: movement.id,
           label: entityLabel(c, movement.id, "movement"),
-          detail: performances.length ? `In ${coverage.get(movement.id) || 0} of ${performances.length} recordings` : void 0,
+          detail: performances.length ? `In ${coverage2.get(movement.id) || 0} of ${performances.length} recordings` : void 0,
           selection: movement.id,
           actions: [
             ...index > 0 ? [action("Move up", "move-movement", { work, movement: movement.id, direction: "up" })] : [],
             ...index < movements.length - 1 ? [action("Move down", "move-movement", { work, movement: movement.id, direction: "down" })] : [],
-            ...coverage.get(movement.id) ? [] : [action("Delete", "delete-movement", { work, movement: movement.id }, { tone: "danger", confirm: "Delete this movement?" })]
+            ...coverage2.get(movement.id) ? [] : [action("Delete", "delete-movement", { work, movement: movement.id }, { tone: "danger", confirm: "Delete this movement?" })]
           ]
         }))
       },
@@ -40690,7 +41805,7 @@ function trackView(c, track) {
           { label: "Performer", value: evidence2.hints?.artist || "Unknown" },
           { label: "Composer tag", value: (evidence2.hints?.composer || []).join(", ") || "None" },
           { label: "WORK tag", value: evidence2.hints?.work || "None" },
-          { label: "File", value: path3.basename(evidence2.path || "") }
+          { label: "File", value: path6.basename(evidence2.path || "") }
         ]
       },
       {
@@ -40757,7 +41872,7 @@ function reviewView(c, id) {
     );
   if (review.kind === "track_link" && track)
     (review.evidence.candidates || []).slice(0, 5).forEach(
-      (candidate, index) => actions.unshift(action(`Link to ${path3.basename(candidate.path || "")}`.slice(0, 100), "relink-track", { id, candidate: String(index) }))
+      (candidate, index) => actions.unshift(action(`Link to ${path6.basename(candidate.path || "")}`.slice(0, 100), "relink-track", { id, candidate: String(index) }))
     );
   for (const candidate of (Array.isArray(review.evidence.candidates) ? review.evidence.candidates : []).slice(0, 5))
     if (typeof candidate === "string" && c.db.prepare("SELECT 1 FROM entity WHERE id=? AND deleted_at IS NULL").get(candidate))
@@ -40825,7 +41940,53 @@ function newView(kind) {
   if (!forms) fail("Unknown item type");
   return { crumbs: [], title: forms.title, badges: [], actions: [], sections: [forms.section] };
 }
-var TABS = ["works", "composers", "performers", "albums", "review", "search"];
+var TABS = ["works", "composers", "performers", "albums", "review", "search", "downloads"];
+function downloadsList(downloads) {
+  return (Array.isArray(downloads) ? downloads : []).map((record, index) => {
+    const best = record.candidates?.[0];
+    return {
+      id: `slskd:${index}`,
+      label: `${record.release?.title || "Release"}${record.track ? ` \xB7 ${record.track}` : ""}`.slice(0, 500),
+      detail: [
+        new Date(record.at).toISOString().slice(0, 16).replace("T", " "),
+        record.performer,
+        `${record.offered ?? 0} offered`,
+        best ? `best ${best.score}` : "no folder qualified"
+      ].filter(Boolean).join(" \xB7 "),
+      badge: record.manual ? { label: "Manual", tone: "muted" } : record.offered ? { label: "Found", tone: "success" } : { label: "Nothing", tone: "warning" },
+      selection: `slskd:${index}`,
+      search: `${record.release?.title || ""} ${record.track || ""} ${record.performer || ""} ${(record.steps || []).map((step) => step.query).join(" ")}`
+    };
+  });
+}
+function downloadView(downloads, index) {
+  const record = (Array.isArray(downloads) ? downloads : [])[index];
+  if (!record) fail("That search is no longer in the log");
+  const steps = (record.steps || []).map((step, i) => ({
+    id: `step-${i}`,
+    label: `${step.step}. ${step.label}: \u201C${step.query}\u201D`.slice(0, 500),
+    detail: step.skipped || step.error || `${step.folders} folder${step.folders === 1 ? "" : "s"}, ${step.qualified} named a performer${step.stopped ? " \xB7 stopped here" : ""}`
+  }));
+  const candidates2 = (record.candidates || []).map((c, i) => ({
+    id: `candidate-${i}`,
+    label: `${c.score} \xB7 ${c.username}: ${c.directory}`.slice(0, 500),
+    detail: [c.reasons?.join(", "), c.duplicateOf && `copy of ${c.duplicateOf}`, `step ${c.step}`].filter(Boolean).join(" \xB7 ").slice(0, 500),
+    ...c.review ? { badge: { label: "Needs a person", tone: "warning" } } : c.duplicateOf ? { badge: { label: "Copy", tone: "muted" } } : {}
+  }));
+  const rejected = (record.rejected || []).map((r, i) => ({ id: `rejected-${i}`, label: `${r.username}: ${r.directory}`.slice(0, 500), detail: `${r.reason} \xB7 step ${r.step}` }));
+  return {
+    crumbs: [],
+    title: record.release?.title || "slskd search",
+    subtitle: [record.kind === "album" ? "Album" : `Track: ${record.track}`, record.performer && `performer ${record.performer}`, record.manual ? "manual search" : "automatic search"].filter(Boolean).join(" \xB7 "),
+    badges: [],
+    actions: [],
+    sections: [
+      { type: "rows", id: "steps", title: "Searches", note: "The ladder stops once a folder lines up with the release and scores 60 or more.", rows: steps, empty: "No search ran." },
+      { type: "rows", id: "candidates", title: "Candidates", note: "Scored on performer, conductor, ensemble, release title, work, catalogue number and movements, plus 25 for lining up with the whole release. Below 45, only a person's manual search offers it.", rows: candidates2, empty: "No folder lined up with the release." },
+      { type: "rows", id: "rejected", title: "Rejected", rows: rejected, empty: "Nothing was rejected for its performers." }
+    ]
+  };
+}
 var SEARCH_KIND = { work: "Work", movement: "Movement", recording: "Recording", composer: "Composer", performer: "Performer", release: "Album" };
 function searchList(c, q) {
   if (!q.trim()) return [];
@@ -40843,8 +42004,9 @@ function searchList(c, q) {
     })
   );
 }
-function listFor(c, tab, q) {
+function listFor(c, tab, q, extra = {}) {
   if (tab === "search") return searchList(c, q);
+  if (tab === "downloads") return downloadsList(extra.downloads);
   if (tab === "works")
     return entities(c, ["work"]).map((work) => {
       const composers = composerNames2(c, work.id);
@@ -40888,7 +42050,7 @@ function listFor(c, tab, q) {
     }).filter((album) => album.classical || q).sort((a, b) => a.label.localeCompare(b.label));
   return openReviews(c).map((review) => ({ id: review.id, ...reviewLabel(c, review), badge: { label: "Review", tone: "warning" }, selection: `review:${review.id}`, search: JSON.stringify(reviewLabel(c, review)) }));
 }
-function renderV2(c, query, revision2) {
+function renderV2(c, query, revision2, { downloads = null } = {}) {
   const q = String(query.q || "");
   if (q.length > 200) fail("Search is too long");
   const offset = Number(query.offset || 0);
@@ -40897,9 +42059,9 @@ function renderV2(c, query, revision2) {
   let tab = TABS.includes(query.tab) ? query.tab : "";
   if (!tab) {
     const kind = selection && !selection.includes(":") ? c.db.prepare("SELECT kind,data FROM entity WHERE id=?").get(selection) : null;
-    tab = selection.startsWith("album:") || selection.startsWith("track:") ? "albums" : selection.startsWith("review:") ? "review" : selection.startsWith("new:") ? { work: "works", composer: "composers", performer: "performers" }[selection.slice(4)] || "works" : kind?.kind === "person" ? isComposer(c, { id: selection, data: JSON.parse(kind.data) }) ? "composers" : "performers" : kind?.kind === "ensemble" ? "performers" : "works";
+    tab = selection.startsWith("slskd:") ? "downloads" : selection.startsWith("album:") || selection.startsWith("track:") ? "albums" : selection.startsWith("review:") ? "review" : selection.startsWith("new:") ? { work: "works", composer: "composers", performer: "performers" }[selection.slice(4)] || "works" : kind?.kind === "person" ? isComposer(c, { id: selection, data: JSON.parse(kind.data) }) ? "composers" : "performers" : kind?.kind === "ensemble" ? "performers" : "works";
   }
-  const all = listFor(c, tab, q);
+  const all = listFor(c, tab, q, { downloads });
   const filtered = q && tab !== "search" ? all.filter((item) => matchesSearch(item.search, q)) : all;
   let view = null;
   if (selection.startsWith("album:")) {
@@ -40907,6 +42069,7 @@ function renderV2(c, query, revision2) {
     if (work) c.entity(work, "work");
     view = albumView(c, albumId, work || null);
   } else if (selection.startsWith("track:")) view = trackView(c, selection.slice(6));
+  else if (selection.startsWith("slskd:")) view = downloadView(downloads, Number(selection.slice(6)));
   else if (selection.startsWith("review:")) view = reviewView(c, selection.slice(7));
   else if (selection.startsWith("new:")) view = newView(selection.slice(4));
   else if (selection) {
@@ -40939,11 +42102,12 @@ function renderV2(c, query, revision2) {
       { id: "performers", label: "Performers" },
       { id: "albums", label: "Albums" },
       { id: "review", label: "Review", count: reviews },
-      { id: "search", label: "Search" }
+      { id: "search", label: "Search" },
+      { id: "downloads", label: "Downloads" }
     ],
     tab,
     list: {
-      placeholder: { works: "Search works or composers", composers: "Search composers", performers: "Search performers", albums: "Search albums, tracks or performers", review: "Search review items", search: "Works, catalogue numbers, performers, albums\u2026" }[tab],
+      placeholder: { works: "Search works or composers", composers: "Search composers", performers: "Search performers", albums: "Search albums, tracks or performers", review: "Search review items", search: "Works, catalogue numbers, performers, albums\u2026", downloads: "Search the last slskd searches" }[tab],
       items: filtered.slice(offset, offset + PAGE).map(({ search: search2, classical, ...item }) => item),
       total: filtered.length,
       offset,
@@ -40953,6 +42117,7 @@ function renderV2(c, query, revision2) {
         performers: "No performers or ensembles yet.",
         albums: q ? "No matching albums." : "No albums with classical tracks yet. Search to find any album.",
         review: "Nothing needs review.",
+        downloads: "No slskd searches yet. Searches for classical albums and tracks appear here with their queries, scores and rejections.",
         search: q ? "Nothing matches. Try another spelling, a catalogue number like Op. 27 No. 2, or fewer words." : "Search every work, movement, recording, composer, performer and album."
       }[tab],
       actions: listActions
@@ -41260,7 +42425,7 @@ var actor = (input) => {
     );
   return String(input.user.id);
 };
-function text2(value, label, { optional = false, max = 1e4 } = {}) {
+function text3(value, label, { optional = false, max = 1e4 } = {}) {
   if (typeof value !== "string" || value.length > max || !optional && !value.trim())
     fail2(`Enter a valid ${label}`);
   return value;
@@ -41302,7 +42467,7 @@ function revision(c, scope = "") {
         (SELECT count(*) FROM segment s JOIN realization_item i ON i.segment_id=s.id WHERE s.track_link_id IN (${marks})) AS n4,
         (SELECT count(*) FROM review_item WHERE status='open' AND (id IN (${marks}) OR target_id IN (${marks}))) AS n5`
   ).get(...Array(7).fill(ids).flat());
-  const digest = createHash3("sha256").update(String(stamp.n3)).digest("hex").slice(0, 12);
+  const digest = createHash4("sha256").update(String(stamp.n3)).digest("hex").slice(0, 12);
   return `${scope}|${[stamp.n0, stamp.n1, stamp.n2, digest, stamp.n4, stamp.n5].join(":")}`;
 }
 var revisionScope = (token) => typeof token === "string" && token.includes("|") ? token.slice(0, token.lastIndexOf("|")) : "";
@@ -41371,7 +42536,7 @@ var movementRows = (c, work) => c.db.prepare(
   "SELECT * FROM relation WHERE kind='movement' AND source_id=? ORDER BY position"
 ).all(work);
 function render(c, input) {
-  const m = new Metadata(c), all = entries(c), query = input.query || {}, q = normalized2(text2(query.q || "", "search", { optional: true, max: 200 }));
+  const m = new Metadata(c), all = entries(c), query = input.query || {}, q = normalized2(text3(query.q || "", "search", { optional: true, max: 200 }));
   const offset = Number(query.offset || 0);
   if (!Number.isSafeInteger(offset) || offset < 0 || offset > 1e7)
     fail2("Invalid page offset");
@@ -41666,7 +42831,7 @@ Provider value: ${providerText}`;
                 options: choices.map(
                   (t) => option(
                     t.id,
-                    `${t.label} \xB7 ${path4.basename(path4.dirname(t.evidence.path))} / ${path4.basename(t.evidence.path)} \xB7 ${t.classification || "unsure"}`
+                    `${t.label} \xB7 ${path7.basename(path7.dirname(t.evidence.path))} / ${path7.basename(t.evidence.path)} \xB7 ${t.classification || "unsure"}`
                   )
                 )
               }),
@@ -41706,7 +42871,7 @@ Provider value: ${providerText}`;
                 options: attached.map(
                   (i) => option(
                     i.id,
-                    `${i.movement_id ? label(i.movement_id) : "Whole work"} \xB7 ${path4.basename(JSON.parse(c.db.prepare("SELECT evidence FROM track_link WHERE id=?").get(i.track_link_id).evidence).path)}`
+                    `${i.movement_id ? label(i.movement_id) : "Whole work"} \xB7 ${path7.basename(JSON.parse(c.db.prepare("SELECT evidence FROM track_link WHERE id=?").get(i.track_link_id).evidence).path)}`
                   )
                 )
               })
@@ -41729,7 +42894,7 @@ Provider value: ${providerText}`;
       `Owned track: ${selectedTrack.title}
 Album: ${selectedTrack.album || "Unknown album"}
 Performer: ${selectedTrack.artist || "Unknown performer"}
-File: ${path4.basename(selectedTrack.evidence.path)}
+File: ${path7.basename(selectedTrack.evidence.path)}
 Classification: ${selectedTrack.classification || "unsure"}`.slice(
         0,
         8e3
@@ -41865,7 +43030,7 @@ function apply(c, input, who) {
   let selection;
   switch (request.command) {
     case "attach-found-track": {
-      const parts = text2(v.choice, "recording and performance", {
+      const parts = text3(v.choice, "recording and performance", {
         max: 200
       }).split("|");
       if (parts.length !== 2)
@@ -41890,7 +43055,7 @@ function apply(c, input, who) {
       );
     }
     case "create-contributor": {
-      const name = text2(v.name, "contributor name", { max: 500 }).trim();
+      const name = text3(v.name, "contributor name", { max: 500 }).trim();
       if (!["person", "ensemble"].includes(v.kind))
         fail2("Select a valid contributor type");
       selection = c.createEntity(v.kind, {
@@ -41900,9 +43065,9 @@ function apply(c, input, who) {
       break;
     }
     case "add-credit": {
-      selection = text2(v.target, "entry", { max: 200 });
+      selection = text3(v.target, "entry", { max: 200 });
       c.entity(selection, ["work", "recording", "performance", "release"]);
-      const contributor = text2(v.contributor, "contributor", { max: 200 }), role = text2(v.role, "role", { max: 80 }), instrument = text2(v.instrument, "instrument", {
+      const contributor = text3(v.contributor, "contributor", { max: 200 }), role = text3(v.role, "role", { max: 80 }), instrument = text3(v.instrument, "instrument", {
         optional: true,
         max: 200
       }).trim() || null;
@@ -41921,28 +43086,28 @@ function apply(c, input, who) {
       break;
     }
     case "remove-credit": {
-      selection = text2(v.target, "entry", { max: 200 });
+      selection = text3(v.target, "entry", { max: 200 });
       c.entity(selection);
-      const credit = text2(v.credit, "credit", { max: 200 });
+      const credit = text3(v.credit, "credit", { max: 200 });
       if (!c.db.prepare("SELECT 1 FROM credit WHERE id=? AND target_id=?").get(credit, selection))
         fail2("Credit does not belong to this entry");
       c.db.prepare("DELETE FROM credit WHERE id=?").run(credit);
       break;
     }
     case "create-composer": {
-      const name = text2(v.name, "composer name", { max: 500 }).trim();
+      const name = text3(v.name, "composer name", { max: 500 }).trim();
       selection = c.createEntity("person", { roles: ["composer"] });
       manual(selection, "name", name);
       break;
     }
     case "create-work": {
-      const title = text2(v.title, "work title", { max: 2e3 }).trim();
-      const composer = text2(v.composer ?? "", "composer", {
+      const title = text3(v.title, "work title", { max: 2e3 }).trim();
+      const composer = text3(v.composer ?? "", "composer", {
         optional: true,
         max: 200
       });
       if (composer) c.entity(composer, "person");
-      const movements = (Array.isArray(v.movements) ? v.movements.join("\n") : text2(v.movements ?? "", "movement titles", { optional: true })).split("\n").map((s) => s.trim()).filter(Boolean);
+      const movements = (Array.isArray(v.movements) ? v.movements.join("\n") : text3(v.movements ?? "", "movement titles", { optional: true })).split("\n").map((s) => s.trim()).filter(Boolean);
       if (movements.length > 100)
         fail2("Create no more than 100 movements at a time");
       warnDuplicate(c, title, composer ? [m.resolve(composer, "name").value].filter(Boolean) : [], v.createAnyway);
@@ -41957,12 +43122,12 @@ function apply(c, input, who) {
       break;
     }
     case "edit-field": {
-      const target = text2(v.target, "entry", { max: 200 }), key = text2(v.field, "field", { max: 80 });
+      const target = text3(v.target, "entry", { max: 200 }), key = text3(v.field, "field", { max: 80 });
       c.entity(target);
       const definition = c.db.prepare("SELECT type FROM field_definition WHERE key=?").get(key);
       if (!definition || !["string", "array"].includes(definition.type))
         fail2("This field is not editable");
-      const raw = text2(v.value, "value", { optional: true });
+      const raw = text3(v.value, "value", { optional: true });
       if (typeof v.blank !== "boolean" || typeof v.pin !== "boolean")
         fail2("Invalid override options");
       const value = v.blank ? null : definition.type === "array" ? raw.split("\n").map((s) => s.trim()).filter(Boolean) : raw;
@@ -41973,9 +43138,9 @@ function apply(c, input, who) {
       break;
     }
     case "use-provider": {
-      selection = text2(v.target, "entry", { max: 200 });
+      selection = text3(v.target, "entry", { max: 200 });
       c.entity(selection);
-      const field2 = text2(v.field, "field", { max: 80 });
+      const field2 = text3(v.field, "field", { max: 80 });
       if (!c.db.prepare("SELECT 1 FROM field_definition WHERE key=?").get(field2))
         fail2("Unknown metadata field");
       m.useProvider(selection, field2, {
@@ -41984,9 +43149,9 @@ function apply(c, input, who) {
       break;
     }
     case "add-movement": {
-      selection = text2(v.work, "work", { max: 200 });
+      selection = text3(v.work, "work", { max: 200 });
       c.entity(selection, "work");
-      const titles = (Array.isArray(v.title) ? v.title : [text2(v.title, "movement title", { max: 2e3 })]).map((title) => String(title).trim()).filter(Boolean);
+      const titles = (Array.isArray(v.title) ? v.title : [text3(v.title, "movement title", { max: 2e3 })]).map((title) => String(title).trim()).filter(Boolean);
       if (!titles.length) fail2("Enter a movement title");
       if (titles.length > 100) fail2("Add no more than 100 movements at a time");
       for (const title of titles) {
@@ -42000,7 +43165,7 @@ function apply(c, input, who) {
       break;
     }
     case "reorder-movements": {
-      selection = text2(v.work, "work", { max: 200 });
+      selection = text3(v.work, "work", { max: 200 });
       c.entity(selection, "work");
       const rows = movementRows(c, selection), ids = rows.map((r) => r.target_id);
       if (!Array.isArray(v.order) || v.order.length !== ids.length || new Set(v.order).size !== ids.length || v.order.some((id) => !ids.includes(id)))
@@ -42017,9 +43182,9 @@ function apply(c, input, who) {
       break;
     }
     case "create-broadcast": {
-      const work = text2(v.work, "work", { max: 200 });
+      const work = text3(v.work, "work", { max: 200 });
       c.entity(work, "work");
-      const title = text2(v.title, "recording title", { max: 2e3 }).trim(), date = text2(v.date, "broadcast date", {
+      const title = text3(v.title, "recording title", { max: 2e3 }).trim(), date = text3(v.date, "broadcast date", {
         optional: true,
         max: 10
       }).trim();
@@ -42037,25 +43202,25 @@ function apply(c, input, who) {
       c.relate("recording_performance", selection, p);
       manual(selection, "title", title);
       if (date) manual(selection, "date", date);
-      const description = text2(v.description, "recording notes", {
+      const description = text3(v.description, "recording notes", {
         optional: true
       });
       if (description) manual(selection, "description", description);
       break;
     }
     case "attach-track": {
-      selection = text2(v.recording, "recording", { max: 200 });
+      selection = text3(v.recording, "recording", { max: 200 });
       c.entity(selection, "recording");
       const pw = c.performanceWork(
-        text2(v.performanceWork, "work performance", { max: 200 })
+        text3(v.performanceWork, "work performance", { max: 200 })
       );
       if (!c.db.prepare(
         "SELECT 1 FROM relation WHERE kind='recording_performance' AND source_id=? AND target_id=?"
       ).get(selection, pw.source_id))
         fail2("This recording does not capture that performance");
-      const movement = text2(v.movement, "movement", { optional: true, max: 200 }) || null;
+      const movement = text3(v.movement, "movement", { optional: true, max: 200 }) || null;
       c.checkMovement(pw.target_id, movement);
-      const track = text2(v.track, "owned track", { max: 200 }), link2 = c.db.prepare("SELECT * FROM track_link WHERE id=? AND state='active'").get(track);
+      const track = text3(v.track, "owned track", { max: 200 }), link2 = c.db.prepare("SELECT * FROM track_link WHERE id=? AND state='active'").get(track);
       if (!link2) fail2("This owned track is missing or requires review");
       const state = c.db.prepare("SELECT state FROM classification WHERE target_id=?").get(track)?.state;
       if (state !== "classical" && v.confirmClassical !== true)
@@ -42080,9 +43245,9 @@ function apply(c, input, who) {
       break;
     }
     case "detach-track": {
-      selection = text2(v.recording, "recording", { max: 200 });
+      selection = text3(v.recording, "recording", { max: 200 });
       c.entity(selection, "recording");
-      const item = text2(v.item, "attachment", { max: 200 });
+      const item = text3(v.item, "attachment", { max: 200 });
       const owned = c.db.prepare(
         `SELECT 1 FROM realization_item i JOIN realization r ON r.id=i.realization_id JOIN relation pw ON pw.id=r.performance_work_id
         JOIN relation rp ON rp.target_id=pw.source_id AND rp.kind='recording_performance' WHERE rp.source_id=? AND i.id=?`
@@ -42103,13 +43268,14 @@ function apply(c, input, who) {
 }
 async function readEditor(input) {
   actor(input);
-  const c = await openCatalogue(path4.join(input.dataFolder, "model"));
+  const c = await openCatalogue(path7.join(input.dataFolder, "model"));
   try {
     if (input.capabilities.adminForms >= 2) {
       const query = input.query || {};
+      const downloads = query.tab === "downloads" || String(query.selection || "").startsWith("slskd:") ? await searchDiagnostics({ dataFolder: input.dataFolder }) : null;
       return transaction(
         c.db,
-        () => query.lookup ? lookupV2(c, query) : renderV2(c, query, revision(c, query.selection || ""))
+        () => query.lookup ? lookupV2(c, query) : renderV2(c, query, revision(c, query.selection || ""), { downloads })
       );
     }
     return transaction(c.db, () => render(c, input));
@@ -42118,7 +43284,7 @@ async function readEditor(input) {
   }
 }
 async function mutateEditor(input) {
-  const who = actor(input), c = await openCatalogue(path4.join(input.dataFolder, "model"));
+  const who = actor(input), c = await openCatalogue(path7.join(input.dataFolder, "model"));
   try {
     try {
       return transaction(c.db, () => {
@@ -42140,8 +43306,8 @@ async function mutateEditor(input) {
 }
 
 // src/model/presentation.js
-import path5 from "node:path";
-var text3 = (value, fallback) => typeof value === "string" && value.trim() ? value.trim() : fallback;
+import path8 from "node:path";
+var text4 = (value, fallback) => typeof value === "string" && value.trim() ? value.trim() : fallback;
 var DisplayValues = class {
   constructor(c) {
     this.statement = c.db.prepare(
@@ -42154,9 +43320,9 @@ var DisplayValues = class {
     return { value: row ? JSON.parse(row.value) : void 0 };
   }
 };
-var entityValue = (metadata, id, field2, fallback) => text3(metadata.resolve(id, field2).value, fallback);
+var entityValue = (metadata, id, field2, fallback) => text4(metadata.resolve(id, field2).value, fallback);
 var evidenceOf = (row) => JSON.parse(row.evidence);
-var trackTitle2 = (evidence2) => text3(evidence2.hints?.title, path5.basename(evidence2.path || "Track"));
+var trackTitle2 = (evidence2) => text4(evidence2.hints?.title, path8.basename(evidence2.path || "Track"));
 function actor2(input) {
   const user = input?.user;
   if (!Number.isSafeInteger(user?.id) || user.id <= 0)
@@ -42189,7 +43355,7 @@ function realizationRows(c, realizationId = null, workId = null, albumId = null)
 }
 var words3 = (value) => String(value || "").normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 function performerOf(hints) {
-  const artist = text3(hints?.artist, text3(hints?.albumArtist, ""));
+  const artist = text4(hints?.artist, text4(hints?.albumArtist, ""));
   const composers = new Set(composersOf(hints || {}).map(words3));
   const performers = artist.split(/\s+[—–]\s+|\s*;\s*/).filter((name) => name && !composers.has(words3(name)));
   return performers.length ? performers.join(", ") : artist;
@@ -42202,9 +43368,9 @@ function queueItem(metadata, row, workTitle = null) {
     fileId: String(row.file_id),
     albumId: String(evidence2.albumId ?? ""),
     title: workTitle ? movementTitle({ title: withoutComposer(trackTitle2(evidence2), composersOf(evidence2.hints || {})), work: evidence2.hints?.work }, workTitle) : row.movement_ids?.length > 1 ? row.movement_ids.map((id) => entityValue(metadata, id, "title", "")).filter(Boolean).join(" / ") : row.movement_id ? entityValue(metadata, row.movement_id, "title", trackTitle2(evidence2)) : trackTitle2(evidence2),
-    artist: text3(evidence2.hints?.artist, text3(evidence2.hints?.albumArtist, "")),
+    artist: text4(evidence2.hints?.artist, text4(evidence2.hints?.albumArtist, "")),
     performer: performerOf(evidence2.hints),
-    album: text3(evidence2.hints?.album, ""),
+    album: text4(evidence2.hints?.album, ""),
     durationMs: Number(evidence2.durationMs) || null,
     startMs: row.start_ms,
     endMs: row.end_ms
@@ -42272,7 +43438,7 @@ function pieceGroups(c, album, following) {
   const pieces = [];
   for (const row of rows) {
     const evidence2 = evidenceOf(row);
-    const workTag = text3(evidence2.hints?.work, "");
+    const workTag = text4(evidence2.hints?.work, "");
     const work = workTag.split(/\s*:\s*/)[0];
     const title = withoutComposer(trackTitle2(evidence2), composersOf(evidence2.hints || {}));
     const split = splitTitle(title);
@@ -42293,9 +43459,9 @@ function pieceGroups(c, album, following) {
       fileId: String(row.file_id),
       albumId: String(evidence2.albumId ?? ""),
       title: tail,
-      artist: text3(evidence2.hints?.artist, text3(evidence2.hints?.albumArtist, "")),
+      artist: text4(evidence2.hints?.artist, text4(evidence2.hints?.albumArtist, "")),
       performer: performerOf(evidence2.hints),
-      album: text3(evidence2.hints?.album, ""),
+      album: text4(evidence2.hints?.album, ""),
       durationMs: Number(evidence2.durationMs) || null,
       startMs: 0,
       endMs: null,
@@ -42428,8 +43594,8 @@ function renderWork(c, workId, user) {
         (credit) => credit.role !== "composer"
       );
       const first = evidenceOf(entries2[0]);
-      const album = text3(entries2[0].realization_label, text3(first.hints?.album, ""));
-      const artist = performers.length ? performers.map((credit) => credit.name).join(", ") : text3(first.hints?.artist, text3(first.hints?.albumArtist, ""));
+      const album = text4(entries2[0].realization_label, text4(first.hints?.album, ""));
+      const artist = performers.length ? performers.map((credit) => credit.name).join(", ") : text4(first.hints?.artist, text4(first.hints?.albumArtist, ""));
       return {
         id,
         label: [artist, album].filter(Boolean).join(" \xB7 ") || `Recording ${index + 1}`,
@@ -42451,7 +43617,7 @@ function renderWork(c, workId, user) {
 }
 async function readWork(input) {
   const user = actor2(input);
-  const c = await openCatalogue(path5.join(input.dataFolder, "model"));
+  const c = await openCatalogue(path8.join(input.dataFolder, "model"));
   try {
     return renderWork(c, input.resourceId, user);
   } finally {
@@ -42460,7 +43626,7 @@ async function readWork(input) {
 }
 async function mutateWork(input) {
   const user = actor2(input);
-  const c = await openCatalogue(path5.join(input.dataFolder, "model"));
+  const c = await openCatalogue(path8.join(input.dataFolder, "model"));
   try {
     return applyWorkMutation(c, input, user);
   } finally {
@@ -42505,7 +43671,7 @@ function applyWorkMutation(c, input, user) {
 }
 async function albumPresentation(input) {
   actor2(input);
-  const c = await openCatalogue(path5.join(input.dataFolder, "model"));
+  const c = await openCatalogue(path8.join(input.dataFolder, "model"));
   try {
     return renderAlbumPresentation(c, input.album.id);
   } finally {
@@ -42514,12 +43680,12 @@ async function albumPresentation(input) {
 }
 
 // src/model/runtime.js
-import { createHash as createHash4, randomUUID as randomUUID7 } from "node:crypto";
-import fs4 from "node:fs/promises";
-import path7 from "node:path";
+import { createHash as createHash5, randomUUID as randomUUID10 } from "node:crypto";
+import fs6 from "node:fs/promises";
+import path9 from "node:path";
 
 // src/model/jobs.js
-import { randomUUID as randomUUID5 } from "node:crypto";
+import { randomUUID as randomUUID9 } from "node:crypto";
 var ModelJobs = class _ModelJobs {
   constructor(catalogue) {
     this.db = catalogue.db;
@@ -42532,7 +43698,7 @@ var ModelJobs = class _ModelJobs {
         "SELECT id FROM model_job WHERE key=? AND state IN ('queued','running','retry')"
       ).get(key);
       if (existing) return existing.id;
-      const id = randomUUID5();
+      const id = randomUUID9();
       this.db.prepare(
         `INSERT INTO model_job(id,type,key,input,state,max_attempts,created_at)
         VALUES (?,?,?,?,'queued',?,?)`
@@ -42698,223 +43864,11 @@ var UserOperations = class {
   }
 };
 
-// src/tags.js
-var import_node_taglib_sharp = __toESM(require_dist(), 1);
-import { randomUUID as randomUUID6 } from "node:crypto";
-import { closeSync, fstatSync, openSync, readSync } from "node:fs";
-import fs3 from "node:fs/promises";
-import path6 from "node:path";
-import_node_taglib_sharp.Id3v2Settings.useNumericGenres = false;
-var READ_STYLE = import_node_taglib_sharp.ReadStyle.None | import_node_taglib_sharp.ReadStyle.PictureLazy;
-var READ_WITH_PROPERTIES = import_node_taglib_sharp.ReadStyle.Average | import_node_taglib_sharp.ReadStyle.PictureLazy;
-var ADDED_TAG_TYPES = import_node_taglib_sharp.TagTypes.Id3v1 | import_node_taglib_sharp.TagTypes.Ape | import_node_taglib_sharp.TagTypes.MovieId | import_node_taglib_sharp.TagTypes.DivX;
-var ITUNES_MEAN = "com.apple.iTunes";
-var MUSICBRAINZ_UFID_OWNER = "http://musicbrainz.org";
-var AUDIO_EXTENSIONS = /* @__PURE__ */ new Set([".flac", ".mp3", ".m4a", ".mp4", ".ogg", ".oga", ".opus"]);
-var isAudioPath = (file) => AUDIO_EXTENSIONS.has(path6.extname(file).toLowerCase());
-var text4 = (value) => value == null ? "" : String(value).trim();
-var texts = (value) => (Array.isArray(value) ? value : [value]).map(text4).filter(Boolean);
-var positive2 = (value) => {
-  const number = Number(value);
-  return Number.isSafeInteger(number) && number > 0 ? number : 0;
-};
-var xiphOf = (file) => file.getTag(import_node_taglib_sharp.TagTypes.Xiph, false);
-var id3Of = (file) => file.getTag(import_node_taglib_sharp.TagTypes.Id3v2, false);
-var appleOf = (file) => file.getTag(import_node_taglib_sharp.TagTypes.Apple, false);
-function userTextFrames(id3, description) {
-  const wanted = description.toLowerCase();
-  return id3.getFramesByClassType(import_node_taglib_sharp.Id3v2FrameClassType.UserTextInformationFrame).filter((frame) => frame.description.toLowerCase() === wanted);
-}
-function textField(xiphName, id3Description, apple) {
-  const box = apple.box ? import_node_taglib_sharp.ByteVector.fromString(apple.box, import_node_taglib_sharp.StringType.Latin1) : null;
-  return {
-    read(file) {
-      const xiph = xiphOf(file);
-      const id3 = id3Of(file);
-      const appleTag = appleOf(file);
-      for (const values of [
-        xiph?.getField(xiphName),
-        id3 && userTextFrames(id3, id3Description).flatMap((frame) => frame.text || []),
-        appleTag && (box ? appleTag.getQuickTimeStrings(box) : appleTag.getItunesStrings(ITUNES_MEAN, apple.name))
-      ]) {
-        const found = texts(values ?? []);
-        if (found.length) return found;
-      }
-      return [];
-    },
-    write(file, values) {
-      const xiph = xiphOf(file);
-      if (xiph) xiph.setFieldAsStrings(xiphName, ...values);
-      const appleTag = appleOf(file);
-      if (appleTag) {
-        if (box) appleTag.setQuickTimeStrings(box, values);
-        else appleTag.setItunesStrings(ITUNES_MEAN, apple.name, ...values);
-      }
-      const id3 = id3Of(file);
-      if (id3) {
-        for (const frame of userTextFrames(id3, id3Description)) id3.removeFrame(frame);
-        if (values.length) {
-          const frame = import_node_taglib_sharp.Id3v2UserTextInformationFrame.fromDescription(id3Description);
-          frame.text = values;
-          id3.addFrame(frame);
-        }
-      }
-    }
-  };
-}
-var workField = textField("WORK", "WORK", { box: "\xA9wrk" });
-var workIdField = textField("MUSICBRAINZ_WORKID", "MusicBrainz Work Id", { name: "MusicBrainz Work Id" });
-var artistIdsField = textField("MUSICBRAINZ_ARTISTID", "MusicBrainz Artist Id", { name: "MusicBrainz Artist Id" });
-var albumArtistIdsField = textField("MUSICBRAINZ_ALBUMARTISTID", "MusicBrainz Album Artist Id", { name: "MusicBrainz Album Artist Id" });
-var WRITERS = {
-  title: {
-    read: (file) => texts(file.tag.title),
-    write: (file, values) => file.tag.title = values[0] ?? void 0
-  },
-  artist: {
-    read: (file) => texts(file.tag.performers),
-    write: (file, values) => file.tag.performers = values
-  },
-  albumArtist: {
-    read: (file) => texts(file.tag.albumArtists),
-    write: (file, values) => file.tag.albumArtists = values
-  },
-  composer: {
-    read: (file) => texts(file.tag.composers),
-    write: (file, values) => file.tag.composers = values
-  },
-  work: { read: (file) => workField.read(file), write: (file, values) => workField.write(file, values) },
-  workId: { read: (file) => workIdField.read(file), write: (file, values) => workIdField.write(file, values) },
-  recordingMbid: {
-    read: (file) => texts(file.tag.musicBrainzTrackId),
-    write: (file, values) => {
-      const id3 = id3Of(file);
-      for (const frame of id3?.getFramesByClassType(import_node_taglib_sharp.Id3v2FrameClassType.UniqueFileIdentifierFrame) || []) {
-        if (frame.owner === MUSICBRAINZ_UFID_OWNER) id3.removeFrame(frame);
-      }
-      file.tag.musicBrainzTrackId = values[0] ?? void 0;
-    }
-  }
-};
-function isFragmentedMp4(filePath) {
-  const fd = openSync(filePath, "r");
-  try {
-    const size = fstatSync(fd).size;
-    const header = Buffer.alloc(16);
-    for (let offset = 0; offset + 8 <= size; ) {
-      readSync(fd, header, 0, 16, offset);
-      const type = header.toString("latin1", 4, 8);
-      if (offset === 0 && type !== "ftyp") return false;
-      if (type === "moof") return true;
-      const boxSize = header.readUInt32BE(0);
-      const length = boxSize === 1 ? Number(header.readBigUInt64BE(8)) : boxSize === 0 ? size - offset : boxSize;
-      if (length < 8) return false;
-      offset += length;
-    }
-    return false;
-  } finally {
-    closeSync(fd);
-  }
-}
-var UnsupportedFormat = class extends Error {
-};
-function openFile(filePath, readStyle = READ_STYLE, asPath = filePath) {
-  if (!isAudioPath(asPath)) throw new UnsupportedFormat(`can't tag ${path6.extname(asPath) || "this kind of"} files`);
-  if (isFragmentedMp4(filePath)) throw new UnsupportedFormat("can't tag fragmented MP4 files");
-  try {
-    return import_node_taglib_sharp.File.createFromPath(filePath, `taglib/${path6.extname(asPath).slice(1).toLowerCase()}`, readStyle);
-  } catch (error) {
-    if (/unsupported format/i.test(String(error?.message))) throw new UnsupportedFormat("can't tag this kind of file");
-    throw error;
-  }
-}
-function readValues(filePath, fields) {
-  const file = openFile(filePath);
-  try {
-    return Object.fromEntries(fields.map((field2) => [field2, WRITERS[field2].read(file)]));
-  } finally {
-    file.dispose();
-  }
-}
-function readTags(filePath) {
-  const file = openFile(filePath, READ_WITH_PROPERTIES);
-  try {
-    const tag = file.tag;
-    return {
-      title: text4(tag.title),
-      artist: text4(tag.performers?.[0]),
-      albumArtist: text4(tag.albumArtists?.[0]),
-      album: text4(tag.album),
-      recordingMbid: text4(tag.musicBrainzTrackId),
-      releaseMbid: text4(tag.musicBrainzReleaseId),
-      releaseGroupMbid: text4(tag.musicBrainzReleaseGroupId),
-      // Every album artist ID: taglib's own property has only the first.
-      albumArtistMbids: [...new Set([...albumArtistIdsField.read(file), text4(tag.musicBrainzReleaseArtistId)].flatMap((v) => texts(v.split(/[;/]/))))],
-      artistMbids: artistIdsField.read(file).flatMap((value) => texts(value.split(/[;/]/))),
-      genres: texts(tag.genres ?? []).flatMap((genre) => texts(genre.split(";"))),
-      composer: texts(tag.composers ?? []),
-      work: workField.read(file)[0] ?? "",
-      // Some taggers put the work here and leave WORK empty.
-      grouping: text4(tag.grouping),
-      workId: workIdField.read(file)[0] ?? "",
-      trackNumber: positive2(tag.track),
-      discNumber: positive2(tag.disc),
-      durationMs: Math.round(file.properties?.durationMilliseconds || 0),
-      year: Number.isSafeInteger(tag.year) && tag.year > 0 ? tag.year : null,
-      label: text4(tag.publisher)
-    };
-  } finally {
-    file.dispose();
-  }
-}
-var same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-async function writeTags(filePath, values) {
-  const source = path6.resolve(filePath);
-  const preview = openFile(source);
-  let changed;
-  try {
-    changed = Object.keys(values).filter((field2) => !same(WRITERS[field2].read(preview), texts(values[field2])));
-  } finally {
-    preview.dispose();
-  }
-  if (!changed.length) return [];
-  const extension = path6.extname(source);
-  const working = path6.join(path6.dirname(source), `.${path6.basename(source, extension)}.${randomUUID6()}.tagging`);
-  await fs3.copyFile(source, working, fs3.constants.COPYFILE_FICLONE);
-  try {
-    const file = openFile(working, READ_STYLE, source);
-    try {
-      file.removeTags(ADDED_TAG_TYPES & ~file.tagTypesOnDisk);
-      const id3 = id3Of(file);
-      if (id3 && !(file.tagTypesOnDisk & import_node_taglib_sharp.TagTypes.Id3v2)) id3.version = 4;
-      for (const field2 of changed) WRITERS[field2].write(file, texts(values[field2]));
-      file.save();
-    } finally {
-      file.dispose();
-    }
-    const verified2 = openFile(working, READ_STYLE, source);
-    try {
-      for (const field2 of changed) {
-        if (!same(WRITERS[field2].read(verified2), texts(values[field2])))
-          throw new Error(`Tag verification failed for ${field2}`);
-      }
-    } finally {
-      verified2.dispose();
-    }
-    await fs3.rename(working, source);
-  } catch (error) {
-    await fs3.rm(working, { force: true }).catch(() => {
-    });
-    throw error;
-  }
-  return changed;
-}
-
 // src/model/runtime.js
 function englishTitle(work, fallback = work.title) {
   return ClassicalResolver.bestEnglishAlias(work.aliases)?.name ?? fallback;
 }
-var modelFolder = (ctx) => path7.join(ctx.dataFolder, "model");
+var modelFolder = (ctx) => path9.join(ctx.dataFolder, "model");
 var emptyTags = () => ({
   title: "",
   artist: "",
@@ -42968,7 +43922,7 @@ async function modelStatus(ctx) {
 }
 var PLUGIN_ID = "aurral-classical";
 var SYNC_INTERVAL_MS = 6 * 60 * 6e4;
-var syncFlag = (ctx) => path7.join(modelFolder(ctx), "sync-requested");
+var syncFlag = (ctx) => path9.join(modelFolder(ctx), "sync-requested");
 async function hostLibrary(ctx) {
   if (ctx.userOperations)
     return new UserOperations(ctx.userOperations, ctx.fetch).library();
@@ -42993,15 +43947,15 @@ async function hostLibrary(ctx) {
 }
 var canReadHostLibrary = (ctx) => !!(ctx.userOperations || ctx.api?.url && ctx.api?.key);
 async function requestModelSync(ctx) {
-  await fs4.mkdir(modelFolder(ctx), { recursive: true });
-  await fs4.writeFile(syncFlag(ctx), `${Date.now()}:${randomUUID7()}`);
+  await fs6.mkdir(modelFolder(ctx), { recursive: true });
+  await fs6.writeFile(syncFlag(ctx), `${Date.now()}:${randomUUID10()}`);
 }
-var readSyncFlag = (ctx) => fs4.readFile(syncFlag(ctx), "utf8").catch(() => null);
+var readSyncFlag = (ctx) => fs6.readFile(syncFlag(ctx), "utf8").catch(() => null);
 async function clearSyncFlag(ctx, seen) {
-  if (seen != null && await readSyncFlag(ctx) === seen) await fs4.rm(syncFlag(ctx), { force: true });
+  if (seen != null && await readSyncFlag(ctx) === seen) await fs6.rm(syncFlag(ctx), { force: true });
 }
 async function modelSyncDue(ctx, { now = Date.now() } = {}) {
-  const requested = await fs4.access(syncFlag(ctx)).then(() => true, () => false);
+  const requested = await fs6.access(syncFlag(ctx)).then(() => true, () => false);
   const catalogue = await openCatalogue(modelFolder(ctx));
   try {
     if (catalogue.db.prepare(
@@ -43045,7 +43999,7 @@ async function enqueueModelScan(ctx, actor3, { system = false } = {}) {
     const library = await hostLibrary(ctx);
     let instance = catalogue.db.prepare("SELECT * FROM core_instance LIMIT 1").get();
     if (!instance) {
-      const id2 = randomUUID7();
+      const id2 = randomUUID10();
       catalogue.db.prepare("INSERT INTO core_instance VALUES (?,?,0)").run(id2, ctx.settings.libraryEpoch || "initial");
       instance = { id: id2, generation: 0 };
     }
@@ -43090,18 +44044,18 @@ async function enqueueModelScan(ctx, actor3, { system = false } = {}) {
 }
 var REUSED = Symbol("reused");
 async function scanFile(file, root, prior) {
-  const real = await fs4.realpath(file.readPath);
-  const relative = path7.relative(root, real);
-  if (!relative || relative === ".." || relative.startsWith(`..${path7.sep}`) || path7.isAbsolute(relative))
+  const real = await fs6.realpath(file.readPath);
+  const relative = path9.relative(root, real);
+  if (!relative || relative === ".." || relative.startsWith(`..${path9.sep}`) || path9.isAbsolute(relative))
     throw new Error("Indexed model file is outside the configured library");
-  const before = await fs4.stat(real);
+  const before = await fs6.stat(real);
   const unchanged = prior?.fingerprint && prior.observedRealPath === real && prior.size === before.size && prior.mtimeMs === before.mtimeMs && (prior.ctimeMs != null ? prior.ctimeMs === before.ctimeMs : prior.ino === before.ino);
   if (unchanged && prior.hints && !prior.hints.tagsUnreadable && prior.ctimeMs != null && ["title", "album", "artist", "albumId", "trackNumber", "discNumber", "recordingMbid"].every((key) => prior[key] === file[key]))
     return { ...prior, ...file, ino: before.ino, durationMs: prior.durationMs, [REUSED]: true };
   const hash = unchanged ? prior.fingerprint : await fingerprint(real);
   const parsed = readModelTags(real);
   const tags = parsed || emptyTags();
-  const after = await fs4.stat(real);
+  const after = await fs6.stat(real);
   if (before.size !== after.size || before.mtimeMs !== after.mtimeMs || before.ino !== after.ino)
     throw new Error("Library file changed during model scan; retry required");
   const kept = !parsed && prior?.hints && sameAudio2(prior, hash) ? prior : null;
@@ -43175,7 +44129,7 @@ function pendingIdentification(catalogue) {
   return [...albums2].map(([albumId, tracks]) => ({
     albumId,
     tracks: tracks.length,
-    key: `${IDENTIFY}:${RULES}:${albumId}:${createHash4("sha256").update(tracks.join("\n")).digest("hex").slice(0, 32)}`
+    key: `${IDENTIFY}:${RULES}:${albumId}:${createHash5("sha256").update(tracks.join("\n")).digest("hex").slice(0, 32)}`
   }));
 }
 var keyRan = (catalogue, key) => Boolean(catalogue.db.prepare("SELECT 1 FROM model_job WHERE key=? LIMIT 1").get(key));
@@ -43183,14 +44137,14 @@ function markSeen(catalogue, album, progress) {
   catalogue.db.prepare(
     `INSERT INTO model_job(id,type,key,input,state,progress,max_attempts,created_at)
        VALUES (?,?,?,?,'done',?,1,?)`
-  ).run(randomUUID7(), IDENTIFY, album.key, JSON.stringify({ albumId: album.albumId }), JSON.stringify(progress), Date.now());
+  ).run(randomUUID10(), IDENTIFY, album.key, JSON.stringify({ albumId: album.albumId }), JSON.stringify(progress), Date.now());
 }
 function queueAlbumIdentification(catalogue, { now = Date.now() } = {}) {
   return transaction(catalogue.db, () => {
     const pending = pendingIdentification(catalogue);
     if (!keyRan(catalogue, BASELINE_KEY)) {
       for (const album of pending) if (!keyRan(catalogue, album.key)) markSeen(catalogue, album, { baseline: true, tracks: album.tracks });
-      catalogue.db.prepare(`INSERT INTO model_job(id,type,key,input,state,max_attempts,created_at) VALUES (?,?,?,'{}','done',1,?)`).run(randomUUID7(), `${IDENTIFY}_baseline`, BASELINE_KEY, now);
+      catalogue.db.prepare(`INSERT INTO model_job(id,type,key,input,state,max_attempts,created_at) VALUES (?,?,?,'{}','done',1,?)`).run(randomUUID10(), `${IDENTIFY}_baseline`, BASELINE_KEY, now);
       return 0;
     }
     const jobs = new ModelJobs(catalogue);
@@ -43231,7 +44185,7 @@ async function queueAlbumMatch(ctx, actor3, albumId) {
     throw new Error("Automatic work matching requires a current host admin");
   const catalogue = await openCatalogue(modelFolder(ctx));
   try {
-    const key = `${IDENTIFY}:${RULES}:manual:${albumId}:${randomUUID7()}`;
+    const key = `${IDENTIFY}:${RULES}:manual:${albumId}:${randomUUID10()}`;
     new ModelJobs(catalogue).enqueue(IDENTIFY, key, { albumId: String(albumId) }, { maxAttempts: 5 });
     return key;
   } finally {
@@ -43458,7 +44412,7 @@ async function runIdentification(ctx, catalogue, jobs, first, owner, deadline) {
 async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 200, checkpointMs = 1e4 } = {}) {
   const catalogue = await openCatalogue(modelFolder(ctx));
   catalogue.db.exec("PRAGMA busy_timeout=60000");
-  const jobs = new ModelJobs(catalogue), owner = randomUUID7(), deadline = Date.now() + budgetMs;
+  const jobs = new ModelJobs(catalogue), owner = randomUUID10(), deadline = Date.now() + budgetMs;
   try {
     const job = jobs.claim(owner, { leaseMs: 6e4 });
     if (!job) return;
@@ -43490,7 +44444,7 @@ async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 200, checkpointMs
       const errors = job.progress.errors || [];
       let errorCount = job.progress.errorCount || 0;
       let reused = job.progress.reused || 0;
-      const root = await fs4.realpath(ctx.libraryFolder);
+      const root = await fs6.realpath(ctx.libraryFolder);
       const previous = new Map(
         catalogue.db.prepare(
           "SELECT core_id,file_id,evidence FROM track_link WHERE instance_id=? AND state='active'"
@@ -43701,12 +44655,12 @@ async function cancelModelScan(ctx, actor3) {
 }
 
 // src/model/classification-report.js
-import path8 from "node:path";
+import path10 from "node:path";
 async function openModelReadOnly(folder) {
   const { DatabaseSync } = await import("node:sqlite");
-  return new DatabaseSync(path8.join(folder, "classical.sqlite"), { readOnly: true });
+  return new DatabaseSync(path10.join(folder, "classical.sqlite"), { readOnly: true });
 }
-var describe = (signal) => `${signal.signal}${signal.value ? ` "${signal.value}"` : ""} +${signal.points}`;
+var describe2 = (signal) => `${signal.signal}${signal.value ? ` "${signal.value}"` : ""} +${signal.points}`;
 function classificationReport(db, { albumId = null, all = false } = {}) {
   const albumPins = new Map(
     db.prepare(
@@ -43735,7 +44689,7 @@ function classificationReport(db, { albumId = null, all = false } = {}) {
       trackId: String(row.core_id),
       albumId: album,
       album: hints.album || "",
-      title: hints.title || path8.basename(evidence2.path || ""),
+      title: hints.title || path10.basename(evidence2.path || ""),
       artist: hints.artist || "",
       genres: hints.genres || [],
       composer: hints.composer || [],
@@ -43746,7 +44700,7 @@ function classificationReport(db, { albumId = null, all = false } = {}) {
       score: automatic.score,
       automatic: automatic.decision,
       reason: automatic.reason,
-      evidence: automatic.signals.map(describe),
+      evidence: automatic.signals.map(describe2),
       next,
       changes: next !== stored
     };
@@ -43761,7 +44715,7 @@ function classificationReport(db, { albumId = null, all = false } = {}) {
   return { tracks, summary };
 }
 async function albumClassificationSummary(ctx, albumId) {
-  const folder = path8.join(ctx.dataFolder, "model");
+  const folder = path10.join(ctx.dataFolder, "model");
   let db;
   try {
     db = await openModelReadOnly(folder);
@@ -43780,130 +44734,8 @@ async function albumClassificationSummary(ctx, albumId) {
   }
 }
 
-// src/store.js
-import { createHash as createHash5, randomUUID as randomUUID8 } from "node:crypto";
-import fs5 from "node:fs/promises";
-import path9 from "node:path";
-var sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-async function readJson(file, fallback) {
-  try {
-    return JSON.parse(await fs5.readFile(file, "utf8"));
-  } catch {
-    return fallback;
-  }
-}
-async function writeJson(file, value) {
-  await fs5.mkdir(path9.dirname(file), { recursive: true });
-  const temp = `${file}.${process.pid}.${randomUUID8()}.tmp`;
-  await fs5.writeFile(temp, JSON.stringify(value));
-  await fs5.rename(temp, file);
-}
-async function tryLock(dir, staleMs) {
-  try {
-    await fs5.mkdir(dir);
-  } catch (error) {
-    if (error.code !== "EEXIST") throw error;
-    const stat = await fs5.stat(dir).catch(() => null);
-    if (stat && Date.now() - stat.mtimeMs < staleMs) return null;
-    await fs5.rm(dir, { recursive: true, force: true });
-    try {
-      await fs5.mkdir(dir);
-    } catch {
-      return null;
-    }
-  }
-  let released = false;
-  return {
-    async touch() {
-      if (released) return;
-      const now = /* @__PURE__ */ new Date();
-      await fs5.utimes(dir, now, now).catch(() => {
-      });
-    },
-    async release() {
-      released = true;
-      await fs5.rm(dir, { recursive: true, force: true }).catch(() => {
-      });
-    }
-  };
-}
-async function withLock(dir, staleMs, run, { waitMs = 3e4 } = {}) {
-  const until = Date.now() + waitMs;
-  for (; ; ) {
-    const lock = await tryLock(dir, staleMs);
-    if (lock) {
-      try {
-        return await run(lock);
-      } finally {
-        await lock.release();
-      }
-    }
-    if (Date.now() > until) throw new Error(`Timed out waiting for ${path9.basename(dir)}`);
-    await sleep(50 + Math.random() * 100);
-  }
-}
-var Throttle = class {
-  constructor(folder, intervalMs) {
-    this.lockDir = path9.join(folder, "mb-throttle.lock");
-    this.stateFile = path9.join(folder, "mb-throttle.json");
-    this.intervalMs = intervalMs;
-  }
-  async run(dispatch) {
-    if (!this.intervalMs) return dispatch();
-    return withLock(this.lockDir, 12e4, async () => {
-      const state = await readJson(this.stateFile, { next: 0 });
-      const wait = (Number(state.next) || 0) - Date.now();
-      if (wait > 0) await sleep(wait);
-      await writeJson(this.stateFile, { next: Date.now() + this.intervalMs });
-      try {
-        return await dispatch();
-      } finally {
-        await writeJson(this.stateFile, { next: Date.now() + this.intervalMs });
-      }
-    }, { waitMs: 12e4 });
-  }
-};
-var FileCache = class {
-  constructor(folder) {
-    this.folder = folder;
-  }
-  file(key) {
-    const hash = createHash5("sha1").update(key).digest("hex");
-    return path9.join(this.folder, hash.slice(0, 2), `${hash}.json`);
-  }
-  async get(key, ttlMs) {
-    const entry = await readJson(this.file(key), null);
-    if (!entry || Date.now() - entry.time > ttlMs) return null;
-    return entry.value;
-  }
-  async set(key, value) {
-    await writeJson(this.file(key), { time: Date.now(), key, value }).catch(() => {
-    });
-  }
-};
-async function pruneCache(folder, maxAgeMs) {
-  const stamp = path9.join(folder, ".pruned");
-  const last = (await fs5.stat(stamp).catch(() => null))?.mtimeMs ?? 0;
-  if (Date.now() - last < 24 * 60 * 6e4) return 0;
-  await fs5.mkdir(folder, { recursive: true });
-  await fs5.writeFile(stamp, "");
-  let removed = 0;
-  for (const dir of await fs5.readdir(folder).catch(() => [])) {
-    const sub = path9.join(folder, dir);
-    for (const name of await fs5.readdir(sub).catch(() => [])) {
-      const file = path9.join(sub, name);
-      const stat = await fs5.stat(file).catch(() => null);
-      if (stat && Date.now() - stat.mtimeMs > maxAgeMs) {
-        await fs5.rm(file, { force: true });
-        removed++;
-      }
-    }
-  }
-  return removed;
-}
-
 // src/compare.js
-import path10 from "node:path";
+import path11 from "node:path";
 var playlistName = (composer, work) => `Recordings: ${composer}: ${work}`.slice(0, 200);
 async function evidence(ctx, track) {
   let tags = null;
@@ -43969,7 +44801,7 @@ async function compareRecordings(ctx, user, selected) {
     diagnostics.push({ workId: id, playlistId, recordings: items });
     lines2.push(`Completed "${playlistName(info.composer, info.work)}": ${items.length} owned recordings`);
   }
-  await writeJson(path10.join(ctx.dataFolder, `comparison-${user.id}.json`), { version: 1, ambiguous, comparisons: diagnostics });
+  await writeJson(path11.join(ctx.dataFolder, `comparison-${user.id}.json`), { version: 1, ambiguous, comparisons: diagnostics });
   if (ambiguous) lines2.push(`${ambiguous} files have ambiguous work IDs and need review`);
   return summarize(lines2);
 }
@@ -43987,7 +44819,7 @@ function summarize(lines2) {
 }
 
 // src/search/provider.js
-import path11 from "node:path";
+import path12 from "node:path";
 var SECTION_IDS = new Set(SECTIONS.map(([id]) => id));
 function linkFor(item) {
   if (item.kind === "work") return { type: "resource", pageId: "work", resourceId: item.ref };
@@ -44025,7 +44857,7 @@ function searchResult(c, query) {
 }
 async function search(input) {
   if (!Number.isSafeInteger(input?.user?.id) || input.user.id <= 0) throw new Error("A real user account is required");
-  const c = await openCatalogue(path11.join(input.dataFolder, "model"));
+  const c = await openCatalogue(path12.join(input.dataFolder, "model"));
   try {
     return searchResult(c, input.query);
   } finally {
@@ -44034,10 +44866,10 @@ async function search(input) {
 }
 
 // src/mb.js
-import path12 from "node:path";
+import path13 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.49" : "dev";
+var VERSION = true ? "1.0.50" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js
@@ -44057,7 +44889,7 @@ var MusicBrainz = class {
     this.userAgent = `AurralClassical/${VERSION} ( ${REPOSITORY} )`;
     this.fetch = fetchImpl;
     this.log = log2;
-    this.cache = new FileCache(path12.join(dataFolder, "mb-cache"));
+    this.cache = new FileCache(path13.join(dataFolder, "mb-cache"));
     const isPublic = this.base === PUBLIC_MB;
     this.throttle = new Throttle(dataFolder, intervalMs ?? (isPublic ? 1e3 : 0));
     this.maxRetries = maxRetries;
@@ -44142,662 +44974,6 @@ var MusicBrainz = class {
     return null;
   }
 };
-
-// src/settings.js
-var DEFAULT_SEPARATOR = " \u2014 ";
-var ROLE_ALIASES = {
-  composer: "composers",
-  composers: "composers",
-  arranger: "arrangers",
-  arrangers: "arrangers",
-  soloist: "soloists",
-  soloists: "soloists",
-  ensemble: "ensembles",
-  ensembles: "ensembles",
-  orchestra: "ensembles",
-  orchestras: "ensembles",
-  conductor: "conductors",
-  conductors: "conductors",
-  credited: "credited"
-};
-function parseOrder(value) {
-  const raw = String(value ?? "").trim();
-  if (!raw) return [...DEFAULT_ORDER];
-  const roles2 = [];
-  for (const word of raw.toLowerCase().split(/[\s,;>|/]+/).filter(Boolean)) {
-    const role = ROLE_ALIASES[word];
-    if (!role) throw new Error(`Name order: "${word}" isn't a role. Use ${ROLES.slice(0, 5).join(", ")}.`);
-    if (!roles2.includes(role)) roles2.push(role);
-  }
-  if (!roles2.includes("credited")) roles2.push("credited");
-  return roles2;
-}
-function parseSeparator(value) {
-  const raw = String(value ?? "");
-  if (!raw.trim()) return DEFAULT_SEPARATOR;
-  if (raw !== raw.trim()) return raw;
-  return /^[,;]$/.test(raw) ? `${raw} ` : ` ${raw} `;
-}
-function slskdSettings(settings) {
-  const url = String(settings.slskdUrl || "").trim().replace(/\/+$/, "");
-  const apiKey = String(settings.slskdApiKey || "").trim();
-  const downloadFolder = String(settings.slskdDownloadFolder || "").trim();
-  return { url, apiKey, downloadFolder, configured: Boolean(url && apiKey) };
-}
-
-// src/slskd.js
-import { randomUUID as randomUUID9 } from "node:crypto";
-var Slskd = class {
-  constructor({ url, apiKey }, fetchImpl = fetch) {
-    if (!url || !apiKey) throw new Error("Set the slskd URL and API key on the plugin's page");
-    this.url = url.replace(/\/+$/, "");
-    this.apiKey = apiKey;
-    this.fetch = fetchImpl;
-  }
-  // slskd answers 429 while it's busy with another request; those wait and
-  // try again.
-  async request(method, route, body, options = {}) {
-    for (let attempt = 0; ; attempt++) {
-      try {
-        return await this.requestOnce(method, route, body, options);
-      } catch (error) {
-        if (!/answered 429/.test(error.message) || attempt >= 10) throw error;
-        await sleep(250 + attempt * 150);
-      }
-    }
-  }
-  async requestOnce(method, route, body, { timeoutMs = 15e3 } = {}) {
-    let response;
-    try {
-      response = await this.fetch(`${this.url}/api/v0${route}`, {
-        method,
-        headers: { "X-API-Key": this.apiKey, ...body !== void 0 && { "Content-Type": "application/json" } },
-        body: body === void 0 ? void 0 : JSON.stringify(body),
-        signal: AbortSignal.timeout(timeoutMs)
-      });
-    } catch (error) {
-      throw new Error(`Couldn't reach slskd: ${error.cause?.code || error.message}`);
-    }
-    if (response.status === 401 || response.status === 403) throw new Error("slskd refused the API key");
-    if (!response.ok) {
-      const detail = (await response.text().catch(() => "")).slice(0, 200);
-      throw new Error(`slskd answered ${response.status} for ${route}${detail ? `: ${detail}` : ""}`);
-    }
-    const textBody = await response.text();
-    return textBody ? JSON.parse(textBody) : null;
-  }
-  application() {
-    return this.request("GET", "/application");
-  }
-  // Starts a search and returns its id.
-  async startSearch(searchText2, searchTimeoutMs) {
-    const id = randomUUID9();
-    const body = { id, searchText: searchText2, searchTimeout: searchTimeoutMs, filterResponses: true, minimumResponseFileCount: 1, responseLimit: 200, fileLimit: 2e4 };
-    await this.request("POST", "/searches", body, { timeoutMs: searchTimeoutMs + 15e3 });
-    return id;
-  }
-  // Waits for a search to finish, never past `deadline`, and returns its
-  // responses.
-  async searchResults(id, deadline) {
-    try {
-      while (Date.now() < deadline) {
-        await sleep(1e3);
-        const state = await this.request("GET", `/searches/${id}`);
-        if (state?.isComplete || String(state?.state || "").startsWith("Completed")) break;
-      }
-      return await this.request("GET", `/searches/${id}/responses`) ?? [];
-    } finally {
-      this.request("DELETE", `/searches/${id}`).catch(() => {
-      });
-    }
-  }
-  async search(searchText2, { searchTimeoutMs = 1e4, deadline = Date.now() + 2e4 } = {}) {
-    return this.searchResults(await this.startSearch(searchText2, searchTimeoutMs), deadline);
-  }
-  enqueue(username, files) {
-    return this.request("POST", `/transfers/downloads/${encodeURIComponent(username)}`, files);
-  }
-  // Every download from one user, as a flat list of files.
-  async downloads(username) {
-    let data;
-    try {
-      data = await this.request("GET", `/transfers/downloads/${encodeURIComponent(username)}`);
-    } catch (error) {
-      if (/answered 404/.test(error.message)) return [];
-      throw error;
-    }
-    return (data?.directories ?? []).flatMap((dir) => dir.files ?? []);
-  }
-};
-var FAILED_STATES = /Errored|Rejected|Cancelled|TimedOut|Aborted|Failed/i;
-var isSucceeded = (state) => /Completed/i.test(state) && /Succeeded/i.test(state);
-
-// src/source.js
-import { randomUUID as randomUUID10 } from "node:crypto";
-import fs6 from "node:fs/promises";
-import path13 from "node:path";
-var LENGTH_TOLERANCE_MS = 2e3;
-var SEARCH_BUDGET_MS = 5e4;
-var SEARCH_TIMEOUT_MS = 12e3;
-var MAX_RESULTS = 50;
-var SOURCE_EXTENSIONS = /* @__PURE__ */ new Set(["flac", "mp3", "m4a"]);
-var LOSSLESS = /* @__PURE__ */ new Set(["flac"]);
-async function loadRelease(mb, releaseMbid) {
-  if (!releaseMbid) return null;
-  const release = await mb.get("release", releaseMbid, RELEASE_INC);
-  if (!release) return null;
-  const discs = (release.media || []).map((medium) => ({
-    position: medium.position,
-    tracks: (medium.tracks || []).map((track) => ({
-      position: track.position,
-      number: track.number,
-      title: track.title || track.recording?.title || "",
-      lengthMs: track.length ?? track.recording?.length ?? null,
-      recordingId: track.recording?.id ?? null,
-      artist: creditString(track["artist-credit"] || track.recording?.["artist-credit"])
-    }))
-  })).filter((disc) => disc.tracks.length > 0);
-  const groupId = release["release-group"]?.id;
-  const editions = groupId ? await mb.query("release", { "release-group": groupId, inc: "recordings", limit: "100" }) : null;
-  const flat = (r) => (r.media || []).flatMap((m) => (m.tracks || []).map((t) => ({ title: t.title || t.recording?.title || "", length: t.length, recordingId: t.recording?.id })));
-  const order = (tracks) => tracks.map((t) => normalizeTitle(t.title)).join("\n");
-  const own = flat(release);
-  const others = (editions?.releases || []).filter((r) => r.id !== release.id);
-  const officialOnly = others.some((r) => r.status === "Official") || release.status === "Official";
-  const pressings = others.filter((r) => !officialOnly || r.status === "Official").map(flat).filter((tracks) => tracks.length === own.length && order(tracks) === order(own));
-  const byRecording = /* @__PURE__ */ new Map();
-  for (const tracks of (editions?.releases || []).map(flat))
-    for (const t of tracks)
-      if (t.recordingId && t.length > 0) byRecording.set(t.recordingId, [...byRecording.get(t.recordingId) ?? [], t.length]);
-  let index = 0;
-  for (const disc of discs)
-    for (const track of disc.tracks) {
-      const i = index++;
-      const lengths = pressings.map((tracks) => tracks[i]).filter((t) => t?.recordingId === track.recordingId && t.length > 0).map((t) => t.length);
-      if (track.lengthMs == null && lengths.length) track.lengthMs = [...lengths].sort((a, b) => a - b)[Math.floor(lengths.length / 2)];
-      track.lengthsMs = [...new Set([track.lengthMs, ...lengths].filter((l) => l != null))];
-      track.anyLengthsMs = [.../* @__PURE__ */ new Set([...track.lengthsMs, ...byRecording.get(track.recordingId) ?? []])];
-    }
-  return {
-    id: release.id,
-    title: release.title,
-    artist: creditString(release["artist-credit"]),
-    artistCredit: release["artist-credit"] || [],
-    year: releaseYear(release.date),
-    releaseGroupId: release["release-group"]?.id ?? null,
-    discs
-  };
-}
-function normalizeTitle(value) {
-  return String(value || "").normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").replace(/\s+/g, " ").trim();
-}
-var extensionOf = (filename) => (filename.match(/\.([a-z0-9]+)$/i)?.[1] || "").toLowerCase();
-var remoteDir = (filename) => filename.replace(/[\\/][^\\/]*$/, "");
-var remoteBase = (filename) => filename.split(/[\\/]/).pop();
-var naturalCompare = new Intl.Collator("en", { numeric: true, sensitivity: "base" }).compare;
-function groupFolders(responses) {
-  const folders = /* @__PURE__ */ new Map();
-  for (const response of responses || []) {
-    for (const file of response.files || []) {
-      const extension = extensionOf(file.filename || "");
-      if (!SOURCE_EXTENSIONS.has(extension) || file.isLocked) continue;
-      const directory = remoteDir(file.filename);
-      const key = `${response.username}\0${directory}`;
-      if (!folders.has(key))
-        folders.set(key, {
-          username: response.username,
-          directory,
-          files: [],
-          freeSlot: response.hasFreeUploadSlot !== false,
-          queueLength: Number(response.queueLength) || 0,
-          speed: Number(response.uploadSpeed) || 0
-        });
-      folders.get(key).files.push({
-        filename: file.filename,
-        size: file.size,
-        lengthMs: Number.isFinite(file.length) ? file.length * 1e3 : null,
-        bitRate: file.bitRate ?? null,
-        extension
-      });
-    }
-  }
-  for (const folder of folders.values()) {
-    folder.files.sort((a, b) => naturalCompare(remoteBase(a.filename), remoteBase(b.filename)));
-    const extensions = new Set(folder.files.map((f) => f.extension));
-    folder.format = extensions.size === 1 ? [...extensions][0] : null;
-  }
-  return [...folders.values()];
-}
-function lengthGap(lengthMs, track, { anyEdition = false } = {}) {
-  const lengths = anyEdition && track.anyLengthsMs?.length ? track.anyLengthsMs : track.lengthsMs?.length ? track.lengthsMs : [track.lengthMs];
-  const gaps = lengths.filter((l) => l != null).map((l) => Math.abs(lengthMs - l));
-  return gaps.length ? Math.min(...gaps) : Infinity;
-}
-function linesUp(files, tracks, options = {}) {
-  if (files.length !== tracks.length) return false;
-  return files.every((file, i) => file.lengthMs != null && lengthGap(file.lengthMs, tracks[i], options) <= LENGTH_TOLERANCE_MS);
-}
-function folderDiscs(folder, release, options = {}) {
-  const all = release.discs.flatMap((disc2) => disc2.tracks);
-  if (release.discs.length > 1 && linesUp(folder.files, all, options)) return release.discs.map((d) => d.position);
-  const disc = release.discs.find((d) => linesUp(folder.files, d.tracks, options));
-  return disc ? [disc.position] : null;
-}
-var folderScore = (folder) => (folder.freeSlot ? 0 : 1e9) + folder.queueLength * 1e6 + (LOSSLESS.has(folder.format) ? 0 : 1e5) - Math.min(folder.speed, 99999);
-function mapFiles(folder, release, discPositions) {
-  const tracks = discPositions.flatMap((position) => {
-    const disc = release.discs.find((d) => d.position === position);
-    return disc.tracks.map((track) => ({ disc: position, track }));
-  });
-  return folder.files.map((file, i) => ({ file, ...tracks[i] }));
-}
-function albumCandidates(folders, release) {
-  const byUser = /* @__PURE__ */ new Map();
-  for (const folder of folders) {
-    const discs = folderDiscs(folder, release);
-    if (!discs) continue;
-    if (!byUser.has(folder.username)) byUser.set(folder.username, []);
-    byUser.get(folder.username).push({ folder, discs });
-  }
-  const wanted = release.discs.map((d) => d.position);
-  const candidates2 = [];
-  for (const [username, matches] of byUser) {
-    matches.sort((a, b) => b.discs.length - a.discs.length || folderScore(a.folder) - folderScore(b.folder));
-    const chosen = [];
-    const covered = /* @__PURE__ */ new Set();
-    for (const match2 of matches) {
-      if (match2.discs.some((d) => covered.has(d))) continue;
-      chosen.push(match2);
-      match2.discs.forEach((d) => covered.add(d));
-    }
-    if (!wanted.every((d) => covered.has(d))) continue;
-    const files = chosen.flatMap(({ folder, discs }) => mapFiles(folder, release, discs));
-    const first = chosen[0].folder;
-    candidates2.push({ username, folders: chosen.map((c) => c.folder), files, score: Math.max(...chosen.map((c) => folderScore(c.folder))), format: first.format, bitRate: first.files[0]?.bitRate ?? null });
-  }
-  return candidates2.sort((a, b) => a.score - b.score);
-}
-function trackCandidates(folders, release, discPosition, trackIndexInDisc) {
-  const out = [];
-  for (const folder of folders) {
-    const discs = folderDiscs(folder, release, { anyEdition: true });
-    if (!discs?.includes(discPosition)) continue;
-    const mapped = mapFiles(folder, release, discs);
-    const hit = mapped.find((m) => m.disc === discPosition && m.track === release.discs.find((d) => d.position === discPosition).tracks[trackIndexInDisc]);
-    if (hit) out.push({ folder, ...hit, score: folderScore(folder) });
-  }
-  return out.sort((a, b) => a.score - b.score);
-}
-function describeMisses(folders, release, options = {}) {
-  const counts = new Set(release.discs.map((d) => d.tracks.length));
-  counts.add(release.discs.reduce((n, d) => n + d.tracks.length, 0));
-  let noLengths = 0;
-  let wrongCount = 0;
-  let wrongLengths = 0;
-  let closest = null;
-  for (const folder of folders) {
-    if (folderDiscs(folder, release, options)) continue;
-    if (!counts.has(folder.files.length)) wrongCount++;
-    else if (folder.files.some((f) => f.lengthMs == null)) noLengths++;
-    else {
-      wrongLengths++;
-      const tracks = release.discs.find((d) => d.tracks.length === folder.files.length)?.tracks ?? release.discs.flatMap((d) => d.tracks);
-      const offs = folder.files.map((f, i) => tracks[i] ? lengthGap(f.lengthMs, tracks[i], options) : Infinity);
-      const worst = Math.max(...offs);
-      if (!closest || worst < closest.worst) closest = { worst, at: offs.indexOf(worst) + 1, over: offs.filter((o) => o > LENGTH_TOLERANCE_MS).length };
-    }
-  }
-  const near = closest ? ` (closest: ${closest.over} track(s) off, worst ${(closest.worst / 1e3).toFixed(1)}s at track ${closest.at})` : "";
-  return `${folders.length} folders: ${wrongCount} with another track count, ${noLengths} without lengths, ${wrongLengths} with lengths off by more than 2s${near}`;
-}
-async function classicalInfo(ctx, recordingId, { albumArtistIds = [], releaseGroupId = null } = {}) {
-  if (!recordingId) return null;
-  const fields = await ctx.resolver.resolve(recordingId, { albumArtistIds, releaseGroupId });
-  if (!fields) return null;
-  const movement = fields.workId ? await ctx.mb.get("work", fields.workId, "artist-rels+work-rels") : null;
-  const work = movement ? await topWork(ctx.mb, movement) : null;
-  const people = fields.people;
-  const performer = people.soloists[0] || people.conductors[0] || people.ensembles[0] || null;
-  return {
-    fields,
-    composer: people.composers[0] || null,
-    performer,
-    ensemble: people.ensembles[0] || null,
-    workTitle: work?.title || fields.work || "",
-    movementTitle: fields.work || ""
-  };
-}
-function searchQueries(info, { albumTitle = "", album = false } = {}) {
-  if (!info.performer) return [];
-  const composer = surname(info.composer);
-  const performer = surname(info.performer);
-  const ensemble = info.performer === info.ensemble ? "" : surname(info.ensemble);
-  const work = shortWorkTitle(info.workTitle);
-  const catalogue = catalogueNumber(info.workTitle) || catalogueNumber(info.movementTitle);
-  const title = searchWords(albumTitle);
-  const byWork = [
-    [performer, ensemble, composer, work, catalogue],
-    [performer, ensemble, composer, catalogue],
-    [performer, ensemble, composer, work]
-  ];
-  const byAlbum = [
-    [performer, ensemble, composer, title],
-    [performer, ensemble, title]
-  ];
-  const candidates2 = album ? [...byAlbum, ...byWork] : [byWork[0], byAlbum[0], byWork[1], byWork[2], byAlbum[1]];
-  const seen = /* @__PURE__ */ new Set();
-  const queries = [];
-  for (const parts of candidates2) {
-    const query = searchWords(parts.filter(Boolean).join(" "));
-    if (query.split(" ").length < 3 || seen.has(query.toLowerCase())) continue;
-    seen.add(query.toLowerCase());
-    queries.push(query);
-  }
-  return queries;
-}
-function performerMatches(folder, info) {
-  const wanted = searchWords(surname(info.performer)).toLowerCase().split(/\s+/).filter(Boolean);
-  if (!wanted.length) return false;
-  const haystack = ` ${searchWords([folder.directory, ...folder.files.map((file) => file.filename)].join(" ")).toLowerCase()} `;
-  return wanted.every((word) => haystack.includes(` ${word} `));
-}
-async function acquisitionIdentity(ctx, track) {
-  const info = await classicalInfo(ctx, track.trackMbid);
-  if (!info) return null;
-  if (!info.performer) return { blocked: true };
-  return { artist: [info.performer.name, info.performer !== info.ensemble && info.ensemble?.name].filter(Boolean).join(" "), aliases: [], requiredTerms: [surname(info.performer)] };
-}
-async function searchFolders(ctx, slskd, queries, accept, started) {
-  const deadline = started + SEARCH_BUDGET_MS;
-  let folders = [];
-  for (const query of queries) {
-    const listenMs = Math.min(SEARCH_TIMEOUT_MS, deadline - Date.now() - 3e3);
-    if (listenMs < 5e3) {
-      ctx.log(`Out of time before searching for "${query}"`);
-      break;
-    }
-    ctx.log(`Searching Soulseek for "${query}" (${Math.round(listenMs / 1e3)}s)`);
-    try {
-      const responses = await slskd.search(query, { searchTimeoutMs: listenMs, deadline: Math.min(deadline, Date.now() + listenMs + 4e3) });
-      folders = folders.concat(groupFolders(responses));
-    } catch (error) {
-      if (!folders.length && query === queries.at(-1)) throw error;
-      ctx.log(`A Soulseek search failed: ${error.message}`);
-    }
-    if (accept(folders)) break;
-  }
-  return folders;
-}
-function slskdFor(ctx) {
-  const settings = slskdSettings(ctx.settings);
-  if (!settings.configured) throw new Error("Set the slskd URL and API key on the plugin's page");
-  return new Slskd(settings, ctx.fetch);
-}
-function locateTrack(release, track) {
-  for (const disc2 of release.discs) {
-    const index2 = disc2.tracks.findIndex((t) => t.recordingId === track.trackMbid);
-    if (index2 >= 0) return { discPosition: disc2.position, index: index2 };
-  }
-  const disc = release.discs.find((d) => d.position === (track.discNumber || 1));
-  const index = disc ? disc.tracks.findIndex((t) => t.position === track.trackNumber) : -1;
-  return { discPosition: disc?.position ?? null, index };
-}
-async function searchTrack(ctx, track) {
-  const started = Date.now();
-  if (!track?.releaseMbid) return [];
-  const release = await loadRelease(ctx.mb, track.releaseMbid);
-  if (!release) return [];
-  const { discPosition, index } = locateTrack(release, track);
-  if (index < 0) return [];
-  const recordingId = track.trackMbid || release.discs.find((d) => d.position === discPosition).tracks[index].recordingId;
-  const info = await classicalInfo(ctx, recordingId, { releaseGroupId: release.releaseGroupId });
-  if (!info) return [];
-  const slskd = slskdFor(ctx);
-  const queries = searchQueries(info, { albumTitle: release.title });
-  const folders = (await searchFolders(ctx, slskd, queries, (found) => trackCandidates(found.filter((f) => performerMatches(f, info)), release, discPosition, index).length > 0, started)).filter((f) => performerMatches(f, info));
-  const target = release.discs.find((d) => d.position === discPosition).tracks[index];
-  ctx.log(`Release ${release.id}: ${describeMisses(folders, release, { anyEdition: true })}`);
-  const seen = /* @__PURE__ */ new Set();
-  return trackCandidates(folders, release, discPosition, index).filter((c) => !seen.has(`${c.folder.username}\0${c.file.filename}`) && seen.add(`${c.folder.username}\0${c.file.filename}`)).slice(0, MAX_RESULTS).map((c) => ({
-    id: `${c.folder.username}:${c.file.filename}`.slice(0, 500),
-    title: track.title || target.title,
-    artist: track.artist || release.artist,
-    album: track.album || release.title,
-    durationMs: c.file.lengthMs,
-    format: c.file.extension,
-    bitrate: c.file.bitRate,
-    data: {
-      username: c.folder.username,
-      files: [{ filename: c.file.filename, size: c.file.size, title: target.title, artist: target.artist, recordingId: target.recordingId, lengthMs: target.lengthMs, lengthsMs: target.anyLengthsMs }]
-    }
-  }));
-}
-async function searchAlbum(ctx, album) {
-  const started = Date.now();
-  if (!album?.releaseMbid) return [];
-  const release = await loadRelease(ctx.mb, album.releaseMbid);
-  if (!release) return [];
-  const firstTracks = release.discs.flatMap((d) => d.tracks).slice(0, 3);
-  let info = null;
-  const albumArtistIds = release.artistCredit.map((c) => c.artist?.id).filter(Boolean);
-  for (const t of firstTracks) {
-    info = await classicalInfo(ctx, t.recordingId, { albumArtistIds, releaseGroupId: release.releaseGroupId });
-    if (info) break;
-  }
-  if (!info) return [];
-  const slskd = slskdFor(ctx);
-  const queries = searchQueries(info, { albumTitle: release.title, album: true });
-  const folders = (await searchFolders(ctx, slskd, queries, (found) => albumCandidates(found.filter((f) => performerMatches(f, info)), release).length > 0, started)).filter((f) => performerMatches(f, info));
-  ctx.log(`Release ${release.id}: ${describeMisses(folders, release)}`);
-  return albumCandidates(folders, release).slice(0, MAX_RESULTS).map((c) => ({
-    id: `${c.username}:${c.folders.map((f) => f.directory).join("|")}`.slice(0, 500),
-    title: album.title || release.title,
-    artist: album.artist || release.artist,
-    year: release.year,
-    trackCount: c.files.length,
-    format: c.format,
-    bitrate: c.bitRate,
-    data: {
-      username: c.username,
-      files: c.files.map((m) => ({
-        filename: m.file.filename,
-        size: m.file.size,
-        disc: m.disc,
-        title: m.track.title,
-        artist: m.track.artist,
-        recordingId: m.track.recordingId,
-        lengthMs: m.track.lengthMs,
-        lengthsMs: m.track.lengthsMs
-      }))
-    }
-  }));
-}
-var downloadsDir = (ctx) => path13.join(ctx.dataFolder, "downloads");
-async function startDownload(ctx, result, kind) {
-  const data = result?.data;
-  if (!data?.username || !Array.isArray(data.files) || !data.files.length) throw new Error("The result has no files to download");
-  const { downloadFolder } = slskdSettings(ctx.settings);
-  if (!downloadFolder) throw new Error("Set slskd's download folder on the plugin's page");
-  const key = downloadKey(data.username, data.files);
-  const existing = await findDownload(ctx, key);
-  if (existing) {
-    ctx.log(`Joining the download already running for ${remoteBase(remoteDir(data.files[0].filename))}`);
-    return { pending: existing };
-  }
-  const slskd = slskdFor(ctx);
-  await slskd.enqueue(data.username, data.files.map((f) => ({ filename: f.filename, size: f.size })));
-  const id = randomUUID10();
-  await writeJson(path13.join(downloadsDir(ctx), `${id}.json`), { kind, key, username: data.username, files: data.files, startedAt: Date.now() });
-  return { pending: id };
-}
-var downloadKey = (username, files) => `${username}\0${files.map((f) => f.filename).sort().join("\0")}`;
-var KEEP_DOWNLOADS_MS = 2 * 24 * 60 * 6e4;
-var MISSING_GRACE_MS = 2 * 6e4;
-async function findDownload(ctx, key) {
-  const dir = downloadsDir(ctx);
-  for (const name of await fs6.readdir(dir).catch(() => [])) {
-    if (!name.endsWith(".json")) continue;
-    const record = await readJson(path13.join(dir, name), null);
-    if (!record || Date.now() - (record.startedAt || 0) > KEEP_DOWNLOADS_MS) {
-      await fs6.rm(path13.join(dir, name), { force: true });
-      continue;
-    }
-    if (record.key === key && !record.failed) return name.replace(/\.json$/, "");
-  }
-  return null;
-}
-async function locate(downloadFolder, file) {
-  const base = remoteBase(file.filename);
-  const direct = path13.join(downloadFolder, remoteBase(remoteDir(file.filename)), base);
-  const stat = await fs6.stat(direct).catch(() => null);
-  if (stat?.isFile()) return direct;
-  let seen = 0;
-  const walk = async (dir, depth) => {
-    if (depth > 4) return null;
-    for (const entry of await fs6.readdir(dir, { withFileTypes: true }).catch(() => [])) {
-      if (++seen > 5e4) return null;
-      const full = path13.join(dir, entry.name);
-      if (entry.isDirectory()) {
-        const found = await walk(full, depth + 1);
-        if (found) return found;
-      } else if (entry.isFile() && (entry.name === base || entry.name.replace(/_\d{15,}(?=\.[^.]+$)/, "") === base)) {
-        const s = await fs6.stat(full).catch(() => null);
-        if (s && (!file.size || s.size === file.size)) return full;
-      }
-    }
-    return null;
-  };
-  return walk(downloadFolder, 0);
-}
-async function downloadStatus(ctx, id, directory) {
-  const record = await readJson(path13.join(downloadsDir(ctx), `${id}.json`), null);
-  if (!record) throw new Error("This download is unknown to the plugin");
-  const slskd = slskdFor(ctx);
-  const transfers = await slskd.downloads(record.username);
-  const rank = (state) => isSucceeded(state) ? 0 : FAILED_STATES.test(state) ? 2 : 1;
-  const states = record.files.map((file) => {
-    const matches = transfers.filter((t) => t.filename === file.filename);
-    return matches.map((t) => t.state || "").sort((a, b) => rank(a) - rank(b))[0] ?? null;
-  });
-  if (states.includes(null)) {
-    const { downloadFolder } = slskdSettings(ctx.settings);
-    for (const [i, file] of record.files.entries()) {
-      if (states[i] !== null) continue;
-      if (await locate(downloadFolder, file)) states[i] = "Completed, Succeeded";
-      else if (Date.now() - (record.startedAt || 0) < (ctx.missingGraceMs ?? MISSING_GRACE_MS)) states[i] = "";
-      else states[i] = "Completed, Failed (slskd no longer has this transfer)";
-    }
-  }
-  const failed = states.find((state) => FAILED_STATES.test(state));
-  if (failed) await writeJson(path13.join(downloadsDir(ctx), `${id}.json`), { ...record, failed: true });
-  if (failed) throw new Error(`slskd: ${remoteBase(record.files[states.indexOf(failed)].filename)} ${failed.replace(/^Completed,\s*/, "").toLowerCase()}`);
-  if (!states.every(isSucceeded)) return { done: false };
-  return finishDownload(ctx, id, record, directory);
-}
-var finishing = /* @__PURE__ */ new Map();
-var FINISH_WAIT_MS = 4e4;
-var KEEP_FREE_BYTES = 1024 ** 3;
-async function finishDownload(ctx, id, record, directory) {
-  const key = `${id}\0${directory}`;
-  let job = finishing.get(key);
-  if (!job) {
-    job = { promise: moveIntoPlace(ctx, id, record, directory) };
-    job.promise.then(
-      (value) => job.value = value,
-      (error) => job.error = error
-    );
-    finishing.set(key, job);
-  }
-  const waitMs = ctx.finishWaitMs ?? FINISH_WAIT_MS;
-  let timer;
-  await Promise.race([job.promise.catch(() => {
-  }), new Promise((r) => timer = setTimeout(r, waitMs))]);
-  clearTimeout(timer);
-  if (!job.value && !job.error) return { done: false };
-  finishing.delete(key);
-  if (job.error) throw job.error;
-  return job.value;
-}
-var formatBytes = (bytes) => bytes >= 1024 ** 3 ? `${(bytes / 1024 ** 3).toFixed(1)} GB` : `${Math.max(1, Math.round(bytes / 1024 ** 2))} MB`;
-async function freeBytes(ctx, dir) {
-  if (ctx.freeBytes) return ctx.freeBytes(dir);
-  for (let at = dir; ; at = path13.dirname(at)) {
-    const stats = await fs6.statfs(at).catch(() => null);
-    if (stats) return stats.bavail * stats.bsize;
-    if (path13.dirname(at) === at) return Infinity;
-  }
-}
-var link = (ctx, local, target) => (ctx.linkFile ?? fs6.link)(local, target);
-async function copyInto(local, target) {
-  const temp = `${target}.${randomUUID10()}.part`;
-  try {
-    await fs6.copyFile(local, temp);
-    await fs6.rename(temp, target);
-  } catch (error) {
-    await fs6.rm(temp, { force: true }).catch(() => {
-    });
-    throw error;
-  }
-}
-async function moveIntoPlace(ctx, id, record, directory) {
-  const { downloadFolder } = slskdSettings(ctx.settings);
-  const files = [];
-  for (const [i, file] of record.files.entries()) {
-    const local = await locate(downloadFolder, file);
-    if (!local) throw new Error(`Couldn't find ${remoteBase(file.filename)} in slskd's download folder`);
-    const name = `${String(file.disc || 1).padStart(2, "0")}-${String(i + 1).padStart(3, "0")} ${remoteBase(file.filename)}`.replace(/[\\/]/g, "_");
-    const target = path13.join(directory, record.kind === "album" ? name : remoteBase(file.filename));
-    files.push({ local, target, file, size: (await fs6.stat(local)).size });
-  }
-  await fs6.mkdir(directory, { recursive: true });
-  const todo = [];
-  for (const entry of files) {
-    const there = await fs6.stat(entry.target).catch(() => null);
-    if (!there || there.size !== entry.size) {
-      await fs6.rm(entry.target, { force: true });
-      todo.push(entry);
-    }
-  }
-  let linked = false;
-  if (todo.length) {
-    linked = await link(ctx, todo[0].local, todo[0].target).then(
-      () => true,
-      () => false
-    );
-  }
-  if (!linked && todo.length) {
-    const needed = todo.reduce((sum, entry) => sum + entry.size, 0);
-    const free = await freeBytes(ctx, directory);
-    if (needed + KEEP_FREE_BYTES > free) {
-      throw new Error(
-        `Not enough room for this download in Aurral's data folder, where Aurral keeps it until import: it needs ${formatBytes(needed)} and ${formatBytes(free)} is free, and at least ${formatBytes(KEEP_FREE_BYTES)} must stay free. Free some space and search again.`
-      );
-    }
-  }
-  for (const entry of linked ? todo.slice(1) : todo) {
-    if (linked) await link(ctx, entry.local, entry.target).catch(() => copyInto(entry.local, entry.target));
-    else await copyInto(entry.local, entry.target);
-  }
-  let tagged = 0;
-  for (const { target, file } of files) {
-    let identified = false;
-    try {
-      const { durationMs } = readTags(target);
-      identified = Boolean(file.recordingId) && durationMs > 0 && lengthGap(durationMs, file) <= LENGTH_TOLERANCE_MS;
-    } catch {
-      identified = false;
-    }
-    if (!identified) continue;
-    try {
-      await writeTags(target, { title: [file.title], artist: [file.artist].filter(Boolean), recordingMbid: [file.recordingId] });
-      tagged++;
-    } catch (error) {
-      ctx.log(`Couldn't tag ${path13.basename(target)}: ${error.message}`);
-    }
-  }
-  ctx.log(`Download ${id}: ${files.length} file(s) ${linked ? "linked" : "copied"}, ${tagged} identified and tagged`);
-  return record.kind === "album" ? { done: true } : { done: true, path: path13.basename(files[0].target) };
-}
 
 // src/tagger.js
 import { randomUUID as randomUUID11 } from "node:crypto";
@@ -45716,8 +45892,9 @@ var index_default = {
   },
   downloadSource: {
     acquisitionIdentity: (input) => acquisitionIdentity(makeContext(input), input.track),
-    search: (input) => searchTrack(makeContext(input), input.track),
-    searchAlbum: (input) => searchAlbum(makeContext(input), input.album),
+    search: (input) => searchTrack(makeContext(input), input.track, { manual: input.manual === true }),
+    // `manual` (fork): a person is choosing, so ambiguous results are offered.
+    searchAlbum: (input) => searchAlbum(makeContext(input), input.album, { manual: input.manual === true }),
     download: (input) => startDownload(makeContext(input), input.result, "track"),
     downloadAlbum: (input) => startDownload(makeContext(input), input.result, "album"),
     status: (input) => downloadStatus(makeContext(input), input.id, input.directory)

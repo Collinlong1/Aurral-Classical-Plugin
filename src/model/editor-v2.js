@@ -980,7 +980,57 @@ function newView(kind) {
 
 // ---- page ----------------------------------------------------------------
 
-const TABS = ["works", "composers", "performers", "albums", "review", "search"];
+const TABS = ["works", "composers", "performers", "albums", "review", "search", "downloads"];
+
+// The last slskd searches: what was asked, what qualified, and why the rest
+// didn't. Read only.
+function downloadsList(downloads) {
+  return (Array.isArray(downloads) ? downloads : []).map((record, index) => {
+    const best = record.candidates?.[0];
+    return {
+      id: `slskd:${index}`,
+      label: `${record.release?.title || "Release"}${record.track ? ` · ${record.track}` : ""}`.slice(0, 500),
+      detail: [
+        new Date(record.at).toISOString().slice(0, 16).replace("T", " "),
+        record.performer,
+        `${record.offered ?? 0} offered`,
+        best ? `best ${best.score}` : "no folder qualified",
+      ].filter(Boolean).join(" · "),
+      badge: record.manual ? { label: "Manual", tone: "muted" } : record.offered ? { label: "Found", tone: "success" } : { label: "Nothing", tone: "warning" },
+      selection: `slskd:${index}`,
+      search: `${record.release?.title || ""} ${record.track || ""} ${record.performer || ""} ${(record.steps || []).map((step) => step.query).join(" ")}`,
+    };
+  });
+}
+
+function downloadView(downloads, index) {
+  const record = (Array.isArray(downloads) ? downloads : [])[index];
+  if (!record) fail("That search is no longer in the log");
+  const steps = (record.steps || []).map((step, i) => ({
+    id: `step-${i}`,
+    label: `${step.step}. ${step.label}: “${step.query}”`.slice(0, 500),
+    detail: step.skipped || step.error || `${step.folders} folder${step.folders === 1 ? "" : "s"}, ${step.qualified} named a performer${step.stopped ? " · stopped here" : ""}`,
+  }));
+  const candidates = (record.candidates || []).map((c, i) => ({
+    id: `candidate-${i}`,
+    label: `${c.score} · ${c.username}: ${c.directory}`.slice(0, 500),
+    detail: [c.reasons?.join(", "), c.duplicateOf && `copy of ${c.duplicateOf}`, `step ${c.step}`].filter(Boolean).join(" · ").slice(0, 500),
+    ...(c.review ? { badge: { label: "Needs a person", tone: "warning" } } : c.duplicateOf ? { badge: { label: "Copy", tone: "muted" } } : {}),
+  }));
+  const rejected = (record.rejected || []).map((r, i) => ({ id: `rejected-${i}`, label: `${r.username}: ${r.directory}`.slice(0, 500), detail: `${r.reason} · step ${r.step}` }));
+  return {
+    crumbs: [],
+    title: record.release?.title || "slskd search",
+    subtitle: [record.kind === "album" ? "Album" : `Track: ${record.track}`, record.performer && `performer ${record.performer}`, record.manual ? "manual search" : "automatic search"].filter(Boolean).join(" · "),
+    badges: [],
+    actions: [],
+    sections: [
+      { type: "rows", id: "steps", title: "Searches", note: "The ladder stops once a folder lines up with the release and scores 60 or more.", rows: steps, empty: "No search ran." },
+      { type: "rows", id: "candidates", title: "Candidates", note: "Scored on performer, conductor, ensemble, release title, work, catalogue number and movements, plus 25 for lining up with the whole release. Below 45, only a person's manual search offers it.", rows: candidates, empty: "No folder lined up with the release." },
+      { type: "rows", id: "rejected", title: "Rejected", rows: rejected, empty: "Nothing was rejected for its performers." },
+    ],
+  };
+}
 const SEARCH_KIND = { work: "Work", movement: "Movement", recording: "Recording", composer: "Composer", performer: "Performer", release: "Album" };
 
 // The classical search engine, for hosts without Aurral's search hook: every
@@ -1001,8 +1051,9 @@ function searchList(c, q) {
     }),
   );
 }
-function listFor(c, tab, q) {
+function listFor(c, tab, q, extra = {}) {
   if (tab === "search") return searchList(c, q);
+  if (tab === "downloads") return downloadsList(extra.downloads);
   if (tab === "works")
     return entities(c, ["work"]).map((work) => {
       const composers = composerNames(c, work.id);
@@ -1053,7 +1104,7 @@ function listFor(c, tab, q) {
   return openReviews(c).map((review) => ({ id: review.id, ...reviewLabel(c, review), badge: { label: "Review", tone: "warning" }, selection: `review:${review.id}`, search: JSON.stringify(reviewLabel(c, review)) }));
 }
 
-export function renderV2(c, query, revision) {
+export function renderV2(c, query, revision, { downloads = null } = {}) {
   const q = String(query.q || "");
   if (q.length > 200) fail("Search is too long");
   const offset = Number(query.offset || 0);
@@ -1063,7 +1114,9 @@ export function renderV2(c, query, revision) {
   // Opening an entry from a link picks the matching tab.
   if (!tab) {
     const kind = selection && !selection.includes(":") ? c.db.prepare("SELECT kind,data FROM entity WHERE id=?").get(selection) : null;
-    tab = selection.startsWith("album:") || selection.startsWith("track:")
+    tab = selection.startsWith("slskd:")
+      ? "downloads"
+      : selection.startsWith("album:") || selection.startsWith("track:")
       ? "albums"
       : selection.startsWith("review:")
         ? "review"
@@ -1075,7 +1128,7 @@ export function renderV2(c, query, revision) {
               ? "performers"
               : "works";
   }
-  const all = listFor(c, tab, q);
+  const all = listFor(c, tab, q, { downloads });
   const filtered = q && tab !== "search" ? all.filter((item) => matchesSearch(item.search, q)) : all;
   let view = null;
   if (selection.startsWith("album:")) {
@@ -1083,6 +1136,7 @@ export function renderV2(c, query, revision) {
     if (work) c.entity(work, "work");
     view = albumView(c, albumId, work || null);
   } else if (selection.startsWith("track:")) view = trackView(c, selection.slice(6));
+  else if (selection.startsWith("slskd:")) view = downloadView(downloads, Number(selection.slice(6)));
   else if (selection.startsWith("review:")) view = reviewView(c, selection.slice(7));
   else if (selection.startsWith("new:")) view = newView(selection.slice(4));
   else if (selection) {
@@ -1123,10 +1177,11 @@ export function renderV2(c, query, revision) {
       { id: "albums", label: "Albums" },
       { id: "review", label: "Review", count: reviews },
       { id: "search", label: "Search" },
+      { id: "downloads", label: "Downloads" },
     ],
     tab,
     list: {
-      placeholder: { works: "Search works or composers", composers: "Search composers", performers: "Search performers", albums: "Search albums, tracks or performers", review: "Search review items", search: "Works, catalogue numbers, performers, albums…" }[tab],
+      placeholder: { works: "Search works or composers", composers: "Search composers", performers: "Search performers", albums: "Search albums, tracks or performers", review: "Search review items", search: "Works, catalogue numbers, performers, albums…", downloads: "Search the last slskd searches" }[tab],
       items: filtered.slice(offset, offset + PAGE).map(({ search, classical, ...item }) => item),
       total: filtered.length,
       offset,
@@ -1136,6 +1191,7 @@ export function renderV2(c, query, revision) {
         performers: "No performers or ensembles yet.",
         albums: q ? "No matching albums." : "No albums with classical tracks yet. Search to find any album.",
         review: "Nothing needs review.",
+        downloads: "No slskd searches yet. Searches for classical albums and tracks appear here with their queries, scores and rejections.",
         search: q ? "Nothing matches. Try another spelling, a catalogue number like Op. 27 No. 2, or fewer words." : "Search every work, movement, recording, composer, performer and album.",
       }[tab],
       actions: listActions,

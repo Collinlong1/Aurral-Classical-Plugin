@@ -5,6 +5,7 @@ import { Metadata } from "./metadata.js";
 import { transaction } from "./database.js";
 import { classify } from "./reconcile.js";
 import { searchText, matchesSearch, ownedTracks } from "./editor-search.js";
+import { searchDiagnostics } from "../source.js";
 import { renderV2, lookupV2, applyV2, V2_COMMANDS, EditorV2Error, warnDuplicate } from "./editor-v2.js";
 
 class EditorError extends Error {
@@ -1067,10 +1068,15 @@ export async function readEditor(input) {
   try {
     if (input.capabilities.adminForms >= 2) {
       const query = input.query || {};
+      // The Downloads tab reads the plugin's own slskd search log.
+      const downloads =
+        query.tab === "downloads" || String(query.selection || "").startsWith("slskd:")
+          ? await searchDiagnostics({ dataFolder: input.dataFolder })
+          : null;
       return transaction(c.db, () =>
         query.lookup
           ? lookupV2(c, query)
-          : renderV2(c, query, revision(c, query.selection || "")),
+          : renderV2(c, query, revision(c, query.selection || ""), { downloads }),
       );
     }
     return transaction(c.db, () => render(c, input));

@@ -9,6 +9,7 @@ import { readJson, writeJson } from "./store.js";
 import { readTags, writeTags } from "./tags.js";
 import { catalogueNumber, creditString, RELEASE_INC, releaseYear, searchWords, shortWorkTitle, surname, topWork } from "./works.js";
 import { slskdSettings } from "./settings.js";
+import { GOOD_SCORE, isAmbiguous, rankCandidates, scoreFolder, searchLadder, withLineUp } from "./slskd-ranking.js";
 
 export const LENGTH_TOLERANCE_MS = 2000;
 const SEARCH_BUDGET_MS = 50_000;
@@ -252,45 +253,16 @@ export async function classicalInfo(ctx, recordingId, { albumArtistIds = [], rel
     fields,
     composer: people.composers[0] || null,
     performer,
+    conductor: people.conductors[0] || null,
     ensemble: people.ensembles[0] || null,
     workTitle: work?.title || fields.work || "",
     movementTitle: fields.work || "",
   };
 }
 
-// Search texts, most specific first: composer + work + catalogue number +
-// performer, then shorter ones Soulseek is likelier to match.
-// For an album, its title comes first: an album of several works is
-// shared as one folder named after the album, not after its first work.
-export function searchQueries(info, { albumTitle = "", album = false } = {}) {
-  if (!info.performer) return [];
-  const composer = surname(info.composer);
-  const performer = surname(info.performer);
-  const ensemble = info.performer === info.ensemble ? "" : surname(info.ensemble);
-  const work = shortWorkTitle(info.workTitle);
-  const catalogue = catalogueNumber(info.workTitle) || catalogueNumber(info.movementTitle);
-  const title = searchWords(albumTitle);
-  const byWork = [
-    [performer, ensemble, composer, work, catalogue],
-    [performer, ensemble, composer, catalogue],
-    [performer, ensemble, composer, work],
-  ];
-  const byAlbum = [
-    [performer, ensemble, composer, title],
-    [performer, ensemble, title],
-  ];
-  // A track is often shared inside a folder named after its album, so the
-  // album search comes second, inside the time a search call has.
-  const candidates = album ? [...byAlbum, ...byWork] : [byWork[0], byAlbum[0], byWork[1], byWork[2], byAlbum[1]];
-  const seen = new Set();
-  const queries = [];
-  for (const parts of candidates) {
-    const query = searchWords(parts.filter(Boolean).join(" "));
-    if (query.split(" ").length < 3 || seen.has(query.toLowerCase())) continue;
-    seen.add(query.toLowerCase());
-    queries.push(query);
-  }
-  return queries;
+// Search texts, in the order of the v0.2 ladder (slskd-ranking.js).
+export function searchQueries(info, { albumTitle = "" } = {}) {
+  return searchLadder(info, { albumTitle }).map((step) => step.query);
 }
 
 export function performerMatches(folder, info) {
@@ -307,30 +279,78 @@ export async function acquisitionIdentity(ctx, track) {
   return { artist: [info.performer.name, info.performer !== info.ensemble && info.ensemble?.name].filter(Boolean).join(" "), aliases: [], requiredTerms: [surname(info.performer)] };
 }
 
-// Runs the searches one at a time (slskd runs one search at a time), most
-// specific first, and stops as soon as a folder lines up. Aurral gives a
-// search call one minute, which also covers the MusicBrainz lookups before
-// and the matching after.
-async function searchFolders(ctx, slskd, queries, accept, started) {
+// Runs the ladder one step at a time (slskd runs one search at a time) and
+// stops once a folder lines up and scores GOOD_SCORE. Aurral gives a search
+// call one minute, which also covers the MusicBrainz lookups before and the
+// matching after. Folders naming none of the performers are set aside with
+// their reason. Returns { folders, rejected, steps }.
+async function searchFolders(ctx, slskd, ladder, { info, albumTitle, movements, accept }, started) {
   const deadline = started + SEARCH_BUDGET_MS;
-  let folders = [];
-  for (const query of queries) {
+  const kept = new Map();
+  const rejected = [];
+  const steps = [];
+  for (const { step, label, query } of ladder) {
     const listenMs = Math.min(SEARCH_TIMEOUT_MS, deadline - Date.now() - 3000);
     if (listenMs < 5000) {
       ctx.log(`Out of time before searching for "${query}"`);
+      steps.push({ step, label, query, skipped: "out of time" });
       break;
     }
-    ctx.log(`Searching Soulseek for "${query}" (${Math.round(listenMs / 1000)}s)`);
+    ctx.log(`Searching Soulseek for "${query}" (${label}, ${Math.round(listenMs / 1000)}s)`);
+    let found = [];
     try {
       const responses = await slskd.search(query, { searchTimeoutMs: listenMs, deadline: Math.min(deadline, Date.now() + listenMs + 4000) });
-      folders = folders.concat(groupFolders(responses));
+      found = groupFolders(responses);
     } catch (error) {
-      if (!folders.length && query === queries.at(-1)) throw error;
+      if (!kept.size && step === ladder.at(-1).step) throw error;
       ctx.log(`A Soulseek search failed: ${error.message}`);
+      steps.push({ step, label, query, error: error.message });
+      continue;
     }
-    if (accept(folders)) break;
+    let qualified = 0;
+    for (const folder of found) {
+      const key = `${folder.username}\u0000${folder.directory}`;
+      if (kept.has(key)) continue;
+      const match = scoreFolder(folder, info, { albumTitle, movements });
+      if (match.rejected) {
+        if (rejected.length < 200) rejected.push({ username: folder.username, directory: folder.directory, reason: match.rejected, step });
+        continue;
+      }
+      qualified++;
+      kept.set(key, Object.assign(folder, { match, step }));
+    }
+    const done = accept([...kept.values()]);
+    steps.push({ step, label, query, folders: found.length, qualified, stopped: done });
+    if (done) break;
   }
-  return folders;
+  return { folders: [...kept.values()], rejected, steps };
+}
+
+// The last searches, newest first, for the editor's Downloads tab.
+const DIAGNOSTICS = "slskd-searches.json";
+const KEEP_DIAGNOSTICS = 25;
+export async function recordSearch(ctx, record) {
+  const file = path.join(ctx.dataFolder, DIAGNOSTICS);
+  const previous = await readJson(file, []);
+  await writeJson(file, [{ at: Date.now(), ...record }, ...(Array.isArray(previous) ? previous : [])].slice(0, KEEP_DIAGNOSTICS)).catch((error) => ctx.log(`Couldn't save slskd diagnostics: ${error.message}`));
+}
+export const searchDiagnostics = (ctx) => readJson(path.join(ctx.dataFolder, DIAGNOSTICS), []);
+
+const describe = (candidate) => ({
+  username: candidate.username,
+  directory: candidate.folders?.[0]?.directory ?? candidate.folder?.directory,
+  score: candidate.match.score,
+  reasons: candidate.match.reasons,
+  step: candidate.step,
+  ...(candidate.duplicateOf && { duplicateOf: candidate.duplicateOf }),
+  ...(isAmbiguous(candidate) && { review: true }),
+});
+
+// Candidates for Aurral, best first. An automatic search leaves out
+// ambiguous ones (a person's manual search still sees them, marked).
+function chooseCandidates(candidates, { manual }) {
+  const ranked = rankCandidates(candidates);
+  return { ranked, offered: manual ? ranked : ranked.filter((candidate) => !isAmbiguous(candidate)) };
 }
 
 // -- the download source -----------------------------------------------------
@@ -352,7 +372,7 @@ export function locateTrack(release, track) {
   return { discPosition: disc?.position ?? null, index };
 }
 
-export async function searchTrack(ctx, track) {
+export async function searchTrack(ctx, track, { manual = false } = {}) {
   const started = Date.now();
   // The release pins what a folder must look like. Aurral may clear a
   // recording ID it couldn't verify; the release's track at the requested
@@ -366,13 +386,23 @@ export async function searchTrack(ctx, track) {
   const info = await classicalInfo(ctx, recordingId, { releaseGroupId: release.releaseGroupId });
   if (!info) return [];
   const slskd = slskdFor(ctx);
-  const queries = searchQueries(info, { albumTitle: release.title });
-  const folders = (await searchFolders(ctx, slskd, queries, (found) => trackCandidates(found.filter((f) => performerMatches(f, info)), release, discPosition, index).length > 0, started)).filter((f) => performerMatches(f, info));
   const target = release.discs.find((d) => d.position === discPosition).tracks[index];
+  const ladder = searchLadder(info, { albumTitle: release.title });
+  const withScore = (found) =>
+    trackCandidates(found, release, discPosition, index).map((c) => ({ ...c, username: c.folder.username, folders: [c.folder], match: withLineUp(c.folder.match, { whole: false }), step: c.folder.step, availability: c.score }));
+  const { folders, rejected, steps } = await searchFolders(
+    ctx,
+    slskd,
+    ladder,
+    { info, albumTitle: release.title, movements: [target.title], accept: (found) => withScore(found).some((c) => c.match.score >= GOOD_SCORE) },
+    started,
+  );
   ctx.log(`Release ${release.id}: ${describeMisses(folders, release, { anyEdition: true })}`);
   const seen = new Set();
-  return trackCandidates(folders, release, discPosition, index)
-    .filter((c) => !seen.has(`${c.folder.username}\u0000${c.file.filename}`) && seen.add(`${c.folder.username}\u0000${c.file.filename}`))
+  const unique = withScore(folders).filter((c) => !seen.has(`${c.folder.username}\u0000${c.file.filename}`) && seen.add(`${c.folder.username}\u0000${c.file.filename}`));
+  const { ranked, offered } = chooseCandidates(unique, { manual });
+  await recordSearch(ctx, { kind: "track", manual, release: { id: release.id, title: release.title }, track: target.title, performer: info.performer?.name || null, steps, candidates: ranked.slice(0, 30).map(describe), rejected: rejected.slice(0, 30), offered: offered.length });
+  return offered
     .slice(0, MAX_RESULTS)
     .map((c) => ({
       id: `${c.folder.username}:${c.file.filename}`.slice(0, 500),
@@ -389,7 +419,7 @@ export async function searchTrack(ctx, track) {
     }));
 }
 
-export async function searchAlbum(ctx, album) {
+export async function searchAlbum(ctx, album, { manual = false } = {}) {
   const started = Date.now();
   if (!album?.releaseMbid) return [];
   const release = await loadRelease(ctx.mb, album.releaseMbid);
@@ -403,10 +433,25 @@ export async function searchAlbum(ctx, album) {
   }
   if (!info) return [];
   const slskd = slskdFor(ctx);
-  const queries = searchQueries(info, { albumTitle: release.title, album: true });
-  const folders = (await searchFolders(ctx, slskd, queries, (found) => albumCandidates(found.filter((f) => performerMatches(f, info)), release).length > 0, started)).filter((f) => performerMatches(f, info));
+  const ladder = searchLadder(info, { albumTitle: release.title });
+  const movements = release.discs.flatMap((d) => d.tracks.map((t) => t.title)).slice(0, 60);
+  const withScore = (found) =>
+    albumCandidates(found, release).map((c) => {
+      // The weakest of its folders speaks for a candidate spread over several.
+      const lead = [...c.folders].sort((a, b) => a.match.score - b.match.score)[0];
+      return { ...c, match: withLineUp(lead.match, { whole: true }), step: lead.step, availability: c.score };
+    });
+  const { folders, rejected, steps } = await searchFolders(
+    ctx,
+    slskd,
+    ladder,
+    { info, albumTitle: release.title, movements, accept: (found) => withScore(found).some((c) => c.match.score >= GOOD_SCORE) },
+    started,
+  );
   ctx.log(`Release ${release.id}: ${describeMisses(folders, release)}`);
-  return albumCandidates(folders, release)
+  const { ranked, offered } = chooseCandidates(withScore(folders), { manual });
+  await recordSearch(ctx, { kind: "album", manual, release: { id: release.id, title: release.title }, performer: info.performer?.name || null, steps, candidates: ranked.slice(0, 30).map(describe), rejected: rejected.slice(0, 30), offered: offered.length });
+  return offered
     .slice(0, MAX_RESULTS)
     .map((c) => ({
       id: `${c.username}:${c.folders.map((f) => f.directory).join("|")}`.slice(0, 500),

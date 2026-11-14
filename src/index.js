@@ -415,8 +415,9 @@ export default {
   downloadSource: {
     acquisitionIdentity: (input) =>
       acquisitionIdentity(makeContext(input), input.track),
-    search: (input) => searchTrack(makeContext(input), input.track),
-    searchAlbum: (input) => searchAlbum(makeContext(input), input.album),
+    search: (input) => searchTrack(makeContext(input), input.track, { manual: input.manual === true }),
+    // `manual` (fork): a person is choosing, so ambiguous results are offered.
+    searchAlbum: (input) => searchAlbum(makeContext(input), input.album, { manual: input.manual === true }),
     download: (input) =>
       startDownload(makeContext(input), input.result, "track"),
     downloadAlbum: (input) =>

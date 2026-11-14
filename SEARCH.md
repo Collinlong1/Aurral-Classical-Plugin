@@ -45,3 +45,17 @@ Two realizations are **one recording on two releases** when their tracks carry t
 ## Speed
 
 `test/search.test.js` builds a 10,000-track library (7,000 documents) and requires every search under 300 ms; searches take 7–20 ms on a laptop-class container, and a full rebuild about 0.8 s.
+
+# slskd acquisition (v0.2)
+
+`src/slskd-ranking.js`. The plugin's slskd source searches only for requests it classifies as classical; everything else is left to Aurral's own sources.
+
+**Ladder** (one search at a time, within the minute Aurral gives a search call): 1. performer + album; 2. performer + work (+ catalogue number); 3. conductor or orchestra + album (when there is one besides the performer); 4. performer + composer + work; 5. broad work search (composer + work + catalogue number). The performer is the first soloist, else the conductor, else the ensemble; the composer never stands in for them. Steps 1–4 name who plays; step 5 doesn't, and what it finds must still name a performer. The ladder stops at the first step that finds a folder lining up with the release and scoring 60 or more.
+
+**Score** (0–100, per folder, on its folder and file names): performer 30, conductor 12, ensemble 12, release title up to 20, work title up to 10, catalogue number 10, movement titles up to 8, lossless 5; then +25 when the folder lines up with the whole release (every track, every length within 2 s, as before) or +20 when a single track lines up with an edition. A folder naming none of the performers is rejected, with "names the composer but none of the performers" when that is the case. Availability (free slot, queue, speed) breaks ties.
+
+**Duplicates**: one folder shared by several users (same folder name, same file sizes) is offered once at its best rank, with its copies right after it as fallbacks.
+
+**Review**: a candidate scoring under 45 (it lines up, but names only the orchestra, say) is never taken automatically. Aurral's Manual Search passes `manual: true` (fork), and then such candidates are offered for a person to choose.
+
+**Diagnostics**: the last 25 searches (`slskd-searches.json` in the plugin's data folder) with each step's query and counts, the candidates with their scores and reasons, and the rejected folders with theirs. The editor's **Downloads** tab shows them. Download, validation, copying and tagging are unchanged.

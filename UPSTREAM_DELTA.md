@@ -1,3 +1,7 @@
+# v0.2 manual-search flag
+
+Core's plugin download source passes `manual: true` to `downloadSource.searchAlbum` when the call comes from Manual Search (`pluginDownloadSource.ts`, a few lines; documented in `plugin-api.md`). Additive: older plugins ignore the field, and automatic searches are unchanged. The plugin offers ambiguous slskd candidates only then. Without it (stock), ambiguous candidates are simply never offered. Test: `.tests/plugins/plugin-download-source.test.ts` manual Search case. PR-readiness: draft.
+
 # v0.2 search hook
 
 Core adds one generic, opt-in capability: `"search": true` in a plugin manifest and a `search(input)` export (`backend/services/plugins/pluginSearch.ts`, about 150 lines; route `GET /api/plugins/search`; `frontend/src/pages/PluginSearchResults.tsx` and a few lines in `SearchResultsPage.tsx`). Each provider answers with typed sections, an optional best result and facets, bounded by schema (10 sections of 50 items, 12 facets of 50 options) and 3 seconds. Plugins send link descriptors (`resource`, `album`, `filter`), never URLs or markup; core builds every path. A failing provider shows a one-line "Couldn’t load" notice and never blocks the rest of search. The capability can be turned off per plugin; with it off, or on stock Aurral, the search page is unchanged. No database, no API version change, no classical rule in core. Test: `.tests/plugins/plugins.test.ts` "search providers answer the search page…". PR-readiness: draft. The plugin's fallback without the hook is the editor's Search tab (admins). See `SEARCH.md`.
