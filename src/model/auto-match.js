@@ -1560,7 +1560,23 @@ export function releaseRangeWorks(catalogue, { actor = null } = {}) {
          GROUP BY CAST(json_extract(t.evidence,'$.albumId') AS TEXT) HAVING count(DISTINCT r.id)>1 LIMIT 1`,
       )
       .get(id);
-    if (!stacked) continue;
+    // Or the tracks on it name different works by number ("…, BWV 855: I.
+    // Prelude", "…, BWV 850: I. Prelude"), held as one recording since 1.0.22.
+    const numbers = new Set(
+      db
+        .prepare(
+          `SELECT t.evidence FROM realization r JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
+           JOIN track_link t ON t.id=s.track_link_id WHERE r.work_id=?`,
+        )
+        .all(id)
+        .map((row) => {
+          const hints = JSON.parse(row.evidence).hints || {};
+          const title = withoutComposer(hints.title, hints.composer);
+          return catalogueSubject(splitTitle(title).head || title);
+        })
+        .filter((subject) => subject && !CATALOGUE_RANGE.test(subject)),
+    );
+    if (!stacked && numbers.size < 2) continue;
     // Tags that would make the same collection again on the next pass keep
     // it: letting it go would only repeat at every scan.
     const again = db
@@ -1877,7 +1893,27 @@ function foldRepeatedMovements(catalogue, work, existing, setSubject, actor) {
       return at >= 0 && rest.splice(at, 1);
     });
   };
+  // The number the tracks on a movement name for their own work ("…, BWV
+  // 855: I. Prelude"): two movements whose tracks name different works are
+  // two pieces, however alike their names.
+  const trackNumber = new Map(
+    existing.map((m) => [
+      m.id,
+      catalogue.db
+        .prepare(
+          `SELECT t.evidence FROM realization_item i JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id
+           WHERE i.movement_id=? LIMIT 1`,
+        )
+        .all(m.id)
+        .map((row) => {
+          const hints = JSON.parse(row.evidence).hints || {};
+          const title = withoutComposer(hints.title, hints.composer);
+          return catalogueSubject(splitTitle(title).head || "");
+        })[0] || "",
+    ]),
+  );
   const same = (a, b) => {
+    if (trackNumber.get(a.id) && trackNumber.get(b.id) && trackNumber.get(a.id) !== trackNumber.get(b.id)) return false;
     const [pa, pb] = [pieceNumber(a.title, setSubject), pieceNumber(b.title, setSubject)];
     if (pa != null && pb != null && pa !== pb) return false;
     const [ca, cb] = [catalogueSubject(a.title), catalogueSubject(b.title)];

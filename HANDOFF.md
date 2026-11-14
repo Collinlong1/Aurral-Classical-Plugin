@@ -1,3 +1,13 @@
+# 1.0.45: a collection held as one recording is let go; English names fall back to the tracks' heading
+
+November 14, 2026. Audit on 1.0.44: 4,582 of 4,765 (96.2%), unchanged; the dry run let no collection go, and 109 work titles still read German. `explain-works.mjs`: "The Well-Tempered Clavier, BWV 846–893" is one recording (album 12814) of six movements, "I. Prelude / II. Fugue" three times, its tracks naming BWV 855, 850 and 847: the 1.0.22 shape. `releaseRangeWorks` only looked for several recordings on one album. "Präludium und Fughetta G-Dur, BWV 902" has a MusicBrainz identity and no English alias there.
+
+- `releaseRangeWorks` also lets go a range work whose tracks name two or more different catalogue numbers.
+- `foldRepeatedMovements` refuses to fold two movements whose tracks name different works by number: the Well-Tempered Clavier's three "I. Prelude"s would have folded into one.
+- "English work names from MusicBrainz" (`work_english:v2`, so it runs once more): a work whose MusicBrainz entry has no English name takes its tracks' own heading with the same catalogue number ("Prelude & Fughetta in G major, BWV 902").
+
+Tests: the range-work test gains the one-recording shape; the English-names test gains a work with no English alias on MusicBrainz; both fail on 1.0.44. 316 plugin tests pass; corpora unchanged; the bundle runs its worker.
+
 # 1.0.44: WORK tags past a collection of works; English names for works matched from tags
 
 November 14, 2026. Audit on 1.0.43 after the scan and the r3 backlog lookup: matched 4,582 of 4,765 classical tracks (96.2%; from 4,410); albums 55/11/28; reviews classification 302, identity 12, duplicate-work 11, movement-mismatch 6. `explain-musicbrainz.mjs`: 155 tracks outside works have a recording ID; 60 of them MusicBrainz names no work for; 97 stay out (Renaissance dances, motets and masses with no composer tag, improvisations). New duplicate-work reviews: Aida, La traviata, Petrushka (each two MusicBrainz works now with one English name; for the admin to merge or keep). The user reported German work names and the Well-Tempered Clavier block still on album 12814.

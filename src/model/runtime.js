@@ -537,9 +537,9 @@ function headingFor(catalogue, work, albumId, title) {
   for (const { evidence } of catalogue.db
     .prepare(
       `SELECT t.evidence FROM realization r JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
-       JOIN track_link t ON t.id=s.track_link_id WHERE r.work_id=? AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?`,
+       JOIN track_link t ON t.id=s.track_link_id WHERE r.work_id=?${albumId == null ? "" : " AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?"}`,
     )
-    .all(work, String(albumId))) {
+    .all(work, ...(albumId == null ? [] : [String(albumId)]))) {
     const hints = JSON.parse(evidence).hints || {};
     const head = splitTitle(withoutComposer(hints.title, hints.composer)).head;
     if (head && catalogueSubject(head) === subject) counts.set(head, (counts.get(head) || 0) + 1);
@@ -556,7 +556,9 @@ function headingFor(catalogue, work, albumId, title) {
 // catalogue number, or is the work's recorded identity. Never a title an
 // admin set. Paced and cached through src/mb.js, resumable; once per version.
 const ENGLISH = "work_english";
-const ENGLISH_KEY = `${ENGLISH}:v1`;
+// v2 (1.0.45): an identified work with no English name takes its tracks'
+// own heading with the same catalogue number.
+const ENGLISH_KEY = `${ENGLISH}:v2`;
 export async function queueEnglishNames(ctx, actor) {
   if (actor?.role !== "admin") throw new Error("English work names require a current host admin");
   const catalogue = await openCatalogue(modelFolder(ctx));
@@ -624,7 +626,7 @@ async function runEnglishNames(ctx, catalogue, jobs, job, deadline) {
         const title = current?.source === "derived" ? JSON.parse(current.value) : null;
         if (typeof title === "string") {
           const { entry, verified } = await englishEntryFor(ctx, catalogue, work);
-          const english = entry && ClassicalResolver.bestEnglishAlias(entry.aliases)?.name;
+          const english = (entry && ClassicalResolver.bestEnglishAlias(entry.aliases)?.name) || (entry && headingFor(catalogue, work, null, title));
           const same = verified || (catalogueSubject(title) && [entry?.title, english].some((name) => catalogueSubject(name || "") === catalogueSubject(title)));
           if (english && same && english !== title) {
             metadata.derived(work, "title", english);

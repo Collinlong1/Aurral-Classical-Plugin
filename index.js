@@ -38380,7 +38380,17 @@ function releaseRangeWorks(catalogue, { actor: actor3 = null } = {}) {
          JOIN track_link t ON t.id=s.track_link_id WHERE r.work_id=?
          GROUP BY CAST(json_extract(t.evidence,'$.albumId') AS TEXT) HAVING count(DISTINCT r.id)>1 LIMIT 1`
     ).get(id);
-    if (!stacked) continue;
+    const numbers = new Set(
+      db.prepare(
+        `SELECT t.evidence FROM realization r JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
+           JOIN track_link t ON t.id=s.track_link_id WHERE r.work_id=?`
+      ).all(id).map((row) => {
+        const hints = JSON.parse(row.evidence).hints || {};
+        const title2 = withoutComposer(hints.title, hints.composer);
+        return catalogueSubject(splitTitle(title2).head || title2);
+      }).filter((subject) => subject && !CATALOGUE_RANGE.test(subject))
+    );
+    if (!stacked && numbers.size < 2) continue;
     const again2 = db.prepare(
       `SELECT DISTINCT t.evidence FROM realization r JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
          JOIN track_link t ON t.id=s.track_link_id WHERE r.work_id=?`
@@ -38618,7 +38628,21 @@ function foldRepeatedMovements(catalogue, work, existing, setSubject, actor3) {
       return at >= 0 && rest.splice(at, 1);
     });
   };
+  const trackNumber = new Map(
+    existing.map((m) => [
+      m.id,
+      catalogue.db.prepare(
+        `SELECT t.evidence FROM realization_item i JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id
+           WHERE i.movement_id=? LIMIT 1`
+      ).all(m.id).map((row) => {
+        const hints = JSON.parse(row.evidence).hints || {};
+        const title = withoutComposer(hints.title, hints.composer);
+        return catalogueSubject(splitTitle(title).head || "");
+      })[0] || ""
+    ])
+  );
   const same2 = (a, b) => {
+    if (trackNumber.get(a.id) && trackNumber.get(b.id) && trackNumber.get(a.id) !== trackNumber.get(b.id)) return false;
     const [pa, pb] = [pieceNumber(a.title, setSubject), pieceNumber(b.title, setSubject)];
     if (pa != null && pb != null && pa !== pb) return false;
     const [ca, cb] = [catalogueSubject(a.title), catalogueSubject(b.title)];
@@ -42473,8 +42497,8 @@ function headingFor(catalogue, work, albumId, title) {
   const counts = /* @__PURE__ */ new Map();
   for (const { evidence: evidence2 } of catalogue.db.prepare(
     `SELECT t.evidence FROM realization r JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
-       JOIN track_link t ON t.id=s.track_link_id WHERE r.work_id=? AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?`
-  ).all(work, String(albumId))) {
+       JOIN track_link t ON t.id=s.track_link_id WHERE r.work_id=?${albumId == null ? "" : " AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?"}`
+  ).all(work, ...albumId == null ? [] : [String(albumId)])) {
     const hints = JSON.parse(evidence2).hints || {};
     const head = splitTitle(withoutComposer(hints.title, hints.composer)).head;
     if (head && catalogueSubject(head) === subject) counts.set(head, (counts.get(head) || 0) + 1);
@@ -42482,7 +42506,7 @@ function headingFor(catalogue, work, albumId, title) {
   return [...counts].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
 }
 var ENGLISH = "work_english";
-var ENGLISH_KEY = `${ENGLISH}:v1`;
+var ENGLISH_KEY = `${ENGLISH}:v2`;
 async function queueEnglishNames(ctx, actor3) {
   if (actor3?.role !== "admin") throw new Error("English work names require a current host admin");
   const catalogue = await openCatalogue(modelFolder(ctx));
@@ -42543,7 +42567,7 @@ async function runEnglishNames(ctx, catalogue, jobs, job, deadline) {
         const title = current?.source === "derived" ? JSON.parse(current.value) : null;
         if (typeof title === "string") {
           const { entry, verified: verified2 } = await englishEntryFor(ctx, catalogue, work);
-          const english = entry && ClassicalResolver.bestEnglishAlias(entry.aliases)?.name;
+          const english = entry && ClassicalResolver.bestEnglishAlias(entry.aliases)?.name || entry && headingFor(catalogue, work, null, title);
           const same2 = verified2 || catalogueSubject(title) && [entry?.title, english].some((name) => catalogueSubject(name || "") === catalogueSubject(title));
           if (english && same2 && english !== title) {
             metadata.derived(work, "title", english);
@@ -43149,7 +43173,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.44" : "dev";
+var VERSION = true ? "1.0.45" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js

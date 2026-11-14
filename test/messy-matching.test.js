@@ -1460,4 +1460,17 @@ test("matching: a WORK tag starting at a collection of works names the work furt
   assert.deepEqual(blocks("monteverdi"), [["Quarto libro de madrigali, SV 75–93", 2]]);
   // Nothing for the repair to let go, and nothing made again.
   assert.equal(releaseRangeWorks(c), 0);
+
+  // explain-works on the user's library: three preludes and fugues held as
+  // one recording of the collection, each track naming its own BWV number.
+  const vikingur = ["Prelude & Fugue in E minor (Well‐Tempered Clavier, Book I, no. 10), BWV 855", "Prelude & Fugue in D major (Well‐Tempered Clavier, Book I, no. 5), BWV 850"].flatMap((pf) =>
+    ["I. Prelude", "II. Fugue"].map((m) => ({ title: `${pf}: ${m}`, composer: ["Johann Sebastian Bach"], genres: ["Classical"] })),
+  );
+  const d = await catalogueWith(t, [{ id: "vikingur", album: "Johann Sebastian Bach", albumArtist: "Víkingur Ólafsson", artist: "Víkingur Ólafsson", titles: vikingur }]);
+  const ids = d.db.prepare("SELECT id FROM track_link ORDER BY json_extract(evidence,'$.hints.trackNumber')").all().map((row) => row.id);
+  const wtc = { workId: "mb-wtc", work: "The Well-Tempered Clavier, BWV 846–893", movement: null, aliases: [], composers: ["Johann Sebastian Bach"], composerIds: {} };
+  autoMatchTaggedWorks(d, { albumId: "vikingur", actor: "model-identify", allowStructuredTitles: true, providerMatches: new Map(ids.map((id) => [id, wtc])) });
+  assert.equal(d.db.prepare("SELECT count(*) AS n FROM realization").get().n, 1);
+  assert.equal(releaseRangeWorks(d), 1);
+  assert.equal(d.db.prepare("SELECT count(*) AS n FROM realization_item").get().n, 0);
 });
