@@ -758,7 +758,7 @@ async function arrangedWork(mb, work, inc) {
 // recording ID: the parent work (or the work itself, when it is a whole
 // piece), its English title, aliases and composers' IDs. Null when there
 // is none. Every request goes through the shared throttle and disk cache.
-async function identifyTrack(ctx, hints) {
+export async function identifyTrack(ctx, hints) {
   let workId = hints.workId;
   let composers = hints.composer || [];
   if (!workId && hints.recordingMbid) {

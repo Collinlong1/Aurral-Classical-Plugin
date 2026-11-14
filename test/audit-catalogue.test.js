@@ -63,3 +63,58 @@ test("audit: the dry run lists the repairs and the live catalogue is left as it 
     live.close();
   }
 });
+
+// The 272 tracks with a recording ID and no work: the audit's dry run runs
+// without MusicBrainz, so it can't say what MusicBrainz names. This script
+// replays identification from the plugin's cache only, never the network.
+test("explain-musicbrainz: reads cached answers only and says what Auto-match would do", async (t) => {
+  const { FileCache } = await import("../src/store.js");
+  const { ClassicalResolver } = await import("../src/resolver.js");
+  const folders = await tempFolders();
+  t.after(() => fs.rm(folders.root, { recursive: true, force: true }));
+  const model = path.join(folders.dataFolder, "model");
+  const c = await openCatalogue(model);
+  c.db.prepare("INSERT INTO core_instance VALUES ('i','e',0)").run();
+  const entries = [
+    ["Aida: Ritorna vincitor!", "rec-1"],
+    ["Aida: O patria mia", "rec-2"],
+    ["Contextures: Riots - Decade ’60: III. Con calore", "rec-3"],
+  ];
+  const tracks = entries.map(([title, recordingMbid], i) => ({
+    coreId: `decca-${i}`,
+    fileId: `decca-${i}`,
+    path: `/library/decca/${i}.flac`,
+    size: 1000,
+    durationMs: 60000,
+    fingerprint: `audio-sha256-v2:decca-${i}`,
+    albumId: "decca",
+    hints: { title, album: "Decca Sound", albumArtist: "Various Artists", artist: "Singer", composer: [i < 2 ? "Giuseppe Verdi" : "William Kraft"], genres: ["Classical"], work: "", trackNumber: i + 1, discNumber: 1, recordingMbid },
+  }));
+  for (const row of reconcile(c, { version: 1, complete: true, instanceId: "i", epoch: "e", generation: 1, tracks })) classify(c, row.id, row.hints);
+  c.close();
+  const cache = new FileCache(path.join(folders.dataFolder, "mb-cache"));
+  const base = "https://musicbrainz.org";
+  const verdi = { type: "composer", direction: "backward", artist: { id: "verdi", name: "Giuseppe Verdi" } };
+  const aida = { id: "aida", title: "Aida", relations: [verdi] };
+  const aria = (id, title) => ({ id, title, relations: [verdi, { type: "parts", direction: "backward", work: aida }] });
+  for (const [id, work] of [["rec-1", aria("w-1", "Aida: Atto I, Scena I. Ritorna vincitor!")], ["rec-2", aria("w-2", "Aida: Atto III. O patria mia")]]) {
+    await cache.set(`${base}|recording/${id}?fmt=json&inc=${ClassicalResolver.RECORDING_INC.replaceAll("+", "%2B")}`, { id, title: "x", "artist-credit": [], relations: [{ type: "performance", direction: "forward", work: { id: work.id, title: work.title } }] });
+    for (const inc of ["aliases+artist-rels+work-rels", ClassicalResolver.WORK_INC]) await cache.set(`${base}|work/${work.id}?fmt=json&inc=${inc.replaceAll("+", "%2B")}`, work);
+  }
+  for (const inc of ["aliases+artist-rels+work-rels", ClassicalResolver.WORK_INC]) await cache.set(`${base}|work/aida?fmt=json&inc=${inc.replaceAll("+", "%2B")}`, aida);
+  await cache.set(`${base}|recording/rec-3?fmt=json&inc=${ClassicalResolver.RECORDING_INC.replaceAll("+", "%2B")}`, { id: "rec-3", title: "x", "artist-credit": [], relations: [] });
+  const file = path.join(model, "classical.sqlite");
+  const hash = async () => createHash("sha256").update(await fs.readFile(file)).digest("hex");
+  const before = await hash();
+  const out = path.join(folders.root, "mb");
+  const explain = path.join(path.dirname(script), "explain-musicbrainz.mjs");
+  await promisify(execFile)(process.execPath, [explain, folders.dataFolder, out]);
+  const { tracks: report } = JSON.parse(await fs.readFile(path.join(out, "musicbrainz.json"), "utf8"));
+  const byTitle = Object.fromEntries(report.map((track) => [track.title, [track.says, track.outcome]]));
+  assert.match(byTitle["Aida: Ritorna vincitor!"][0], /of "Aida"/);
+  assert.match(byTitle["Aida: Ritorna vincitor!"][1], /^matches "Aida"/);
+  assert.equal(byTitle["Contextures: Riots - Decade ’60: III. Con calore"][0], "the recording names no work");
+  assert.equal(byTitle["Contextures: Riots - Decade ’60: III. Con calore"][1], "stays out");
+  assert.equal(await hash(), before);
+  assert.deepEqual((await fs.readdir(out)).sort(), ["musicbrainz.json", "musicbrainz.md"]);
+});
