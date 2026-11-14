@@ -331,7 +331,7 @@ function candidates(
       trackNumber,
     });
   }
-  return separateRecordings(mergeCompletions([...groups.values()])).filter((group) => {
+  return splitScattered(separateRecordings(mergeCompletions([...groups.values()]))).filter((group) => {
     // The title most of the work's tracks use, so one typo doesn't name it.
     group.work = [...group.titles].sort((a, b) => b[1] - a[1])[0][0];
     const positions = group.tracks.map(
@@ -348,7 +348,8 @@ function candidates(
           ? "only one track of a work with movements on this album"
           : new Set(positions).size !== positions.length
             ? "two tracks share a disc and track number"
-            : new Set(group.tracks.map((track) => normalized(track.title))).size !== group.tracks.length
+            : // MusicBrainz telling four "Promenade"s apart tells them apart.
+              new Set(group.tracks.map(pieceName)).size !== group.tracks.length
               ? "two tracks share a title"
               : null;
     if (explain)
@@ -418,12 +419,43 @@ function mergeCompletions(groups) {
 // A bracket of numbers only ("Mazurka … (3)") tells repeats apart, so it stays.
 const recordingTitle = (title) =>
   words(clean(title).replace(/\s*[([][^()[\]]*\p{L}[^()[\]]*[)\]]\s*$/u, ""));
+// A set's pieces scattered over a box and recorded more than once
+// (Rachmaninoff's waltzes and preludes from several sessions): each run of
+// neighbouring tracks is its own recording. Only for a numbered set
+// MusicBrainz names, and only where a title repeats, so a work an album
+// interrupts once keeps one recording.
+// One piece is one title and, when MusicBrainz names it, one MusicBrainz
+// name: four "Promenade"s it names apart are four pieces; a Christe and a
+// Kyrie II it files under one "Kyrie" are two.
+const pieceName = (track) => `${normalized(track.title)}|${normalized(track.providerMovement || "")}`;
+function splitScattered(groups) {
+  return groups.flatMap((group) => {
+    const name = pieceName;
+    if (!group.providerWorkId || !catalogueSet(group.work) || new Set(group.tracks.map(name)).size === group.tracks.length) return [group];
+    const runs = [];
+    for (const track of [...group.tracks].sort(albumOrder)) {
+      const last = runs.at(-1)?.at(-1);
+      // The next track, or the first of the next disc.
+      const next = last && (last.discNumber === track.discNumber ? track.trackNumber - last.trackNumber === 1 : track.discNumber - last.discNumber === 1 && track.trackNumber === 1);
+      if (next) runs.at(-1).push(track);
+      else runs.push([track]);
+    }
+    // Only when every run then names each piece once.
+    if (runs.length === 1 || runs.some((run) => new Set(run.map(name)).size !== run.length)) return [group];
+    return runs.map((tracks, i) => ({
+      ...group,
+      key: i ? JSON.stringify([...JSON.parse(group.key), `run:${i + 1}`]) : group.key,
+      legacyKey: group.legacyKey && i ? JSON.stringify([...JSON.parse(group.legacyKey), `run:${i + 1}`]) : group.legacyKey,
+      tracks,
+    }));
+  });
+}
 function separateRecordings(groups) {
   return groups.flatMap((group) => {
-    const titles = group.tracks.map((track) => recordingTitle(track.title));
+    const titles = group.tracks.map((track) => recordingTitle(track.title) + (track.providerMovement ? `|${normalized(track.providerMovement)}` : ""));
     if (new Set(titles).size === titles.length) return [group];
     const ordered = [...group.tracks].sort(albumOrder);
-    const title = (track) => recordingTitle(track?.title);
+    const title = (track) => (track ? recordingTitle(track.title) + (track.providerMovement ? `|${normalized(track.providerMovement)}` : "") : undefined);
     const runs = [[]];
     ordered.forEach((track, i) => {
       const run = runs.at(-1);

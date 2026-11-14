@@ -37531,7 +37531,7 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
       trackNumber
     });
   }
-  return separateRecordings(mergeCompletions([...groups.values()])).filter((group) => {
+  return splitScattered(separateRecordings(mergeCompletions([...groups.values()]))).filter((group) => {
     group.work = [...group.titles].sort((a, b) => b[1] - a[1])[0][0];
     const positions = group.tracks.map(
       (track) => `${track.discNumber}:${track.trackNumber}`
@@ -37541,7 +37541,10 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
       group.standalone && group.tracks.length !== 1 ? "several tracks name the same whole piece" : (
         // One piece of a set ("Prelude, Op. 11, No. 8" in "24 Preludes,
         // Op. 11") is a whole piece; one movement of a symphony is not.
-        !group.standalone && group.tracks.length < 2 && !catalogueSet(group.work) ? "only one track of a work with movements on this album" : new Set(positions).size !== positions.length ? "two tracks share a disc and track number" : new Set(group.tracks.map((track) => normalized(track.title))).size !== group.tracks.length ? "two tracks share a title" : null
+        !group.standalone && group.tracks.length < 2 && !catalogueSet(group.work) ? "only one track of a work with movements on this album" : new Set(positions).size !== positions.length ? "two tracks share a disc and track number" : (
+          // MusicBrainz telling four "Promenade"s apart tells them apart.
+          new Set(group.tracks.map(pieceName)).size !== group.tracks.length ? "two tracks share a title" : null
+        )
       )
     );
     if (explain)
@@ -37584,12 +37587,33 @@ function mergeCompletions(groups) {
   return [...groups.filter((group) => !merged.has(group)), ...result];
 }
 var recordingTitle = (title) => words(clean3(title).replace(new RegExp("\\s*[([][^()[\\]]*\\p{L}[^()[\\]]*[)\\]]\\s*$", "u"), ""));
+var pieceName = (track) => `${normalized(track.title)}|${normalized(track.providerMovement || "")}`;
+function splitScattered(groups) {
+  return groups.flatMap((group) => {
+    const name = pieceName;
+    if (!group.providerWorkId || !catalogueSet(group.work) || new Set(group.tracks.map(name)).size === group.tracks.length) return [group];
+    const runs = [];
+    for (const track of [...group.tracks].sort(albumOrder)) {
+      const last = runs.at(-1)?.at(-1);
+      const next = last && (last.discNumber === track.discNumber ? track.trackNumber - last.trackNumber === 1 : track.discNumber - last.discNumber === 1 && track.trackNumber === 1);
+      if (next) runs.at(-1).push(track);
+      else runs.push([track]);
+    }
+    if (runs.length === 1 || runs.some((run) => new Set(run.map(name)).size !== run.length)) return [group];
+    return runs.map((tracks, i) => ({
+      ...group,
+      key: i ? JSON.stringify([...JSON.parse(group.key), `run:${i + 1}`]) : group.key,
+      legacyKey: group.legacyKey && i ? JSON.stringify([...JSON.parse(group.legacyKey), `run:${i + 1}`]) : group.legacyKey,
+      tracks
+    }));
+  });
+}
 function separateRecordings(groups) {
   return groups.flatMap((group) => {
-    const titles = group.tracks.map((track) => recordingTitle(track.title));
+    const titles = group.tracks.map((track) => recordingTitle(track.title) + (track.providerMovement ? `|${normalized(track.providerMovement)}` : ""));
     if (new Set(titles).size === titles.length) return [group];
     const ordered = [...group.tracks].sort(albumOrder);
-    const title = (track) => recordingTitle(track?.title);
+    const title = (track) => track ? recordingTitle(track.title) + (track.providerMovement ? `|${normalized(track.providerMovement)}` : "") : void 0;
     const runs = [[]];
     ordered.forEach((track, i) => {
       const run = runs.at(-1);
@@ -42831,7 +42855,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.39" : "dev";
+var VERSION = true ? "1.0.40" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js

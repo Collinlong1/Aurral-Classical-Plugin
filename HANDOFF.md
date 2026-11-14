@@ -1,3 +1,16 @@
+# 1.0.40: MusicBrainz matches refused for repeated titles
+
+November 14, 2026. Audits on 1.0.38 and 1.0.39 after scans: matched 4,410 of 4,791 classical tracks; albums 48/19/28; reviews classification 303, movement-mismatch 14, identity 11, duplicate-work 7. Piano Concerto No. 2 has three movements and all seven albums; The Seasons has twelve (Yunchan Lim's album); the variation sets have a movement per variation (Paganini 26, Corelli 23, Chopin op. 22 22), album 831 one row per track. The dry runs are empty: the scans made the repairs.
+
+`scripts/explain-musicbrainz.mjs` (new, read-only) replays identification from the plugin's MusicBrainz cache, with no network, and runs Auto-match on a snapshot with the answers; the audit's own dry run has no MusicBrainz. On the user's library, of 353 classical tracks outside every work with a recording ID: MusicBrainz names a parent for 219 (most through a work ID in the tags), names no work for 70 (Renaissance dances and motets, Mulan, improvisations), and 64 have nothing cached. Of the 219, Auto-match sends 51 to movement-mismatch review (La bohème, Le Sacre, Chants polonais and others) and leaves out 168: 133 as the only track of a work with movements (opera overtures and arias, act preludes, single pieces of song cycles and sets; also Liszt transcriptions MusicBrainz ties to the original opera or symphony), 32 because two tracks share a title, 2 refused when made.
+
+- **Two tracks share a title**: tracks are one piece only when their titles and MusicBrainz's names for them both agree. Pictures at an Exhibition's four "Promenade"s, which MusicBrainz names apart, match; a Christe and a Kyrie II MusicBrainz files under one "Kyrie" stay two pieces.
+- **A numbered set MusicBrainz names, scattered over a box and recorded more than once** (Rachmaninoff's Op. 64 waltzes and Op. 3 Morceaux): each run of neighbouring tracks (continuing to track 1 of the next disc) is its own recording, when every run then names each piece once. Limited to numbered sets: applied to every group, it split Josquin's masses and the B minor Mass in the corpus.
+
+Not changed: Liszt's arrangements whose tracks credit each variation's composer (Hexaméron, Ungarischer Romanzero, Un portrait: one group per composer, so one track each); a single excerpt of a work with movements, waiting on the user's decision.
+
+Test: `test/messy-matching.test.js` "MusicBrainz tells same-titled movements apart; a set recorded twice in a box is two recordings"; fails on 1.0.39. 310 plugin tests pass; Apple and non-classical corpora unchanged.
+
 # 1.0.39: a movement per variation
 
 November 14, 2026. The user asked for variation sets to have proper movements. Album 831 gives several of Rachmaninoff's variations a track ("Theme: L'istesso tempo / II. L'istesso tempo / … / VI."), and matching made each track one movement: the Paganini Rhapsody had 12, the Corelli Variations 10, the Chopin Variations 14, and the albums with a track per variation (13354, 3223, 10668) joined in 1.0.37 as several tracks on one movement.

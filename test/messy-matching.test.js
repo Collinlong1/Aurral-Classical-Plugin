@@ -1268,3 +1268,37 @@ test("matching: a work made with several variations a movement gets a movement p
   assert.deepEqual(page.recordings.map((recording) => [recording.items.length, recording.complete]).sort(), [[3, true], [5, true], [6, true]]);
   assert.equal(c.db.prepare("SELECT COUNT(*) AS n FROM review_item WHERE status='open' AND json_extract(evidence,'$.reason')='movement-mismatch'").get().n, 0);
 });
+
+// From explain-musicbrainz on the user's library: MusicBrainz names the
+// work, and matching refused it because two tracks share a title. Pictures
+// at an Exhibition has four "Promenade"s MusicBrainz tells apart; a box of
+// one pianist's recordings plays the Op. 64 waltzes in two sessions.
+test("matching: MusicBrainz tells same-titled movements apart; a set recorded twice in a box is two recordings", async (t) => {
+  const tag = (composer, extra = {}) => (title) => ({ title, composer: [composer], genres: ["Classical"], ...extra });
+  const pictures = ["Promenade", "I. Gnomus", "Promenade", "II. The Old Castle", "Promenade", "X. The Great Gate of Kiev"];
+  const named = ["Promenade. Allegro giusto", "I. Gnomus", "Promenade. Moderato comodo", "II. Il vecchio castello", "Promenade. Moderato non tanto", "X. The Great Gate of Kiev"];
+  const c = await catalogueWith(t, [
+    { id: "pictures", album: "History of Classical Music", albumArtist: "Various Artists", artist: "Orchestra", titles: pictures.map((m) => `Pictures at an Exhibition: ${m}`).map(tag("Modest Mussorgsky")) },
+    {
+      id: "box",
+      album: "The Complete Recordings",
+      albumArtist: "Sergei Rachmaninoff",
+      artist: "Sergei Rachmaninoff",
+      titles: [
+        tag("Frédéric Chopin", { trackNumber: 1, discNumber: 6 })("Waltz in C-sharp minor, Op. 64 No. 2"),
+        tag("Frédéric Chopin", { trackNumber: 2, discNumber: 6 })("Waltz in A-flat major, Op. 64 No. 3"),
+        tag("Frédéric Chopin", { trackNumber: 9, discNumber: 10 })("Waltz in A-flat major, Op. 64 No. 3"),
+      ],
+    },
+  ]);
+  const ids = (albumId) => c.db.prepare("SELECT id FROM track_link WHERE CAST(json_extract(evidence,'$.albumId') AS TEXT)=? ORDER BY json_extract(evidence,'$.hints.discNumber'),json_extract(evidence,'$.hints.trackNumber')").all(albumId).map((row) => row.id);
+  const provider = (workId, work, composers, movements) => (id, i) => [id, { workId, work, movement: movements?.[i] ?? null, aliases: [], composers, composerIds: {} }];
+  const match = (albumId, matches) => autoMatchTaggedWorks(c, { albumId, actor: "admin", allowStructuredTitles: true, providerMatches: new Map(matches) });
+  match("pictures", ids("pictures").map(provider("mb-pictures", "Pictures at an Exhibition", ["Modest Mussorgsky"], named)));
+  assert.deepEqual(renderAlbumPresentation(c, "pictures").groups.map((group) => [group.title, group.items.length, Boolean(group.workId)]), [["Pictures at an Exhibition", 6, true]]);
+  match("box", ids("box").map(provider("mb-op64", "Waltzes, op. 64", ["Frédéric Chopin"])));
+  const groups = renderAlbumPresentation(c, "box").groups;
+  assert.deepEqual(groups.map((group) => [group.title, group.items.length]), [["Waltzes, op. 64", 2], ["Waltzes, op. 64", 1]]);
+  assert.equal(groups[0].workId, groups[1].workId);
+  assert.notEqual(groups[0].id, groups[1].id);
+});
