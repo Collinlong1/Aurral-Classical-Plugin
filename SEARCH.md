@@ -40,7 +40,7 @@ Composer, performer, conductor, ensemble, period, form, instrument, recording ty
 
 Search never merges documents: two works with one title stay two results, each with its composer and catalogue number. A work, recording or album appears once.
 
-Two realizations are **one recording on two releases** when their tracks carry the same MusicBrainz recordings, or, with none, the same performers play the same movements within two seconds each. Never across works, never two on one album, never on names alone. The recording lists every release it appears on.
+Two realizations are **one recording on two releases** when their tracks carry the same MusicBrainz recordings, or, with none, the same performers play the same movements on the same number of tracks, each within two seconds. Never across works, never two on one album, never on names alone. The recording lists every release it appears on.
 
 ## Speed
 

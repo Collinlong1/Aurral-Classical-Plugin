@@ -65,7 +65,7 @@ test("browse tabs, lookups and an album turned into a work in one step", async (
   const s = await setup(t);
   const page = await s.read();
   assert.equal(page.version, 2);
-  assert.deepEqual(page.tabs.map((tab) => tab.id), ["works", "composers", "performers", "albums", "review", "search", "downloads"]);
+  assert.deepEqual(page.tabs.map((tab) => tab.id), ["works", "composers", "performers", "albums", "review", "search", "downloads", "history"]);
   assert.equal(page.tab, "works");
   // Albums list shows albums with classical tracks; others are found by search.
   const albums = await s.read({ tab: "albums" });
@@ -438,10 +438,27 @@ test("#16 duplicate-work and same-name reviews offer the merge that settles them
   const b = (await s.ok("create-work", { title: "Sketch", composer: "", movements: [], createAnyway: true })).selection;
   s.c.review("identity", b, { reason: "duplicate-work", keep: a });
   let review = s.c.db.prepare("SELECT id FROM review_item WHERE target_id=?").get(b).id;
-  let merge = (await s.read({ selection: `review:${review}` })).view.actions.find((x) => x.command === "merge-entity");
+  let view = (await s.read({ selection: `review:${review}` })).view;
+  // Side by side, with what a merge would do.
+  assert.deepEqual(section(view, "compare").rows.find((r) => r.id === "Title").badge.label, "Same");
+  assert.equal(section(view, "merge-preview").items[0].selection, a);
+  let merge = section(view, "decide").actions.find((x) => x.command === "merge-entity");
   assert.deepEqual(merge.arguments, { target: b, into: a, confirm: true });
-  await s.ok("merge-entity", merge.arguments, `review:${review}`);
+  const merged = await s.ok("merge-entity", merge.arguments, `review:${review}`);
+  assert.equal(merged.selection, "", "the queue is empty, so the list comes back");
   assert.deepEqual(liveWorks(s), [a]);
+  // The merge is undoable from History.
+  const history = await s.read({ tab: "history" });
+  assert.match(history.list.items[0].label, /^Merged “Sketch” into “Sketch”$/);
+  const undo = (await s.read({ selection: history.list.items[0].selection })).view.actions.find((x) => x.command === "undo-change");
+  await s.ok("undo-change", undo.arguments, history.list.items[0].selection);
+  assert.deepEqual(liveWorks(s).sort(), [a, b].sort());
+  // Keep both: resolved, and remembered.
+  const again = s.c.db.prepare("SELECT id FROM review_item WHERE target_id=? AND status='open'").get(b)?.id;
+  assert.ok(again, "the review comes back with the work");
+  view = (await s.read({ selection: `review:${again}` })).view;
+  await s.ok("keep-distinct", section(view, "decide").actions.find((x) => x.command === "keep-distinct").arguments, `review:${again}`);
+  assert.ok(s.c.db.prepare("SELECT 1 FROM match_suppression WHERE key LIKE 'distinct:%'").get());
   const p1 = (await s.ok("create-contributor", { name: "Johann Strauss", kind: "person" })).selection;
   const p2 = (await s.ok("create-contributor", { name: "Johann Strauss", kind: "person" })).selection;
   s.c.review("identity", p2, { reason: "same-name-composers", name: "Johann Strauss" });

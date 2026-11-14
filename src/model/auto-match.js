@@ -644,6 +644,15 @@ const keyOf = (subjectOf) => (title, composers) =>
     subjectOf(title) || `title:${words(title).replace(KEY_PHRASE, " ").replace(/\s+/g, " ").trim()}`,
   ]);
 export const workKey = keyOf(catalogueSubject);
+// Two works an admin chose to keep apart.
+export const distinctKey = (a, b) => `distinct:${[a, b].sort().join("|")}`;
+const keptDistinct = (catalogue, a, b) => Boolean(catalogue.db.prepare("SELECT 1 FROM match_suppression WHERE key=?").get(distinctKey(a, b)));
+// What a deleted work leaves behind so matching won't make it again: its
+// name with its composers, and its MusicBrainz work.
+export const suppressionKeys = (title, composers, providerWorkId = null) => [
+  `work:${workKey(title, composers)}`,
+  ...(providerWorkId ? [`musicbrainz:${providerWorkId}`] : []),
+];
 const legacyWorkKey = keyOf(legacyCatalogueSubject);
 
 const ROMAN = { i: 1, v: 5, x: 10, l: 50, c: 100 };
@@ -1455,6 +1464,21 @@ function createGroup(catalogue, group, actor, index) {
           reason: "ambiguous-composer",
           composers: ambiguous,
           candidates: ambiguous.flatMap((name) => index.people.get(words(name))),
+          albumId: group.albumId,
+          tracks: ordered.map((t) => t.id),
+        });
+        return false;
+      }
+      // An admin deleted this work: matching never makes it again on its
+      // own; the album waits in review until the admin allows it.
+      const suppressed = suppressionKeys(group.work, group.composers, group.providerWorkId).find((key) =>
+        catalogue.db.prepare("SELECT 1 FROM match_suppression WHERE key=?").get(key),
+      );
+      if (suppressed) {
+        catalogue.review("auto_match", ordered[0].id, {
+          reason: "deleted-work",
+          suppression: suppressed,
+          work: group.work,
           albumId: group.albumId,
           tracks: ordered.map((t) => t.id),
         });
@@ -2276,6 +2300,20 @@ export function mergeWork(catalogue, keep, drop, actor) {
   return true;
 }
 
+// What merging `drop` into `keep` would do, without doing it: how the
+// dropped work's movements land on the kept work's, or ok: false.
+export function mergePreview(catalogue, keep, drop) {
+  const keepMovements = workMovements(catalogue, keep),
+    dropMovements = workMovements(catalogue, drop);
+  if (!dropMovements.length) return { ok: true, mapped: [] };
+  const mapped = mapToMovements(
+    keepMovements,
+    dropMovements.map((m) => ({ movementTitle: resolvedName(catalogue, m.id, "title") || "" })),
+  );
+  if (!mapped) return { ok: false, mapped: [] };
+  return { ok: true, mapped: dropMovements.map((m, i) => ({ from: m.id, to: mapped[i] })) };
+}
+
 function verifiedIdentities(catalogue, entity, kind) {
   return new Set(
     catalogue.db
@@ -2315,7 +2353,8 @@ export function mergeDuplicateAutoWorks(catalogue, { actor = null } = {}) {
       // can be two pieces: an admin decides. A catalogue number, or a title
       // with a number of its own ("Symphony No. 5", "Z. 629"), is identity.
       if (!/\d/.test(JSON.parse(key)[1])) {
-        for (const id of ids.slice(1)) catalogue.review("identity", id, { reason: "duplicate-work", keep: ids[0], evidence: "same title, no number" });
+        for (const id of ids.slice(1))
+          if (!keptDistinct(catalogue, ids[0], id)) catalogue.review("identity", id, { reason: "duplicate-work", keep: ids[0], evidence: "same title, no number" });
         continue;
       }
       const auto = (id) =>
@@ -2326,9 +2365,11 @@ export function mergeDuplicateAutoWorks(catalogue, { actor = null } = {}) {
       const keep = ids.find((id) => !auto(id)) || ids[0];
       if (ids.filter((id) => !auto(id)).length > 1) continue;
       for (const id of ids.filter((id) => id !== keep))
+        // An admin said these are two works: never merged, never asked again.
+        if (keptDistinct(catalogue, keep, id)) continue;
         // Same title and number, different verified MusicBrainz works or
         // composers: kept apart, for an admin to decide.
-        if (!compatibleAutoWorks(catalogue, keep, id)) catalogue.review("identity", id, { reason: "duplicate-work", keep, evidence: "different MusicBrainz identities" });
+        else if (!compatibleAutoWorks(catalogue, keep, id)) catalogue.review("identity", id, { reason: "duplicate-work", keep, evidence: "different MusicBrainz identities" });
         else if (mergeWork(catalogue, keep, id, actor)) works++;
         else catalogue.review("identity", id, { reason: "duplicate-work", keep });
     }

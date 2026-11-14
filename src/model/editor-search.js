@@ -16,13 +16,16 @@ export const matchesSearch = (value, query) => {
     .filter(Boolean)
     .every((term) => haystack.includes(term));
 };
-export function ownedTracks(catalogue) {
+// Every owned track, or one album's (through the track_album index).
+export function ownedTracks(catalogue, { albumId = null } = {}) {
   return catalogue.db
     .prepare(
       `SELECT t.*,c.state AS classification FROM track_link t
-    LEFT JOIN classification c ON c.target_id=t.id WHERE t.state='active' ORDER BY t.created_at,t.id`,
+    LEFT JOIN classification c ON c.target_id=t.id WHERE t.state='active'
+    ${albumId === null ? "" : "AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?"}
+    ORDER BY t.created_at,t.id`,
     )
-    .all()
+    .all(...(albumId === null ? [] : [String(albumId)]))
     .map((row) => {
       const evidence = JSON.parse(row.evidence),
         hints = evidence.hints || {};

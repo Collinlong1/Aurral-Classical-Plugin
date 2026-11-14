@@ -192,6 +192,7 @@ test("search answers within 300 ms on a 10,000-track index", async (t) => {
 test("the editor's Search tab lists ranked results that open their entries", async (t) => {
   const { c, moonlight } = await library(t);
   const { renderV2 } = await import("../src/model/editor-v2.js");
+  ensureSearchIndex(c);
   const page = renderV2(c, { tab: "search", q: "op 27 no 2" }, "r");
   assert.equal(page.tab, "search");
   assert.equal(page.list.items[0].selection, moonlight);

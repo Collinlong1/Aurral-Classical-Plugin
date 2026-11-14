@@ -141,8 +141,16 @@ export function ownedRecordings(c, tracks = classicalTracks(c), values = resolve
       const key = item.movementId || `seq:${item.sequence}`;
       parts.set(key, (parts.get(key) || 0) + ms);
     }
+    const trackMs = [];
+    for (const item of recording.items) {
+      const last = trackMs.at(-1);
+      const ms = item.endMs != null ? item.endMs - item.startMs : Math.max(0, item.track.durationMs - (item.startMs || 0));
+      if (last && last.track === item.track.id && last.start === item.startMs) continue;
+      trackMs.push({ track: item.track.id, start: item.startMs, ms });
+    }
     recordings.push({
       ...recording,
+      trackMs: trackMs.map((entry) => entry.ms),
       people: performers,
       taggedPerformers: tagged,
       performerNames: performers.length ? performers.map((p) => p.name) : tagged,
@@ -161,7 +169,8 @@ export function ownedRecordings(c, tracks = classicalTracks(c), values = resolve
 
 // Two realizations are one recording on two releases when their tracks
 // carry the same MusicBrainz recordings, or, without them, the same
-// performers play the same parts within two seconds each. Never across
+// performers play the same parts on the same number of tracks, each within
+// two seconds. Never across
 // works, never when both sit on one album, never on names alone.
 export function sameRecording(a, b) {
   if (a.workId !== b.workId || a.id === b.id) return false;
@@ -174,7 +183,9 @@ export function sameRecording(a, b) {
     const other = b.parts.get(key);
     if (other == null || Math.abs(other - ms) > 2000) return false;
   }
-  return true;
+  // The same tracks, too: one release's single track holding three
+  // movements is a different cut from another's three tracks.
+  return a.trackMs.length === b.trackMs.length && a.trackMs.every((ms, i) => Math.abs(ms - b.trackMs[i]) <= 2000);
 }
 
 // Realizations grouped into recordings: [{ key, realizations: [...] }].
@@ -481,9 +492,11 @@ export function normalizeFilters(raw) {
 
 // Searches the index. `q` may be empty when filters are set. Results come in
 // typed sections, works first; facets count what the current results hold.
-export function searchCatalogue(c, { q = "", filters = {}, kinds = null, limit = 8, offset = 0 } = {}) {
+export function searchCatalogue(c, { q = "", filters = {}, kinds = null, limit = 8, offset = 0, ensure = true } = {}) {
   const started = performance.now();
-  const index = ensureSearchIndex(c);
+  // `ensure: false` inside a read-only snapshot: the caller brought the index
+  // up to date first.
+  const index = ensure ? ensureSearchIndex(c) : { rebuilt: false, docs: c.db.prepare("SELECT docs FROM search_state WHERE id=1").get()?.docs ?? 0, ms: 0 };
   const query = parseQuery(String(q).slice(0, 200));
   const wanted = normalizeFilters(filters);
   let scores = null;

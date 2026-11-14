@@ -179,3 +179,29 @@ export function transaction(db, run) {
     if (!nested) activeTransactions.delete(db);
   }
 }
+
+// A consistent snapshot for pages that only read: BEGIN (deferred) takes no
+// write lock, so a page never waits behind a scan's write, nor holds one up.
+// Rendering can still write now and then (a field's resolution settling);
+// if a scan committed meanwhile, that write fails on the old snapshot, and
+// the page is read again with the write lock, as before.
+export function readTransaction(db, run) {
+  if (activeTransactions.has(db)) return run();
+  db.exec("BEGIN");
+  activeTransactions.add(db);
+  let result;
+  try {
+    result = run();
+    if (result && typeof result.then === "function")
+      throw new Error("No asynchronous work inside classical transactions");
+    db.exec("COMMIT");
+  } catch (error) {
+    db.exec("ROLLBACK");
+    activeTransactions.delete(db);
+    if (/SQLITE_BUSY|database is locked/i.test(`${error?.code || ""} ${error?.message || ""}`)) return transaction(db, run);
+    throw error;
+  } finally {
+    activeTransactions.delete(db);
+  }
+  return result;
+}

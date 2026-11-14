@@ -1726,3 +1726,28 @@ test("album groups that start on the same track order by length, then id, not by
     ["a", "b"],
   );
 });
+
+test("a page read takes no write lock, and falls back to one when its snapshot goes stale", async (t) => {
+  const { c, folders } = await setup(t);
+  const { readTransaction } = await import("../src/model/database.js");
+  const other = await openCatalogue(folders.dataFolder);
+  t.after(() => other.close());
+  // Another connection can write while a read is open.
+  const count = () => c.db.prepare("SELECT count(*) AS n FROM entity WHERE kind='work'").get().n;
+  const seen = readTransaction(c.db, () => {
+    const before = count();
+    other.createEntity("work");
+    return [before, count()];
+  });
+  assert.deepEqual(seen, [0, 0], "the read keeps its snapshot while another connection writes");
+  // A write on a stale snapshot is retried under the write lock.
+  let runs = 0;
+  const made = readTransaction(c.db, () => {
+    runs++;
+    c.db.prepare("SELECT count(*) FROM entity").get();
+    if (runs === 1) other.createEntity("work");
+    return c.createEntity("work");
+  });
+  assert.equal(runs, 2);
+  assert.equal(c.entity(made).kind, "work");
+});

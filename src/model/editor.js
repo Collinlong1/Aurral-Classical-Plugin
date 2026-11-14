@@ -2,11 +2,12 @@ import path from "node:path";
 import { createHash } from "node:crypto";
 import { openCatalogue, CREDIT_ROLES, PERSON_ROLES, ENSEMBLE_ROLES } from "./catalogue.js";
 import { Metadata } from "./metadata.js";
-import { transaction } from "./database.js";
+import { readTransaction, transaction } from "./database.js";
 import { classify } from "./reconcile.js";
 import { searchText, matchesSearch, ownedTracks } from "./editor-search.js";
 import { searchDiagnostics } from "../source.js";
-import { renderV2, lookupV2, applyV2, V2_COMMANDS, EditorV2Error, warnDuplicate } from "./editor-v2.js";
+import { ensureSearchIndex } from "../search/engine.js";
+import { renderV2, lookupV2, applyV2, V2_COMMANDS, EditorV2Error, warnDuplicate, parseAlbumSelection, nextReview } from "./editor-v2.js";
 
 class EditorError extends Error {
   constructor(message, status = 400) {
@@ -46,13 +47,23 @@ function text(value, label, { optional = false, max = 10000 } = {}) {
 function scopeIds(c, scope) {
   if (!scope || scope.startsWith("new:")) return [];
   if (scope.startsWith("track:")) return [scope.slice(6)];
+  // A History entry: the change itself and the works it touched.
+  if (scope.startsWith("change:")) {
+    const id = scope.slice(7);
+    const row = c.db.prepare("SELECT data FROM change_set WHERE id=?").get(id);
+    return [id, ...(row ? JSON.parse(row.data).works || [] : [])];
+  }
+  if (scope.startsWith("bulk:")) {
+    const row = c.db.prepare("SELECT data FROM change_set WHERE id=? AND kind='selection'").get(scope.slice(5));
+    return [scope.slice(5), ...(row ? JSON.parse(row.data).works || [] : [])];
+  }
   if (scope.startsWith("review:")) {
     const id = scope.slice(7);
     const review = c.db.prepare("SELECT target_id FROM review_item WHERE id=?").get(id);
     return review ? [id, review.target_id, ...scopeIds(c, review.target_id)] : [id];
   }
   if (scope.startsWith("album:")) {
-    const [albumId, work] = scope.slice(6).split("@");
+    const { albumId, work } = parseAlbumSelection(scope);
     const tracks = c.db
       .prepare("SELECT id FROM track_link WHERE CAST(json_extract(evidence,'$.albumId') AS TEXT)=?")
       .all(albumId)
@@ -727,6 +738,25 @@ function apply(c, input, who) {
       fail("Unknown editor command or fields");
     const result = applyV2(c, request, who);
     c.audit(`editor.${request.command}`, request.values.target || request.values.work || request.values.albumId || result.selection || "", { values: request.values }, who);
+    // The change's own audit entry is part of it, not a later edit that
+    // would block its undo.
+    if (result.changeId)
+      c.db.prepare("UPDATE change_set SET data=json_set(data,'$.after',(SELECT max(id) FROM audit_event)) WHERE id=?").run(result.changeId);
+    // Working through the review queue: once the item on screen is settled,
+    // the next one opens, so nobody goes back to the list between items.
+    const scope = revisionScope(request.revision);
+    if (scope.startsWith("review:") && request.command !== "open") {
+      const id = scope.slice(7);
+      const status = c.db.prepare("SELECT status FROM review_item WHERE id=?").get(id)?.status;
+      if (status !== "open") {
+        const next = nextReview(c, id);
+        return {
+          ok: true,
+          message: `${result.message || "Done."}${next ? " Next item:" : " The review queue is empty."}`.slice(0, 500),
+          selection: next ? `review:${next}` : "",
+        };
+      }
+    }
     return {
       ok: true,
       message: result.message ?? "Saved",
@@ -1073,7 +1103,10 @@ export async function readEditor(input) {
         query.tab === "downloads" || String(query.selection || "").startsWith("slskd:")
           ? await searchDiagnostics({ dataFolder: input.dataFolder })
           : null;
-      return transaction(c.db, () =>
+      // The search index is brought up to date before the snapshot: a page
+      // read never writes.
+      if (query.tab === "search" && query.q) ensureSearchIndex(c);
+      return readTransaction(c.db, () =>
         query.lookup
           ? lookupV2(c, query)
           : renderV2(c, query, revision(c, query.selection || ""), { downloads }),

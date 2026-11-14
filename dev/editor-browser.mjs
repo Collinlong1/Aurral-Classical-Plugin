@@ -63,7 +63,16 @@ try {
   await search.press("Enter");
   await album.waitFor();
   await album.click();
-  await group("Tracks").getByText(/No\. 1 Prélude \(Presto\)/).waitFor();
+  // v0.2: an album's tracks are split into those in a work and those not.
+  const trackGroups = detail
+    .locator("section")
+    .filter({ has: page.getByRole("heading", { name: /^(Not in a work|In a work)$/ }) });
+  await trackGroups.getByText(/No\. 1 Prélude \(Presto\)/).first().waitFor();
+  // Bulk selection: tick a track; the bar counts it and offers its actions.
+  await detail.getByRole("checkbox", { name: /^Select .*No\. 1 Prélude \(Presto\)/ }).first().check();
+  await detail.getByText("1 selected", { exact: true }).waitFor();
+  await detail.getByRole("button", { name: "Clear", exact: true }).first().click();
+  await detail.getByText("None selected", { exact: true }).first().waitFor();
   // Create a composer, then a work from the composer page.
   await page.getByRole("button", { name: /^Composers/ }).click();
   await page.getByRole("button", { name: "New composer", exact: true }).click();
