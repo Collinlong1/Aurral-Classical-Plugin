@@ -38439,6 +38439,25 @@ function joinCollection(catalogue, metadata, work, { id: mbid, title }, actor3) 
   catalogue.relate("collection_member", collection, work, { position });
   catalogue.audit("work.join_collection", work, { collection, title }, actor3);
 }
+function fileCollectionsFromTags(catalogue, { actor: actor3 = null } = {}) {
+  const metadata = new Metadata(catalogue);
+  let filed = 0;
+  const rows = catalogue.db.prepare(
+    `SELECT DISTINCT r.work_id AS work,json_extract(t.evidence,'$.hints.work') AS tag FROM realization r
+       JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id
+       WHERE coalesce(json_extract(t.evidence,'$.hints.work'),'')!=''
+       AND NOT EXISTS(SELECT 1 FROM relation c WHERE c.kind='collection_member' AND c.target_id=r.work_id)`
+  ).all();
+  for (const { work, tag } of rows) {
+    if (catalogue.db.prepare("SELECT 1 FROM relation WHERE kind='collection_member' AND target_id=?").get(work)) continue;
+    const proposal = proposedWork({ work: tag, title: "" }, false);
+    const title = resolvedName(catalogue, work, "title");
+    if (!proposal?.collection || typeof title !== "string" || !catalogueSubject(title) || catalogueSubject(proposal.title) !== catalogueSubject(title)) continue;
+    joinCollection(catalogue, metadata, work, { id: null, title: proposal.collection }, actor3);
+    filed++;
+  }
+  return filed;
+}
 var LEAF = "movement-work";
 function movementWithLeaf(catalogue, work, leaf) {
   if (!leaf) return null;
@@ -39228,6 +39247,7 @@ function autoMatchTaggedWorks(catalogue, {
   if (albumId != null) repairMovementTitles(catalogue, { albumId });
   if (albumId == null) {
     releaseRangeWorks(catalogue, { actor: actor3 });
+    fileCollectionsFromTags(catalogue, { actor: actor3 });
     repairWorkTitles(catalogue);
     repairMovementTitles(catalogue);
     for (const { work } of catalogue.db.prepare(
@@ -42534,7 +42554,7 @@ function headingFor(catalogue, work, albumId, title) {
   return [...counts].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
 }
 var ENGLISH = "work_english";
-var ENGLISH_KEY = `${ENGLISH}:v2`;
+var ENGLISH_KEY = `${ENGLISH}:v3`;
 async function queueEnglishNames(ctx, actor3) {
   if (actor3?.role !== "admin") throw new Error("English work names require a current host admin");
   const catalogue = await openCatalogue(modelFolder(ctx));
@@ -42600,6 +42620,18 @@ async function runEnglishNames(ctx, catalogue, jobs, job, deadline) {
           if (english && same2 && english !== title) {
             metadata.derived(work, "title", english);
             progress.renamed++;
+          }
+          const above = entry && (verified2 || same2) && (entry.relations || []).find((rel) => rel.type === "parts" && rel.direction === "backward" && rel.work?.id);
+          const hasParts = (entry?.relations || []).some((rel) => rel.type === "parts" && rel.direction === "forward");
+          if (above && hasParts && (isCollectionLike(above.work.title || "") || namesCatalogueRange(above.work.title || ""))) {
+            const filed = catalogue.db.prepare("SELECT 1 FROM relation WHERE kind='collection_member' AND target_id=?").get(work);
+            if (!filed) {
+              const book = await ctx.mb.get("work", above.work.id, "aliases+artist-rels+work-rels");
+              if (book) {
+                joinCollection(catalogue, metadata, work, { id: book.id, title: collectionTitle(englishTitle(book)) }, "model-english");
+                progress.filed = (progress.filed || 0) + 1;
+              }
+            }
           }
         }
       } catch (error) {
@@ -43209,7 +43241,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.46" : "dev";
+var VERSION = true ? "1.0.47" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js
@@ -44774,11 +44806,11 @@ var index_default = {
       const ctx = makeContext(input);
       const queued = await queueEnglishNames(ctx, input.user);
       if (!queued.queued && queued.state === "done")
-        return { message: `English work names were looked up already: ${queued.renamed} of ${queued.total} works renamed.` };
+        return { message: `Work names and books were looked up already: ${queued.renamed} of ${queued.total} works renamed, ${queued.filed || 0} filed under their book.` };
       await modelJobs(ctx, { budgetMs: ACTION_BUDGET_MS });
       const status = await englishNamesStatus(ctx);
       return {
-        message: status?.state === "done" ? `Looked up ${status.total} works on MusicBrainz: ${status.renamed} renamed to their English names. Titles you set yourself were left alone.` : `Looked up ${status?.cursor ?? 0} of ${status?.total ?? "?"} works so far (${status?.renamed ?? 0} renamed): run this again, or enable the plugin schedule, to continue.`
+        message: status?.state === "done" ? `Looked up ${status.total} works on MusicBrainz: ${status.renamed} renamed to their English names, ${status.filed || 0} filed under their book (such as The Well-Tempered Clavier, Book I). Titles you set yourself were left alone.` : `Looked up ${status?.cursor ?? 0} of ${status?.total ?? "?"} works so far (${status?.renamed ?? 0} renamed): run this again, or enable the plugin schedule, to continue.`
       };
     },
     async "classical-auto-match"(input) {

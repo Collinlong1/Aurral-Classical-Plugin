@@ -9,7 +9,7 @@ import { createHash } from "node:crypto";
 import { tempFolders } from "./helpers.js";
 import { artistCredits, composersOf } from "../src/model/credits.js";
 import { classificationEvidence } from "../src/model/classify-evidence.js";
-import { releaseRangeWorks, recordTaggedLeaves, splitTitle, stripWorkPrefix, autoMatchTaggedWorks, withoutComposer, mapToMovements, movementParts, catalogueSubject, workKey, mergeWork, provablyDifferent } from "../src/model/auto-match.js";
+import { fileCollectionsFromTags, releaseRangeWorks, recordTaggedLeaves, splitTitle, stripWorkPrefix, autoMatchTaggedWorks, withoutComposer, mapToMovements, movementParts, catalogueSubject, workKey, mergeWork, provablyDifferent } from "../src/model/auto-match.js";
 import { openCatalogue } from "../src/model/catalogue.js";
 import { Metadata } from "../src/model/metadata.js";
 import { reconcile, classify } from "../src/model/reconcile.js";
@@ -1463,6 +1463,12 @@ test("matching: a WORK tag starting at a collection of works names the work furt
   ]);
   // One collection for both.
   assert.equal(c.db.prepare("SELECT count(*) AS n FROM entity WHERE kind='collection' AND deleted_at IS NULL").get().n, 1);
+  // Matched before 1.0.46, with no collection: the scan files them from
+  // their WORK tags; once.
+  c.db.prepare("DELETE FROM relation WHERE kind='collection_member'").run();
+  assert.equal(fileCollectionsFromTags(c), 2);
+  assert.equal(fileCollectionsFromTags(c), 0);
+  assert.ok(blocks("bach").every(([title]) => title.endsWith("· “The Well-Tempered Clavier, Book I”")));
   assert.deepEqual(blocks("monteverdi"), [["Quarto libro de madrigali, SV 75–93", 2]]);
   // Nothing for the repair to let go, and nothing made again.
   assert.equal(releaseRangeWorks(c), 0);

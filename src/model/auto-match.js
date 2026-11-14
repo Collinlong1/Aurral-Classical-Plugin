@@ -1626,7 +1626,7 @@ export function releaseRangeWorks(catalogue, { actor = null } = {}) {
 // Well-Tempered Clavier, Book I"): the one with that MusicBrainz work, else
 // the one of that name, else a new one. A work already in a collection keeps
 // it (an admin may have chosen it).
-function joinCollection(catalogue, metadata, work, { id: mbid, title }, actor) {
+export function joinCollection(catalogue, metadata, work, { id: mbid, title }, actor) {
   const db = catalogue.db;
   if (!title || db.prepare("SELECT 1 FROM relation WHERE kind='collection_member' AND target_id=?").get(work)) return;
   let collection = mbid
@@ -1647,6 +1647,32 @@ function joinCollection(catalogue, metadata, work, { id: mbid, title }, actor) {
   const position = (db.prepare("SELECT max(position) AS n FROM relation WHERE kind='collection_member' AND source_id=?").get(collection).n || 0) + 1;
   catalogue.relate("collection_member", collection, work, { position });
   catalogue.audit("work.join_collection", work, { collection, title }, actor);
+}
+
+// Works matched before 1.0.46 have no collection: their tracks' WORK tags
+// still name the book above them ("The Well-Tempered Clavier, BWV 846–893:
+// Book I, BWV 846–869: Prelude and Fugue …, BWV 855: Prelude"). A work the
+// tag's named part matches by number joins it. Library pass; no lookups.
+export function fileCollectionsFromTags(catalogue, { actor = null } = {}) {
+  const metadata = new Metadata(catalogue);
+  let filed = 0;
+  const rows = catalogue.db
+    .prepare(
+      `SELECT DISTINCT r.work_id AS work,json_extract(t.evidence,'$.hints.work') AS tag FROM realization r
+       JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id
+       WHERE coalesce(json_extract(t.evidence,'$.hints.work'),'')!=''
+       AND NOT EXISTS(SELECT 1 FROM relation c WHERE c.kind='collection_member' AND c.target_id=r.work_id)`,
+    )
+    .all();
+  for (const { work, tag } of rows) {
+    if (catalogue.db.prepare("SELECT 1 FROM relation WHERE kind='collection_member' AND target_id=?").get(work)) continue;
+    const proposal = proposedWork({ work: tag, title: "" }, false);
+    const title = resolvedName(catalogue, work, "title");
+    if (!proposal?.collection || typeof title !== "string" || !catalogueSubject(title) || catalogueSubject(proposal.title) !== catalogueSubject(title)) continue;
+    joinCollection(catalogue, metadata, work, { id: null, title: proposal.collection }, actor);
+    filed++;
+  }
+  return filed;
 }
 
 // A movement's own MusicBrainz work, so another album's recording of
@@ -2699,6 +2725,7 @@ export function autoMatchTaggedWorks(
   // Catalogue-wide repairs belong to the library pass, not to each album.
   if (albumId == null) {
     releaseRangeWorks(catalogue, { actor });
+    fileCollectionsFromTags(catalogue, { actor });
     repairWorkTitles(catalogue);
     repairMovementTitles(catalogue);
     // Works an album made with several variations a movement.

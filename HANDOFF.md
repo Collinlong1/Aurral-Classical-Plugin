@@ -1,3 +1,12 @@
+# 1.0.47: works matched before get their book
+
+November 14, 2026. 1.0.46 gives a work its collection (the book above it) only when matching makes it; the user asked how works matched before get theirs.
+
+- `fileCollectionsFromTags` (library pass, no lookups): a work with no collection whose tracks' WORK tag starts at a collection ("The Well-Tempered Clavier, BWV 846–893: Book I, BWV 846–869: Prelude and Fugue …, BWV 855: …") joins that collection when the tag's named part has the work's catalogue number.
+- "Work names and books from MusicBrainz" (`work_english:v3`, renamed from "English work names", runs once more): a work whose MusicBrainz entry has parts of its own and sits under a range or collection of works joins that book (English name, its range dropped), only where the entry is the work's identity or carries its number. Reports how many it filed.
+
+Tests: the Well-Tempered Clavier tag test files two old works once; the English-names test files a prelude and fugue under its book; both fail on 1.0.46. 316 plugin tests pass; corpora unchanged; the bundle runs its worker.
+
 # 1.0.46: a prelude and fugue is subtitled with its book, as Apple Music Classical shows it
 
 November 14, 2026. The user asked how Apple Music Classical groups preludes and fugues. Its page for Keith Jarrett's Book 1 (classical.music.apple.com/us/album/1452667337) lists 24 works, one per prelude and fugue ("Prelude & Fugue No. 2 in C Minor, BWV 847 · “The Well-tempered Clavier, Book 1”"), each with "I. Prelude … / II. Fugue …" under it; no work holds the book. 1.0.45 already makes each its own work; the user asked for Apple's subtitle.

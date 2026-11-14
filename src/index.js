@@ -275,13 +275,13 @@ export default {
       const ctx = makeContext(input);
       const queued = await queueEnglishNames(ctx, input.user);
       if (!queued.queued && queued.state === "done")
-        return { message: `English work names were looked up already: ${queued.renamed} of ${queued.total} works renamed.` };
+        return { message: `Work names and books were looked up already: ${queued.renamed} of ${queued.total} works renamed, ${queued.filed || 0} filed under their book.` };
       await modelJobs(ctx, { budgetMs: ACTION_BUDGET_MS });
       const status = await englishNamesStatus(ctx);
       return {
         message:
           status?.state === "done"
-            ? `Looked up ${status.total} works on MusicBrainz: ${status.renamed} renamed to their English names. Titles you set yourself were left alone.`
+            ? `Looked up ${status.total} works on MusicBrainz: ${status.renamed} renamed to their English names, ${status.filed || 0} filed under their book (such as The Well-Tempered Clavier, Book I). Titles you set yourself were left alone.`
             : `Looked up ${status?.cursor ?? 0} of ${status?.total ?? "?"} works so far (${status?.renamed ?? 0} renamed): run this again, or enable the plugin schedule, to continue.`,
       };
     },

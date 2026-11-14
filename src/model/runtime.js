@@ -8,7 +8,7 @@ import { ModelJobs } from "./jobs.js";
 import { reconcile, classify } from "./reconcile.js";
 import { UserOperations } from "../user-operations.js";
 import { readTags } from "../tags.js";
-import { autoMatchTaggedWorks, catalogueSubject, collectionTitle, isCollectionLike, namesCatalogueRange, splitTitle, titleHead, withoutComposer } from "./auto-match.js";
+import { autoMatchTaggedWorks, catalogueSubject, collectionTitle, isCollectionLike, joinCollection, namesCatalogueRange, splitTitle, titleHead, withoutComposer } from "./auto-match.js";
 import { topWork } from "../works.js";
 import { ClassicalResolver } from "../resolver.js";
 import { fingerprint, tagSensitive } from "./fingerprint.js";
@@ -557,8 +557,9 @@ function headingFor(catalogue, work, albumId, title) {
 // admin set. Paced and cached through src/mb.js, resumable; once per version.
 const ENGLISH = "work_english";
 // v2 (1.0.45): an identified work with no English name takes its tracks'
-// own heading with the same catalogue number.
-const ENGLISH_KEY = `${ENGLISH}:v2`;
+// own heading with the same catalogue number. v3 (1.0.47): a work its entry
+// files under a book of works joins it as a collection.
+const ENGLISH_KEY = `${ENGLISH}:v3`;
 export async function queueEnglishNames(ctx, actor) {
   if (actor?.role !== "admin") throw new Error("English work names require a current host admin");
   const catalogue = await openCatalogue(modelFolder(ctx));
@@ -631,6 +632,20 @@ async function runEnglishNames(ctx, catalogue, jobs, job, deadline) {
           if (english && same && english !== title) {
             metadata.derived(work, "title", english);
             progress.renamed++;
+          }
+          // The book above it, as identification would have found it: a
+          // range or collection of works, over a work with parts of its own.
+          const above = entry && (verified || same) && (entry.relations || []).find((rel) => rel.type === "parts" && rel.direction === "backward" && rel.work?.id);
+          const hasParts = (entry?.relations || []).some((rel) => rel.type === "parts" && rel.direction === "forward");
+          if (above && hasParts && (isCollectionLike(above.work.title || "") || namesCatalogueRange(above.work.title || ""))) {
+            const filed = catalogue.db.prepare("SELECT 1 FROM relation WHERE kind='collection_member' AND target_id=?").get(work);
+            if (!filed) {
+              const book = await ctx.mb.get("work", above.work.id, "aliases+artist-rels+work-rels");
+              if (book) {
+                joinCollection(catalogue, metadata, work, { id: book.id, title: collectionTitle(englishTitle(book)) }, "model-english");
+                progress.filed = (progress.filed || 0) + 1;
+              }
+            }
           }
         }
       } catch (error) {

@@ -291,9 +291,9 @@ test("background matching: no climbing into a range of works; English names; the
 // name only when that entry carries the work's own number.
 test("background matching: English work names from MusicBrainz, once, for works matched from tags", async (t) => {
   const lib = await library(t);
-  await lib.add("liszt", ["Zwei Konzertetüden, S. 145: I. Waldesrauschen", "Zwei Konzertetüden, S. 145: II. Gnomenreigen", "Trauervorspiel und Trauermarsch, S206: I. Trauervorspiel", "Trauervorspiel und Trauermarsch, S206: II. Trauermarsch", "Scherzo und Marsch, S177: I. Scherzo", "Scherzo und Marsch, S177: II. Marsch", "Two Episodes from Lenau's Faust, S. 110: I. The Night Procession", "Two Episodes from Lenau's Faust, S. 110: II. Mephisto Waltz"], {
+  await lib.add("liszt", ["Zwei Konzertetüden, S. 145: I. Waldesrauschen", "Zwei Konzertetüden, S. 145: II. Gnomenreigen", "Trauervorspiel und Trauermarsch, S206: I. Trauervorspiel", "Trauervorspiel und Trauermarsch, S206: II. Trauermarsch", "Scherzo und Marsch, S177: I. Scherzo", "Scherzo und Marsch, S177: II. Marsch", "Two Episodes from Lenau's Faust, S. 110: I. The Night Procession", "Two Episodes from Lenau's Faust, S. 110: II. Mephisto Waltz", "Präludium und Fuge c-Moll, BWV 847: I. Präludium", "Präludium und Fuge c-Moll, BWV 847: II. Fuge"], {
     composer: "Franz Liszt",
-    workIds: ["mb-wald", "mb-gnom", "mb-vorspiel", "mb-marsch", "mb-scherzo", "mb-m", "mb-zug", "mb-walzer"],
+    workIds: ["mb-wald", "mb-gnom", "mb-vorspiel", "mb-marsch", "mb-scherzo", "mb-m", "mb-zug", "mb-walzer", "mb-847p", "mb-847f"],
   });
   await lib.scan();
   const part = (id, title, parent) => ({ id, title, relations: [{ type: "parts", direction: "backward", work: { id: parent } }] });
@@ -306,6 +306,18 @@ test("background matching: English work names from MusicBrainz, once, for works 
     // No English name on MusicBrainz: the tracks' own heading, same number.
     "mb-zug": part("mb-zug", "Der nächtliche Zug", "mb-s110"),
     "mb-s110": { id: "mb-s110", title: "Zwei Episoden aus Lenaus Faust, S. 110", relations: [] },
+    // Under a book of works: its English name, and the book as collection.
+    "mb-847p": part("mb-847p", "Präludium", "mb-847"),
+    "mb-847": {
+      id: "mb-847",
+      title: "Präludium und Fuge c-Moll, BWV 847",
+      aliases: [{ locale: "en", name: "Prelude and Fugue in C minor, BWV 847", type: "Work name" }],
+      relations: [
+        { type: "parts", direction: "backward", work: { id: "mb-wtc1", title: "Das Wohltemperierte Klavier I, BWV 846–869" } },
+        { type: "parts", direction: "forward", work: { id: "mb-847p" } },
+      ],
+    },
+    "mb-wtc1": { id: "mb-wtc1", title: "Das Wohltemperierte Klavier I, BWV 846–869", aliases: [{ locale: "en", name: "The Well-Tempered Clavier, Book I, BWV 846–869", type: "Work name" }], relations: [] },
     "mb-scherzo": part("mb-scherzo", "Scherzo", "mb-s177"),
     "mb-s177": { id: "mb-s177", title: "Scherzo und Marsch, S. 177", aliases: [{ locale: "en", name: "Scherzo and March, S. 177", type: "Work name" }], relations: [] },
   };
@@ -326,7 +338,7 @@ test("background matching: English work names from MusicBrainz, once, for works 
   const input = { ...lib.ctx, settings: { mbMirror: `http://127.0.0.1:${server.address().port}` }, user: admin };
   const { message } = await plugin.actions["classical-english-names"](input);
   assert.match(message, /renamed/);
-  assert.deepEqual((await lib.view("liszt")).map(([title]) => title), ["Two Concert Études, S. 145", "Trauervorspiel und Trauermarsch, S206", "Scherzo und Marsch, S. 177", "Two Episodes from Lenau's Faust, S. 110"]);
+  assert.deepEqual((await lib.view("liszt")).map(([title]) => title), ["Two Concert Études, S. 145", "Trauervorspiel und Trauermarsch, S206", "Scherzo und Marsch, S. 177", "Two Episodes from Lenau's Faust, S. 110", "Prelude and Fugue in C minor, BWV 847 · “The Well-Tempered Clavier, Book I”"]);
   // Once: a second run looks nothing up.
   assert.match((await plugin.actions["classical-english-names"](input)).message, /already/);
 });
