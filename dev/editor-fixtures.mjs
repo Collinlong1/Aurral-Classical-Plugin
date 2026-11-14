@@ -51,11 +51,18 @@ if (action === "prepare") {
     .prepare("SELECT coalesce(max(generation),0) AS n FROM core_instance")
     .get().n;
   beforeScan.close();
-  await request("/plugins/aurral-classical/actions/classical-model-scan", {
-    albumId: library.albums[0].id,
+  // v0.2: the scan starts from the editor's Maintenance tab and runs on the
+  // model worker in the background.
+  const maintenance = await request(
+    "/plugins/aurral-classical/pages/editor?tab=activity",
+  );
+  await request("/plugins/aurral-classical/pages/editor", {
+    revision: maintenance.revision,
+    command: "maintenance-scan",
+    values: {},
   });
   let done = false;
-  for (let attempt = 0; attempt < 100; attempt++) {
+  for (let attempt = 0; attempt < 600; attempt++) {
     try {
       const c = await openCatalogue(
         "/config/plugin-data/aurral-classical/model",

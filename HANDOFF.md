@@ -1,3 +1,13 @@
+# v0.2 implemented for review (1.0.53, schema 4)
+
+November 14, 2026. The user authorized v0.2 with its development scope and asked first to bring fork `main` up to date with upstream and `aurral-classical` up to date with `main`. Done in that order (see V0_2_REPORT.md, "Before v0.2"): fork `main` `8e0bcb0` (upstream through #1889), core `aurral-classical` `2c43f44` (backup `aurral-classical-backup-2026-11-14`), integration run 43624183170 green after fixing a by-chance row-menu check.
+
+v0.2 then landed as focused commits in both repositories: search (1.0.49 + core search hook), slskd ladder and diagnostics (1.0.50 + manual-search flag), comparisons (1.0.51 + resource fields and save-as-playlist), editor overhaul (1.0.52 + admin pages select/pager), menu consolidation and UI pass (1.0.53). Everything is in V0_2_REPORT.md: scope table, migration and rollback, tests, acceptance checklist and open items. EDITOR_GUIDE.md and SEARCH.md describe the new behavior; UPSTREAM_DELTA.md lists the four core additions.
+
+Honest notes: the comparisons commit (1.0.51) was committed after running only three test files and broke one messy-matching test (a three-track cut grouped with a six-track one); the editor commit (1.0.52) fixed the rule and the full suite has passed since. One core commit (`76ad33a`) was pushed with the unsafe-any count above the baseline because a piped check hid the failure; `6a52e1e` fixed it right after. Docker Hub was rate-limited in this environment, so the Compose fixture ran on the host with the same paths and a local `docker exec` shim; CI runs the real Compose workflow.
+
+No PR, merge into `main`, release or deployment. No production access. No subagents.
+
 # v0.1 release gate: 1.0.48 against core cc51a65
 
 November 14, 2026. The work-view integration workflow (Compose, Chromium, restart) had last run on November 11 against core `66b54b5`, from `phase4-review`. Its core pin is now `cc51a65`, core `aurral-classical` after the Sync-fork merge of upstream through #1838, and it ran on `aurral-classical` at `ddb4acf` (plugin 1.0.48) by workflow_dispatch: run 43617362225, every step passed (synthetic instance and comparisons, browser editor and permissions, restart persistence with media unchanged). Rerun it after any core sync (`dev/seed.mjs` and `dev/smoke.mjs` import core internals).

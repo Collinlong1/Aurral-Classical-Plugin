@@ -140,7 +140,9 @@ test("deleting works in use keeps tracks and files, isn't undone by matching, an
   const review = c.db.prepare("SELECT * FROM review_item WHERE kind='auto_match' AND status='open' AND json_extract(evidence,'$.reason')='deleted-work'").all();
   assert.equal(review.length, 2);
   // Undo puts both back, with their recordings.
-  const history = await read({ tab: "history" });
+  const history = await read({ tab: "activity" });
+  assert.equal(history.list.items[0].label, "Maintenance", "maintenance is pinned first");
+  history.list.items.shift();
   assert.equal(history.list.items[0].label, "Deleted 2 works");
   const undo = (await read({ selection: history.list.items[0].selection })).view.actions[0];
   const undone = await mutate(undo.command, undo.arguments, history.list.items[0].selection);
@@ -202,4 +204,24 @@ test("the review queue opens the next item after each decision, and resolves man
   assert.match((await mutate(toDismiss.command, { ...toDismiss.arguments, ids: ["r3", "r4"] })).message, /Dismissed 2 items/);
   const tabs = (await read({ tab: "review" })).tabs;
   assert.equal(tabs.find((tab) => tab.id === "review").count, 0, "counts update at once");
+});
+
+test("Activity opens on Maintenance, whose commands queue library work through the runtime", async (t) => {
+  const folders = await tempFolders();
+  t.after(() => fs.rm(folders.root, { recursive: true, force: true }));
+  const ran = [];
+  const maintenance = {
+    status: async () => ({ schema: 4, indexed: 12, scan: { state: "running", processed: 3, total: 12, leaseUntil: Date.now() + 60_000 }, identification: null, english: null }),
+    run: async (command, user) => (ran.push([command, user.role]), `ran ${command}`),
+  };
+  const input = { ...folders, user: { id: 1, role: "admin" }, pageId: "editor", capabilities: { adminForms: 2 }, maintenance };
+  const page = await readEditor({ ...input, query: { tab: "activity" } });
+  assert.equal(page.view.title, "Maintenance");
+  assert.equal(page.view.badges[0].label, "Scan running");
+  assert.deepEqual(page.view.actions.map((a) => a.command), ["maintenance-scan", "maintenance-cancel"]);
+  const result = await mutateEditor({ ...input, mutation: { revision: page.revision, command: "maintenance-scan", values: {} } });
+  assert.deepEqual(result, { ok: true, message: "ran maintenance-scan", selection: "maintenance" });
+  assert.deepEqual(ran, [["maintenance-scan", "admin"]]);
+  // Regular users never reach it.
+  await assert.rejects(readEditor({ ...input, user: { id: 2, role: "user" }, query: { tab: "activity" } }));
 });

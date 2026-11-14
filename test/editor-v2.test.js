@@ -65,7 +65,7 @@ test("browse tabs, lookups and an album turned into a work in one step", async (
   const s = await setup(t);
   const page = await s.read();
   assert.equal(page.version, 2);
-  assert.deepEqual(page.tabs.map((tab) => tab.id), ["works", "composers", "performers", "albums", "review", "search", "downloads", "history"]);
+  assert.deepEqual(page.tabs.map((tab) => tab.id), ["works", "composers", "performers", "albums", "review", "search", "activity"]);
   assert.equal(page.tab, "works");
   // Albums list shows albums with classical tracks; others are found by search.
   const albums = await s.read({ tab: "albums" });
@@ -448,7 +448,8 @@ test("#16 duplicate-work and same-name reviews offer the merge that settles them
   assert.equal(merged.selection, "", "the queue is empty, so the list comes back");
   assert.deepEqual(liveWorks(s), [a]);
   // The merge is undoable from History.
-  const history = await s.read({ tab: "history" });
+  const history = await s.read({ tab: "activity" });
+  history.list.items.shift();
   assert.match(history.list.items[0].label, /^Merged “Sketch” into “Sketch”$/);
   const undo = (await s.read({ selection: history.list.items[0].selection })).view.actions.find((x) => x.command === "undo-change");
   await s.ok("undo-change", undo.arguments, history.list.items[0].selection);

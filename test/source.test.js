@@ -267,8 +267,9 @@ test("album search ranks by performer and release, keeps copies as fallbacks, an
   // The editor's Downloads tab shows the same log.
   const { readEditor } = await import("../src/model/editor.js");
   const editorInput = { dataFolder: folders.dataFolder, user: { id: 1, role: "admin" }, pageId: "editor", capabilities: { adminForms: 2 } };
-  const list = await readEditor({ ...editorInput, query: { tab: "downloads" } });
-  assert.equal(list.list.items[0].badge.label, "Manual");
+  const list = await readEditor({ ...editorInput, query: { tab: "activity" } });
+  assert.equal(list.list.items[0].label, "Maintenance");
+  assert.equal(list.list.items[1].badge.label, "Manual");
   const view = (await readEditor({ ...editorInput, query: { selection: "slskd:0" } })).view;
   assert.deepEqual(view.sections.map((section) => section.id), ["steps", "candidates", "rejected"]);
   assert.match(view.sections[0].rows[0].label, /^1\. Performer \+ album: “Karajan Symphonies 5 7”/);

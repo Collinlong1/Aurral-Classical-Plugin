@@ -8,6 +8,7 @@ import { transaction } from "./database.js";
 import { classify } from "./reconcile.js";
 import { searchText, matchesSearch, ownedTracks } from "./editor-search.js";
 import { searchCatalogue } from "../search/engine.js";
+import { readValues } from "../tags.js";
 import { deleteWorks, deletionImpact, recentChanges, recordChange, undoChange } from "./history.js";
 import {
   mapToMovements,
@@ -346,7 +347,7 @@ function duplicateSections(c, a, b, reviewId) {
             { label: "Kept", value: `“${entityLabel(c, b, "work")}”, with its title and fields; fields you set on this one are not copied`, selection: b },
             { label: "Recordings after", value: `${realizationsOf(a).length + realizationsOf(b).length}, every track keeps its file` },
             ...preview.mapped.slice(0, 30).map(({ from, to }) => ({ label: movementNames(from), value: `becomes ${movementNames(to)}` })),
-            { label: "Undo", value: "From History, until either work changes again" },
+            { label: "Undo", value: "From Activity, until either work changes again" },
           ]
         : [{ label: "Can't merge yet", value: "The two works' movements don't line up. Rename or reorder them so they match, then merge." }],
     },
@@ -358,7 +359,7 @@ function duplicateSections(c, a, b, reviewId) {
       empty: "Merge, keep both as separate works, or dismiss to decide later.",
       actions: [
         ...(preview.ok
-          ? [action("Merge into the other", "merge-entity", { target: a, into: b, confirm: true }, { tone: "danger", confirm: "Move this work's recordings, credits, favourites and picks into the other work, then remove this one? You can undo it from History." })]
+          ? [action("Merge into the other", "merge-entity", { target: a, into: b, confirm: true }, { tone: "danger", confirm: "Move this work's recordings, credits, favourites and picks into the other work, then remove this one? You can undo it from Activity." })]
           : []),
         action("Keep both", "keep-distinct", { id: reviewId }),
       ],
@@ -373,7 +374,7 @@ function deleteConfirm(c, works, title = null) {
     impact.movements && `${impact.movements} movement${impact.movements === 1 ? "" : "s"}`,
     impact.recordings && `${impact.recordings} recording${impact.recordings === 1 ? "" : "s"}`,
   ].filter(Boolean);
-  return `Delete ${title ? `“${title}”` : "these works"} from the classical catalogue${parts.length ? `, with ${parts.join(" and ")}` : ""}?${impact.tracks ? ` Its ${impact.tracks} track${impact.tracks === 1 ? "" : "s"} stay in your library, just not in a work.` : ""} Audio files are never deleted. Matching won't make it again unless you allow it, and you can undo this from History.`.slice(0, 500);
+  return `Delete ${title ? `“${title}”` : "these works"} from the classical catalogue${parts.length ? `, with ${parts.join(" and ")}` : ""}?${impact.tracks ? ` Its ${impact.tracks} track${impact.tracks === 1 ? "" : "s"} stay in your library, just not in a work.` : ""} Audio files are never deleted. Matching won't make it again unless you allow it, and you can undo this from Activity.`.slice(0, 500);
 }
 
 // ---- form helpers ------------------------------------------------------
@@ -1012,6 +1013,7 @@ function albumView(c, albumId, chosenWork, page = 0) {
     actions: [
       ...(chosenWork ? [open("Choose a different work", albumSelection(albumId, "", page))] : []),
       action("Send all to Classical", "set-album-classification", { albumId, state: "classical" }),
+      action("Preview tag removal", "preview-tag-removal", { albumId }),
       action("Remove all from Classical", "set-album-classification", { albumId, state: "not_classical" }, { tone: "danger", confirm: `Remove all ${tracks.length} tracks on this album from Aurral Classical? They stay in your Aurral library.` }),
     ],
     sections,
@@ -1189,7 +1191,69 @@ function newView(kind) {
 
 // ---- page ----------------------------------------------------------------
 
-const TABS = ["works", "composers", "performers", "albums", "review", "search", "downloads", "history"];
+const TABS = ["works", "composers", "performers", "albums", "review", "search", "activity"];
+
+// Activity: maintenance first, then merges, deletions and slskd searches,
+// newest first, each opening its own view.
+function activityList(c, downloads) {
+  const maintenance = { id: "maintenance", label: "Maintenance", detail: "Library scan, MusicBrainz lookups and their progress", badge: { label: "Tools", tone: "muted" }, selection: "maintenance", search: "maintenance scan musicbrainz lookups" };
+  const changes = historyList(c).map((item) => ({ ...item, at: c.db.prepare("SELECT created_at FROM change_set WHERE id=?").get(item.id.slice(7))?.created_at || 0 }));
+  const searches = downloadsList(downloads).map((item, index) => ({ ...item, at: (Array.isArray(downloads) ? downloads[index]?.at : 0) || 0 }));
+  return [maintenance, ...[...changes, ...searches].sort((a, b) => b.at - a.at).map(({ at, ...item }) => item)];
+}
+
+// Library-wide work, kept out of album menus: one place to see the model's
+// state and start what runs on the model worker.
+function maintenanceView(status) {
+  if (!status) fail("Maintenance needs the plugin's runtime");
+  const scan = status.scan;
+  const id = status.identification;
+  const names = status.english;
+  const scanRunning = scan && ["queued", "running", "retry"].includes(scan.state);
+  return {
+    crumbs: [],
+    title: "Maintenance",
+    subtitle: `Classical model schema ${status.schema} · ${status.indexed} indexed track${status.indexed === 1 ? "" : "s"}`,
+    badges: scanRunning ? [{ label: "Scan running", tone: "warning" }] : [],
+    actions: [
+      action(scanRunning ? "Continue scan" : "Scan the library", "maintenance-scan", {}),
+      ...(scanRunning ? [action("Cancel scan", "maintenance-cancel", {}, { tone: "danger", confirm: "Stop the scan? What it read so far is kept, and the next scan resumes." })] : []),
+    ],
+    sections: [
+      {
+        type: "details",
+        id: "scan",
+        title: "Library scan",
+        items: [
+          { label: "Last scan", value: scan ? `${scan.state}; ${scan.processed}/${scan.total} files${scan.skipped ? `, ${scan.skipped} unreadable` : ""}` : "None yet" },
+          ...(scan?.error ? [{ label: "Error", value: String(scan.error).slice(0, 2000) }] : []),
+          { label: "What it does", value: "Reads the Library's classical tracks, read only, and matches their works. Scans also run by themselves on the plugin's schedule." },
+        ],
+      },
+      {
+        type: "details",
+        id: "musicbrainz",
+        title: "MusicBrainz",
+        items: [
+          { label: "Identification", value: id ? `${id.queued} queued, ${id.done} done, ${id.matched} work groups made${id.backlog ? `; ${id.backlog} earlier albums wait for the one-time lookup` : ""}` : "Nothing yet" },
+          { label: "Work names and books", value: names ? `${names.state}: ${names.renamed ?? 0} of ${names.total ?? "?"} renamed, ${names.filed || 0} filed` : "Not run" },
+        ],
+      },
+      {
+        type: "rows",
+        id: "lookups",
+        title: "One-time lookups",
+        note: "Each runs once per rules version, one request a second on public MusicBrainz, on the model worker. Run again to continue.",
+        rows: [],
+        empty: "Start one below; progress shows above.",
+        actions: [
+          action("Identify earlier albums", "maintenance-backlog", {}, { confirm: "Look up, once, the albums scanned before automatic identification? It runs in the background, one request a second." }),
+          action("Work names from MusicBrainz", "maintenance-english", {}, { confirm: "Look up English work names and books on MusicBrainz, once per work? Titles you set yourself are left alone." }),
+        ],
+      },
+    ],
+  };
+}
 
 // Merges and deletions, newest first, each undoable from its view.
 function historyList(c) {
@@ -1349,8 +1413,7 @@ function searchList(c, q) {
 }
 function listFor(c, tab, q, extra = {}) {
   if (tab === "search") return searchList(c, q);
-  if (tab === "downloads") return downloadsList(extra.downloads);
-  if (tab === "history") return historyList(c);
+  if (tab === "activity") return activityList(c, extra.downloads);
   if (tab === "works") {
     // Labels, composers and recording counts for every work in three
     // queries, not three per work.
@@ -1437,7 +1500,7 @@ const LIST_SELECT = {
     key: "works",
     actions: [
       action("Edit together", "bulk-edit-open", {}),
-      action("Delete", "delete-works", {}, { tone: "danger", confirm: "Delete these works from the classical catalogue? Their tracks stay in your library, just not in a work, and audio files are never deleted. You can undo this from History." }),
+      action("Delete", "delete-works", {}, { tone: "danger", confirm: "Delete these works from the classical catalogue? Their tracks stay in your library, just not in a work, and audio files are never deleted. You can undo this from Activity." }),
     ],
   },
   review: {
@@ -1450,7 +1513,7 @@ const LIST_SELECT = {
   },
 };
 
-export function renderV2(c, query, revision, { downloads = null } = {}) {
+export function renderV2(c, query, revision, { downloads = null, maintenance = null } = {}) {
   const q = String(query.q || "");
   if (q.length > 200) fail("Search is too long");
   const offset = Number(query.offset || 0);
@@ -1460,10 +1523,8 @@ export function renderV2(c, query, revision, { downloads = null } = {}) {
   // Opening an entry from a link picks the matching tab.
   if (!tab) {
     const kind = selection && !selection.includes(":") ? c.db.prepare("SELECT kind,data FROM entity WHERE id=?").get(selection) : null;
-    tab = selection.startsWith("slskd:")
-      ? "downloads"
-      : selection.startsWith("change:")
-        ? "history"
+    tab = selection.startsWith("slskd:") || selection === "maintenance" || selection.startsWith("change:")
+      ? "activity"
         : selection.startsWith("bulk:")
           ? "works"
       : selection.startsWith("album:") || selection.startsWith("track:")
@@ -1488,6 +1549,7 @@ export function renderV2(c, query, revision, { downloads = null } = {}) {
   } else if (selection.startsWith("track:")) view = trackView(c, selection.slice(6));
   else if (selection.startsWith("slskd:")) view = downloadView(downloads, Number(selection.slice(6)));
   else if (selection.startsWith("change:")) view = changeView(c, selection.slice(7));
+  else if (selection === "maintenance") view = maintenanceView(maintenance);
   else if (selection.startsWith("bulk:")) view = bulkView(c, selection.slice(5));
   else if (selection.startsWith("review:")) view = reviewView(c, selection.slice(7));
   else if (selection.startsWith("new:")) view = newView(selection.slice(4));
@@ -1504,6 +1566,7 @@ export function renderV2(c, query, revision, { downloads = null } = {}) {
             ? movementView(c, entity.id)
             : recordingView(c, entity.id);
   }
+  if (!selection && tab === "activity" && maintenance) view = maintenanceView(maintenance);
   const reviews = c.db.prepare("SELECT count(*) AS n FROM review_item WHERE status='open'").get().n;
   const tracks = c.db.prepare("SELECT count(*) AS n FROM track_link WHERE state='active'").get().n;
   const notes = [];
@@ -1529,12 +1592,11 @@ export function renderV2(c, query, revision, { downloads = null } = {}) {
       { id: "albums", label: "Albums" },
       { id: "review", label: "Review", count: reviews },
       { id: "search", label: "Search" },
-      { id: "downloads", label: "Downloads" },
-      { id: "history", label: "History" },
+      { id: "activity", label: "Activity" },
     ],
     tab,
     list: {
-      placeholder: { works: "Search works or composers", composers: "Search composers", performers: "Search performers", albums: "Search albums, tracks or performers", review: "Search review items", search: "Works, catalogue numbers, performers, albums…", downloads: "Search the last slskd searches", history: "Search merges and deletions" }[tab],
+      placeholder: { works: "Search works or composers", composers: "Search composers", performers: "Search performers", albums: "Search albums, tracks or performers", review: "Search review items", search: "Works, catalogue numbers, performers, albums…", activity: "Search merges, deletions and slskd searches" }[tab],
       items: filtered.slice(offset, offset + PAGE).map(({ search, classical, ...item }) => item),
       total: filtered.length,
       offset,
@@ -1544,8 +1606,7 @@ export function renderV2(c, query, revision, { downloads = null } = {}) {
         performers: "No performers or ensembles yet.",
         albums: q ? "No matching albums." : "No albums with classical tracks yet. Search to find any album.",
         review: "Nothing needs review.",
-        history: "No merges or deletions yet. Each one appears here and can be undone.",
-        downloads: "No slskd searches yet. Searches for classical albums and tracks appear here with their queries, scores and rejections.",
+        activity: "Nothing yet. Merges and deletions appear here to undo, and slskd searches with their queries, scores and rejections.",
         search: q ? "Nothing matches. Try another spelling, a catalogue number like Op. 27 No. 2, or fewer words." : "Search every work, movement, recording, composer, performer and album.",
       }[tab],
       actions: listActions,
@@ -1608,6 +1669,7 @@ export const V2_COMMANDS = {
   "choose-album-work": ["albumId", "work", "page"],
   "assign-album": ["albumId", "work", "tracks", "mapping", "page"],
   "set-album-classification": ["albumId", "state"],
+  "preview-tag-removal": ["albumId"],
   "unassign-tracks": ["albumId", "tracks"],
   "unassign-album": ["albumId", "work"],
   "create-work-from-album": ["albumId", "tracks", "include", "title", "composer", "composerName", "createAnyway"],
@@ -1728,7 +1790,7 @@ export function applyV2(c, request, who) {
       const entity = c.entity(target);
       if (entity.kind === "work") {
         const { result, changeId } = deleteWorks(c, [target], who, { names: [entityLabel(c, target, "work")] });
-        return { changeId, selection: "", message: `Deleted the work${result.tracks ? `; its ${result.tracks} track${result.tracks === 1 ? " is" : "s are"} no longer in a work` : ""}. Audio files are unchanged. Undo it from History.`, tab: "works" };
+        return { changeId, selection: "", message: `Deleted the work${result.tracks ? `; its ${result.tracks} track${result.tracks === 1 ? " is" : "s are"} no longer in a work` : ""}. Audio files are unchanged. Undo it from Activity.`, tab: "works" };
       }
       const used =
         entity.kind === "person" || entity.kind === "ensemble"
@@ -1747,7 +1809,7 @@ export function applyV2(c, request, who) {
       if (!works.length || works.length > 500) fail("Choose at least one work");
       for (const work of works) c.entity(work, "work");
       const { result, changeId } = deleteWorks(c, works, who, { names: works.map((work) => entityLabel(c, work, "work")) });
-      return { changeId, selection: "", message: `Deleted ${works.length} work${works.length === 1 ? "" : "s"}${result.tracks ? `; ${result.tracks} track${result.tracks === 1 ? " is" : "s are"} no longer in a work` : ""}. Audio files are unchanged. Undo it from History.` };
+      return { changeId, selection: "", message: `Deleted ${works.length} work${works.length === 1 ? "" : "s"}${result.tracks ? `; ${result.tracks} track${result.tracks === 1 ? " is" : "s are"} no longer in a work` : ""}. Audio files are unchanged. Undo it from Activity.` };
     }
     case "bulk-edit-open": {
       const works = Array.isArray(v.works) ? [...new Set(v.works.filter((x) => typeof x === "string"))] : [];
@@ -1855,7 +1917,7 @@ export function applyV2(c, request, who) {
       } else fail("This kind of entry can't be merged");
       // The entry merged away has nothing left to review.
       c.db.prepare("UPDATE review_item SET status='resolved' WHERE target_id=? AND status='open'").run(target);
-      return { selection: into, message: drop.kind === "work" ? "Merged. Undo it from History." : "Merged.", ...(drop.kind === "work" && { changeId }) };
+      return { selection: into, message: drop.kind === "work" ? "Merged. Undo it from Activity." : "Merged.", ...(drop.kind === "work" && { changeId }) };
     }
     case "set-classification": {
       const tracks = Array.isArray(v.tracks) ? v.tracks : [];
@@ -1888,6 +1950,24 @@ export function applyV2(c, request, who) {
       if (mapping.length !== tracks.length) fail("Every track needs a choice");
       const count = assignTracks(c, m, who, work, tracks, mapping);
       return { selection: albumSelection(albumId, "", Number(v.page) || 0), message: `Assigned ${count} track${count === 1 ? "" : "s"}.` };
+    }
+    case "preview-tag-removal": {
+      const albumId = str(v.albumId, "album", { max: 200 });
+      const fields = ["composer", "work", "workId"];
+      const counts = Object.fromEntries(fields.map((field) => [field, 0]));
+      let unreadable = 0;
+      for (const track of ownedTracks(c, { albumId })) {
+        try {
+          const values = readValues(track.evidence.readPath || track.evidence.path, fields);
+          for (const field of fields) counts[field] += values[field].length;
+        } catch {
+          unreadable++;
+        }
+      }
+      return {
+        selection: `album:${albumId}`,
+        message: `Clearing classical tags would remove ${counts.composer} composer, ${counts.work} work and ${counts.workId} work-ID values${unreadable ? `; ${unreadable} file${unreadable === 1 ? "" : "s"} couldn't be read` : ""}. Nothing was changed. Use the album menu to clear or restore tags.`,
+      };
     }
     case "set-album-classification": {
       const albumId = str(v.albumId, "album", { max: 200 });

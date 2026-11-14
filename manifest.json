@@ -1,7 +1,7 @@
 {
   "id": "aurral-classical",
   "name": "Aurral Classical",
-  "version": "1.0.52",
+  "version": "1.0.53",
   "api": 1,
   "description": "Tags classical music as Composer \u2014 Soloist \u2014 Ensemble \u2014 Conductor from MusicBrainz, compares recordings of a movement, and downloads classical albums from slskd.",
   "repository": "https://github.com/Collinlong1/Aurral-Classical-Plugin",
@@ -69,37 +69,10 @@
   "test": true,
   "actions": [
     {
-      "id": "preview-remove",
-      "label": "Preview classical tag removal",
+      "id": "compare-album",
+      "localPlaylists": true,
+      "label": "Compare recordings",
       "target": "album",
-      "admin": true
-    },
-    {
-      "id": "clear-classical",
-      "label": "Clear classical fields (keep backup)",
-      "target": "album",
-      "admin": true,
-      "background": true
-    },
-    {
-      "id": "tag-artist",
-      "label": "Tag as classical",
-      "target": "artist",
-      "admin": true,
-      "background": true
-    },
-    {
-      "id": "tag-album",
-      "label": "Tag as classical",
-      "target": "album",
-      "admin": true,
-      "background": true
-    },
-    {
-      "id": "untag-album",
-      "label": "Restore original classical tags",
-      "target": "album",
-      "admin": true,
       "background": true
     },
     {
@@ -110,63 +83,43 @@
       "background": true
     },
     {
-      "id": "compare-album",
-      "localPlaylists": true,
-      "label": "Compare recordings",
-      "target": "album",
-      "background": true
-    },
-    {
-      "id": "classical-model-status",
-      "label": "Classical model status",
-      "target": "album",
-      "admin": true
-    },
-    {
-      "id": "classical-model-scan",
-      "label": "Scan classical model (read only)",
+      "id": "classical-auto-match",
+      "label": "Match classical works",
       "target": "album",
       "admin": true,
-      "background": true,
-      "localPlaylists": true
+      "background": true
     },
     {
       "id": "classical-classification-report",
-      "label": "Classification report (read only)",
+      "label": "Classical report",
       "target": "album",
       "admin": true
     },
     {
-      "id": "classical-model-cancel",
-      "label": "Cancel classical model scan",
-      "target": "album",
-      "admin": true
-    },
-    {
-      "id": "classical-auto-match",
-      "label": "Auto-match classical works (read only)",
+      "id": "tag-album",
+      "label": "Tag as classical",
       "target": "album",
       "admin": true,
       "background": true
     },
     {
-      "id": "classical-auto-match-library",
-      "label": "Auto-match every album (tags and titles)",
+      "id": "untag-album",
+      "label": "Restore original tags",
       "target": "album",
       "admin": true,
       "background": true
     },
     {
-      "id": "classical-identify-backlog",
-      "label": "Identify earlier albums on MusicBrainz",
+      "id": "clear-classical",
+      "label": "Clear classical tags (keep backup)",
       "target": "album",
       "admin": true,
       "background": true
     },
     {
-      "id": "classical-english-names",
-      "label": "Work names and books from MusicBrainz",
-      "target": "album",
+      "id": "tag-artist",
+      "label": "Tag as classical",
+      "target": "artist",
       "admin": true,
       "background": true
     }

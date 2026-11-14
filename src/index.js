@@ -161,12 +161,60 @@ function artistFiles(index, artist) {
     .map(([file]) => file);
 }
 
+// The editor's Maintenance tab: the model's state, and library-wide work
+// queued on the model worker (it continues on the plugin schedule).
+function maintenance(input) {
+  const ctx = makeContext(input);
+  const start = () =>
+    modelJobs(ctx, { budgetMs: ACTION_BUDGET_MS }).catch((error) => log(`Classical model work stopped: ${error.message}`));
+  return {
+    async status() {
+      const status = await modelStatus(ctx);
+      return {
+        ...status,
+        indexed: status.tracks.reduce((sum, row) => sum + row.count, 0),
+        scan: status.scan && {
+          ...status.scan,
+          state: status.scan.state === "running" && status.scan.leaseUntil <= status.now ? "interrupted (scan again to resume)" : status.scan.state,
+        },
+        english: await englishNamesStatus(ctx).catch(() => null),
+      };
+    },
+    async run(command, user) {
+      if (command === "maintenance-scan") {
+        const id = await enqueueModelScan(ctx, user);
+        start();
+        return `Scan ${id} is running in the background; reload to see its progress.`;
+      }
+      if (command === "maintenance-cancel") {
+        await cancelModelScan(ctx, user);
+        return "Scan cancellation requested; what it read so far is kept.";
+      }
+      if (command === "maintenance-backlog") {
+        const result = await identifyBacklog(ctx, user);
+        start();
+        return result.albums
+          ? `Queued ${result.albums} album${result.albums === 1 ? "" : "s"} (${result.tracks} tracks) for a one-time MusicBrainz lookup, one request a second.`
+          : "No album is waiting for its one-time MusicBrainz lookup. Any lookup still queued continues.";
+      }
+      if (command === "maintenance-english") {
+        const queued = await queueEnglishNames(ctx, user);
+        if (!queued.queued && queued.state === "done")
+          return `Work names and books were looked up already: ${queued.renamed} of ${queued.total} works renamed, ${queued.filed || 0} filed under their book.`;
+        start();
+        return "Looking up work names and books on MusicBrainz in the background, one request a second.";
+      }
+      throw new Error("Unknown maintenance command");
+    },
+  };
+}
+
 export default {
   pages: {
     read: (input) =>
-      input.pageId === "work" ? readWork(input) : readEditor(input),
+      input.pageId === "work" ? readWork(input) : readEditor({ ...input, maintenance: maintenance(input) }),
     mutate: (input) =>
-      input.pageId === "work" ? mutateWork(input) : mutateEditor(input),
+      input.pageId === "work" ? mutateWork(input) : mutateEditor({ ...input, maintenance: maintenance(input) }),
   },
   albumPresentation,
   search,

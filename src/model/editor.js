@@ -1098,9 +1098,12 @@ export async function readEditor(input) {
   try {
     if (input.capabilities.adminForms >= 2) {
       const query = input.query || {};
+      // The Maintenance tab shows the model's status (read outside the snapshot).
+      const maintenance =
+        (query.tab === "activity" || query.selection === "maintenance") && input.maintenance ? await input.maintenance.status() : null;
       // The Downloads tab reads the plugin's own slskd search log.
       const downloads =
-        query.tab === "downloads" || String(query.selection || "").startsWith("slskd:")
+        query.tab === "activity" || String(query.selection || "").startsWith("slskd:")
           ? await searchDiagnostics({ dataFolder: input.dataFolder })
           : null;
       // The search index is brought up to date before the snapshot: a page
@@ -1109,7 +1112,7 @@ export async function readEditor(input) {
       return readTransaction(c.db, () =>
         query.lookup
           ? lookupV2(c, query)
-          : renderV2(c, query, revision(c, query.selection || ""), { downloads }),
+          : renderV2(c, query, revision(c, query.selection || ""), { downloads, maintenance }),
       );
     }
     return transaction(c.db, () => render(c, input));
@@ -1118,6 +1121,17 @@ export async function readEditor(input) {
   }
 }
 export async function mutateEditor(input) {
+  // Library maintenance queues work for the model worker; it runs outside
+  // the catalogue transaction and never waits for the work itself.
+  if (String(input.mutation?.command || "").startsWith("maintenance-")) {
+    actor(input);
+    if (!input.maintenance) return { ok: false, status: 400, message: "Maintenance needs the plugin's runtime" };
+    try {
+      return { ok: true, message: await input.maintenance.run(input.mutation.command, input.user), selection: "maintenance" };
+    } catch (error) {
+      return { ok: false, status: 400, message: String(error.message || error).slice(0, 500) };
+    }
+  }
   const who = actor(input),
     c = await openCatalogue(path.join(input.dataFolder, "model"));
   try {
