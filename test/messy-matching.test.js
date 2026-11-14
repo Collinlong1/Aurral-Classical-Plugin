@@ -1302,3 +1302,75 @@ test("matching: MusicBrainz tells same-titled movements apart; a set recorded tw
   assert.equal(groups[0].workId, groups[1].workId);
   assert.notEqual(groups[0].id, groups[1].id);
 });
+
+// The user: a single excerpt now joins its work, as Apple Music Classical
+// files it. Excerpts of an opera on two albums, then the whole opera,
+// must end up one work in the opera's order, each excerpt on its movement;
+// so must the opera first and an excerpt later. MusicBrainz's own work for
+// each movement settles it; without one, the excerpt's words do.
+test("matching: excerpts of an opera, then the whole opera, are one work; and the other way round", async (t) => {
+  const puccini = (title) => ({ title, composer: ["Giacomo Puccini"], genres: ["Classical"] });
+  const act = ["Act I. Gira la cote!", "Act I. Signore, ascolta!", "Act II. In questa reggia", "Act III. Nessun dorma!"];
+  const leaves = ["mb-gira", "mb-signore", "mb-reggia", "mb-nessun"];
+  const c = await catalogueWith(t, [
+    { id: "tenors", album: "Great Tenors", albumArtist: "Various Artists", artist: "Tenor", titles: ["Turandot: Atto III. “Nessun dorma”"].map(puccini) },
+    { id: "sopranos", album: "Great Sopranos", albumArtist: "Various Artists", artist: "Soprano", titles: ["Turandot, Act I: Signore, ascolta!"].map(puccini) },
+    { id: "complete", album: "Turandot", albumArtist: "Orchestra", artist: "Orchestra", titles: act.map((m) => `Turandot: ${m}`).map(puccini) },
+    { id: "late", album: "Encores", albumArtist: "Tenor", artist: "Tenor", titles: ["Turandot: Nessun dorma"].map(puccini) },
+    // An excerpt, then the whole opera, whose MusicBrainz works for the
+    // movements aren't the excerpt's (one is linked to an arrangement).
+    { id: "aria", album: "Puccini Arias", albumArtist: "Tenor", artist: "Tenor", titles: ["La bohème: Act I. “Che gelida manina”"].map(puccini) },
+    { id: "liszt", album: "The Complete Liszt Piano Music", albumArtist: "Leslie Howard", artist: "Leslie Howard", titles: [{ title: "Isoldens Liebestod – Schlußszene aus Richard Wagners “Tristan und Isolde”, S447", composer: ["Richard Wagner"], genres: ["Classical"] }] },
+    { id: "boheme", album: "La bohème", albumArtist: "Orchestra", artist: "Orchestra", titles: ["Act I. Che gelida manina", "Act I. Sì. Mi chiamano Mimì", "Act IV. Sono andati?"].map((m) => `La bohème: ${m}`).map(puccini) },
+  ]);
+  const ids = (albumId) => c.db.prepare("SELECT id FROM track_link WHERE CAST(json_extract(evidence,'$.albumId') AS TEXT)=? ORDER BY json_extract(evidence,'$.hints.trackNumber')").all(albumId).map((row) => row.id);
+  const turandot = (leaf) => ({ workId: "mb-turandot", work: "Turandot", movement: null, leafWorkId: leaf, aliases: [], composers: ["Giacomo Puccini"], composerIds: {} });
+  const match = (albumId, leafs) => autoMatchTaggedWorks(c, { albumId, actor: "admin", allowStructuredTitles: true, providerMatches: new Map(leafs ? ids(albumId).map((id, i) => [id, turandot(leafs[i])]) : []) });
+  const blocks = (albumId) => renderAlbumPresentation(c, albumId)?.groups.map((group) => [group.workId, group.items.map((item) => item.title), group.missing.length]) ?? [];
+  const itemsOf = (albumId) =>
+    c.db
+      .prepare(
+        `SELECT i.movement_id FROM realization_item i JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id
+         WHERE CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=? ORDER BY i.sequence`,
+      )
+      .all(albumId)
+      .map((row) => row.movement_id);
+
+  // Two excerpt albums: one work, two movements, nothing listed missing.
+  match("tenors", ["mb-nessun"]);
+  match("sopranos", ["mb-signore"]);
+  const [[work, , missing]] = blocks("tenors");
+  assert.ok(work);
+  assert.equal(missing, 0);
+  assert.deepEqual(blocks("sopranos").map(([id, , gone]) => [id, gone]), [[work, 0]]);
+  assert.equal(workMovementTitles(c, work).length, 2);
+
+  // The whole opera: four movements in its order, each excerpt on its own.
+  match("complete", leaves);
+  assert.deepEqual(blocks("complete").map(([id, rows, gone]) => [id, rows.length, gone]), [[work, 4, 0]]);
+  const movements = workMovementTitles(c, work, true);
+  assert.equal(movements.length, 4);
+  assert.deepEqual(itemsOf("complete"), movements);
+  assert.deepEqual(itemsOf("tenors"), [movements[3]]);
+  assert.deepEqual(itemsOf("sopranos"), [movements[1]]);
+
+  // An excerpt after the opera, with no MusicBrainz work for its movement
+  // here: its words find "Nessun dorma!".
+  autoMatchTaggedWorks(c, { albumId: "late", actor: "admin", allowStructuredTitles: true, providerMatches: new Map(ids("late").map((id) => [id, turandot("mb-nessun-arranged")])) });
+  assert.deepEqual(itemsOf("late"), [movements[3]]);
+  assert.deepEqual(blocks("late").map(([id, , gone]) => [id, gone]), [[work, 0]]);
+  assert.equal(workMovementTitles(c, work).length, 4);
+
+  autoMatchTaggedWorks(c, { albumId: "aria", actor: "admin", allowStructuredTitles: true, providerMatches: new Map(ids("aria").map((id) => [id, { workId: "mb-boheme", work: "La bohème", movement: null, leafWorkId: "mb-manina-arranged", aliases: [], composers: ["Giacomo Puccini"], composerIds: {} }])) });
+  const boheme = (leaf) => ({ workId: "mb-boheme", work: "La bohème", movement: null, leafWorkId: leaf, aliases: [], composers: ["Giacomo Puccini"], composerIds: {} });
+  autoMatchTaggedWorks(c, { albumId: "boheme", actor: "admin", allowStructuredTitles: true, providerMatches: new Map(ids("boheme").map((id, i) => [id, boheme(["mb-manina", "mb-mimi", "mb-andati"][i])])) });
+  const [[opera]] = blocks("aria");
+  assert.ok(opera);
+  assert.deepEqual(blocks("boheme").map(([id, rows]) => [id, rows.length]), [[opera, 3]]);
+  assert.deepEqual(itemsOf("aria"), [workMovementTitles(c, opera, true)[0]]);
+  // Liszt's transcription, which MusicBrainz files under Wagner's opera,
+  // has a number of its own: it stays a track of its own.
+  autoMatchTaggedWorks(c, { albumId: "liszt", actor: "admin", allowStructuredTitles: true, providerMatches: new Map(ids("liszt").map((id) => [id, { workId: "mb-tristan", work: "Tristan und Isolde, WWV 90", movement: null, leafWorkId: "mb-liebestod", aliases: [], composers: ["Richard Wagner"], composerIds: {} }])) });
+  assert.deepEqual(itemsOf("liszt"), []);
+  assert.equal(c.db.prepare("SELECT COUNT(*) AS n FROM review_item WHERE status='open' AND json_extract(evidence,'$.reason')='movement-mismatch'").get().n, 0);
+});

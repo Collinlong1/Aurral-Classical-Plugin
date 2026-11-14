@@ -801,6 +801,9 @@ export async function identifyTrack(ctx, hints) {
     work: englishTitle(parent),
     movement: standalone ? null : englishTitle(leaf, null),
     ...(standalone && { standalone: true }),
+    // The movement's own MusicBrainz work ("Nessun dorma" in Turandot), so
+    // every album of it finds the same movement whatever its title says.
+    ...(!standalone && leaf.id !== parent.id && { leafWorkId: leaf.id }),
     aliases: [
       ...new Set(
         (parent.aliases || [])

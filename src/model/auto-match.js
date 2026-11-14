@@ -324,6 +324,7 @@ function candidates(
       ...row,
       composers,
       providerMovement: provider?.movement ? clean(provider.movement) : null,
+      providerLeaf: provider?.leafWorkId || null,
       title: clean(tagged.title),
       // The title without a "Composer: " prefix, for reading the movement.
       parsedTitle: clean(hints.title),
@@ -337,6 +338,14 @@ function candidates(
     const positions = group.tracks.map(
       (track) => `${track.discNumber}:${track.trackNumber}`,
     );
+    // One excerpt MusicBrainz places in a larger work (an overture, an
+    // aria, one song of a cycle) joins that work, as Apple Music Classical
+    // files it; not a transcription whose own number the work doesn't share.
+    group.excerpt =
+      !group.standalone &&
+      Boolean(group.providerWorkId) &&
+      group.tracks.every((track) => track.providerLeaf) &&
+      !(group.tracks.length === 1 && numberedElsewhere(group.tracks[0].title, group.work));
     const reason = group.tracks.every((track) => track.attached)
       ? "matched"
       : // Whole pieces are one track each; anything else needs two movements.
@@ -344,7 +353,7 @@ function candidates(
         ? "several tracks name the same whole piece"
         : // One piece of a set ("Prelude, Op. 11, No. 8" in "24 Preludes,
           // Op. 11") is a whole piece; one movement of a symphony is not.
-          !group.standalone && group.tracks.length < 2 && !catalogueSet(group.work)
+          !group.standalone && group.tracks.length < 2 && !catalogueSet(group.work) && !group.excerpt
           ? "only one track of a work with movements on this album"
           : new Set(positions).size !== positions.length
             ? "two tracks share a disc and track number"
@@ -424,6 +433,17 @@ const recordingTitle = (title) =>
 // neighbouring tracks is its own recording. Only for a numbered set
 // MusicBrainz names, and only where a title repeats, so a work an album
 // interrupts once keeps one recording.
+// A title carrying a catalogue number of its own that the work it is
+// filed under doesn't have: Liszt's "Isoldens Liebestod, S447" under
+// Wagner's Tristan, "Les morts, S516" under the orchestral Odes funèbres.
+// A piece of a set ("Op. 64 No. 2" in "Waltzes, op. 64") shares its set's.
+function numberedElsewhere(title, workTitle) {
+  const own = catalogueSubject(title);
+  if (!own) return false;
+  const numbers = clean(workTitle).split(/\s*[,·;]\s*|\s+\/\s+/).map(catalogueSubject).concat(catalogueSubject(workTitle)).filter(Boolean);
+  return !numbers.some((number) => own === number || own.startsWith(`${number}:`) || number.startsWith(`${own}:`));
+}
+
 // One piece is one title and, when MusicBrainz names it, one MusicBrainz
 // name: four "Promenade"s it names apart are four pieces; a Christe and a
 // Kyrie II it files under one "Kyrie" are two.
@@ -1289,18 +1309,38 @@ function createGroup(catalogue, group, actor, index) {
       // movement each before another album joins it.
       if (existing.some(combined) && splitCombinedMovements(catalogue, work, actor)) existing = workMovements(catalogue, work);
       const setSubject = catalogueSubject(String(resolvedName(catalogue, work, "title") || "")) || catalogueSubject(catalogued || group.work);
-      movements = existing.length
-        ? mapToMovements(existing, ordered, { setSubject, sections: true })
-        : null;
+      // Excerpts MusicBrainz identifies, each on its own movement: all of
+      // them or none, so no movement is added for half a group.
+      const place = () => {
+        try {
+          return transaction(catalogue.db, () => {
+            const used = new Set();
+            return ordered.map((track) => {
+              const movement = placeExcerpt(catalogue, metadata, work, workMovements(catalogue, work), track, setSubject, used);
+              if (!movement) throw new Error("unplaced");
+              used.add(movement);
+              return movement;
+            });
+          });
+        } catch (error) {
+          if (error.message !== "unplaced") throw error;
+          return null;
+        }
+      };
+      // An excerpt is never placed by its position on the album.
+      const excerpts = group.excerpt && existing.length && ordered.length <= existing.length;
+      movements = excerpts ? place() : existing.length ? mapToMovements(existing, ordered, { setSubject, sections: true }) : null;
       // An old match listed a second recording's movements again after the
       // first's (six movements for a three-movement concerto): one set.
-      if (!movements && existing.length > 1 && foldRepeatedMovements(catalogue, work, existing, setSubject, actor)) {
+      if (!movements && !excerpts && existing.length > 1 && foldRepeatedMovements(catalogue, work, existing, setSubject, actor)) {
         existing = workMovements(catalogue, work);
         movements = mapToMovements(existing, ordered, { setSubject, sections: true });
       }
       // A work an earlier album made from part of a piece takes the rest
-      // from this fuller album.
+      // from this fuller album, in its order.
       if (!movements && existing.length) movements = expandIncompleteWork(catalogue, metadata, work, existing, ordered, setSubject, group, actor);
+      // Excerpts the work lacks, after the ones it has.
+      if (!movements && existing.length && group.excerpt && !excerpts) movements = place();
       if (!movements && existing.length) {
         // Same work, but the album's movements can't be mapped safely.
         catalogue.review("auto_match", ordered[0].id, {
@@ -1311,6 +1351,7 @@ function createGroup(catalogue, group, actor, index) {
         });
         return false;
       }
+      ordered.forEach((track, i) => typeof movements?.[i] === "string" && recordLeaf(catalogue, movements[i], track.providerLeaf));
       // Record the identity on the work the tags made, so tag and MusicBrainz
       // matches of this piece keep landing on one work.
       if (group.providerWorkId) catalogue.externalIdentity(work, "musicbrainz", "work", group.providerWorkId, { evidence: { source: "parent-work" } });
@@ -1367,12 +1408,14 @@ function createGroup(catalogue, group, actor, index) {
       // A track naming several sections gives each its own movement.
       let position = 0;
       movements = ordered.map((track) => {
-        const made = sectionTitles(track.movementTitle || `Movement ${position + 1}`).map((title) => {
+        const sections = sectionTitles(track.movementTitle || `Movement ${position + 1}`);
+        const made = sections.map((title) => {
           const movement = catalogue.createEntity("movement");
           position++;
           metadata.derived(movement, "title", title);
           metadata.derived(movement, "movementNumber", String(position));
           catalogue.relate("movement", work, movement, { position });
+          if (sections.length === 1) recordLeaf(catalogue, movement, track.providerLeaf);
           return movement;
         });
         return made.length === 1 ? made[0] : made;
@@ -1384,6 +1427,7 @@ function createGroup(catalogue, group, actor, index) {
         work: group.work,
         composers: group.composers,
         providerWorkId: group.providerWorkId,
+        ...(group.excerpt && { excerpt: true }),
       },
     });
     const performance = catalogue.createEntity("performance");
@@ -1439,6 +1483,80 @@ function placeTrack(catalogue, realization, performanceWork, recording, segment,
   });
 }
 
+// A movement's own MusicBrainz work, so another album's recording of
+// "Nessun dorma" finds it whatever its title says.
+const LEAF = "movement-work";
+function movementWithLeaf(catalogue, work, leaf) {
+  if (!leaf) return null;
+  return (
+    catalogue.db
+      .prepare(
+        `SELECT x.entity_id AS id FROM external_identity x JOIN relation r ON r.kind='movement' AND r.target_id=x.entity_id AND r.source_id=?
+         WHERE x.provider='musicbrainz' AND x.record_kind='${LEAF}' AND x.record_id=? AND x.state='active'`,
+      )
+      .get(work, leaf)?.id ?? null
+  );
+}
+function recordLeaf(catalogue, movement, leaf) {
+  if (!movement || !leaf) return;
+  const held = catalogue.db.prepare(`SELECT entity_id FROM external_identity WHERE provider='musicbrainz' AND record_kind='${LEAF}' AND record_id=? AND state='active'`).get(leaf);
+  const own = catalogue.db.prepare(`SELECT 1 FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='${LEAF}' AND state='active'`).get(movement);
+  if (!held && !own) catalogue.externalIdentity(movement, "musicbrainz", LEAF, leaf, { evidence: { source: "recording" } });
+}
+// A work made only from excerpts (an overture here, an aria there), or
+// whose every movement carries its MusicBrainz work: its movements are what
+// albums happened to play, in no settled order, and a MusicBrainz work none
+// of them has is certainly one it lacks.
+function excerptsOnly(catalogue, work) {
+  const records = catalogue.db.prepare("SELECT evidence FROM external_identity WHERE entity_id=? AND record_kind='album-work' AND state='active'").all(work);
+  if (records.length > 0 && records.every((row) => JSON.parse(row.evidence).excerpt === true)) return true;
+  const movements = workMovements(catalogue, work);
+  return movements.length > 0 && movements.every((m) =>
+    catalogue.db.prepare(`SELECT 1 FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='${LEAF}' AND state='active'`).get(m.id),
+  );
+}
+// Every word of one name in the other, apart from the work's own name:
+// "Nessun dorma" in "Atto III. “Nessun dorma!”", "Overture" in
+// "Il barbiere di Siviglia: Overture. Sinfonia".
+const ACT_WORD = /^(?:act|atto|akt|acte|aufzug|scene|scena|szene|prologue|prolog|prologo)$/;
+function namesWithin(a, b, workTitle) {
+  const strip = (text) => {
+    // "Atto III." and "Act III" are where, not what.
+    const list = words(text)
+      .split(" ")
+      .filter(Boolean)
+      .filter((word, i, all) => !ACT_WORD.test(word) && !(i > 0 && ACT_WORD.test(all[i - 1]) && romanValue(word)));
+    for (const word of words(workTitle).split(" ")) if (list.includes(word) && list.length > 1) list.splice(list.indexOf(word), 1);
+    return list;
+  };
+  const [x, y] = [strip(a), strip(b)];
+  const [short, long] = x.length <= y.length ? [x, y] : [y, x];
+  return short.length > 0 && short.every((word) => long.includes(word));
+}
+// An excerpt's movement on a work: the one with its MusicBrainz work, the
+// one it names, or the one whose name its words make up. On a work made only
+// from excerpts, an excerpt it lacks is added at the end. Null otherwise.
+function placeExcerpt(catalogue, metadata, work, existing, track, setSubject, used = new Set()) {
+  const byLeaf = movementWithLeaf(catalogue, work, track.providerLeaf);
+  if (byLeaf) return used.has(byLeaf) ? null : byLeaf;
+  const named = namedMovement(existing, track.movementTitle, used, setSubject);
+  const workTitle = resolvedName(catalogue, work, "title") || "";
+  const within = existing.filter((m) => !used.has(m.id) && namesWithin(m.title, track.movementTitle, workTitle));
+  const found = named || (within.length === 1 ? within[0] : null);
+  if (found) {
+    recordLeaf(catalogue, found.id, track.providerLeaf);
+    return found.id;
+  }
+  if (within.length || !excerptsOnly(catalogue, work)) return null;
+  const position = (catalogue.db.prepare("SELECT max(position) AS n FROM relation WHERE kind='movement' AND source_id=?").get(work).n || 0) + 1;
+  const movement = catalogue.createEntity("movement");
+  metadata.derived(movement, "title", track.movementTitle || track.title);
+  metadata.derived(movement, "movementNumber", String(position));
+  catalogue.relate("movement", work, movement, { position });
+  recordLeaf(catalogue, movement, track.providerLeaf);
+  return movement;
+}
+
 // An auto-made work holding only part of a piece (two of Debussy's six
 // Children's Corner pieces, two of nine Études-tableaux) takes a fuller
 // album's movements. Only when nobody edited the work or its movements,
@@ -1452,11 +1570,26 @@ function expandIncompleteWork(catalogue, metadata, work, existing, ordered, setS
   const madeByMatching = catalogue.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work'").get(work);
   if (!madeByMatching || editedInEditor(catalogue, ids) || hasManualEdits(catalogue, ids)) return null;
   const used = new Set();
+  // A movement's own MusicBrainz work settles it first.
   const mapped = ordered.map((track) => {
-    const movement = namedMovement(existing, track.movementTitle, used, setSubject);
+    const leaf = movementWithLeaf(catalogue, work, track.providerLeaf);
+    const movement = (leaf && !used.has(leaf) && existing.find((m) => m.id === leaf)) || namedMovement(existing, track.movementTitle, used, setSubject);
     if (movement) used.add(movement.id);
     return movement;
   });
+  // A work made only from excerpts: each excerpt is in exactly one track,
+  // by its words; its movements follow no order until a full album gives one.
+  const loose = excerptsOnly(catalogue, work);
+  if (loose) {
+    const workTitle = resolvedName(catalogue, work, "title") || "";
+    for (const movement of existing) {
+      if (used.has(movement.id)) continue;
+      const named = ordered.map((track, i) => i).filter((i) => !mapped[i] && namesWithin(movement.title, ordered[i].movementTitle, workTitle));
+      if (named.length !== 1) continue;
+      mapped[named[0]] = movement;
+      used.add(movement.id);
+    }
+  }
   // A movement named with the work's own name ("Troika (The Seasons:
   // November)"): the rest of its words, two at least, in exactly one track.
   const workWords = words(resolvedName(catalogue, work, "title") || "").split(" ");
@@ -1474,7 +1607,7 @@ function expandIncompleteWork(catalogue, metadata, work, existing, ordered, setS
   }
   if (used.size !== existing.length) return null;
   const positions = mapped.filter(Boolean).map((m) => m.position);
-  if (positions.some((position, i) => i && position < positions[i - 1])) return null;
+  if (!loose && positions.some((position, i) => i && position < positions[i - 1])) return null;
   // A new track must name its movement, and not a number the work holds.
   const held = new Set(existing.map((m) => movementPiece(m, setSubject)).filter((n) => n != null));
   for (const [i, track] of ordered.entries()) {
@@ -1498,6 +1631,7 @@ function expandIncompleteWork(catalogue, metadata, work, existing, ordered, setS
       catalogue.relate("movement", work, movement, { position });
     }
     metadata.derived(movement, "movementNumber", String(position));
+    recordLeaf(catalogue, movement, track.providerLeaf);
     return movement;
   });
   catalogue.audit("work.auto_match_expand", work, { albumId: group.albumId, from: existing.length, to: result.length, tracks: ordered.map((t) => t.id) }, actor);

@@ -1,3 +1,15 @@
+# 1.0.41: a single excerpt joins its work, as Apple Music Classical files it
+
+November 14, 2026. `explain-musicbrainz.mjs` on the user's library: 133 classical tracks MusicBrainz places in a larger work stayed out as "only one track of a work with movements on this album": opera overtures, arias and act preludes, single songs of cycles, single pieces of sets, single symphony movements. The 204 Apple albums in the corpus have 988 single-track blocks Apple files under a larger work (Egmont's overture, Solveig's Song in Peer Gynt, one Hungarian Rhapsody of nineteen); the user chose to follow Apple.
+
+- **An excerpt**: a group MusicBrainz identifies, every track with its own MusicBrainz work under the parent (`leafWorkId` from `identifyTrack`). A single excerpt may be one track. Not a single track whose title carries a catalogue number the parent doesn't share (`numberedElsewhere`): Liszt's transcriptions MusicBrainz files under the original (Isoldens Liebestod S447 under Tristan, the Freischütz score S575, the Eroica march S463e), Stradal's and Rachmaninoff's Bach. On the user's library this keeps 27 out and lets 106 join.
+- **Each movement keeps its MusicBrainz work** (external identity `musicbrainz`/`movement-work`), recorded when a movement is made, mapped or expanded, unless another movement holds it.
+- **Placing an excerpt** on an existing work: the movement with its MusicBrainz work, else the one it names, else the one whose name holds all its words (act and scene markers aside). Never by its position on the album: a single track on a one-movement work was mapped by count. On a work made only from excerpts, or whose every movement has its MusicBrainz work, an excerpt none of them is gets a movement of its own, added at the end; all of a group or none.
+- **The whole work later**: expansion of such a work maps its movements by MusicBrainz work or words and follows the full album's order. A work tags made without MusicBrainz works sends an unplaced excerpt to review, as before.
+- **Album pages** list nothing missing for an excerpt (`excerpt` in the album record).
+
+Corpus: Apple and non-classical unchanged. Tests: `test/messy-matching.test.js` "excerpts of an opera, then the whole opera, are one work; and the other way round" (two excerpt albums, the whole opera, a later excerpt found by its words, an excerpt then an opera whose MusicBrainz works differ, Liszt's Liebestod kept out; fails on 1.0.40); the background test's lone symphony movement now joins its symphony; the explain-musicbrainz test's lone aria now matches. 311 plugin tests pass.
+
 # 1.0.40: MusicBrainz matches refused for repeated titles
 
 November 14, 2026. Audits on 1.0.38 and 1.0.39 after scans: matched 4,410 of 4,791 classical tracks; albums 48/19/28; reviews classification 303, movement-mismatch 14, identity 11, duplicate-work 7. Piano Concerto No. 2 has three movements and all seven albums; The Seasons has twelve (Yunchan Lim's album); the variation sets have a movement per variation (Paganini 26, Corelli 23, Chopin op. 22 22), album 831 one row per track. The dry runs are empty: the scans made the repairs.

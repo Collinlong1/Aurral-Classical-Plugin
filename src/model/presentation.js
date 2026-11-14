@@ -297,7 +297,14 @@ export function renderAlbumPresentation(c, albumId) {
     // only a few of is no incomplete recording: its other pieces are not
     // listed as missing on the album page (the work's own page has them).
     const title = entityValue(metadata, workId, "title", "Untitled work");
-    const excerpts = NUMBERED_SET.test(title) && present.size * 2 < movements.length;
+    // Nor is one excerpt (an overture, an aria) a recording of the rest.
+    const excerpts =
+      (NUMBERED_SET.test(title) && present.size * 2 < movements.length) ||
+      Boolean(
+        c.db
+          .prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work' AND json_extract(evidence,'$.albumId')=? AND json_extract(evidence,'$.excerpt')=1")
+          .get(workId, album),
+      );
     return runs.map((run, index) => ({
       id: index ? `${realizationId}:${index}` : realizationId,
       workId,

@@ -116,10 +116,9 @@ test("explain-musicbrainz: reads cached answers only and says what Auto-match wo
   assert.match(byTitle["Aida: Ritorna vincitor!"][1], /^matches "Aida"/);
   assert.equal(byTitle["Contextures: Riots - Decade ’60: III. Con calore"][0], "the recording names no work");
   assert.equal(byTitle["Contextures: Riots - Decade ’60: III. Con calore"][1], "stays out");
-  // One aria alone on its album: MusicBrainz names the opera, matching
-  // says why it stays out.
+  // One aria alone on its album joins the opera, as an excerpt.
   assert.match(byTitle["Aida: Celeste Aida"][0], /of "Aida"/);
-  assert.equal(byTitle["Aida: Celeste Aida"][1], "stays out: only one track of a work with movements on this album");
+  assert.match(byTitle["Aida: Celeste Aida"][1], /^matches "Aida"/);
   assert.equal(await hash(), before);
   assert.deepEqual((await fs.readdir(out)).sort(), ["musicbrainz.json", "musicbrainz.md"]);
 });

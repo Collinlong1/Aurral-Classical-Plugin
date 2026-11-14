@@ -211,7 +211,8 @@ test("background matching: a whole work in one movement, titled with its tempo, 
   await lib.add("earlier", ["Prélude"], { recordings: [recording(1)] });
   await lib.scan();
   lib.works["work-7"] = { id: "work-7", title: "Piano Sonata no. 7, op. 64 “White Mass”", relations: [{ type: "composer", artist: { id: "artist-scriabin", name: "Alexander Scriabin" } }] };
-  // A symphony movement that MusicBrainz files under its symphony stays refused alone.
+  // A symphony movement that MusicBrainz files under its symphony joins it
+  // as an excerpt (1.0.41), as Apple Music Classical shows it.
   lib.works["work-8"] = { id: "work-8", title: "Symphony no. 5, op. 67: I. Allegro con brio", relations: [{ type: "parts", direction: "backward", work: { id: "work-sym" } }] };
   lib.works["work-sym"] = { id: "work-sym", title: "Symphony no. 5, op. 67", relations: [{ type: "parts", direction: "forward", work: { id: "work-8" } }] };
   await lib.add("scriabin", ['Piano Sonata no. 7, op. 64 "Messe blanche": Allegro', "Symphony no. 5, op. 67: Allegro con brio"], { composer: "Alexander Scriabin", recordings: [recording(7), recording(8)] });
@@ -219,5 +220,5 @@ test("background matching: a whole work in one movement, titled with its tempo, 
   await runModelJobs(lib.ctx, { budgetMs: 30_000 });
   const groups = await lib.view("scriabin");
   assert.deepEqual(groups.find(([title]) => /Sonata no\. 7/.test(title)), ['Piano Sonata no. 7, op. 64 "Messe blanche"', true, 1]);
-  assert.equal(groups.filter(([, matched]) => matched).length, 1);
+  assert.deepEqual(groups.find(([title]) => /Symphony no\. 5/.test(title)), ["Symphony no. 5, op. 67", true, 1]);
 });
