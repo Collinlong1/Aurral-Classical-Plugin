@@ -1,3 +1,11 @@
+# 1.0.42: movements take their MusicBrainz work from the Work Id tags
+
+November 14, 2026. 1.0.41 records a movement's own MusicBrainz work only when an album is matched, so movements matched earlier have none, and a later excerpt finds them by name alone. Most of the user's files are Picard-tagged: a track's MusicBrainz Work Id tag (`hints.workId`) is its movement's own work.
+
+`recordTaggedLeaves` (every match, album and library pass) gives each movement the Work Id of a track on it: only a track holding one movement, a tag that isn't the work's own MusicBrainz work, and an ID no other movement holds; a movement keeps the first it gets. No MusicBrainz request. Evidence source `work-id-tag`.
+
+Test: `test/messy-matching.test.js` "movements take their MusicBrainz work from the tracks' Work Id tags" (a full opera matched as before 1.0.41, then an excerpt whose title names nothing in it finds "Nessun dorma!"; fails on 1.0.41). 312 plugin tests pass; corpora unchanged.
+
 # 1.0.41: a single excerpt joins its work, as Apple Music Classical files it
 
 November 14, 2026. `explain-musicbrainz.mjs` on the user's library: 133 classical tracks MusicBrainz places in a larger work stayed out as "only one track of a work with movements on this album": opera overtures, arias and act preludes, single songs of cycles, single pieces of sets, single symphony movements. The 204 Apple albums in the corpus have 988 single-track blocks Apple files under a larger work (Egmont's overture, Solveig's Song in Peer Gynt, one Hungarian Rhapsody of nineteen); the user chose to follow Apple.

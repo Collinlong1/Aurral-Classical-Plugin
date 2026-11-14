@@ -1497,12 +1497,37 @@ function movementWithLeaf(catalogue, work, leaf) {
       .get(work, leaf)?.id ?? null
   );
 }
-function recordLeaf(catalogue, movement, leaf) {
-  if (!movement || !leaf) return;
+function recordLeaf(catalogue, movement, leaf, source = "recording") {
+  if (!movement || !leaf) return false;
   const held = catalogue.db.prepare(`SELECT entity_id FROM external_identity WHERE provider='musicbrainz' AND record_kind='${LEAF}' AND record_id=? AND state='active'`).get(leaf);
   const own = catalogue.db.prepare(`SELECT 1 FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='${LEAF}' AND state='active'`).get(movement);
-  if (!held && !own) catalogue.externalIdentity(movement, "musicbrainz", LEAF, leaf, { evidence: { source: "recording" } });
+  if (held || own) return false;
+  catalogue.externalIdentity(movement, "musicbrainz", LEAF, leaf, { evidence: { source } });
+  return true;
 }
+// Tracks already in works carry their movement's MusicBrainz work in their
+// tags (MusicBrainz Work Id): it becomes the movement's, so excerpts and
+// recordings matched later find that movement. Only a track on one movement,
+// a tag that isn't the work's own MusicBrainz work, and an ID no other
+// movement holds; a movement keeps the first it gets. No lookups.
+export function recordTaggedLeaves(catalogue, { albumId = null } = {}) {
+  const rows = catalogue.db
+    .prepare(
+      `SELECT i.movement_id AS movement,r.work_id AS work,json_extract(t.evidence,'$.hints.workId') AS leaf
+       FROM realization_item i JOIN realization r ON r.id=i.realization_id JOIN segment s ON s.id=i.segment_id
+       JOIN track_link t ON t.id=s.track_link_id AND t.state='active'
+       WHERE i.movement_id IS NOT NULL AND coalesce(json_extract(t.evidence,'$.hints.workId'),'')!=''
+       ${albumId == null ? "" : "AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?"}
+       AND NOT EXISTS(SELECT 1 FROM realization_item o WHERE o.segment_id=i.segment_id AND o.id!=i.id)
+       AND NOT EXISTS(SELECT 1 FROM external_identity x WHERE x.entity_id=i.movement_id AND x.provider='musicbrainz' AND x.record_kind='${LEAF}' AND x.state='active')
+       AND NOT EXISTS(SELECT 1 FROM external_identity x WHERE x.entity_id=r.work_id AND x.provider='musicbrainz' AND x.record_kind='work' AND x.record_id=json_extract(t.evidence,'$.hints.workId'))`,
+    )
+    .all(...(albumId == null ? [] : [String(albumId)]));
+  let recorded = 0;
+  for (const { movement, leaf } of rows) if (recordLeaf(catalogue, movement, String(leaf), "work-id-tag")) recorded++;
+  return recorded;
+}
+
 // A work made only from excerpts (an overture here, an aria there), or
 // whose every movement carries its MusicBrainz work: its movements are what
 // albums happened to play, in no settled order, and a MusicBrainz work none
@@ -2504,6 +2529,7 @@ export function autoMatchTaggedWorks(
       .all())
       deriveWorkFields(catalogue, id, metadata);
   }
+  recordTaggedLeaves(catalogue, { albumId });
   const index = catalogueIndex(catalogue);
   let created = 0;
   for (const group of groups)

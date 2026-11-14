@@ -9,7 +9,7 @@ import { createHash } from "node:crypto";
 import { tempFolders } from "./helpers.js";
 import { artistCredits, composersOf } from "../src/model/credits.js";
 import { classificationEvidence } from "../src/model/classify-evidence.js";
-import { splitTitle, stripWorkPrefix, autoMatchTaggedWorks, withoutComposer, mapToMovements, movementParts, catalogueSubject, workKey, mergeWork, provablyDifferent } from "../src/model/auto-match.js";
+import { recordTaggedLeaves, splitTitle, stripWorkPrefix, autoMatchTaggedWorks, withoutComposer, mapToMovements, movementParts, catalogueSubject, workKey, mergeWork, provablyDifferent } from "../src/model/auto-match.js";
 import { openCatalogue } from "../src/model/catalogue.js";
 import { Metadata } from "../src/model/metadata.js";
 import { reconcile, classify } from "../src/model/reconcile.js";
@@ -1373,4 +1373,29 @@ test("matching: excerpts of an opera, then the whole opera, are one work; and th
   autoMatchTaggedWorks(c, { albumId: "liszt", actor: "admin", allowStructuredTitles: true, providerMatches: new Map(ids("liszt").map((id) => [id, { workId: "mb-tristan", work: "Tristan und Isolde, WWV 90", movement: null, leafWorkId: "mb-liebestod", aliases: [], composers: ["Richard Wagner"], composerIds: {} }])) });
   assert.deepEqual(itemsOf("liszt"), []);
   assert.equal(c.db.prepare("SELECT COUNT(*) AS n FROM review_item WHERE status='open' AND json_extract(evidence,'$.reason')='movement-mismatch'").get().n, 0);
+});
+
+// Works matched before 1.0.41 have no MusicBrainz work on their movements.
+// The tracks' MusicBrainz Work Id tags give them one, so a later excerpt
+// whose title names nothing in the work still finds its movement.
+test("matching: movements take their MusicBrainz work from the tracks' Work Id tags", async (t) => {
+  const puccini = (title, workId) => ({ title, composer: ["Giacomo Puccini"], genres: ["Classical"], workId });
+  const acts = [["Act I. Gira la cote!", "mb-gira"], ["Act I. Signore, ascolta!", "mb-signore"], ["Act III. Nessun dorma!", "mb-nessun"]];
+  const c = await catalogueWith(t, [
+    { id: "complete", album: "Turandot", albumArtist: "Orchestra", artist: "Orchestra", titles: acts.map(([m, id]) => puccini(`Turandot: ${m}`, id)) },
+    { id: "encore", album: "Encores", albumArtist: "Tenor", artist: "Tenor", titles: [puccini("Turandot: Calaf's aria", "mb-nessun")] },
+  ]);
+  const ids = (albumId) => c.db.prepare("SELECT id FROM track_link WHERE CAST(json_extract(evidence,'$.albumId') AS TEXT)=? ORDER BY json_extract(evidence,'$.hints.trackNumber')").all(albumId).map((row) => row.id);
+  const turandot = (leaf) => ({ workId: "mb-turandot", work: "Turandot", movement: null, ...(leaf && { leafWorkId: leaf }), aliases: [], composers: ["Giacomo Puccini"], composerIds: {} });
+  // Matched as before 1.0.41: no MusicBrainz work for the movements.
+  autoMatchTaggedWorks(c, { albumId: "complete", actor: "admin", allowStructuredTitles: true, providerMatches: new Map(ids("complete").map((id) => [id, turandot(null)])) });
+  c.db.prepare("DELETE FROM external_identity WHERE record_kind='movement-work'").run();
+  const work = renderAlbumPresentation(c, "complete").groups[0].workId;
+  assert.equal(recordTaggedLeaves(c), 3);
+  assert.equal(recordTaggedLeaves(c), 0);
+  autoMatchTaggedWorks(c, { albumId: "encore", actor: "admin", allowStructuredTitles: true, providerMatches: new Map(ids("encore").map((id) => [id, turandot("mb-nessun")])) });
+  const movement = c.db
+    .prepare("SELECT i.movement_id FROM realization_item i JOIN segment s ON s.id=i.segment_id WHERE s.track_link_id=?")
+    .get(ids("encore")[0])?.movement_id;
+  assert.equal(movement, workMovementTitles(c, work, true)[2]);
 });
