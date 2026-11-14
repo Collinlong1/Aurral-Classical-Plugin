@@ -1116,3 +1116,71 @@ test("matching: variations by number, editions numbered one apart, and a work li
   for (const albumId of ["first", "second", "later"]) assert.deepEqual(items(albumId), three);
   assert.equal(mismatches(), 0);
 });
+
+// From explain-works on the 1.0.37 install: 1.0.22 matched a box's two
+// recordings of a piece as one recording, so the work listed every
+// movement twice and the fold (which needs separate recordings) left it.
+// The recording is split, then folded; The Seasons, whose second "Troika"
+// names the work, then takes a full album's twelve pieces.
+test("matching: one recording listing a piece twice splits into two, folds, and the work expands", async (t) => {
+  const tag = (composer) => (title) => ({ title, composer: [composer], genres: ["Classical"] });
+  const rach = tag("Sergei Rachmaninoff");
+  const months = ["January. By the Fireside. Moderato semplice ma espressivo", "February. Carnaval. Allegro giusto", "March. Song of the Lark. Andantino espressivo", "April. Snowdrop. Allegretto con moto e un poco rubato", "May. White Nights. Andantino", "June. Barcarolle. Andante cantabile", "July. Song of the Reaper. Allegro moderato con moto", "August. The Harvest. Allegro vivace", "September. The Hunt. Allegro non troppo", "October. Autumn Song. Andante doloroso e molto cantabile", "November. Troïka. Allegro moderato", "December. Christmas. Tempo di valse"];
+  const roman = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
+  const c = await catalogueWith(t, [
+    { id: "box", album: "The Complete Recordings", albumArtist: "Sergei Rachmaninoff", artist: "Sergei Rachmaninoff", titles: [...["I. Moderato; Allegro", "II. Adagio sostenuto", "III. Allegro scherzando"].map((m) => `Piano Concerto no. 2 in C minor, op. 18: ${m}`), ...["I. Moderato - Allegro (Stokowski)", "II. Adagio sostenuto (Stokowski)", "III. Allegro scherzando (Stokowski)"].map((m) => `Piano Concerto No. 2 in C minor, Op. 18: ${m}`)].map(rach).concat(["The Seasons, op. 37a: Troika (The Seasons: November)", "The Seasons, op. 37a: November: Troika"].map(tag("Pyotr Tchaikovsky"))) },
+    { id: "later", album: "Piano Concertos nos. 1 & 2", albumArtist: "Pianist", artist: "Pianist", titles: ["I. Moderato", "II. Adagio sostenuto", "III. Allegro scherzando"].map((m) => `Piano Concerto no. 2 in C minor, op. 18: ${m}`).map(rach) },
+    { id: "lim", album: "The Seasons", albumArtist: "Yunchan Lim", artist: "Yunchan Lim", titles: months.map((m, i) => `The Seasons, op. 37a: ${roman[i]}. ${m}`).map(tag("Pyotr Tchaikovsky")) },
+  ]);
+  const match = (albumId) => autoMatchTaggedWorks(c, { albumId, actor: "admin", allowStructuredTitles: true });
+  match("box");
+  const groups = renderAlbumPresentation(c, "box").groups;
+  const pc2 = groups[0].workId;
+  const seasons = groups.find((group) => /Seasons/.test(group.title)).workId;
+  assert.ok(pc2 && seasons);
+  // The 1.0.22 shape: each work's movements listed once per recording, all
+  // in one recording of the box.
+  const metadata = new Metadata(c);
+  const realizationOf = (work) => c.db.prepare("SELECT id,performance_work_id FROM realization WHERE work_id=? ORDER BY rowid").all(work);
+  const legacy = (work, titles) => {
+    const [keep, ...others] = realizationOf(work);
+    let position = workMovementTitles(c, work).length;
+    let sequence = c.db.prepare("SELECT max(sequence) AS n FROM realization_item WHERE realization_id=?").get(keep.id).n;
+    for (const other of others) {
+      const items = c.db.prepare("SELECT * FROM realization_item WHERE realization_id=? ORDER BY sequence").all(other.id);
+      items.forEach((item, i) => {
+        const movement = c.createEntity("movement");
+        metadata.derived(movement, "title", titles[i]);
+        c.relate("movement", work, movement, { position: ++position });
+        c.db.prepare("UPDATE realization_item SET realization_id=?,movement_id=?,sequence=? WHERE id=?").run(keep.id, movement, ++sequence, item.id);
+        c.db.prepare("UPDATE recording_content SET movement_id=?,performance_work_id=? WHERE performance_work_id=? AND movement_id IS ?").run(movement, keep.performance_work_id, other.performance_work_id, item.movement_id);
+      });
+      const performance = c.db.prepare("SELECT source_id FROM relation WHERE id=?").get(other.performance_work_id).source_id;
+      const kept = c.db.prepare("SELECT source_id FROM relation WHERE id=?").get(keep.performance_work_id).source_id;
+      c.db.prepare("UPDATE relation SET target_id=? WHERE kind='recording_performance' AND target_id=?").run(kept, performance);
+      c.db.prepare("DELETE FROM realization WHERE id=?").run(other.id);
+    }
+  };
+  if (realizationOf(pc2).length === 2) legacy(pc2, ["I. Moderato - Allegro (Stokowski)", "II. Adagio sostenuto (Stokowski)", "III. Allegro scherzando (Stokowski)"]);
+  if (realizationOf(seasons).length === 2) legacy(seasons, ["November: Troika"]);
+  assert.equal(workMovementTitles(c, pc2).length, 6);
+  assert.deepEqual(workMovementTitles(c, seasons), ["Troika (The Seasons: November)", "November: Troika"]);
+  assert.equal(realizationOf(pc2).length, 1);
+
+  match("later");
+  match("lim");
+  assert.deepEqual(workMovementTitles(c, pc2), ["I. Moderato; Allegro", "II. Adagio sostenuto", "III. Allegro scherzando"]);
+  assert.equal(realizationOf(pc2).length, 3);
+  // Every recording's tracks on the three movements, each its own performance.
+  const three = workMovementTitles(c, pc2, true);
+  for (const { id } of realizationOf(pc2)) assert.deepEqual(c.db.prepare("SELECT movement_id FROM realization_item WHERE realization_id=? ORDER BY sequence").all(id).map((row) => row.movement_id), three);
+  const performances = c.db.prepare("SELECT count(DISTINCT p.source_id) AS n FROM realization r JOIN relation p ON p.id=r.performance_work_id WHERE r.work_id=?").get(pc2).n;
+  assert.equal(performances, 3);
+  for (const content of c.db.prepare("SELECT c.recording_id,pw.source_id AS performance FROM recording_content c JOIN relation pw ON pw.id=c.performance_work_id WHERE pw.target_id=?").all(pc2))
+    assert.ok(c.db.prepare("SELECT 1 FROM relation WHERE kind='recording_performance' AND source_id=? AND target_id=?").get(content.recording_id, content.performance));
+  // The Seasons: one Troika, two recordings of it, then all twelve.
+  assert.equal(workMovementTitles(c, seasons).length, 12);
+  assert.equal(workMovementTitles(c, seasons)[10], "Troika (The Seasons: November)");
+  assert.deepEqual(renderAlbumPresentation(c, "lim").groups.map((group) => [group.workId, group.items.length]), [[seasons, 12]]);
+  assert.equal(c.db.prepare("SELECT COUNT(*) AS n FROM review_item WHERE status='open' AND json_extract(evidence,'$.reason')='movement-mismatch'").get().n, 0);
+});

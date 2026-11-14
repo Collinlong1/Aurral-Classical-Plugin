@@ -1,3 +1,14 @@
+# 1.0.38: one recording listing a piece twice is split, then folded
+
+November 14, 2026. Audit on 1.0.37 after a scan: matched 4,380 of 4,791 classical tracks (from 4,256); albums 43/23/29; the Paganini Rhapsody, Corelli and Carnaval albums joined their works; reviews classification 303, movement-mismatch 21, identity 11, duplicate-work 7. The dry run folded nothing. `explain-works.mjs` (which now lists the recordings holding each movement) showed why: Piano Concerto No. 2 and The Seasons each have one recording, from album 13354, holding all their movements; 1.0.22 matched the box's two performances as one.
+
+- `foldRepeatedMovements` also takes a work held by one recording whose movements restart at the first one and repeat the whole first run, in the album's order (six concerto movements as 3 + 3; two "Troika"s as 1 + 1). Each later run first becomes its own performance and recording of the work (items, recording contents and the recordings' performance move), then folds as in 1.0.37.
+- An incomplete work expands when a movement named with the work's own name ("Troika (The Seasons: November)") has the rest of its words, two at least, in exactly one of the fuller album's tracks ("XI. November. Troïka. Allegro moderato").
+
+Corpus: Apple false joins unchanged. Three albums changed, all reviewed as correct joins: Segovia's two Courantes of Cello Suite No. 3 now sit on that suite's "III. Courante" (a missing line follows); Rosenthal's two recordings of "Reflets dans l'eau" are one movement in two performances, so two blocks where Apple shows one (work-tags blocks 196 → 195); a Don Giovanni album shares the opera work another edition made and takes its capitalised names. Baseline saved. Non-classical corpus unchanged.
+
+Test: `test/messy-matching.test.js` "one recording listing a piece twice splits into two, folds, and the work expands", with the box's titles; fails on 1.0.37. 307 plugin tests pass.
+
 # 1.0.37: fuller albums join works that divide or number them differently
 
 November 13, 2026. Audit on 1.0.36 after the scan and backlog lookup: matched 4,256 of 4,791 classical tracks (from 4,195); albums 42/24/29; reviews classification 303, movement-mismatch 27, identity 11, duplicate-work 7; the dry run makes no repairs. Scriabin's Sonatas 5–10 match as one-track works and single set pieces join their sets. 226 tracks would go to movement-mismatch review on the next Auto-match; by existing work:

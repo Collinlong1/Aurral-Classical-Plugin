@@ -38231,6 +38231,17 @@ function expandIncompleteWork(catalogue, metadata, work, existing, ordered, setS
     if (movement) used.add(movement.id);
     return movement;
   });
+  const workWords = words(resolvedName(catalogue, work, "title") || "").split(" ");
+  for (const movement of existing) {
+    if (used.has(movement.id)) continue;
+    const rest = words(movement.title).split(" ").filter(Boolean);
+    for (const word of workWords) if (rest.includes(word)) rest.splice(rest.indexOf(word), 1);
+    if (rest.length < 2) continue;
+    const named = ordered.map((track, i) => [i, words(movementParts(track.movementTitle).text).split(" ")]).filter(([i, text4]) => !mapped[i] && rest.every((word) => text4.includes(word)));
+    if (named.length !== 1) continue;
+    mapped[named[0][0]] = movement;
+    used.add(movement.id);
+  }
   if (used.size !== existing.length) return null;
   const positions = mapped.filter(Boolean).map((m) => m.position);
   if (positions.some((position, i) => i && position < positions[i - 1])) return null;
@@ -38262,21 +38273,6 @@ function foldRepeatedMovements(catalogue, work, existing, setSubject, actor3) {
   const ids = [work, ...existing.map((m) => m.id)];
   const madeByMatching = catalogue.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work'").get(work);
   if (!madeByMatching || editedInEditor(catalogue, ids) || hasManualEdits(catalogue, ids)) return false;
-  const realizedBy = (movement) => catalogue.db.prepare("SELECT DISTINCT realization_id AS id FROM realization_item WHERE movement_id=? ORDER BY 1").all(movement).map((row) => row.id);
-  const runs = [];
-  for (const movement of existing) {
-    const by = realizedBy(movement.id);
-    if (!by.length) return false;
-    const key = by.join(" ");
-    if (runs.at(-1)?.key === key) runs.at(-1).movements.push(movement);
-    else runs.push({ key, by, movements: [movement] });
-  }
-  if (runs.length < 2) return false;
-  const seen = /* @__PURE__ */ new Set();
-  for (const run of runs) for (const id of run.by) {
-    if (seen.has(id)) return false;
-    seen.add(id);
-  }
   const tokens = (text4) => words(text4).split(" ").filter(Boolean);
   const within = (short, long) => {
     const rest = [...long];
@@ -38295,9 +38291,38 @@ function foldRepeatedMovements(catalogue, work, existing, setSubject, actor3) {
     const [ta, tb] = [tokens(a.title), tokens(b.title)];
     return a.text === b.text || (ta.length <= tb.length ? within(ta, tb) : within(tb, ta));
   };
+  const db = catalogue.db;
+  const realizedBy = (movement) => db.prepare("SELECT DISTINCT realization_id AS id FROM realization_item WHERE movement_id=? ORDER BY 1").all(movement).map((row) => row.id);
+  let runs = [];
+  for (const movement of existing) {
+    const by = realizedBy(movement.id);
+    if (!by.length) return false;
+    const key = by.join(" ");
+    if (runs.at(-1)?.key === key) runs.at(-1).movements.push(movement);
+    else runs.push({ key, by, movements: [movement] });
+  }
+  let split = null;
+  if (runs.length === 1 && runs[0].by.length === 1) {
+    const restart = existing.findIndex((m, i) => i > 0 && same2(existing[0], m));
+    if (restart < 1 || existing.length % restart) return false;
+    split = runs[0].by[0];
+    runs = [];
+    for (let i = 0; i < existing.length; i += restart) runs.push({ by: [], movements: existing.slice(i, i + restart) });
+    const order = db.prepare("SELECT movement_id FROM realization_item WHERE realization_id=? ORDER BY sequence").all(split).map((row) => row.movement_id);
+    if (order.join(" ") !== existing.map((m) => m.id).join(" ")) return false;
+  }
+  if (runs.length < 2) return false;
+  if (!split) {
+    const seen = /* @__PURE__ */ new Set();
+    for (const run of runs) for (const id of run.by) {
+      if (seen.has(id)) return false;
+      seen.add(id);
+    }
+  }
   const [first, ...later] = runs;
   const pairs = [];
   for (const run of later) {
+    if (split && run.movements.length !== first.movements.length) return false;
     let from = 0;
     for (const movement of run.movements) {
       const match2 = first.movements.findIndex((m, i) => i >= from && same2(m, movement));
@@ -38306,8 +38331,27 @@ function foldRepeatedMovements(catalogue, work, existing, setSubject, actor3) {
       from = match2 + 1;
     }
   }
-  const db = catalogue.db;
   transaction(db, () => {
+    if (split) {
+      const original = db.prepare("SELECT * FROM realization WHERE id=?").get(split);
+      const performance = db.prepare("SELECT source_id FROM relation WHERE id=?").get(original.performance_work_id).source_id;
+      for (const run of later) {
+        const own = catalogue.createEntity("performance");
+        const performanceWork = catalogue.relate("performance_work", own, work);
+        const realization = catalogue.realization(work, performanceWork, original.label);
+        const items = db.prepare(`SELECT * FROM realization_item WHERE realization_id=? AND movement_id IN (${run.movements.map(() => "?").join(",")}) ORDER BY sequence`).all(split, ...run.movements.map((m) => m.id));
+        items.forEach((item, i) => {
+          db.prepare("UPDATE realization_item SET realization_id=?,sequence=? WHERE id=?").run(realization, i + 1, item.id);
+          for (const { id, recording_id: recording } of db.prepare(
+            `SELECT c.id,c.recording_id FROM segment_content x JOIN recording_content c ON c.id=x.content_id
+               WHERE x.segment_id=? AND c.performance_work_id=?`
+          ).all(item.segment_id, original.performance_work_id)) {
+            db.prepare("UPDATE recording_content SET performance_work_id=? WHERE id=?").run(performanceWork, id);
+            db.prepare("UPDATE relation SET target_id=? WHERE kind='recording_performance' AND source_id=? AND target_id=?").run(own, recording, performance);
+          }
+        });
+      }
+    }
     for (const [drop, keep] of pairs) {
       db.prepare("UPDATE realization_item SET movement_id=? WHERE movement_id=?").run(keep, drop);
       db.prepare("UPDATE recording_content SET movement_id=? WHERE movement_id=?").run(keep, drop);
@@ -38315,7 +38359,7 @@ function foldRepeatedMovements(catalogue, work, existing, setSubject, actor3) {
       transferIdentities(db, keep, drop);
       db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), drop);
     }
-    catalogue.audit("work.fold_movements", work, { from: existing.length, to: existing.length - pairs.length }, actor3);
+    catalogue.audit("work.fold_movements", work, { from: existing.length, to: existing.length - pairs.length, split: Boolean(split) }, actor3);
   });
   return true;
 }
@@ -42652,7 +42696,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.37" : "dev";
+var VERSION = true ? "1.0.38" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js
