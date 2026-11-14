@@ -4,6 +4,7 @@ import { transaction } from "./database.js";
 import { NUMBERED_SET, isCollectionLike, numberedPiece, movementTitle, splitTitle, withoutComposer } from "./auto-match.js";
 import { catalogueNumber } from "../works.js";
 import { composersOf } from "./credits.js";
+import { groupRecordings, ownedRecordings } from "../search/engine.js";
 
 const text = (value, fallback) =>
   typeof value === "string" && value.trim() ? value.trim() : fallback;
@@ -355,9 +356,15 @@ export function renderWork(c, workId, user) {
   const state = c.db
     .prepare("SELECT * FROM user_work_state WHERE user_id=? AND work_id=?")
     .get(user.id, workId);
-  const adminPick = c.db
+  const recordings = recordingsOf(c, metadata, workId, movements, byRealization);
+  // A pick names a realization; one heard on another release of the same
+  // recording points at the entry shown for it.
+  const shown = (realization) => recordings.find((r) => r.id === realization || r.releases.some((release) => release.realizationId === realization))?.id ?? realization;
+  const userPick = state?.picked_realization_id ? shown(state.picked_realization_id) : null;
+  const rawAdminPick = c.db
     .prepare("SELECT realization_id FROM admin_work_pick WHERE work_id=?")
     .get(workId)?.realization_id;
+  const adminPick = rawAdminPick ? shown(rawAdminPick) : null;
   return {
     version: 1,
     work: {
@@ -384,57 +391,78 @@ export function renderWork(c, workId, user) {
         })),
     },
     favourite: state?.favourite === 1,
-    pickedRealizationId: state?.picked_realization_id || adminPick || null,
+    pickedRealizationId: userPick || adminPick || null,
     adminPickId: adminPick || null,
-    pickScope: state?.picked_realization_id
+    pickScope: userPick
       ? "user"
       : adminPick
         ? "admin"
         : null,
-    recordings: [...byRealization.entries()].map(([id, entries], index) => {
-      const present = new Set(
-        entries.flatMap((entry) => entry.movement_ids).filter(Boolean),
-      );
-      const performanceId = c.db
-        .prepare("SELECT source_id FROM relation WHERE id=?")
-        .get(entries[0].performance_work_id)?.source_id;
-      const recordingIds = c.db
-        .prepare(
-          "SELECT source_id FROM relation WHERE kind='recording_performance' AND target_id=? ORDER BY source_id",
-        )
-        .all(performanceId)
-        .map((row) => row.source_id);
-      const performers = credits(c, metadata, performanceId).filter(
-        (credit) => credit.role !== "composer",
-      );
-      const first = evidenceOf(entries[0]);
-      const album = text(entries[0].realization_label, text(first.hints?.album, ""));
-      const artist = performers.length
-        ? performers.map((credit) => credit.name).join(", ")
-        : text(first.hints?.artist, text(first.hints?.albumArtist, ""));
-      return {
-        id,
-        label:
-          [artist, album].filter(Boolean).join(" · ") ||
-          `Recording ${index + 1}`,
-        albumId: first.albumId == null ? null : String(first.albumId),
-        recordingIds,
-        credits: credits(c, metadata, performanceId),
-        items: entries.map((entry) =>
-          queueItem(
-            metadata,
-            entry,
-            entry.movement_id && entries.filter((other) => other.movement_id === entry.movement_id).length > 1
-              ? entityValue(metadata, workId, "title", "")
-              : null,
-          ),
-        ),
-        missing: movements.filter((movement) => !present.has(movement.id)),
-        complete:
-          movements.length === 0 ||
-          movements.every((movement) => present.has(movement.id)),
-      };
-    }),
+    recordings,
+  };
+}
+
+// Owned recordings of a work, one per performance: the same recording on
+// several releases is one entry listing every release (search's rule:
+// same MusicBrainz recordings, or the same performers with every part
+// within two seconds; never two on one album). It plays from its first
+// release; picks keep naming that realization.
+function recordingsOf(c, metadata, workId, movements, byRealization) {
+  const facts = new Map(ownedRecordings(c, undefined, undefined, { workId }).map((r) => [r.id, r]));
+  const groups = groupRecordings([...byRealization.keys()].map((id) => facts.get(id)).filter(Boolean));
+  const grouped = new Map(groups.flatMap((group) => group.realizations.map((r) => [r.id, group])));
+  const seen = new Set();
+  const out = [];
+  for (const [id, entries] of byRealization) {
+    const group = grouped.get(id);
+    if (group && seen.has(group.key)) continue;
+    if (group) seen.add(group.key);
+    const releases = (group?.realizations ?? [facts.get(id)].filter(Boolean)).flatMap((r) =>
+      r.albums.map((albumId) => ({ albumId: String(albumId), album: r.album || "", realizationId: r.id })),
+    );
+    out.push(recordingEntry(c, metadata, workId, movements, id, entries, facts.get(id), releases, out.length));
+  }
+  return out;
+}
+
+function recordingEntry(c, metadata, workId, movements, id, entries, fact, releases, index) {
+  const present = new Set(entries.flatMap((entry) => entry.movement_ids).filter(Boolean));
+  const performanceId = c.db.prepare("SELECT source_id FROM relation WHERE id=?").get(entries[0].performance_work_id)?.source_id;
+  const recordingIds = c.db
+    .prepare("SELECT source_id FROM relation WHERE kind='recording_performance' AND target_id=? ORDER BY source_id")
+    .all(performanceId)
+    .map((row) => row.source_id);
+  const performers = credits(c, metadata, performanceId).filter((credit) => credit.role !== "composer");
+  const first = evidenceOf(entries[0]);
+  const album = text(entries[0].realization_label, text(first.hints?.album, ""));
+  const artist = performers.length
+    ? performers.map((credit) => credit.name).join(", ")
+    : text(first.hints?.artist, text(first.hints?.albumArtist, ""));
+  const items = entries.map((entry) =>
+    queueItem(
+      metadata,
+      entry,
+      entry.movement_id && entries.filter((other) => other.movement_id === entry.movement_id).length > 1
+        ? entityValue(metadata, workId, "title", "")
+        : null,
+    ),
+  );
+  entries.forEach((entry, i) => (items[i].movementIds = entry.movement_ids.filter(Boolean)));
+  return {
+    id,
+    label: [artist, album].filter(Boolean).join(" · ") || `Recording ${index + 1}`,
+    albumId: first.albumId == null ? null : String(first.albumId),
+    recordingIds,
+    credits: credits(c, metadata, performanceId),
+    performer: fact?.performerNames?.join(", ") || artist,
+    year: fact?.year ?? null,
+    recordLabel: fact?.label || "",
+    durationMs: fact?.durationMs || null,
+    parts: movements.map((movement) => ({ movementId: movement.id, durationMs: fact?.parts.get(movement.id) ?? null })),
+    releases,
+    items,
+    missing: movements.filter((movement) => !present.has(movement.id)),
+    complete: movements.length === 0 || movements.every((movement) => present.has(movement.id)),
   };
 }
 

@@ -200,3 +200,26 @@ test("the editor's Search tab lists ranked results that open their entries", asy
   assert.ok(page.list.items.some((item) => item.badge.label === "Album" && item.selection.startsWith("album:")));
   assert.deepEqual(renderV2(c, { tab: "search", q: "" }, "r").list.items, []);
 });
+
+test("the work page lists one entry per recording, with its releases, parts and movements", async (t) => {
+  const { c, moonlight } = await library(t);
+  const { renderWork } = await import("../src/model/presentation.js");
+  const realizations = realizationsOf(c, moonlight);
+  // A user's pick of the box-set copy points at the recording shown.
+  const box = c.db.prepare("SELECT id FROM realization WHERE work_id=? AND label='Album levit-box'").get(moonlight).id;
+  c.db.prepare("INSERT INTO user_work_state VALUES (7,?,0,?,?)").run(moonlight, box, Date.now());
+  const view = renderWork(c, moonlight, { id: 7, role: "user" });
+  assert.equal(realizations.length, 3);
+  assert.equal(view.recordings.length, 2, "Levit's two releases are one recording");
+  const levit = view.recordings.find((r) => r.releases.length === 2);
+  assert.deepEqual(levit.releases.map((r) => r.album).sort(), ["Album levit", "Album levit-box"]);
+  assert.equal(levit.performer, "Igor Levit");
+  assert.equal(view.pickedRealizationId, levit.id);
+  assert.equal(view.pickScope, "user");
+  const barenboim = view.recordings.find((r) => r.performer === "Daniel Barenboim");
+  assert.deepEqual(barenboim.parts.map((p) => p.durationMs), [360000, 140000, 420000]);
+  assert.equal(barenboim.durationMs, 920000);
+  assert.ok(barenboim.complete);
+  assert.deepEqual(barenboim.items.map((i) => i.movementIds.length), [1, 1, 1]);
+  assert.deepEqual(barenboim.items.map((i) => i.movementIds[0]), view.work.movements.map((m) => m.id));
+});

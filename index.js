@@ -38834,11 +38834,11 @@ function buildDocuments(c) {
   }
   const recordings = ownedRecordings(c, tracks, values);
   const groups = groupRecordings(recordings);
-  const recordingsOf = /* @__PURE__ */ new Map();
+  const recordingsOf2 = /* @__PURE__ */ new Map();
   for (const group of groups) {
     const workId = group.realizations[0].workId;
-    if (!recordingsOf.has(workId)) recordingsOf.set(workId, []);
-    recordingsOf.get(workId).push(group);
+    if (!recordingsOf2.has(workId)) recordingsOf2.set(workId, []);
+    recordingsOf2.get(workId).push(group);
   }
   const composersOf2 = (workId) => (creditsOf.get(workId) || []).filter((k) => k.role === "composer");
   const workTitle = (workId) => text2(values.get(workId)?.title) || "Untitled work";
@@ -38855,7 +38855,7 @@ function buildDocuments(c) {
     if (text2(v.form)) facets.push(["form", fold(v.form), text2(v.form)]);
     for (const instrument of list(v.instrumentation)) facets.push(["instrument", fold(instrument), instrument]);
     workFacets.set(id, facets);
-    const groupsHere = recordingsOf.get(id) || [];
+    const groupsHere = recordingsOf2.get(id) || [];
     const recordingFacets = groupsHere.flatMap((group) => recordingGroupFacets(group, name));
     const owned = groupsHere.length > 0;
     docs.push({
@@ -38877,7 +38877,7 @@ function buildDocuments(c) {
   for (const [workId, movements] of movementsOf) {
     const title = workTitle(workId);
     const composers = composersOf2(workId).map((k) => name(k.id));
-    const owned = (recordingsOf.get(workId) || []).length > 0;
+    const owned = (recordingsOf2.get(workId) || []).length > 0;
     movements.forEach((movement, index) => {
       const v = values.get(movement) || {};
       const movementTitle2 = text2(v.title) || `Movement ${index + 1}`;
@@ -43555,7 +43555,11 @@ function renderWork(c, workId, user) {
     byRealization.set(row.realization_id, current);
   }
   const state = c.db.prepare("SELECT * FROM user_work_state WHERE user_id=? AND work_id=?").get(user.id, workId);
-  const adminPick = c.db.prepare("SELECT realization_id FROM admin_work_pick WHERE work_id=?").get(workId)?.realization_id;
+  const recordings = recordingsOf(c, metadata, workId, movements, byRealization);
+  const shown = (realization) => recordings.find((r) => r.id === realization || r.releases.some((release) => release.realizationId === realization))?.id ?? realization;
+  const userPick = state?.picked_realization_id ? shown(state.picked_realization_id) : null;
+  const rawAdminPick = c.db.prepare("SELECT realization_id FROM admin_work_pick WHERE work_id=?").get(workId)?.realization_id;
+  const adminPick = rawAdminPick ? shown(rawAdminPick) : null;
   return {
     version: 1,
     work: {
@@ -43579,40 +43583,60 @@ function renderWork(c, workId, user) {
       }))
     },
     favourite: state?.favourite === 1,
-    pickedRealizationId: state?.picked_realization_id || adminPick || null,
+    pickedRealizationId: userPick || adminPick || null,
     adminPickId: adminPick || null,
-    pickScope: state?.picked_realization_id ? "user" : adminPick ? "admin" : null,
-    recordings: [...byRealization.entries()].map(([id, entries2], index) => {
-      const present = new Set(
-        entries2.flatMap((entry) => entry.movement_ids).filter(Boolean)
-      );
-      const performanceId = c.db.prepare("SELECT source_id FROM relation WHERE id=?").get(entries2[0].performance_work_id)?.source_id;
-      const recordingIds = c.db.prepare(
-        "SELECT source_id FROM relation WHERE kind='recording_performance' AND target_id=? ORDER BY source_id"
-      ).all(performanceId).map((row) => row.source_id);
-      const performers = credits2(c, metadata, performanceId).filter(
-        (credit) => credit.role !== "composer"
-      );
-      const first = evidenceOf(entries2[0]);
-      const album = text4(entries2[0].realization_label, text4(first.hints?.album, ""));
-      const artist = performers.length ? performers.map((credit) => credit.name).join(", ") : text4(first.hints?.artist, text4(first.hints?.albumArtist, ""));
-      return {
-        id,
-        label: [artist, album].filter(Boolean).join(" \xB7 ") || `Recording ${index + 1}`,
-        albumId: first.albumId == null ? null : String(first.albumId),
-        recordingIds,
-        credits: credits2(c, metadata, performanceId),
-        items: entries2.map(
-          (entry) => queueItem(
-            metadata,
-            entry,
-            entry.movement_id && entries2.filter((other) => other.movement_id === entry.movement_id).length > 1 ? entityValue(metadata, workId, "title", "") : null
-          )
-        ),
-        missing: movements.filter((movement) => !present.has(movement.id)),
-        complete: movements.length === 0 || movements.every((movement) => present.has(movement.id))
-      };
-    })
+    pickScope: userPick ? "user" : adminPick ? "admin" : null,
+    recordings
+  };
+}
+function recordingsOf(c, metadata, workId, movements, byRealization) {
+  const facts = new Map(ownedRecordings(c, void 0, void 0, { workId }).map((r) => [r.id, r]));
+  const groups = groupRecordings([...byRealization.keys()].map((id) => facts.get(id)).filter(Boolean));
+  const grouped = new Map(groups.flatMap((group) => group.realizations.map((r) => [r.id, group])));
+  const seen = /* @__PURE__ */ new Set();
+  const out = [];
+  for (const [id, entries2] of byRealization) {
+    const group = grouped.get(id);
+    if (group && seen.has(group.key)) continue;
+    if (group) seen.add(group.key);
+    const releases = (group?.realizations ?? [facts.get(id)].filter(Boolean)).flatMap(
+      (r) => r.albums.map((albumId) => ({ albumId: String(albumId), album: r.album || "", realizationId: r.id }))
+    );
+    out.push(recordingEntry(c, metadata, workId, movements, id, entries2, facts.get(id), releases, out.length));
+  }
+  return out;
+}
+function recordingEntry(c, metadata, workId, movements, id, entries2, fact, releases, index) {
+  const present = new Set(entries2.flatMap((entry) => entry.movement_ids).filter(Boolean));
+  const performanceId = c.db.prepare("SELECT source_id FROM relation WHERE id=?").get(entries2[0].performance_work_id)?.source_id;
+  const recordingIds = c.db.prepare("SELECT source_id FROM relation WHERE kind='recording_performance' AND target_id=? ORDER BY source_id").all(performanceId).map((row) => row.source_id);
+  const performers = credits2(c, metadata, performanceId).filter((credit) => credit.role !== "composer");
+  const first = evidenceOf(entries2[0]);
+  const album = text4(entries2[0].realization_label, text4(first.hints?.album, ""));
+  const artist = performers.length ? performers.map((credit) => credit.name).join(", ") : text4(first.hints?.artist, text4(first.hints?.albumArtist, ""));
+  const items = entries2.map(
+    (entry) => queueItem(
+      metadata,
+      entry,
+      entry.movement_id && entries2.filter((other) => other.movement_id === entry.movement_id).length > 1 ? entityValue(metadata, workId, "title", "") : null
+    )
+  );
+  entries2.forEach((entry, i) => items[i].movementIds = entry.movement_ids.filter(Boolean));
+  return {
+    id,
+    label: [artist, album].filter(Boolean).join(" \xB7 ") || `Recording ${index + 1}`,
+    albumId: first.albumId == null ? null : String(first.albumId),
+    recordingIds,
+    credits: credits2(c, metadata, performanceId),
+    performer: fact?.performerNames?.join(", ") || artist,
+    year: fact?.year ?? null,
+    recordLabel: fact?.label || "",
+    durationMs: fact?.durationMs || null,
+    parts: movements.map((movement) => ({ movementId: movement.id, durationMs: fact?.parts.get(movement.id) ?? null })),
+    releases,
+    items,
+    missing: movements.filter((movement) => !present.has(movement.id)),
+    complete: movements.length === 0 || movements.every((movement) => present.has(movement.id))
   };
 }
 async function readWork(input) {
@@ -44869,7 +44893,7 @@ async function search(input) {
 import path13 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.50" : "dev";
+var VERSION = true ? "1.0.51" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js
