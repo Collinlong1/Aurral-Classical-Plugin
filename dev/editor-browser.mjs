@@ -311,9 +311,15 @@ try {
         await menuPage.goto(`${url}/album/${phase4.albumId}`);
         await menuPage.getByRole("button", { name: "By work", exact: true }).waitFor();
         const presentation = await (await menuPage.request.get(`${url}/api/plugins/album-presentation/${phase4.albumId}`)).json();
-        const firstGroup = presentation.groups[0];
+        // The bounded work's group. Another work on the same tracks can
+        // start on the same track; their order is by ID, so never assume it
+        // comes first.
+        const groupIndex = presentation.groups.findIndex((group) => group.workId === phase4.work);
+        assert.ok(groupIndex >= 0, "the bounded work is on the album page");
+        const firstGroup = presentation.groups[groupIndex];
         const item = firstGroup.items[0];
-        const row = menuPage.getByRole("list", { name: /works$/ }).getByRole("listitem").first();
+        const rowIndex = presentation.groups.slice(0, groupIndex).reduce((sum, group) => sum + group.items.length, 0);
+        const row = menuPage.getByRole("list", { name: /works$/ }).getByRole("listitem").nth(rowIndex);
         await row.getByRole("button", { name: `${item.title} options`, exact: true }).click();
         await menuPage.getByRole("menuitem", { name: action, exact: true }).click();
         await menuPage.waitForFunction((id) => {
