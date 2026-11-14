@@ -35,6 +35,13 @@ for (const { id, title } of works) {
   console.log(`- made by matching: ${db.prepare("SELECT count(*) AS n FROM external_identity WHERE entity_id=? AND record_kind='album-work' AND state='active'").get(id).n} active album records`);
   console.log(`- MusicBrainz work IDs: ${db.prepare("SELECT group_concat(record_id) AS ids FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='work' AND state='active'").get(id).ids || "none"}`);
   console.log(`- movements: ${movements.length}`);
+  // Which recordings (realizations) hold each movement: the repeated-movement
+  // fold needs runs of movements each held only by its own recordings.
+  for (const [i, movement] of movements.entries()) {
+    const by = db.prepare("SELECT DISTINCT realization_id AS id FROM realization_item WHERE movement_id=? ORDER BY 1").all(movement).map((row) => row.id.slice(0, 8));
+    const content = db.prepare("SELECT count(*) AS n FROM recording_content WHERE movement_id=?").get(movement).n;
+    console.log(`  ${i + 1}. ${value(movement, "title")?.value ?? movement} — recordings ${by.join(", ") || "none"}; recording contents ${content}`);
+  }
   const manual = db
     .prepare(`SELECT m.entity_id AS target,a.field,a.value,a.actor,a.updated_at FROM assertion a JOIN metadata_target m ON m.id=a.target_id WHERE a.source='manual' AND m.entity_id IN (${marks}) ORDER BY a.updated_at`)
     .all(...ids);
@@ -54,7 +61,7 @@ for (const { id, title } of works) {
     )
     .all(id);
   console.log(`- recordings: ${new Set(recordings.map((row) => row.id)).size}`);
-  for (const row of recordings) console.log(`  - album ${row.album}: ${row.title}`);
+  for (const row of recordings) console.log(`  - ${row.id.slice(0, 8)} album ${row.album}: ${row.title}`);
 }
 console.log(`\n${works.length} work(s) matched.`);
 db.close();
