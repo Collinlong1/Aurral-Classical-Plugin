@@ -20,9 +20,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: Collinlong1/aurral
-          # Core aurral-classical after the Sync-fork merge of upstream
-          # through #1838 (the v0.1 release gate).
-          ref: cc51a659a51261fcbf6c9d404d5ebcae4c4fd858
+          # Core aurral-classical after merging fork main (upstream through
+          # #1889), the v0.2 starting point.
+          ref: 2c43f44a0086b873a9d0a76f267f6d663d6c2a19
           path: core
       - uses: actions/setup-node@v4
         with:
