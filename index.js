@@ -37400,7 +37400,13 @@ var isCatalogueRange = (text4) => /\d+[a-z]?\s*[-–—]\s*\d+/i.test(text4) || 
 var catalogued = (text4) => Boolean(catalogueNumber(text4)) && !isCatalogueRange(text4);
 var catalogueSet = (text4) => NUMBERED_SET.test(text4) && catalogued(text4);
 var COUNTED_COLLECTION = new RegExp("(?<!\\p{L})(?:\\d+|zwei|drei|vier|f\xFCnf|sechs|sieben|acht|neun|zehn|elf|zw\xF6lf|dreizehn|vierzehn|deux|trois|quatre|cinq|six|sept|huit|neuf|dix|douze|two|three|four|five|six|seven|eight|nine|ten|twelve)\\s+(?:\\p{L}+\\s+)?(?:lieder|songs?|m\xE9lodies|melodies|chants|ges\xE4nge)(?!\\p{L})", "iu");
-var readsAsWork = (text4) => Boolean(text4) && (!isCollectionLike(text4) && (MULTI_MOVEMENT.test(text4) || catalogued(text4)) || catalogueSet(text4) || COUNTED_COLLECTION.test(text4) && catalogued(text4));
+var WITH_FUGUE = new RegExp("(?<!\\p{L})(?:fugue|fuga|fuge|fughetta)(?!\\p{L})", "iu");
+var readsAsWork = (text4) => Boolean(text4) && (!isCollectionLike(text4) && (MULTI_MOVEMENT.test(text4) || catalogued(text4)) || catalogueSet(text4) || (COUNTED_COLLECTION.test(text4) || WITH_FUGUE.test(text4)) && catalogued(text4));
+var BOOK_IN_BRACKETS = /\s*\(([^()]*?(?:book|livre|teil|heft|vol\.?|volume)\s+(?:[ivx]+|\d+))(?:[^()]*)\)/iu;
+function withBook(title) {
+  const book = title.match(BOOK_IN_BRACKETS);
+  return book ? { title: clean3(title.replace(BOOK_IN_BRACKETS, "")), collection: clean3(book[1]) } : { title };
+}
 function numberedPiece(title) {
   const match2 = String(title).match(/^(.+?)[,\s]+(no\.?\s*\d+\b.*)$/i);
   if (!match2 || !NUMBERED_SET.test(match2[1]) || /\bin\s+[a-h]\b/i.test(match2[1])) return null;
@@ -37442,7 +37448,10 @@ function proposedWork({ work, grouping, title }, allowStructuredTitles) {
   }
   if (!allowStructuredTitles) return null;
   const candidate = titleHead(title);
-  if (readsAsWork(candidate)) return { title: candidate, evidence: "structured-title" };
+  if (readsAsWork(candidate)) {
+    const named = withBook(candidate);
+    return catalogued(named.title) || named.title === candidate ? { ...named, evidence: "structured-title" } : { title: candidate, evidence: "structured-title" };
+  }
   if (candidate) {
     const next = titleHead(splitTitle(title).tail) || splitTitle(title).tail;
     const number = catalogueNumber(next);
@@ -37471,7 +37480,9 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
     const hints = { ...tagged, title: withoutComposer(tagged.title, tagged.composer) };
     const offered = providerMatches.get(row.id);
     const own = offered ? trackSubject(tagged) : "";
-    const provider = offered && own && provablyDifferent(own, catalogueSubject(clean3(offered.work))) ? null : offered;
+    const heading = splitTitle(withoutComposer(tagged.title, tagged.composer)).head || "";
+    const inCollection = offered && CATALOGUE_RANGE.test(clean3(offered.work)) && catalogueSubject(heading) && !CATALOGUE_RANGE.test(heading);
+    const provider = offered && own && provablyDifferent(own, catalogueSubject(clean3(offered.work))) || inCollection ? null : offered;
     const local = proposedWork(hints, true);
     const proposal = provider ? {
       // The tags' own title wins when it names the same catalogue number.
@@ -38423,12 +38434,13 @@ function releaseRangeWorks(catalogue, { actor: actor3 = null } = {}) {
   }
   return released;
 }
+var bookName = (title) => words(String(title || "")).replace(/^(?:the|das|der|die|le|la|les|il)\s+/, "");
 function joinCollection(catalogue, metadata, work, { id: mbid, title }, actor3) {
   const db = catalogue.db;
   if (!title || db.prepare("SELECT 1 FROM relation WHERE kind='collection_member' AND target_id=?").get(work)) return;
   let collection = mbid ? db.prepare("SELECT entity_id AS id FROM external_identity WHERE provider='musicbrainz' AND record_kind='collection' AND record_id=? AND state='active'").get(mbid)?.id : null;
   if (!collection)
-    collection = db.prepare("SELECT id FROM entity WHERE kind='collection' AND deleted_at IS NULL ORDER BY created_at").all().map((row) => row.id).find((id) => words(resolvedName(catalogue, id, "title") || "") === words(title));
+    collection = db.prepare("SELECT id FROM entity WHERE kind='collection' AND deleted_at IS NULL ORDER BY created_at").all().map((row) => row.id).find((id) => bookName(resolvedName(catalogue, id, "title")) === bookName(title));
   if (!collection) {
     collection = catalogue.createEntity("collection");
     metadata.derived(collection, "title", title);
@@ -39182,6 +39194,32 @@ function repairMovementTitles(catalogue, { albumId = null } = {}) {
     }
   return repaired;
 }
+var FORM_ONLY = /^((?:[ivxlc]+|\d+)[.)]\s+)?(prelude|praeludium|präludium|prélude|preludio|fugue|fuga|fuge|fughetta|fantasia|fantasie|fantaisie|toccata)$/iu;
+var KEY_NAME = new RegExp("(?<!\\p{L})in\\s+([a-g](?:[-\u2010 ](?:flat|sharp))?\\s+(?:major|minor))(?!\\p{L})", "iu");
+function keyMovementTitles(catalogue, { albumId = null } = {}) {
+  const metadata = new Metadata(catalogue);
+  const rows = catalogue.db.prepare(
+    `SELECT r.source_id AS work,r.target_id AS movement,a.value FROM relation r
+       JOIN metadata_target m ON m.entity_id=r.target_id JOIN field_resolution f ON f.target_id=m.id AND f.field='title'
+       JOIN assertion a ON a.id=f.assertion_id AND a.source='derived'
+       WHERE r.kind='movement'
+       ${albumId == null ? "" : `AND r.source_id IN (SELECT re.work_id FROM realization re JOIN realization_item i ON i.realization_id=re.id
+              JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id
+              WHERE CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?)`}`
+  ).all(...albumId == null ? [] : [String(albumId)]);
+  let keyed = 0;
+  for (const row of rows) {
+    const current = JSON.parse(row.value);
+    const form2 = typeof current === "string" && clean3(current).match(FORM_ONLY);
+    if (!form2) continue;
+    const workTitle = String(resolvedName(catalogue, row.work, "title") || "");
+    const key = WITH_FUGUE.test(workTitle) && workTitle.match(KEY_NAME);
+    if (!key) continue;
+    metadata.derived(row.movement, "title", `${form2[1] || ""}${form2[2]} in ${clean3(key[1])}`);
+    keyed++;
+  }
+  return keyed;
+}
 function repairWorkTitles(catalogue) {
   const metadata = new Metadata(catalogue);
   const works = catalogue.db.prepare(
@@ -39265,6 +39303,7 @@ function autoMatchTaggedWorks(catalogue, {
   let created = 0;
   for (const group of groups)
     if (createGroup(catalogue, group, actor3, index)) created++;
+  keyMovementTitles(catalogue, { albumId });
   resolveSettledReviews(catalogue, albumId, actor3);
   return { created, candidates: groups.length };
 }
@@ -43241,7 +43280,7 @@ function summarize(lines2) {
 import path11 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.47" : "dev";
+var VERSION = true ? "1.0.48" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js

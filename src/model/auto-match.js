@@ -106,9 +106,23 @@ const catalogueSet = (text) => NUMBERED_SET.test(text) && catalogued(text);
 // a counted one with a catalogue number of its own is one ("Zwölf Lieder
 // von Fr. Schubert, S558bis").
 const COUNTED_COLLECTION = /(?<!\p{L})(?:\d+|zwei|drei|vier|fünf|sechs|sieben|acht|neun|zehn|elf|zwölf|dreizehn|vierzehn|deux|trois|quatre|cinq|six|sept|huit|neuf|dix|douze|two|three|four|five|six|seven|eight|nine|ten|twelve)\s+(?:\p{L}+\s+)?(?:lieder|songs?|mélodies|melodies|chants|gesänge)(?!\p{L})/iu;
+// A prelude with its fugue (or fughetta) and a number of its own is one
+// work, "Prelude" in its name notwithstanding: "Prelude & Fugue in E minor
+// (Well‐Tempered Clavier, Book I, no. 10), BWV 855".
+const WITH_FUGUE = /(?<!\p{L})(?:fugue|fuga|fuge|fughetta)(?!\p{L})/iu;
 const readsAsWork = (text) =>
   Boolean(text) &&
-  ((!isCollectionLike(text) && (MULTI_MOVEMENT.test(text) || catalogued(text))) || catalogueSet(text) || (COUNTED_COLLECTION.test(text) && catalogued(text)));
+  ((!isCollectionLike(text) && (MULTI_MOVEMENT.test(text) || catalogued(text))) ||
+    catalogueSet(text) ||
+    ((COUNTED_COLLECTION.test(text) || WITH_FUGUE.test(text)) && catalogued(text)));
+// The book a title names in brackets: "(Well‐Tempered Clavier, Book I, no.
+// 10)" is the book "Well‐Tempered Clavier, Book I", and the work's title
+// goes without it.
+const BOOK_IN_BRACKETS = /\s*\(([^()]*?(?:book|livre|teil|heft|vol\.?|volume)\s+(?:[ivx]+|\d+))(?:[^()]*)\)/iu;
+function withBook(title) {
+  const book = title.match(BOOK_IN_BRACKETS);
+  return book ? { title: clean(title.replace(BOOK_IN_BRACKETS, "")), collection: clean(book[1]) } : { title };
+}
 
 // "24 Préludes, op. 28 no. 6 in B minor": a numbered piece of a set named in
 // the plural. A key before the number names one piece instead ("Études in
@@ -188,7 +202,10 @@ function proposedWork({ work, grouping, title }, allowStructuredTitles) {
   if (!allowStructuredTitles) return null;
   // Every track of a work shares the head, numbered or not ("Theme: Largo").
   const candidate = titleHead(title);
-  if (readsAsWork(candidate)) return { title: candidate, evidence: "structured-title" };
+  if (readsAsWork(candidate)) {
+    const named = withBook(candidate);
+    return catalogued(named.title) || named.title === candidate ? { ...named, evidence: "structured-title" } : { title: candidate, evidence: "structured-title" };
+  }
   if (candidate) {
     // "Années de pèlerinage, Deuxième année: Italie, S. 161, no. 4: Sonetto
     // 47": the head names the work and the next part its number, as a WORK
@@ -246,7 +263,12 @@ function candidates(
     // recording linked to a sibling version) is not taken.
     const offered = providerMatches.get(row.id);
     const own = offered ? trackSubject(tagged) : "";
-    const provider = offered && own && provablyDifferent(own, catalogueSubject(clean(offered.work))) ? null : offered;
+    // Nor a collection of works ("The Well-Tempered Clavier, BWV 846–893")
+    // for a track whose own heading names one of them ("…, BWV 855: I.
+    // Prelude").
+    const heading = splitTitle(withoutComposer(tagged.title, tagged.composer)).head || "";
+    const inCollection = offered && CATALOGUE_RANGE.test(clean(offered.work)) && catalogueSubject(heading) && !CATALOGUE_RANGE.test(heading);
+    const provider = (offered && own && provablyDifferent(own, catalogueSubject(clean(offered.work)))) || inCollection ? null : offered;
     const local = proposedWork(hints, true);
     const proposal = provider
       ? {
@@ -1626,6 +1648,9 @@ export function releaseRangeWorks(catalogue, { actor = null } = {}) {
 // Well-Tempered Clavier, Book I"): the one with that MusicBrainz work, else
 // the one of that name, else a new one. A work already in a collection keeps
 // it (an admin may have chosen it).
+// "Well‐Tempered Clavier, Book I" and "The Well-Tempered Clavier, Book I"
+// are one book.
+const bookName = (title) => words(String(title || "")).replace(/^(?:the|das|der|die|le|la|les|il)\s+/, "");
 export function joinCollection(catalogue, metadata, work, { id: mbid, title }, actor) {
   const db = catalogue.db;
   if (!title || db.prepare("SELECT 1 FROM relation WHERE kind='collection_member' AND target_id=?").get(work)) return;
@@ -1637,7 +1662,7 @@ export function joinCollection(catalogue, metadata, work, { id: mbid, title }, a
       .prepare("SELECT id FROM entity WHERE kind='collection' AND deleted_at IS NULL ORDER BY created_at")
       .all()
       .map((row) => row.id)
-      .find((id) => words(resolvedName(catalogue, id, "title") || "") === words(title));
+      .find((id) => bookName(resolvedName(catalogue, id, "title")) === bookName(title));
   if (!collection) {
     collection = catalogue.createEntity("collection");
     metadata.derived(collection, "title", title);
@@ -2645,6 +2670,45 @@ export function repairMovementTitles(catalogue, { albumId = null } = {}) {
 // Work titles taken from MusicBrainz before the tags' own title won: when
 // every track of a work agrees on a title naming the same catalogue number,
 // use it. Manual and provider titles are left alone.
+// A movement named only by its form ("I. Prelude", "II. Fugue") of a
+// prelude and fugue says which it is with the work's key, as Apple Music
+// Classical writes "I. Prelude in C Minor": "I. Prelude in E minor". Only a
+// title matching gave it, and only when the work's title names a key.
+const FORM_ONLY = /^((?:[ivxlc]+|\d+)[.)]\s+)?(prelude|praeludium|präludium|prélude|preludio|fugue|fuga|fuge|fughetta|fantasia|fantasie|fantaisie|toccata)$/iu;
+const KEY_NAME = /(?<!\p{L})in\s+([a-g](?:[-‐ ](?:flat|sharp))?\s+(?:major|minor))(?!\p{L})/iu;
+export function keyMovementTitles(catalogue, { albumId = null } = {}) {
+  const metadata = new Metadata(catalogue);
+  const rows = catalogue.db
+    .prepare(
+      `SELECT r.source_id AS work,r.target_id AS movement,a.value FROM relation r
+       JOIN metadata_target m ON m.entity_id=r.target_id JOIN field_resolution f ON f.target_id=m.id AND f.field='title'
+       JOIN assertion a ON a.id=f.assertion_id AND a.source='derived'
+       WHERE r.kind='movement'
+       ${
+         albumId == null
+           ? ""
+           : `AND r.source_id IN (SELECT re.work_id FROM realization re JOIN realization_item i ON i.realization_id=re.id
+              JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id
+              WHERE CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?)`
+       }`,
+    )
+    .all(...(albumId == null ? [] : [String(albumId)]));
+  let keyed = 0;
+  for (const row of rows) {
+    const current = JSON.parse(row.value);
+    const form = typeof current === "string" && clean(current).match(FORM_ONLY);
+    if (!form) continue;
+    // Only a prelude-and-fugue kind of work: a suite's "I. Prélude" is told
+    // apart by its suite, as Apple Music Classical leaves it.
+    const workTitle = String(resolvedName(catalogue, row.work, "title") || "");
+    const key = WITH_FUGUE.test(workTitle) && workTitle.match(KEY_NAME);
+    if (!key) continue;
+    metadata.derived(row.movement, "title", `${form[1] || ""}${form[2]} in ${clean(key[1])}`);
+    keyed++;
+  }
+  return keyed;
+}
+
 export function repairWorkTitles(catalogue) {
   const metadata = new Metadata(catalogue);
   const works = catalogue.db
@@ -2748,6 +2812,7 @@ export function autoMatchTaggedWorks(
   let created = 0;
   for (const group of groups)
     if (createGroup(catalogue, group, actor, index)) created++;
+  keyMovementTitles(catalogue, { albumId });
   resolveSettledReviews(catalogue, albumId, actor);
   return { created, candidates: groups.length };
 }

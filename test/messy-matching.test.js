@@ -1478,11 +1478,28 @@ test("matching: a WORK tag starting at a collection of works names the work furt
   const vikingur = ["Prelude & Fugue in E minor (Well‐Tempered Clavier, Book I, no. 10), BWV 855", "Prelude & Fugue in D major (Well‐Tempered Clavier, Book I, no. 5), BWV 850"].flatMap((pf) =>
     ["I. Prelude", "II. Fugue"].map((m) => ({ title: `${pf}: ${m}`, composer: ["Johann Sebastian Bach"], genres: ["Classical"] })),
   );
+  // MusicBrainz naming the collection for them is refused now: each track's
+  // heading names its own prelude and fugue.
   const d = await catalogueWith(t, [{ id: "vikingur", album: "Johann Sebastian Bach", albumArtist: "Víkingur Ólafsson", artist: "Víkingur Ólafsson", titles: vikingur }]);
   const ids = d.db.prepare("SELECT id FROM track_link ORDER BY json_extract(evidence,'$.hints.trackNumber')").all().map((row) => row.id);
   const wtc = { workId: "mb-wtc", work: "The Well-Tempered Clavier, BWV 846–893", movement: null, aliases: [], composers: ["Johann Sebastian Bach"], composerIds: {} };
+  const placed = (catalogue) => renderAlbumPresentation(catalogue, "vikingur").groups.map((group) => [group.title, group.items.map((item) => item.title)]);
+  const expected = [
+    ["Prelude & Fugue in E minor, BWV 855 · “Well‐Tempered Clavier, Book I”", ["I. Prelude in E minor", "II. Fugue in E minor"]],
+    ["Prelude & Fugue in D major, BWV 850 · “Well‐Tempered Clavier, Book I”", ["I. Prelude in D major", "II. Fugue in D major"]],
+  ];
   autoMatchTaggedWorks(d, { albumId: "vikingur", actor: "model-identify", allowStructuredTitles: true, providerMatches: new Map(ids.map((id) => [id, wtc])) });
-  assert.equal(d.db.prepare("SELECT count(*) AS n FROM realization").get().n, 1);
-  assert.equal(releaseRangeWorks(d), 1);
-  assert.equal(d.db.prepare("SELECT count(*) AS n FROM realization_item").get().n, 0);
+  assert.deepEqual(placed(d), expected);
+
+  // The shape an earlier version left (one recording of the collection, the
+  // tracks naming BWV 855 and 850) is let go, and the scan places each.
+  const e = await catalogueWith(t, [{ id: "vikingur", album: "Johann Sebastian Bach", albumArtist: "Víkingur Ólafsson", artist: "Víkingur Ólafsson", titles: ["I. Prelude", "II. Fugue", "III. Prelude", "IV. Fugue"].map((title) => ({ title, composer: ["Johann Sebastian Bach"], genres: ["Classical"] })) }]);
+  const old = e.db.prepare("SELECT id FROM track_link ORDER BY json_extract(evidence,'$.hints.trackNumber')").all().map((row) => row.id);
+  autoMatchTaggedWorks(e, { albumId: "vikingur", actor: "model-identify", allowStructuredTitles: true, providerMatches: new Map(old.map((id) => [id, wtc])) });
+  assert.equal(e.db.prepare("SELECT count(*) AS n FROM realization").get().n, 1);
+  old.forEach((id, i) => e.db.prepare("UPDATE track_link SET evidence=json_set(evidence,'$.hints.title',?) WHERE id=?").run(vikingur[i].title, id));
+  assert.equal(releaseRangeWorks(e), 1);
+  assert.equal(e.db.prepare("SELECT count(*) AS n FROM realization_item").get().n, 0);
+  autoMatchTaggedWorks(e, { actor: "model-scan", allowStructuredTitles: true });
+  assert.deepEqual(placed(e), expected);
 });

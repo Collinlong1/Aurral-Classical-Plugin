@@ -1,3 +1,14 @@
+# 1.0.48: preludes and fugues named by their tracks, with their keys
+
+November 14, 2026. On 1.0.47 (scan of 12,802 tracks, 0 errors; "Work names and books from MusicBrainz" looked up 1,357 works, renamed 63, filed 7) the user's Bach album still had "The Well-Tempered Clavier, BWV 846–893" as one recording of BWV 855, 850 and 847, re-identified into the same shape; BWV 902 took its English title. Its tracks read "Prelude & Fugue in E minor (Well‐Tempered Clavier, Book I, no. 10), BWV 855: I. Prelude": "Prelude" made the heading a loose collection to the title rules, so no local work, and the guard against a MusicBrainz work with another number took the track's number from that same rule, so it never fired. The user also asked for keys in the movements, as Apple writes "I. Prelude in C Minor".
+
+- A heading with its own catalogue number that names a fugue or fughetta reads as a work; a book in brackets ("(Well‐Tempered Clavier, Book I, no. 10)") becomes its collection and leaves the title ("Prelude & Fugue in E minor, BWV 855").
+- A MusicBrainz match naming a collection of works (a catalogue range) is refused for a track whose own heading names a number of its own.
+- `keyMovementTitles` (every match): a movement of a prelude-and-fugue kind of work (its title names a fugue and a key) named by its form only ("I. Prelude", "II. Fugue") takes the key: "I. Prelude in E minor". A suite's "I. Prélude" is left alone, as Apple leaves it. Derived titles only.
+- Collections match by name without a leading article ("Well‐Tempered Clavier, Book I" is "The Well-Tempered Clavier, Book I").
+
+Corpus: work-tags blocks match Apple on 196/204 albums (from 195), false joins 54 (from 59); baseline saved; non-classical unchanged. Test: the Well-Tempered Clavier test checks the refused MusicBrainz collection, the old one-recording shape let go and placed by the scan, the book from the brackets and the keyed movements; fails on 1.0.47. 316 plugin tests pass; the bundle runs its worker.
+
 # 1.0.47: works matched before get their book
 
 November 14, 2026. 1.0.46 gives a work its collection (the book above it) only when matching makes it; the user asked how works matched before get theirs.
