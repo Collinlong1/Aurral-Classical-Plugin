@@ -219,8 +219,7 @@ the stored state and whether it came from a track pin, an album pin or the
 automatic classifier, and the state the next scan would store (marked `*` when
 it changes). Pins are never changed by a scan. `--album <id>` limits it to one
 album, `--all` includes ordinary tracks, `--json` prints the data. An admin can
-get one album's summary from its menu: **Classification report (read
-only)**.
+get one album's summary from its menu: **Classical report**.
 
 ## Test corpus
 
@@ -270,7 +269,7 @@ npm run corpus -- --nonclassical --update-baseline     # save an improvement (ex
 
 For a real Aurral, put the generated folder in Aurral's library folder, set
 the plugin's MusicBrainz mirror to `http://localhost:5099`, then run the model
-scan and "Auto-match classical works". Add an album here for every new case.
+scan (Activity → Maintenance) and "Match classical works". Add an album here for every new case.
 
 ## Release
 
@@ -286,8 +285,8 @@ Library can be mounted read only. The editor, album **By work** view and work
 pages need the matching Aurral Classical fork, which adds generic admin-form
 and album-presentation hooks; a stock Aurral shows none of them.
 
-**Scans.** **Scan classical model (read only)** (album menu, admin) indexes the
-Library in resumable batches; the plugin schedule also rescans every 6 hours
+**Scans.** **Scan the library** (the editor's Activity → Maintenance, admin)
+indexes the Library in resumable batches; the plugin schedule also rescans every 6 hours
 and after downloads. A download that arrives during a scan, or while the host
 can't be reached, still gets a fresh scan later. Files the tag reader rejects
 keep the tags an earlier scan read.
@@ -304,10 +303,10 @@ a piece into more tracks line up with the movements they cover.
 Albums whose unmatched tracks carry MusicBrainz recording IDs and are new or
 changed since the last scan are then looked up on MusicBrainz in the
 background, one request a second on the public server, cached and resumable;
-**Classical model status** shows the queue. Albums already in the Library
+Activity → Maintenance shows the queue. Albums already in the Library
 when this was installed are looked up only when an admin runs **Identify
-earlier albums on MusicBrainz** (once). **Auto-match classical works (read
-only)** still runs both for one album at once. MusicBrainz IDs and the tags'
+earlier albums** there (once). **Match classical works** (album menu) still
+runs both for one album at once. MusicBrainz IDs and the tags'
 own titles are reconciled into one work, and MusicBrainz composer IDs keep
 same-named composers apart. When more than one work or composer could fit,
 nothing is created: the album goes to the review queue, and its review closes

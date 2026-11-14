@@ -1573,7 +1573,7 @@ export function renderV2(c, query, revision, { downloads = null, maintenance = n
   if (!tracks)
     notes.push({
       tone: "warning",
-      text: "No owned tracks are indexed yet. Run “Scan classical model (read only)” from an album menu; scans also run on their own when the plugin schedule is on.",
+      text: "No owned tracks are indexed yet. Start a scan from Activity → Maintenance; scans also run on their own when the plugin schedule is on.",
     });
   const listActions = {
     works: [open("New work", "new:work")],

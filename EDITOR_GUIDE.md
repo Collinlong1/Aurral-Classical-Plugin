@@ -56,7 +56,7 @@ Dismiss items you've checked.
 
 ## Scans
 
-Scans run on their own when the plugin schedule and API access are on: after downloads, and every 6 hours. Admins can also run **Scan classical model (read only)** from an album menu. Opening the editor never starts a scan, identification or download.
+Scans run on their own when the plugin schedule and API access are on: after downloads, and every 6 hours. Admins can also start one from **Activity → Maintenance**. Opening the editor never starts a scan, identification or download.
 
 ## Activity
 
