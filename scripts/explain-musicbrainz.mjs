@@ -16,7 +16,7 @@ import sqlite, { DatabaseSync } from "node:sqlite";
 import { MusicBrainz } from "../src/mb.js";
 import { ClassicalResolver } from "../src/resolver.js";
 import { identifyTrack } from "../src/model/runtime.js";
-import { autoMatchTaggedWorks } from "../src/model/auto-match.js";
+import { autoMatchTaggedWorks, explainMatching } from "../src/model/auto-match.js";
 import { openCatalogue } from "../src/model/catalogue.js";
 
 const [folder, outDir = "."] = process.argv.slice(2);
@@ -86,7 +86,16 @@ try {
     try {
       match = await identifyTrack(ctx, hints);
     } catch {}
-    const says = !recording
+    const tagged = hints.workId ? get("work", hints.workId) : null;
+    const says = hints.workId && !works.length
+      ? match
+        ? match.standalone
+          ? `a whole work: "${match.work}" (work ID in its tags)`
+          : `"${match.movement ?? tagged?.title ?? hints.workId}" of "${match.work}" (work ID in its tags)`
+        : tagged
+          ? `work "${tagged.title}" (work ID in its tags), refused: no parent, and the title reads as a movement`
+          : "work ID in its tags, not cached"
+      : !recording
       ? "no cached answer for its recording"
       : !works.length
         ? "the recording names no work"
@@ -104,10 +113,14 @@ try {
   }
 
   // What Auto-match would then do, album by album, on the snapshot.
+  // Why the matching step leaves a track out, before Auto-match runs.
   const albums = [...new Set(tracks.map((track) => track.albumId))];
+  const why = new Map();
   for (const albumId of albums) {
     const matches = new Map(tracks.filter((t) => t.albumId === albumId && providerMatches.has(t.id)).map((t) => [t.id, providerMatches.get(t.id)]));
-    if (matches.size) autoMatchTaggedWorks(sim, { albumId, actor: "explain", allowStructuredTitles: true, providerMatches: matches });
+    if (!matches.size) continue;
+    for (const [id, { reason, work }] of explainMatching(sim, albumId, matches)) why.set(id, { reason, work });
+    autoMatchTaggedWorks(sim, { albumId, actor: "explain", allowStructuredTitles: true, providerMatches: matches });
   }
   const workOf = sim.db.prepare(
     `SELECT r.work_id FROM segment s JOIN realization_item i ON i.segment_id=s.id JOIN realization r ON r.id=i.realization_id WHERE s.track_link_id=? LIMIT 1`,
@@ -119,7 +132,17 @@ try {
   }
   for (const track of tracks) {
     const work = workOf.get(track.id)?.work_id;
-    track.outcome = work ? `matches "${nameOf(work)}"` : reviews.has(track.id) ? `review: ${reviews.get(track.id)}` : track.work ? "stays out (Auto-match refuses this MusicBrainz match)" : "stays out";
+    const reason = why.get(track.id)?.reason;
+    track.reason = reason || null;
+    track.outcome = work
+      ? `matches "${nameOf(work)}"`
+      : reviews.has(track.id)
+        ? `review: ${reviews.get(track.id)}`
+        : !track.work
+          ? "stays out"
+          : !reason || reason === "matches when Auto-match runs"
+            ? "stays out: the match was refused when made (an earlier match of this album was undone, or an admin took the album out)"
+            : `stays out: ${reason}`;
   }
   sim.close();
 

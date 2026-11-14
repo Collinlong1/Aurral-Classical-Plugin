@@ -79,6 +79,7 @@ test("explain-musicbrainz: reads cached answers only and says what Auto-match wo
     ["Aida: Ritorna vincitor!", "rec-1"],
     ["Aida: O patria mia", "rec-2"],
     ["Contextures: Riots - Decade ’60: III. Con calore", "rec-3"],
+    ["Aida: Celeste Aida", "rec-4"],
   ];
   const tracks = entries.map(([title, recordingMbid], i) => ({
     coreId: `decca-${i}`,
@@ -87,8 +88,8 @@ test("explain-musicbrainz: reads cached answers only and says what Auto-match wo
     size: 1000,
     durationMs: 60000,
     fingerprint: `audio-sha256-v2:decca-${i}`,
-    albumId: "decca",
-    hints: { title, album: "Decca Sound", albumArtist: "Various Artists", artist: "Singer", composer: [i < 2 ? "Giuseppe Verdi" : "William Kraft"], genres: ["Classical"], work: "", trackNumber: i + 1, discNumber: 1, recordingMbid },
+    albumId: i === 3 ? "arias" : "decca",
+    hints: { title, album: i === 3 ? "Arias" : "Decca Sound", albumArtist: "Various Artists", artist: "Singer", composer: [i === 2 ? "William Kraft" : "Giuseppe Verdi"], genres: ["Classical"], work: "", trackNumber: i + 1, discNumber: 1, recordingMbid },
   }));
   for (const row of reconcile(c, { version: 1, complete: true, instanceId: "i", epoch: "e", generation: 1, tracks })) classify(c, row.id, row.hints);
   c.close();
@@ -97,7 +98,7 @@ test("explain-musicbrainz: reads cached answers only and says what Auto-match wo
   const verdi = { type: "composer", direction: "backward", artist: { id: "verdi", name: "Giuseppe Verdi" } };
   const aida = { id: "aida", title: "Aida", relations: [verdi] };
   const aria = (id, title) => ({ id, title, relations: [verdi, { type: "parts", direction: "backward", work: aida }] });
-  for (const [id, work] of [["rec-1", aria("w-1", "Aida: Atto I, Scena I. Ritorna vincitor!")], ["rec-2", aria("w-2", "Aida: Atto III. O patria mia")]]) {
+  for (const [id, work] of [["rec-1", aria("w-1", "Aida: Atto I, Scena I. Ritorna vincitor!")], ["rec-2", aria("w-2", "Aida: Atto III. O patria mia")], ["rec-4", aria("w-4", "Aida: Atto I, Scena I. Celeste Aida")]]) {
     await cache.set(`${base}|recording/${id}?fmt=json&inc=${ClassicalResolver.RECORDING_INC.replaceAll("+", "%2B")}`, { id, title: "x", "artist-credit": [], relations: [{ type: "performance", direction: "forward", work: { id: work.id, title: work.title } }] });
     for (const inc of ["aliases+artist-rels+work-rels", ClassicalResolver.WORK_INC]) await cache.set(`${base}|work/${work.id}?fmt=json&inc=${inc.replaceAll("+", "%2B")}`, work);
   }
@@ -115,6 +116,10 @@ test("explain-musicbrainz: reads cached answers only and says what Auto-match wo
   assert.match(byTitle["Aida: Ritorna vincitor!"][1], /^matches "Aida"/);
   assert.equal(byTitle["Contextures: Riots - Decade ’60: III. Con calore"][0], "the recording names no work");
   assert.equal(byTitle["Contextures: Riots - Decade ’60: III. Con calore"][1], "stays out");
+  // One aria alone on its album: MusicBrainz names the opera, matching
+  // says why it stays out.
+  assert.match(byTitle["Aida: Celeste Aida"][0], /of "Aida"/);
+  assert.equal(byTitle["Aida: Celeste Aida"][1], "stays out: only one track of a work with movements on this album");
   assert.equal(await hash(), before);
   assert.deepEqual((await fs.readdir(out)).sort(), ["musicbrainz.json", "musicbrainz.md"]);
 });

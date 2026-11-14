@@ -360,9 +360,9 @@ function candidates(
 
 // What Auto-match would make of each classical track on an album, and why a
 // track stays out of every work. Reads only.
-export function explainMatching(catalogue, albumId) {
+export function explainMatching(catalogue, albumId, providerMatches = new Map()) {
   const explain = new Map();
-  candidates(catalogue, albumId, true, new Map(), explain);
+  candidates(catalogue, albumId, true, providerMatches, explain);
   return explain;
 }
 
