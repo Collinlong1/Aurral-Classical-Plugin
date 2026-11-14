@@ -41,6 +41,28 @@ export function warnDuplicate(c, title, composers, createAnyway) {
 }
 const CREATE_ANYWAY = { key: "createAnyway", label: "Create anyway", type: "checkbox", value: false, help: "Only if no existing work is the same piece." };
 const PAGE = 100;
+// Long sections in an entry's view (a composer's works, a work's recordings
+// or movements) show 100 rows at a time; the page is part of the selection
+// ("ID~2"), so a reload or an edit keeps it.
+const SECTION_PAGE = 100;
+export function parseEntitySelection(selection) {
+  const match = /^(.*)~(\d{1,6})$/.exec(selection);
+  return match ? { id: match[1], page: Number(match[2]) } : { id: selection, page: 0 };
+}
+const entitySelection = (id, page) => (page > 0 ? `${id}~${page}` : id);
+function paged(rows, page, id, noun = "") {
+  if (rows.length <= SECTION_PAGE) return { rows };
+  const pages = Math.ceil(rows.length / SECTION_PAGE);
+  const at = Math.min(Math.max(0, page), pages - 1);
+  return {
+    rows: rows.slice(at * SECTION_PAGE, (at + 1) * SECTION_PAGE),
+    pager: {
+      label: `${noun ? `${noun} ` : ""}${at * SECTION_PAGE + 1}–${Math.min((at + 1) * SECTION_PAGE, rows.length)} of ${rows.length}`,
+      ...(at > 0 && { previous: entitySelection(id, at - 1) }),
+      ...(at < pages - 1 && { next: entitySelection(id, at + 1) }),
+    },
+  };
+}
 const ROLES = CREDIT_ROLES;
 const roleLabel = (role) => role[0].toUpperCase() + role.slice(1);
 const PROVIDERS = { musicbrainz: "MusicBrainz", openopus: "Open Opus", "open-opus": "Open Opus" };
@@ -273,15 +295,7 @@ function reviewLabel(c, review) {
                 : "Tracks didn't line up with the work's movements",
       };
     case "identity":
-      return {
-        label: labelOf(c, review.target_id) || "Catalogue entry",
-        detail:
-          review.evidence.reason === "duplicate-work"
-            ? "Possible duplicate work"
-            : review.evidence.reason === "same-name-composers"
-              ? "Several composers share this name"
-              : "Identity needs checking",
-      };
+      return { label: labelOf(c, review.target_id) || "Catalogue entry", detail: identityQuestion(c, review) };
     case "track_link":
       return { label: trackName || "Track", detail: "File changed or moved; link needs checking" };
     default:
@@ -290,6 +304,48 @@ function reviewLabel(c, review) {
         detail: review.kind.replace(/_/g, " "),
       };
   }
+}
+
+// Identity reviews ask one of three questions; each says which.
+const DUPLICATE_WHY = {
+  "same title, no number": "same title and composer, no catalogue number to tell them apart",
+  "different MusicBrainz identities": "same title and composer, but linked to different MusicBrainz works",
+};
+const PROVIDER_PAGES = { musicbrainz: "https://musicbrainz.org" };
+function providerIdentity(c, review) {
+  const { provider, recordKind, recordId, confidence } = review.evidence;
+  if (!provider || !recordId) return null;
+  const holder = c.db
+    .prepare(
+      `SELECT x.entity_id FROM external_identity x JOIN entity e ON e.id=x.entity_id AND e.deleted_at IS NULL
+       WHERE x.provider=? AND x.record_kind=? AND x.record_id=? AND x.state='active'`,
+    )
+    .get(provider, recordKind, recordId)?.entity_id;
+  const linkedHere = holder === review.target_id;
+  return {
+    provider,
+    recordKind,
+    recordId,
+    confidence: Number.isFinite(confidence) ? confidence : null,
+    holder: holder && !linkedHere ? holder : null,
+    linkedHere,
+    url: PROVIDER_PAGES[provider] && recordKind ? `${PROVIDER_PAGES[provider]}/${recordKind}/${recordId}` : null,
+  };
+}
+function identityQuestion(c, review) {
+  const reason = review.evidence.reason;
+  if (reason === "duplicate-work") {
+    const other = review.evidence.keep ? labelOf(c, review.evidence.keep) : null;
+    const why = DUPLICATE_WHY[review.evidence.evidence] || "same title and composer";
+    return `Possible duplicate of “${other || "another work"}”: ${why}`.slice(0, 500);
+  }
+  if (reason === "same-name-composers") return `Several composers are named “${review.evidence.name || labelOf(c, review.target_id) || "this"}”: one person or different people?`.slice(0, 500);
+  const identity = providerIdentity(c, review);
+  if (!identity) return "Identity needs checking";
+  const record = `${providerName(identity.provider)} ${identity.recordKind || "record"}`;
+  if (identity.holder) return `This ${record} is already linked to “${labelOf(c, identity.holder) || "another entry"}”: the same piece twice, or the wrong match?`.slice(0, 500);
+  if (identity.linkedHere) return `Linked to this ${record} since; nothing left to decide`;
+  return `Matched a ${record}${identity.confidence != null ? ` only ${Math.round(identity.confidence * 100)}% sure` : " without enough certainty"}; not linked until you confirm`;
 }
 
 // Two works that may be one, side by side: each field for both, differences
@@ -327,8 +383,18 @@ function duplicateSections(c, a, b, reviewId) {
       badge: same ? { label: "Same", tone: "muted" } : { label: "Differs", tone: "warning" },
     };
   });
-  const preview = mergePreview(c, b, a);
   const movementNames = (id) => entityLabel(c, id, "movement");
+  // What a merge would do, either way round.
+  const previewItems = (keep, drop) => {
+    const preview = mergePreview(c, keep, drop, { addMissing: true });
+    return [
+      { label: "Kept", value: `“${entityLabel(c, keep, "work")}”, with its title and fields; fields set on the other are not copied`, selection: keep },
+      { label: "Recordings after", value: `${realizationsOf(a).length + realizationsOf(b).length}, every track keeps its file` },
+      ...preview.mapped.slice(0, 20).map(({ from, to }) => ({ label: movementNames(from), value: `becomes ${movementNames(to)}` })),
+      ...preview.added.slice(0, 10).map((id) => ({ label: movementNames(id), value: "added to the kept work, at the end" })),
+      { label: "Undo", value: "From Activity, until either work changes again" },
+    ];
+  };
   return [
     {
       type: "rows",
@@ -338,29 +404,17 @@ function duplicateSections(c, a, b, reviewId) {
       rows,
       actions: [open("Edit this work", a), open("Edit the other work", b)],
     },
-    {
-      type: "details",
-      id: "merge-preview",
-      title: "If you merge this into the other work",
-      items: preview.ok
-        ? [
-            { label: "Kept", value: `“${entityLabel(c, b, "work")}”, with its title and fields; fields you set on this one are not copied`, selection: b },
-            { label: "Recordings after", value: `${realizationsOf(a).length + realizationsOf(b).length}, every track keeps its file` },
-            ...preview.mapped.slice(0, 30).map(({ from, to }) => ({ label: movementNames(from), value: `becomes ${movementNames(to)}` })),
-            { label: "Undo", value: "From Activity, until either work changes again" },
-          ]
-        : [{ label: "Can't merge yet", value: "The two works' movements don't line up. Rename or reorder them so they match, then merge." }],
-    },
+    { type: "details", id: "merge-preview", title: "If you merge this into the other work", items: previewItems(b, a) },
+    { type: "details", id: "merge-preview-other", title: "If you merge the other work into this", items: previewItems(a, b) },
     {
       type: "rows",
       id: "decide",
       title: "Decide",
       rows: [],
-      empty: "Merge, keep both as separate works, or dismiss to decide later.",
+      empty: "Merge either way, keep both as separate works, or dismiss to decide later.",
       actions: [
-        ...(preview.ok
-          ? [action("Merge into the other", "merge-entity", { target: a, into: b, confirm: true }, { tone: "danger", confirm: "Move this work's recordings, credits, favourites and picks into the other work, then remove this one? You can undo it from Activity." })]
-          : []),
+        action("Merge into the other", "merge-entity", { target: a, into: b, confirm: true }, { tone: "danger", confirm: "Move this work's recordings, credits, favourites and picks into the other work, then remove this one? You can undo it from Activity." }),
+        action("Merge the other into this", "merge-entity", { target: a, into: b, direction: "from", confirm: true }, { tone: "danger", confirm: "Move the other work's recordings, credits, favourites and picks into this one, then remove the other? You can undo it from Activity." }),
         action("Keep both", "keep-distinct", { id: reviewId }),
       ],
     },
@@ -477,14 +531,24 @@ const mergeForm = (target, lookup, noun, note) => ({
   arguments: { target },
   submitLabel: "Merge",
   fields: [
-    { key: "into", label: `Keep this ${noun}`, type: "lookup", lookup, value: "", placeholder: `Search ${noun}s`, required: true },
-    { key: "confirm", label: `Remove this ${noun} after moving everything`, type: "checkbox", value: false },
+    { key: "into", label: `Other ${noun}`, type: "lookup", lookup, value: "", placeholder: `Search ${noun}s`, required: true },
+    {
+      key: "direction",
+      label: "Which one stays",
+      type: "select",
+      value: "into",
+      options: [
+        { value: "into", label: `Merge this ${noun} into the other (the other stays)` },
+        { value: "from", label: `Merge the other ${noun} into this one (this one stays)` },
+      ],
+    },
+    { key: "confirm", label: `Remove the ${noun} merged away after moving everything`, type: "checkbox", value: false },
   ],
 });
 
 // ---- views ---------------------------------------------------------------
 
-function workView(c, work) {
+function workView(c, work, page = 0) {
   const title = entityLabel(c, work, "work");
   const composers = credits(c, work).filter((credit) => credit.role === "composer");
   const movements = workMovements(c, work);
@@ -535,7 +599,7 @@ function workView(c, work) {
         id: "movements",
         title: "Movements",
         empty: "No movements. Single-movement works can stay this way.",
-        rows: movements.map((movement, index) => ({
+        ...paged(movements.map((movement, index) => ({
           id: movement.id,
           label: entityLabel(c, movement.id, "movement"),
           detail: performances.length ? `In ${coverage.get(movement.id) || 0} of ${performances.length} recordings` : undefined,
@@ -545,7 +609,7 @@ function workView(c, work) {
             ...(index < movements.length - 1 ? [action("Move down", "move-movement", { work, movement: movement.id, direction: "down" })] : []),
             ...(coverage.get(movement.id) ? [] : [action("Delete", "delete-movement", { work, movement: movement.id }, { tone: "danger", confirm: "Delete this movement?" })]),
           ],
-        })),
+        })), page, work, "Movements"),
       },
       {
         type: "form",
@@ -563,7 +627,7 @@ function workView(c, work) {
         title: "Recordings",
         note: "Open an album to change which of its tracks belong to this work.",
         empty: "No owned recordings yet. Open an album and assign it to this work.",
-        rows: [...recordingRows, ...broadcasts],
+        ...paged([...recordingRows, ...broadcasts], page, work, "Recordings"),
       },
       {
         type: "form",
@@ -579,12 +643,12 @@ function workView(c, work) {
           { key: "description", label: "Notes", type: "textarea", value: "" },
         ],
       },
-      mergeForm(work, "works", "work", "Moves this work's recordings, credits, favourites and picks into the work you choose. Movements are matched by title or number."),
+      mergeForm(work, "works", "work", "Moves the recordings, credits, favourites and picks of the work merged away into the one that stays. Movements are matched by title or number; a movement the staying work lacks is added to it, at the end, to put in order afterwards."),
     ],
   };
 }
 
-function contributorView(c, entity) {
+function contributorView(c, entity, page = 0) {
   const kind = entity.kind;
   const name = entity.label;
   const composer = kind === "person" && isComposer(c, entity);
@@ -603,9 +667,14 @@ function contributorView(c, entity) {
         id: "works",
         title: "Works",
         empty: "No works yet.",
-        rows: works
-          .map((work) => ({ id: work, label: entityLabel(c, work, "work"), detail: `${realizations(c, work).length} recordings`, selection: work }))
-          .sort((a, b) => a.label.localeCompare(b.label)),
+        ...paged(
+          works
+            .map((work) => ({ id: work, label: entityLabel(c, work, "work"), detail: `${realizations(c, work).length} recordings`, selection: work }))
+            .sort((a, b) => a.label.localeCompare(b.label)),
+          page,
+          entity.id,
+          "Works",
+        ),
       },
       {
         type: "form",
@@ -627,12 +696,17 @@ function contributorView(c, entity) {
       type: "rows",
       id: "credits",
       title: composer ? "Other credits" : "Credits",
-      rows: other.map((credit) => ({
-        id: credit.id,
-        label: entityLabel(c, credit.target_id, credit.target_kind),
-        detail: `${roleLabel(credit.role)}${credit.instrument ? ` · ${credit.instrument}` : ""}`,
-        selection: credit.target_id,
-      })),
+      ...paged(
+        other.map((credit) => ({
+          id: credit.id,
+          label: entityLabel(c, credit.target_id, credit.target_kind),
+          detail: `${roleLabel(credit.role)}${credit.instrument ? ` · ${credit.instrument}` : ""}`,
+          selection: credit.target_id,
+        })),
+        page,
+        entity.id,
+        "Credits",
+      ),
     });
   sections.push(mergeForm(entity.id, kind === "ensemble" ? "contributors" : composer ? "composers" : "contributors", kind === "ensemble" ? "ensemble" : "person", "Moves every credit to the entry you choose, then removes this one."));
   return {
@@ -647,7 +721,7 @@ function contributorView(c, entity) {
   };
 }
 
-function movementView(c, movement) {
+function movementView(c, movement, page = 0) {
   const work = c.db.prepare("SELECT source_id FROM relation WHERE kind='movement' AND target_id=?").get(movement)?.source_id;
   const items = c.db
     .prepare(
@@ -672,12 +746,17 @@ function movementView(c, movement) {
         id: "tracks",
         title: "Owned tracks",
         empty: "No owned track is assigned to this movement yet.",
-        rows: items.map((item) => ({
-          id: item.id,
-          label: trackTitle(item.evidence),
-          detail: [item.evidence.hints?.artist, item.label || item.evidence.hints?.album].filter(Boolean).join(" · "),
-          ...(item.evidence.albumId != null && { selection: `album:${item.evidence.albumId}` }),
-        })),
+        ...paged(
+          items.map((item) => ({
+            id: item.id,
+            label: trackTitle(item.evidence),
+            detail: [item.evidence.hints?.artist, item.label || item.evidence.hints?.album].filter(Boolean).join(" · "),
+            ...(item.evidence.albumId != null && { selection: `album:${item.evidence.albumId}` }),
+          })),
+          page,
+          movement,
+          "Tracks",
+        ),
       },
     ],
   };
@@ -783,20 +862,33 @@ function guessWork(tracks) {
   return "";
 }
 const ALBUM_PAGE = 100;
-// "album:ID", "album:ID@WORK" (assigning to a work), each with "~PAGE".
+// "album:ID", "album:ID@WORK" (assigning to a work), each with "~PAGE", and
+// "!TOKEN" when moving ticked tracks (the token names them).
 export function parseAlbumSelection(selection) {
-  const [rest, page = "0"] = selection.slice(6).split("~");
+  const [body, move = ""] = selection.slice(6).split("!");
+  const [rest, page = "0"] = body.split("~");
   const [albumId, work = ""] = rest.split("@");
   const index = Number(page);
-  return { albumId, work, page: Number.isSafeInteger(index) && index >= 0 ? index : 0 };
+  return { albumId, work, move, page: Number.isSafeInteger(index) && index >= 0 ? index : 0 };
 }
-const albumSelection = (albumId, work, page) => `album:${albumId}${work ? `@${work}` : ""}${page ? `~${page}` : ""}`;
+const albumSelection = (albumId, work, page, move = "") =>
+  `album:${albumId}${work ? `@${work}` : ""}${page ? `~${page}` : ""}${move ? `!${move}` : ""}`;
+const pageOf = (v) => (Number.isSafeInteger(Number(v.page)) && Number(v.page) > 0 ? Number(v.page) : 0);
+
+// Tracks ticked to move, stored under a short-lived token (a selection
+// can't hold a hundred track IDs).
+function movingTracks(c, token) {
+  const row = c.db.prepare("SELECT data FROM change_set WHERE id=? AND kind='selection'").get(token);
+  const tracks = row ? JSON.parse(row.data).tracks : null;
+  if (!Array.isArray(tracks)) fail("Those ticked tracks are no longer remembered. Tick them again.");
+  return tracks;
+}
 
 // One workflow for an album: the works it holds, then its tracks a page of
 // 100 at a time, split into those not in a work and those in one, each
 // selectable for bulk changes, then the forms that put unmatched tracks on
 // this page into a work. A 600-track box set never sends every track.
-function albumView(c, albumId, chosenWork, page = 0) {
+function albumView(c, albumId, chosenWork, page = 0, move = "") {
   const album = albums(c, albumId).get(albumId);
   if (!album) fail("This album isn't in the classical index. Run a scan first.");
   const tracks = album.tracks;
@@ -848,6 +940,13 @@ function albumView(c, albumId, chosenWork, page = 0) {
     action("Send to Classical", "set-classification", { state: "classical" }),
     action("Remove from Classical", "set-classification", { state: "not_classical" }, { tone: "danger", confirm: "Remove these tracks from Aurral Classical? They stay in your Aurral library." }),
   ];
+  // Tracks ticked for "Move to another work", named by a token.
+  const moving = move ? new Set(movingTracks(c, move).filter((id) => assigned.has(id))) : null;
+  const where = (track) =>
+    assigned
+      .get(track.id)
+      .map((link) => `${entityLabel(c, link.work_id, "work")}${link.movement_id ? `: ${entityLabel(c, link.movement_id, "movement")}` : ""}`)
+      .join("; ");
   const pager =
     pages > 1
       ? {
@@ -876,8 +975,8 @@ function albumView(c, albumId, chosenWork, page = 0) {
           ...(movements.length && missing ? { badge: { label: `${missing} movement${missing === 1 ? "" : "s"} missing`, tone: "warning" } } : {}),
           selection: work,
           actions: [
-            action("Add tracks", "choose-album-work", { albumId, work }),
-            action("Unassign", "unassign-album", { albumId, work }, { tone: "danger", confirm: "Remove this album's tracks from the work? The work and the audio stay." }),
+            action("Add tracks", "choose-album-work", { albumId, work, page: String(page) }),
+            action("Unassign", "unassign-album", { albumId, work, page: String(page) }, { tone: "danger", confirm: "Remove this album's tracks from the work? The work and the audio stay." }),
           ],
         };
       }),
@@ -890,7 +989,7 @@ function albumView(c, albumId, chosenWork, page = 0) {
     note: unassignedHere.length ? "Tick tracks to change them together. Send to Classical and Remove from Classical override automatic detection and survive rescans." : undefined,
     empty: unassigned.length ? "Every track on this page is in a work." : "Every track on this album is in a work.",
     rows: unassignedHere.map(trackRow),
-    select: { key: "tracks", actions: classify },
+    select: { key: "tracks", actions: [action("Assign to a work", "move-tracks-open", { albumId, page: String(page) }), ...classify] },
     ...(!assignedHere.length && pager && { pager }),
   });
   if (assignedHere.length)
@@ -899,10 +998,12 @@ function albumView(c, albumId, chosenWork, page = 0) {
       id: "in-works",
       title: "In a work",
       rows: assignedHere.map(trackRow),
+      note: "Tick tracks and choose Move to another work to put them in a different work (or a new movement of one) in one step.",
       select: {
         key: "tracks",
         actions: [
-          action("Remove from work", "unassign-tracks", { albumId }, { tone: "danger", confirm: "Take these tracks out of their works? The works and the audio stay." }),
+          action("Move to another work", "move-tracks-open", { albumId, page: String(page) }),
+          action("Remove from work", "unassign-tracks", { albumId, page: String(page) }, { tone: "danger", confirm: "Take these tracks out of their works? The works and the audio stay." }),
           classify[1],
         ],
       },
@@ -910,36 +1011,62 @@ function albumView(c, albumId, chosenWork, page = 0) {
     });
   if (chosenWork) {
     const movements = workMovements(c, chosenWork);
-    const candidates = unassignedHere;
+    const inChosen = (track) => assigned.get(track.id).some((link) => link.work_id === chosenWork);
+    // Moving: the ticked tracks. Otherwise every track on this page not yet
+    // in this work; a track in another work starts as Skip and moves here
+    // when given a movement.
+    const candidates = moving
+      ? tracks.filter((track) => moving.has(track.id))
+      : onPage.filter((track) => !inChosen(track));
+    const suggested = suggestMapping(c, chosenWork, candidates);
     sections.push({
       type: "form",
       id: "assign",
-      title: `Assign tracks to ${entityLabel(c, chosenWork, "work")}`,
+      title: `${moving ? "Move" : "Assign"} tracks to ${entityLabel(c, chosenWork, "work")}`,
       note: candidates.length
-        ? `Check each track's movement, choose Skip for tracks that aren't part of this work, then save.${pages > 1 ? " Tracks on this page only; the pages below hold the rest." : ""} Assigned tracks are sent to Classical.`
-        : "Every track on this page is already in a work. Remove one from its work first, or go to another page.",
+        ? `Check each track's movement, or choose New movement to add one named after the track (at the end; reorder it on the work). Skip leaves a track where it is.${!moving && pages > 1 ? " Tracks on this page only; the other pages hold the rest." : ""} A track already in another work moves here. Assigned tracks are sent to Classical.`
+        : "Every track on this page is already in this work. Go to another page, or choose a different work.",
       command: "assign-album",
       arguments: { albumId, work: chosenWork, tracks: candidates.map((track) => track.id), page: String(page) },
-      submitLabel: "Assign tracks",
+      submitLabel: moving ? "Move tracks" : "Assign tracks",
       fields: candidates.length
         ? [
             {
               key: "mapping",
               label: "Movement",
               type: "mapping",
-              // Tracks marked not classical default to Skip.
-              value: suggestMapping(c, chosenWork, candidates).map((movement, index) =>
-                stateOf(candidates[index].id).state === "not_classical" ? "" : movement,
-              ),
-              rows: candidates.map((track) => ({ label: `${number(track, tracks.indexOf(track))}. ${track.title}`.slice(0, 500), detail: track.artist?.slice(0, 500) || undefined })),
+              // Tracks marked not classical, and tracks in another work
+              // (unless they were ticked to move), default to Skip.
+              value: suggested.map((movement, index) => {
+                const track = candidates[index];
+                if (stateOf(track.id).state === "not_classical") return "";
+                if (assigned.get(track.id).length && !moving) return "";
+                return movement || (moving ? "new" : "");
+              }),
+              rows: candidates.map((track) => ({
+                label: `${number(track, tracks.indexOf(track))}. ${track.title}`.slice(0, 500),
+                detail: (assigned.get(track.id).length ? `Now in ${where(track)}` : track.artist || "").slice(0, 500) || undefined,
+              })),
               options: [
                 { value: "", label: "Skip" },
                 ...movements.map((movement) => ({ value: movement.id, label: entityLabel(c, movement.id, "movement") })),
+                { value: "new", label: "New movement" },
                 ...(movements.length ? [] : [{ value: "whole", label: "Whole work" }]),
               ],
             },
           ]
         : [],
+    });
+  } else if (moving) {
+    sections.push({
+      type: "form",
+      id: "move",
+      title: `Choose a work for ${moving.size} track${moving.size === 1 ? "" : "s"}`,
+      note: "Choose the work, then the movement for each track (or New movement). Tracks in another work leave it when you save.",
+      command: "choose-album-work",
+      arguments: { albumId, page: String(page), move },
+      submitLabel: "Continue",
+      fields: [{ key: "work", label: "Work", type: "lookup", lookup: "works", value: "", placeholder: "Search works", required: true }],
     });
   } else if (unassignedHere.length) {
     // Tracks marked Not classical start as Skip and never seed the guesses.
@@ -1011,10 +1138,11 @@ function albumView(c, albumId, chosenWork, page = 0) {
       ...(unassigned.length && classicalCount ? [{ label: `${unassigned.length} not in a work`, tone: "warning" }] : []),
     ],
     actions: [
-      ...(chosenWork ? [open("Choose a different work", albumSelection(albumId, "", page))] : []),
-      action("Send all to Classical", "set-album-classification", { albumId, state: "classical" }),
-      action("Preview tag removal", "preview-tag-removal", { albumId }),
-      action("Remove all from Classical", "set-album-classification", { albumId, state: "not_classical" }, { tone: "danger", confirm: `Remove all ${tracks.length} tracks on this album from Aurral Classical? They stay in your Aurral library.` }),
+      ...(chosenWork || move ? [open(chosenWork ? "Choose a different work" : "Cancel move", albumSelection(albumId, "", page, chosenWork ? move : ""))] : []),
+      ...(chosenWork && move ? [open("Cancel move", albumSelection(albumId, "", page))] : []),
+      action("Send all to Classical", "set-album-classification", { albumId, state: "classical", page: String(page) }),
+      action("Preview tag removal", "preview-tag-removal", { albumId, page: String(page) }),
+      action("Remove all from Classical", "set-album-classification", { albumId, state: "not_classical", page: String(page) }, { tone: "danger", confirm: `Remove all ${tracks.length} tracks on this album from Aurral Classical? They stay in your Aurral library.` }),
     ],
     sections,
   };
@@ -1026,8 +1154,12 @@ function trackView(c, track) {
   const evidence = JSON.parse(row.evidence);
   const state = classification(c, track);
   const links = attachments(c, track);
+  // Back to the album page this track is on.
+  const albumPage =
+    evidence.albumId != null ? Math.max(0, Math.floor((albums(c, String(evidence.albumId)).get(String(evidence.albumId))?.tracks.findIndex((t) => t.id === track) ?? 0) / ALBUM_PAGE)) : 0;
+  const albumLink = evidence.albumId != null ? albumSelection(String(evidence.albumId), "", albumPage) : "";
   return {
-    crumbs: evidence.albumId != null ? [{ label: evidence.hints?.album || "Album", selection: `album:${evidence.albumId}` }] : [],
+    crumbs: evidence.albumId != null ? [{ label: evidence.hints?.album || "Album", selection: albumLink }] : [],
     title: trackTitle(evidence),
     subtitle: [evidence.hints?.artist, evidence.hints?.album].filter(Boolean).join(" · "),
     badges: [{ ...CLASSIFICATION[state.state], ...(state.pinned ? { label: `${CLASSIFICATION[state.state].label} · Set by you` } : {}) }],
@@ -1043,7 +1175,7 @@ function trackView(c, track) {
         id: "file",
         title: "File",
         items: [
-          { label: "Album", value: evidence.hints?.album || "Unknown", ...(evidence.albumId != null && { selection: `album:${evidence.albumId}` }) },
+          { label: "Album", value: evidence.hints?.album || "Unknown", ...(evidence.albumId != null && { selection: albumLink }) },
           { label: "Performer", value: evidence.hints?.artist || "Unknown" },
           { label: "Composer tag", value: (evidence.hints?.composer || []).join(", ") || "None" },
           { label: "WORK tag", value: evidence.hints?.work || "None" },
@@ -1084,6 +1216,19 @@ function reviewView(c, id) {
   if (evidence?.albumId != null) actions.push(open("Open album", `album:${evidence.albumId}`));
   if (entity) actions.push(open("Open entry", review.target_id));
   if (review.evidence.keep) actions.push(open("Open the other work", review.evidence.keep));
+  const identity = review.kind === "identity" && !review.evidence.reason ? providerIdentity(c, review) : null;
+  if (identity?.holder) {
+    const holderKind = c.db.prepare("SELECT kind FROM entity WHERE id=?").get(identity.holder)?.kind;
+    const holderName = labelOf(c, identity.holder) || "the other entry";
+    actions.push(open(`Open “${holderName}”`.slice(0, 100), identity.holder));
+    actions.unshift(action("Link here instead", "move-identity", { id }, { confirm: `Link this ${providerName(identity.provider)} ${identity.recordKind} to this entry and take it off “${holderName}”?`.slice(0, 500) }));
+    if (entity && holderKind === entity.kind && ["work", "person", "ensemble"].includes(entity.kind))
+      actions.unshift(
+        action(`Merge into “${holderName}”`.slice(0, 100), "merge-entity", { target: review.target_id, into: identity.holder, confirm: true }, { tone: "danger", confirm: `Same ${entity.kind}: move everything from this entry into “${holderName}”, then remove this one?${entity.kind === "work" ? " You can undo it from Activity." : ""}`.slice(0, 500) }),
+        action(`Merge “${holderName}” into this`.slice(0, 100), "merge-entity", { target: review.target_id, into: identity.holder, direction: "from", confirm: true }, { tone: "danger", confirm: `Same ${entity.kind}: move everything from “${holderName}” into this entry, then remove it?${entity.kind === "work" ? " You can undo it from Activity." : ""}`.slice(0, 500) }),
+      );
+  } else if (identity && !identity.linkedHere && entity)
+    actions.unshift(action(`Link to this ${providerName(identity.provider)} ${identity.recordKind || "record"}`.slice(0, 100), "move-identity", { id }));
   // Minimum fixes for reviews that otherwise block their entry.
   const live = (id) => typeof id === "string" && c.db.prepare("SELECT kind FROM entity WHERE id=? AND deleted_at IS NULL").get(id);
   if (review.kind === "identity" && review.evidence.reason === "same-name-composers" && entity) {
@@ -1127,14 +1272,48 @@ function reviewView(c, id) {
       { label: "Performer", value: evidence.hints?.artist || "Unknown" },
       { label: "Composer tag", value: (evidence.hints?.composer || []).join(", ") || "None" },
     );
-  if (review.evidence.reason) items.push({ label: "Reason", value: String(review.evidence.reason).replace(/-/g, " ") });
+  if (review.kind === "identity") {
+    items.push({ label: "Question", value: identityQuestion(c, review) });
+    if (entity) {
+      items.push({ label: "This entry", value: `${labelOf(c, review.target_id) || "Untitled"} (${entity.kind})`, selection: review.target_id });
+      if (entity.kind === "work") {
+        items.push({ label: "Composers", value: composerNames(c, review.target_id).join(", ") || "None" });
+        const recordings = realizations(c, review.target_id).length;
+        items.push({ label: "Recordings", value: String(recordings) });
+      }
+    }
+    if (identity) {
+      items.push({ label: `${providerName(identity.provider)} ${identity.recordKind || "record"}`, value: identity.url || identity.recordId });
+      if (identity.confidence != null) items.push({ label: "Match certainty", value: `${Math.round(identity.confidence * 100)}% (links are made at 95% or more)` });
+      if (identity.holder) {
+        items.push({ label: "Now linked to", value: labelOf(c, identity.holder) || "Another entry", selection: identity.holder });
+        if (c.db.prepare("SELECT kind FROM entity WHERE id=?").get(identity.holder)?.kind === "work") {
+          items.push({ label: "Its composers", value: composerNames(c, identity.holder).join(", ") || "None" });
+          items.push({ label: "Its recordings", value: String(realizations(c, identity.holder).length) });
+        }
+      }
+      if (typeof review.evidence.evidence === "string") items.push({ label: "Matched by", value: review.evidence.evidence.slice(0, 2000) });
+    }
+    items.push({
+      label: "What to do",
+      value: identity?.holder
+        ? "If both entries are the same piece, merge them (either way round). If this entry is the right match, Link here instead. If neither, dismiss: nothing is linked."
+        : identity
+          ? "Check the record, then link it, or dismiss to leave this entry unlinked."
+          : review.evidence.reason === "duplicate-work"
+            ? "Compare the two works below, then merge (either way round) or keep both."
+            : "Merge the entries if they are one person; dismiss if they are different people.",
+    });
+  } else if (review.evidence.reason) items.push({ label: "Reason", value: String(review.evidence.reason).replace(/-/g, " ") });
   for (const [field, entry] of Object.entries(conflicts))
     items.push({ label: `Conflicting ${field}`, value: (entry.values || []).map((value) => `${providerName(value.provider)}: ${display(value.value)}`).join(" · ").slice(0, 500) || "Values differ" });
   for (const entry of Object.values(review.kind === "provider_omission" ? review.evidence.entries || {} : {}))
     items.push({ label: "No longer provided", value: `${entry.field} (${providerName(entry.provider)})` });
   const sections = items.length ? [{ type: "details", id: "evidence", title: "What we know", items }] : [];
   // Fix the entry here: its own fields, without leaving the queue.
-  if (entity && review.kind !== "identity") sections.push({ ...detailsForm(c, review.target_id, entity.kind), title: `Edit ${entity.kind}` });
+  if (entity && (review.kind !== "identity" || identity)) sections.push({ ...detailsForm(c, review.target_id, entity.kind), title: `Edit ${entity.kind}` });
+  if (identity?.holder && entity?.kind === "work" && live(identity.holder) && c.db.prepare("SELECT kind FROM entity WHERE id=?").get(identity.holder)?.kind === "work")
+    sections.push(...duplicateSections(c, review.target_id, identity.holder, id).filter((section) => section.id !== "decide"));
   if (review.kind === "identity" && review.evidence.reason === "duplicate-work" && entity && live(review.evidence.keep))
     sections.push(...duplicateSections(c, review.target_id, review.evidence.keep, id));
   const position = c.db.prepare("SELECT count(*) AS n FROM review_item WHERE status='open'").get().n;
@@ -1513,16 +1692,29 @@ const LIST_SELECT = {
   },
 };
 
+// The list row that stands for a selection: an album page for the album, a
+// track for its album, an entry's page for the entry.
+function listKey(c, selection) {
+  if (selection.startsWith("album:")) return `album:${parseAlbumSelection(selection).albumId}`;
+  if (selection.startsWith("track:")) {
+    const row = c.db.prepare("SELECT evidence FROM track_link WHERE id=?").get(selection.slice(6));
+    const albumId = row ? JSON.parse(row.evidence).albumId : null;
+    return albumId != null ? `album:${albumId}` : selection;
+  }
+  if (selection.includes(":")) return selection;
+  return parseEntitySelection(selection).id;
+}
+
 export function renderV2(c, query, revision, { downloads = null, maintenance = null } = {}) {
   const q = String(query.q || "");
   if (q.length > 200) fail("Search is too long");
-  const offset = Number(query.offset || 0);
+  let offset = Number(query.offset || 0);
   if (!Number.isSafeInteger(offset) || offset < 0) fail("Invalid page offset");
   const selection = String(query.selection || "");
   let tab = TABS.includes(query.tab) ? query.tab : "";
   // Opening an entry from a link picks the matching tab.
   if (!tab) {
-    const kind = selection && !selection.includes(":") ? c.db.prepare("SELECT kind,data FROM entity WHERE id=?").get(selection) : null;
+    const kind = selection && !selection.includes(":") ? c.db.prepare("SELECT kind,data FROM entity WHERE id=?").get(parseEntitySelection(selection).id) : null;
     tab = selection.startsWith("slskd:") || selection === "maintenance" || selection.startsWith("change:")
       ? "activity"
         : selection.startsWith("bulk:")
@@ -1534,18 +1726,25 @@ export function renderV2(c, query, revision, { downloads = null, maintenance = n
         : selection.startsWith("new:")
           ? { work: "works", composer: "composers", performer: "performers" }[selection.slice(4)] || "works"
           : kind?.kind === "person"
-            ? isComposer(c, { id: selection, data: JSON.parse(kind.data) }) ? "composers" : "performers"
+            ? isComposer(c, { id: parseEntitySelection(selection).id, data: JSON.parse(kind.data) }) ? "composers" : "performers"
             : kind?.kind === "ensemble"
               ? "performers"
               : "works";
   }
   const all = listFor(c, tab, q, { downloads });
   const filtered = q && tab !== "search" ? all.filter((item) => matchesSearch(item.search, q)) : all;
+  // An empty offset (a link that opens an entry, or a reload of one) shows
+  // the page of the list that holds the open entry.
+  if (query.offset === "" && selection) {
+    const key = listKey(c, selection);
+    const index = filtered.findIndex((item) => item.selection === key);
+    offset = index >= 0 ? Math.floor(index / PAGE) * PAGE : 0;
+  }
   let view = null;
   if (selection.startsWith("album:")) {
-    const { albumId, work, page } = parseAlbumSelection(selection);
+    const { albumId, work, page, move } = parseAlbumSelection(selection);
     if (work) c.entity(work, "work");
-    view = albumView(c, albumId, work || null, page);
+    view = albumView(c, albumId, work || null, page, move);
   } else if (selection.startsWith("track:")) view = trackView(c, selection.slice(6));
   else if (selection.startsWith("slskd:")) view = downloadView(downloads, Number(selection.slice(6)));
   else if (selection.startsWith("change:")) view = changeView(c, selection.slice(7));
@@ -1554,16 +1753,17 @@ export function renderV2(c, query, revision, { downloads = null, maintenance = n
   else if (selection.startsWith("review:")) view = reviewView(c, selection.slice(7));
   else if (selection.startsWith("new:")) view = newView(selection.slice(4));
   else if (selection) {
-    const entity = c.db.prepare("SELECT * FROM entity WHERE id=? AND deleted_at IS NULL").get(selection);
+    const { id: entityId, page } = parseEntitySelection(selection);
+    const entity = c.db.prepare("SELECT * FROM entity WHERE id=? AND deleted_at IS NULL").get(entityId);
     if (!entity) fail("This catalogue entry no longer exists");
     const parsed = { ...entity, data: JSON.parse(entity.data), label: entityLabel(c, entity.id, entity.kind) };
     view =
       entity.kind === "work"
-        ? workView(c, entity.id)
+        ? workView(c, entity.id, page)
         : entity.kind === "person" || entity.kind === "ensemble"
-          ? contributorView(c, parsed)
+          ? contributorView(c, parsed, page)
           : entity.kind === "movement"
-            ? movementView(c, entity.id)
+            ? movementView(c, entity.id, page)
             : recordingView(c, entity.id);
   }
   if (!selection && tab === "activity" && maintenance) view = maintenanceView(maintenance);
@@ -1657,7 +1857,7 @@ export const V2_COMMANDS = {
   "move-movement": ["work", "movement", "direction"],
   "delete-movement": ["work", "movement"],
   "delete-entity": ["target"],
-  "merge-entity": ["target", "into", "confirm"],
+  "merge-entity": ["target", "into", "confirm", "direction"],
   "delete-works": ["works"],
   "bulk-edit-open": ["works"],
   "bulk-edit": ["token", "period", "form", "key", "instrumentation", "composer"],
@@ -1665,13 +1865,15 @@ export const V2_COMMANDS = {
   "undo-change": ["id"],
   "allow-work": ["id"],
   "keep-distinct": ["id"],
+  "move-identity": ["id"],
   "set-classification": ["tracks", "state"],
-  "choose-album-work": ["albumId", "work", "page"],
+  "choose-album-work": ["albumId", "work", "page", "move"],
+  "move-tracks-open": ["albumId", "tracks", "page"],
   "assign-album": ["albumId", "work", "tracks", "mapping", "page"],
-  "set-album-classification": ["albumId", "state"],
-  "preview-tag-removal": ["albumId"],
-  "unassign-tracks": ["albumId", "tracks"],
-  "unassign-album": ["albumId", "work"],
+  "set-album-classification": ["albumId", "state", "page"],
+  "preview-tag-removal": ["albumId", "page"],
+  "unassign-tracks": ["albumId", "tracks", "page"],
+  "unassign-album": ["albumId", "work", "page"],
   "create-work-from-album": ["albumId", "tracks", "include", "title", "composer", "composerName", "createAnyway"],
   "resolve-review": ["id"],
   "resolve-reviews": ["ids", "as"],
@@ -1690,19 +1892,43 @@ function createWork(c, m, who, { title, composer, movements }) {
   });
   return work;
 }
-function assignTracks(c, m, who, work, tracks, mapping) {
+// Puts tracks on a work's movements. "new" adds a movement named after the
+// track at the end of the work; with `move`, a track already in a work
+// leaves it first (its old per-track recording goes with it).
+function assignTracks(c, m, who, work, tracks, mapping, { move = false } = {}) {
   const movements = new Set(workMovements(c, work).map((movement) => movement.id));
   const chosen = tracks
     .map((track, index) => ({ track, movement: mapping[index] }))
     .filter((entry) => entry.movement);
   if (!chosen.length) fail("Choose a movement for at least one track");
   for (const { track, movement } of chosen) {
-    if (movement !== "whole" && !movements.has(movement)) fail("A chosen movement belongs to a different work");
+    if (movement !== "whole" && movement !== "new" && !movements.has(movement)) fail("A chosen movement belongs to a different work");
     if (!c.db.prepare("SELECT 1 FROM track_link WHERE id=? AND state='active'").get(track)) fail("A track is missing or needs review");
-    if (attachments(c, track).length) fail("A track is already in a work. Unassign it first.");
+    if (!move && attachments(c, track).length) fail("A track is already in a work. Unassign it first.");
   }
-  const seen = chosen.map((entry) => entry.movement).filter((movement) => movement !== "whole");
+  const seen = chosen.map((entry) => entry.movement).filter((movement) => movement !== "whole" && movement !== "new");
   if (new Set(seen).size !== seen.length) fail("Each movement can only be chosen once per album");
+  let moved = 0;
+  if (move)
+    for (const { track } of chosen) {
+      const items = c.db.prepare("SELECT i.id FROM realization_item i JOIN segment s ON s.id=i.segment_id WHERE s.track_link_id=?").all(track);
+      for (const item of items) c.detachItem(item.id, { dropRecording: true });
+      if (items.length) moved++;
+    }
+  const workTitle = entityLabel(c, work, "work");
+  let added = 0;
+  for (const entry of chosen) {
+    if (entry.movement !== "new") continue;
+    const evidence = JSON.parse(c.db.prepare("SELECT evidence FROM track_link WHERE id=?").get(entry.track).evidence);
+    const name = movementTitle({ title: trackTitle(evidence), work: evidence.hints?.work }, workTitle) || trackTitle(evidence);
+    const movement = c.createEntity("movement");
+    m.manual(movement, "title", name.slice(0, 2000), { actor: who, pin: true });
+    const position = c.db.prepare("SELECT coalesce(max(position),0)+1 AS n FROM relation WHERE kind='movement' AND source_id=?").get(work).n;
+    c.relate("movement", work, movement, { position });
+    c.audit("editor.add-movement", work, { movement, from: "assign" }, who);
+    entry.movement = movement;
+    added++;
+  }
   const performance = c.createEntity("performance");
   const performanceWork = c.relate("performance_work", performance, work);
   const first = JSON.parse(c.db.prepare("SELECT evidence FROM track_link WHERE id=?").get(chosen[0].track).evidence);
@@ -1721,7 +1947,7 @@ function assignTracks(c, m, who, work, tracks, mapping) {
   // The admin grouped these tracks, which answers any open match question about them.
   for (const { track } of chosen)
     c.db.prepare("UPDATE review_item SET status='resolved' WHERE kind='auto_match' AND status='open' AND target_id=?").run(track);
-  return chosen.length;
+  return { count: chosen.length, moved, added };
 }
 
 export function applyV2(c, request, who) {
@@ -1885,6 +2111,31 @@ export function applyV2(c, request, who) {
       c.db.prepare("UPDATE review_item SET status='resolved' WHERE id=?").run(id);
       return { selection: "", message: "Kept as two works; matching won't merge them or ask again." };
     }
+    case "move-identity": {
+      // The admin confirms a provider match the catalogue held back: link it
+      // to this entry, taking it off the entry that had it.
+      const id = str(v.id, "review item", { max: 200 });
+      const review = c.db.prepare("SELECT * FROM review_item WHERE id=? AND kind='identity' AND status='open'").get(id);
+      if (!review) fail("This review item is already resolved");
+      const evidence = JSON.parse(review.evidence);
+      const identity = providerIdentity(c, { ...review, evidence });
+      if (!identity) fail("This review doesn't name a provider record");
+      c.entity(review.target_id);
+      if (identity.holder)
+        c.db
+          .prepare("UPDATE external_identity SET state='conflict' WHERE entity_id=? AND provider=? AND record_kind=? AND record_id=? AND state='active'")
+          .run(identity.holder, identity.provider, identity.recordKind, identity.recordId);
+      c.db
+        .prepare(
+          `INSERT INTO external_identity VALUES (?,?,?,?,'active',?)
+           ON CONFLICT(entity_id,provider,record_kind,record_id) DO UPDATE SET state='active',evidence=excluded.evidence`,
+        )
+        .run(review.target_id, identity.provider, identity.recordKind, identity.recordId, JSON.stringify({ confirmedBy: "admin", previous: identity.holder || null }));
+      c.audit("identity.confirm", review.target_id, { provider: identity.provider, record: identity.recordId, from: identity.holder || null }, who);
+      if (identity.holder) c.audit("identity.release", identity.holder, { provider: identity.provider, record: identity.recordId, to: review.target_id }, who);
+      c.db.prepare("UPDATE review_item SET status='resolved' WHERE id=?").run(id);
+      return { selection: review.target_id, message: `Linked to ${providerName(identity.provider)} ${identity.recordKind} ${identity.recordId}.`.slice(0, 500) };
+    }
     case "allow-work": {
       const id = str(v.id, "review item", { max: 200 });
       const review = c.db.prepare("SELECT * FROM review_item WHERE id=? AND status='open'").get(id);
@@ -1895,28 +2146,51 @@ export function applyV2(c, request, who) {
       return { selection: "", message: "Matching may make this work again; it will at the next scan or album match." };
     }
     case "merge-entity": {
-      const target = str(v.target, "entry", { max: 200 });
-      const into = str(v.into, "entry to keep", { max: 200 });
+      // "from": the chosen entry merges into the one on screen.
+      if (v.direction !== undefined && !["into", "from"].includes(v.direction)) fail("Choose which entry stays");
+      const [target, into] =
+        v.direction === "from"
+          ? [str(v.into, "other entry", { max: 200 }), str(v.target, "entry", { max: 200 })]
+          : [str(v.target, "entry", { max: 200 }), str(v.into, "entry to keep", { max: 200 })];
       if (v.confirm !== true) fail("Confirm the merge first");
       if (target === into) fail("Choose a different entry to keep");
       const drop = c.entity(target);
       const keep = c.entity(into);
       let changeId = null;
+      let added = [];
       if (drop.kind === "work") {
         if (keep.kind !== "work") fail("Choose a work");
         let merged;
         ({ result: merged, changeId } = recordChange(
           c,
           { kind: "merge", summary: `Merged “${entityLabel(c, target, "work")}” into “${entityLabel(c, into, "work")}”`, works: [into, target], actor: who, extra: { works: [into, target] } },
-          () => mergeWork(c, into, target, who),
+          () => mergeWork(c, into, target, who, { addMissing: true }),
         ));
         if (!merged) fail("The two works' movements don't line up. Rename or reorder them so they match, then merge.");
+        added = merged.added || [];
       } else if (["person", "ensemble"].includes(drop.kind)) {
         if (!["person", "ensemble"].includes(keep.kind)) fail("Choose a person or ensemble");
         mergeContributor(c, into, target, who);
       } else fail("This kind of entry can't be merged");
       // The entry merged away has nothing left to review.
       c.db.prepare("UPDATE review_item SET status='resolved' WHERE target_id=? AND status='open'").run(target);
+      // A duplicate question about the pair is answered, whichever way round.
+      c.db
+        .prepare("UPDATE review_item SET status='resolved' WHERE status='open' AND kind='identity' AND target_id=? AND json_extract(evidence,'$.keep')=?")
+        .run(into, target);
+      if (added.length) {
+        // Open the kept work at its Movements, on the page of the first one
+        // added, so they can be put in order.
+        const order = workMovements(c, into).map((movement) => movement.id);
+        const page = Math.floor(Math.max(0, order.indexOf(added[0])) / SECTION_PAGE);
+        const names = added.slice(0, 3).map((id) => `“${entityLabel(c, id, "movement")}”`).join(", ");
+        return {
+          selection: entitySelection(into, page),
+          focus: "movements",
+          changeId,
+          message: `Merged. Added ${added.length} movement${added.length === 1 ? "" : "s"} the work didn't have (${names}${added.length > 3 ? ` and ${added.length - 3} more` : ""}) at the end of Movements; use Move up to put ${added.length === 1 ? "it" : "them"} in order. Undo it from Activity.`.slice(0, 500),
+        };
+      }
       return { selection: into, message: drop.kind === "work" ? "Merged. Undo it from Activity." : "Merged.", ...(drop.kind === "work" && { changeId }) };
     }
     case "set-classification": {
@@ -1939,7 +2213,22 @@ export function applyV2(c, request, who) {
       const albumId = str(v.albumId, "album", { max: 200 });
       const work = str(v.work, "work", { max: 200 });
       c.entity(work, "work");
-      return { selection: albumSelection(albumId, work, Number(v.page) || 0), message: "" };
+      const move = typeof v.move === "string" && /^[0-9a-f-]{36}$/.test(v.move) ? v.move : "";
+      if (move) movingTracks(c, move);
+      return { selection: albumSelection(albumId, work, pageOf(v), move), message: "", focus: "assign" };
+    }
+    case "move-tracks-open": {
+      const albumId = str(v.albumId, "album", { max: 200 });
+      const tracks = Array.isArray(v.tracks) ? [...new Set(v.tracks.filter((t) => typeof t === "string"))] : [];
+      if (!tracks.length || tracks.length > 1000) fail("Tick at least one track");
+      const owned = new Set(ownedTracks(c, { albumId }).map((track) => track.id));
+      if (tracks.some((track) => !owned.has(track))) fail("A ticked track isn't on this album");
+      c.db.prepare("DELETE FROM change_set WHERE kind='selection' AND created_at<?").run(Date.now() - 86_400_000);
+      const token = randomUUID();
+      c.db
+        .prepare("INSERT INTO change_set(id,kind,actor,summary,data,created_at) VALUES (?,?,?,?,?,?)")
+        .run(token, "selection", who, `${tracks.length} tracks`, JSON.stringify({ tracks }), Date.now());
+      return { selection: albumSelection(albumId, "", pageOf(v), token), message: "", focus: "move" };
     }
     case "assign-album": {
       const albumId = str(v.albumId, "album", { max: 200 });
@@ -1948,8 +2237,13 @@ export function applyV2(c, request, who) {
       const tracks = Array.isArray(v.tracks) ? v.tracks : [];
       const mapping = Array.isArray(v.mapping) ? v.mapping : [];
       if (mapping.length !== tracks.length) fail("Every track needs a choice");
-      const count = assignTracks(c, m, who, work, tracks, mapping);
-      return { selection: albumSelection(albumId, "", Number(v.page) || 0), message: `Assigned ${count} track${count === 1 ? "" : "s"}.` };
+      const { count, moved, added } = assignTracks(c, m, who, work, tracks, mapping, { move: true });
+      const parts = [
+        `${moved ? "Moved" : "Assigned"} ${count} track${count === 1 ? "" : "s"} to “${entityLabel(c, work, "work")}”`,
+        moved && moved < count ? `${moved} of them from another work` : "",
+        added ? `added ${added} movement${added === 1 ? "" : "s"} at the end; reorder ${added === 1 ? "it" : "them"} on the work` : "",
+      ].filter(Boolean);
+      return { selection: albumSelection(albumId, "", pageOf(v)), message: `${parts.join("; ")}.`.slice(0, 500), focus: "in-works" };
     }
     case "preview-tag-removal": {
       const albumId = str(v.albumId, "album", { max: 200 });
@@ -1965,7 +2259,7 @@ export function applyV2(c, request, who) {
         }
       }
       return {
-        selection: `album:${albumId}`,
+        selection: albumSelection(albumId, "", pageOf(v)),
         message: `Clearing classical tags would remove ${counts.composer} composer, ${counts.work} work and ${counts.workId} work-ID values${unreadable ? `; ${unreadable} file${unreadable === 1 ? "" : "s"} couldn't be read` : ""}. Nothing was changed. Use the album menu to clear or restore tags.`,
       };
     }
@@ -1978,7 +2272,7 @@ export function applyV2(c, request, who) {
         classify(c, track.id, {}, { manual: v.state, actor: who });
         c.db.prepare("UPDATE review_item SET status='resolved' WHERE kind='classification' AND target_id=? AND status='open'").run(track.id);
       }
-      return { selection: `album:${albumId}`, message: `${v.state === "classical" ? "Sent" : "Removed"} ${tracks.length} track${tracks.length === 1 ? "" : "s"} ${v.state === "classical" ? "to" : "from"} Classical.` };
+      return { selection: albumSelection(albumId, "", pageOf(v)), message: `${v.state === "classical" ? "Sent" : "Removed"} ${tracks.length} track${tracks.length === 1 ? "" : "s"} ${v.state === "classical" ? "to" : "from"} Classical.` };
     }
     case "unassign-tracks": {
       const albumId = str(v.albumId, "album", { max: 200 });
@@ -1991,7 +2285,7 @@ export function applyV2(c, request, who) {
         if (items.length) count++;
       }
       if (!count) fail("None of these tracks are in a work");
-      return { selection: `album:${albumId}`, message: `Took ${count} track${count === 1 ? "" : "s"} out of their works.` };
+      return { selection: albumSelection(albumId, "", pageOf(v)), message: `Took ${count} track${count === 1 ? "" : "s"} out of their works.` };
     }
     case "unassign-album": {
       const albumId = str(v.albumId, "album", { max: 200 });
@@ -2005,7 +2299,7 @@ export function applyV2(c, request, who) {
       if (!items.length) fail("No tracks from this album are in that work");
       // Each track's recording was made for it; nothing of the attachment stays.
       for (const item of items) c.detachItem(item.id, { dropRecording: true });
-      return { selection: `album:${albumId}`, message: `Unassigned ${items.length} track${items.length === 1 ? "" : "s"}.` };
+      return { selection: albumSelection(albumId, "", pageOf(v)), message: `Unassigned ${items.length} track${items.length === 1 ? "" : "s"}.` };
     }
     case "create-work-from-album": {
       const albumId = str(v.albumId, "album", { max: 200 });

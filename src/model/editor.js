@@ -7,7 +7,7 @@ import { classify } from "./reconcile.js";
 import { searchText, matchesSearch, ownedTracks } from "./editor-search.js";
 import { searchDiagnostics } from "../source.js";
 import { ensureSearchIndex } from "../search/engine.js";
-import { renderV2, lookupV2, applyV2, V2_COMMANDS, EditorV2Error, warnDuplicate, parseAlbumSelection, nextReview } from "./editor-v2.js";
+import { renderV2, lookupV2, applyV2, V2_COMMANDS, EditorV2Error, warnDuplicate, parseAlbumSelection, parseEntitySelection, nextReview } from "./editor-v2.js";
 
 class EditorError extends Error {
   constructor(message, status = 400) {
@@ -46,6 +46,8 @@ function text(value, label, { optional = false, max = 10000 } = {}) {
 // revision token; a write may only touch entries inside that scope.
 function scopeIds(c, scope) {
   if (!scope || scope.startsWith("new:")) return [];
+  // An entry's page ("ID~2") is the entry.
+  if (!scope.includes(":")) scope = parseEntitySelection(scope).id;
   if (scope.startsWith("track:")) return [scope.slice(6)];
   // A History entry: the change itself and the works it touched.
   if (scope.startsWith("change:")) {
@@ -761,6 +763,8 @@ function apply(c, input, who) {
       ok: true,
       message: result.message ?? "Saved",
       ...(typeof result.selection === "string" && { selection: result.selection }),
+      // The section to bring into view once the page shows the result.
+      ...(typeof result.focus === "string" && result.focus && { focus: result.focus }),
     };
   }
   const v = request.values,

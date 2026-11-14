@@ -10,8 +10,9 @@ using the same rules, so beets no longer needs to touch these files.
   `WORK` and `MUSICBRAINZ_WORKID`, all from MusicBrainz.
 * **Tag as classical.** An admin-only artist and album menu item, for files
   that were already in the Library.
-* **Compare recordings.** A track and album menu item that makes a playlist of
-  the same movement played by different performers.
+* **Compare recordings.** On a work page (fork), a movement across every owned
+  recording, with **Play comparison** and **Save as playlist**. (The track and album menu item was removed
+  in 1.0.54.)
 * **slskd download source.** Finds classical tracks and albums on Soulseek
   through your slskd, only in folders that line up with the exact release.
 * **Classical catalogue.** Works, movements, composers and recordings built from
@@ -25,8 +26,8 @@ In Aurral, open **Settings > Plugins**, paste
 `https://github.com/Collinlong1/Aurral-Classical-Plugin`, and install
 **Aurral Classical**. Fill in the settings, press **Test**, then turn it on.
 
-The plugin asks for **Aurral API access** to create Compare recordings
-playlists and to check who may use that item.
+The plugin asks for **Aurral API access** to read the Library for its scans
+and tagging.
 
 ## Settings
 
@@ -37,7 +38,6 @@ playlists and to check who may use that item.
 | slskd download folder | slskd's downloads folder, as Aurral's container sees it. Finished files are copied from here. |
 | Name order | The roles in the artist, in order. Default `composers, arrangers, soloists, ensembles, conductors`. People credited on the recording but in none of these roles come last. |
 | Separator | Goes between the names. Default `—`, with a space either side. |
-| Recordings to compare | How many recordings Compare recordings puts in a playlist. Default 10, at most 25. |
 
 ## Tagging
 
@@ -131,16 +131,12 @@ list for a few minutes, so reload the page after turning the plugin on.
 
 ## Compare recordings
 
-On a track (or an album, one playlist per movement, up to 10), this makes or
-updates a static playlist called `Recordings: <Composer>: <Work>` with the
-same movement from up to N recordings. The chosen recording comes first, then
-other recordings already in the Library, then others MusicBrainz lists for
-that Work (excerpts and medleys left out), each from its earliest official
-release. Aurral queues downloads for the tracks the Library doesn't have.
-
-Admins and users who may request music can use it. Aurral's API can only create
-a playlist as the plugin itself, so it has no owner: admins see it under
-Playlists, other users don't yet.
+Open a work (from an album's **By work** view, or search) to see every owned
+recording of it, one entry per recording with its releases and parts. Choose
+a movement to hear it across recordings: **Play comparison**, or **Save as
+playlist** to keep it as your own static playlist of the exact files. Up to 1.0.53 a "Compare recordings" track and
+album menu item did this too; it was removed in 1.0.54 because the work page
+does it better.
 
 ## slskd download source
 
@@ -328,6 +324,5 @@ pinned fields) survive rescans. Stale tabs can't overwrite newer edits. See
 **Known limits.** Some catalogue systems aren't recognized yet (for example
 Ravel's M. numbers), so such works need a WORK tag in a known form or a
 MusicBrainz match. Recordings left behind by unassigns made before v0.1 stay
-until removed by hand. Compare recordings by work identity and the richer
-review screens are planned for v0.2. Reports for each phase are in
+until removed by hand. Reports for each phase are in
 `PHASE_*_REPORT.md`; [MODEL_V1.md](MODEL_V1.md) covers backup and restore.

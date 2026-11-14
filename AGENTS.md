@@ -1,6 +1,6 @@
 # Project instructions
 
-Status, November 14, 2026 (America/Chicago): v0.2 (search, slskd ladder, recording comparisons, editor overhaul, menu consolidation) was authorized by the user on November 14 and is implemented for review; see V0_2_REPORT.md. v0.3 and later scope (performer mapping editor, entity pages, tag writing, Discover, reports, community release) is not authorized. Read HANDOFF.md first (newest entry on top), then V0_2_REPORT.md.
+Status, November 14, 2026 (America/Chicago): v0.2 (search, slskd ladder, recording comparisons, editor overhaul, menu consolidation) was authorized by the user on November 14 and is implemented for review; see V0_2_REPORT.md. The user's follow-up list of editor workflow fixes (November 14) is implemented in 1.0.54 on `claude/modest-brown-rtcrsz` in both repositories. v0.3 and later scope (performer mapping editor, entity pages, tag writing, Discover, reports, community release) is not authorized. Read HANDOFF.md first (newest entry on top), then V0_2_REPORT.md.
 
 Branches and sync:
 - Develop on `aurral-classical`. The companion core is Collinlong1/aurral `aurral-classical`; `.github/workflows/phase3-integration.yml` pins the core commit the browser workflow runs against.

@@ -1,6 +1,26 @@
 # Aurral Classical v0.2 — implementation report
 
-November 14, 2026. Authorized by the user ("Alright let's start in v0.2", with the v0.2 development scope). Implemented on `aurral-classical` in both repositories; nothing merged into `main`, nothing deployed, no production access. Plugin 1.0.48 → 1.0.53, schema 3 → 4.
+November 14, 2026. Authorized by the user ("Alright let's start in v0.2", with the v0.2 development scope). Implemented on `aurral-classical` in both repositories; nothing merged into `main`, nothing deployed, no production access. Plugin 1.0.48 → 1.0.53, schema 3 → 4; follow-up fixes in 1.0.54 (below), no schema change.
+
+## v0.2 follow-up: editor workflow fixes (1.0.54)
+
+November 14, 2026. After first use of v0.2 the user listed workflow problems in the editor. Each, with what changed:
+
+| Asked | Change |
+| --- | --- |
+| Pagination for editor pages such as works | Long sections in an entry page 100 rows at a time with a pager (a composer's works and credits, a work's movements and recordings, a movement's tracks; selection `ID~page`). The browse list and album tracks already paged. |
+| Page number kept after reloads and edits | Every album action carries its page (`album:ID~page`); a track's breadcrumb returns to its album page; links that open an entry send an empty offset and the plugin shows the list page holding it, so a reload lands there too. |
+| Pager at the top too | Core renders pagers above and below the list and paged sections. |
+| Merge: add a movement the other work lacks, then open it to reorder | The editor's merge maps movements by title (or number where one is untitled) and moves the rest, with their tracks, to the end of the kept work; the result opens the kept work at Movements (page of the first added) with a message naming them. Matching's own merges still need every movement to line up. Undo restores both works. |
+| Merge the other work into this one | The merge form asks which one stays; the duplicate review offers both directions and previews both. A reverse merge also settles the pair's review. |
+| Create a movement while assigning | "New movement" in the assign mapping adds one named after the track, at the end of the work. |
+| Moving tracks between works | "Move to another work" (and "Assign to a work") on ticked tracks: choose the work, then each track's movement or New movement; the tracks leave their old work in the same step. The assign form also lists tracks already in another work ("Now in …"). |
+| Does moving update the grouping, and when? | The catalogue changes at once. The album page's By work view was cached up to 30 seconds and kept while navigating; the core now refreshes it (and work pages) after each editor change. Editing a file's tags never moves a track already in a work: scans keep tracks where they are (see EDITOR_GUIDE). |
+| Selecting something jumps to the top of the page | Results of commands other than `open` keep the scroll position (router state honoured by `Layout`); a result can name a section to scroll to (`focus`), used for the assign/move steps, a merge's movements and a section's next page. |
+| Identity reviews vague | The queue says which question: a MusicBrainz work already linked to another entry, a match below 95% (with its certainty), a possible duplicate (of which work, and why), composers sharing a name. The review page shows the MusicBrainz link, certainty, what matched, the other entry (composers, recordings, side by side for works), what to do, and the fixes: merge either way, Link here instead, Link to this MusicBrainz work, Dismiss. |
+| Compare recordings menu item creates no playlist; remove it | The track and album menu items are removed (`compare-album`, `compare-track`, `src/compare.js`); comparisons stay on the work page (Play comparison, Save as playlist). The integration smoke now saves the comparison from the work page, after the fixtures exist. The now-unused "Comparison scope" setting is left in place so saved settings don't change. |
+
+Tests: plugin `test/editor-v0.2-workflow.test.js` (6: list locating, section pages, track crumb and kept album page, moving tracks with New movement, a new movement while assigning, merge either way adding movements with undo, identity review wording and Link here instead); `test/box-set.js` now holds the shared fixture; the removed menu action's tests go with it. Plugin suite 331 pass on Node 22.23. Core: `pnpm check` clean (any baseline 1089 unchanged), unit suite 2666 pass, frontend build, new host test for empty offset and `focus`. Not run here: the Compose/Chromium integration workflow (its smoke step changed; it needs a CI run) and the remote CI matrix.
 
 ## Before v0.2: branch sync
 

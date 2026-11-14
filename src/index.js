@@ -23,7 +23,6 @@ import {
 } from "./model/runtime.js";
 import { readValues } from "./tags.js";
 import { albumClassificationSummary } from "./model/classification-report.js";
-import { compareRecordings } from "./compare.js";
 import { search } from "./search/provider.js";
 import { MusicBrainz, mbBaseUrl, TTL } from "./mb.js";
 import { ClassicalResolver } from "./resolver.js";
@@ -394,20 +393,6 @@ export default {
           artistFiles(index, input.artist),
           input.artist.name,
         ),
-      };
-    },
-
-    async "compare-track"(input) {
-      const ctx = makeContext(input);
-      return {
-        message: await compareRecordings(ctx, input.user, input.tracks),
-      };
-    },
-
-    async "compare-album"(input) {
-      const ctx = makeContext(input);
-      return {
-        message: await compareRecordings(ctx, input.user, input.album.tracks),
       };
     },
   },

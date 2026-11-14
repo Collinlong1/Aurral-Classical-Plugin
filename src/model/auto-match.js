@@ -2242,25 +2242,54 @@ function mergeDuplicateComposers(catalogue, index, actor) {
   return merged;
 }
 
-// Fold a duplicate auto-created work into another work with the same identity.
-export function mergeWork(catalogue, keep, drop, actor) {
+// How the dropped work's movements land on the kept work's: each drop
+// movement's kept movement, or null. Without `addMissing` every movement
+// must line up (null when they don't). With it (an admin's merge), the
+// movements that line up by title (or by number, where one is untitled) are
+// mapped and the rest are null: they move to the kept work as they are.
+function mergeMapping(catalogue, keep, drop, addMissing) {
   const keepMovements = workMovements(catalogue, keep),
     dropMovements = workMovements(catalogue, drop);
-  let map = new Map();
-  if (dropMovements.length) {
-    const mapped = mapToMovements(
-      keepMovements,
-      dropMovements.map((m) => ({ movementTitle: resolvedName(catalogue, m.id, "title") || "" })),
-    );
-    if (!mapped) return false;
-    map = new Map(dropMovements.map((m, i) => [m.id, mapped[i]]));
-  }
+  if (!dropMovements.length) return { dropMovements, mapped: [] };
+  const full = mapToMovements(
+    keepMovements,
+    dropMovements.map((m) => ({ movementTitle: resolvedName(catalogue, m.id, "title") || "" })),
+  );
+  if (full && (!addMissing || full.every((id) => typeof id === "string"))) return { dropMovements, mapped: full };
+  if (!addMissing) return null;
+  const used = new Set();
+  const mapped = dropMovements.map((d) => {
+    const found =
+      keepMovements.find((k) => !used.has(k.id) && k.text && k.text === d.text && (k.index == null || d.index == null || k.index === d.index)) ||
+      keepMovements.find((k) => !used.has(k.id) && k.index != null && k.index === d.index && (!k.text || !d.text));
+    if (!found) return null;
+    used.add(found.id);
+    return found.id;
+  });
+  return { dropMovements, mapped };
+}
+
+// Fold a duplicate work into another. Matching passes require every
+// movement to line up; an admin's merge (`addMissing`) moves the movements
+// the kept work lacks onto it, at the end, and reports them in `added`.
+export function mergeWork(catalogue, keep, drop, actor, { addMissing = false } = {}) {
+  const mapping = mergeMapping(catalogue, keep, drop, addMissing);
+  if (!mapping) return false;
+  const map = new Map(mapping.dropMovements.map((m, i) => [m.id, mapping.mapped[i]]));
+  const added = [];
   const db = catalogue.db;
   db.prepare("UPDATE relation SET target_id=? WHERE kind='performance_work' AND target_id=?").run(keep, drop);
   db.prepare("UPDATE OR IGNORE relation SET target_id=? WHERE kind='collection_member' AND target_id=?").run(keep, drop);
   db.prepare("DELETE FROM relation WHERE kind='collection_member' AND target_id=?").run(drop);
   db.prepare("UPDATE realization SET work_id=? WHERE work_id=?").run(keep, drop);
   for (const [from, to] of map) {
+    if (!to) {
+      // The kept work has no such movement: this one joins it, last.
+      const position = db.prepare("SELECT coalesce(max(position),0)+1 AS n FROM relation WHERE kind='movement' AND source_id=?").get(keep).n;
+      db.prepare("UPDATE relation SET source_id=?,position=? WHERE kind='movement' AND source_id=? AND target_id=?").run(keep, position, drop, from);
+      added.push(from);
+      continue;
+    }
     db.prepare("UPDATE realization_item SET movement_id=? WHERE movement_id=?").run(to, from);
     db.prepare("UPDATE recording_content SET movement_id=? WHERE movement_id=?").run(to, from);
     transferIdentities(db, to, from);
@@ -2296,22 +2325,18 @@ export function mergeWork(catalogue, keep, drop, actor) {
   db.prepare("DELETE FROM admin_work_pick WHERE work_id=?").run(drop);
   transferIdentities(db, keep, drop);
   db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), drop);
-  catalogue.audit("work.merge", drop, { into: keep }, actor);
-  return true;
+  catalogue.audit("work.merge", drop, { into: keep, ...(added.length && { addedMovements: added }) }, actor);
+  return addMissing ? { added } : true;
 }
 
 // What merging `drop` into `keep` would do, without doing it: how the
-// dropped work's movements land on the kept work's, or ok: false.
-export function mergePreview(catalogue, keep, drop) {
-  const keepMovements = workMovements(catalogue, keep),
-    dropMovements = workMovements(catalogue, drop);
-  if (!dropMovements.length) return { ok: true, mapped: [] };
-  const mapped = mapToMovements(
-    keepMovements,
-    dropMovements.map((m) => ({ movementTitle: resolvedName(catalogue, m.id, "title") || "" })),
-  );
-  if (!mapped) return { ok: false, mapped: [] };
-  return { ok: true, mapped: dropMovements.map((m, i) => ({ from: m.id, to: mapped[i] })) };
+// dropped work's movements land on the kept work's (`added`: the ones that
+// would join the kept work), or ok: false.
+export function mergePreview(catalogue, keep, drop, { addMissing = false } = {}) {
+  const mapping = mergeMapping(catalogue, keep, drop, addMissing);
+  if (!mapping) return { ok: false, mapped: [], added: [] };
+  const pairs = mapping.dropMovements.map((m, i) => ({ from: m.id, to: mapping.mapped[i] }));
+  return { ok: true, mapped: pairs.filter((pair) => pair.to), added: pairs.filter((pair) => !pair.to).map((pair) => pair.from) };
 }
 
 function verifiedIdentities(catalogue, entity, kind) {

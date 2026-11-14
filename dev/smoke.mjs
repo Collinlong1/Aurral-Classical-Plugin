@@ -8,14 +8,25 @@ const request = (user, route, body) => fetch(`${api}${route}`, {
 });
 const selected = getLibrary({availableOnly:true}).tracks.find((track) => track.files.some((file) => file.path.includes("multiple-recordings")));
 assert.ok(selected,"Synthetic library was indexed");
+// Comparisons are saved from the work page (the album and track menus no
+// longer carry "Compare recordings"): every person reads the work's
+// recordings as themselves and saves them as their own playlist.
+const fs = await import("node:fs/promises");
+const { work } = JSON.parse(await fs.readFile("/config/phase4-fixture.json", "utf8"));
 const owned = [];
 for (const user of ["fixture-admin","fixture-one","fixture-two"]) {
-  const response = await request(user,"/plugins/aurral-classical/actions/compare-track",{trackIds:[selected.id]});
+  const page = await request(user,`/plugins/aurral-classical/resources/work/${work}`);
+  assert.equal(page.status,200,await page.clone().text());
+  const view = await page.json();
+  const itemIds = view.recordings.flatMap((recording) => recording.items.map((item) => item.id));
+  assert.ok(itemIds.length >= 5,`The work page lists every owned recording for ${user}`);
+  const name = `Recordings: Fixture Sonata (${user})`;
+  const response = await request(user,`/plugins/aurral-classical/resources/work/${work}/playlist`,{name,itemIds});
   assert.equal(response.status,200,await response.text());
   let playlist;
   for (let attempt=0; attempt<120; attempt++) {
     const status = await (await request(user,"/playlists/status")).json();
-    playlist = status.staticPlaylists.find((p) => p.name.startsWith("Recordings:"));
+    playlist = status.staticPlaylists.find((p) => p.name === name);
     if (playlist) break;
     await new Promise((resolve) => setTimeout(resolve,250));
   }
