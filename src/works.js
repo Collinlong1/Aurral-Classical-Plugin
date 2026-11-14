@@ -22,6 +22,9 @@ const CATALOGUES = [
   [new RegExp(`\\bTrV\\s*(\\d+${SUFFIX})`, "i"), "TrV"],
   [new RegExp(`\\bL\\.\\s*(\\d+${SUFFIX})`), "L"],
   [new RegExp(`\\bFP\\s*(\\d+${SUFFIX})`), "FP"],
+  // Ravel's (Marnat): "Boléro, M 81", "Pavane…, M.19". Capital M only.
+  // "M. 63/2" is the second of M. 63's pieces.
+  [new RegExp(`(?<![\\p{L}\\d])M(?:\\.\\s*|\\s+)(\\d+${SUFFIX}(?:\\/\\d+)?)(?![\\d])`, "u"), "M"],
 ];
 const OPUS = /\bop(?:us|\.)?\s*(\d+[a-z]?)(?:\s*,?\s*(?:no\.?|nr\.?|n°)\s*(\d+))?/i;
 // A number within the catalogue number that follows it: "S164e No. 2",

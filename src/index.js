@@ -10,7 +10,8 @@ import {
   modelStatus,
   enqueueModelScan,
   cancelModelScan,
-  autoMatchWorks,
+  queueAlbumMatch,
+  albumMatchResult,
   autoMatchLibrary,
   identifyBacklog,
   runModelJobs,
@@ -267,15 +268,18 @@ export default {
       };
     },
     async "classical-auto-match"(input) {
-      const result = await autoMatchWorks(
-        makeContext(input),
-        input.user,
-        input.album?.id,
-      );
+      // On the model worker: a large album's MusicBrainz lookups no longer
+      // keep the plugin from answering (it was reported "busy").
+      const ctx = makeContext(input);
+      const key = await queueAlbumMatch(ctx, input.user, input.album?.id);
+      await modelJobs(ctx, { budgetMs: ACTION_BUDGET_MS });
+      const result = await albumMatchResult(ctx, key);
+      if (result?.state !== "done")
+        return { message: "Still looking this album up on MusicBrainz in the background (one request a second). Reload the album in a few minutes, or run this again to continue." };
       return {
         message:
-          result.created > 0
-            ? `Created ${result.created} work group${result.created === 1 ? "" : "s"} from classical WORK/title, composer and track-order evidence. Reload the album to use Works view.`
+          result.matched > 0
+            ? `Created ${result.matched} work group${result.matched === 1 ? "" : "s"} from classical WORK/title, composer and MusicBrainz evidence. Reload the album to use Works view.`
             : "No new groups matched this album's WORK tags, structured titles or MusicBrainz parent-work evidence. Tracks remain available in the metadata editor.",
       };
     },

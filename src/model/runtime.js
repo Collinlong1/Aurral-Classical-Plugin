@@ -2,21 +2,22 @@ import { createHash, randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { openCatalogue } from "./catalogue.js";
+import { Metadata } from "./metadata.js";
 import { transaction, verifyOnce } from "./database.js";
 import { ModelJobs } from "./jobs.js";
 import { reconcile, classify } from "./reconcile.js";
 import { UserOperations } from "../user-operations.js";
 import { readTags } from "../tags.js";
-import { autoMatchTaggedWorks, catalogueSubject, isCollectionLike, titleHead, withoutComposer } from "./auto-match.js";
+import { autoMatchTaggedWorks, catalogueSubject, isCollectionLike, namesCatalogueRange, titleHead, withoutComposer } from "./auto-match.js";
 import { topWork } from "../works.js";
-import { ClassicalResolver, isLatin } from "../resolver.js";
+import { ClassicalResolver } from "../resolver.js";
 import { fingerprint, tagSensitive } from "./fingerprint.js";
 
-// A work's English title, as artist names pick theirs: a primary English
-// alias, or any English alias when MusicBrainz's title isn't Latin script.
+// A work's English name: any English alias MusicBrainz gives (a primary
+// one first), not only a primary one ("Prelude and Fughetta in G major, BWV
+// 902" for "Präludium und Fughetta G-Dur").
 function englishTitle(work, fallback = work.title) {
-  const alias = ClassicalResolver.bestEnglishAlias(work.aliases);
-  return alias && (alias.primary || !isLatin(work.title)) ? alias.name : fallback;
+  return ClassicalResolver.bestEnglishAlias(work.aliases)?.name ?? fallback;
 }
 
 export const modelFolder = (ctx) => path.join(ctx.dataFolder, "model");
@@ -358,10 +359,11 @@ async function scanFile(file, root, prior) {
 // action, never automatic.
 const IDENTIFY = "album_identify";
 // The identification rules' version is part of every key. When the rules
-// change (1.0.35 accepted whole works in one movement), the next scan records
-// the albums still pending as seen again, without looking them up, and the
-// admin's backlog action asks MusicBrainz about them once more.
-const RULES = "r2";
+// change (1.0.35 accepted whole works in one movement; 1.0.43 single
+// excerpts, same-titled movements and tracks never looked up), the next scan
+// records the albums still pending as seen again, without looking them up,
+// and the admin's backlog action asks MusicBrainz about them once more.
+const RULES = "r3";
 const BASELINE_KEY = `album-identify-baseline:${RULES}`;
 
 function pendingIdentification(catalogue) {
@@ -451,6 +453,31 @@ export async function identifyBacklog(ctx, actor) {
   }
 }
 
+// The admin's "Auto-match classical works" on one album: an identification
+// job like a scan's, worked on the model worker, so a large album never
+// holds up the plugin's own thread. Its key is new each time.
+export async function queueAlbumMatch(ctx, actor, albumId) {
+  if (actor?.role !== "admin")
+    throw new Error("Automatic work matching requires a current host admin");
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  try {
+    const key = `${IDENTIFY}:${RULES}:manual:${albumId}:${randomUUID()}`;
+    new ModelJobs(catalogue).enqueue(IDENTIFY, key, { albumId: String(albumId) }, { maxAttempts: 5 });
+    return key;
+  } finally {
+    catalogue.close();
+  }
+}
+export async function albumMatchResult(ctx, key) {
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  try {
+    const row = catalogue.db.prepare("SELECT state,progress FROM model_job WHERE key=?").get(key);
+    return row ? { state: row.state, ...JSON.parse(row.progress || "{}") } : null;
+  } finally {
+    catalogue.close();
+  }
+}
+
 export function identificationStatus(catalogue) {
   const rows = catalogue.db
     .prepare(
@@ -468,6 +495,36 @@ export function identificationStatus(catalogue) {
     matched: sum(() => true, "matched"),
     errors: sum(() => true, "errors"),
   };
+}
+
+// Works on this album that MusicBrainz identified and matching titled (never
+// one an admin named) take MusicBrainz's English name when it has one: an
+// earlier version kept "Präludium und Fughetta G-Dur, BWV 902" because its
+// English alias wasn't the primary one. The same request identification
+// makes, so it usually comes from the cache.
+async function englishWorkTitles(ctx, catalogue, albumId) {
+  const rows = catalogue.db
+    .prepare(
+      `SELECT DISTINCT r.work_id AS work,x.record_id AS mbid FROM realization r
+       JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id
+       JOIN external_identity x ON x.entity_id=r.work_id AND x.provider='musicbrainz' AND x.record_kind='work' AND x.state='active'
+       WHERE CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?`,
+    )
+    .all(String(albumId));
+  const metadata = new Metadata(catalogue);
+  for (const { work, mbid } of rows) {
+    const current = catalogue.db
+      .prepare("SELECT a.value,a.source FROM field_resolution f JOIN assertion a ON a.id=f.assertion_id JOIN metadata_target m ON m.id=f.target_id WHERE m.entity_id=? AND f.field='title'")
+      .get(work);
+    if (!current || current.source !== "derived") continue;
+    try {
+      const data = await ctx.mb.get("work", mbid, "aliases+artist-rels+work-rels");
+      const english = data && ClassicalResolver.bestEnglishAlias(data.aliases)?.name;
+      if (english && english !== JSON.parse(current.value)) metadata.derived(work, "title", english);
+    } catch (error) {
+      ctx.log(`English work title skipped: ${error.message}`);
+    }
+  }
 }
 
 // Works an identification job: its album's pending tracks, one MusicBrainz
@@ -536,6 +593,7 @@ async function runIdentification(ctx, catalogue, jobs, first, owner, deadline) {
         allowStructuredTitles: true,
         providerMatches: new Map(progress.matches),
       });
+      await englishWorkTitles(ctx, catalogue, albumId);
       jobs.checkpoint(job, { cursor: progress.cursor, identified: progress.matches.length, matched: result.created, errors: progress.errors }, { done: true, leaseMs: 60_000 });
     } catch (error) {
       jobs.fail(job, error.message);
@@ -776,7 +834,10 @@ export async function identifyTrack(ctx, hints) {
   // the set above it: stop below a set-named parent once the work has
   // parts of its own.
   const hasParts = (work) => (work.relations || []).some((rel) => rel.type === "parts" && rel.direction === "forward");
-  const parent = leaf && (await topWork(ctx.mb, leaf, 0, inc, { stop: (above, below) => isCollectionLike(above.title) && hasParts(below) }));
+  // Nor into a range of works once the work below has parts of its own
+  // ("The Well-Tempered Clavier, BWV 846–893" above "Prelude and Fugue in E
+  // minor, BWV 855"); a madrigal goes on up to its book.
+  const parent = leaf && (await topWork(ctx.mb, leaf, 0, inc, { stop: (above, below) => (isCollectionLike(above.title) || namesCatalogueRange(above.title)) && hasParts(below) }));
   // A work with no parent is a whole piece only when the track's own
   // title reads as one, not as a movement of something MusicBrainz
   // hasn't linked up.
@@ -799,6 +860,7 @@ export async function identifyTrack(ctx, hints) {
   return {
     workId: parent.id,
     work: englishTitle(parent),
+    ...(!ClassicalResolver.bestEnglishAlias(parent.aliases) && { untranslated: true }),
     movement: standalone ? null : englishTitle(leaf, null),
     ...(standalone && { standalone: true }),
     // The movement's own MusicBrainz work ("Nessun dorma" in Turandot), so

@@ -12,6 +12,7 @@ import plugin from "../src/index.js";
 import { writeTags } from "../src/tags.js";
 import { openCatalogue } from "../src/model/catalogue.js";
 import { renderAlbumPresentation } from "../src/model/presentation.js";
+import { Metadata } from "../src/model/metadata.js";
 import { enqueueModelScan, identifyBacklog, modelStatus, runModelJobs } from "../src/model/runtime.js";
 
 const admin = { id: 1, role: "admin" };
@@ -221,4 +222,60 @@ test("background matching: a whole work in one movement, titled with its tempo, 
   const groups = await lib.view("scriabin");
   assert.deepEqual(groups.find(([title]) => /Sonata no\. 7/.test(title)), ['Piano Sonata no. 7, op. 64 "Messe blanche"', true, 1]);
   assert.deepEqual(groups.find(([title]) => /Symphony no\. 5/.test(title)), ["Symphony no. 5, op. 67", true, 1]);
+});
+
+// From the user's library on 1.0.42: three preludes and fugues on one album
+// were filed under "The Well-Tempered Clavier, BWV 846–893" (identification
+// climbed MusicBrainz's tree into the range of works above them), and works
+// kept German names because their English alias wasn't the primary one.
+test("background matching: no climbing into a range of works; English names; the admin action runs on the worker", async (t) => {
+  const lib = await library(t);
+  await lib.add("earlier", ["Prélude"], { recordings: [recording(1)] });
+  await lib.scan();
+  const part = (id, title, parent) => ({ id, title, relations: [{ type: "parts", direction: "backward", work: { id: parent } }] });
+  Object.assign(lib.works, {
+    "work-31": part("work-31", "Prelude", "pf855"),
+    "work-32": part("work-32", "Fugue", "pf855"),
+    pf855: {
+      id: "pf855",
+      title: "Präludium und Fuge e-Moll, BWV 855",
+      aliases: [{ locale: "en", name: "Prelude and Fugue in E minor, BWV 855", primary: false, type: "Work name" }],
+      relations: [
+        { type: "parts", direction: "backward", work: { id: "wtc1" } },
+        { type: "parts", direction: "forward", work: { id: "work-31" } },
+        { type: "parts", direction: "forward", work: { id: "work-32" } },
+      ],
+    },
+    wtc1: part("wtc1", "Das Wohltemperierte Klavier I, BWV 846–869", "wtc"),
+    wtc: { id: "wtc", title: "The Well-Tempered Clavier, BWV 846–893", relations: [] },
+    "work-33": part("work-33", "Präludium", "pf902"),
+    pf902: { id: "pf902", title: "Präludium und Fughetta G-Dur, BWV 902", relations: [] },
+  });
+  await lib.add("bach", ["Prelude", "Fugue", "Prelude & Fughetta in G major, BWV 902: I. Prelude"], { composer: "Johann Sebastian Bach", recordings: [recording(31), recording(32), recording(33)] });
+  await lib.scan();
+  await runModelJobs(lib.ctx, { budgetMs: 30_000 });
+  assert.deepEqual(await lib.view("bach"), [
+    ["Prelude and Fugue in E minor, BWV 855", true, 2],
+    ["Prelude & Fughetta in G major, BWV 902", true, 1],
+  ]);
+
+  // A work titled before 1.0.43 takes the English name when its album is
+  // matched again, through the admin action, which now runs on the worker.
+  const c = await openCatalogue(path.join(lib.ctx.dataFolder, "model"));
+  const work = c.db.prepare("SELECT entity_id AS id FROM external_identity WHERE record_kind='work' AND record_id='pf855' AND state='active'").get().id;
+  new Metadata(c).derived(work, "title", "Präludium und Fuge e-Moll, BWV 855");
+  c.close();
+  // MusicBrainz as a mirror over HTTP: the worker makes its own client.
+  const server = http.createServer((request, response) => {
+    const [, , , entity, id] = new URL(request.url, "http://mirror").pathname.split("/");
+    const data = entity === "work" ? lib.works[id] : null;
+    response.writeHead(data ? 200 : 404, { "content-type": "application/json" });
+    response.end(JSON.stringify(data || { error: "Not Found" }));
+  });
+  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  t.after(() => server.close());
+  const settings = { mbMirror: `http://127.0.0.1:${server.address().port}` };
+  const { message } = await plugin.actions["classical-auto-match"]({ ...lib.ctx, settings, user: admin, album: { id: "bach" } });
+  assert.match(message, /No new groups|Created/);
+  assert.equal((await lib.view("bach"))[0][0], "Prelude and Fugue in E minor, BWV 855");
 });

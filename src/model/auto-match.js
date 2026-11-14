@@ -102,9 +102,13 @@ const catalogued = (text) => Boolean(catalogueNumber(text)) && !isCatalogueRange
 // 34", "24 Préludes, op. 28") is one work; a set's name alone ("Études") is
 // not, and "Prelude No. 1, Op. 23/1" is one piece of a set.
 const catalogueSet = (text) => NUMBERED_SET.test(text) && catalogued(text);
+// A collection's name ("Lieder", "Song Cycle") is too loose to be a work;
+// a counted one with a catalogue number of its own is one ("Zwölf Lieder
+// von Fr. Schubert, S558bis").
+const COUNTED_COLLECTION = /(?<!\p{L})(?:\d+|zwei|drei|vier|fünf|sechs|sieben|acht|neun|zehn|elf|zwölf|dreizehn|vierzehn|deux|trois|quatre|cinq|six|sept|huit|neuf|dix|douze|two|three|four|five|six|seven|eight|nine|ten|twelve)\s+(?:\p{L}+\s+)?(?:lieder|songs?|mélodies|melodies|chants|gesänge)(?!\p{L})/iu;
 const readsAsWork = (text) =>
   Boolean(text) &&
-  ((!isCollectionLike(text) && (MULTI_MOVEMENT.test(text) || catalogued(text))) || catalogueSet(text));
+  ((!isCollectionLike(text) && (MULTI_MOVEMENT.test(text) || catalogued(text))) || catalogueSet(text) || (COUNTED_COLLECTION.test(text) && catalogued(text)));
 
 // "24 Préludes, op. 28 no. 6 in B minor": a numbered piece of a set named in
 // the plural. A key before the number names one piece instead ("Études in
@@ -216,6 +220,7 @@ function candidates(
   // Composers the library already credits corroborate a name read from an
   // artist field.
   const knownComposers = rows.length ? knownComposerNames(catalogue) : new Set();
+  const numbered = allowStructuredTitles ? numberedRuns(rows) : new Set();
   for (const row of rows) {
     const tagged = row.evidence.hints || {};
     const hints = { ...tagged, title: withoutComposer(tagged.title, tagged.composer) };
@@ -232,12 +237,16 @@ function candidates(
           title:
             local && sameCatalogue(local.title, provider.work)
               ? local.title
-              : clean(provider.work),
+              : // No English name on MusicBrainz ("Präludium und Fughetta
+                // G-Dur, BWV 902"): the tags' own heading with the same number.
+                provider.untranslated && splitTitle(clean(hints.title)).head && sameCatalogue(splitTitle(clean(hints.title)).head, provider.work)
+                ? clean(splitTitle(clean(hints.title)).head)
+                : clean(provider.work),
           evidence: "musicbrainz-parent",
           identity: provider.workId,
           ...(provider.standalone && { standalone: true }),
         }
-      : proposedWork(hints, allowStructuredTitles);
+      : proposedWork(hints, allowStructuredTitles) || numberedRun(hints, numbered);
     // GROUPING names a whole piece the way WORK does.
     if (
       proposal &&
@@ -433,6 +442,41 @@ const recordingTitle = (title) =>
 // neighbouring tracks is its own recording. Only for a numbered set
 // MusicBrainz names, and only where a title repeats, so a work an album
 // interrupts once keeps one recording.
+// Three or more neighbouring tracks under one heading that number their
+// movements I, II, III… from the first, though the heading names no form:
+// "Chain 3: I. Presto", "Contextures: Riots - Decade ’60: III. Con calore".
+const FIRST_NUMERAL = /(?:^|:\s+)([IVXLC]+)[.)]\s/;
+function numberedRuns(rows) {
+  const heads = new Set();
+  const ordered = rows
+    .map((row) => {
+      const hints = row.evidence.hints || {};
+      const { head, tail } = splitTitle(withoutComposer(hints.title, hints.composer));
+      const numeral = tail?.match(FIRST_NUMERAL)?.[1];
+      return { head: head && clean(head), number: numeral ? romanValue(numeral.toLowerCase()) : null, disc: Number(hints.discNumber) || 1, track: Number(hints.trackNumber) };
+    })
+    .filter((row) => row.head && row.number && Number.isSafeInteger(row.track))
+    .sort((a, b) => a.disc - b.disc || a.track - b.track);
+  let run = [];
+  const close = () => {
+    if (run.length >= 3 && run[0].number === 1 && run.every((row, i) => !i || row.number > run[i - 1].number)) heads.add(run[0].head);
+    run = [];
+  };
+  for (const row of ordered) {
+    const last = run.at(-1);
+    if (last && (last.head !== row.head || last.disc !== row.disc || row.track !== last.track + 1)) close();
+    run.push(row);
+  }
+  close();
+  return heads;
+}
+// A heading naming a part or act of something larger ("Le Sacre du
+// Printemps, Pt. 1") is not a work of its own.
+const PART_OF = /(?<!\p{L})(?:act|akt|atto|acte|part|pt\.?|teil|scene|szene|book|livre|heft|disc|cd)\s*[ivxlc\d]+/iu;
+function numberedRun({ title }, heads) {
+  const head = clean(splitTitle(title).head || "");
+  return head && heads.has(head) && !PART_OF.test(head) ? { title: head, evidence: "structured-title" } : null;
+}
 // A title carrying a catalogue number of its own that the work it is
 // filed under doesn't have: Liszt's "Isoldens Liebestod, S447" under
 // Wagner's Tristan, "Les morts, S516" under the orchestral Odes funèbres.
@@ -1483,6 +1527,44 @@ function placeTrack(catalogue, realization, performanceWork, recording, segment,
   });
 }
 
+// A work titled with a range of numbers ("The Well-Tempered Clavier, BWV
+// 846–893") that one album holds several recordings of: identification
+// before 1.0.43 climbed MusicBrainz's tree past each prelude and fugue up to
+// the collection, and put three different ones on its "I. Prelude / II.
+// Fugue". An unedited matching-made one lets its recordings go, so the next
+// identification places each on its own work; the work goes too. A book of
+// madrigals, one recording of several of its pieces, stays.
+const CATALOGUE_RANGE = /(?<!\p{L})(?:BWV|HWV|SV|K|KV|D|Op\.?|RV|S|Hob\.?)\s*\d+[a-z]?\s*[-–—]\s*\d+/iu;
+export const namesCatalogueRange = (title) => CATALOGUE_RANGE.test(String(title || ""));
+export function releaseRangeWorks(catalogue, { actor = null } = {}) {
+  const db = catalogue.db;
+  let released = 0;
+  for (const { id } of db.prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL").all()) {
+    const title = resolvedName(catalogue, id, "title");
+    if (typeof title !== "string" || !CATALOGUE_RANGE.test(title)) continue;
+    const stacked = db
+      .prepare(
+        `SELECT 1 FROM realization r JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
+         JOIN track_link t ON t.id=s.track_link_id WHERE r.work_id=?
+         GROUP BY CAST(json_extract(t.evidence,'$.albumId') AS TEXT) HAVING count(DISTINCT r.id)>1 LIMIT 1`,
+      )
+      .get(id);
+    if (!stacked) continue;
+    const ids = [id, ...workMovements(catalogue, id).map((m) => m.id)];
+    const madeByMatching = db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work'").get(id);
+    if (!madeByMatching || editedInEditor(catalogue, ids) || hasManualEdits(catalogue, ids)) continue;
+    transaction(db, () => {
+      const items = db.prepare("SELECT i.id FROM realization_item i JOIN realization r ON r.id=i.realization_id WHERE r.work_id=?").all(id);
+      for (const item of items) catalogue.detachItem(item.id, { dropRecording: true });
+      db.prepare("UPDATE external_identity SET state='stale' WHERE entity_id IN (" + ids.map(() => "?").join(",") + ") AND state='active'").run(...ids);
+      db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id IN (" + ids.map(() => "?").join(",") + ")").run(Date.now(), Date.now(), ...ids);
+      catalogue.audit("work.release_range", id, { title, tracks: items.length }, actor);
+    });
+    released++;
+  }
+  return released;
+}
+
 // A movement's own MusicBrainz work, so another album's recording of
 // "Nessun dorma" finds it whatever its title says.
 const LEAF = "movement-work";
@@ -2512,6 +2594,7 @@ export function autoMatchTaggedWorks(
   if (albumId != null) repairMovementTitles(catalogue, { albumId });
   // Catalogue-wide repairs belong to the library pass, not to each album.
   if (albumId == null) {
+    releaseRangeWorks(catalogue, { actor });
     repairWorkTitles(catalogue);
     repairMovementTitles(catalogue);
     // Works an album made with several variations a movement.

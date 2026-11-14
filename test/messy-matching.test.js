@@ -9,7 +9,7 @@ import { createHash } from "node:crypto";
 import { tempFolders } from "./helpers.js";
 import { artistCredits, composersOf } from "../src/model/credits.js";
 import { classificationEvidence } from "../src/model/classify-evidence.js";
-import { recordTaggedLeaves, splitTitle, stripWorkPrefix, autoMatchTaggedWorks, withoutComposer, mapToMovements, movementParts, catalogueSubject, workKey, mergeWork, provablyDifferent } from "../src/model/auto-match.js";
+import { releaseRangeWorks, recordTaggedLeaves, splitTitle, stripWorkPrefix, autoMatchTaggedWorks, withoutComposer, mapToMovements, movementParts, catalogueSubject, workKey, mergeWork, provablyDifferent } from "../src/model/auto-match.js";
 import { openCatalogue } from "../src/model/catalogue.js";
 import { Metadata } from "../src/model/metadata.js";
 import { reconcile, classify } from "../src/model/reconcile.js";
@@ -1398,4 +1398,46 @@ test("matching: movements take their MusicBrainz work from the tracks' Work Id t
     .prepare("SELECT i.movement_id FROM realization_item i JOIN segment s ON s.id=i.segment_id WHERE s.track_link_id=?")
     .get(ids("encore")[0])?.movement_id;
   assert.equal(movement, workMovementTitles(c, work, true)[2]);
+});
+
+// From the user's library on 1.0.42: Liszt's Schubert sets named a work and
+// its number in every title but read as a loose collection of Lieder;
+// Ravel's Marnat numbers weren't read; "Chain 3: I. / II. / III." named no
+// form. And works titled with a range of numbers held several pieces.
+test("matching: counted song sets with numbers, Ravel's numbers, numbered runs; range works let go", async (t) => {
+  const by = (composer) => (title) => ({ title, composer: [composer], genres: ["Classical"] });
+  const c = await catalogueWith(t, [
+    { id: "liszt", album: "The Complete Liszt Piano Music", albumArtist: "Leslie Howard", artist: "Leslie Howard", titles: ["Zwölf Lieder von Fr. Schubert, S558bis: III. Du bist die Ruh'", "Zwölf Lieder von Fr. Schubert, S558bis: IV. Erlkönig (third version)", "Zwölf Lieder von Fr. Schubert, S558bis: VII. Frühlingsglaube"].map(by("Franz Schubert")) },
+    { id: "ravel", album: "Ravel", albumArtist: "Pianist", artist: "Pianist", titles: ["Boléro, M 81: Tempo di Bolero – Moderato assai", "À la manière de Borodine, M. 63/1", "À la manière de Chabrier, M. 63/2", "Piano Sonata no. 1, op. 2: Allegro"].map(by("Maurice Ravel")) },
+    { id: "sonatine", album: "Ravel II", albumArtist: "Pianist", artist: "Pianist", titles: ["Sonatine, M. 40: Modéré", "Sonatine, M. 40: Mouvement de menuet", "Sonatine, M. 40: Animé"].map(by("Maurice Ravel")) },
+    { id: "chain", album: "Modern", albumArtist: "Orchestra", artist: "Orchestra", titles: ["Chain 3: I. Presto", "Chain 3: II. Presto (13)", "Chain 3: III. (38)"].map(by("Witold Lutosławski")) },
+    { id: "rite", album: "The Rite of Spring", albumArtist: "Orchestra", artist: "Orchestra", titles: ["Le Sacre du Printemps, Pt. 1: I. Introduction", "Le Sacre du Printemps, Pt. 1: II. Les augures printaniers", "Le Sacre du Printemps, Pt. 1: III. Jeu du rapt"].map(by("Igor Stravinsky")) },
+    { id: "wtc", album: "Bach", albumArtist: "Pianist", artist: "Pianist", titles: ["Prelude", "Fugue", "Prelude", "Fugue"].map(by("Johann Sebastian Bach")) },
+  ]);
+  const match = (albumId) => autoMatchTaggedWorks(c, { albumId, actor: "admin", allowStructuredTitles: true });
+  const blocks = (albumId) => renderAlbumPresentation(c, albumId)?.groups.map((group) => [group.title, Boolean(group.workId), group.items.length]) ?? [];
+  for (const albumId of ["liszt", "ravel", "sonatine", "chain", "rite"]) match(albumId);
+  // Several tempo-titled tracks under one heading are one work's movements.
+  assert.deepEqual(blocks("sonatine"), [["Sonatine, M. 40", true, 3]]);
+  assert.deepEqual(blocks("liszt"), [["Zwölf Lieder von Fr. Schubert, S558bis", true, 3]]);
+  // Ravel's numbers are read: the two "À la manière" pieces, M. 63/1 and
+  // M. 63/2, stay two pieces; a lone movement of a sonata stays out.
+  const ravel = blocks("ravel");
+  assert.ok(!ravel.some(([title, matched]) => matched && /M\. 63/.test(title)));
+  assert.ok(ravel.every(([, matched, rows]) => !matched || rows === 1));
+  assert.deepEqual(blocks("chain"), [["Chain 3", true, 3]]);
+  // A heading naming a part is not a work of its own.
+  assert.ok(blocks("rite").every(([, matched]) => !matched));
+
+  // A work matching made under a range of numbers, holding two different
+  // preludes and fugues as one: its recordings are let go, the work too.
+  const ids = c.db.prepare("SELECT id FROM track_link WHERE CAST(json_extract(evidence,'$.albumId') AS TEXT)='wtc' ORDER BY json_extract(evidence,'$.hints.trackNumber')").all().map((row) => row.id);
+  const wtc = { workId: "mb-wtc", work: "The Well-Tempered Clavier, BWV 846–893", movement: null, aliases: [], composers: ["Johann Sebastian Bach"], composerIds: {} };
+  autoMatchTaggedWorks(c, { albumId: "wtc", actor: "model-identify", allowStructuredTitles: true, providerMatches: new Map(ids.map((id) => [id, wtc])) });
+  assert.ok(blocks("wtc").some(([title, matched]) => matched && /BWV 846–893/.test(title)));
+  assert.equal(releaseRangeWorks(c), 1);
+  assert.ok(blocks("wtc").every(([, matched]) => !matched));
+  assert.equal(c.db.prepare("SELECT count(*) AS n FROM realization r JOIN entity e ON e.id=r.work_id WHERE e.deleted_at IS NULL").get().n > 0, true);
+  // Matching the album again with what MusicBrainz says now leaves nothing on it.
+  assert.equal(releaseRangeWorks(c), 0);
 });
