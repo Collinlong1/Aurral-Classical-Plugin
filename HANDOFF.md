@@ -1,3 +1,16 @@
+# Metadata editor UI, item 6 (November 15, 2026)
+
+Item 5 is published at the user's request: core `a26e013fea9bbc172e263aa3a294323f3b258927`, plugin 1.0.57 with paired CI `be404e3` pinning that core and running the footer browser check. The user then supplied the review's original seven recommendations; they are now recorded verbatim in plugin `EDITOR_UI_HANDOFF.md`. Against that text, item 5 still lacks an unsaved-change count and validation beside the affected field (raised with the user, not done).
+
+Item 6 (plugin 1.0.58) has two parts.
+
+- **Reordering:** movements are reordered locally and saved once. Core adds a generic v2 `order` form field (drag handle, keyboard drag via the shared `SortableList`, ↑/↓ buttons) and advertises `capabilities.orderField: true`. Older cores get a position-menu form instead. Per-click Move up/down remains only for works over 500 movements.
+- **Review decisions:** reviews about two entries lead with the question and both named entries, then **Decide**: Merge…, Link the record here instead (identity reviews only), Keep separate or Skip. The header only navigates. Merge opens a merge step that shows both outcomes and asks which entry stays; the work/person Merge forms lead to the same step.
+
+No schema change or new permission. Merge semantics, undo and the item-5 footer contract are unchanged.
+
+Validation: `pnpm check` passes (1089 unsafe-any uses, baseline unchanged); production build passes; full core unit suite 388 files / 2666 tests passed (`.scratch/editor-item6-unit.log`, 133 s); core plugin-host tests 30/30 (red on a26e013 first). Plugin editor/matching tests 97/97 (5 red on 1.0.57 first); standard full plugin suite 340/340 passed with normal file isolation (`.scratch/editor-item6-all-tests.log`, 167 s). A new real-renderer reorder/review browser check passes at desktop/phone widths. The five earlier checks pass at both widths. Not run: `pnpm eden test` (no Docker daemon), full Compose/restart, remote CI. Item 6 is committed on the session branch `claude/eager-babbage-gkwhxx` only, not on `aurral-classical`; item 7 remains pending.
+
 # Metadata editor UI, item 5 (November 15, 2026)
 
 Item 4 is published: core `292252ce897f7ebf2df99cba303cd1b6c2a58e90`; plugin regression/docs `8de3cbb`, paired-CI commit `5a846040b60e1486659055bd824a3b7a2041b93a` (CI pins core 292252c and runs the lookup/search browser check). The previous session's uncommitted item-5 work was not available, so item 5 was re-implemented in a fresh cloud session on branch `claude/eager-babbage-gkwhxx` in both repositories, starting from those published heads.
