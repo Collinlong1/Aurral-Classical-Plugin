@@ -2,14 +2,14 @@
 
 ## Current checkpoint
 
-November 14, 2026 (America/Chicago). The user authorized the seven improvements from the editor review, one at a time, and requested a consistently updated handoff. **Item 1 is pushed**: core `365e6dc49a54d9137e82c56e6956dabc1c9899f3`, plugin `26be9ac013ed9ccd64726064c89b192352736a06`. **Item 2 is complete locally**, as a separate change (core `c38393b`, plugin 1.0.55). The user additionally emphasized that core changes must be broad, reusable upstream improvements; all album/work/grouping workflow logic stays in the plugin. No deployment or PR is requested.
+November 14, 2026 (America/Chicago). The user authorized the seven improvements from the editor review, one at a time, and requested a consistently updated handoff. **Item 1 is pushed**: core `365e6dc49a54d9137e82c56e6956dabc1c9899f3`, plugin `26be9ac013ed9ccd64726064c89b192352736a06`. **Item 2 publication authorized**: core `c38393bd4816e721bd4c838e59ad0403452f7153` pushed; plugin implementation `8800d16`, version 1.0.55, being pushed with its paired CI pin. **Item 3 starts next**: sectioned work editing with add forms on demand. The user additionally emphasized that core changes must be broad, reusable upstream improvements; all album/work/grouping workflow logic stays in the plugin. No deployment or PR is requested.
 
 Baseline: core `61b8ddcab63b99b427099ea4bedca9f3f1c6a2b5`, plugin `fc144f20930139e728b8d5319866e96225fd7774`, both `aurral-classical`. Local checkouts: `/workspace/aurral`, `/workspace/plugin`. Changes are on the user-authorized aurral-classical branches only; no production access, deployment, PR, upstream write or subagents.
 
 ## Ordered work
 
 1. **Published:** protect unsaved edits when saving another form, running an action, or navigating away.
-2. **Complete locally:** focused album assignment: select tracks, choose/create work, map movements, apply.
+2. **Publication authorized:** focused album assignment: select tracks, choose/create work, map movements, apply.
 3. Pending: sectioned work editing; reveal add forms on demand; consolidate advanced actions.
 4. Pending: keyboard-friendly lookup fields and clear search behavior/status.
 5. Pending: save/cancel and feedback close to the active task.
@@ -51,7 +51,7 @@ Baseline: core `61b8ddcab63b99b427099ea4bedca9f3f1c6a2b5`, plugin `fc144f2093013
 - Core has only two item-2 runtime edits: a selected-state attribute on the shared BulkBar and CSS that keeps that bar sticky while selected. Applies to every plugin rows section, with existing Aurral tokens. No new API, classical names, routes, SQL or grouping decisions. All workflow stays in the plugin. The plugin cannot style host-owned controls through its declarative API; this behavior belongs to the shared renderer.
 - Item 1 also belongs in core: the host owns dirty forms, mutation refresh/reset, routing and unload events. Putting those guards only in the plugin would miss browser navigation and host-level draft loss. Every admin-pages-v2 plugin benefits. These are candidates for upstream review, not claims of upstream acceptance.
 - Removed an experimental smooth-to-instant section-scroll change after it did not resolve the mobile browser check. Browser automation now waits for existing section navigation to finish before opening a Select, which intentionally closes on scroll. Production scroll behavior stays as published.
-- Plugin manifest bumped to 1.0.55 and index.js rebuilt. Updated user guide, both handoffs/inventories, V0_2_REPORT.md and UPSTREAM_DELTA.md. No new CI pin: paired integration remains pinned to published item-1 core until item 2 is published.
+- Plugin manifest bumped to 1.0.55 and index.js rebuilt. Updated user guide, both handoffs/inventories, V0_2_REPORT.md and UPSTREAM_DELTA.md. Paired integration now pins item-2 core `c38393b` and runs the assignment browser regression before the full-app workflow.
 
 ## Item 2 validation
 
@@ -63,4 +63,4 @@ Baseline: core `61b8ddcab63b99b427099ea4bedca9f3f1c6a2b5`, plugin `fc144f2093013
 
 ## Next action
 
-Item 2 is complete and reviewed locally: core `c38393b`, plugin 1.0.55. Both item-2 changes remain unpushed. Item 1 is already published at the refs above. Items 3–7 remain pending; next is sectioned work editing. Keep all domain logic in the plugin and every core addition reusable upstream. Before publishing item 2, update the integration core pin to its published commit and add the assignment browser regression to paired CI.
+Push item 2 (plugin implementation `8800d16` plus paired CI pin; core `c38393b` already pushed), then implement item 3. Keep work section navigation and on-demand form state in the plugin using the existing editor API. No item-3 core changes planned. Items 4–7 remain pending.

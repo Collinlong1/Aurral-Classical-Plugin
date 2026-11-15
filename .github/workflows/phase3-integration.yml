@@ -22,7 +22,7 @@ jobs:
           repository: Collinlong1/aurral
           # Core aurral-classical with the v0.2 hooks (search, manual
           # search, comparisons, admin page selection and pages).
-          ref: 365e6dc49a54d9137e82c56e6956dabc1c9899f3
+          ref: c38393bd4816e721bd4c838e59ad0403452f7153
           path: core
       - uses: actions/setup-node@v4
         with:
@@ -39,6 +39,11 @@ jobs:
         env:
           AURRAL_CORE_PATH: ${{ github.workspace }}/core
         run: node dev/editor-drafts-browser.mjs
+      - name: Group selected album tracks
+        working-directory: plugin
+        env:
+          AURRAL_CORE_PATH: ${{ github.workspace }}/core
+        run: node dev/editor-assignment-browser.mjs
       - name: Start synthetic instance and verify comparisons
         working-directory: plugin
         env:
