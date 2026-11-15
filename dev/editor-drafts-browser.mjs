@@ -275,6 +275,9 @@ try {
     await page.getByRole("button", { name: "Albums", exact: true }).click();
     await titleInput.fill("History draft");
     const beforeBack = page.url();
+    const stateBefore = await page.evaluate(() => JSON.stringify(history.state));
+    const consoleLines = [];
+    page.on("console", (message) => consoleLines.push(`${message.type()}: ${message.text()}`.slice(0, 300)));
     await page.evaluate(() => window.history.back());
     await page
       .getByRole("heading", { name: "Discard unsaved changes?" })
@@ -290,8 +293,9 @@ try {
           title: document.querySelector("input")?.value,
           unsaved: document.querySelector(".plugin-admin__unsaved")?.textContent ?? null,
           dialog: document.querySelector('[role="alertdialog"]')?.textContent ?? null,
+          stateAfter: JSON.stringify(history.state),
         }));
-        console.error("Back was not guarded", JSON.stringify({ width, beforeBack, browser: browser.version(), ...state }));
+        console.error("Back was not guarded", JSON.stringify({ width, beforeBack, stateBefore, browser: browser.version(), ...state, console: consoleLines }));
         throw error;
       });
     await modal.getByRole("button", { name: "Cancel", exact: true }).click();
