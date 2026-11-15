@@ -124,11 +124,24 @@ try {
       await reorder.getByRole("button", { name: "Drag A", exact: true }).focus();
       await page.keyboard.press("Space");
       await reorder.locator(".plugin-admin__order-item.is-dragging").waitFor();
-      // Each step is announced to screen readers; wait for it before the next.
-      for (const position of [2, 3]) {
-        await page.keyboard.press("ArrowDown");
-        await page.waitForFunction((p) => [...document.querySelectorAll("[id^='DndLiveRegion']")].some((n) => n.textContent.includes(`A moved to position ${p} of 4`)), position);
+      // Steer by what is announced to screen readers ("A moved to position N
+      // of 4"): the sensor listens for arrows just after the pick-up, so a key
+      // sent before that changes nothing and is simply pressed again.
+      const announced = () => page.evaluate(() => {
+        const text = [...document.querySelectorAll("[id^='DndLiveRegion']")].map((n) => n.textContent).join(" ");
+        const found = [...text.matchAll(/A (?:moved to|at) position (\d+) of 4/g)];
+        return found.length ? Number(found.at(-1)[1]) : 1;
+      });
+      for (let attempt = 0; attempt < 12 && (await announced()) !== 3; attempt++) {
+        const from = await announced();
+        await page.keyboard.press(from < 3 ? "ArrowDown" : "ArrowUp");
+        await page.waitForFunction(([p, f]) => {
+          const text = [...document.querySelectorAll("[id^='DndLiveRegion']")].map((n) => n.textContent).join(" ");
+          const found = [...text.matchAll(/A (?:moved to|at) position (\d+) of 4/g)];
+          return found.length && Number(found.at(-1)[1]) !== f;
+        }, [3, from], { timeout: 1500 }).catch(() => {});
       }
+      assert.equal(await announced(), 3, "keyboard drag reaches position 3");
       await page.keyboard.press("Space");
       await expectOrder(["B", "D", "A", "C"], "keyboard drag");
       // Pointer drag by the handle.
