@@ -7,7 +7,7 @@ Item 7 is published at the user's request: core `ebbb7e2172e8433ff1266ae6a1faf07
 
 The plugin (1.0.59) names fields for dates, titles, names, credited people and the merge step's other entry. Generic core and plugin changes only; no schema, permission or command change.
 
-Validation: `pnpm check` passes (1089 unsafe-any uses, baseline unchanged); production build passes; full core unit suite GAPS_UNIT_PENDING; core plugin-host tests 30/30 (red on ebbb7e2 first). Plugin editor tests 56/56 (red on 1.0.58 first); standard full plugin suite GAPS_PLUGIN_PENDING. All seven real-renderer browser checks pass at desktop/phone widths; the footer check failed on ebbb7e2 first. Not run: `pnpm eden test` (no Docker daemon), full Compose/restart. The paired integration workflow is to be run manually on `aurral-classical` after publication; see plugin `EDITOR_UI_HANDOFF.md`.
+Validation: `pnpm check` passes (1089 unsafe-any uses, baseline unchanged); production build passes; full core unit suite 388 files / 2666 tests passed (`.scratch/editor-gaps-unit.log`, 139 s); core plugin-host tests 30/30 (red on ebbb7e2 first). Plugin editor tests 56/56 (red on 1.0.58 first); standard full plugin suite 341/341 passed with normal file isolation (`.scratch/editor-gaps-all-tests.log`, 165 s). All seven real-renderer browser checks pass at desktop/phone widths; the footer check failed on ebbb7e2 first. Not run: `pnpm eden test` (no Docker daemon), full Compose/restart. The paired integration workflow is to be run manually on `aurral-classical` after publication; see plugin `EDITOR_UI_HANDOFF.md`.
 
 # Metadata editor UI, item 7 (November 15, 2026)
 
