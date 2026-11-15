@@ -274,6 +274,13 @@ try {
     );
     await page.getByRole("button", { name: "Albums", exact: true }).click();
     await titleInput.fill("History draft");
+    // Back is guarded by state the page registers after React applies the
+    // edit. Wait for that the way a person's next click would see it: the
+    // page's own guard asks about the draft, then Cancel and press Back.
+    await page.getByRole("button", { name: "Albums", exact: true }).click();
+    await page.getByRole("heading", { name: "Discard unsaved changes?" }).waitFor();
+    await modal.getByRole("button", { name: "Cancel", exact: true }).click();
+    await modal.waitFor({ state: "detached" });
     const beforeBack = page.url();
     const stateBefore = await page.evaluate(() => JSON.stringify(history.state));
     const consoleLines = [];
