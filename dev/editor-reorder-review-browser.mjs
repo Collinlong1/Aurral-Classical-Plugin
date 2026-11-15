@@ -25,7 +25,7 @@ await build({
       function Editor() {
         const [search, setSearch] = useSearchParams();
         const params = { selection: search.get('selection') || 'album:box~6', q: search.get('q') || '', offset: search.get('offset') || '0', tab: search.get('tab') || 'works' };
-        const query = useQuery({ queryKey: ['fixture', search.toString()], queryFn: () => fetch('/document?' + new URLSearchParams(params)).then(r => r.json()), refetchOnWindowFocus: false, placeholderData: keepPreviousData });
+        const query = useQuery({ queryKey: ['plugins', 'page', 'fixture', 'editor', params.selection, params.q, params.offset, params.tab], queryFn: () => fetch('/document?' + new URLSearchParams(params)).then(r => r.json()), refetchOnWindowFocus: false, placeholderData: keepPreviousData });
         // Like PluginPage: the current page stays on screen while the next loads.
         if (query.isPending) return <p>Loading…</p>;
         return <PluginAdminPage pluginId='fixture' pageId='editor' data={query.data} params={params} fetching={query.isFetching} onNavigate={(next) => setSearch({ ...params, ...next })} onRefetch={() => query.refetch()} />;
@@ -156,6 +156,9 @@ try {
       await page.screenshot({ path: path.join(output, `reorder-${width}.png`), animations: "disabled" });
       await page.getByRole("button", { name: "Save order", exact: true }).click();
       await group("Movements").locator(".plugin-admin__feedback").filter({ hasText: "Movement order saved." }).waitFor();
+      // The list beside the message is the saved order, not the copy of the
+      // page cached from before.
+      assert.deepEqual(await group("Movements").locator(".settings-service__name").evaluateAll((rows) => rows.map((row) => row.firstChild?.textContent)), ["C", "B", "D", "A"]);
       assert.equal(requests.length, writes + 1, "one save");
       assert.deepEqual(order(), ["C", "B", "D", "A"]);
 
