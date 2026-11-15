@@ -42056,236 +42056,218 @@ function movingTracks(c, token) {
   if (!Array.isArray(tracks)) fail("Those ticked tracks are no longer remembered. Tick them again.");
   return tracks;
 }
+function rememberAlbumTracks(c, albumId, selected, who) {
+  const ids = new Set(Array.isArray(selected) ? selected.filter((id) => typeof id === "string") : []);
+  if (!ids.size || ids.size > ALBUM_PAGE) fail("Select between 1 and 100 tracks from this page");
+  const tracks = albums(c, albumId).get(albumId)?.tracks.filter((track) => ids.has(track.id)).map((track) => track.id) || [];
+  if (tracks.length !== ids.size) fail("A selected track is no longer on this album");
+  c.db.prepare("DELETE FROM change_set WHERE kind='selection' AND created_at<?").run(Date.now() - 864e5);
+  const token = randomUUID10();
+  c.db.prepare("INSERT INTO change_set(id,kind,actor,summary,data,created_at) VALUES (?,?,?,?,?,?)").run(token, "selection", who, `${tracks.length} tracks`, JSON.stringify({ albumId, tracks }), Date.now());
+  return token;
+}
+function checkAssignmentSelection(c, request) {
+  const scope = request.revision.slice(0, request.revision.lastIndexOf("|"));
+  if (!scope.startsWith("album:")) return false;
+  const selected = parseAlbumSelection(scope);
+  if (!selected.move) return false;
+  if (selected.albumId !== request.values.albumId || selected.move !== request.values.move || (request.command === "assign-album" ? selected.work !== request.values.work : selected.work !== "new") || JSON.stringify(movingTracks(c, selected.move)) !== JSON.stringify(request.values.tracks))
+    fail("The selected tracks changed. Cancel grouping and select the tracks again.");
+  return true;
+}
 function albumView(c, albumId, chosenWork, page = 0, move = "") {
   const album = albums(c, albumId).get(albumId);
   if (!album) fail("This album isn't in the classical index. Run a scan first.");
   const tracks = album.tracks;
   const pages = Math.max(1, Math.ceil(tracks.length / ALBUM_PAGE));
-  if (page >= pages) page = pages - 1;
+  page = Math.min(page, pages - 1);
   const onPage = tracks.slice(page * ALBUM_PAGE, (page + 1) * ALBUM_PAGE);
   const assigned = new Map(tracks.map((track) => [track.id, []]));
   for (const row of c.db.prepare(
     `SELECT s.track_link_id AS track,i.id AS item,i.movement_id,r.id AS realization,r.work_id FROM segment s
-       JOIN realization_item i ON i.segment_id=s.id JOIN realization r ON r.id=i.realization_id
-       JOIN track_link t ON t.id=s.track_link_id
-       WHERE CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=? ORDER BY i.sequence`
-  ).iterate(albumId))
-    assigned.get(row.track)?.push(row);
-  const states = new Map(
-    c.db.prepare(
-      `SELECT k.target_id,k.state,k.pinned FROM classification k JOIN track_link t ON t.id=k.target_id
-         WHERE CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?`
-    ).all(albumId).map((row) => [row.target_id, row])
-  );
+     JOIN realization_item i ON i.segment_id=s.id JOIN realization r ON r.id=i.realization_id
+     JOIN track_link t ON t.id=s.track_link_id
+     WHERE CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=? ORDER BY i.sequence`
+  ).iterate(albumId)) assigned.get(row.track)?.push(row);
+  const states = new Map(c.db.prepare(
+    `SELECT k.target_id,k.state,k.pinned FROM classification k JOIN track_link t ON t.id=k.target_id
+     WHERE CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?`
+  ).all(albumId).map((row) => [row.target_id, row]));
   const stateOf = (track) => states.get(track) || { state: "unsure", pinned: 0 };
   const works = [...new Set([...assigned.values()].flat().map((a) => a.work_id))];
   const unassigned = tracks.filter((track) => !assigned.get(track.id).length);
-  const unassignedHere = onPage.filter((track) => !assigned.get(track.id).length);
-  const assignedHere = onPage.filter((track) => assigned.get(track.id).length);
   const classicalCount = tracks.filter((track) => stateOf(track.id).state === "classical").length;
-  const number = (track, index) => `${track.evidence.hints?.discNumber > 1 ? `${track.evidence.hints.discNumber}-` : ""}${track.evidence.hints?.trackNumber || index + 1}`;
-  const trackRow = (track) => {
-    const state = stateOf(track.id);
-    const links = assigned.get(track.id);
-    const where2 = links.map((link2) => `${entityLabel(c, link2.work_id, "work")}${link2.movement_id ? `: ${entityLabel(c, link2.movement_id, "movement")}` : ""}`).join("; ");
-    return {
-      id: track.id,
-      label: `${number(track, tracks.indexOf(track))}. ${track.title}`.slice(0, 500),
-      detail: (where2 || track.artist || "").slice(0, 500) || void 0,
-      badge: { ...CLASSIFICATION[state.state], ...state.pinned ? { label: `${CLASSIFICATION[state.state].label} \xB7 Set by you` } : {} },
-      selection: `track:${track.id}`
-    };
-  };
-  const classify2 = [
-    action("Send to Classical", "set-classification", { state: "classical" }),
-    action("Remove from Classical", "set-classification", { state: "not_classical" }, { tone: "danger", confirm: "Remove these tracks from Aurral Classical? They stay in your Aurral library." })
-  ];
-  const moving = move ? new Set(movingTracks(c, move).filter((id) => assigned.has(id))) : null;
-  const where = (track) => assigned.get(track.id).map((link2) => `${entityLabel(c, link2.work_id, "work")}${link2.movement_id ? `: ${entityLabel(c, link2.movement_id, "movement")}` : ""}`).join("; ");
-  const pager = pages > 1 ? {
-    label: `Tracks ${page * ALBUM_PAGE + 1}\u2013${Math.min((page + 1) * ALBUM_PAGE, tracks.length)} of ${tracks.length}`,
-    ...page > 0 && { previous: albumSelection(albumId, chosenWork, page - 1) },
-    ...page < pages - 1 && { next: albumSelection(albumId, chosenWork, page + 1) }
-  } : void 0;
+  const number = (track) => `${track.evidence.hints?.discNumber > 1 ? `${track.evidence.hints.discNumber}-` : ""}${track.evidence.hints?.trackNumber || tracks.indexOf(track) + 1}`;
+  const where = (track) => assigned.get(track.id).map(
+    (link2) => `${entityLabel(c, link2.work_id, "work")}${link2.movement_id ? `: ${entityLabel(c, link2.movement_id, "movement")}` : ""}`
+  ).join("; ");
+  const selected = move ? new Set(movingTracks(c, move)) : null;
+  const candidates2 = selected ? tracks.filter((track) => selected.has(track.id)) : [];
+  if (selected && candidates2.length !== selected.size) fail("A selected track is no longer on this album. Cancel grouping and select the tracks again.");
+  const isNew = chosenWork === "new";
+  const mappingStep = Boolean(move && chosenWork);
+  const label = `${candidates2.length} track${candidates2.length === 1 ? "" : "s"}`;
   const sections = [];
-  if (works.length) {
-    const tracksIn = /* @__PURE__ */ new Map();
-    for (const links of assigned.values()) for (const link2 of links) tracksIn.set(link2.work_id, (tracksIn.get(link2.work_id) || 0) + 1);
+  let actions;
+  if (move) {
     sections.push({
-      type: "rows",
-      id: "works",
-      title: "Works on this album",
-      note: works.length > 200 ? `The first 200 of ${works.length} works.` : void 0,
-      rows: works.slice(0, 200).map((work) => {
-        const movements = workMovements(c, work);
-        const covered = new Set([...assigned.values()].flat().filter((link2) => link2.work_id === work).map((link2) => link2.movement_id));
-        const missing = movements.filter((movement) => !covered.has(movement.id)).length;
-        return {
+      type: "details",
+      id: "grouping",
+      title: "Group selected tracks",
+      items: [
+        { label: `Step ${mappingStep ? 3 : 2} of 3`, value: mappingStep ? "Check tracks and apply" : "Choose a work" },
+        { label: "Selection", value: `${label} from this album, in album order` }
+      ]
+    });
+    actions = [
+      ...mappingStep ? [open("Choose a different work", albumSelection(albumId, "", page, move))] : [],
+      open("Cancel grouping", albumSelection(albumId, "", page))
+    ];
+    if (!chosenWork) {
+      const kept = candidates2.filter((track) => stateOf(track.id).state !== "not_classical");
+      const guess = guessWork(kept);
+      const composer = kept.map((track) => track.evidence.hints?.composer?.[0]).find(Boolean) || "";
+      const likely = guess ? similarWorks(c, guess, composer ? [composer] : []).slice(0, 5) : [];
+      if (likely.length) sections.push({
+        type: "rows",
+        id: "likely-works",
+        title: "Suggested works",
+        rows: likely.map((work) => ({
           id: work,
           label: entityLabel(c, work, "work"),
-          detail: [composerNames2(c, work).join(", "), `${tracksIn.get(work)} track${tracksIn.get(work) === 1 ? "" : "s"}`].filter(Boolean).join(" \xB7 "),
-          ...movements.length && missing ? { badge: { label: `${missing} movement${missing === 1 ? "" : "s"} missing`, tone: "warning" } } : {},
-          selection: work,
-          actions: [
-            action("Add tracks", "choose-album-work", { albumId, work, page: String(page) }),
-            action("Unassign", "unassign-album", { albumId, work, page: String(page) }, { tone: "danger", confirm: "Remove this album's tracks from the work? The work and the audio stay." })
-          ]
-        };
-      })
-    });
-  }
-  sections.push({
-    type: "rows",
-    id: "unmatched",
-    title: "Not in a work",
-    note: unassignedHere.length ? "Tick tracks to change them together. Send to Classical and Remove from Classical override automatic detection and survive rescans." : void 0,
-    empty: unassigned.length ? "Every track on this page is in a work." : "Every track on this album is in a work.",
-    rows: unassignedHere.map(trackRow),
-    select: { key: "tracks", actions: [action("Assign to a work", "move-tracks-open", { albumId, page: String(page) }), ...classify2] },
-    ...!assignedHere.length && pager && { pager }
-  });
-  if (assignedHere.length)
-    sections.push({
-      type: "rows",
-      id: "in-works",
-      title: "In a work",
-      rows: assignedHere.map(trackRow),
-      note: "Tick tracks and choose Move to another work to put them in a different work (or a new movement of one) in one step.",
-      select: {
-        key: "tracks",
-        actions: [
-          action("Move to another work", "move-tracks-open", { albumId, page: String(page) }),
-          action("Remove from work", "unassign-tracks", { albumId, page: String(page) }, { tone: "danger", confirm: "Take these tracks out of their works? The works and the audio stay." }),
-          classify2[1]
+          detail: composerNames2(c, work).join(", ") || void 0,
+          actions: [action("Use this work", "choose-album-work", { albumId, work, page: String(page), move })]
+        }))
+      });
+      sections.push({
+        type: "form",
+        id: "move",
+        title: `Choose a work for ${label}`,
+        note: "Use an existing work, or choose Create a new work. Your selected tracks stay together through both steps.",
+        command: "choose-album-work",
+        arguments: { albumId, page: String(page), move },
+        submitLabel: "Continue to movements",
+        fields: [{ key: "work", label: "Work", type: "lookup", lookup: "works", value: "", placeholder: guess ? `Search, for example \u201C${guess}\u201D` : "Search works", required: true }]
+      });
+      actions.unshift(action("Create a new work", "new-album-work", { albumId, page: String(page), move }));
+    } else if (isNew) {
+      const excluded = (track) => stateOf(track.id).state === "not_classical";
+      const kept = candidates2.filter((track) => !excluded(track));
+      const composer = kept.map((track) => track.evidence.hints?.composer?.[0]).find(Boolean) || "";
+      sections.push({
+        type: "form",
+        id: "new-work",
+        title: "Create a work from selected tracks",
+        note: "Check the work details and each selected track. Skip leaves a track where it is. Included tracks become Classical; any already in another work move here. Nothing changes until Create and assign.",
+        command: "create-work-from-album",
+        arguments: { albumId, tracks: candidates2.map((track) => track.id), page: String(page), move },
+        submitLabel: "Create and assign",
+        fields: [
+          { key: "title", label: "Work title", type: "text", value: guessWork(kept), required: true },
+          { key: "composer", label: "Composer", type: "lookup", lookup: "composers", value: "", valueLabel: "", placeholder: composer ? `Search, for example \u201C${composer}\u201D` : "Search composers" },
+          { key: "composerName", label: "Or a new composer", type: "text", value: composer, help: "Used when no composer is chosen above." },
+          {
+            key: "include",
+            label: "Track",
+            type: "mapping",
+            value: candidates2.map((track) => excluded(track) ? "" : "include"),
+            rows: candidates2.map((track) => ({ label: `${number(track)}. ${track.title}`.slice(0, 500), detail: (where(track) ? `Now in ${where(track)}` : track.artist || "").slice(0, 500) || void 0 })),
+            options: [{ value: "include", label: "Add as a movement" }, { value: "", label: "Skip" }]
+          },
+          CREATE_ANYWAY
         ]
-      },
-      ...pager && { pager }
-    });
-  if (chosenWork) {
-    const movements = workMovements(c, chosenWork);
-    const inChosen = (track) => assigned.get(track.id).some((link2) => link2.work_id === chosenWork);
-    const candidates2 = moving ? tracks.filter((track) => moving.has(track.id)) : onPage.filter((track) => !inChosen(track));
-    const suggested = suggestMapping(c, chosenWork, candidates2);
-    sections.push({
-      type: "form",
-      id: "assign",
-      title: `${moving ? "Move" : "Assign"} tracks to ${entityLabel(c, chosenWork, "work")}`,
-      note: candidates2.length ? `Check each track's movement, or choose New movement to add one named after the track (at the end; reorder it on the work). Skip leaves a track where it is.${!moving && pages > 1 ? " Tracks on this page only; the other pages hold the rest." : ""} A track already in another work moves here. Assigned tracks are sent to Classical.` : "Every track on this page is already in this work. Go to another page, or choose a different work.",
-      command: "assign-album",
-      arguments: { albumId, work: chosenWork, tracks: candidates2.map((track) => track.id), page: String(page) },
-      submitLabel: moving ? "Move tracks" : "Assign tracks",
-      fields: candidates2.length ? [
-        {
+      });
+    } else {
+      const movements = workMovements(c, chosenWork);
+      const suggested = suggestMapping(c, chosenWork, candidates2);
+      const moving = candidates2.some((track) => assigned.get(track.id).length);
+      sections.push({
+        type: "form",
+        id: "assign",
+        title: `Assign selected tracks to ${entityLabel(c, chosenWork, "work")}`,
+        note: "Check each movement, or choose New movement to add one named after the track. Skip leaves a track where it is. Assigned tracks become Classical; tracks already in a work move here. Nothing changes until you apply.",
+        command: "assign-album",
+        arguments: { albumId, work: chosenWork, tracks: candidates2.map((track) => track.id), page: String(page), move },
+        submitLabel: moving ? "Move tracks" : "Assign tracks",
+        fields: [{
           key: "mapping",
           label: "Movement",
           type: "mapping",
-          // Tracks marked not classical, and tracks in another work
-          // (unless they were ticked to move), default to Skip.
-          value: suggested.map((movement, index) => {
-            const track = candidates2[index];
-            if (stateOf(track.id).state === "not_classical") return "";
-            if (assigned.get(track.id).length && !moving) return "";
-            return movement || (moving ? "new" : "");
-          }),
-          rows: candidates2.map((track) => ({
-            label: `${number(track, tracks.indexOf(track))}. ${track.title}`.slice(0, 500),
-            detail: (assigned.get(track.id).length ? `Now in ${where(track)}` : track.artist || "").slice(0, 500) || void 0
-          })),
+          value: suggested.map((movement, index) => stateOf(candidates2[index].id).state === "not_classical" ? "" : movement || "new"),
+          rows: candidates2.map((track) => ({ label: `${number(track)}. ${track.title}`.slice(0, 500), detail: (where(track) ? `Now in ${where(track)}` : track.artist || "").slice(0, 500) || void 0 })),
           options: [
             { value: "", label: "Skip" },
             ...movements.map((movement) => ({ value: movement.id, label: entityLabel(c, movement.id, "movement") })),
             { value: "new", label: "New movement" },
             ...movements.length ? [] : [{ value: "whole", label: "Whole work" }]
           ]
-        }
-      ] : []
-    });
-  } else if (moving) {
-    sections.push({
-      type: "form",
-      id: "move",
-      title: `Choose a work for ${moving.size} track${moving.size === 1 ? "" : "s"}`,
-      note: "Choose the work, then the movement for each track (or New movement). Tracks in another work leave it when you save.",
-      command: "choose-album-work",
-      arguments: { albumId, page: String(page), move },
-      submitLabel: "Continue",
-      fields: [{ key: "work", label: "Work", type: "lookup", lookup: "works", value: "", placeholder: "Search works", required: true }]
-    });
-  } else if (unassignedHere.length) {
-    const excluded = (track) => stateOf(track.id).state === "not_classical";
-    const kept = unassignedHere.filter((track) => !excluded(track));
-    const guess = guessWork(kept);
-    const composer = kept.map((track) => track.evidence.hints?.composer?.[0]).find(Boolean) || "";
-    const likely = guess ? similarWorks(c, guess, composer ? [composer] : []).slice(0, 5) : [];
-    if (likely.length)
-      sections.push({
-        type: "rows",
-        id: "likely-works",
-        title: "This work may already exist",
-        note: "Assign these tracks to one of these instead of creating another copy.",
-        rows: likely.map((work) => ({
+        }]
+      });
+    }
+  } else {
+    if (works.length) sections.push({
+      type: "rows",
+      id: "works",
+      title: "Works on this album",
+      note: works.length > 200 ? `The first 200 of ${works.length} works.` : void 0,
+      rows: works.slice(0, 200).map((work) => {
+        const links = [...assigned.values()].flat().filter((link2) => link2.work_id === work);
+        const covered = new Set(links.map((link2) => link2.movement_id));
+        const missing = workMovements(c, work).filter((movement) => !covered.has(movement.id)).length;
+        return {
           id: work,
           label: entityLabel(c, work, "work"),
-          detail: composerNames2(c, work).join(", ") || void 0,
+          detail: [composerNames2(c, work).join(", "), `${new Set(links.map((link2) => link2.track)).size} tracks`].filter(Boolean).join(" \xB7 "),
+          ...missing ? { badge: { label: `${missing} movement${missing === 1 ? "" : "s"} missing`, tone: "warning" } } : {},
           selection: work,
-          actions: [action("Assign here", "choose-album-work", { albumId, work })]
-        }))
-      });
-    sections.push(
-      {
-        type: "form",
-        id: "choose-work",
-        title: "Assign to an existing work",
-        note: "Choose the work, then match each track to a movement.",
-        command: "choose-album-work",
-        arguments: { albumId, page: String(page) },
-        submitLabel: "Continue",
-        fields: [{ key: "work", label: "Work", type: "lookup", lookup: "works", value: "", placeholder: guess ? `Search, for example \u201C${guess}\u201D` : "Search works", required: true }]
-      },
-      {
-        type: "form",
-        id: "new-work",
-        title: "Create a work from these tracks",
-        note: `Creates the work with one movement per track you keep, in album order, and assigns them. Choose Skip for tracks that aren't part of it.${pages > 1 ? " Tracks on this page only." : ""}`,
-        command: "create-work-from-album",
-        arguments: { albumId, tracks: unassignedHere.map((track) => track.id) },
-        submitLabel: "Create and assign",
-        fields: [
-          { key: "title", label: "Work title", type: "text", value: guess, required: true },
-          {
-            key: "include",
-            label: "Track",
-            type: "mapping",
-            value: unassignedHere.map((track) => excluded(track) ? "" : "include"),
-            rows: unassignedHere.map((track) => ({ label: `${number(track, tracks.indexOf(track))}. ${track.title}`.slice(0, 500), detail: track.artist?.slice(0, 500) || void 0 })),
-            options: [
-              { value: "include", label: "Add as a movement" },
-              { value: "", label: "Skip" }
-            ]
-          },
-          { key: "composer", label: "Composer", type: "lookup", lookup: "composers", value: "", valueLabel: "", placeholder: composer ? `Search, for example \u201C${composer}\u201D` : "Search composers" },
-          { key: "composerName", label: "Or a new composer", type: "text", value: composer, help: "Used when no composer is chosen above." },
-          CREATE_ANYWAY
-        ]
-      }
-    );
+          actions: [open("Add tracks", albumSelection(albumId, work, page)), action("Unassign", "unassign-album", { albumId, work, page: String(page) }, { tone: "danger", confirm: "Remove this album's tracks from the work? The work and the audio stay." })]
+        };
+      })
+    });
+    sections.push({
+      type: "rows",
+      id: "tracks",
+      title: "Tracks",
+      note: chosenWork ? `Step 1 of 3: select tracks for \u201C${entityLabel(c, chosenWork, "work")}\u201D. Selection applies to this page.` : "Step 1 of 3: select tracks, then Group selected tracks to choose an existing or new work. Selection applies to this page.",
+      rows: onPage.map((track) => {
+        const state = stateOf(track.id);
+        return {
+          id: track.id,
+          label: `${number(track)}. ${track.title}`.slice(0, 500),
+          detail: [where(track) || "Not in a work", track.artist].filter(Boolean).join(" \xB7 ").slice(0, 500),
+          badge: { ...CLASSIFICATION[state.state], ...state.pinned ? { label: `${CLASSIFICATION[state.state].label} \xB7 Set by you` } : {} },
+          selection: `track:${track.id}`
+        };
+      }),
+      select: { key: "tracks", actions: [
+        action("Group selected tracks", "move-tracks-open", { albumId, page: String(page), ...chosenWork && { work: chosenWork } }),
+        action("Send to Classical", "set-classification", { state: "classical" }),
+        action("Remove from Classical", "set-classification", { state: "not_classical" }, { tone: "danger", confirm: "Remove these tracks from Aurral Classical? They stay in your Aurral library." }),
+        action("Remove from work", "unassign-tracks", { albumId, page: String(page) }, { tone: "danger", confirm: "Take these tracks out of their works? The works and the audio stay." })
+      ] },
+      ...pages > 1 && { pager: {
+        label: `Tracks ${page * ALBUM_PAGE + 1}\u2013${Math.min((page + 1) * ALBUM_PAGE, tracks.length)} of ${tracks.length}`,
+        ...page > 0 && { previous: albumSelection(albumId, chosenWork, page - 1) },
+        ...page < pages - 1 && { next: albumSelection(albumId, chosenWork, page + 1) }
+      } }
+    });
+    actions = [
+      ...chosenWork ? [open("Cancel grouping", albumSelection(albumId, "", page))] : [],
+      action("Send all to Classical", "set-album-classification", { albumId, state: "classical", page: String(page) }),
+      action("Preview tag removal", "preview-tag-removal", { albumId, page: String(page) }),
+      action("Remove all from Classical", "set-album-classification", { albumId, state: "not_classical", page: String(page) }, { tone: "danger", confirm: `Remove all ${tracks.length} tracks on this album from Aurral Classical? They stay in your Aurral library.` })
+    ];
   }
   return {
     crumbs: [],
     title: album.title,
     subtitle: [album.artist, `${tracks.length} track${tracks.length === 1 ? "" : "s"}`].filter(Boolean).join(" \xB7 "),
-    badges: [
+    badges: move ? [{ label: `${label} selected`, tone: "default" }] : [
       { label: `${classicalCount} classical`, tone: classicalCount ? "success" : "muted" },
       ...works.length ? [{ label: `${works.length} work${works.length === 1 ? "" : "s"}`, tone: "default" }] : [],
       ...unassigned.length && classicalCount ? [{ label: `${unassigned.length} not in a work`, tone: "warning" }] : []
     ],
-    actions: [
-      ...chosenWork || move ? [open(chosenWork ? "Choose a different work" : "Cancel move", albumSelection(albumId, "", page, chosenWork ? move : ""))] : [],
-      ...chosenWork && move ? [open("Cancel move", albumSelection(albumId, "", page))] : [],
-      action("Send all to Classical", "set-album-classification", { albumId, state: "classical", page: String(page) }),
-      action("Preview tag removal", "preview-tag-removal", { albumId, page: String(page) }),
-      action("Remove all from Classical", "set-album-classification", { albumId, state: "not_classical", page: String(page) }, { tone: "danger", confirm: `Remove all ${tracks.length} tracks on this album from Aurral Classical? They stay in your Aurral library.` })
-    ],
+    actions,
     sections
   };
 }
@@ -42807,7 +42789,7 @@ function renderV2(c, query, revision2, { downloads = null, maintenance: maintena
   let view = null;
   if (selection.startsWith("album:")) {
     const { albumId, work, page, move } = parseAlbumSelection(selection);
-    if (work) c.entity(work, "work");
+    if (work && work !== "new") c.entity(work, "work");
     view = albumView(c, albumId, work || null, page, move);
   } else if (selection.startsWith("track:")) view = trackView(c, selection.slice(6));
   else if (selection.startsWith("slskd:")) view = downloadView(downloads, Number(selection.slice(6)));
@@ -42909,13 +42891,14 @@ var V2_COMMANDS = {
   "move-identity": ["id"],
   "set-classification": ["tracks", "state"],
   "choose-album-work": ["albumId", "work", "page", "move"],
-  "move-tracks-open": ["albumId", "tracks", "page"],
-  "assign-album": ["albumId", "work", "tracks", "mapping", "page"],
+  "move-tracks-open": ["albumId", "tracks", "page", "work"],
+  "new-album-work": ["albumId", "move", "page"],
+  "assign-album": ["albumId", "work", "tracks", "mapping", "page", "move"],
   "set-album-classification": ["albumId", "state", "page"],
   "preview-tag-removal": ["albumId", "page"],
   "unassign-tracks": ["albumId", "tracks", "page"],
   "unassign-album": ["albumId", "work", "page"],
-  "create-work-from-album": ["albumId", "tracks", "include", "title", "composer", "composerName", "createAnyway"],
+  "create-work-from-album": ["albumId", "tracks", "include", "title", "composer", "composerName", "createAnyway", "page", "move"],
   "resolve-review": ["id"],
   "resolve-reviews": ["ids", "as"],
   "choose-provider-value": ["id", "field", "assertion"],
@@ -43223,22 +43206,29 @@ function applyV2(c, request, who) {
       const albumId = str(v.albumId, "album", { max: 200 });
       const work = str(v.work, "work", { max: 200 });
       c.entity(work, "work");
-      const move = typeof v.move === "string" && /^[0-9a-f-]{36}$/.test(v.move) ? v.move : "";
+      let move = typeof v.move === "string" && /^[0-9a-f-]{36}$/.test(v.move) ? v.move : "";
       if (move) movingTracks(c, move);
+      else {
+        const tracks = albums(c, albumId).get(albumId)?.tracks.slice(pageOf(v) * ALBUM_PAGE, (pageOf(v) + 1) * ALBUM_PAGE) || [];
+        move = rememberAlbumTracks(c, albumId, tracks.filter((track) => !attachments(c, track.id).some((entry) => entry.work_id === work)).map((track) => track.id), who);
+      }
       return { selection: albumSelection(albumId, work, pageOf(v), move), message: "", focus: "assign" };
     }
     case "move-tracks-open": {
       const albumId = str(v.albumId, "album", { max: 200 });
-      const tracks = Array.isArray(v.tracks) ? [...new Set(v.tracks.filter((t) => typeof t === "string"))] : [];
-      if (!tracks.length || tracks.length > 1e3) fail("Tick at least one track");
-      const owned = new Set(ownedTracks(c, { albumId }).map((track) => track.id));
-      if (tracks.some((track) => !owned.has(track))) fail("A ticked track isn't on this album");
-      c.db.prepare("DELETE FROM change_set WHERE kind='selection' AND created_at<?").run(Date.now() - 864e5);
-      const token = randomUUID10();
-      c.db.prepare("INSERT INTO change_set(id,kind,actor,summary,data,created_at) VALUES (?,?,?,?,?,?)").run(token, "selection", who, `${tracks.length} tracks`, JSON.stringify({ tracks }), Date.now());
-      return { selection: albumSelection(albumId, "", pageOf(v), token), message: "", focus: "move" };
+      const work = typeof v.work === "string" ? v.work : "";
+      if (work) c.entity(work, "work");
+      const token = rememberAlbumTracks(c, albumId, v.tracks, who);
+      return { selection: albumSelection(albumId, work, pageOf(v), token), message: "", focus: work ? "assign" : "move" };
+    }
+    case "new-album-work": {
+      const albumId = str(v.albumId, "album", { max: 200 });
+      const move = str(v.move, "track selection", { max: 200 });
+      movingTracks(c, move);
+      return { selection: albumSelection(albumId, "new", pageOf(v), move), message: "", focus: "new-work" };
     }
     case "assign-album": {
+      checkAssignmentSelection(c, request);
       const albumId = str(v.albumId, "album", { max: 200 });
       const work = str(v.work, "work", { max: 200 });
       c.entity(work, "work");
@@ -43251,7 +43241,7 @@ function applyV2(c, request, who) {
         moved && moved < count ? `${moved} of them from another work` : "",
         added ? `added ${added} movement${added === 1 ? "" : "s"} at the end; reorder ${added === 1 ? "it" : "them"} on the work` : ""
       ].filter(Boolean);
-      return { selection: albumSelection(albumId, "", pageOf(v)), message: `${parts.join("; ")}.`.slice(0, 500), focus: "in-works" };
+      return { selection: albumSelection(albumId, "", pageOf(v)), message: `${parts.join("; ")}.`.slice(0, 500), focus: "tracks" };
     }
     case "preview-tag-removal": {
       const albumId = str(v.albumId, "album", { max: 200 });
@@ -43307,6 +43297,7 @@ function applyV2(c, request, who) {
       return { selection: albumSelection(albumId, "", pageOf(v)), message: `Unassigned ${items.length} track${items.length === 1 ? "" : "s"}.` };
     }
     case "create-work-from-album": {
+      const selected = checkAssignmentSelection(c, request);
       const albumId = str(v.albumId, "album", { max: 200 });
       const offered = Array.isArray(v.tracks) ? v.tracks : [];
       if (!offered.length) fail("This album has no unassigned tracks");
@@ -43338,8 +43329,8 @@ function applyV2(c, request, who) {
         movements: ordered.map((track) => movementTitle({ title: track.title, work: track.evidence.hints?.work }, title) || track.title)
       });
       const movements = workMovements(c, work).map((movement) => movement.id);
-      assignTracks(c, m, who, work, tracks, movements);
-      return { selection: work, message: `Created \u201C${title}\u201D with ${movements.length} movements.` };
+      assignTracks(c, m, who, work, tracks, movements, { move: selected });
+      return { selection: selected ? albumSelection(albumId, "", pageOf(v)) : work, message: `Created \u201C${title}\u201D with ${movements.length} movements.`, ...selected && { focus: "tracks" } };
     }
     case "choose-provider-value": {
       const id = str(v.id, "review item", { max: 200 });
@@ -45843,7 +45834,7 @@ async function search(input) {
 import path12 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.54" : "dev";
+var VERSION = true ? "1.0.55" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js

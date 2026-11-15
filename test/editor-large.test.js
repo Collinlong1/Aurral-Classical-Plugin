@@ -20,27 +20,27 @@ test("an album of 640 tracks opens a page at a time, never past the 500-row limi
   const sections = Object.fromEntries(first.sections.map((section) => [section.id, section]));
   assert.ok(sections.works.rows.length >= 40, "tagged works are listed");
   assert.ok(rowsIn(first) <= 500, `${rowsIn(first)} rows`);
-  const tracksOnPage = (sections.unmatched?.rows.length || 0) + (sections["in-works"]?.rows.length || 0);
+  const tracksOnPage = sections.tracks.rows.length;
   assert.equal(tracksOnPage, 100);
-  const pager = (sections["in-works"] || sections.unmatched).pager;
+  const pager = sections.tracks.pager;
   assert.equal(pager.label, "Tracks 1–100 of 640");
   assert.equal(pager.previous, undefined);
   assert.equal(pager.next, "album:box~1");
   // The last page holds the last 40 tracks, all outside a work.
   const last = (await read({ selection: "album:box~6" })).view;
   const lastSections = Object.fromEntries(last.sections.map((section) => [section.id, section]));
-  assert.equal(lastSections.unmatched.rows.length, 40);
-  assert.equal(lastSections.unmatched.pager.label, "Tracks 601–640 of 640");
-  assert.equal(lastSections.unmatched.pager.next, undefined);
+  assert.equal(lastSections.tracks.rows.length, 40);
+  assert.equal(lastSections.tracks.pager.label, "Tracks 601–640 of 640");
+  assert.equal(lastSections.tracks.pager.next, undefined);
   assert.ok(rowsIn(last) <= 500);
   // A page past the end shows the last page.
-  assert.equal((await read({ selection: "album:box~99" })).view.sections.find((s) => s.id === "unmatched").pager.label, "Tracks 601–640 of 640");
+  assert.equal((await read({ selection: "album:box~99" })).view.sections.find((s) => s.id === "tracks").pager.label, "Tracks 601–640 of 640");
 });
 
 test("bulk actions change only the ticked tracks, and the album-wide action every track", async (t) => {
   const { c, read, mutate } = await boxSet(t);
   const last = (await read({ selection: "album:box~6" })).view;
-  const unmatched = last.sections.find((section) => section.id === "unmatched");
+  const unmatched = last.sections.find((section) => section.id === "tracks");
   const send = unmatched.select.actions.find((a) => a.label === "Remove from Classical");
   const ticked = unmatched.rows.slice(0, 3).map((row) => row.id);
   const result = await mutate(send.command, { ...send.arguments, tracks: ticked }, "album:box~6");
@@ -49,7 +49,7 @@ test("bulk actions change only the ticked tracks, and the album-wide action ever
   assert.deepEqual(states.map((row) => row.target_id).sort(), [...ticked].sort());
   // Take three tracks out of their works.
   const page = (await read({ selection: "album:box" })).view;
-  const inWorks = page.sections.find((section) => section.id === "in-works");
+  const inWorks = page.sections.find((section) => section.id === "tracks");
   const out = inWorks.select.actions.find((a) => a.command === "unassign-tracks");
   const pick = inWorks.rows.slice(0, 2).map((row) => row.id);
   const before = c.db.prepare("SELECT count(*) AS n FROM realization_item").get().n;

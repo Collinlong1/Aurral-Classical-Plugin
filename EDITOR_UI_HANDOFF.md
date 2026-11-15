@@ -2,14 +2,14 @@
 
 ## Current checkpoint
 
-November 14, 2026 (America/Chicago). The user authorized the seven improvements from the editor review, one at a time, and requested a consistently updated handoff. **Item 1 is published in core `365e6dc49a54d9137e82c56e6956dabc1c9899f3`; the companion tests and handoff are being pushed next.** The user requested this push and then item 2. No deployment or PR is requested.
+November 14, 2026 (America/Chicago). The user authorized the seven improvements from the editor review, one at a time, and requested a consistently updated handoff. **Item 1 is pushed**: core `365e6dc49a54d9137e82c56e6956dabc1c9899f3`, plugin `26be9ac013ed9ccd64726064c89b192352736a06`. **Item 2 is complete locally**, as a separate change (core `c38393b`, plugin 1.0.55). The user additionally emphasized that core changes must be broad, reusable upstream improvements; all album/work/grouping workflow logic stays in the plugin. No deployment or PR is requested.
 
 Baseline: core `61b8ddcab63b99b427099ea4bedca9f3f1c6a2b5`, plugin `fc144f20930139e728b8d5319866e96225fd7774`, both `aurral-classical`. Local checkouts: `/workspace/aurral`, `/workspace/plugin`. Changes are on the user-authorized aurral-classical branches only; no production access, deployment, PR, upstream write or subagents.
 
 ## Ordered work
 
 1. **Published:** protect unsaved edits when saving another form, running an action, or navigating away.
-2. Pending: focused album assignment: select tracks, choose/create work, map movements, apply.
+2. **Complete locally:** focused album assignment: select tracks, choose/create work, map movements, apply.
 3. Pending: sectioned work editing; reveal add forms on demand; consolidate advanced actions.
 4. Pending: keyboard-friendly lookup fields and clear search behavior/status.
 5. Pending: save/cancel and feedback close to the active task.
@@ -44,6 +44,23 @@ Baseline: core `61b8ddcab63b99b427099ea4bedca9f3f1c6a2b5`, plugin `fc144f2093013
 - This step requires the new core UI build; no plugin bundle rebuild or manifest version bump is needed. The plugin's existing runtime files remain untouched.
 - Documentation updated in both HANDOFF.md files and feature inventories, the plugin V0_2_REPORT.md and UPSTREAM_DELTA.md, and the user-facing EDITOR_GUIDE.md. This file is the authoritative running UI handoff.
 
+## Item 2: implementation and core boundary
+
+- Plugin `src/model/editor-v2.js`: one paged Tracks section replaces split assigned/unassigned lists and always-open grouping forms. Select tracks on this page, choose an existing or new work, then map only that selection and apply. Existing work suggestions appear only while choosing. Add tracks from a work starts at track selection.
+- Selection tokens use the existing plugin change_set storage, enforce album membership and canonical album order, expire after a day, and bind final requests to the selected track IDs and destination. Back preserves the token; Cancel returns to the same album page without assigning. Not classical defaults to Skip; Skip preserves existing attachments. Creating a work can atomically move included selected tracks from another work. No catalogue schema change; legacy direct commands and v1 hosts remain supported.
+- Core has only two item-2 runtime edits: a selected-state attribute on the shared BulkBar and CSS that keeps that bar sticky while selected. Applies to every plugin rows section, with existing Aurral tokens. No new API, classical names, routes, SQL or grouping decisions. All workflow stays in the plugin. The plugin cannot style host-owned controls through its declarative API; this behavior belongs to the shared renderer.
+- Item 1 also belongs in core: the host owns dirty forms, mutation refresh/reset, routing and unload events. Putting those guards only in the plugin would miss browser navigation and host-level draft loss. Every admin-pages-v2 plugin benefits. These are candidates for upstream review, not claims of upstream acceptance.
+- Removed an experimental smooth-to-instant section-scroll change after it did not resolve the mobile browser check. Browser automation now waits for existing section navigation to finish before opening a Select, which intentionally closes on scroll. Production scroll behavior stays as published.
+- Plugin manifest bumped to 1.0.55 and index.js rebuilt. Updated user guide, both handoffs/inventories, V0_2_REPORT.md and UPSTREAM_DELTA.md. No new CI pin: paired integration remains pinned to published item-1 core until item 2 is published.
+
+## Item 2 validation
+
+- Focused editor/large-album/workflow tests: 35/35 passed with normal file isolation (Node 26.12). Covers 640-track pagination, selection order, cancel/back without assignment, Not classical Skip, rejecting substituted tracks, selected-only create/apply, and moving an assigned selection into a new work.
+- `dev/editor-assignment-browser.mjs`: actual host renderer and actual plugin read/mutate commands, disposable synthetic 640-track catalogue, loopback server; passes at 1280px and 390px. Verifies sticky selected actions, a single task form, existing/new work paths, Skip, apply only selected tracks and return to album page 6. Screenshots inspected at both widths. It does not run the full Aurral app or contact providers.
+- Draft regression also passes at both widths after item 2. Core pnpm check passes (1089 unsafe-any, unchanged baseline); frontend production build passes. Final core runtime diff is smaller than the checked build (experimental scroll edit reverted).
+- An exploratory full-plugin run with `--test-isolation=none` failed in source/download tests. Those tests replace process-global fetch; that mode is not a valid substitute for the standard isolated suite. The standard full suite with normal isolation and loopback access passed: **333/333 tests**, exit 0 (263.44 seconds). Logs: `.scratch/editor-assignment-all-tests.log` (failed shared-process run), `.scratch/editor-assignment-isolated-tests.log` (standard run), `.scratch/editor-assignment-focused-final.log`, `.scratch/editor-assignment-browser.log`, `.scratch/editor-assignment-drafts.log`. Earlier mobile automation attempts failed while Select was dismissed by scrolling; the final browser run passes with the original production scrolling.
+- Core full 2666-test suite passed for item 1; not repeated for the item-2 sticky styling. Full Compose/restart and remote CI not run for item 2.
+
 ## Next action
 
-**Item 2: focused album assignment**, not started. Inspect `src/model/editor-v2.js` (`albumView`, assign/create/move commands) and the generic host field/section contract before changing it. Preserve the existing work-choice/mapping rules, classification defaults, explicit move semantics, revision protection and the new draft guard. Replace the repeated always-visible mapping forms with a single selected-track flow. Validate existing editor workflow regressions and the real UI; update this handoff after implementation and validation. Keep this as a separate change from item 1.
+Item 2 is complete and reviewed locally: core `c38393b`, plugin 1.0.55. Both item-2 changes remain unpushed. Item 1 is already published at the refs above. Items 3–7 remain pending; next is sectioned work editing. Keep all domain logic in the plugin and every core addition reusable upstream. Before publishing item 2, update the integration core pin to its published commit and add the assignment browser regression to paired CI.

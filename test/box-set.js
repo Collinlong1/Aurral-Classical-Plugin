@@ -55,6 +55,6 @@ export async function boxSet(t, { tracks = 640 } = {}) {
   const read = (query = {}) => readEditor({ ...input, query });
   const mutate = async (command, values, selection = "") =>
     mutateEditor({ ...input, mutation: { revision: (await read({ selection })).revision, command, values } });
-  return { c, read, mutate };
+  return { c, read, mutate, input };
 }
 

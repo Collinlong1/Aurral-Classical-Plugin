@@ -15,10 +15,10 @@ Everything here changes the classical catalogue only. Audio files are never writ
 
 ## Common tasks
 
-**Group an album.** Albums tab → open the album. It shows the works on the album (with how many movements are missing), then its tracks 100 at a time in **Not in a work** and **In a work**; the pager under them moves through a large box set. Tick tracks to **Send to Classical**, **Remove from Classical** or **Remove from work**; **Send all** / **Remove all** act on the whole album. The forms below work on the unmatched tracks of the page you are on; **Preview tag removal** reads the files and says what clearing tags would remove, changing nothing.
-- **Create a work from this album** creates the work with one movement per track you keep, in album order, and assigns them. Choose **Skip** for tracks that aren't part of the work; tracks marked Not classical start as Skip and stay Not classical. The title and composer are suggested from tags.
-- **Assign to an existing work:** search for the work, press Continue, check each track's suggested movement (or Skip), then **Assign tracks**. Choose **New movement** for a track the work has no movement for: a movement named after the track is added at the end of the work (reorder it there with Move up). Tracks you assign are sent to Classical.
-- **Move tracks to another work:** tick tracks under *In a work* (or *Not in a work*) → **Move to another work** (**Assign to a work**), choose the work, then each track's movement or New movement → **Move tracks**. The tracks leave their old work in the same step; no need to remove them first. The assign form also lists tracks already in another work ("Now in …", starting as Skip): give one a movement and it moves.
+**Group an album.** Albums tab → open the album. The album shows its works, then one **Tracks** list, 100 tracks per page. Each row shows its current work or **Not in a work**. Select tracks on the current page, then **Group selected tracks**. The selected-item actions stay visible as you scroll.
+- **Choose a work:** search for an existing work or use a suggested one; choose **Create a new work** to enter a title and composer instead. Only this task's form is shown. **Choose a different work** keeps your selected tracks; **Cancel grouping** returns to the album without changing assignments.
+- **Map and apply:** only selected tracks appear, in album order. Check each suggested movement, choose **New movement**, or **Skip**. Not classical tracks start as Skip. New works get one movement per included track. Nothing is assigned until **Assign tracks**, **Move tracks**, or **Create and assign** is pressed. Tracks already in another work move atomically when included; Skip leaves them where they are. The album returns to the same page.
+- **Other track actions:** selected rows can be sent to Classical, removed from Classical, or removed from their work. **Send all** / **Remove all** act on the album; **Preview tag removal** reads the files without changing them.
 - **When grouping changes.** Moves, assigns and unassigns change the catalogue at once; the album's **By work** view and work pages show it the next time they load (the editor refreshes them after each change). Editing a file's tags does not move a track that is already in a work: scans keep tracks where you or matching put them. Move it here instead.
 - **Unassign** (under *Works on this album*) removes the album's tracks from a work without touching the work or the audio. It removes the per-track recordings too, and clears any pick of that album's recording. Rescans won't put the album back into that work; assign it again by hand to rematch.
 
@@ -52,7 +52,7 @@ Everything here changes the classical catalogue only. Audio files are never writ
 
 Dismiss items you've checked.
 
-**Creating a work that already exists.** If a work with the same title or catalogue number (and composer) is already in the catalogue, the album page lists it under *This work may already exist* with **Assign here**. Creating it anyway asks you to tick **Create anyway**.
+**Creating a work that already exists.** The choose-work step offers **Suggested works** with **Use this work**. Creating a matching title or catalogue number (and composer) still requires **Create anyway**.
 
 **Credits.** Roles: composer, soloist, performer, conductor, orchestra, ensemble, choir, arranger and lyricist. Orchestra, ensemble and choir need an ensemble; the others except performer need a person.
 

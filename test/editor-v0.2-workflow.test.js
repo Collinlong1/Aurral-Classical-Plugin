@@ -37,6 +37,78 @@ function newWork(c, title, movements) {
   return work;
 }
 
+test("album grouping selects tracks once, chooses existing or new, then applies only those tracks", async (t) => {
+  const { c, read, mutate } = await boxSet(t);
+  const start = "album:box~6";
+  const initial = (await read({ selection: start })).view;
+  const tracks = section(initial, "tracks");
+  assert.ok(tracks, "one track list replaces split lists and repeated forms");
+  assert.equal(tracks.rows.length, 40);
+  assert.equal(initial.sections.filter((s) => s.type === "form").length, 0);
+  const [a, b, other] = tracks.rows.map((row) => row.id);
+  const begin = tracks.select.actions.find((action) => action.command === "move-tracks-open");
+  const before = c.db.prepare("SELECT count(*) AS n FROM realization_item").get().n;
+  const opened = await mutate(begin.command, { ...begin.arguments, tracks: [b, a] }, start);
+  assert.equal(opened.ok, true, opened.message);
+  const choice = (await read({ selection: opened.selection })).view;
+  assert.equal(section(choice, "tracks"), undefined, "selected tracks aren't repeated alongside the form");
+  assert.equal(choice.sections.filter((s) => s.type === "form").length, 1);
+  assert.ok(choice.badges.some((badge) => badge.label === "2 tracks selected"));
+  const create = choice.actions.find((action) => action.command === "new-album-work");
+  assert.ok(create, "create is an explicit choice, not an always-open form");
+  const creating = await mutate(create.command, create.arguments, opened.selection);
+  assert.equal(creating.ok, true, creating.message);
+  const newView = (await read({ selection: creating.selection })).view;
+  const form = section(newView, "new-work");
+  assert.deepEqual(form.arguments.tracks, [a, b], "album order wins over checkbox click order");
+  assert.equal(newView.sections.filter((s) => s.type === "form").length, 1);
+  assert.equal(c.db.prepare("SELECT count(*) AS n FROM realization_item").get().n, before, "choosing and canceling never assigns");
+  const cancel = newView.actions.find((action) => action.label === "Cancel grouping");
+  assert.equal(cancel.arguments.selection, start);
+  const back = newView.actions.find((action) => action.label === "Choose a different work");
+  assert.equal(back.arguments.selection, opened.selection, "back keeps the selected-track token");
+
+  const done = await mutate(form.command, { ...form.arguments, title: "Selected pieces", composer: "", composerName: "Joseph Haydn", include: ["include", ""] }, creating.selection);
+  assert.equal(done.ok, true, done.message);
+  assert.equal(done.selection, start, "apply returns to the album page");
+  assert.equal(worksOfTrack(c, a).length, 1);
+  assert.equal(worksOfTrack(c, b).length, 0, "Skip leaves the track untouched");
+  assert.equal(worksOfTrack(c, other).length, 0, "unselected tracks never enter the work");
+
+  const previousWork = worksOfTrack(c, a)[0].work_id;
+  const moving = await mutate("move-tracks-open", { albumId: "box", tracks: [a], page: "6" }, start);
+  const movingView = (await read({ selection: moving.selection })).view;
+  const newAction = movingView.actions.find((action) => action.command === "new-album-work");
+  const newStep = await mutate(newAction.command, newAction.arguments, moving.selection);
+  const moveForm = section((await read({ selection: newStep.selection })).view, "new-work");
+  const moved = await mutate(moveForm.command, { ...moveForm.arguments, title: "Moved selected piece", composer: "", composerName: "", include: ["include"] }, newStep.selection);
+  assert.equal(moved.ok, true, moved.message);
+  assert.equal(worksOfTrack(c, a).length, 1, "creating a work moves an already assigned selected track once");
+  assert.notEqual(worksOfTrack(c, a)[0].work_id, previousWork);
+});
+
+test("selected album tracks keep classification defaults and reject a changed selection at apply", async (t) => {
+  const { c, read, mutate } = await boxSet(t);
+  const selection = "album:box~6";
+  const a = trackId(c, "box-600");
+  const b = trackId(c, "box-601");
+  await mutate("set-classification", { tracks: [a], state: "not_classical" }, selection);
+  const opened = await mutate("move-tracks-open", { albumId: "box", tracks: [a, b], page: "6" }, selection);
+  const target = newWork(c, "Small suite", ["I. Prelude"]);
+  const choose = section((await read({ selection: opened.selection })).view, "move");
+  const chosen = await mutate(choose.command, { ...choose.arguments, work: target }, opened.selection);
+  const assigning = (await read({ selection: chosen.selection })).view;
+  const form = section(assigning, "assign");
+  assert.equal(form.fields[0].value[0], "", "Not classical starts as Skip");
+  assert.deepEqual(form.arguments.tracks, [a, b]);
+  const invalid = await mutate(form.command, { ...form.arguments, tracks: [a, trackId(c, "box-602")], mapping: ["", "new"] }, chosen.selection);
+  assert.equal(invalid.ok, false, "apply must use the offered selected tracks");
+  const done = await mutate(form.command, { ...form.arguments, mapping: ["", "new"] }, chosen.selection);
+  assert.equal(done.ok, true, done.message);
+  assert.equal(worksOfTrack(c, a).length, 0);
+  assert.equal(worksOfTrack(c, b).length, 1);
+});
+
 test("the list opens on the page holding the open entry; a track leads back to its album page", async (t) => {
   const { c, read, mutate } = await boxSet(t);
   for (let i = 0; i < 150; i++) newWork(c, `Zz work ${String(i).padStart(3, "0")}`, []);
@@ -82,7 +154,7 @@ test("ticked tracks move to another work in one step, onto its movements or new 
   assert.equal(worksOfTrack(c, a)[0].work_id, from);
 
   const page = (await read({ selection: "album:box" })).view;
-  const move = section(page, "in-works").select.actions.find((x) => x.command === "move-tracks-open");
+  const move = section(page, "tracks").select.actions.find((x) => x.command === "move-tracks-open");
   const opened = await mutate(move.command, { ...move.arguments, tracks: [a, b] }, "album:box");
   assert.equal(opened.ok, true);
   assert.equal(opened.focus, "move");
@@ -102,7 +174,7 @@ test("ticked tracks move to another work in one step, onto its movements or new 
   const done = await mutate(assign.command, { ...assign.arguments, mapping: [target[0].id, "new"] }, chosen.selection);
   assert.equal(done.ok, true, done.message);
   assert.match(done.message, /^Moved 2 tracks to “Sonata No\. 2, Op\. 2”; added 1 movement/);
-  assert.equal(done.focus, "in-works");
+  assert.equal(done.focus, "tracks");
   assert.deepEqual(worksOfTrack(c, a), [{ work_id: to, movement_id: target[0].id }]);
   const after = workMovements(c, to);
   assert.equal(after.length, target.length + 1);
@@ -115,7 +187,7 @@ test("assigning to an existing work can add a movement for a track it lacks", as
   const work = newWork(c, "Short suite", ["I. Prelude"]);
   const lone = trackId(c, "box-600");
   const chosen = await mutate("choose-album-work", { albumId: "box", work, page: "6" }, "album:box~6");
-  assert.equal(chosen.selection, `album:box@${work}~6`);
+  assert.ok(chosen.selection.startsWith(`album:box@${work}~6!`));
   const assign = section((await read({ selection: chosen.selection })).view, "assign");
   const mapping = assign.arguments.tracks.map((id) => (id === lone ? "new" : ""));
   const done = await mutate(assign.command, { ...assign.arguments, mapping }, chosen.selection);

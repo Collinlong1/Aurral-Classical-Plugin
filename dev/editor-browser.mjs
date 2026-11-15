@@ -63,10 +63,10 @@ try {
   await search.press("Enter");
   await album.waitFor();
   await album.click();
-  // v0.2: an album's tracks are split into those in a work and those not.
+  // Album grouping starts from one track list.
   const trackGroups = detail
     .locator("section")
-    .filter({ has: page.getByRole("heading", { name: /^(Not in a work|In a work)$/ }) });
+    .filter({ has: page.getByRole("heading", { name: /^Tracks$/ }) });
   await trackGroups.getByText(/No\. 1 Prélude \(Presto\)/).first().waitFor();
   // Bulk selection: tick a track; the bar counts it and offers its actions.
   await detail.getByRole("checkbox", { name: /^Select .*No\. 1 Prélude \(Presto\)/ }).first().check();

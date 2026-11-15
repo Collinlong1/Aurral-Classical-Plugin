@@ -60,8 +60,19 @@ async function setup(t) {
   return { c, read, mutate, ok, trackIds, input };
 }
 const section = (view, id) => view.sections.find((s) => s.id === id);
+async function albumChoice(s, album) {
+  const opened = await s.ok("move-tracks-open", { albumId: album, tracks: s.trackIds(album) }, `album:${album}`);
+  return { selection: opened.selection, view: (await s.read({ selection: opened.selection })).view };
+}
+async function newAlbumForm(s, album) {
+  const choice = await albumChoice(s, album);
+  const create = choice.view.actions.find((action) => action.command === "new-album-work");
+  const opened = await s.ok(create.command, create.arguments, choice.selection);
+  return { selection: opened.selection, form: section((await s.read({ selection: opened.selection })).view, "new-work") };
+}
 
-test("browse tabs, lookups and an album turned into a work in one step", async (t) => {
+
+test("browse tabs, lookups and an album turned into a work through selected tracks", async (t) => {
   const s = await setup(t);
   const page = await s.read();
   assert.equal(page.version, 2);
@@ -73,15 +84,16 @@ test("browse tabs, lookups and an album turned into a work in one step", async (
   assert.equal((await s.read({ tab: "albums", q: "summer" })).list.items[0].label, "Album C");
   const album = (await s.read({ selection: "album:A" })).view;
   assert.equal(album.title, "Album A");
-  const create = section(album, "new-work");
+  const { form: create, selection: creating } = await newAlbumForm(s, "A");
   assert.equal(create.fields.find((f) => f.key === "title").value, "Symphony No. 5 in C minor, Op. 67");
   const result = await s.ok("create-work-from-album", {
     ...create.arguments,
     title: "Symphony No. 5 in C minor, Op. 67",
     composer: "",
     composerName: "Ludwig van Beethoven",
-  }, "album:A");
-  const work = result.selection;
+  }, creating);
+  assert.equal(result.selection, "album:A");
+  const work = s.c.db.prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL").get().id;
   const workView = (await s.read({ selection: work })).view;
   assert.deepEqual(section(workView, "movements").rows.map((r) => r.label), titles);
   assert.equal(section(workView, "recordings").rows[0].badge.label, "Complete");
@@ -91,7 +103,7 @@ test("browse tabs, lookups and an album turned into a work in one step", async (
   assert.ok((await s.read({ lookup: "tracks", q: "andante orchestra b" })).options.length >= 1);
   // Second album: choose the existing work; movements are suggested.
   const chosen = await s.ok("choose-album-work", { albumId: "B", work }, "album:B");
-  assert.equal(chosen.selection, `album:B@${work}`);
+  assert.ok(chosen.selection.startsWith(`album:B@${work}!`));
   const assign = section((await s.read({ selection: chosen.selection })).view, "assign");
   const movements = section(workView, "movements").rows.map((r) => r.id);
   assert.deepEqual(assign.fields[0].value, movements);
@@ -212,7 +224,7 @@ test("#1 unassign removes the whole attachment, so the album can be matched agai
   // The movement is no longer "in use", and the album shows as unassigned.
   const movement = s.c.db.prepare("SELECT target_id FROM relation WHERE kind='movement' AND source_id=? ORDER BY position").get(work).target_id;
   const album = (await s.read({ selection: "album:A" })).view;
-  assert.ok(section(album, "new-work"));
+  assert.ok(section(album, "tracks").rows.every((track) => track.detail.startsWith("Not in a work")));
   // A rescan respects the unassign: no re-attachment, no duplicate work.
   assert.equal(autoMatchTaggedWorks(s.c, { albumId: "A", allowStructuredTitles: true }).created, 0);
   assert.ok(s.trackIds("A").every((track) => !workOfTrack(s, track).length));
@@ -282,7 +294,7 @@ test("#15 tracks marked Not classical are skipped when creating a work, and Skip
   const s = await setup(t);
   const tracks = s.trackIds("A");
   await s.ok("set-classification", { tracks: [tracks[3]], state: "not_classical" }, "album:A");
-  const form = section((await s.read({ selection: "album:A" })).view, "new-work");
+  const { form } = await newAlbumForm(s, "A");
   const include = form.fields.find((f) => f.key === "include");
   assert.equal(include.type, "mapping");
   assert.deepEqual(include.value, ["include", "include", "include", ""]);
@@ -471,9 +483,9 @@ test("#16 duplicate-work and same-name reviews offer the merge that settles them
 test("#22 creating a work that already exists asks first, and the album page points to it", async (t) => {
   const s = await setup(t);
   const work = (await s.ok("create-work-from-album", { albumId: "A", tracks: s.trackIds("A"), title: "Symphony No. 5 in C minor, Op. 67", composer: "", composerName: "Ludwig van Beethoven" }, "album:A")).selection;
-  const album = (await s.read({ selection: "album:B" })).view;
+  const album = (await albumChoice(s, "B")).view;
   assert.deepEqual(section(album, "likely-works").rows.map((r) => r.id), [work]);
-  assert.ok(section(album, "new-work").fields.some((f) => f.key === "createAnyway"));
+  assert.ok((await newAlbumForm(s, "B")).form.fields.some((f) => f.key === "createAnyway"));
   const values = { albumId: "B", tracks: s.trackIds("B"), title: "Symphony No.5, Op. 67", composer: "", composerName: "Ludwig van Beethoven" };
   const refused = await s.mutate("create-work-from-album", values, "album:B");
   assert.equal(refused.ok, false);
