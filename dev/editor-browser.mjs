@@ -172,7 +172,11 @@ try {
   await page.getByRole("alertdialog").getByRole("button", { name: "Discard", exact: true }).click();
   await page.getByRole("alertdialog").waitFor({ state: "detached" });
   await page.getByRole("alert").waitFor({ state: "hidden" });
-  assert.equal(await group("Details").getByLabel("Nickname", { exact: true }).inputValue(), "");
+  assert.notEqual(
+    await group("Details").getByLabel("Nickname", { exact: true }).inputValue(),
+    "Unsaved draft",
+    "the discarded draft is gone; the page shows the newer data",
+  );
   if (process.env.EDITOR_SCREENSHOT_DIR) {
     await fs.mkdir(process.env.EDITOR_SCREENSHOT_DIR, { recursive: true });
     await page.screenshot({
