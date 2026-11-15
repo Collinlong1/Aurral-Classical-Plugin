@@ -1,3 +1,11 @@
+# Metadata editor UI, item 4 (November 14, 2026)
+
+Item 3 is published: core `c0cf7ab55f130a57cb9b68efc5e052ef8f5579b5`; plugin implementation `a9904b8`, paired-CI commit `39f51193c9f50a622a0eb780dfc47c041d8525ce` (1.0.56). The user requested push, then item 4. Paired CI now includes the work-sections browser check.
+
+Item 4 improves the generic admin-pages-v2 renderer: arrow/Home/End navigation, Enter selection without form submission, Escape/Tab retaining the chosen value, active-option ARIA and scrolling; request-specific loading/error/empty states, explicit retry, and aborted/obsolete response protection. List search has a visible Search button, submission guidance and applied-query result counts. Lookup typing still searches automatically; list search remains explicit. All plugins using this renderer benefit. No classical logic, plugin runtime/bundle/schema, backend, auth or API changes. Plugin remains 1.0.56.
+
+Core checks passed with 1089 unsafe-any uses (unchanged), production build passed, all 2666 core unit tests passed across 388 files, and four actual-renderer browser harnesses passed at desktop/phone widths. Eden was attempted but Docker image extraction failed with no space left on device before journeys ran; this checkout's lab was removed with pnpm eden down. Remote CI/full Compose restart not run. Running implementation record: plugin `EDITOR_UI_HANDOFF.md`. Item 4 core commit `292252c` is complete locally, unpushed; items 5–7 remain pending.
+
 # Metadata editor UI, item 3 (November 14, 2026)
 
 Item 2 is published: core `c38393bd4816e721bd4c838e59ad0403452f7153`; plugin implementation `8800d16` with paired-CI pin `6a41904` (1.0.55). The user requested push, then item 3.

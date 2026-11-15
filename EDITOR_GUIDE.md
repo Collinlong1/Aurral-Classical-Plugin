@@ -8,10 +8,16 @@ Everything here changes the classical catalogue only. Audio files are never writ
 
 - **Tabs:** Works, Composers, Performers, Albums, Review (with a count of open items), Search and Activity.
 - **Bulk:** the Works list, the Review list and an album's track sections have checkboxes. Tick rows (or **Select all**), then an action; destructive ones ask first and say how many are selected. Partial failures are reported without undoing what succeeded.
-- **Left:** a searchable list for the current tab, 100 at a time, with the pager above and below it. Search covers titles, composers, performers, album titles and track titles, ignoring accents and punctuation. Opening an entry from a link, or reloading the page, shows the list page that holds it.
+- **Left:** a searchable list for the current tab, 100 at a time, with the pager above and below it. Type, then press **Enter** or **Search** to apply the search. The hint distinguishes unapplied text from the applied search and shows its result count; **Clear search** restores the full list. Search covers titles, composers, performers, album titles and track titles, ignoring accents and punctuation. Opening an entry from a link, or reloading the page, shows the list page that holds it.
 - **Pages stay put.** Saving, assigning, ticking and other actions keep you where you are on the page; when an action opens the next step further down (choosing a work, a merge's new movements), the page scrolls to it. Long sections (a composer's works, a work's movements or recordings, an album's tracks) page 100 at a time, and the page is part of the address, so a reload or an edit stays on it. A track's breadcrumb leads back to the album page it is on.
 - **Right:** the open item. The breadcrumb leads back up (for example work → composer); on a phone it is also the way back to the list.
 - Each item shows its details as one form with a single **Save**. Leaving or reloading with unsaved edits asks first. Saving another form or running an action also asks before discarding edits elsewhere: choose **Keep editing** to save or discard those edits first. A failed action keeps your drafts.
+
+## Lookup fields
+
+Lookup fields (work, composer, person or owned track) search automatically as you type. Use **↑/↓** to move through results, **Home/End** for first/last, and **Enter** to choose without saving the form. **Escape** closes the results and keeps the previous choice; **Tab** leaves the field without choosing. Click/tap a result to choose it, or use the clear button to remove the choice.
+
+Searching, no matches and lookup failures are separate states. **Try again** retries a failed query; it can also be reached with Tab, or press Enter in the failed lookup. Changing the query hides the old options while the new results load.
 
 ## Common tasks
 
