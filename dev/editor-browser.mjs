@@ -166,8 +166,13 @@ try {
     await group("Details").getByLabel("Nickname", { exact: true }).inputValue(),
     "Unsaved draft",
   );
+  // Reload asks before discarding the draft, then shows the newer data.
   await page.getByRole("button", { name: "Reload", exact: true }).click();
+  await page.getByRole("heading", { name: "Discard unsaved changes?" }).waitFor();
+  await page.getByRole("alertdialog").getByRole("button", { name: "Discard", exact: true }).click();
+  await page.getByRole("alertdialog").waitFor({ state: "detached" });
   await page.getByRole("alert").waitFor({ state: "hidden" });
+  assert.equal(await group("Details").getByLabel("Nickname", { exact: true }).inputValue(), "");
   if (process.env.EDITOR_SCREENSHOT_DIR) {
     await fs.mkdir(process.env.EDITOR_SCREENSHOT_DIR, { recursive: true });
     await page.screenshot({
