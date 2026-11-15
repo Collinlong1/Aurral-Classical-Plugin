@@ -22,7 +22,7 @@ jobs:
           repository: Collinlong1/aurral
           # Core aurral-classical with the v0.2 hooks (search, manual
           # search, comparisons, admin page selection and pages).
-          ref: c38393bd4816e721bd4c838e59ad0403452f7153
+          ref: c0cf7ab55f130a57cb9b68efc5e052ef8f5579b5
           path: core
       - uses: actions/setup-node@v4
         with:
@@ -44,6 +44,11 @@ jobs:
         env:
           AURRAL_CORE_PATH: ${{ github.workspace }}/core
         run: node dev/editor-assignment-browser.mjs
+      - name: Edit work sections and reveal forms on demand
+        working-directory: plugin
+        env:
+          AURRAL_CORE_PATH: ${{ github.workspace }}/core
+        run: node dev/editor-work-sections-browser.mjs
       - name: Start synthetic instance and verify comparisons
         working-directory: plugin
         env:

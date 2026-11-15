@@ -2,7 +2,7 @@
 
 ## Current checkpoint
 
-November 14, 2026 (America/Chicago). The user authorized the seven improvements from the editor review, one at a time, and requested a consistently updated handoff. **Item 1 is pushed**: core `365e6dc49a54d9137e82c56e6956dabc1c9899f3`, plugin `26be9ac013ed9ccd64726064c89b192352736a06`. **Item 2 is pushed**: core `c38393bd4816e721bd4c838e59ad0403452f7153`, plugin implementation `8800d16` and paired CI commit `6a419049f872976e965b4ee4588b7096378572ea`, version 1.0.55. **Item 3 is complete locally** (plugin 1.0.56, core CSS `c0cf7ab`): sectioned work editing with add forms on demand. The user additionally emphasized that core changes must be broad, reusable upstream improvements; all album/work/grouping workflow logic stays in the plugin. No deployment or PR is requested.
+November 14, 2026 (America/Chicago). The user authorized the seven improvements from the editor review, one at a time, and requested a consistently updated handoff. **Item 1 is pushed**: core `365e6dc49a54d9137e82c56e6956dabc1c9899f3`, plugin `26be9ac013ed9ccd64726064c89b192352736a06`. **Item 2 is pushed**: core `c38393bd4816e721bd4c838e59ad0403452f7153`, plugin implementation `8800d16` and paired CI commit `6a419049f872976e965b4ee4588b7096378572ea`, version 1.0.55. **Item 3 publication authorized** (plugin implementation `a9904b8`, version 1.0.56; core CSS `c0cf7ab55f130a57cb9b68efc5e052ef8f5579b5` pushed): sectioned work editing with add forms on demand. The user additionally emphasized that core changes must be broad, reusable upstream improvements; all album/work/grouping workflow logic stays in the plugin. No deployment or PR is requested.
 
 Baseline: core `61b8ddcab63b99b427099ea4bedca9f3f1c6a2b5`, plugin `fc144f20930139e728b8d5319866e96225fd7774`, both `aurral-classical`. Local checkouts: `/workspace/aurral`, `/workspace/plugin`. Changes are on the user-authorized aurral-classical branches only; no production access, deployment, PR, upstream write or subagents.
 
@@ -10,8 +10,8 @@ Baseline: core `61b8ddcab63b99b427099ea4bedca9f3f1c6a2b5`, plugin `fc144f2093013
 
 1. **Published:** protect unsaved edits when saving another form, running an action, or navigating away.
 2. **Published:** focused album assignment: select tracks, choose/create work, map movements, apply.
-3. **Complete locally:** sectioned work editing; reveal add forms on demand; consolidate advanced actions.
-4. Pending: keyboard-friendly lookup fields and clear search behavior/status.
+3. **Publication authorized:** sectioned work editing; reveal add forms on demand; consolidate advanced actions.
+4. **Starting:** keyboard-friendly lookup fields and clear search behavior/status.
 5. Pending: save/cancel and feedback close to the active task.
 6. Pending: batch movement reordering and clearer review/merge decisions.
 7. Pending: preserve each list's search, page and scroll when visiting related entries.
@@ -79,4 +79,4 @@ Baseline: core `61b8ddcab63b99b427099ea4bedca9f3f1c6a2b5`, plugin `fc144f2093013
 
 ## Next action
 
-Item 3 is reviewed and complete locally: plugin 1.0.56 and generic core CSS commit `c0cf7ab`. Neither item-3 change is pushed. Before publication, update the paired core pin and add `dev/editor-work-sections-browser.mjs` to CI after publishing its core commit. Item 4 (keyboard-friendly lookup and search feedback) is next; items 4–7 remain pending. Item 2 is already pushed at the refs above. No PR, merge, deployment, provider calls or production access.
+Publish plugin item 3 with paired CI pinned to core c0cf7ab and its work-sections browser regression, then implement item 4: keyboard-friendly lookup and clear search behavior/status. Item 3 core is pushed; verify the plugin remote after publication. Keep domain logic in the plugin; keyboard and request-state behavior belongs to the generic host renderer. Items 5–7 remain pending.
