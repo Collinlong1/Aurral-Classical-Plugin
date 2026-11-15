@@ -22,7 +22,7 @@ jobs:
           repository: Collinlong1/aurral
           # Core aurral-classical with the v0.2 hooks (search, manual
           # search, comparisons, admin page selection and pages).
-          ref: 61b8ddcab63b99b427099ea4bedca9f3f1c6a2b5
+          ref: 365e6dc49a54d9137e82c56e6956dabc1c9899f3
           path: core
       - uses: actions/setup-node@v4
         with:
@@ -34,6 +34,11 @@ jobs:
       - run: npm install --global pnpm@12.15.0
       - run: pnpm install --frozen-lockfile && pnpm check && pnpm build
         working-directory: core
+      - name: Protect editor drafts across actions and navigation
+        working-directory: plugin
+        env:
+          AURRAL_CORE_PATH: ${{ github.workspace }}/core
+        run: node dev/editor-drafts-browser.mjs
       - name: Start synthetic instance and verify comparisons
         working-directory: plugin
         env:

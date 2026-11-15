@@ -1,3 +1,7 @@
+# Metadata editor UI, item 1
+
+Draft protection lives in the generic core renderer; this repository adds the isolated Chromium regression harness and running `EDITOR_UI_HANDOFF.md`. No plugin runtime, bundle, catalogue schema, matching, search or acquisition behavior changed. Items 2–7 remain pending.
+
 # Phase 4 inventory addendum
 
 The v0.1 review fixes preserve verified identities during automatic duplicate-work repair, include movement edits in album revision scopes, and route generic core playback menus through bounded plugin queue items. Album and resource-page player titles both include the work and part. Manifest 1.0.13 retains the standalone-work hotfix and the latest mixed-metadata and scan checkpoint changes from `1019fd5`.

@@ -1,5 +1,7 @@
 # Aurral Classical v0.2 — implementation report
 
+Incremental editor UI improvements, November 14, 2026: see `EDITOR_UI_HANDOFF.md` for the user-authorized seven-item sequence and current validation. Item 1 protects drafts across cross-form saves, actions, conflict reload and navigation in the generic core renderer. This is local work after 1.0.54, with no plugin schema or bundle change; the remaining UI items are pending.
+
 November 14, 2026. Authorized by the user ("Alright let's start in v0.2", with the v0.2 development scope). Implemented on `aurral-classical` in both repositories; nothing merged into `main`, nothing deployed, no production access. Plugin 1.0.48 → 1.0.53, schema 3 → 4; follow-up fixes in 1.0.54 (below), no schema change.
 
 ## v0.2 follow-up: editor workflow fixes (1.0.54)

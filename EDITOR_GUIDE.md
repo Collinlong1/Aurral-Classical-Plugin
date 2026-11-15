@@ -11,7 +11,7 @@ Everything here changes the classical catalogue only. Audio files are never writ
 - **Left:** a searchable list for the current tab, 100 at a time, with the pager above and below it. Search covers titles, composers, performers, album titles and track titles, ignoring accents and punctuation. Opening an entry from a link, or reloading the page, shows the list page that holds it.
 - **Pages stay put.** Saving, assigning, ticking and other actions keep you where you are on the page; when an action opens the next step further down (choosing a work, a merge's new movements), the page scrolls to it. Long sections (a composer's works, a work's movements or recordings, an album's tracks) page 100 at a time, and the page is part of the address, so a reload or an edit stays on it. A track's breadcrumb leads back to the album page it is on.
 - **Right:** the open item. The breadcrumb leads back up (for example work → composer); on a phone it is also the way back to the list.
-- Each item shows its details as one form with a single **Save**. Leaving with unsaved edits asks first.
+- Each item shows its details as one form with a single **Save**. Leaving or reloading with unsaved edits asks first. Saving another form or running an action also asks before discarding edits elsewhere: choose **Keep editing** to save or discard those edits first. A failed action keeps your drafts.
 
 ## Common tasks
 
