@@ -22,7 +22,7 @@ jobs:
           repository: Collinlong1/aurral
           # Core aurral-classical with the v0.2 hooks (search, manual
           # search, comparisons, admin page selection and pages).
-          ref: c0cf7ab55f130a57cb9b68efc5e052ef8f5579b5
+          ref: 292252ce897f7ebf2df99cba303cd1b6c2a58e90
           path: core
       - uses: actions/setup-node@v4
         with:
@@ -49,6 +49,11 @@ jobs:
         env:
           AURRAL_CORE_PATH: ${{ github.workspace }}/core
         run: node dev/editor-work-sections-browser.mjs
+      - name: Navigate lookup results and apply list searches
+        working-directory: plugin
+        env:
+          AURRAL_CORE_PATH: ${{ github.workspace }}/core
+        run: node dev/editor-lookups-browser.mjs
       - name: Start synthetic instance and verify comparisons
         working-directory: plugin
         env:

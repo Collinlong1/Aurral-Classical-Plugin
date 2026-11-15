@@ -2,7 +2,7 @@
 
 ## Current checkpoint
 
-November 14, 2026 (America/Chicago). The user authorized the seven improvements from the editor review, one at a time, and requested a consistently updated handoff. **Item 1 is pushed**: core `365e6dc49a54d9137e82c56e6956dabc1c9899f3`, plugin `26be9ac013ed9ccd64726064c89b192352736a06`. **Item 2 is pushed**: core `c38393bd4816e721bd4c838e59ad0403452f7153`, plugin implementation `8800d16` and paired CI commit `6a419049f872976e965b4ee4588b7096378572ea`, version 1.0.55. **Item 4 is complete locally (generic core renderer only). Item 3 is pushed** (plugin implementation `a9904b8`, paired CI `39f51193c9f50a622a0eb780dfc47c041d8525ce`, version 1.0.56; core CSS `c0cf7ab55f130a57cb9b68efc5e052ef8f5579b5`): sectioned work editing with add forms on demand. The user additionally emphasized that core changes must be broad, reusable upstream improvements; all album/work/grouping workflow logic stays in the plugin. No deployment or PR is requested.
+November 14, 2026 (America/Chicago). The user authorized the seven improvements from the editor review, one at a time, and requested a consistently updated handoff. **Item 1 is pushed**: core `365e6dc49a54d9137e82c56e6956dabc1c9899f3`, plugin `26be9ac013ed9ccd64726064c89b192352736a06`. **Item 2 is pushed**: core `c38393bd4816e721bd4c838e59ad0403452f7153`, plugin implementation `8800d16` and paired CI commit `6a419049f872976e965b4ee4588b7096378572ea`, version 1.0.55. **Item 4 publication authorized** (core `292252ce897f7ebf2df99cba303cd1b6c2a58e90` pushed; plugin regression/docs `8de3cbb`, paired CI being pushed). **Item 5 starts next. Item 3 is pushed** (plugin implementation `a9904b8`, paired CI `39f51193c9f50a622a0eb780dfc47c041d8525ce`, version 1.0.56; core CSS `c0cf7ab55f130a57cb9b68efc5e052ef8f5579b5`): sectioned work editing with add forms on demand. The user additionally emphasized that core changes must be broad, reusable upstream improvements; all album/work/grouping workflow logic stays in the plugin. No deployment or PR is requested.
 
 Baseline: core `61b8ddcab63b99b427099ea4bedca9f3f1c6a2b5`, plugin `fc144f20930139e728b8d5319866e96225fd7774`, both `aurral-classical`. Local checkouts: `/workspace/aurral`, `/workspace/plugin`. Changes are on the user-authorized aurral-classical branches only; no production access, deployment, PR, upstream write or subagents.
 
@@ -11,8 +11,8 @@ Baseline: core `61b8ddcab63b99b427099ea4bedca9f3f1c6a2b5`, plugin `fc144f2093013
 1. **Published:** protect unsaved edits when saving another form, running an action, or navigating away.
 2. **Published:** focused album assignment: select tracks, choose/create work, map movements, apply.
 3. **Published:** sectioned work editing; reveal add forms on demand; consolidate advanced actions.
-4. **Complete locally:** keyboard-friendly lookup fields and clear search behavior/status.
-5. Pending: save/cancel and feedback close to the active task.
+4. **Publication authorized:** keyboard-friendly lookup fields and clear search behavior/status.
+5. **Starting:** save/cancel and feedback close to the active task.
 6. Pending: batch movement reordering and clearer review/merge decisions.
 7. Pending: preserve each list's search, page and scroll when visiting related entries.
 
@@ -95,4 +95,4 @@ Baseline: core `61b8ddcab63b99b427099ea4bedca9f3f1c6a2b5`, plugin `fc144f2093013
 
 ## Next action
 
-Item 4 is implemented/reviewed locally: generic core renderer commit `292252c`, plugin browser regression/docs only (runtime stays 1.0.56). Core checks, frontend build, 2666 core tests and four editor browser regressions are green; Eden is blocked by Docker storage capacity as recorded above. Before publishing item 4, push its generic core renderer commit, pin it in paired CI and add `dev/editor-lookups-browser.mjs`. Item 5 (save/cancel and feedback close to the active task) is next; items 5–7 remain pending. Keep the paired CI pin at published core until item-4 publication is requested.
+Push plugin item 4 with paired CI pinned to core 292252c and the lookup/search regression, then implement item 5: save/cancel and feedback close to the active task. Core item 4 is already pushed; verify the plugin remote after publication. Keep domain logic in the plugin and shared editor behavior generic. Items 6–7 remain pending.
