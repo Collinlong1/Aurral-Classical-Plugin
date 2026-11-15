@@ -23,13 +23,15 @@ import {
 } from "./auto-match.js";
 
 export class EditorV2Error extends Error {
-  constructor(message, status = 400) {
+  // `field`: the form field the message is about; the host shows it there.
+  constructor(message, status = 400, field = undefined) {
     super(message);
     this.status = status;
+    if (field) this.field = field;
   }
 }
-const fail = (message) => {
-  throw new EditorV2Error(message);
+const fail = (message, field) => {
+  throw new EditorV2Error(message, 400, field);
 };
 // Creating a work that probably exists already asks for confirmation first.
 export function warnDuplicate(c, title, composers, createAnyway) {
@@ -1919,8 +1921,8 @@ export function lookupV2(c, query) {
 
 // ---- commands --------------------------------------------------------------
 
-const str = (value, label, { optional = false, max = 10000 } = {}) => {
-  if (typeof value !== "string" || value.length > max || (!optional && !value.trim())) fail(`Enter a valid ${label}`);
+const str = (value, label, { optional = false, max = 10000, field } = {}) => {
+  if (typeof value !== "string" || value.length > max || (!optional && !value.trim())) fail(`Enter a valid ${label}`, field);
   return value;
 };
 const lines = (value) =>
@@ -2051,7 +2053,7 @@ export function applyV2(c, request, who) {
         const current = type === "lines" ? (Array.isArray(resolved.value) ? resolved.value : resolved.value ? [String(resolved.value)] : []) : display(resolved.value);
         if (JSON.stringify(next) === JSON.stringify(current)) continue;
         if ((key === "title" || key === "name") && !next) fail(`${key === "name" ? "Name" : "Title"} can't be empty. Use Mark blank to clear it on purpose.`);
-        if (key === "date" && next && !validDate(next)) fail("Use a valid year, year-month or full ISO date");
+        if (key === "date" && next && !validDate(next)) fail("Use a valid year, year-month or full ISO date", key);
         // Classical edits are authoritative: pin them so provider refreshes never overwrite them.
         m.manual(target, key, next, { actor: who, pin: true });
         changed++;
@@ -2256,10 +2258,10 @@ export function applyV2(c, request, who) {
     }
     case "merge-open": {
       const target = str(v.target, "entry", { max: 200 });
-      const into = str(v.into, "other entry", { max: 200 });
-      if (target === into) fail("Choose a different entry");
+      const into = str(v.into, "other entry", { max: 200, field: "into" });
+      if (target === into) fail("Choose a different entry", "into");
       const kinds = [c.entity(target).kind, c.entity(into).kind];
-      if (!(MERGEABLE[kinds[0]] || []).includes(kinds[1])) fail(kinds[0] === "work" ? "Choose a work" : "Choose a person or ensemble");
+      if (!(MERGEABLE[kinds[0]] || []).includes(kinds[1])) fail(kinds[0] === "work" ? "Choose a work" : "Choose a person or ensemble", "into");
       return { selection: mergeSelection(target, into), message: "" };
     }
     case "merge-entity": {
@@ -2443,7 +2445,7 @@ export function applyV2(c, request, who) {
         v.include !== undefined ? v.include[index] === "include" : classification(c, track).state !== "not_classical",
       );
       if (!tracks.length) fail("Choose at least one track for the work");
-      const title = str(v.title, "work title", { max: 2000 }).trim();
+      const title = str(v.title, "work title", { max: 2000, field: "title" }).trim();
       let composer = str(v.composer ?? "", "composer", { optional: true, max: 200 });
       const composerName = str(v.composerName ?? "", "composer name", { optional: true, max: 500 }).trim();
       warnDuplicate(c, title, composer ? [labelOf(c, composer)].filter(Boolean) : composerName ? [composerName] : [], v.createAnyway);

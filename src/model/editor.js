@@ -10,13 +10,15 @@ import { ensureSearchIndex } from "../search/engine.js";
 import { renderV2, lookupV2, applyV2, V2_COMMANDS, EditorV2Error, warnDuplicate, parseAlbumSelection, parseEntitySelection, finishWorkMutation, nextReview, parseMergeSelection } from "./editor-v2.js";
 
 class EditorError extends Error {
-  constructor(message, status = 400) {
+  // `field`: the form field the message is about; v2 hosts show it there.
+  constructor(message, status = 400, field = undefined) {
     super(message);
+    if (field) this.field = field;
     this.status = status;
   }
 }
-const fail = (message) => {
-  throw new EditorError(message);
+const fail = (message, field) => {
+  throw new EditorError(message, 400, field);
 };
 const actor = (input) => {
   if (
@@ -31,13 +33,13 @@ const actor = (input) => {
     );
   return String(input.user.id);
 };
-function text(value, label, { optional = false, max = 10000 } = {}) {
+function text(value, label, { optional = false, max = 10000, field } = {}) {
   if (
     typeof value !== "string" ||
     value.length > max ||
     (!optional && !value.trim())
   )
-    fail(`Enter a valid ${label}`);
+    fail(`Enter a valid ${label}`, field);
   return value;
 }
 // Optimistic concurrency is scoped to what the open page shows (an entry and
@@ -827,7 +829,7 @@ function apply(c, input, who) {
       );
     }
     case "create-contributor": {
-      const name = text(v.name, "contributor name", { max: 500 }).trim();
+      const name = text(v.name, "contributor name", { max: 500, field: "name" }).trim();
       if (!["person", "ensemble"].includes(v.kind))
         fail("Select a valid contributor type");
       selection = c.createEntity(v.kind, {
@@ -839,7 +841,7 @@ function apply(c, input, who) {
     case "add-credit": {
       selection = text(v.target, "entry", { max: 200 });
       c.entity(selection, ["work", "recording", "performance", "release"]);
-      const contributor = text(v.contributor, "contributor", { max: 200 }),
+      const contributor = text(v.contributor, "contributor", { max: 200, field: "contributor" }),
         role = text(v.role, "role", { max: 80 }),
         instrument =
           text(v.instrument, "instrument", {
@@ -880,13 +882,13 @@ function apply(c, input, who) {
       break;
     }
     case "create-composer": {
-      const name = text(v.name, "composer name", { max: 500 }).trim();
+      const name = text(v.name, "composer name", { max: 500, field: "name" }).trim();
       selection = c.createEntity("person", { roles: ["composer"] });
       manual(selection, "name", name);
       break;
     }
     case "create-work": {
-      const title = text(v.title, "work title", { max: 2000 }).trim();
+      const title = text(v.title, "work title", { max: 2000, field: "title" }).trim();
       const composer = text(v.composer ?? "", "composer", {
         optional: true,
         max: 200,
@@ -930,7 +932,7 @@ function apply(c, input, who) {
               .filter(Boolean)
           : raw;
       if (key === "date" && value && !validDate(value))
-        fail("Use a valid year, year-month or full ISO date");
+        fail("Use a valid year, year-month or full ISO date", "date");
       manual(target, key, value, v.pin);
       selection = target;
       break;
@@ -951,10 +953,10 @@ function apply(c, input, who) {
     case "add-movement": {
       selection = text(v.work, "work", { max: 200 });
       c.entity(selection, "work");
-      const titles = (Array.isArray(v.title) ? v.title : [text(v.title, "movement title", { max: 2000 })])
+      const titles = (Array.isArray(v.title) ? v.title : [text(v.title, "movement title", { max: 2000, field: "title" })])
         .map((title) => String(title).trim())
         .filter(Boolean);
-      if (!titles.length) fail("Enter a movement title");
+      if (!titles.length) fail("Enter a movement title", "title");
       if (titles.length > 100) fail("Add no more than 100 movements at a time");
       for (const title of titles) {
         const rows = movementRows(c, selection);
@@ -997,13 +999,14 @@ function apply(c, input, who) {
     case "create-broadcast": {
       const work = text(v.work, "work", { max: 200 });
       c.entity(work, "work");
-      const title = text(v.title, "recording title", { max: 2000 }).trim(),
+      const title = text(v.title, "recording title", { max: 2000, field: "title" }).trim(),
         date = text(v.date, "broadcast date", {
           optional: true,
           max: 10,
+          field: "date",
         }).trim();
       if (date && !validDate(date))
-        fail("Use a valid year, year-month or full ISO date");
+        fail("Use a valid year, year-month or full ISO date", "date");
       const p = c.createEntity("performance", {
         type: "broadcast",
         ...(date && {
@@ -1159,7 +1162,7 @@ export async function mutateEditor(input) {
       });
     } catch (error) {
       if (error instanceof EditorError || error instanceof EditorV2Error)
-        return { ok: false, status: error.status, message: error.message.slice(0, 500) };
+        return { ok: false, status: error.status, message: error.message.slice(0, 500), ...(error.field && { field: error.field }) };
       // Model constraint failures are expected validation failures; SQLite/internal errors stay diagnostic.
       if (error instanceof Error && !error.code)
         return { ok: false, status: 400, message: error.message.slice(0, 200) };

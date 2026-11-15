@@ -41331,13 +41331,15 @@ function deleteWorks(c, workIds, actor3, { names }) {
 
 // src/model/editor-v2.js
 var EditorV2Error = class extends Error {
-  constructor(message, status = 400) {
+  // `field`: the form field the message is about; the host shows it there.
+  constructor(message, status = 400, field2 = void 0) {
     super(message);
     this.status = status;
+    if (field2) this.field = field2;
   }
 };
-var fail = (message) => {
-  throw new EditorV2Error(message);
+var fail = (message, field2) => {
+  throw new EditorV2Error(message, 400, field2);
 };
 function warnDuplicate(c, title, composers, createAnyway) {
   if (createAnyway === true) return;
@@ -43015,8 +43017,8 @@ function lookupV2(c, query) {
   else fail("Unknown lookup");
   return { version: 2, lookup: kind, options: options.slice(0, 50).map((o) => ({ ...o, label: o.label.slice(0, 500), ...o.detail && { detail: o.detail.slice(0, 500) } })) };
 }
-var str = (value, label, { optional = false, max = 1e4 } = {}) => {
-  if (typeof value !== "string" || value.length > max || !optional && !value.trim()) fail(`Enter a valid ${label}`);
+var str = (value, label, { optional = false, max = 1e4, field: field2 } = {}) => {
+  if (typeof value !== "string" || value.length > max || !optional && !value.trim()) fail(`Enter a valid ${label}`, field2);
   return value;
 };
 var lines = (value) => (Array.isArray(value) ? value : typeof value === "string" ? value.split("\n") : []).map((line) => String(line).trim()).filter(Boolean);
@@ -43135,7 +43137,7 @@ function applyV2(c, request, who) {
         const current = type === "lines" ? Array.isArray(resolved.value) ? resolved.value : resolved.value ? [String(resolved.value)] : [] : display(resolved.value);
         if (JSON.stringify(next) === JSON.stringify(current)) continue;
         if ((key === "title" || key === "name") && !next) fail(`${key === "name" ? "Name" : "Title"} can't be empty. Use Mark blank to clear it on purpose.`);
-        if (key === "date" && next && !validDate(next)) fail("Use a valid year, year-month or full ISO date");
+        if (key === "date" && next && !validDate(next)) fail("Use a valid year, year-month or full ISO date", key);
         m.manual(target, key, next, { actor: who, pin: true });
         changed++;
       }
@@ -43324,10 +43326,10 @@ function applyV2(c, request, who) {
     }
     case "merge-open": {
       const target = str(v.target, "entry", { max: 200 });
-      const into = str(v.into, "other entry", { max: 200 });
-      if (target === into) fail("Choose a different entry");
+      const into = str(v.into, "other entry", { max: 200, field: "into" });
+      if (target === into) fail("Choose a different entry", "into");
       const kinds2 = [c.entity(target).kind, c.entity(into).kind];
-      if (!(MERGEABLE[kinds2[0]] || []).includes(kinds2[1])) fail(kinds2[0] === "work" ? "Choose a work" : "Choose a person or ensemble");
+      if (!(MERGEABLE[kinds2[0]] || []).includes(kinds2[1])) fail(kinds2[0] === "work" ? "Choose a work" : "Choose a person or ensemble", "into");
       return { selection: mergeSelection(target, into), message: "" };
     }
     case "merge-entity": {
@@ -43495,7 +43497,7 @@ function applyV2(c, request, who) {
         (track, index) => v.include !== void 0 ? v.include[index] === "include" : classification(c, track).state !== "not_classical"
       );
       if (!tracks.length) fail("Choose at least one track for the work");
-      const title = str(v.title, "work title", { max: 2e3 }).trim();
+      const title = str(v.title, "work title", { max: 2e3, field: "title" }).trim();
       let composer = str(v.composer ?? "", "composer", { optional: true, max: 200 });
       const composerName = str(v.composerName ?? "", "composer name", { optional: true, max: 500 }).trim();
       warnDuplicate(c, title, composer ? [labelOf(c, composer)].filter(Boolean) : composerName ? [composerName] : [], v.createAnyway);
@@ -43585,13 +43587,15 @@ function applyV2(c, request, who) {
 
 // src/model/editor.js
 var EditorError = class extends Error {
-  constructor(message, status = 400) {
+  // `field`: the form field the message is about; v2 hosts show it there.
+  constructor(message, status = 400, field2 = void 0) {
     super(message);
+    if (field2) this.field = field2;
     this.status = status;
   }
 };
-var fail2 = (message) => {
-  throw new EditorError(message);
+var fail2 = (message, field2) => {
+  throw new EditorError(message, 400, field2);
 };
 var actor = (input) => {
   if (input.pageId !== "editor" || ![1, 2].includes(input.capabilities?.adminForms) || input.user?.role !== "admin" || !Number.isSafeInteger(input.user.id) || input.user.id <= 0)
@@ -43600,9 +43604,9 @@ var actor = (input) => {
     );
   return String(input.user.id);
 };
-function text3(value, label, { optional = false, max = 1e4 } = {}) {
+function text3(value, label, { optional = false, max = 1e4, field: field2 } = {}) {
   if (typeof value !== "string" || value.length > max || !optional && !value.trim())
-    fail2(`Enter a valid ${label}`);
+    fail2(`Enter a valid ${label}`, field2);
   return value;
 }
 function scopeIds(c, scope) {
@@ -44261,7 +44265,7 @@ function apply(c, input, who) {
       );
     }
     case "create-contributor": {
-      const name = text3(v.name, "contributor name", { max: 500 }).trim();
+      const name = text3(v.name, "contributor name", { max: 500, field: "name" }).trim();
       if (!["person", "ensemble"].includes(v.kind))
         fail2("Select a valid contributor type");
       selection = c.createEntity(v.kind, {
@@ -44273,7 +44277,7 @@ function apply(c, input, who) {
     case "add-credit": {
       selection = text3(v.target, "entry", { max: 200 });
       c.entity(selection, ["work", "recording", "performance", "release"]);
-      const contributor = text3(v.contributor, "contributor", { max: 200 }), role = text3(v.role, "role", { max: 80 }), instrument = text3(v.instrument, "instrument", {
+      const contributor = text3(v.contributor, "contributor", { max: 200, field: "contributor" }), role = text3(v.role, "role", { max: 80 }), instrument = text3(v.instrument, "instrument", {
         optional: true,
         max: 200
       }).trim() || null;
@@ -44301,13 +44305,13 @@ function apply(c, input, who) {
       break;
     }
     case "create-composer": {
-      const name = text3(v.name, "composer name", { max: 500 }).trim();
+      const name = text3(v.name, "composer name", { max: 500, field: "name" }).trim();
       selection = c.createEntity("person", { roles: ["composer"] });
       manual(selection, "name", name);
       break;
     }
     case "create-work": {
-      const title = text3(v.title, "work title", { max: 2e3 }).trim();
+      const title = text3(v.title, "work title", { max: 2e3, field: "title" }).trim();
       const composer = text3(v.composer ?? "", "composer", {
         optional: true,
         max: 200
@@ -44338,7 +44342,7 @@ function apply(c, input, who) {
         fail2("Invalid override options");
       const value = v.blank ? null : definition.type === "array" ? raw.split("\n").map((s) => s.trim()).filter(Boolean) : raw;
       if (key === "date" && value && !validDate2(value))
-        fail2("Use a valid year, year-month or full ISO date");
+        fail2("Use a valid year, year-month or full ISO date", "date");
       manual(target, key, value, v.pin);
       selection = target;
       break;
@@ -44357,8 +44361,8 @@ function apply(c, input, who) {
     case "add-movement": {
       selection = text3(v.work, "work", { max: 200 });
       c.entity(selection, "work");
-      const titles = (Array.isArray(v.title) ? v.title : [text3(v.title, "movement title", { max: 2e3 })]).map((title) => String(title).trim()).filter(Boolean);
-      if (!titles.length) fail2("Enter a movement title");
+      const titles = (Array.isArray(v.title) ? v.title : [text3(v.title, "movement title", { max: 2e3, field: "title" })]).map((title) => String(title).trim()).filter(Boolean);
+      if (!titles.length) fail2("Enter a movement title", "title");
       if (titles.length > 100) fail2("Add no more than 100 movements at a time");
       for (const title of titles) {
         const rows = movementRows(c, selection);
@@ -44390,12 +44394,13 @@ function apply(c, input, who) {
     case "create-broadcast": {
       const work = text3(v.work, "work", { max: 200 });
       c.entity(work, "work");
-      const title = text3(v.title, "recording title", { max: 2e3 }).trim(), date = text3(v.date, "broadcast date", {
+      const title = text3(v.title, "recording title", { max: 2e3, field: "title" }).trim(), date = text3(v.date, "broadcast date", {
         optional: true,
-        max: 10
+        max: 10,
+        field: "date"
       }).trim();
       if (date && !validDate2(date))
-        fail2("Use a valid year, year-month or full ISO date");
+        fail2("Use a valid year, year-month or full ISO date", "date");
       const p = c.createEntity("performance", {
         type: "broadcast",
         ...date && {
@@ -44518,7 +44523,7 @@ async function mutateEditor(input) {
       });
     } catch (error) {
       if (error instanceof EditorError || error instanceof EditorV2Error)
-        return { ok: false, status: error.status, message: error.message.slice(0, 500) };
+        return { ok: false, status: error.status, message: error.message.slice(0, 500), ...error.field && { field: error.field } };
       if (error instanceof Error && !error.code)
         return { ok: false, status: 400, message: error.message.slice(0, 200) };
       throw error;
@@ -46032,7 +46037,7 @@ async function search(input) {
 import path12 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.58" : "dev";
+var VERSION = true ? "1.0.59" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js

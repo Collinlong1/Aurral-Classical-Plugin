@@ -119,7 +119,7 @@ try {
       // Arrow buttons move locally.
       await reorder.getByRole("button", { name: "Move D up", exact: true }).click();
       assert.deepEqual(await shown(), ["A", "B", "D", "C"]);
-      await page.locator(".plugin-admin__form-footer").getByText("Unsaved changes", { exact: true }).waitFor();
+      await page.locator(".plugin-admin__form-footer").getByText("1 unsaved change", { exact: true }).waitFor();
       // Keyboard drag: Space picks up, arrows move, Space drops.
       await reorder.getByRole("button", { name: "Drag A", exact: true }).focus();
       await page.keyboard.press("Space");

@@ -92,7 +92,8 @@ const json = (res, value, status = 200) => { res.writeHead(status, { "Content-Ty
 const answer = (res, request) => {
   const { command, values } = request;
   if (command === "open") return json(res, { ok: true, message: "", selection: values.selection });
-  if (command === "save" && values.title === "rejected") return json(res, { error: "Titles can't say rejected" }, 400);
+  if (command === "save" && values.title === "rejected") return json(res, { error: "Titles can't say rejected", field: "title" }, 400);
+  if (command === "save" && values.title === "unexplained") return json(res, { error: "The plugin refused this save" }, 400);
   if (command === "save" && values.title === "conflict") return json(res, { error: "Newer revision. Reload before saving." }, 409);
   revision++;
   if (command === "save") { title = values.title; return json(res, { ok: true, message: "Saved details" }); }
@@ -151,12 +152,17 @@ try {
       // The plugin's Cancel sits beside Submit, with no unsaved indicator yet.
       await footer.getByRole("button", { name: "Cancel", exact: true }).waitFor();
       assert.equal(await footer.getByRole("button", { name: "Save details", exact: true }).count(), 1);
-      assert.equal(await footer.getByText("Unsaved changes", { exact: true }).count(), 0);
+      assert.equal(await footer.getByText(/unsaved change/).count(), 0);
 
       // Editing shows the indicator and local Discard; the footer stays on
       // screen while the long form continues below the fold.
       await titleInput.fill("Draft title");
-      await footer.getByText("Unsaved changes", { exact: true }).waitFor();
+      await footer.getByText("1 unsaved change", { exact: true }).waitFor();
+      // The count follows each changed field.
+      await tab.getByLabel("Field 1", { exact: true }).fill("Changed");
+      await footer.getByText("2 unsaved changes", { exact: true }).waitFor();
+      await tab.getByLabel("Field 1", { exact: true }).fill("");
+      await footer.getByText("1 unsaved change", { exact: true }).waitFor();
       await titleInput.evaluate((node) => node.scrollIntoView({ block: "start" }));
       const geometry = await details.evaluate((group) => {
         const form = group.querySelector("form").getBoundingClientRect();
@@ -183,7 +189,7 @@ try {
       await titleInput.evaluate((node) => node.scrollIntoView({ block: "start" }));
       await footer.getByRole("button", { name: "Discard changes", exact: true }).click();
       assert.equal(await titleInput.inputValue(), "Example");
-      assert.equal(await footer.getByText("Unsaved changes", { exact: true }).count(), 0);
+      assert.equal(await footer.getByText(/unsaved change/).count(), 0);
 
       // Cancel with a draft asks first; keeping the draft sends nothing.
       await titleInput.fill("Draft title");
@@ -203,7 +209,7 @@ try {
       await details.locator("form").evaluate((form) => form.requestSubmit());
       await saving.click({ force: true }).catch(() => {});
       assert.equal(writes.length, 1, "a pending submit is sent once");
-      assert.equal(await footer.getByText("Unsaved changes", { exact: true }).count(), 0, "Saving replaces the unsaved indicator");
+      assert.equal(await footer.getByText(/unsaved change/).count(), 0, "Saving replaces the unsaved indicator");
       await shot("saving");
       held.shift()();
       await footer.locator(".plugin-admin__feedback").filter({ hasText: "Saved details" }).waitFor();
@@ -213,12 +219,26 @@ try {
       await footer.evaluate((node) => node.scrollIntoView({ block: "end" }));
       await shot("saved");
 
-      // A rejected save keeps the draft and explains why beside Submit.
+      // A rejected save that names a field explains why beside that field,
+      // marks it invalid and takes focus there; the draft stays.
       await titleInput.fill("rejected");
       await save.click();
-      await footer.getByRole("alert").filter({ hasText: "Titles can't say rejected" }).waitFor();
+      const titleRow = details.locator(".settings-row").filter({ has: titleInput });
+      await titleRow.getByRole("alert").filter({ hasText: "Titles can't say rejected" }).waitFor();
+      assert.equal(await titleInput.getAttribute("aria-invalid"), "true");
+      assert.equal(await titleInput.evaluate((node) => node === document.activeElement), true, "focus moves to the field");
+      assert.equal(await tab.locator(`#${await titleInput.getAttribute("aria-describedby")}`).textContent(), "Titles can't say rejected");
+      assert.equal(await footer.getByRole("alert").count(), 0, "not repeated in the footer");
       assert.equal(await titleInput.inputValue(), "rejected");
-      await footer.getByText("Unsaved changes", { exact: true }).waitFor();
+      await footer.getByText("1 unsaved change", { exact: true }).waitFor();
+      await titleInput.evaluate((node) => node.scrollIntoView({ block: "center" }));
+      await shot("field-error");
+      // One that names no field stays beside Submit.
+      await titleInput.fill("unexplained");
+      await save.click();
+      await footer.getByRole("alert").filter({ hasText: "The plugin refused this save" }).waitFor();
+      assert.equal(await titleRow.getByRole("alert").count(), 0);
+      assert.equal(await titleInput.getAttribute("aria-invalid"), null);
       await footer.evaluate((node) => node.scrollIntoView({ block: "end" }));
       await shot("error");
 

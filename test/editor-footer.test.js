@@ -78,3 +78,22 @@ test("album grouping forms offer Cancel grouping beside Submit at every step", a
   const create = await checkCancel(s, creating, "Cancel grouping", destination);
   assert.ok(find(create.actions, "Choose a different work"));
 });
+
+test("rejected saves name the field they are about, so the host can show them there", async (t) => {
+  const s = await boxSet(t);
+  const work = (await s.mutate("create-work", { title: "Field suite", movements: ["I. Allegro", "II. Adagio"] }, "")).selection;
+  const broadcast = await s.mutate("create-broadcast", { work, title: "Radio", date: "2026-99" }, `${work}!broadcast`);
+  assert.deepEqual([broadcast.ok, broadcast.status, broadcast.field], [false, 400, "date"]);
+  const untitled = await s.mutate("create-broadcast", { work, title: " ", date: "" }, `${work}!broadcast`);
+  assert.equal(untitled.field, "title");
+  const recording = (await s.mutate("create-broadcast", { work, title: "Radio", date: "2026", description: "" }, `${work}!broadcast`)).selection;
+  const details = await s.mutate("save-entity", { target: recording, date: "nope" }, recording);
+  assert.deepEqual([details.ok, details.field], [false, "date"]);
+  const self = await s.mutate("merge-open", { target: work, into: work }, `${work}!merge`);
+  assert.equal(self.field, "into");
+  const created = await s.mutate("create-work", { title: "", movements: [] }, "new:work");
+  assert.equal(created.field, "title");
+  // A refusal about no particular field names none.
+  const stale = await s.mutate("set-movement-order", { work, movements: ["x"], positions: ["1"] }, `${work}!reorder`);
+  assert.deepEqual([stale.status, stale.field], [409, undefined]);
+});
