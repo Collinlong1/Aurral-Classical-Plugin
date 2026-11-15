@@ -1,3 +1,11 @@
+# Metadata editor UI, item 7 (November 15, 2026)
+
+Item 6 is published at the user's request: core `fd5d60bb5c669c58267ec8b58d54935a6068b40f`, plugin 1.0.58 with paired CI `2b22ed2` pinning that core and running the reorder/review browser check. The user accepted item 5's two remaining gaps (unsaved count, field-level validation) for now.
+
+Item 7 keeps list navigation stable, in the generic admin-pages-v2 renderer only. Each tab remembers its search, page and scroll for the browser session. After following links to related entries, the tab button or the breadcrumb back to the list returns there, including after a reload. Links still open the entry's own tab at the page that holds it. Lists reached through links never replace a remembered place. No plugin, API or schema change; plugin remains 1.0.58.
+
+Validation: `pnpm check` passes (1089 unsafe-any uses, baseline unchanged); production build passes; full core unit suite UNIT_PENDING (still running when this was written). The new real-renderer list-places browser check failed on fd5d60b and passes at desktop/phone widths, three runs in a row. All six earlier browser checks pass at both widths. Not run: `pnpm eden test` (no Docker daemon), full Compose/restart, remote CI. Item 7 is committed on the session branch `claude/eager-babbage-gkwhxx` only, not on `aurral-classical`. All seven review items are now implemented.
+
 # Metadata editor UI, item 6 (November 15, 2026)
 
 Item 5 is published at the user's request: core `a26e013fea9bbc172e263aa3a294323f3b258927`, plugin 1.0.57 with paired CI `be404e3` pinning that core and running the footer browser check. The user then supplied the review's original seven recommendations; they are now recorded verbatim in plugin `EDITOR_UI_HANDOFF.md`. Against that text, item 5 still lacks an unsaved-change count and validation beside the affected field (raised with the user, not done).
