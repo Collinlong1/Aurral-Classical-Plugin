@@ -200,10 +200,21 @@ test("a merge adds the movements the kept work lacks and opens them; either way 
   const { c, read, mutate } = await boxSet(t);
   const keep = workTitled(c, "Sonata No. 3, Op. 3");
   const extra = newWork(c, "Sonata No. 3 (copy)", ["I. Allegro", "V. Finale"]);
-  const form = section((await read({ selection: `${keep}!merge` })).view, "merge");
-  assert.deepEqual(form.fields.find((f) => f.key === "direction").options.map((o) => o.value), ["into", "from"]);
-  // On the kept work: merge the other into this.
-  const merged = await mutate("merge-entity", { target: keep, into: extra, direction: "from", confirm: true }, keep);
+  const open = section((await read({ selection: `${keep}!merge` })).view, "merge");
+  assert.deepEqual(open.fields.map((f) => f.key), ["into"], "the merge form only picks the other work");
+  const step = await mutate(open.command, { ...open.arguments, into: extra }, `${keep}!merge`);
+  assert.equal(step.selection, `merge:${keep}:${extra}`);
+  const stepView = (await read({ selection: step.selection })).view;
+  // Both outcomes are shown before choosing the work that stays.
+  assert.ok(section(stepView, "keep-first").items.some((item) => /V\. Finale/.test(item.label)));
+  const form = section(stepView, "merge");
+  const direction = form.fields.find((f) => f.key === "direction");
+  assert.deepEqual(direction.options.map((o) => [o.value, o.label]), [["from", "The one you opened"], ["into", "The other one"]]);
+  assert.equal(direction.value, "from", "the work with recordings stays by default");
+  // (This host predates form footers, so Cancel is in the header.)
+  assert.equal(stepView.actions.find((a) => a.label === "Cancel").arguments.selection, `${keep}!merge`, "Cancel returns to the merge form");
+  // Keep this work: merge the other into it.
+  const merged = await mutate(form.command, { ...form.arguments, direction: "from" }, step.selection);
   assert.equal(merged.ok, true, merged.message);
   assert.equal(merged.selection, `${keep}!movements`);
   assert.equal(merged.focus, "movements");
@@ -231,13 +242,17 @@ test("identity reviews say what they ask and offer the fixes", async (t) => {
   assert.ok(details.includes("Matched a MusicBrainz work only 80% sure; not linked until you confirm"), details.join("\n"));
   const id = c.db.prepare("SELECT id FROM review_item WHERE kind='identity' AND target_id=?").get(other).id;
   const view = (await read({ selection: `review:${id}` })).view;
-  const labels = view.actions.map((a) => a.label);
-  for (const label of ["Merge into “Sonata No. 4, Op. 4”", "Merge “Sonata No. 4, Op. 4” into this", "Link here instead", "Dismiss"]) assert.ok(labels.includes(label), labels.join(", "));
+  // Question first, then one decision per choice; the header only navigates.
+  assert.deepEqual(view.sections.slice(0, 2).map((item) => item.id), ["evidence", "decide"]);
+  assert.equal(view.actions.some((a) => ["merge-entity", "move-identity", "resolve-review"].includes(a.command)), false);
+  const decide = section(view, "decide");
+  assert.deepEqual(decide.rows.map((row) => row.label), ["Merge “Sonata No. 5, Op. 5” and “Sonata No. 4, Op. 4”", "Link the record here instead", "Keep separate", ...decide.rows.slice(3).map((row) => row.label)]);
+  assert.equal(decide.rows[0].actions[0].arguments.selection, `merge:${other}:${holder}:${id}`);
   const facts = Object.fromEntries(section(view, "evidence").items.map((item) => [item.label, item.value]));
   assert.equal(facts["Now linked to"], "Sonata No. 4, Op. 4");
   assert.equal(facts["MusicBrainz work"], "https://musicbrainz.org/work/11111111-1111-1111-1111-111111111111");
   assert.ok(section(view, "compare"), "both works side by side");
-  const link = view.actions.find((a) => a.label === "Link here instead");
+  const link = decide.rows[1].actions[0];
   assert.equal((await mutate(link.command, link.arguments, `review:${id}`)).ok, true);
   const active = c.db.prepare("SELECT entity_id FROM external_identity WHERE record_id=? AND state='active'").all("11111111-1111-1111-1111-111111111111").map((row) => ({ ...row }));
   assert.deepEqual(active, [{ entity_id: other }]);

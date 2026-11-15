@@ -7,7 +7,7 @@ import { classify } from "./reconcile.js";
 import { searchText, matchesSearch, ownedTracks } from "./editor-search.js";
 import { searchDiagnostics } from "../source.js";
 import { ensureSearchIndex } from "../search/engine.js";
-import { renderV2, lookupV2, applyV2, V2_COMMANDS, EditorV2Error, warnDuplicate, parseAlbumSelection, parseEntitySelection, finishWorkMutation, nextReview } from "./editor-v2.js";
+import { renderV2, lookupV2, applyV2, V2_COMMANDS, EditorV2Error, warnDuplicate, parseAlbumSelection, parseEntitySelection, finishWorkMutation, nextReview, parseMergeSelection } from "./editor-v2.js";
 
 class EditorError extends Error {
   constructor(message, status = 400) {
@@ -54,6 +54,11 @@ function scopeIds(c, scope) {
     const id = scope.slice(7);
     const row = c.db.prepare("SELECT data FROM change_set WHERE id=?").get(id);
     return [id, ...(row ? JSON.parse(row.data).works || [] : [])];
+  }
+  // The merge step: both entries (and the review it came from).
+  if (scope.startsWith("merge:")) {
+    const { a, b, review } = parseMergeSelection(scope);
+    return [a, b, ...(review ? [review] : [])];
   }
   if (scope.startsWith("bulk:")) {
     const row = c.db.prepare("SELECT data FROM change_set WHERE id=? AND kind='selection'").get(scope.slice(5));
@@ -1120,6 +1125,7 @@ export async function readEditor(input) {
               downloads,
               maintenance,
               formActions: input.capabilities.formActions === true,
+              orderField: input.capabilities.orderField === true,
             }),
       );
     }

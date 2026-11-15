@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { boxSet } from "./box-set.js";
-import { mutateEditor } from "../src/model/editor.js";
+import { mutateEditor, readEditor } from "../src/model/editor.js";
 
 const section = (view, id) => view.sections.find((item) => item.id === id);
 const formCount = (view) => view.sections.filter((item) => item.type === "form").length;
@@ -68,8 +68,10 @@ test("work section mutations return to the relevant section and preserve paginat
   assert.equal(after.rows.length, 2);
   assert.equal(after.pager.label, "Movements 101–102 of 102");
   assert.ok(after.rows.some((row) => row.label === "Finale"));
-  const move = after.rows[1].actions.find((item) => item.command === "move-movement");
-  const moved = await s.mutate(move.command, move.arguments, added.selection);
+  const reordering = await go(s, added.selection, "Reorder movements");
+  const reorder = section((await s.read({ selection: reordering })).view, "reorder");
+  const positions = reorder.fields[0].value.map((_, i) => String(i === 100 ? 102 : i === 101 ? 101 : i + 1));
+  const moved = await s.mutate(reorder.command, { ...reorder.arguments, positions }, reordering);
   assert.equal(moved.ok, true, moved.message);
   assert.equal(moved.selection, added.selection);
   const credits = await go(s, s.work, "Credits");
@@ -122,7 +124,7 @@ test("Reorder movements moves several at once and keeps the rest in order", asyn
   // E to 1 and A to 3: the others keep their order around them.
   const saved = await s.mutate(form.command, { ...form.arguments, positions: ["3", "2", "3", "4", "1"] }, reordering);
   assert.equal(saved.ok, true, saved.message);
-  assert.match(saved.message, /moved 2 movements/);
+  assert.equal(saved.message, "Movement order saved.");
   assert.equal(saved.selection, movements, "returns to Movements");
   assert.equal(saved.focus, "movements");
   const [a, b, c, d, e] = ids;
@@ -137,6 +139,23 @@ test("Reorder movements moves several at once and keeps the rest in order", asyn
   assert.equal(invalid.ok, false);
   assert.equal(invalid.status, 400);
   assert.deepEqual(names(), [e, b, a, c, d]);
+
+  // Each movement is reordered in this form, not saved one click at a time.
+  assert.equal(section((await s.read({ selection: movements })).view, "movements").rows.some((row) => row.actions.some((item) => item.command === "move-movement")), false);
+
+  // A host with order fields gets the list itself and sends the new order.
+  const host = { ...s.input, capabilities: { adminForms: 2, formActions: true, orderField: true } };
+  const ordered = section((await readEditor({ ...host, query: { selection: reordering } })).view, "reorder");
+  assert.deepEqual(ordered.fields.map((field) => [field.key, field.type]), [["order", "order"]]);
+  assert.deepEqual(ordered.fields[0].value, [e, b, a, c, d]);
+  assert.equal(ordered.fields[0].options[0].label, "E");
+  const revision = (await readEditor({ ...host, query: { selection: reordering } })).revision;
+  const reordered = await mutateEditor({ ...host, mutation: { revision, command: ordered.command, values: { ...ordered.arguments, order: [a, b, c, d, e] } } });
+  assert.equal(reordered.ok, true, reordered.message);
+  assert.deepEqual(names(), [a, b, c, d, e]);
+  const missing = await mutateEditor({ ...host, mutation: { revision: (await readEditor({ ...host, query: { selection: reordering } })).revision, command: ordered.command, values: { ...ordered.arguments, movements: [a, b, c, d, e], order: [a, a, c, d, e] } } });
+  assert.equal(missing.ok, false);
+  assert.equal(missing.status, 400);
 
   // A single movement has nothing to reorder.
   const single = await fixture(t, ["Only"]);

@@ -88,7 +88,7 @@ try {
     const cleanup = [];
     fixture = await boxSet({ after: (fn) => cleanup.push(fn) });
     // The capabilities core sends: forms carry Cancel beside Submit.
-    fixture.input.capabilities = { adminForms: 2, formActions: true };
+    fixture.input.capabilities = { adminForms: 2, formActions: true, orderField: true };
     const context = await browser.newContext({ viewport: { width, height: 900 } });
     const page = await context.newPage();
     page.setDefaultTimeout(15000);

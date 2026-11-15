@@ -451,12 +451,19 @@ test("#16 duplicate-work and same-name reviews offer the merge that settles them
   s.c.review("identity", b, { reason: "duplicate-work", keep: a });
   let review = s.c.db.prepare("SELECT id FROM review_item WHERE target_id=?").get(b).id;
   let view = (await s.read({ selection: `review:${review}` })).view;
-  // Side by side, with what a merge would do.
+  // Side by side; Merge leads to a step that shows both outcomes and asks
+  // which work stays.
   assert.deepEqual(section(view, "compare").rows.find((r) => r.id === "Title").badge.label, "Same");
-  assert.equal(section(view, "merge-preview").items[0].selection, a);
-  let merge = section(view, "decide").actions.find((x) => x.command === "merge-entity");
-  assert.deepEqual(merge.arguments, { target: b, into: a, confirm: true });
-  const merged = await s.ok("merge-entity", merge.arguments, `review:${review}`);
+  const decide = section(view, "decide");
+  assert.deepEqual(decide.rows.map((row) => row.id), [`merge-${a}`, "separate"]);
+  const step = decide.rows[0].actions[0].arguments.selection;
+  assert.equal(step, `merge:${b}:${a}:${review}`);
+  const stepView = (await s.read({ selection: step })).view;
+  assert.equal(section(stepView, "keep-second").items[0].selection, a);
+  let merge = section(stepView, "merge");
+  assert.deepEqual(merge.arguments, { target: b, into: a, confirm: true, review });
+  assert.deepEqual(stepView.actions.find((x) => x.label === "Cancel").arguments, { selection: `review:${review}` }, "Cancel returns to the review");
+  const merged = await s.ok(merge.command, { ...merge.arguments, direction: "into" }, step);
   assert.equal(merged.selection, "", "the queue is empty, so the list comes back");
   assert.deepEqual(liveWorks(s), [a]);
   // The merge is undoable from History.
@@ -470,14 +477,18 @@ test("#16 duplicate-work and same-name reviews offer the merge that settles them
   const again = s.c.db.prepare("SELECT id FROM review_item WHERE target_id=? AND status='open'").get(b)?.id;
   assert.ok(again, "the review comes back with the work");
   view = (await s.read({ selection: `review:${again}` })).view;
-  await s.ok("keep-distinct", section(view, "decide").actions.find((x) => x.command === "keep-distinct").arguments, `review:${again}`);
+  await s.ok("keep-distinct", section(view, "decide").rows.find((row) => row.id === "separate").actions[0].arguments, `review:${again}`);
   assert.ok(s.c.db.prepare("SELECT 1 FROM match_suppression WHERE key LIKE 'distinct:%'").get());
   const p1 = (await s.ok("create-contributor", { name: "Johann Strauss", kind: "person" })).selection;
   const p2 = (await s.ok("create-contributor", { name: "Johann Strauss", kind: "person" })).selection;
   s.c.review("identity", p2, { reason: "same-name-composers", name: "Johann Strauss" });
   review = s.c.db.prepare("SELECT id FROM review_item WHERE target_id=?").get(p2).id;
-  merge = (await s.read({ selection: `review:${review}` })).view.actions.find((x) => x.command === "merge-entity");
-  assert.deepEqual(merge.arguments, { target: p2, into: p1, confirm: true });
+  const choice = section((await s.read({ selection: `review:${review}` })).view, "decide").rows[0].actions[0].arguments.selection;
+  merge = section((await s.read({ selection: choice })).view, "merge");
+  assert.deepEqual(merge.arguments, { target: p2, into: p1, confirm: true, review });
+  const people = await s.ok(merge.command, { ...merge.arguments, direction: "into" }, choice);
+  assert.equal(people.selection, "", "the last review is settled");
+  assert.ok(s.c.db.prepare("SELECT deleted_at FROM entity WHERE id=?").get(p2).deleted_at);
 });
 
 test("#22 creating a work that already exists asks first, and the album page points to it", async (t) => {

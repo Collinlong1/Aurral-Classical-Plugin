@@ -376,8 +376,8 @@ function identityQuestion(c, review) {
 }
 
 // Two works that may be one, side by side: each field for both, differences
-// marked, and what a merge would do before it is done.
-function duplicateSections(c, a, b, reviewId) {
+// marked.
+function compareWorks(c, a, b) {
   const m = new Metadata(c);
   const value = (work, field) => display(m.resolve(work, field).value);
   const movementsOf = (work) => workMovements(c, work);
@@ -410,42 +410,98 @@ function duplicateSections(c, a, b, reviewId) {
       badge: same ? { label: "Same", tone: "muted" } : { label: "Differs", tone: "warning" },
     };
   });
-  const movementNames = (id) => entityLabel(c, id, "movement");
-  // What a merge would do, either way round.
-  const previewItems = (keep, drop) => {
-    const preview = mergePreview(c, keep, drop, { addMissing: true });
-    return [
-      { label: "Kept", value: `“${entityLabel(c, keep, "work")}”, with its title and fields; fields set on the other are not copied`, selection: keep },
-      { label: "Recordings after", value: `${realizationsOf(a).length + realizationsOf(b).length}, every track keeps its file` },
-      ...preview.mapped.slice(0, 20).map(({ from, to }) => ({ label: movementNames(from), value: `becomes ${movementNames(to)}` })),
-      ...preview.added.slice(0, 10).map((id) => ({ label: movementNames(id), value: "added to the kept work, at the end" })),
-      { label: "Undo", value: "From Activity, until either work changes again" },
-    ];
+  return {
+    type: "rows",
+    id: "compare",
+    title: "Side by side",
+    note: "This work first, the other second. Open either to edit it; the comparison updates when you come back.",
+    rows,
+    actions: [open("Edit this work", a), open("Edit the other work", b)],
   };
+}
+
+// What merging `drop` into `keep` does, said before it is done.
+function mergeOutcome(c, keep, drop) {
+  const kind = c.entity(keep).kind;
+  const label = (id) => labelOf(c, id) || entityLabel(c, id, kind);
+  if (kind !== "work") {
+    const moving = c.db.prepare("SELECT count(*) AS n FROM credit WHERE contributor_id=?").get(drop).n;
+    return [
+      { label: "Stays", value: `“${label(keep)}”, with its name and fields`, selection: keep },
+      { label: "Removed", value: `“${label(drop)}”` },
+      { label: "Credits moved", value: `${moving}, to “${label(keep)}”` },
+      { label: "Undo", value: "Not possible: check before merging" },
+    ];
+  }
+  const preview = mergePreview(c, keep, drop, { addMissing: true });
+  const movement = (id) => entityLabel(c, id, "movement");
+  if (!preview.ok) return [{ label: "Can't merge this way", value: "The movements don't line up. Rename or reorder them so they match, then merge." }];
   return [
-    {
-      type: "rows",
-      id: "compare",
-      title: "Side by side",
-      note: "This work first, the other second. Open either to edit it; the comparison updates when you come back.",
-      rows,
-      actions: [open("Edit this work", a), open("Edit the other work", b)],
-    },
-    { type: "details", id: "merge-preview", title: "If you merge this into the other work", items: previewItems(b, a) },
-    { type: "details", id: "merge-preview-other", title: "If you merge the other work into this", items: previewItems(a, b) },
-    {
-      type: "rows",
-      id: "decide",
-      title: "Decide",
-      rows: [],
-      empty: "Merge either way, keep both as separate works, or dismiss to decide later.",
-      actions: [
-        action("Merge into the other", "merge-entity", { target: a, into: b, confirm: true }, { tone: "danger", confirm: "Move this work's recordings, credits, favourites and picks into the other work, then remove this one? You can undo it from Activity." }),
-        action("Merge the other into this", "merge-entity", { target: a, into: b, direction: "from", confirm: true }, { tone: "danger", confirm: "Move the other work's recordings, credits, favourites and picks into this one, then remove the other? You can undo it from Activity." }),
-        action("Keep both", "keep-distinct", { id: reviewId }),
-      ],
-    },
+    { label: "Stays", value: `“${label(keep)}”, with its title and fields; fields set on the other are not copied`, selection: keep },
+    { label: "Removed", value: `“${label(drop)}”` },
+    { label: "Recordings after", value: `${realizations(c, keep).length + realizations(c, drop).length}, every track keeps its file` },
+    ...preview.mapped.slice(0, 20).map(({ from, to }) => ({ label: movement(from), value: `becomes ${movement(to)}` })),
+    ...preview.added.slice(0, 10).map((id) => ({ label: movement(id), value: "added to the kept work, at the end" })),
+    { label: "Undo", value: "From Activity, until either work changes again" },
   ];
+}
+
+// The merge step: two named entries, what happens either way round, and the
+// choice of the one that stays. `review` is the review item it came from.
+export function parseMergeSelection(selection) {
+  const [, a = "", b = "", review = ""] = selection.split(":");
+  if (!a || !b || a === b) fail("Choose two different entries to merge");
+  return { a, b, review };
+}
+const mergeSelection = (a, b, review = "") => `merge:${a}:${b}${review ? `:${review}` : ""}`;
+const MERGEABLE = { work: ["work"], person: ["person", "ensemble"], ensemble: ["person", "ensemble"] };
+function mergeView(c, a, b, review) {
+  const first = c.db.prepare("SELECT kind FROM entity WHERE id=? AND deleted_at IS NULL").get(a);
+  const second = c.db.prepare("SELECT kind FROM entity WHERE id=? AND deleted_at IS NULL").get(b);
+  if (!first || !second) fail("One of these entries no longer exists");
+  if (!(MERGEABLE[first.kind] || []).includes(second.kind)) fail("These two entries can't be merged");
+  const work = first.kind === "work";
+  const label = (id) => `“${labelOf(c, id) || entityLabel(c, id, first.kind)}”`;
+  const weight = (id) => (work ? realizations(c, id).length : c.db.prepare("SELECT count(*) AS n FROM credit WHERE contributor_id=?").get(id).n);
+  // Duplicates usually share a name, so each is also named by its role.
+  const count = (id) => `${weight(id)} ${work ? "recording" : "credit"}${weight(id) === 1 ? "" : "s"}`;
+  const named = { [a]: `${label(a)} (the one you opened · ${count(a)})`, [b]: `${label(b)} (the other · ${count(b)})` };
+  const back = review ? `review:${review}` : work ? entitySelection(a, 0, "merge") : a;
+  return {
+    crumbs: [],
+    title: work ? "Merge two works" : "Merge two entries",
+    subtitle: `${named[a]} and ${named[b]}`.slice(0, 500),
+    badges: [],
+    actions: [],
+    sections: [
+      { type: "details", id: "keep-first", title: `If ${named[a]} stays`.slice(0, 200), items: mergeOutcome(c, a, b) },
+      { type: "details", id: "keep-second", title: `If ${named[b]} stays`.slice(0, 200), items: mergeOutcome(c, b, a) },
+      {
+        type: "form",
+        id: "merge",
+        title: "Merge",
+        note: `Choose the entry that stays. Everything from the other moves to it, then the other is removed.${work ? " You can undo it from Activity." : " This can't be undone."}`,
+        command: "merge-entity",
+        arguments: { target: a, into: b, confirm: true, ...(review && { review }) },
+        submitLabel: "Merge",
+        actions: [open("Cancel", back)],
+        fields: [
+          {
+            key: "direction",
+            label: "Entry that stays",
+            type: "select",
+            // The one with more recordings (or credits) by default.
+            value: weight(a) > weight(b) ? "from" : "into",
+            options: [
+              { value: "from", label: "The one you opened" },
+              { value: "into", label: "The other one" },
+            ],
+          },
+        ],
+      },
+      ...(work ? [compareWorks(c, a, b)] : []),
+    ],
+  };
 }
 
 // What deleting works takes with it, said before it happens.
@@ -553,29 +609,18 @@ const mergeForm = (target, lookup, noun, note) => ({
   type: "form",
   id: "merge",
   title: `Merge with another ${noun}`,
-  note,
-  command: "merge-entity",
+  note: `${note} Next you see both side by side and choose the one that stays.`,
+  command: "merge-open",
   arguments: { target },
-  submitLabel: "Merge",
+  submitLabel: "Continue",
   fields: [
     { key: "into", label: `Other ${noun}`, type: "lookup", lookup, value: "", placeholder: `Search ${noun}s`, required: true },
-    {
-      key: "direction",
-      label: "Which one stays",
-      type: "select",
-      value: "into",
-      options: [
-        { value: "into", label: `Merge this ${noun} into the other (the other stays)` },
-        { value: "from", label: `Merge the other ${noun} into this one (this one stays)` },
-      ],
-    },
-    { key: "confirm", label: `Remove the ${noun} merged away after moving everything`, type: "checkbox", value: false },
   ],
 });
 
 // ---- views ---------------------------------------------------------------
 
-function workView(c, work, page = 0, section = "details") {
+function workView(c, work, page = 0, section = "details", { orderField = false } = {}) {
   const current = WORK_FORMS[section] || section;
   const title = entityLabel(c, work, "work");
   const composers = credits(c, work).filter((credit) => credit.role === "composer");
@@ -634,8 +679,10 @@ function workView(c, work, page = 0, section = "details") {
           detail: performances.length ? `In ${coverage.get(movement.id) || 0} of ${performances.length} recordings` : undefined,
           selection: movement.id,
           actions: [
-            ...(index > 0 ? [action("Move up", "move-movement", { work, movement: movement.id, direction: "up" })] : []),
-            ...(index < movements.length - 1 ? [action("Move down", "move-movement", { work, movement: movement.id, direction: "down" })] : []),
+            // Reorder movements puts them in order with one save; a work
+            // too long for that form keeps step-by-step moves.
+            ...(movements.length > REORDER_LIMIT && index > 0 ? [action("Move up", "move-movement", { work, movement: movement.id, direction: "up" })] : []),
+            ...(movements.length > REORDER_LIMIT && index < movements.length - 1 ? [action("Move down", "move-movement", { work, movement: movement.id, direction: "down" })] : []),
             ...(coverage.get(movement.id) ? [] : [action("Delete", "delete-movement", { work, movement: movement.id }, { tone: "danger", confirm: "Delete this movement?" })]),
           ],
         })), page, work, "Movements", "movements"),
@@ -644,12 +691,20 @@ function workView(c, work, page = 0, section = "details") {
         type: "form",
         id: "reorder",
         title: "Reorder movements",
-        note: "Change the number of each movement you want to move; the others keep their order around them. Nothing changes until you save.",
+        note: orderField
+          ? "Drag a movement by its handle, or use its arrows (with the keyboard: Space to pick up, arrow keys, Space to drop). Nothing changes until you save."
+          : "Change the number of each movement you want to move; the others keep their order around them. Nothing changes until you save.",
         command: "set-movement-order",
         arguments: { work, movements: movements.map((movement) => movement.id) },
         submitLabel: "Save order",
         fields: [
-          {
+          orderField ? {
+            key: "order",
+            label: "Movements",
+            type: "order",
+            value: movements.slice(0, REORDER_LIMIT).map((movement) => movement.id),
+            options: movements.slice(0, REORDER_LIMIT).map((movement) => ({ value: movement.id, label: entityLabel(c, movement.id, "movement").slice(0, 500) })),
+          } : {
             key: "positions",
             label: "Position",
             type: "mapping",
@@ -1185,6 +1240,9 @@ function reviewView(c, id) {
   const evidence = track ? JSON.parse(track.evidence) : null;
   const entity = c.db.prepare("SELECT kind FROM entity WHERE id=? AND deleted_at IS NULL").get(review.target_id);
   const actions = [];
+  // Reviews about two entries that may be one: decided as Merge, Keep
+  // separate or Skip, with the entry that stays chosen in the merge step.
+  const pairs = [];
   if (review.kind === "classification" && track)
     actions.push(
       action("Send to Classical", "set-classification", { tracks: [review.target_id], state: "classical" }),
@@ -1198,12 +1256,10 @@ function reviewView(c, id) {
     const holderKind = c.db.prepare("SELECT kind FROM entity WHERE id=?").get(identity.holder)?.kind;
     const holderName = labelOf(c, identity.holder) || "the other entry";
     actions.push(open(`Open “${holderName}”`.slice(0, 100), identity.holder));
-    actions.unshift(action("Link here instead", "move-identity", { id }, { confirm: `Link this ${providerName(identity.provider)} ${identity.recordKind} to this entry and take it off “${holderName}”?`.slice(0, 500) }));
+    const link = action("Link here instead", "move-identity", { id }, { confirm: `Link this ${providerName(identity.provider)} ${identity.recordKind} to this entry and take it off “${holderName}”?`.slice(0, 500) });
     if (entity && holderKind === entity.kind && ["work", "person", "ensemble"].includes(entity.kind))
-      actions.unshift(
-        action(`Merge into “${holderName}”`.slice(0, 100), "merge-entity", { target: review.target_id, into: identity.holder, confirm: true }, { tone: "danger", confirm: `Same ${entity.kind}: move everything from this entry into “${holderName}”, then remove this one?${entity.kind === "work" ? " You can undo it from Activity." : ""}`.slice(0, 500) }),
-        action(`Merge “${holderName}” into this`.slice(0, 100), "merge-entity", { target: review.target_id, into: identity.holder, direction: "from", confirm: true }, { tone: "danger", confirm: `Same ${entity.kind}: move everything from “${holderName}” into this entry, then remove it?${entity.kind === "work" ? " You can undo it from Activity." : ""}`.slice(0, 500) }),
-      );
+      pairs.push({ other: identity.holder, link, why: `“${holderName}” has this ${providerName(identity.provider)} ${identity.recordKind || "record"}` });
+    else actions.unshift(link);
   } else if (identity && !identity.linkedHere && entity)
     actions.unshift(action(`Link to this ${providerName(identity.provider)} ${identity.recordKind || "record"}`.slice(0, 100), "move-identity", { id }));
   // Minimum fixes for reviews that otherwise block their entry.
@@ -1211,12 +1267,7 @@ function reviewView(c, id) {
   if (review.kind === "identity" && review.evidence.reason === "same-name-composers" && entity) {
     const name = searchText(String(review.evidence.name || labelOf(c, review.target_id) || ""));
     for (const other of entities(c, ["person"]).filter((p) => p.id !== review.target_id && searchText(p.label) === name).slice(0, 5))
-      actions.unshift(
-        action(`Same person: merge into “${other.label}”`.slice(0, 100), "merge-entity", { target: review.target_id, into: other.id, confirm: true }, {
-          tone: "danger",
-          confirm: "Move every credit to the other entry, then remove this one?",
-        }),
-      );
+      pairs.push({ other: other.id });
   }
   const conflicts = review.kind === "provider_conflict" ? review.evidence.entries || { [review.evidence.field]: review.evidence } : {};
   for (const [field, entry] of Object.entries(conflicts))
@@ -1238,9 +1289,14 @@ function reviewView(c, id) {
       actions.push(open(`Open “${labelOf(c, candidate) || "candidate"}”`.slice(0, 100), candidate));
   if (review.kind === "auto_match" && review.evidence.reason === "deleted-work")
     actions.unshift(action("Allow this work again", "allow-work", { id }));
-  actions.push(action("Dismiss", "resolve-review", { id }));
+  const distinct = review.kind === "identity" && review.evidence.reason === "duplicate-work" && entity && live(review.evidence.keep);
+  if (distinct) pairs.push({ other: review.evidence.keep });
   const next = nextReview(c, id);
-  if (next) actions.push(open("Skip", `review:${next}`));
+  // Decisions about a pair live in Decide; the header keeps navigation.
+  if (!pairs.length) {
+    actions.push(action("Dismiss", "resolve-review", { id }));
+    if (next) actions.push(open("Skip", `review:${next}`));
+  }
   const items = [];
   if (evidence)
     items.push(
@@ -1253,6 +1309,8 @@ function reviewView(c, id) {
     items.push({ label: "Question", value: identityQuestion(c, review) });
     if (entity) {
       items.push({ label: "This entry", value: `${labelOf(c, review.target_id) || "Untitled"} (${entity.kind})`, selection: review.target_id });
+      for (const { other } of pairs.filter((pair) => !pair.link))
+        items.push({ label: "The other entry", value: `${labelOf(c, other) || "Untitled"} (${c.entity(other).kind})`, selection: other });
       if (entity.kind === "work") {
         items.push({ label: "Composers", value: composerNames(c, review.target_id).join(", ") || "None" });
         const recordings = realizations(c, review.target_id).length;
@@ -1271,7 +1329,7 @@ function reviewView(c, id) {
       }
       if (typeof review.evidence.evidence === "string") items.push({ label: "Matched by", value: review.evidence.evidence.slice(0, 2000) });
     }
-    items.push({
+    if (!pairs.length) items.push({
       label: "What to do",
       value: identity?.holder
         ? "If both entries are the same piece, merge them (either way round). If this entry is the right match, Link here instead. If neither, dismiss: nothing is linked."
@@ -1286,13 +1344,32 @@ function reviewView(c, id) {
     items.push({ label: `Conflicting ${field}`, value: (entry.values || []).map((value) => `${providerName(value.provider)}: ${display(value.value)}`).join(" · ").slice(0, 500) || "Values differ" });
   for (const entry of Object.values(review.kind === "provider_omission" ? review.evidence.entries || {} : {}))
     items.push({ label: "No longer provided", value: `${entry.field} (${providerName(entry.provider)})` });
-  const sections = items.length ? [{ type: "details", id: "evidence", title: "What we know", items }] : [];
+  const sections = items.length ? [{ type: "details", id: "evidence", title: pairs.length ? "The question" : "What we know", items }] : [];
+  if (pairs.length) {
+    const name = (entry) => `“${labelOf(c, entry) || "Untitled"}”`;
+    const rows = pairs.map(({ other }) => ({
+      id: `merge-${other}`,
+      label: `Merge ${name(review.target_id)} and ${name(other)}`.slice(0, 500),
+      detail: "They are the same. Next you see both side by side, choose the one that stays, and confirm.",
+      actions: [open("Merge…", mergeSelection(review.target_id, other, id))],
+    }));
+    const link = pairs.find((pair) => pair.link)?.link;
+    if (link) rows.push({ id: "link", label: "Link the record here instead", detail: `${pairs[0].why}. This moves it to ${name(review.target_id)}; both entries stay.`.slice(0, 500), actions: [link] });
+    rows.push({
+      id: "separate",
+      label: "Keep separate",
+      detail: distinct ? "They are different works. Matching won't suggest merging them again." : "They are different. Nothing is merged or linked, and this item closes.",
+      actions: [distinct ? action("Keep separate", "keep-distinct", { id }) : action("Keep separate", "resolve-review", { id })],
+    });
+    if (next) rows.push({ id: "skip", label: "Skip", detail: "Decide later; the next item opens.", actions: [open("Skip", `review:${next}`)] });
+    sections.push({ type: "rows", id: "decide", title: "Decide", rows });
+  }
   // Fix the entry here: its own fields, without leaving the queue.
   if (entity && (review.kind !== "identity" || identity)) sections.push({ ...detailsForm(c, review.target_id, entity.kind), title: `Edit ${entity.kind}` });
   if (identity?.holder && entity?.kind === "work" && live(identity.holder) && c.db.prepare("SELECT kind FROM entity WHERE id=?").get(identity.holder)?.kind === "work")
-    sections.push(...duplicateSections(c, review.target_id, identity.holder, id).filter((section) => section.id !== "decide"));
+    sections.push(compareWorks(c, review.target_id, identity.holder));
   if (review.kind === "identity" && review.evidence.reason === "duplicate-work" && entity && live(review.evidence.keep))
-    sections.push(...duplicateSections(c, review.target_id, review.evidence.keep, id));
+    sections.push(compareWorks(c, review.target_id, review.evidence.keep));
   const position = c.db.prepare("SELECT count(*) AS n FROM review_item WHERE status='open'").get().n;
   return {
     crumbs: [],
@@ -1695,7 +1772,7 @@ function hoistFormActions(view) {
   return view;
 }
 
-export function renderV2(c, query, revision, { downloads = null, maintenance = null, formActions = false } = {}) {
+export function renderV2(c, query, revision, { downloads = null, maintenance = null, formActions = false, orderField = false } = {}) {
   const q = String(query.q || "");
   if (q.length > 200) fail("Search is too long");
   let offset = Number(query.offset || 0);
@@ -1705,7 +1782,11 @@ export function renderV2(c, query, revision, { downloads = null, maintenance = n
   // Opening an entry from a link picks the matching tab.
   if (!tab) {
     const kind = selection && !selection.includes(":") ? c.db.prepare("SELECT kind,data FROM entity WHERE id=?").get(parseEntitySelection(selection).id) : null;
-    tab = selection.startsWith("slskd:") || selection === "maintenance" || selection.startsWith("change:")
+    const subject = selection.startsWith("merge:") ? parseMergeSelection(selection) : null;
+    const subjectRow = subject ? c.db.prepare("SELECT kind,data FROM entity WHERE id=?").get(subject.a) : null;
+    tab = subject
+      ? subject.review ? "review" : subjectRow?.kind === "work" ? "works" : subjectRow && isComposer(c, { id: subject.a, data: JSON.parse(subjectRow.data) }) ? "composers" : "performers"
+      : selection.startsWith("slskd:") || selection === "maintenance" || selection.startsWith("change:")
       ? "activity"
         : selection.startsWith("bulk:")
           ? "works"
@@ -1740,6 +1821,10 @@ export function renderV2(c, query, revision, { downloads = null, maintenance = n
   else if (selection.startsWith("change:")) view = changeView(c, selection.slice(7));
   else if (selection === "maintenance") view = maintenanceView(maintenance);
   else if (selection.startsWith("bulk:")) view = bulkView(c, selection.slice(5));
+  else if (selection.startsWith("merge:")) {
+    const { a, b, review } = parseMergeSelection(selection);
+    view = mergeView(c, a, b, review);
+  }
   else if (selection.startsWith("review:")) view = reviewView(c, selection.slice(7));
   else if (selection.startsWith("new:")) view = newView(selection.slice(4));
   else if (selection) {
@@ -1750,7 +1835,7 @@ export function renderV2(c, query, revision, { downloads = null, maintenance = n
     const parsed = { ...entity, data: JSON.parse(entity.data), label: entityLabel(c, entity.id, entity.kind) };
     view =
       entity.kind === "work"
-        ? workView(c, entity.id, page, section || (page > 0 ? "movements" : "details"))
+        ? workView(c, entity.id, page, section || (page > 0 ? "movements" : "details"), { orderField })
         : entity.kind === "person" || entity.kind === "ensemble"
           ? contributorView(c, parsed, page)
           : entity.kind === "movement"
@@ -1847,10 +1932,11 @@ export const V2_COMMANDS = {
   "save-entity": null,
   "set-blank": ["target", "field"],
   "move-movement": ["work", "movement", "direction"],
-  "set-movement-order": ["work", "movements", "positions"],
+  "set-movement-order": ["work", "movements", "positions", "order"],
   "delete-movement": ["work", "movement"],
   "delete-entity": ["target"],
-  "merge-entity": ["target", "into", "confirm", "direction"],
+  "merge-entity": ["target", "into", "confirm", "direction", "review"],
+  "merge-open": ["target", "into"],
   "delete-works": ["works"],
   "bulk-edit-open": ["works"],
   "bulk-edit": ["token", "period", "form", "key", "instrumentation", "composer"],
@@ -2001,16 +2087,25 @@ export function applyV2(c, request, who) {
       const rows = c.db.prepare("SELECT target_id FROM relation WHERE kind='movement' AND source_id=? ORDER BY position").all(work).map((r) => r.target_id);
       if (!Array.isArray(v.movements) || v.movements.length !== rows.length || v.movements.some((id, i) => id !== rows[i]))
         throw new EditorV2Error("The movements changed since this page loaded. Reload, then reorder again.", 409);
-      const positions = Array.isArray(v.positions) ? v.positions.map(Number) : [];
-      if (positions.length !== rows.length || positions.some((n) => !Number.isInteger(n) || n < 1 || n > rows.length)) fail("Choose a position for every movement");
-      const moved = rows.map((id, i) => ({ id, i, to: positions[i] })).filter(({ i, to }) => to !== i + 1);
+      let order;
+      if (v.order !== undefined) {
+        // The whole new order, from a host with order fields.
+        if (!Array.isArray(v.order) || v.order.length !== rows.length || new Set(v.order).size !== rows.length || v.order.some((id) => !rows.includes(id)))
+          fail("The new order must list each movement once");
+        order = [...v.order];
+      } else {
+        const positions = Array.isArray(v.positions) ? v.positions.map(Number) : [];
+        if (positions.length !== rows.length || positions.some((n) => !Number.isInteger(n) || n < 1 || n > rows.length)) fail("Choose a position for every movement");
+        const shifted = rows.map((id, i) => ({ id, i, to: positions[i] })).filter(({ i, to }) => to !== i + 1);
+        order = rows.filter((_, i) => positions[i] === i + 1);
+        for (const { id, to } of shifted.sort((a, b) => a.to - b.to || a.i - b.i)) order.splice(Math.min(to - 1, order.length), 0, id);
+      }
+      const moved = order.filter((id, i) => id !== rows[i]);
       if (!moved.length) return { selection: work, message: "The order is unchanged." };
-      const order = rows.filter((_, i) => positions[i] === i + 1);
-      for (const { id, to } of moved.sort((a, b) => a.to - b.to || a.i - b.i)) order.splice(Math.min(to - 1, order.length), 0, id);
       const bump = rows.length + 1000;
       c.db.prepare("UPDATE relation SET position=position+? WHERE kind='movement' AND source_id=?").run(bump, work);
       order.forEach((id, i) => c.db.prepare("UPDATE relation SET position=? WHERE kind='movement' AND source_id=? AND target_id=?").run(i + 1, work, id));
-      return { selection: work, message: `Movement order saved: moved ${moved.length} movement${moved.length === 1 ? "" : "s"}.` };
+      return { selection: work, message: "Movement order saved." };
     }
     case "delete-movement": {
       const work = str(v.work, "work", { max: 200 });
@@ -2159,6 +2254,14 @@ export function applyV2(c, request, who) {
       c.db.prepare("UPDATE review_item SET status='resolved' WHERE id=?").run(id);
       return { selection: "", message: "Matching may make this work again; it will at the next scan or album match." };
     }
+    case "merge-open": {
+      const target = str(v.target, "entry", { max: 200 });
+      const into = str(v.into, "other entry", { max: 200 });
+      if (target === into) fail("Choose a different entry");
+      const kinds = [c.entity(target).kind, c.entity(into).kind];
+      if (!(MERGEABLE[kinds[0]] || []).includes(kinds[1])) fail(kinds[0] === "work" ? "Choose a work" : "Choose a person or ensemble");
+      return { selection: mergeSelection(target, into), message: "" };
+    }
     case "merge-entity": {
       // "from": the chosen entry merges into the one on screen.
       if (v.direction !== undefined && !["into", "from"].includes(v.direction)) fail("Choose which entry stays");
@@ -2192,6 +2295,12 @@ export function applyV2(c, request, who) {
       c.db
         .prepare("UPDATE review_item SET status='resolved' WHERE status='open' AND kind='identity' AND target_id=? AND json_extract(evidence,'$.keep')=?")
         .run(into, target);
+      const fromReview = typeof v.review === "string" && v.review ? v.review : null;
+      if (fromReview) {
+        c.db.prepare("UPDATE review_item SET status='resolved' WHERE id=? AND status='open'").run(fromReview);
+        const next = nextReview(c, fromReview);
+        return { selection: next ? `review:${next}` : "", tab: "review", message: `Merged into “${labelOf(c, into) || "the entry that stays"}”.${drop.kind === "work" ? " Undo it from Activity." : ""}`.slice(0, 500), ...(drop.kind === "work" && { changeId }) };
+      }
       if (added.length) {
         // Open the kept work at its Movements, on the page of the first one
         // added, so they can be put in order.

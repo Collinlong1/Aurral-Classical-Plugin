@@ -88,10 +88,10 @@ try {
   const work = selection();
   assert.ok(work);
   await detail.getByRole("button", { name: "Movements", exact: true }).click();
-  // Movement order is one click per move.
-  await group("Movements")
-    .getByRole("button", { name: "Move down: I. First", exact: true })
-    .click();
+  // Movements are reordered locally, then saved once.
+  await group("Movements").getByRole("button", { name: "Reorder movements", exact: true }).click();
+  await group("Reorder movements").getByRole("button", { name: "Move I. First down", exact: true }).click();
+  await group("Reorder movements").getByRole("button", { name: "Save order", exact: true }).click();
   await status("Movement order saved");
   assert.deepEqual(
     await group("Movements").locator(".settings-service__name").evaluateAll((rows) =>
