@@ -274,8 +274,26 @@ try {
     );
     await page.getByRole("button", { name: "Albums", exact: true }).click();
     await titleInput.fill("History draft");
+    const beforeBack = page.url();
     await page.evaluate(() => window.history.back());
-    await page.getByRole("heading", { name: "Discard unsaved changes?" }).waitFor();
+    await page
+      .getByRole("heading", { name: "Discard unsaved changes?" })
+      .waitFor()
+      .catch(async (error) => {
+        // Say what the page shows instead, with a screenshot CI uploads.
+        const evidence = path.resolve("browser-evidence");
+        await fs.mkdir(evidence, { recursive: true });
+        await page.screenshot({ path: path.join(evidence, `drafts-back-${width}.png`), fullPage: true });
+        const state = await page.evaluate(() => ({
+          url: location.href,
+          historyLength: history.length,
+          title: document.querySelector("input")?.value,
+          unsaved: document.querySelector(".plugin-admin__unsaved")?.textContent ?? null,
+          dialog: document.querySelector('[role="alertdialog"]')?.textContent ?? null,
+        }));
+        console.error("Back was not guarded", JSON.stringify({ width, beforeBack, browser: browser.version(), ...state }));
+        throw error;
+      });
     await modal.getByRole("button", { name: "Cancel", exact: true }).click();
     assert.equal(
       await titleInput.inputValue(),
