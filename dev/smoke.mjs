@@ -31,8 +31,14 @@ for (const user of ["fixture-admin","fixture-one","fixture-two"]) {
     await new Promise((resolve) => setTimeout(resolve,250));
   }
   assert.ok(playlist,`Comparison completed for ${user}`);
-  const jobs = await (await request(user,`/playlists/jobs/${playlist.id}`)).json();
-  assert.ok(jobs.length >= 5);
+  // The playlist appears before its tracks finish as jobs; wait for them.
+  let jobs = [];
+  for (let attempt=0; attempt<120; attempt++) {
+    jobs = await (await request(user,`/playlists/jobs/${playlist.id}`)).json();
+    if (Array.isArray(jobs) && jobs.length >= itemIds.length && jobs.every((job) => job.status === "done")) break;
+    await new Promise((resolve) => setTimeout(resolve,250));
+  }
+  assert.ok(Array.isArray(jobs) && jobs.length >= 5, `Comparison jobs for ${user}: ${JSON.stringify(Array.isArray(jobs) ? jobs.map((job) => job.status) : jobs).slice(0, 300)}`);
   for (const job of jobs) {
     assert.equal(job.status,"done");
     const audio = await request(user,`/playlists/stream/${job.id}`);
