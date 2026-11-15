@@ -1,3 +1,14 @@
+# Metadata editor UI, item 5 completion (November 15, 2026)
+
+Item 7 is published at the user's request: core `ebbb7e2172e8433ff1266ae6a1faf07ed50b5661`, plugin `4c95faa` pinning it in paired CI. At the user's request, item 5's two remaining points from the review are now done.
+
+- **Unsaved count:** the form footer counts changed fields ("2 unsaved changes").
+- **Errors beside fields:** a plugin rejection may name a field (a bounded optional `field` on `{ok:false}` results, passed through as `{error, field}`). The host shows the message under that field, marks it invalid and moves focus there. Without a field it falls back to the footer as before; older hosts ignore it.
+
+The plugin (1.0.59) names fields for dates, titles, names, credited people and the merge step's other entry. Generic core and plugin changes only; no schema, permission or command change.
+
+Validation: `pnpm check` passes (1089 unsafe-any uses, baseline unchanged); production build passes; full core unit suite GAPS_UNIT_PENDING; core plugin-host tests 30/30 (red on ebbb7e2 first). Plugin editor tests 56/56 (red on 1.0.58 first); standard full plugin suite GAPS_PLUGIN_PENDING. All seven real-renderer browser checks pass at desktop/phone widths; the footer check failed on ebbb7e2 first. Not run: `pnpm eden test` (no Docker daemon), full Compose/restart. The paired integration workflow is to be run manually on `aurral-classical` after publication; see plugin `EDITOR_UI_HANDOFF.md`.
+
 # Metadata editor UI, item 7 (November 15, 2026)
 
 Item 6 is published at the user's request: core `fd5d60bb5c669c58267ec8b58d54935a6068b40f`, plugin 1.0.58 with paired CI `2b22ed2` pinning that core and running the reorder/review browser check. The user accepted item 5's two remaining gaps (unsaved count, field-level validation) for now.
