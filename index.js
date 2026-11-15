@@ -41884,8 +41884,7 @@ function workView(c, work, page = 0, section = "details") {
       action("Delete work", "delete-entity", { target: work }, { tone: "danger", confirm: deleteConfirm(c, [work], title) })
     ] }];
   } else if (Object.hasOwn(WORK_FORMS, section)) {
-    view.actions.push(open("Cancel", entitySelection(work, page, current)));
-    view.sections = [selected];
+    view.sections = [{ ...selected, actions: [open("Cancel", entitySelection(work, page, current))] }];
   } else {
     const add = { movements: ["Add movements", "add-movement"], credits: ["Add a credit", "add-credit"], recordings: ["Add a broadcast recording", "broadcast"] }[section];
     view.sections = [{ ...selected, ...add && { actions: [open(add[0], entitySelection(work, page, add[1]))] } }];
@@ -42156,10 +42155,8 @@ function albumView(c, albumId, chosenWork, page = 0, move = "") {
         { label: "Selection", value: `${label} from this album, in album order` }
       ]
     });
-    actions = [
-      ...mappingStep ? [open("Choose a different work", albumSelection(albumId, "", page, move))] : [],
-      open("Cancel grouping", albumSelection(albumId, "", page))
-    ];
+    actions = mappingStep ? [open("Choose a different work", albumSelection(albumId, "", page, move))] : [];
+    const footer = [open("Cancel grouping", albumSelection(albumId, "", page))];
     if (!chosenWork) {
       const kept = candidates2.filter((track) => stateOf(track.id).state !== "not_classical");
       const guess = guessWork(kept);
@@ -42184,6 +42181,7 @@ function albumView(c, albumId, chosenWork, page = 0, move = "") {
         command: "choose-album-work",
         arguments: { albumId, page: String(page), move },
         submitLabel: "Continue to movements",
+        actions: footer,
         fields: [{ key: "work", label: "Work", type: "lookup", lookup: "works", value: "", placeholder: guess ? `Search, for example \u201C${guess}\u201D` : "Search works", required: true }]
       });
       actions.unshift(action("Create a new work", "new-album-work", { albumId, page: String(page), move }));
@@ -42199,6 +42197,7 @@ function albumView(c, albumId, chosenWork, page = 0, move = "") {
         command: "create-work-from-album",
         arguments: { albumId, tracks: candidates2.map((track) => track.id), page: String(page), move },
         submitLabel: "Create and assign",
+        actions: footer,
         fields: [
           { key: "title", label: "Work title", type: "text", value: guessWork(kept), required: true },
           { key: "composer", label: "Composer", type: "lookup", lookup: "composers", value: "", valueLabel: "", placeholder: composer ? `Search, for example \u201C${composer}\u201D` : "Search composers" },
@@ -42226,6 +42225,7 @@ function albumView(c, albumId, chosenWork, page = 0, move = "") {
         command: "assign-album",
         arguments: { albumId, work: chosenWork, tracks: candidates2.map((track) => track.id), page: String(page), move },
         submitLabel: moving ? "Move tracks" : "Assign tracks",
+        actions: footer,
         fields: [{
           key: "mapping",
           label: "Movement",
@@ -42511,7 +42511,7 @@ function newView(kind) {
     }
   }[kind];
   if (!forms) fail("Unknown item type");
-  return { crumbs: [], title: forms.title, badges: [], actions: [], sections: [forms.section] };
+  return { crumbs: [], title: forms.title, badges: [], actions: [], sections: [{ ...forms.section, actions: [open("Cancel", "")] }] };
 }
 var TABS = ["works", "composers", "performers", "albums", "review", "search", "activity"];
 function activityList(c, downloads) {
@@ -42637,6 +42637,7 @@ function bulkView(c, token) {
         command: "bulk-edit",
         arguments: { token },
         submitLabel: `Apply to ${works.length} work${works.length === 1 ? "" : "s"}`,
+        actions: [open("Cancel", "")],
         fields: [
           ...BULK_FIELDS.map(([key, label, type]) => ({ key, label, type, value: type === "lines" ? [] : "" })),
           { key: "composer", label: "Add composer", type: "lookup", lookup: "composers", value: "", valueLabel: "", placeholder: "Search composers" }
@@ -42805,7 +42806,16 @@ function listKey(c, selection) {
   if (selection.includes(":")) return selection;
   return parseEntitySelection(selection).id;
 }
-function renderV2(c, query, revision2, { downloads = null, maintenance: maintenance2 = null } = {}) {
+function hoistFormActions(view) {
+  for (const section of view.sections) {
+    if (section.type !== "form" || !section.actions) continue;
+    for (const item of section.actions)
+      if (!view.actions.some((existing) => JSON.stringify(existing) === JSON.stringify(item))) view.actions.push(item);
+    delete section.actions;
+  }
+  return view;
+}
+function renderV2(c, query, revision2, { downloads = null, maintenance: maintenance2 = null, formActions = false } = {}) {
   const q = String(query.q || "");
   if (q.length > 200) fail("Search is too long");
   let offset = Number(query.offset || 0);
@@ -42844,6 +42854,7 @@ function renderV2(c, query, revision2, { downloads = null, maintenance: maintena
     view = entity.kind === "work" ? workView(c, entity.id, page, section || (page > 0 ? "movements" : "details")) : entity.kind === "person" || entity.kind === "ensemble" ? contributorView(c, parsed, page) : entity.kind === "movement" ? movementView(c, entity.id, page) : recordingView(c, entity.id);
   }
   if (!selection && tab === "activity" && maintenance2) view = maintenanceView(maintenance2);
+  if (view && !formActions) hoistFormActions(view);
   const reviews = c.db.prepare("SELECT count(*) AS n FROM review_item WHERE status='open'").get().n;
   const tracks = c.db.prepare("SELECT count(*) AS n FROM track_link WHERE state='active'").get().n;
   const notes = [];
@@ -43009,7 +43020,7 @@ function applyV2(c, request, who) {
   const m = new Metadata(c);
   switch (request.command) {
     case "open":
-      return { selection: str(v.selection, "selection", { max: 500 }), message: "" };
+      return { selection: str(v.selection, "selection", { optional: true, max: 500 }), message: "" };
     case "save-entity": {
       const target = str(v.target, "entry", { max: 200 });
       const entity = c.entity(target);
@@ -44329,7 +44340,11 @@ async function readEditor(input) {
       if (query.tab === "search" && query.q) ensureSearchIndex(c);
       return readTransaction(
         c.db,
-        () => query.lookup ? lookupV2(c, query) : renderV2(c, query, revision(c, query.selection || ""), { downloads, maintenance: maintenance2 })
+        () => query.lookup ? lookupV2(c, query) : renderV2(c, query, revision(c, query.selection || ""), {
+          downloads,
+          maintenance: maintenance2,
+          formActions: input.capabilities.formActions === true
+        })
       );
     }
     return transaction(c.db, () => render(c, input));
@@ -45873,7 +45888,7 @@ async function search(input) {
 import path12 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.56" : "dev";
+var VERSION = true ? "1.0.57" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js

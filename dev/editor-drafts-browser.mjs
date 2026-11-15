@@ -95,6 +95,7 @@ const document = () => ({
         command: "save",
         arguments: {},
         submitLabel: "Save",
+        actions: [],
         fields: [field("title", "Title", title)],
       },
       {
@@ -117,6 +118,7 @@ const document = () => ({
         command: "credit",
         arguments: {},
         submitLabel: "Add credit",
+        actions: [],
         fields: [field("name", "Credit name")],
       },
     ],

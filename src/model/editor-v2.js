@@ -679,8 +679,7 @@ function workView(c, work, page = 0, section = "details") {
       action("Delete work", "delete-entity", { target: work }, { tone: "danger", confirm: deleteConfirm(c, [work], title) }),
     ] }];
   } else if (Object.hasOwn(WORK_FORMS, section)) {
-    view.actions.push(open("Cancel", entitySelection(work, page, current)));
-    view.sections = [selected];
+    view.sections = [{ ...selected, actions: [open("Cancel", entitySelection(work, page, current))] }];
   } else {
     const add = { movements: ["Add movements", "add-movement"], credits: ["Add a credit", "add-credit"], recordings: ["Add a broadcast recording", "broadcast"] }[section];
     view.sections = [{ ...selected, ...(add && { actions: [open(add[0], entitySelection(work, page, add[1]))] }) }];
@@ -992,10 +991,8 @@ function albumView(c, albumId, chosenWork, page = 0, move = "") {
         { label: "Selection", value: `${label} from this album, in album order` },
       ],
     });
-    actions = [
-      ...(mappingStep ? [open("Choose a different work", albumSelection(albumId, "", page, move))] : []),
-      open("Cancel grouping", albumSelection(albumId, "", page)),
-    ];
+    actions = mappingStep ? [open("Choose a different work", albumSelection(albumId, "", page, move))] : [];
+    const footer = [open("Cancel grouping", albumSelection(albumId, "", page))];
     if (!chosenWork) {
       const kept = candidates.filter((track) => stateOf(track.id).state !== "not_classical");
       const guess = guessWork(kept);
@@ -1010,7 +1007,7 @@ function albumView(c, albumId, chosenWork, page = 0, move = "") {
       sections.push({
         type: "form", id: "move", title: `Choose a work for ${label}`,
         note: "Use an existing work, or choose Create a new work. Your selected tracks stay together through both steps.",
-        command: "choose-album-work", arguments: { albumId, page: String(page), move }, submitLabel: "Continue to movements",
+        command: "choose-album-work", arguments: { albumId, page: String(page), move }, submitLabel: "Continue to movements", actions: footer,
         fields: [{ key: "work", label: "Work", type: "lookup", lookup: "works", value: "", placeholder: guess ? `Search, for example “${guess}”` : "Search works", required: true }],
       });
       actions.unshift(action("Create a new work", "new-album-work", { albumId, page: String(page), move }));
@@ -1021,7 +1018,7 @@ function albumView(c, albumId, chosenWork, page = 0, move = "") {
       sections.push({
         type: "form", id: "new-work", title: "Create a work from selected tracks",
         note: "Check the work details and each selected track. Skip leaves a track where it is. Included tracks become Classical; any already in another work move here. Nothing changes until Create and assign.",
-        command: "create-work-from-album", arguments: { albumId, tracks: candidates.map((track) => track.id), page: String(page), move }, submitLabel: "Create and assign",
+        command: "create-work-from-album", arguments: { albumId, tracks: candidates.map((track) => track.id), page: String(page), move }, submitLabel: "Create and assign", actions: footer,
         fields: [
           { key: "title", label: "Work title", type: "text", value: guessWork(kept), required: true },
           { key: "composer", label: "Composer", type: "lookup", lookup: "composers", value: "", valueLabel: "", placeholder: composer ? `Search, for example “${composer}”` : "Search composers" },
@@ -1040,7 +1037,7 @@ function albumView(c, albumId, chosenWork, page = 0, move = "") {
       sections.push({
         type: "form", id: "assign", title: `Assign selected tracks to ${entityLabel(c, chosenWork, "work")}`,
         note: "Check each movement, or choose New movement to add one named after the track. Skip leaves a track where it is. Assigned tracks become Classical; tracks already in a work move here. Nothing changes until you apply.",
-        command: "assign-album", arguments: { albumId, work: chosenWork, tracks: candidates.map((track) => track.id), page: String(page), move }, submitLabel: moving ? "Move tracks" : "Assign tracks",
+        command: "assign-album", arguments: { albumId, work: chosenWork, tracks: candidates.map((track) => track.id), page: String(page), move }, submitLabel: moving ? "Move tracks" : "Assign tracks", actions: footer,
         fields: [{ key: "mapping", label: "Movement", type: "mapping",
           value: suggested.map((movement, index) => stateOf(candidates[index].id).state === "not_classical" ? "" : movement || "new"),
           rows: candidates.map((track) => ({ label: `${number(track)}. ${track.title}`.slice(0, 500), detail: (where(track) ? `Now in ${where(track)}` : track.artist || "").slice(0, 500) || undefined })),
@@ -1317,7 +1314,7 @@ function newView(kind) {
     },
   }[kind];
   if (!forms) fail("Unknown item type");
-  return { crumbs: [], title: forms.title, badges: [], actions: [], sections: [forms.section] };
+  return { crumbs: [], title: forms.title, badges: [], actions: [], sections: [{ ...forms.section, actions: [open("Cancel", "")] }] };
 }
 
 // ---- page ----------------------------------------------------------------
@@ -1458,6 +1455,7 @@ function bulkView(c, token) {
         command: "bulk-edit",
         arguments: { token },
         submitLabel: `Apply to ${works.length} work${works.length === 1 ? "" : "s"}`,
+        actions: [open("Cancel", "")],
         fields: [
           ...BULK_FIELDS.map(([key, label, type]) => ({ key, label, type, value: type === "lines" ? [] : "" })),
           { key: "composer", label: "Add composer", type: "lookup", lookup: "composers", value: "", valueLabel: "", placeholder: "Search composers" },
@@ -1657,7 +1655,19 @@ function listKey(c, selection) {
   return parseEntitySelection(selection).id;
 }
 
-export function renderV2(c, query, revision, { downloads = null, maintenance = null } = {}) {
+// Forms name their Cancel as a footer action beside Submit. Hosts without
+// `formActions` drop that field, so their forms keep it in the header.
+function hoistFormActions(view) {
+  for (const section of view.sections) {
+    if (section.type !== "form" || !section.actions) continue;
+    for (const item of section.actions)
+      if (!view.actions.some((existing) => JSON.stringify(existing) === JSON.stringify(item))) view.actions.push(item);
+    delete section.actions;
+  }
+  return view;
+}
+
+export function renderV2(c, query, revision, { downloads = null, maintenance = null, formActions = false } = {}) {
   const q = String(query.q || "");
   if (q.length > 200) fail("Search is too long");
   let offset = Number(query.offset || 0);
@@ -1720,6 +1730,7 @@ export function renderV2(c, query, revision, { downloads = null, maintenance = n
             : recordingView(c, entity.id);
   }
   if (!selection && tab === "activity" && maintenance) view = maintenanceView(maintenance);
+  if (view && !formActions) hoistFormActions(view);
   const reviews = c.db.prepare("SELECT count(*) AS n FROM review_item WHERE status='open'").get().n;
   const tracks = c.db.prepare("SELECT count(*) AS n FROM track_link WHERE state='active'").get().n;
   const notes = [];
@@ -1909,7 +1920,8 @@ export function applyV2(c, request, who) {
   const m = new Metadata(c);
   switch (request.command) {
     case "open":
-      return { selection: str(v.selection, "selection", { max: 500 }), message: "" };
+      // An empty selection returns to the list (Cancel on a new entry).
+      return { selection: str(v.selection, "selection", { optional: true, max: 500 }), message: "" };
     case "save-entity": {
       const target = str(v.target, "entry", { max: 200 });
       const entity = c.entity(target);

@@ -73,7 +73,7 @@ const document = (params) => {
   const rows = ["Alpha", "Bravo", "Charlie"].filter((label) => label.toLowerCase().includes(q.toLowerCase())).map((label) => ({ id: label, label, selection: label, actions: [] }));
   return { version: 2, title: "Plugin editor", revision: String(revision), tabs: [], notes: [], tab: "items",
     list: { items: rows, total: rows.length, offset: 0, actions: [], placeholder: "Search items", empty: "No matching items." },
-    view: params.get("selection") ? { title: "Edit item", crumbs: [], badges: [], actions: [], sections: [{ type: "form", id: "edit", title: "Details", command: "save", arguments: {}, submitLabel: "Save", fields: [
+    view: params.get("selection") ? { title: "Edit item", crumbs: [], badges: [], actions: [], sections: [{ type: "form", id: "edit", title: "Details", command: "save", arguments: {}, submitLabel: "Save", actions: [], fields: [
       { key: "choice", label: "Related item", type: "lookup", lookup: "items", value: selected, valueLabel: selectedLabel, actions: [] },
       { key: "title", label: "Title", type: "text", value: "Example", actions: [] },
     ] }] } : null };

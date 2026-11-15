@@ -87,6 +87,8 @@ try {
   for (const width of [1280, 390]) {
     const cleanup = [];
     fixture = await boxSet({ after: (fn) => cleanup.push(fn) });
+    // The capabilities core sends: forms carry Cancel beside Submit.
+    fixture.input.capabilities = { adminForms: 2, formActions: true };
     const context = await browser.newContext({ viewport: { width, height: 900 } });
     const page = await context.newPage();
     page.setDefaultTimeout(15000);
@@ -154,7 +156,8 @@ try {
       await creating.getByLabel("Work title", { exact: true }).fill("Browser selected piece");
       await creating.getByRole("button", { name: "Create and assign", exact: true }).click();
       await group("Tracks").waitFor();
-      assert.match(await page.locator(".plugin-admin__status").textContent(), /Created/);
+      // The result is reported beside the album's tracks, where the task returns.
+      await group("Tracks").locator(".plugin-admin__feedback").filter({ hasText: /Created/ }).waitFor();
       assert.equal(attached(applied.values.tracks[1]), 1);
       assert.deepEqual(errors, []);
       console.log(`PASS: one track list, sticky selection, existing/new work, mapping, Skip and kept album page (${width}px)`);

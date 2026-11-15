@@ -87,6 +87,8 @@ try {
   for (const width of [1280, 390]) {
     const cleanup = [];
     fixture = await boxSet({ after: (fn) => cleanup.push(fn) });
+    // The capabilities core sends: forms carry Cancel beside Submit.
+    fixture.input.capabilities = { adminForms: 2, formActions: true };
     const context = await browser.newContext({ viewport: { width, height: 900 } });
     const page = await context.newPage();
     page.setDefaultTimeout(15000);
@@ -101,6 +103,7 @@ try {
       assert.equal(created.ok, true, created.message);
       const work = created.selection;
       const nav = (name) => page.locator(".plugin-admin__view-actions").getByRole("button", { name, exact: true });
+      const cancel = () => page.locator(".plugin-admin__form-footer").getByRole("button", { name: "Cancel", exact: true });
       const title = () => group("Details").getByLabel("Title", { exact: true });
       await page.goto(`${origin}/editor?selection=${work}`);
       await title().waitFor();
@@ -122,7 +125,8 @@ try {
       await group("Movements").getByRole("button", { name: "Add movements", exact: true }).click();
       const adding = group("Add movements");
       await adding.getByLabel("Movement titles", { exact: true }).fill("III. Finale");
-      await nav("Cancel").click();
+      assert.equal(await nav("Cancel").count(), 0, "Cancel sits beside Submit, not in the header");
+      await cancel().click();
       await page.getByRole("button", { name: "Discard and continue", exact: true }).click();
       await group("Movements").waitFor();
       assert.equal(await group("Movements").locator(".plugin-admin__row").count(), 2, "canceled form creates no movements");
@@ -139,7 +143,7 @@ try {
       await group("Credits").getByRole("button", { name: "Add a credit", exact: true }).click();
       await group("Add a credit").waitFor();
       assert.equal(await page.locator(".plugin-admin__detail form").count(), 1);
-      await nav("Cancel").click();
+      await cancel().click();
       await group("Credits").waitFor();
       await nav("Advanced").click();
       await group("Advanced").waitFor();
@@ -148,7 +152,7 @@ try {
       await group("Advanced").getByRole("button", { name: "Merge with another work", exact: true }).click();
       await group("Merge with another work").waitFor();
       assert.equal(await page.locator(".plugin-admin__detail form").count(), 1);
-      await nav("Cancel").click();
+      await cancel().click();
       await group("Advanced").getByRole("button", { name: "Delete work", exact: true }).click();
       await page.getByRole("alertdialog").getByRole("button", { name: "Cancel", exact: true }).click();
       assert.equal(fixture.c.db.prepare("SELECT deleted_at FROM entity WHERE id=?").get(work).deleted_at, null);

@@ -1116,7 +1116,11 @@ export async function readEditor(input) {
       return readTransaction(c.db, () =>
         query.lookup
           ? lookupV2(c, query)
-          : renderV2(c, query, revision(c, query.selection || ""), { downloads, maintenance }),
+          : renderV2(c, query, revision(c, query.selection || ""), {
+              downloads,
+              maintenance,
+              formActions: input.capabilities.formActions === true,
+            }),
       );
     }
     return transaction(c.db, () => render(c, input));
