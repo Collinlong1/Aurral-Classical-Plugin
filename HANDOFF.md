@@ -1,3 +1,16 @@
+# Paired integration CI passes (November 15, 2026)
+
+The user asked for the paired integration workflow to be run on `aurral-classical`. **Run 30 (`43682154366`) passed** (plugin `347a4e4`, core pin `a7691ad`). It covers all seven editor browser checks, the comparison smoke, the full-app editor and permissions check, and restart persistence with unchanged media.
+
+Runs 19–29 failed first. Most failures were test-timing or stale test expectations that CI exposed for the first time: the browser checks for items 1–6 had never been run in CI. Fixes:
+
+- **Draft-check waits:** the drafts check waits for the page's own guard before Back, and harness hosts keep previous data like `PluginPage`.
+- **Comparison smoke:** it waits for its jobs and expects one job per distinct file, as core saves them.
+- **Keyboard drag:** the reorder check steers by dnd-kit's announcements.
+- **Full-app check:** it answers the discard dialog that Reload shows since item 1.
+
+One real bug was fixed in core `a7691ad`: a save that returned to a previously visited page (Movements after Save order) briefly showed that page's cached, outdated copy. Successful changes now drop the editor's other cached pages. Core check, build and 2666/2666 unit tests pass. Details: plugin `EDITOR_UI_HANDOFF.md`.
+
 # Metadata editor UI, item 5 completion (November 15, 2026)
 
 Item 7 is published at the user's request: core `ebbb7e2172e8433ff1266ae6a1faf07ed50b5661`, plugin `4c95faa` pinning it in paired CI. At the user's request, item 5's two remaining points from the review are now done.
