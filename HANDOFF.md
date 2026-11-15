@@ -2,7 +2,7 @@
 
 November 14, 2026. The user sent a list of v0.2 workflow changes (pagination and kept pages, pagers at the top, merges that add missing movements and work either way, new movements while assigning, moving tracks between works, grouping refresh, scroll jumps, vague identity reviews, removing the Compare recordings menu item). All are implemented; see V0_2_REPORT.md, "v0.2 follow-up". Core changes are generic admin-page additions (`focus`, empty offset, preserve-scroll navigation, top pagers, presentation refresh); UPSTREAM_DELTA.md has them.
 
-Branches: both repositories' work is on `claude/modest-brown-rtcrsz` (this session's branch, from `aurral-classical`); `aurral-classical` itself is unchanged until the user moves it. The integration workflow's core pin is unchanged and its smoke step changed (comparison saved from the work page after `editor-fixtures.mjs prepare`); it has not run yet.
+Branches: committed on `claude/modest-brown-rtcrsz` and, at the user's request (November 15), fast-forwarded onto `aurral-classical` in both repositories (core `61b8ddc`, plugin `c2d411b`). The integration workflow now pins core `61b8ddc`. Its smoke step changed (comparison saved from the work page after `editor-fixtures.mjs prepare`); it has not run yet.
 
 Checks: plugin 331 tests (Node 22.23), bundle rebuilt; core `pnpm check` clean, 2666 unit tests, frontend build (Node 26.12). No PR, merge, release or deployment. No production access. No subagents.
 

@@ -22,7 +22,7 @@ jobs:
           repository: Collinlong1/aurral
           # Core aurral-classical with the v0.2 hooks (search, manual
           # search, comparisons, admin page selection and pages).
-          ref: 1697431e8230ae2ad48bd75355dca1ab9f1c79ac
+          ref: 61b8ddcab63b99b427099ea4bedca9f3f1c6a2b5
           path: core
       - uses: actions/setup-node@v4
         with:
