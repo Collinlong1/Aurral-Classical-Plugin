@@ -41350,7 +41350,8 @@ var CREATE_ANYWAY = { key: "createAnyway", label: "Create anyway", type: "checkb
 var PAGE = 100;
 var SECTION_PAGE = 100;
 var WORK_SECTIONS = { details: "Details", movements: "Movements", credits: "Credits", recordings: "Recordings", advanced: "Advanced" };
-var WORK_FORMS = { "add-movement": "movements", "add-credit": "credits", broadcast: "recordings", merge: "advanced" };
+var WORK_FORMS = { "add-movement": "movements", reorder: "movements", "add-credit": "credits", broadcast: "recordings", merge: "advanced" };
+var REORDER_LIMIT = 500;
 function parseEntitySelection(selection) {
   const at = selection.lastIndexOf("!");
   const section = at < 0 ? "" : selection.slice(at + 1);
@@ -41384,7 +41385,7 @@ function finishWorkMutation(c, request, result) {
     section = "movements";
     page = Math.floor(Math.max(0, workMovements(c, current.id).length - 1) / SECTION_PAGE);
   } else if (["add-credit", "remove-credit"].includes(request.command)) section = "credits";
-  else if (["move-movement", "delete-movement", "reorder-movements"].includes(request.command)) section = "movements";
+  else if (["move-movement", "delete-movement", "reorder-movements", "set-movement-order"].includes(request.command)) section = "movements";
   else section = WORK_FORMS[section] || section;
   return { ...result, selection: entitySelection(current.id, page, section === "details" ? "" : section), focus: section };
 }
@@ -41844,6 +41845,25 @@ function workView(c, work, page = 0, section = "details") {
       },
       {
         type: "form",
+        id: "reorder",
+        title: "Reorder movements",
+        note: "Change the number of each movement you want to move; the others keep their order around them. Nothing changes until you save.",
+        command: "set-movement-order",
+        arguments: { work, movements: movements.map((movement) => movement.id) },
+        submitLabel: "Save order",
+        fields: [
+          {
+            key: "positions",
+            label: "Position",
+            type: "mapping",
+            value: movements.map((_, index) => String(index + 1)),
+            rows: movements.slice(0, REORDER_LIMIT).map((movement, index) => ({ label: `${index + 1}. ${entityLabel(c, movement.id, "movement")}`.slice(0, 500) })),
+            options: movements.slice(0, REORDER_LIMIT).map((_, index) => ({ value: String(index + 1), label: `Position ${index + 1}` }))
+          }
+        ]
+      },
+      {
+        type: "form",
         id: "add-movement",
         title: "Add movements",
         command: "add-movement",
@@ -41883,11 +41903,17 @@ function workView(c, work, page = 0, section = "details") {
       open("Merge with another work", entitySelection(work, 0, "merge")),
       action("Delete work", "delete-entity", { target: work }, { tone: "danger", confirm: deleteConfirm(c, [work], title) })
     ] }];
+  } else if (section === "reorder" && (movements.length < 2 || movements.length > REORDER_LIMIT)) {
+    fail(movements.length < 2 ? "This work has nothing to reorder." : `Reorder works up to ${REORDER_LIMIT} movements; use Move up and Move down.`);
   } else if (Object.hasOwn(WORK_FORMS, section)) {
     view.sections = [{ ...selected, actions: [open("Cancel", entitySelection(work, page, current))] }];
   } else {
-    const add = { movements: ["Add movements", "add-movement"], credits: ["Add a credit", "add-credit"], recordings: ["Add a broadcast recording", "broadcast"] }[section];
-    view.sections = [{ ...selected, ...add && { actions: [open(add[0], entitySelection(work, page, add[1]))] } }];
+    const add = {
+      movements: [["Add movements", "add-movement"], ...movements.length > 1 && movements.length <= REORDER_LIMIT ? [["Reorder movements", "reorder"]] : []],
+      credits: [["Add a credit", "add-credit"]],
+      recordings: [["Add a broadcast recording", "broadcast"]]
+    }[section];
+    view.sections = [{ ...selected, ...add && { actions: add.map(([label, form2]) => open(label, entitySelection(work, page, form2))) } }];
   }
   return view;
 }
@@ -42927,6 +42953,7 @@ var V2_COMMANDS = {
   "save-entity": null,
   "set-blank": ["target", "field"],
   "move-movement": ["work", "movement", "direction"],
+  "set-movement-order": ["work", "movements", "positions"],
   "delete-movement": ["work", "movement"],
   "delete-entity": ["target"],
   "merge-entity": ["target", "into", "confirm", "direction"],
@@ -43061,6 +43088,23 @@ function applyV2(c, request, who) {
       c.db.prepare("UPDATE relation SET position=position+? WHERE kind='movement' AND source_id=?").run(bump, work);
       rows.forEach((id, i) => c.db.prepare("UPDATE relation SET position=? WHERE kind='movement' AND source_id=? AND target_id=?").run(i + 1, work, id));
       return { selection: work, message: "Movement order saved." };
+    }
+    case "set-movement-order": {
+      const work = str(v.work, "work", { max: 200 });
+      c.entity(work, "work");
+      const rows = c.db.prepare("SELECT target_id FROM relation WHERE kind='movement' AND source_id=? ORDER BY position").all(work).map((r) => r.target_id);
+      if (!Array.isArray(v.movements) || v.movements.length !== rows.length || v.movements.some((id, i) => id !== rows[i]))
+        throw new EditorV2Error("The movements changed since this page loaded. Reload, then reorder again.", 409);
+      const positions = Array.isArray(v.positions) ? v.positions.map(Number) : [];
+      if (positions.length !== rows.length || positions.some((n) => !Number.isInteger(n) || n < 1 || n > rows.length)) fail("Choose a position for every movement");
+      const moved = rows.map((id, i) => ({ id, i, to: positions[i] })).filter(({ i, to }) => to !== i + 1);
+      if (!moved.length) return { selection: work, message: "The order is unchanged." };
+      const order = rows.filter((_, i) => positions[i] === i + 1);
+      for (const { id, to } of moved.sort((a, b) => a.to - b.to || a.i - b.i)) order.splice(Math.min(to - 1, order.length), 0, id);
+      const bump = rows.length + 1e3;
+      c.db.prepare("UPDATE relation SET position=position+? WHERE kind='movement' AND source_id=?").run(bump, work);
+      order.forEach((id, i) => c.db.prepare("UPDATE relation SET position=? WHERE kind='movement' AND source_id=? AND target_id=?").run(i + 1, work, id));
+      return { selection: work, message: `Movement order saved: moved ${moved.length} movement${moved.length === 1 ? "" : "s"}.` };
     }
     case "delete-movement": {
       const work = str(v.work, "work", { max: 200 });
@@ -43230,7 +43274,7 @@ function applyV2(c, request, who) {
           selection: entitySelection(into, page, "movements"),
           focus: "movements",
           changeId,
-          message: `Merged. Added ${added.length} movement${added.length === 1 ? "" : "s"} the work didn't have (${names}${added.length > 3 ? ` and ${added.length - 3} more` : ""}) at the end of Movements; use Move up to put ${added.length === 1 ? "it" : "them"} in order. Undo it from Activity.`.slice(0, 500)
+          message: `Merged. Added ${added.length} movement${added.length === 1 ? "" : "s"} the work didn't have (${names}${added.length > 3 ? ` and ${added.length - 3} more` : ""}) at the end of Movements; use Reorder movements to put ${added.length === 1 ? "it" : "them"} in order. Undo it from Activity.`.slice(0, 500)
         };
       }
       return { selection: into, message: drop.kind === "work" ? "Merged. Undo it from Activity." : "Merged.", ...drop.kind === "work" && { changeId } };
@@ -45888,7 +45932,7 @@ async function search(input) {
 import path12 from "node:path";
 
 // src/version.js
-var VERSION = true ? "1.0.57" : "dev";
+var VERSION = true ? "1.0.58" : "dev";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js

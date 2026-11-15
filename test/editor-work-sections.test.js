@@ -100,3 +100,46 @@ test("section addresses retain entry identity and stale/cross-entry protection",
   const legacy = (await s.read({ selection: `${s.work}~1` })).view;
   assert.ok(section(legacy, "movements"), "legacy paged work links still open movements");
 });
+
+test("Reorder movements moves several at once and keeps the rest in order", async (t) => {
+  const s = await fixture(t, ["A", "B", "C", "D", "E"]);
+  const names = () => s.c.db.prepare("SELECT target_id FROM relation WHERE kind='movement' AND source_id=? ORDER BY position").all(s.work).map((row) => row.target_id);
+  const ids = names();
+  const movements = await go(s, s.work, "Movements");
+  const reordering = await go(s, movements, "Reorder movements");
+  const view = (await s.read({ selection: reordering })).view;
+  assert.deepEqual(view.sections.map((item) => item.id), ["reorder"]);
+  const form = section(view, "reorder");
+  assert.deepEqual(form.arguments.movements, ids);
+  assert.deepEqual(form.fields[0].value, ["1", "2", "3", "4", "5"]);
+  assert.equal(form.fields[0].rows[4].label, "5. E");
+
+  // Unchanged positions write nothing.
+  const same = await s.mutate(form.command, { ...form.arguments, positions: ["1", "2", "3", "4", "5"] }, reordering);
+  assert.equal(same.message, "The order is unchanged.");
+  assert.deepEqual(names(), ids);
+
+  // E to 1 and A to 3: the others keep their order around them.
+  const saved = await s.mutate(form.command, { ...form.arguments, positions: ["3", "2", "3", "4", "1"] }, reordering);
+  assert.equal(saved.ok, true, saved.message);
+  assert.match(saved.message, /moved 2 movements/);
+  assert.equal(saved.selection, movements, "returns to Movements");
+  assert.equal(saved.focus, "movements");
+  const [a, b, c, d, e] = ids;
+  assert.deepEqual(names(), [e, b, a, c, d]);
+
+  // A stale page (the movements changed) and invalid positions are refused.
+  const stale = await s.mutate(form.command, { ...form.arguments, positions: ["2", "1", "3", "4", "5"] }, reordering);
+  assert.equal(stale.ok, false);
+  assert.equal(stale.status, 409);
+  const fresh = section((await s.read({ selection: reordering })).view, "reorder");
+  const invalid = await s.mutate(fresh.command, { ...fresh.arguments, positions: ["1", "2", "3", "4", "9"] }, reordering);
+  assert.equal(invalid.ok, false);
+  assert.equal(invalid.status, 400);
+  assert.deepEqual(names(), [e, b, a, c, d]);
+
+  // A single movement has nothing to reorder.
+  const single = await fixture(t, ["Only"]);
+  const only = await go(single, single.work, "Movements");
+  assert.equal(section((await single.read({ selection: only })).view, "movements").actions.some((item) => item.label === "Reorder movements"), false);
+});
