@@ -18,8 +18,12 @@ for (const user of ["fixture-admin","fixture-one","fixture-two"]) {
   const page = await request(user,`/plugins/aurral-classical/resources/work/${work}`);
   assert.equal(page.status,200,await page.clone().text());
   const view = await page.json();
-  const itemIds = view.recordings.flatMap((recording) => recording.items.map((item) => item.id));
+  const items = view.recordings.flatMap((recording) => recording.items);
+  const itemIds = items.map((item) => item.id);
   assert.ok(itemIds.length >= 5,`The work page lists every owned recording for ${user}`);
+  // Core saves one file per run of items on it (movements sharing an attacca
+  // track), so the playlist has one track per run.
+  const files = items.filter((item, index) => index === 0 || items[index - 1].fileId !== item.fileId).length;
   const name = `Recordings: Fixture Sonata (${user})`;
   const response = await request(user,`/plugins/aurral-classical/resources/work/${work}/playlist`,{name,itemIds});
   assert.equal(response.status,200,await response.text());
@@ -35,10 +39,10 @@ for (const user of ["fixture-admin","fixture-one","fixture-two"]) {
   let jobs = [];
   for (let attempt=0; attempt<120; attempt++) {
     jobs = await (await request(user,`/playlists/jobs/${playlist.id}`)).json();
-    if (Array.isArray(jobs) && jobs.length >= itemIds.length && jobs.every((job) => job.status === "done")) break;
+    if (Array.isArray(jobs) && jobs.length >= files && jobs.every((job) => job.status === "done")) break;
     await new Promise((resolve) => setTimeout(resolve,250));
   }
-  assert.ok(Array.isArray(jobs) && jobs.length >= 5, `Comparison jobs for ${user}: ${JSON.stringify(Array.isArray(jobs) ? jobs.map((job) => job.status) : jobs).slice(0, 300)}`);
+  assert.ok(Array.isArray(jobs) && jobs.length === files, `Comparison jobs for ${user}: expected ${files} (${itemIds.length} items), got ${JSON.stringify(Array.isArray(jobs) ? jobs.map((job) => job.status) : jobs).slice(0, 300)}`);
   for (const job of jobs) {
     assert.equal(job.status,"done");
     const audio = await request(user,`/playlists/stream/${job.id}`);
