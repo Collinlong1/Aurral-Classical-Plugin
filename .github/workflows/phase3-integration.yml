@@ -22,7 +22,7 @@ jobs:
           repository: Collinlong1/aurral
           # Core aurral-classical with the v0.2 hooks (search, manual
           # search, comparisons, admin page selection and pages).
-          ref: a26e013fea9bbc172e263aa3a294323f3b258927
+          ref: fd5d60bb5c669c58267ec8b58d54935a6068b40f
           path: core
       - uses: actions/setup-node@v4
         with:
@@ -59,6 +59,11 @@ jobs:
         env:
           AURRAL_CORE_PATH: ${{ github.workspace }}/core
         run: node dev/editor-footer-browser.mjs
+      - name: Reorder movements locally and decide reviews
+        working-directory: plugin
+        env:
+          AURRAL_CORE_PATH: ${{ github.workspace }}/core
+        run: node dev/editor-reorder-review-browser.mjs
       - name: Start synthetic instance and verify comparisons
         working-directory: plugin
         env:
