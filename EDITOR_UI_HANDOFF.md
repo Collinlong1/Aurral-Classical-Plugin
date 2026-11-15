@@ -150,7 +150,7 @@ The user supplied the original review text on November 15, 2026; it was not in e
 ## Item 7 validation
 
 - New generic `dev/editor-list-places-browser.mjs` (synthetic two-tab page modeled on the plugin's link/offset behavior, actual renderer, loopback). It fails on core fd5d60b with `EDITOR_PLACES_BASELINE=fd5d60b`: the Works tab resets the list to "Work 1" (`.scratch/editor-list-places-before.log`). It passes at 1280px and 390px on three consecutive runs. It covers a search, page 2 and a scroll kept across a link to another tab (Works tab return) and a same-tab link (breadcrumb return), each tab keeping its own search, a reload, and a cleared search replacing the remembered one.
-- All earlier harnesses pass at both widths: drafts, assignment, work sections, lookups, footer, reorder/review (`.scratch/editor-item7-*.log`). Core: `pnpm check` passes (1089 unsafe-any uses, baseline unchanged); production build passes; full core unit suite UNIT_PENDING (still running when this was written). No plugin runtime change, so the item-6 run of 340/340 remains the latest plugin-suite evidence. Not run: `pnpm eden test` (no Docker daemon), full Compose/restart, remote CI.
+- All earlier harnesses pass at both widths: drafts, assignment, work sections, lookups, footer, reorder/review (`.scratch/editor-item7-*.log`). Core: `pnpm check` passes (1089 unsafe-any uses, baseline unchanged); production build passes; full core unit suite 388 files / 2666 tests passed (`.scratch/editor-item7-unit.log`, 137 s). No plugin runtime change, so the item-6 run of 340/340 remains the latest plugin-suite evidence. Not run: `pnpm eden test` (no Docker daemon), full Compose/restart, remote CI.
 
 ## Next action
 
