@@ -17,14 +17,14 @@ await build({
     contents: `
       import React from 'react';
       import { createRoot } from 'react-dom/client';
-      import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
+      import { QueryClient, QueryClientProvider, useQuery, keepPreviousData } from '@tanstack/react-query';
       import { createBrowserRouter, RouterProvider, Link, useSearchParams } from 'react-router';
       import PluginAdminPage from './frontend/src/pages/PluginAdminPage.tsx';
       import './frontend/src/index.css';
       function Editor() {
         const [search, setSearch] = useSearchParams();
         const params = { selection: search.get('selection') || '', q: search.get('q') || '', offset: search.get('offset') || '0', tab: search.get('tab') || 'works' };
-        const query = useQuery({ queryKey: ['fixture', search.toString()], queryFn: () => fetch('/document?' + new URLSearchParams(params)).then(r => r.json()), refetchOnWindowFocus: false });
+        const query = useQuery({ queryKey: ['fixture', search.toString()], queryFn: () => fetch('/document?' + new URLSearchParams(params)).then(r => r.json()), refetchOnWindowFocus: false, placeholderData: keepPreviousData }); // like PluginPage: the page stays mounted while the next loads
         return <>{query.data && <PluginAdminPage pluginId='fixture' pageId='editor' data={query.data} params={params} fetching={query.isFetching} onNavigate={(next) => setSearch({ ...params, ...next })} onRefetch={() => query.refetch()} />}</>;
       }
       const router = createBrowserRouter([{ path: '/editor', element: <Editor /> }, { path: '/elsewhere', element: <h1>Elsewhere</h1> }]);
