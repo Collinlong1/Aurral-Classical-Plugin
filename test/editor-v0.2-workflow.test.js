@@ -135,13 +135,13 @@ test("long sections in an entry page 100 rows at a time, the page kept in the se
   const { c, read } = await boxSet(t);
   const names = Array.from({ length: 130 }, (_, i) => `${i + 1}. Variation`);
   const work = newWork(c, "Many variations", names);
-  const first = section((await read({ selection: work })).view, "movements");
+  const first = section((await read({ selection: `${work}!movements` })).view, "movements");
   assert.equal(first.rows.length, 100);
   assert.equal(first.pager.label, "Movements 1–100 of 130");
-  assert.equal(first.pager.next, `${work}~1`);
+  assert.equal(first.pager.next, `${work}~1!movements`);
   const second = await read({ selection: `${work}~1` });
   assert.equal(section(second.view, "movements").rows.length, 30);
-  assert.equal(section(second.view, "movements").pager.previous, work);
+  assert.equal(section(second.view, "movements").pager.previous, `${work}!movements`);
   assert.equal(second.tab, "works");
 });
 
@@ -200,12 +200,12 @@ test("a merge adds the movements the kept work lacks and opens them; either way 
   const { c, read, mutate } = await boxSet(t);
   const keep = workTitled(c, "Sonata No. 3, Op. 3");
   const extra = newWork(c, "Sonata No. 3 (copy)", ["I. Allegro", "V. Finale"]);
-  const form = section((await read({ selection: keep })).view, "merge");
+  const form = section((await read({ selection: `${keep}!merge` })).view, "merge");
   assert.deepEqual(form.fields.find((f) => f.key === "direction").options.map((o) => o.value), ["into", "from"]);
   // On the kept work: merge the other into this.
   const merged = await mutate("merge-entity", { target: keep, into: extra, direction: "from", confirm: true }, keep);
   assert.equal(merged.ok, true, merged.message);
-  assert.equal(merged.selection, keep);
+  assert.equal(merged.selection, `${keep}!movements`);
   assert.equal(merged.focus, "movements");
   assert.match(merged.message, /Added 1 movement .*“V\. Finale”/);
   const titles = workMovements(c, keep).map((m) => m.title);

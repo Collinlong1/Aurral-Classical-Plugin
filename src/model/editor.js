@@ -7,7 +7,7 @@ import { classify } from "./reconcile.js";
 import { searchText, matchesSearch, ownedTracks } from "./editor-search.js";
 import { searchDiagnostics } from "../source.js";
 import { ensureSearchIndex } from "../search/engine.js";
-import { renderV2, lookupV2, applyV2, V2_COMMANDS, EditorV2Error, warnDuplicate, parseAlbumSelection, parseEntitySelection, nextReview } from "./editor-v2.js";
+import { renderV2, lookupV2, applyV2, V2_COMMANDS, EditorV2Error, warnDuplicate, parseAlbumSelection, parseEntitySelection, finishWorkMutation, nextReview } from "./editor-v2.js";
 
 class EditorError extends Error {
   constructor(message, status = 400) {
@@ -1144,7 +1144,8 @@ export async function mutateEditor(input) {
         const request = input.mutation;
         if (request && typeof request === "object" && request.values && typeof request.values === "object")
           checkRevision(c, request);
-        return apply(c, input, who);
+        const result = apply(c, input, who);
+        return input.capabilities.adminForms >= 2 ? finishWorkMutation(c, request, result) : result;
       });
     } catch (error) {
       if (error instanceof EditorError || error instanceof EditorV2Error)

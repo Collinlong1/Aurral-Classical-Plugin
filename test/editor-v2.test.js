@@ -94,9 +94,9 @@ test("browse tabs, lookups and an album turned into a work through selected trac
   }, creating);
   assert.equal(result.selection, "album:A");
   const work = s.c.db.prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL").get().id;
-  const workView = (await s.read({ selection: work })).view;
+  const workView = (await s.read({ selection: `${work}!movements` })).view;
   assert.deepEqual(section(workView, "movements").rows.map((r) => r.label), titles);
-  assert.equal(section(workView, "recordings").rows[0].badge.label, "Complete");
+  assert.equal(section((await s.read({ selection: `${work}!recordings` })).view, "recordings").rows[0].badge.label, "Complete");
   // Lookups search on their own, independent of the list search.
   assert.equal((await s.read({ lookup: "works", q: "symphony 5" })).options[0].value, work);
   assert.equal((await s.read({ lookup: "composers", q: "beethoven" })).options.length, 1);
@@ -108,12 +108,12 @@ test("browse tabs, lookups and an album turned into a work through selected trac
   const movements = section(workView, "movements").rows.map((r) => r.id);
   assert.deepEqual(assign.fields[0].value, movements);
   await s.ok("assign-album", { ...assign.arguments, mapping: assign.fields[0].value }, chosen.selection);
-  const after = (await s.read({ selection: work })).view;
+  const after = (await s.read({ selection: `${work}!recordings` })).view;
   assert.equal(section(after, "recordings").rows.length, 2);
   assert.equal(s.c.db.prepare("SELECT count(*) AS n FROM entity WHERE kind='person' AND deleted_at IS NULL").get().n, 1);
   // Unassign keeps the work and the audio.
   await s.ok("unassign-album", { albumId: "B", work }, "album:B");
-  assert.equal(section((await s.read({ selection: work })).view, "recordings").rows.length, 1);
+  assert.equal(section((await s.read({ selection: `${work}!recordings` })).view, "recordings").rows.length, 1);
 });
 
 test("one save edits several fields, pins them, and field actions keep provenance", async (t) => {
@@ -144,15 +144,15 @@ test("movements reorder, add in bulk and delete; credits use their own lookup", 
   const s = await setup(t);
   const work = (await s.ok("create-work", { title: "Suite", composer: "", movements: ["Prelude", "Allemande"] })).selection;
   await s.ok("add-movement", { work, title: ["Courante", "Sarabande"] }, work);
-  let rows = section((await s.read({ selection: work })).view, "movements").rows;
+  let rows = section((await s.read({ selection: `${work}!movements` })).view, "movements").rows;
   assert.deepEqual(rows.map((r) => r.label), ["Prelude", "Allemande", "Courante", "Sarabande"]);
   await s.ok("move-movement", { work, movement: rows[3].id, direction: "up" }, work);
   await s.ok("delete-movement", { work, movement: rows[0].id }, work);
-  rows = section((await s.read({ selection: work })).view, "movements").rows;
+  rows = section((await s.read({ selection: `${work}!movements` })).view, "movements").rows;
   assert.deepEqual(rows.map((r) => r.label), ["Allemande", "Sarabande", "Courante"]);
   const cellist = (await s.ok("create-contributor", { name: "Pierre Fournier", kind: "person" })).selection;
   await s.ok("add-credit", { target: work, contributor: cellist, role: "soloist", instrument: "cello" }, work);
-  assert.equal(section((await s.read({ selection: work })).view, "credits").rows[0].detail, "Soloist · cello");
+  assert.equal(section((await s.read({ selection: `${work}!credits` })).view, "credits").rows[0].detail, "Soloist · cello");
   assert.equal((await s.read({ selection: cellist })).view.subtitle, "Performer");
   assert.equal((await s.mutate("delete-entity", { target: cellist }, cellist)).ok, false, "in-use people can't be deleted");
 });
@@ -186,10 +186,10 @@ test("duplicate works merge, and unused works can be deleted", async (t) => {
   const b = (await s.ok("create-work-from-album", { albumId: "B", tracks: s.trackIds("B"), title: "Symphony No. 5 (dup)", composer: "", composerName: "Ludwig van Beethoven" }, "album:B")).selection;
   assert.equal((await s.mutate("merge-entity", { target: b, into: a, confirm: false }, b)).ok, false);
   await s.ok("merge-entity", { target: b, into: a, confirm: true }, b);
-  assert.equal(section((await s.read({ selection: a })).view, "recordings").rows.length, 2);
+  assert.equal(section((await s.read({ selection: `${a}!recordings` })).view, "recordings").rows.length, 2);
   assert.equal((await s.read({ tab: "works" })).list.items.length, 1);
   const empty = (await s.ok("create-work", { title: "Sketch", composer: "", movements: [] })).selection;
-  const del = (await s.read({ selection: empty })).view.actions.find((x) => x.command === "delete-entity");
+  const del = section((await s.read({ selection: `${empty}!advanced` })).view, "advanced").actions.find((x) => x.command === "delete-entity");
   assert.ok(del.confirm);
   await s.ok(del.command, del.arguments, empty);
   assert.equal((await s.read({ tab: "works" })).list.items.length, 1);
@@ -369,7 +369,7 @@ test("#11 every role the editor offers saves, Lyricist included, and wrong kinds
   const work = (await s.ok("create-work", { title: "Lieder", composer: "", movements: [] })).selection;
   const poet = (await s.ok("create-contributor", { name: "Wilhelm Müller", kind: "person" })).selection;
   const choir = (await s.ok("create-contributor", { name: "RIAS Kammerchor", kind: "ensemble" })).selection;
-  const form = section((await s.read({ selection: work })).view, "add-credit");
+  const form = section((await s.read({ selection: `${work}!add-credit` })).view, "add-credit");
   const roles = form.fields.find((f) => f.key === "role").options.map((o) => o.value);
   assert.ok(roles.includes("lyricist"));
   for (const role of roles) {

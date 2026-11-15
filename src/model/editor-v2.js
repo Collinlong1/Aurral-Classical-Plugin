@@ -45,12 +45,18 @@ const PAGE = 100;
 // or movements) show 100 rows at a time; the page is part of the selection
 // ("ID~2"), so a reload or an edit keeps it.
 const SECTION_PAGE = 100;
+const WORK_SECTIONS = { details: "Details", movements: "Movements", credits: "Credits", recordings: "Recordings", advanced: "Advanced" };
+const WORK_FORMS = { "add-movement": "movements", "add-credit": "credits", broadcast: "recordings", merge: "advanced" };
 export function parseEntitySelection(selection) {
-  const match = /^(.*)~(\d{1,6})$/.exec(selection);
-  return match ? { id: match[1], page: Number(match[2]) } : { id: selection, page: 0 };
+  const at = selection.lastIndexOf("!");
+  const section = at < 0 ? "" : selection.slice(at + 1);
+  if (at >= 0 && !Object.hasOwn(WORK_SECTIONS, section) && !Object.hasOwn(WORK_FORMS, section)) fail("Unknown work section");
+  const entry = at < 0 ? selection : selection.slice(0, at);
+  const match = /^(.*)~(\d{1,6})$/.exec(entry);
+  return { id: match ? match[1] : entry, page: match ? Number(match[2]) : 0, section };
 }
-const entitySelection = (id, page) => (page > 0 ? `${id}~${page}` : id);
-function paged(rows, page, id, noun = "") {
+const entitySelection = (id, page, section = "") => `${id}${page > 0 ? `~${page}` : ""}${section ? `!${section}` : ""}`;
+function paged(rows, page, id, noun = "", section = "") {
   if (rows.length <= SECTION_PAGE) return { rows };
   const pages = Math.ceil(rows.length / SECTION_PAGE);
   const at = Math.min(Math.max(0, page), pages - 1);
@@ -58,10 +64,28 @@ function paged(rows, page, id, noun = "") {
     rows: rows.slice(at * SECTION_PAGE, (at + 1) * SECTION_PAGE),
     pager: {
       label: `${noun ? `${noun} ` : ""}${at * SECTION_PAGE + 1}–${Math.min((at + 1) * SECTION_PAGE, rows.length)} of ${rows.length}`,
-      ...(at > 0 && { previous: entitySelection(id, at - 1) }),
-      ...(at < pages - 1 && { next: entitySelection(id, at + 1) }),
+      ...(at > 0 && { previous: entitySelection(id, at - 1, section) }),
+      ...(at < pages - 1 && { next: entitySelection(id, at + 1, section) }),
     },
   };
+}
+
+// Keep work mutations in their active section; v1 and other entity editors
+// retain their existing destinations. No UI-only state is added to writes.
+export function finishWorkMutation(c, request, result) {
+  const scope = request.revision.slice(0, request.revision.lastIndexOf("|"));
+  if (!scope || scope.includes(":") || request.command === "open") return result;
+  const current = parseEntitySelection(scope);
+  if (c.db.prepare("SELECT kind FROM entity WHERE id=? AND deleted_at IS NULL").get(current.id)?.kind !== "work" || result.selection !== current.id) return result;
+  let section = current.section || (current.page > 0 ? "movements" : "details");
+  let page = current.page;
+  if (request.command === "add-movement") {
+    section = "movements";
+    page = Math.floor(Math.max(0, workMovements(c, current.id).length - 1) / SECTION_PAGE);
+  } else if (["add-credit", "remove-credit"].includes(request.command)) section = "credits";
+  else if (["move-movement", "delete-movement", "reorder-movements"].includes(request.command)) section = "movements";
+  else section = WORK_FORMS[section] || section;
+  return { ...result, selection: entitySelection(current.id, page, section === "details" ? "" : section), focus: section };
 }
 const ROLES = CREDIT_ROLES;
 const roleLabel = (role) => role[0].toUpperCase() + role.slice(1);
@@ -548,7 +572,8 @@ const mergeForm = (target, lookup, noun, note) => ({
 
 // ---- views ---------------------------------------------------------------
 
-function workView(c, work, page = 0) {
+function workView(c, work, page = 0, section = "details") {
+  const current = WORK_FORMS[section] || section;
   const title = entityLabel(c, work, "work");
   const composers = credits(c, work).filter((credit) => credit.role === "composer");
   const movements = workMovements(c, work);
@@ -583,15 +608,16 @@ function workView(c, work, page = 0) {
     )
     .all(work)
     .map((row) => ({ id: row.id, label: entityLabel(c, row.id, "recording"), detail: "Broadcast recording", selection: row.id }));
-  return {
+  const view = {
     crumbs: composers.slice(0, 1).map((composer) => ({ label: composer.name, selection: composer.contributor_id })),
     title,
     subtitle: composers.map((composer) => composer.name).join(", ") || "Composer unknown",
     badges: [
+      { label: WORK_SECTIONS[current], tone: "default" },
       { label: `${performances.length} recording${performances.length === 1 ? "" : "s"}`, tone: "default" },
       ...(movements.length ? [{ label: `${movements.length} movements`, tone: "muted" }] : []),
     ],
-    actions: [action("Delete work", "delete-entity", { target: work }, { tone: "danger", confirm: deleteConfirm(c, [work], title) })],
+    actions: Object.entries(WORK_SECTIONS).map(([key, label]) => open(label, entitySelection(work, key === current ? page : 0, key === "details" ? "" : key))),
     sections: [
       detailsForm(c, work, "work"),
       {
@@ -609,7 +635,7 @@ function workView(c, work, page = 0) {
             ...(index < movements.length - 1 ? [action("Move down", "move-movement", { work, movement: movement.id, direction: "down" })] : []),
             ...(coverage.get(movement.id) ? [] : [action("Delete", "delete-movement", { work, movement: movement.id }, { tone: "danger", confirm: "Delete this movement?" })]),
           ],
-        })), page, work, "Movements"),
+        })), page, work, "Movements", "movements"),
       },
       {
         type: "form",
@@ -627,7 +653,7 @@ function workView(c, work, page = 0) {
         title: "Recordings",
         note: "Open an album to change which of its tracks belong to this work.",
         empty: "No owned recordings yet. Open an album and assign it to this work.",
-        ...paged([...recordingRows, ...broadcasts], page, work, "Recordings"),
+        ...paged([...recordingRows, ...broadcasts], page, work, "Recordings", "recordings"),
       },
       {
         type: "form",
@@ -646,6 +672,20 @@ function workView(c, work, page = 0) {
       mergeForm(work, "works", "work", "Moves the recordings, credits, favourites and picks of the work merged away into the one that stays. Movements are matched by title or number; a movement the staying work lacks is added to it, at the end, to put in order afterwards."),
     ],
   };
+  const selected = view.sections.find((item) => item.id === section);
+  if (section === "advanced") {
+    view.sections = [{ type: "rows", id: "advanced", title: "Advanced", rows: [], empty: "Merge duplicate works or delete this work from the classical catalogue. Audio files stay in your library.", actions: [
+      open("Merge with another work", entitySelection(work, 0, "merge")),
+      action("Delete work", "delete-entity", { target: work }, { tone: "danger", confirm: deleteConfirm(c, [work], title) }),
+    ] }];
+  } else if (Object.hasOwn(WORK_FORMS, section)) {
+    view.actions.push(open("Cancel", entitySelection(work, page, current)));
+    view.sections = [selected];
+  } else {
+    const add = { movements: ["Add movements", "add-movement"], credits: ["Add a credit", "add-credit"], recordings: ["Add a broadcast recording", "broadcast"] }[section];
+    view.sections = [{ ...selected, ...(add && { actions: [open(add[0], entitySelection(work, page, add[1]))] }) }];
+  }
+  return view;
 }
 
 function contributorView(c, entity, page = 0) {
@@ -1665,13 +1705,14 @@ export function renderV2(c, query, revision, { downloads = null, maintenance = n
   else if (selection.startsWith("review:")) view = reviewView(c, selection.slice(7));
   else if (selection.startsWith("new:")) view = newView(selection.slice(4));
   else if (selection) {
-    const { id: entityId, page } = parseEntitySelection(selection);
+    const { id: entityId, page, section } = parseEntitySelection(selection);
     const entity = c.db.prepare("SELECT * FROM entity WHERE id=? AND deleted_at IS NULL").get(entityId);
     if (!entity) fail("This catalogue entry no longer exists");
+    if (section && entity.kind !== "work") fail("Sections are only available for works");
     const parsed = { ...entity, data: JSON.parse(entity.data), label: entityLabel(c, entity.id, entity.kind) };
     view =
       entity.kind === "work"
-        ? workView(c, entity.id, page)
+        ? workView(c, entity.id, page, section || (page > 0 ? "movements" : "details"))
         : entity.kind === "person" || entity.kind === "ensemble"
           ? contributorView(c, parsed, page)
           : entity.kind === "movement"
@@ -2098,7 +2139,7 @@ export function applyV2(c, request, who) {
         const page = Math.floor(Math.max(0, order.indexOf(added[0])) / SECTION_PAGE);
         const names = added.slice(0, 3).map((id) => `“${entityLabel(c, id, "movement")}”`).join(", ");
         return {
-          selection: entitySelection(into, page),
+          selection: entitySelection(into, page, "movements"),
           focus: "movements",
           changeId,
           message: `Merged. Added ${added.length} movement${added.length === 1 ? "" : "s"} the work didn't have (${names}${added.length > 3 ? ` and ${added.length - 3} more` : ""}) at the end of Movements; use Move up to put ${added.length === 1 ? "it" : "them"} in order. Undo it from Activity.`.slice(0, 500),

@@ -76,8 +76,8 @@ test("deleting works in use keeps tracks and files, isn't undone by matching, an
   const second = liveWork(c, "Sonata No. 2, Op. 2");
   assert.ok(first && second);
   const tracksBefore = c.db.prepare("SELECT id,evidence,state FROM track_link ORDER BY id").all();
-  const view = (await read({ selection: first })).view;
-  const remove = view.actions.find((a) => a.command === "delete-entity");
+  const view = (await read({ selection: `${first}!advanced` })).view;
+  const remove = view.sections.find((s) => s.id === "advanced").actions.find((a) => a.command === "delete-entity");
   assert.match(remove.confirm, /4 movements and 1 recording.*4 tracks stay in your library.*Audio files are never deleted/);
   // Both, from the list's bulk action.
   const bulk = (await read({ tab: "works" })).list.select.actions.find((a) => a.command === "delete-works");

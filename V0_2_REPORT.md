@@ -1,3 +1,11 @@
+# Metadata editor UI, item 3 (November 14, 2026)
+
+Item 2 is published: core `c38393bd4816e721bd4c838e59ad0403452f7153`; plugin implementation `8800d16` with paired-CI pin `6a41904` (1.0.55). The user requested push, then item 3.
+
+Item 3 (plugin 1.0.56) separates work editing into Details, Movements, Credits, Recordings and Advanced using the existing editor API. Add and merge forms open on request; Cancel returns to their section, with host draft protection. Successful edits stay in the relevant section; added movements open their last page. Merge/delete remain confirmed/undoable as before, under Advanced. Plugin-owned section addresses survive reloads and use the existing work revision scope. No schema or matching changes.
+
+The only item-3 core runtime change is two generic mobile CSS declarations: row actions take their own line and wrap, keeping labels readable for every plugin. Before/after screenshots caught and verified the fix. No classical-specific core code or new API. Validation and next actions: plugin `EDITOR_UI_HANDOFF.md`; item 3 is complete locally and unpushed. Validation: 336/336 full plugin tests, 38/38 focused editor tests, three real-renderer browser harnesses at desktop/phone widths, core checks (1089 unsafe-any, unchanged) and production build. Core CSS commit `c0cf7ab`; plugin bundle rebuilt. Full Compose/restart and remote CI not run for this step. Items 4–7 remain pending.
+
 # Metadata editor UI, item 2 (November 14, 2026)
 
 Local implementation for review, plugin 1.0.55. Album grouping now uses one paged track list: select tracks → choose an existing work or create one → map only those tracks → apply. Back retains the selection; Cancel leaves assignments unchanged. Not classical defaults to Skip; explicit moves remain atomic. Selection tokens bind the final request to the selected album tracks, in album order. Existing forms/rows/navigation API; no schema change.

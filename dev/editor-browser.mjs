@@ -87,6 +87,7 @@ try {
   await detail.getByRole("heading", { name: `Fixture sonata ${token}`, exact: true }).waitFor();
   const work = selection();
   assert.ok(work);
+  await detail.getByRole("button", { name: "Movements", exact: true }).click();
   // Movement order is one click per move.
   await group("Movements")
     .getByRole("button", { name: "Move down: I. First", exact: true })
@@ -99,6 +100,8 @@ try {
     ["II. Second", "I. First", "III. Third"],
   );
   // Validation errors keep the draft.
+  await detail.getByRole("button", { name: "Recordings", exact: true }).click();
+  await group("Recordings").getByRole("button", { name: "Add a broadcast recording", exact: true }).click();
   const broadcast = group("Add a broadcast recording");
   await broadcast.getByLabel("Title", { exact: true }).fill(`Fixture broadcast ${token}`);
   await broadcast.getByLabel("Date", { exact: true }).fill("2026-99");

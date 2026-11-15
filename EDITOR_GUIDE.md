@@ -24,15 +24,15 @@ Everything here changes the classical catalogue only. Audio files are never writ
 
 **Send to / Remove from Classical.** On an album or a track. These manual choices beat automatic detection and survive rescans. On a track, **Use automatic detection** returns it to the detector.
 
-**Edit a work.** Edit any details and press Save; edited fields are pinned so provider refreshes never overwrite them.
+**Edit a work.** Open a work and choose **Details**, **Movements**, **Credits**, **Recordings** or **Advanced**. Only the current section is shown, and reloads keep that section. Details opens first; edit its fields and press Save. Edited fields are pinned so provider refreshes never overwrite them.
 - Each field shows where its value came from: MusicBrainz, From file tags, Edited, or Intentionally blank. A pinned field whose provider value differs shows that value.
 - Next to a field: **Use MusicBrainz value** unpins it, **Remove pin** recomputes it, and **Mark blank** stores a deliberate blank.
-- **Movements:** Move up/down, Delete (only when no track uses it), and add several at once, one per line.
-- **Credits:** add a person or ensemble with a role and optional instrument; the person search is its own box.
-- **Recordings** lists every owned performance with movement coverage.
-- **Add a broadcast recording** covers radio or concert recordings that aren't on an album.
+- **Movements:** Move up/down or Delete (only when no track uses it). **Add movements** opens a separate form; enter one title per line. Saving returns to the page containing the new movements.
+- **Credits:** choose **Add a credit**, then a person or ensemble, role and optional instrument; the person search is its own box. Saving returns to Credits.
+- **Recordings** lists owned performances with movement coverage. **Add a broadcast recording** opens a form for radio or concert recordings that are not on an album; saving opens the new recording.
+- **Advanced:** open **Merge with another work**, or **Delete work**. The merge form and add forms stay closed until requested. **Cancel** returns to their section; leaving a changed form asks before discarding its draft.
 
-**Delete works.** On a work, or several from the Works list. The confirmation says how many movements, recordings and tracks are involved. The tracks stay in your library (they just leave the work) and audio files are never touched. Matching won't make a deleted work again on its own: an album that would gets a review item, **Allow this work again** or leave it.
+**Delete works.** Open a work → **Advanced** → **Delete work**, or select several from the Works list. The confirmation says how many movements, recordings and tracks are involved. The tracks stay in your library (they just leave the work) and audio files are never touched. Matching won't make a deleted work again on its own: an album that would gets a review item, **Allow this work again** or leave it.
 
 **Edit together.** Tick works in the list → **Edit together**: period, form, key, instrumentation, or add a composer to all of them (empty fields are left alone), or **Use provider values** to unpin what you set by hand.
 
