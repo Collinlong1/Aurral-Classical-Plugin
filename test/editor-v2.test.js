@@ -6,7 +6,7 @@ import { readEditor, mutateEditor } from "../src/model/editor.js";
 import { openCatalogue } from "../src/model/catalogue.js";
 import { Metadata } from "../src/model/metadata.js";
 import { reconcile, classify } from "../src/model/reconcile.js";
-import { autoMatchTaggedWorks, repairMergedIdentities } from "../src/model/auto-match.js";
+import { autoMatchTaggedWorks, repairMergedIdentities, mergeDuplicateAutoWorks, distinctKey } from "../src/model/auto-match.js";
 import { mutateEditor as mutateRaw } from "../src/model/editor.js";
 import { tempFolders } from "./helpers.js";
 import { renderAlbumPresentation } from "../src/model/presentation.js";
@@ -679,4 +679,86 @@ test("#13 when the kept work has no composer, all dropped composers move", async
   assert.match(section(view, "keep-second").items.find((item) => item.label === "Composers").value, /move to the kept work/);
   await s.ok("merge-entity", { target: s.b, into: s.a, confirm: true }, step);
   assert.deepEqual(composerCredits(s, s.a), composers);
+});
+
+for (const mode of ["album", "standalone"]) {
+  test(`#12 Create anyway keeps ${mode} work distinct across scans and new ambiguous albums`, async (t) => {
+    const s = await setup(t);
+    const title = "Symphony No. 5 in C minor, Op. 67";
+    for (const album of ["A", "B"]) for (const track of s.trackIds(album)) setHints(s, track, { work: title });
+    autoMatchTaggedWorks(s.c);
+    const [original] = liveWorks(s);
+    const [composer] = composerCredits(s, original);
+    if (mode === "album") {
+      const { form, selection } = await newAlbumForm(s, "B");
+      const values = { ...form.arguments, title, composer, composerName: "" };
+      assert.equal((await s.mutate("create-work-from-album", values, selection)).ok, false);
+      await s.ok("create-work-from-album", { ...values, createAnyway: true }, selection);
+    } else {
+      assert.equal((await s.mutate("create-work", { title, composer, movements: titles })).ok, false);
+      await s.ok("create-work", { title, composer, movements: titles, createAnyway: true });
+    }
+    const made = liveWorks(s).find((id) => id !== original);
+    const suppression = s.c.db.prepare("SELECT reason,actor FROM match_suppression WHERE key=?").get(distinctKey(original, made));
+    assert.equal(suppression?.reason, "distinct");
+    assert.equal(suppression.actor, "1");
+    const before = ["A", "B"].map((album) => s.trackIds(album).map((id) => workOfTrack(s, id)));
+    for (let pass = 0; pass < 3; pass++) {
+      autoMatchTaggedWorks(s.c);
+      assert.deepEqual(liveWorks(s).sort(), [original, made].sort());
+      assert.deepEqual(["A", "B"].map((album) => s.trackIds(album).map((id) => workOfTrack(s, id))), before);
+    }
+    assert.equal(s.c.db.prepare("SELECT count(*) AS n FROM review_item WHERE kind='identity' AND status='open' AND json_extract(evidence,'$.reason')='duplicate-work'").get().n, 0);
+    addSpellingAlbum(s, "D", "Ludwig van Beethoven", 2);
+    assert.deepEqual(liveWorks(s).sort(), [original, made].sort());
+    assert.ok(s.trackIds("D").every((id) => workOfTrack(s, id).length === 0));
+    const review = s.c.db.prepare("SELECT evidence FROM review_item WHERE kind='auto_match' AND json_extract(evidence,'$.reason')='ambiguous-work' AND json_extract(evidence,'$.albumId')='D'").get();
+    assert.deepEqual(JSON.parse(review.evidence).candidates.sort(), [original, made].sort());
+  });
+}
+
+test("#12 Create anyway records all similar works, including unnumbered ones", async (t) => {
+  const s = await setup(t);
+  const first = (await s.ok("create-work", { title: "Prelude", movements: [] })).selection;
+  const second = (await s.ok("create-work", { title: "Prelude", movements: [], createAnyway: true })).selection;
+  const third = (await s.ok("create-work", { title: "Prelude", movements: [], createAnyway: true })).selection;
+  for (const other of [first, second])
+    assert.ok(s.c.db.prepare("SELECT 1 FROM match_suppression WHERE key=?").get(distinctKey(third, other)));
+  assert.deepEqual(mergeDuplicateAutoWorks(s.c), { people: 0, works: 0 });
+  assert.equal(liveWorks(s).length, 3);
+});
+
+for (const manualFirst of [false, true]) {
+  test(`#12 duplicate repair reviews a work without an album-work identity (manual first: ${manualFirst})`, async (t) => {
+    const s = await setup(t), m = new Metadata(s.c);
+    const composer = s.c.createEntity("person", { roles: ["composer"] });
+    m.derived(composer, "name", "Ludwig van Beethoven");
+    const works = [];
+    for (const isManual of manualFirst ? [true, false] : [false, true]) {
+      const work = s.c.createEntity("work");
+      // Deliberately no manual assertion or suppression: identity is the guard.
+      m.derived(work, "title", "Symphony No. 5, Op. 67");
+      s.c.credit(work, composer, "composer");
+      if (!isManual) s.c.externalIdentity(work, "embedded-tags", "album-work", `old-${work}`);
+      works.push(work);
+    }
+    for (let pass = 0; pass < 2; pass++) assert.deepEqual(mergeDuplicateAutoWorks(s.c), { people: 0, works: 0 });
+    assert.deepEqual(liveWorks(s).sort(), works.sort());
+    assert.equal(s.c.db.prepare("SELECT count(*) AS n FROM review_item WHERE kind='identity' AND status='open' AND json_extract(evidence,'$.reason')='duplicate-work'").get().n, 1);
+  });
+}
+
+test("#12 duplicate repair asks for a decision when neither work has an album-work identity", async (t) => {
+  const s = await setup(t), m = new Metadata(s.c);
+  const composer = s.c.createEntity("person", { roles: ["composer"] });
+  m.derived(composer, "name", "Ludwig van Beethoven");
+  const works = [0, 1].map(() => {
+    const work = s.c.createEntity("work");
+    m.derived(work, "title", "Symphony No. 5, Op. 67");
+    s.c.credit(work, composer, "composer");
+    return work;
+  });
+  for (let pass = 0; pass < 2; pass++) assert.deepEqual(mergeDuplicateAutoWorks(s.c), { people: 0, works: 0 });
+  assert.deepEqual(liveWorks(s).sort(), works.sort());
+  assert.equal(s.c.db.prepare("SELECT count(*) AS n FROM review_item WHERE kind='identity' AND status='open' AND json_extract(evidence,'$.reason')='duplicate-work'").get().n, 1);
 });

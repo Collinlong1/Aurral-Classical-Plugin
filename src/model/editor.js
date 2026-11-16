@@ -7,7 +7,7 @@ import { classify } from "./reconcile.js";
 import { searchText, matchesSearch, ownedTracks } from "./editor-search.js";
 import { searchDiagnostics } from "../source.js";
 import { ensureSearchIndex } from "../search/engine.js";
-import { renderV2, lookupV2, applyV2, V2_COMMANDS, EditorV2Error, warnDuplicate, parseAlbumSelection, parseEntitySelection, finishWorkMutation, nextReview, parseMergeSelection } from "./editor-v2.js";
+import { renderV2, lookupV2, applyV2, V2_COMMANDS, EditorV2Error, warnDuplicate, rememberDistinct, parseAlbumSelection, parseEntitySelection, finishWorkMutation, nextReview, parseMergeSelection } from "./editor-v2.js";
 
 class EditorError extends Error {
   // `field`: the form field the message is about; v2 hosts show it there.
@@ -905,10 +905,11 @@ function apply(c, input, who) {
         .filter(Boolean);
       if (movements.length > 100)
         fail("Create no more than 100 movements at a time");
-      warnDuplicate(c, title, composer ? [m.resolve(composer, "name").value].filter(Boolean) : [], v.createAnyway);
+      const similar = warnDuplicate(c, title, composer ? [m.resolve(composer, "name").value].filter(Boolean) : [], v.createAnyway);
       selection = c.createEntity("work");
       manual(selection, "title", title);
       if (composer) c.credit(selection, composer, "composer");
+      rememberDistinct(c, selection, similar, who);
       movements.forEach((title, i) => {
         const id = c.createEntity("movement");
         manual(id, "title", title);

@@ -1,3 +1,11 @@
+# v0.3 Phase 0.03 — preserve deliberate separate works (issue #12)
+
+Branch `fix/v0.3-0.03-preserve-distinct-works` starts at `aurral-classical` `15618a1`, which includes merged E2 PR #95 and L2 PR #94. Current #12 has no extra dependencies or later scope comments. This implements E1 only.
+
+Both work creation paths remember Create anyway as distinct from every similar work in the existing suppression table. Duplicate repair never merges into or out of a work without an album-work identity; unsuppressed duplicates are reviewed instead. Repeated scans preserve the original and new work and their album assignments. A later album that fits both raises ambiguous-work for the admin. Existing all-auto duplicate cleanup remains covered by its regression test. No schema, core, media or provider-request change; bundle rebuilt.
+
+Verification and base/fixed probe evidence: `V0_3_REPORT.md`. The known Phase 1 fixture mismatch remains outside this issue.
+
 # v0.3 Phase 0.02 — work-merge composers (issue #13)
 
 Branch `fix/v0.3-0.02-work-merge-composers` starts at merged `aurral-classical` `2b50d44` (PR #94, L2 prerequisite). Current #13 has no later comments changing scope. This change implements E2 only.

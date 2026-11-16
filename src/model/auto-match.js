@@ -2436,16 +2436,21 @@ export function mergeDuplicateAutoWorks(catalogue, { actor = null } = {}) {
           if (!keptDistinct(catalogue, ids[0], id)) catalogue.review("identity", id, { reason: "duplicate-work", keep: ids[0], evidence: "same title, no number" });
         continue;
       }
+      const hasAlbumWork = (id) => catalogue.db
+        .prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work'").get(id);
       const auto = (id) =>
-        catalogue.db
-          .prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work'")
-          .get(id) &&
+        hasAlbumWork(id) &&
         !hasManualEdits(catalogue, [id, ...workMovements(catalogue, id).map((m) => m.id)]);
       const keep = ids.find((id) => !auto(id)) || ids[0];
-      if (ids.filter((id) => !auto(id)).length > 1) continue;
+      const severalEdited = ids.filter((id) => !auto(id)).length > 1;
       for (const id of ids.filter((id) => id !== keep))
         // An admin said these are two works: never merged, never asked again.
         if (keptDistinct(catalogue, keep, id)) continue;
+        // A work made outside automatic album matching is never silently
+        // folded into another work, nor used to absorb an auto-created one.
+        else if (!hasAlbumWork(keep) || !hasAlbumWork(id))
+          catalogue.review("identity", id, { reason: "duplicate-work", keep, evidence: "work not created by automatic matching" });
+        else if (severalEdited) continue;
         // Same title and number, different verified MusicBrainz works or
         // composers: kept apart, for an admin to decide.
         else if (!compatibleAutoWorks(catalogue, keep, id)) catalogue.review("identity", id, { reason: "duplicate-work", keep, evidence: "different MusicBrainz identities" });

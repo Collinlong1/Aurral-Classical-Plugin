@@ -1,3 +1,29 @@
+# v0.3 Phase 0.03 — E1 / issue #12
+
+Base: `aurral-classical` `15618a1`, containing merged E2 PR #95 and L2 PR #94. The handoff sequence places E1 next. Current #12 declares no further dependencies and has no later comments changing scope. No other issue is implemented here.
+
+## Result
+
+Both `create-work` and `create-work-from-album` now persist Create anyway as one `distinctKey(newWork, similar)` suppression per similar work. This uses the existing `match_suppression` table, with the host actor recorded, inside the creation transaction. Duplicate warnings still require confirmation.
+
+`mergeDuplicateAutoWorks` reviews a pair instead of merging whenever either work lacks an `album-work` identity. Explicitly distinct pairs remain silent. Existing protection for multiple edited auto-created works and conflicting provider identities stays in place, and cleanup of genuine old all-auto duplicates still passes its regression.
+
+The original and new works retain their separate album assignments across repeated scans. A new album fitting both stays unassigned with an `ambiguous-work` review. This prevents the unwanted automatic merge; it does not add undo for automatic merges or repair already collapsed works. No schema, core, media-tag or provider-request changes. Bundle rebuilt.
+
+## Verification
+
+On Node 24.22.1:
+
+- Six new editor regressions fail against merged base `15618a1` and pass with the fix.
+- `node --test test/editor-v2.test.js test/auto-match.test.js test/editor-v0.2-workflow.test.js`: 49/49 passed. Coverage includes both create paths and retained warning behavior, exact album assignments across three rescans, ambiguous subsequent albums, all-similar suppression including unnumbered works, identity-less works in both creation orders, and two identity-less works raising one stable review across repeated repair passes. The existing old all-auto duplicate cleanup still passes.
+- Review probe `p5.mjs` run against base `15618a1` and the fix using `PLUGIN_SRC`. Section A: the base collapses albums A/B back into one work; the fix retains two live works with their separate recordings. Sections B–E probe unrelated review/editor/track-link findings and are outside #12.
+- `npm run build`: passed. `git diff --check`: passed.
+- Full `npm test`: 356/356 passed.
+
+No local browser or Compose/restart run for #12. The known pre-existing Phase 1 workflow fixture mismatch remains unchanged and outside scope.
+
+---
+
 # v0.3 Phase 0.02 — E2 / issue #13
 
 Base: `aurral-classical` `2b50d44`, including merged PR #94 / L2. The handoff orders E2 immediately after L2. The current issue has no later comments changing scope. #10 remains open on GitHub, but its implementation is merged and present in this base. No other issue is implemented here.
