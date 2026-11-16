@@ -1,3 +1,11 @@
+# v0.3 Phase 1.6 — persist reissue links between performances (issue #54)
+
+Second of ten commits in one PR (1.5–1.7, 2.1–2.7). Implements #54 only; #54 has no later comments.
+
+New `src/model/reissues.js`. After matching (and after credits are derived), `linkReissues` stores a `same_recording` relation for each pair of performances of a work that the v0.2 rule (`sameRecording`: same MusicBrainz recordings, or the same performers with every part and track within two seconds, never on one album) joins. `groupRecordings` reads the stored state first: a link joins, an admin's unlink (`unlinkReissue`, audited as `reissue.unlink`) keeps apart, and the rule decides only pairs with neither; matching never links a pair an admin took apart until `relinkReissue`. The work page and the search index use it. New relation kinds `same_recording` and `member_of` (for 2.3). The first library pass backfills links for existing recordings (plan §3 step 2). No schema or core change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
 # v0.3 Phase 1.5 — contributor identity by aliases and MusicBrainz IDs (issue #55)
 
 First of ten commits in one PR (1.5–1.7, 2.1–2.7) on `claude/pensive-bardeen-5dat3q`, from `aurral-classical` `ea1eb8d` (merged PR #104). Implements #55 only; #55 has no later comments.

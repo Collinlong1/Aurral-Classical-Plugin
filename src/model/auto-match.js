@@ -4,6 +4,7 @@ import { transaction } from "./database.js";
 import { catalogueNumber, cataloguePiece } from "../works.js";
 import { artistCredits, composersOf } from "./credits.js";
 import { deriveCredits } from "./contributors.js";
+import { linkReissues } from "./reissues.js";
 
 const MULTI_MOVEMENT =
   /\b(symphon(?:y|ie)|sinfonia|sonata|sonatina|concerto|suite|partita|quartet|quintet|sextet|septet|octet|nonet|trio|serenade|divertimento|cassation|mass|missa|requiem|stabat mater|magnificat|te deum|vespers|cantata|oratorio|passion|variations?|ballet)\b/i;
@@ -3105,6 +3106,8 @@ export function autoMatchTaggedWorks(
   keyMovementTitles(catalogue, { albumId });
   // Who plays each newly matched performance, from its tags.
   deriveCredits(catalogue, { albumId });
+  // One performance on several releases, stored once its performers are known.
+  linkReissues(catalogue, { albumId });
   resolveSettledReviews(catalogue, albumId, actor);
   return { created, candidates: groups.length };
 }

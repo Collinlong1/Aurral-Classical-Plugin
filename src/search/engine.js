@@ -65,7 +65,7 @@ export function catalogueStamp(c) {
 }
 
 // Every resolved display value, read once.
-function resolvedValues(c) {
+export function resolvedValues(c) {
   const values = new Map();
   for (const row of c.db
     .prepare(
@@ -79,7 +79,7 @@ function resolvedValues(c) {
   return values;
 }
 
-function classicalTracks(c) {
+export function classicalTracks(c) {
   const tracks = new Map();
   for (const row of c.db
     .prepare(
@@ -104,8 +104,9 @@ const yearOf = (value) => {
 export function ownedRecordings(c, tracks = classicalTracks(c), values = resolvedValues(c), { workId = null } = {}) {
   const rows = c.db
     .prepare(
-      `SELECT r.id AS realization,r.work_id,r.performance_work_id,r.label,i.movement_id,i.sequence,s.track_link_id,s.start_ms,s.end_ms
-       FROM realization r JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
+      `SELECT r.id AS realization,r.work_id,r.performance_work_id,pw.source_id AS performance_id,r.label,i.movement_id,i.sequence,s.track_link_id,s.start_ms,s.end_ms
+       FROM realization r JOIN relation pw ON pw.id=r.performance_work_id
+       JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
        JOIN entity w ON w.id=r.work_id AND w.deleted_at IS NULL
        ${workId ? "WHERE r.work_id=?" : ""}
        ORDER BY r.id,i.sequence,i.occurrence,i.id`,
@@ -119,7 +120,7 @@ export function ownedRecordings(c, tracks = classicalTracks(c), values = resolve
   for (const row of rows) {
     const track = tracks.get(row.track_link_id);
     if (!track) continue;
-    if (!byRealization.has(row.realization)) byRealization.set(row.realization, { id: row.realization, workId: row.work_id, performanceWorkId: row.performance_work_id, label: row.label, items: [] });
+    if (!byRealization.has(row.realization)) byRealization.set(row.realization, { id: row.realization, workId: row.work_id, performanceWorkId: row.performance_work_id, performanceId: row.performance_id, label: row.label, items: [] });
     byRealization.get(row.realization).items.push({ movementId: row.movement_id, sequence: row.sequence, track, startMs: row.start_ms, endMs: row.end_ms });
   }
   const recordings = [];
@@ -184,11 +185,36 @@ export function sameRecording(a, b) {
   return a.trackMs.length === b.trackMs.length && a.trackMs.every((ms, i) => Math.abs(ms - b.trackMs[i]) <= 2000);
 }
 
-// Realizations grouped into recordings: [{ key, realizations: [...] }].
-export function groupRecordings(recordings) {
+const performancePair = (a, b) => (a < b ? `${a}|${b}` : `${b}|${a}`);
+// Stored reissue decisions: { linked, unlinked } sets of performance pairs.
+// Matching links what the rule joins (`same_recording`); an admin's latest
+// link or unlink of a pair holds.
+export function reissueState(c) {
+  const linked = new Set(c.db.prepare("SELECT source_id,target_id FROM relation WHERE kind='same_recording'").all().map((row) => performancePair(row.source_id, row.target_id)));
+  const unlinked = new Set();
+  for (const row of c.db.prepare("SELECT action,data FROM audit_event WHERE action IN ('reissue.link','reissue.unlink') ORDER BY id").iterate()) {
+    const { a, b } = JSON.parse(row.data);
+    if (row.action === "reissue.unlink") unlinked.add(performancePair(a, b));
+    else unlinked.delete(performancePair(a, b));
+  }
+  return { linked, unlinked };
+}
+
+// Realizations grouped into recordings: [{ key, realizations: [...] }]. With
+// the stored `state`, a link joins and an admin's unlink keeps apart; the
+// rule decides only pairs with neither.
+export function groupRecordings(recordings, state = null) {
+  const same = (a, b) => {
+    if (state && a.performanceId && b.performanceId && a.performanceId !== b.performanceId) {
+      const key = performancePair(a.performanceId, b.performanceId);
+      if (state.linked.has(key)) return true;
+      if (state.unlinked.has(key)) return false;
+    }
+    return sameRecording(a, b);
+  };
   const groups = [];
   for (const recording of recordings) {
-    const group = groups.find((g) => g.realizations.some((other) => sameRecording(recording, other)));
+    const group = groups.find((g) => g.realizations.some((other) => same(recording, other)));
     if (group) group.realizations.push(recording);
     else groups.push({ key: recording.id, realizations: [recording] });
   }
@@ -263,7 +289,7 @@ export function buildDocuments(c) {
     collectionsOf.get(row.target_id).push(row.source_id);
   }
   const recordings = ownedRecordings(c, tracks, values);
-  const groups = groupRecordings(recordings);
+  const groups = groupRecordings(recordings, reissueState(c));
   const recordingsOf = new Map();
   for (const group of groups) {
     const workId = group.realizations[0].workId;

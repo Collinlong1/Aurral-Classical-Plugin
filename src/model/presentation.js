@@ -4,7 +4,7 @@ import { transaction } from "./database.js";
 import { NUMBERED_SET, isCollectionLike, numberedPiece, movementTitle, splitTitle, withoutComposer } from "./auto-match.js";
 import { catalogueNumber } from "../works.js";
 import { composersOf } from "./credits.js";
-import { groupRecordings, ownedRecordings } from "../search/engine.js";
+import { groupRecordings, ownedRecordings, reissueState } from "../search/engine.js";
 import { performerNames } from "./contributors.js";
 
 const text = (value, fallback) =>
@@ -465,7 +465,7 @@ function workPage(c, workId, user) {
 // release; picks keep naming that realization.
 function recordingsOf(c, metadata, workId, movements, byRealization) {
   const facts = new Map(ownedRecordings(c, undefined, undefined, { workId }).map((r) => [r.id, r]));
-  const groups = groupRecordings([...byRealization.keys()].map((id) => facts.get(id)).filter(Boolean));
+  const groups = groupRecordings([...byRealization.keys()].map((id) => facts.get(id)).filter(Boolean), reissueState(c));
   const grouped = new Map(groups.flatMap((group) => group.realizations.map((r) => [r.id, group])));
   const seen = new Set();
   const out = [];

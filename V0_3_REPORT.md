@@ -1,3 +1,17 @@
+# v0.3 Phase 1.6 — reissue links / issue #54
+
+## Result
+
+- `reissues.js`: `linkReissues(c, { albumId })` for the works on the album (or every work in the library pass), `unlinkReissue`, `relinkReissue`. Links are stored source < target with distinct positions (the relation table's unique keys).
+- `engine.js`: `reissueState(c)` returns stored links and the latest admin decisions (from `audit_event`, as `unassignedByAdmin` reads album decisions); `groupRecordings(recordings, state)` applies them before the rule; `ownedRecordings` returns each recording's `performanceId`; `classicalTracks` and `resolvedValues` are exported for `linkReissues`. The search index stamp already counts relations, so a link or unlink rebuilds it.
+- `presentation.js` `recordingsOf` passes the state.
+
+## Verification
+
+On Node 22.23: full `npm test` 413/413; Apple corpus identical to the baseline. Extended `the work page lists one entry per recording` (`test/search.test.js`): Levit's two releases are stored as one link; with the box set retagged to a different recording ID they stay one entry; after an admin's unlink they are two, a full library pass with the original tags adds no link back and search lists them as two recordings; relinking makes them one again. It fails on the 1.5 code (the module does not exist there).
+
+---
+
 # v0.3 Phase 1.5 — contributor identity / issue #55
 
 ## Result
