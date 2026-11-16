@@ -9,7 +9,7 @@ import { classify } from "./reconcile.js";
 import { searchText, matchesSearch, ownedTracks } from "./editor-search.js";
 import { searchCatalogue } from "../search/engine.js";
 import { readValues } from "../tags.js";
-import { deleteWorks, deletionImpact, recentChanges, recordChange, undoChange } from "./history.js";
+import { CHANGE_KINDS, deleteWorks, deletionImpact, recentChanges, recordChange, undoChange } from "./history.js";
 import {
   mapToMovements,
   distinctKey,
@@ -1606,14 +1606,14 @@ function historyList(c) {
   return recentChanges(c, 100).map((change) => ({
     id: `change:${change.id}`,
     label: change.summary,
-    detail: [new Date(change.created_at).toISOString().slice(0, 16).replace("T", " "), change.kind === "merge" ? "Merge" : "Deletion"].join(" · "),
+    detail: [new Date(change.created_at).toISOString().slice(0, 16).replace("T", " "), change.kind.startsWith("merge") ? "Merge" : "Deletion"].join(" · "),
     ...(change.undone_at ? { badge: { label: "Undone", tone: "muted" } } : {}),
     selection: `change:${change.id}`,
     search: change.summary,
   }));
 }
 function changeView(c, id) {
-  const row = c.db.prepare("SELECT * FROM change_set WHERE id=? AND kind IN ('merge','delete')").get(id);
+  const row = c.db.prepare(`SELECT * FROM change_set WHERE id=? AND kind IN (${CHANGE_KINDS.map(() => "?").join(",")})`).get(id, ...CHANGE_KINDS);
   if (!row) fail("That change isn't in the history");
   const data = JSON.parse(row.data);
   const impact = data.impact || {};
@@ -1631,10 +1631,11 @@ function changeView(c, id) {
         id: "change",
         title: "What changed",
         items: [
-          { label: "Kind", value: row.kind === "merge" ? "Merge of two works" : "Deletion" },
+          { label: "Kind", value: { merge: "Merge of two works", "merge-person": "Merge of two people or ensembles", "delete-person": "Deletion of a person or ensemble" }[row.kind] || "Deletion" },
           ...(impact.movements != null ? [{ label: "Movements", value: String(impact.movements) }, { label: "Recordings", value: String(impact.recordings) }, { label: "Tracks taken out of works", value: String(impact.tracks) }] : []),
           { label: "Audio files", value: "Never changed" },
           ...(data.works || []).filter((work) => c.db.prepare("SELECT 1 FROM entity WHERE id=? AND deleted_at IS NULL").get(work)).map((work) => ({ label: "Work", value: entityLabel(c, work, "work"), selection: work })),
+          ...(data.contributors || []).filter((id) => c.db.prepare("SELECT 1 FROM entity WHERE id=? AND deleted_at IS NULL").get(id)).map((id) => ({ label: "Entry", value: labelOf(c, id) || "Untitled", selection: id })),
         ],
       },
     ],
@@ -2254,6 +2255,15 @@ export const V2_COMMANDS = {
   "relink-track": ["id", "candidate"],
 };
 
+// Merge two people or ensembles as one undoable change.
+function mergePeople(c, keep, drop, who) {
+  return recordChange(
+    c,
+    { kind: "merge-person", summary: `Merged “${labelOf(c, drop) || "an entry"}” into “${labelOf(c, keep) || "an entry"}”`, contributors: [keep, drop], actor: who },
+    () => mergeContributor(c, keep, drop, who),
+  );
+}
+
 // An alias for a contributor, once per spelling.
 function addAlias(c, entity, text) {
   const spelling = String(text ?? "").trim();
@@ -2460,10 +2470,21 @@ export function applyV2(c, request, who) {
             ? c.db.prepare("SELECT 1 FROM recording_content rc JOIN segment_content sc ON sc.content_id=rc.id WHERE rc.recording_id=? LIMIT 1").get(target)
             : null;
       if (used) fail("This entry is still in use. Merge it, or remove what uses it first.");
+      if (entity.kind === "person" || entity.kind === "ensemble") {
+        const { changeId } = recordChange(
+          c,
+          { kind: "delete-person", summary: `Deleted “${entityLabel(c, target, entity.kind)}”`, contributors: [target], actor: who },
+          () => {
+            c.db.prepare("DELETE FROM credit WHERE target_id=?").run(target);
+            c.db.prepare("DELETE FROM relation WHERE kind='member_of' AND (source_id=? OR target_id=?)").run(target, target);
+            c.db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), target);
+          },
+        );
+        return { changeId, selection: "", message: "Deleted. Undo it from Activity.", tab: "performers" };
+      }
       c.db.prepare("DELETE FROM credit WHERE target_id=?").run(target);
       c.db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), target);
-      const tab = entity.kind === "person" || entity.kind === "ensemble" ? "performers" : "works";
-      return { selection: "", message: "Deleted.", tab };
+      return { selection: "", message: "Deleted.", tab: "works" };
     }
     case "delete-works": {
       const works = Array.isArray(v.works) ? [...new Set(v.works.filter((x) => typeof x === "string"))] : [];
@@ -2559,9 +2580,9 @@ export function applyV2(c, request, who) {
       const keep = c.entity(into, ["person", "ensemble"]);
       if (drop.kind !== keep.kind) fail(drop.kind === "person" ? "Choose a person" : "Choose an ensemble", "into");
       const spelling = entityLabel(c, target, drop.kind);
-      mergeContributor(c, into, target, who);
+      const { changeId } = mergePeople(c, into, target, who);
       c.db.prepare("UPDATE review_item SET status='resolved' WHERE target_id=? AND status='open'").run(target);
-      return { selection: into, message: `“${spelling}” is now “${entityLabel(c, into, keep.kind)}”: tags spelled that way land here.`.slice(0, 500) };
+      return { changeId, selection: into, message: `“${spelling}” is now “${entityLabel(c, into, keep.kind)}”: tags spelled that way land here. Undo it from Activity.`.slice(0, 500) };
     }
     case "change-roles": {
       const target = c.entity(str(v.target, "person or ensemble", { max: 200 }), ["person", "ensemble"]);
@@ -2690,7 +2711,7 @@ export function applyV2(c, request, who) {
         added = merged.added || [];
       } else if (["person", "ensemble"].includes(drop.kind)) {
         if (!["person", "ensemble"].includes(keep.kind)) fail("Choose a person or ensemble");
-        mergeContributor(c, into, target, who);
+        ({ changeId } = mergePeople(c, into, target, who));
       } else fail("This kind of entry can't be merged");
       // The entry merged away has nothing left to review.
       c.db.prepare("UPDATE review_item SET status='resolved' WHERE target_id=? AND status='open'").run(target);
@@ -2702,7 +2723,7 @@ export function applyV2(c, request, who) {
       if (fromReview) {
         c.db.prepare("UPDATE review_item SET status='resolved' WHERE id=? AND status='open'").run(fromReview);
         const next = nextReview(c, fromReview);
-        return { selection: next ? `review:${next}` : "", tab: "review", message: `Merged into “${labelOf(c, into) || "the entry that stays"}”.${drop.kind === "work" ? " Undo it from Activity." : ""}`.slice(0, 500), ...(drop.kind === "work" && { changeId }) };
+        return { selection: next ? `review:${next}` : "", tab: "review", message: `Merged into “${labelOf(c, into) || "the entry that stays"}”. Undo it from Activity.`.slice(0, 500), changeId };
       }
       if (added.length) {
         // Open the kept work at its Movements, on the page of the first one
@@ -2717,7 +2738,7 @@ export function applyV2(c, request, who) {
           message: `Merged. Added ${added.length} movement${added.length === 1 ? "" : "s"} the work didn't have (${names}${added.length > 3 ? ` and ${added.length - 3} more` : ""}) at the end of Movements; use Reorder movements to put ${added.length === 1 ? "it" : "them"} in order. Undo it from Activity.`.slice(0, 500),
         };
       }
-      return { selection: into, message: drop.kind === "work" ? "Merged. Undo it from Activity." : "Merged.", ...(drop.kind === "work" && { changeId }) };
+      return { selection: into, message: "Merged. Undo it from Activity.", changeId };
     }
     case "set-classification": {
       const tracks = Array.isArray(v.tracks) ? v.tracks : [];

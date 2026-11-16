@@ -1,3 +1,17 @@
+# v0.3 Phase 2.6 — contributor undo / issue #62
+
+## Result
+
+- `history.js`: `contributorClosure`, `CHANGE_KINDS`, `recordChange(..., { contributors })` (snapshot of both records, plus their credit state after the change), `undoChange` (credit-state check; un-deletes people and ensembles named by restored credits; later merge-person/delete-person changes block as merges and deletions do), `recentChanges` lists all four kinds.
+- `editor-v2.js`: `mergePeople` wraps `mergeContributor` for `merge-entity` (people and ensembles) and `map-contributor`; `delete-entity` for a person or ensemble records `delete-person` (it also drops their memberships); Activity labels the new kinds; merge replies say "Undo it from Activity."
+- `auto-match.js` `mergeContributor`: memberships move to the kept record; one it already has is dropped.
+
+## Verification
+
+On Node 22.23: full `npm test` 421/421. New editor-v2 tests: a merge of two people (credits on a recording and a work, an alias, a membership, a MusicBrainz identity) is listed in Activity and its undo restores every row of both records exactly; after a second merge, a credit given to the kept person blocks the undo and nothing changes; deleting an unused person is undoable; deleting a work, then its composer, then undoing the work's deletion brings the composer back, credited (E11). A name mapped with This is… stays mapped through a library pass and a rescan, and its undo brings the tag-made record back with its credit. Both fail on the 2.5 code.
+
+---
+
 # v0.3 Phase 2.5 — map a name / issue #60
 
 ## Result

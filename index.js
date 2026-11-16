@@ -40493,6 +40493,15 @@ function mergeContributor(catalogue, keep, drop, actor3) {
       catalogue.db.prepare("UPDATE credit SET contributor_id=? WHERE id=?").run(keep, credit.id);
   }
   transferIdentities(catalogue.db, keep, drop);
+  for (const relation of catalogue.db.prepare("SELECT * FROM relation WHERE kind='member_of' AND (source_id=? OR target_id=?)").all(drop, drop)) {
+    const [source, target] = [relation.source_id === drop ? keep : relation.source_id, relation.target_id === drop ? keep : relation.target_id];
+    const exists = source === target || catalogue.db.prepare("SELECT 1 FROM relation WHERE kind='member_of' AND source_id=? AND target_id=?").get(source, target);
+    if (exists) catalogue.db.prepare("DELETE FROM relation WHERE id=?").run(relation.id);
+    else {
+      const position = catalogue.db.prepare("SELECT coalesce(max(position),0)+1 AS n FROM relation WHERE kind='member_of' AND source_id=?").get(source).n;
+      catalogue.db.prepare("UPDATE relation SET source_id=?,target_id=?,position=? WHERE id=?").run(source, target, position, relation.id);
+    }
+  }
   catalogue.db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), drop);
   catalogue.audit("person.merge", drop, { into: keep }, actor3);
 }
@@ -41770,6 +41779,11 @@ function workClosure(c, workIds) {
   for (const row of all("SELECT content_id AS id FROM segment_content WHERE segment_id IN ($)", list3(segments))) contents.add(row.id);
   return { entities: entities2, relations: relations2, realizations: realizations2, segments, contents };
 }
+function contributorClosure(c, ids) {
+  return { entities: new Set(ids), relations: /* @__PURE__ */ new Set(), realizations: /* @__PURE__ */ new Set(), segments: /* @__PURE__ */ new Set(), contents: /* @__PURE__ */ new Set() };
+}
+var creditState = (c, ids) => JSON.stringify(c.db.prepare(`SELECT id,target_id,contributor_id,role,instrument,state FROM credit WHERE contributor_id IN (${marks(ids)}) ORDER BY id`).all(...ids).map((row) => ({ ...row })));
+var CHANGE_KINDS = ["merge", "delete", "merge-person", "delete-person"];
 function predicates(set) {
   const e = list3(set.entities), r = list3(set.realizations), s = list3(set.segments), k = list3(set.contents), pw = list3(set.relations);
   const any = (column, ids) => [`${column} IN (${marks(ids)})`, ids];
@@ -41803,14 +41817,14 @@ function snapshot(c, set) {
 }
 var serialSet = (set) => Object.fromEntries(Object.entries(set).map(([key, ids]) => [key, list3(ids)]));
 var parseSet = (data) => Object.fromEntries(Object.entries(data).map(([key, ids]) => [key, new Set(ids)]));
-function recordChange(c, { kind, summary, works, actor: actor3, extra = {} }, change) {
+function recordChange(c, { kind, summary, works = [], contributors = [], actor: actor3, extra = {} }, change) {
   return transaction(c.db, () => {
-    const set = workClosure(c, works);
+    const set = contributors.length ? contributorClosure(c, contributors) : workClosure(c, works);
     const rows = snapshot(c, set);
     const result = change();
     const after = c.db.prepare("SELECT coalesce(max(id),0) AS n FROM audit_event").get().n;
     const id = randomUUID9();
-    c.db.prepare("INSERT INTO change_set(id,kind,actor,summary,data,created_at) VALUES (?,?,?,?,?,?)").run(id, kind, actor3, summary.slice(0, 500), JSON.stringify({ set: serialSet(set), rows, after, ...extra }), Date.now());
+    c.db.prepare("INSERT INTO change_set(id,kind,actor,summary,data,created_at) VALUES (?,?,?,?,?,?)").run(id, kind, actor3, summary.slice(0, 500), JSON.stringify({ set: serialSet(set), rows, after, ...contributors.length && { contributors, credits: creditState(c, contributors) }, ...extra }), Date.now());
     return { result, changeId: id };
   });
 }
@@ -41833,10 +41847,11 @@ function undoChange(c, id, actor3) {
            'editor.choose-album-work','editor.new-album-work') LIMIT 1`).get(data.after, ...ids);
     const laterChange = c.db.prepare(`SELECT 1 FROM change_set c
       WHERE c.rowid > (SELECT rowid FROM change_set WHERE id=?)
-        AND c.kind IN ('merge','delete') AND c.undone_at IS NULL
+        AND c.kind IN ('merge','delete','merge-person','delete-person') AND c.undone_at IS NULL
         AND EXISTS (SELECT 1 FROM json_each(c.data, '$.set.entities') e
           WHERE e.value IN (${marks(ids)})) LIMIT 1`).get(id, ...ids);
-    if (later || laterChange) throw new Error("These entries changed after this, so undoing it would lose that change. Undo the later changes first, or fix it by hand.");
+    const creditsChanged = data.contributors && creditState(c, data.contributors) !== data.credits;
+    if (later || laterChange || creditsChanged) throw new Error("These entries changed after this, so undoing it would lose that change. Undo the later changes first, or fix it by hand.");
     c.db.exec("PRAGMA defer_foreign_keys=ON");
     const tables = predicates(set);
     for (const [table, [where, args]] of tables) c.db.prepare(`DELETE FROM ${table} WHERE ${where}`).run(...args);
@@ -41845,6 +41860,9 @@ function undoChange(c, id, actor3) {
         const columns = Object.keys(saved);
         c.db.prepare(`INSERT INTO ${table}(${columns.join(",")}) VALUES (${columns.map(() => "?").join(",")})`).run(...columns.map((key) => saved[key]));
       }
+    const named = [...new Set((data.rows.credit || []).map((credit) => credit.contributor_id))];
+    if (named.length)
+      c.db.prepare(`UPDATE entity SET deleted_at=NULL,updated_at=? WHERE kind IN ('person','ensemble') AND deleted_at IS NOT NULL AND id IN (${marks(named)})`).run(Date.now(), ...named);
     if (c.db.prepare("PRAGMA foreign_key_check").all().length) throw new Error("Undo would break the catalogue's links; nothing was changed");
     for (const key of data.suppressions || []) c.db.prepare("DELETE FROM match_suppression WHERE key=?").run(key);
     c.db.prepare("UPDATE change_set SET undone_at=? WHERE id=?").run(Date.now(), id);
@@ -41853,7 +41871,7 @@ function undoChange(c, id, actor3) {
   });
 }
 function recentChanges(c, limit = 50) {
-  return c.db.prepare("SELECT id,kind,actor,summary,created_at,undone_at FROM change_set WHERE kind IN ('merge','delete') ORDER BY created_at DESC LIMIT ?").all(limit);
+  return c.db.prepare(`SELECT id,kind,actor,summary,created_at,undone_at FROM change_set WHERE kind IN (${CHANGE_KINDS.map(() => "?").join(",")}) ORDER BY created_at DESC LIMIT ?`).all(...CHANGE_KINDS, limit);
 }
 function deletionImpact(c, workIds) {
   const set = workClosure(c, workIds);
@@ -43331,14 +43349,14 @@ function historyList(c) {
   return recentChanges(c, 100).map((change) => ({
     id: `change:${change.id}`,
     label: change.summary,
-    detail: [new Date(change.created_at).toISOString().slice(0, 16).replace("T", " "), change.kind === "merge" ? "Merge" : "Deletion"].join(" \xB7 "),
+    detail: [new Date(change.created_at).toISOString().slice(0, 16).replace("T", " "), change.kind.startsWith("merge") ? "Merge" : "Deletion"].join(" \xB7 "),
     ...change.undone_at ? { badge: { label: "Undone", tone: "muted" } } : {},
     selection: `change:${change.id}`,
     search: change.summary
   }));
 }
 function changeView(c, id) {
-  const row = c.db.prepare("SELECT * FROM change_set WHERE id=? AND kind IN ('merge','delete')").get(id);
+  const row = c.db.prepare(`SELECT * FROM change_set WHERE id=? AND kind IN (${CHANGE_KINDS.map(() => "?").join(",")})`).get(id, ...CHANGE_KINDS);
   if (!row) fail("That change isn't in the history");
   const data = JSON.parse(row.data);
   const impact = data.impact || {};
@@ -43354,10 +43372,11 @@ function changeView(c, id) {
         id: "change",
         title: "What changed",
         items: [
-          { label: "Kind", value: row.kind === "merge" ? "Merge of two works" : "Deletion" },
+          { label: "Kind", value: { merge: "Merge of two works", "merge-person": "Merge of two people or ensembles", "delete-person": "Deletion of a person or ensemble" }[row.kind] || "Deletion" },
           ...impact.movements != null ? [{ label: "Movements", value: String(impact.movements) }, { label: "Recordings", value: String(impact.recordings) }, { label: "Tracks taken out of works", value: String(impact.tracks) }] : [],
           { label: "Audio files", value: "Never changed" },
-          ...(data.works || []).filter((work) => c.db.prepare("SELECT 1 FROM entity WHERE id=? AND deleted_at IS NULL").get(work)).map((work) => ({ label: "Work", value: entityLabel(c, work, "work"), selection: work }))
+          ...(data.works || []).filter((work) => c.db.prepare("SELECT 1 FROM entity WHERE id=? AND deleted_at IS NULL").get(work)).map((work) => ({ label: "Work", value: entityLabel(c, work, "work"), selection: work })),
+          ...(data.contributors || []).filter((id2) => c.db.prepare("SELECT 1 FROM entity WHERE id=? AND deleted_at IS NULL").get(id2)).map((id2) => ({ label: "Entry", value: labelOf(c, id2) || "Untitled", selection: id2 }))
         ]
       }
     ]
@@ -43865,6 +43884,13 @@ var V2_COMMANDS = {
   "choose-provider-value": ["id", "field", "assertion"],
   "relink-track": ["id", "candidate"]
 };
+function mergePeople(c, keep, drop, who) {
+  return recordChange(
+    c,
+    { kind: "merge-person", summary: `Merged \u201C${labelOf(c, drop) || "an entry"}\u201D into \u201C${labelOf(c, keep) || "an entry"}\u201D`, contributors: [keep, drop], actor: who },
+    () => mergeContributor(c, keep, drop, who)
+  );
+}
 function addAlias(c, entity, text6) {
   const spelling = String(text6 ?? "").trim();
   if (!spelling) return;
@@ -44048,10 +44074,21 @@ function applyV2(c, request, who) {
       }
       const used = entity.kind === "person" || entity.kind === "ensemble" ? c.db.prepare("SELECT 1 FROM credit WHERE contributor_id=? AND state='active' LIMIT 1").get(target) : entity.kind === "recording" ? c.db.prepare("SELECT 1 FROM recording_content rc JOIN segment_content sc ON sc.content_id=rc.id WHERE rc.recording_id=? LIMIT 1").get(target) : null;
       if (used) fail("This entry is still in use. Merge it, or remove what uses it first.");
+      if (entity.kind === "person" || entity.kind === "ensemble") {
+        const { changeId } = recordChange(
+          c,
+          { kind: "delete-person", summary: `Deleted \u201C${entityLabel(c, target, entity.kind)}\u201D`, contributors: [target], actor: who },
+          () => {
+            c.db.prepare("DELETE FROM credit WHERE target_id=?").run(target);
+            c.db.prepare("DELETE FROM relation WHERE kind='member_of' AND (source_id=? OR target_id=?)").run(target, target);
+            c.db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), target);
+          }
+        );
+        return { changeId, selection: "", message: "Deleted. Undo it from Activity.", tab: "performers" };
+      }
       c.db.prepare("DELETE FROM credit WHERE target_id=?").run(target);
       c.db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), target);
-      const tab = entity.kind === "person" || entity.kind === "ensemble" ? "performers" : "works";
-      return { selection: "", message: "Deleted.", tab };
+      return { selection: "", message: "Deleted.", tab: "works" };
     }
     case "delete-works": {
       const works = Array.isArray(v.works) ? [...new Set(v.works.filter((x) => typeof x === "string"))] : [];
@@ -44144,9 +44181,9 @@ function applyV2(c, request, who) {
       const keep = c.entity(into, ["person", "ensemble"]);
       if (drop.kind !== keep.kind) fail(drop.kind === "person" ? "Choose a person" : "Choose an ensemble", "into");
       const spelling = entityLabel(c, target, drop.kind);
-      mergeContributor(c, into, target, who);
+      const { changeId } = mergePeople(c, into, target, who);
       c.db.prepare("UPDATE review_item SET status='resolved' WHERE target_id=? AND status='open'").run(target);
-      return { selection: into, message: `\u201C${spelling}\u201D is now \u201C${entityLabel(c, into, keep.kind)}\u201D: tags spelled that way land here.`.slice(0, 500) };
+      return { changeId, selection: into, message: `\u201C${spelling}\u201D is now \u201C${entityLabel(c, into, keep.kind)}\u201D: tags spelled that way land here. Undo it from Activity.`.slice(0, 500) };
     }
     case "change-roles": {
       const target = c.entity(str(v.target, "person or ensemble", { max: 200 }), ["person", "ensemble"]);
@@ -44263,7 +44300,7 @@ function applyV2(c, request, who) {
         added = merged.added || [];
       } else if (["person", "ensemble"].includes(drop.kind)) {
         if (!["person", "ensemble"].includes(keep.kind)) fail("Choose a person or ensemble");
-        mergeContributor(c, into, target, who);
+        ({ changeId } = mergePeople(c, into, target, who));
       } else fail("This kind of entry can't be merged");
       c.db.prepare("UPDATE review_item SET status='resolved' WHERE target_id=? AND status='open'").run(target);
       c.db.prepare("UPDATE review_item SET status='resolved' WHERE status='open' AND kind='identity' AND target_id=? AND json_extract(evidence,'$.keep')=?").run(into, target);
@@ -44271,7 +44308,7 @@ function applyV2(c, request, who) {
       if (fromReview) {
         c.db.prepare("UPDATE review_item SET status='resolved' WHERE id=? AND status='open'").run(fromReview);
         const next = nextReview(c, fromReview);
-        return { selection: next ? `review:${next}` : "", tab: "review", message: `Merged into \u201C${labelOf(c, into) || "the entry that stays"}\u201D.${drop.kind === "work" ? " Undo it from Activity." : ""}`.slice(0, 500), ...drop.kind === "work" && { changeId } };
+        return { selection: next ? `review:${next}` : "", tab: "review", message: `Merged into \u201C${labelOf(c, into) || "the entry that stays"}\u201D. Undo it from Activity.`.slice(0, 500), changeId };
       }
       if (added.length) {
         const order = workMovements(c, into).map((movement) => movement.id);
@@ -44284,7 +44321,7 @@ function applyV2(c, request, who) {
           message: `Merged. Added ${added.length} movement${added.length === 1 ? "" : "s"} the work didn't have (${names}${added.length > 3 ? ` and ${added.length - 3} more` : ""}) at the end of Movements; use Reorder movements to put ${added.length === 1 ? "it" : "them"} in order. Undo it from Activity.`.slice(0, 500)
         };
       }
-      return { selection: into, message: drop.kind === "work" ? "Merged. Undo it from Activity." : "Merged.", ...drop.kind === "work" && { changeId } };
+      return { selection: into, message: "Merged. Undo it from Activity.", changeId };
     }
     case "set-classification": {
       const tracks = Array.isArray(v.tracks) ? v.tracks : [];

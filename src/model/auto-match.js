@@ -2371,6 +2371,16 @@ export function mergeContributor(catalogue, keep, drop, actor) {
         .run(keep, credit.id);
   }
   transferIdentities(catalogue.db, keep, drop);
+  // Ensemble memberships move too; one the kept record already has is dropped.
+  for (const relation of catalogue.db.prepare("SELECT * FROM relation WHERE kind='member_of' AND (source_id=? OR target_id=?)").all(drop, drop)) {
+    const [source, target] = [relation.source_id === drop ? keep : relation.source_id, relation.target_id === drop ? keep : relation.target_id];
+    const exists = source === target || catalogue.db.prepare("SELECT 1 FROM relation WHERE kind='member_of' AND source_id=? AND target_id=?").get(source, target);
+    if (exists) catalogue.db.prepare("DELETE FROM relation WHERE id=?").run(relation.id);
+    else {
+      const position = catalogue.db.prepare("SELECT coalesce(max(position),0)+1 AS n FROM relation WHERE kind='member_of' AND source_id=?").get(source).n;
+      catalogue.db.prepare("UPDATE relation SET source_id=?,target_id=?,position=? WHERE id=?").run(source, target, position, relation.id);
+    }
+  }
   catalogue.db
     .prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?")
     .run(Date.now(), Date.now(), drop);

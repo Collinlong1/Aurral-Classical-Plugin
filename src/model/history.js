@@ -1,4 +1,5 @@
-// Undo for destructive metadata changes (merging and deleting works).
+// Undo for destructive metadata changes (merging and deleting works, and
+// merging and deleting people and ensembles).
 //
 // Before the change, every row that names the works involved (their
 // movements, performances, recordings, realizations, segments, credits,
@@ -32,6 +33,18 @@ export function workClosure(c, workIds) {
   for (const row of all("SELECT content_id AS id FROM segment_content WHERE segment_id IN ($)", list(segments))) contents.add(row.id);
   return { entities, relations, realizations, segments, contents };
 }
+
+// A person's or ensemble's own rows: their credits, aliases, identities,
+// relations (ensemble membership), metadata and reviews all hang off the
+// entity, so the entity is the whole closure.
+export function contributorClosure(c, ids) {
+  return { entities: new Set(ids), relations: new Set(), realizations: new Set(), segments: new Set(), contents: new Set() };
+}
+// Every credit naming these contributors, in a stable order: undo compares
+// it with the state right after the change.
+const creditState = (c, ids) =>
+  JSON.stringify(c.db.prepare(`SELECT id,target_id,contributor_id,role,instrument,state FROM credit WHERE contributor_id IN (${marks(ids)}) ORDER BY id`).all(...ids).map((row) => ({ ...row })));
+export const CHANGE_KINDS = ["merge", "delete", "merge-person", "delete-person"];
 
 // The rows to keep, table by table, with the predicate that finds them.
 function predicates(set) {
@@ -75,10 +88,11 @@ function snapshot(c, set) {
 const serialSet = (set) => Object.fromEntries(Object.entries(set).map(([key, ids]) => [key, list(ids)]));
 const parseSet = (data) => Object.fromEntries(Object.entries(data).map(([key, ids]) => [key, new Set(ids)]));
 
-// Runs `change` with a snapshot taken first, and records it for undo.
-export function recordChange(c, { kind, summary, works, actor, extra = {} }, change) {
+// Runs `change` with a snapshot taken first, and records it for undo. `works`
+// snapshots works and all they hold; `contributors`, people and ensembles.
+export function recordChange(c, { kind, summary, works = [], contributors = [], actor, extra = {} }, change) {
   return transaction(c.db, () => {
-    const set = workClosure(c, works);
+    const set = contributors.length ? contributorClosure(c, contributors) : workClosure(c, works);
     const rows = snapshot(c, set);
     const result = change();
     // Rows the change wrote count as "its own" when checking later edits.
@@ -86,7 +100,7 @@ export function recordChange(c, { kind, summary, works, actor, extra = {} }, cha
     const id = randomUUID();
     c.db
       .prepare("INSERT INTO change_set(id,kind,actor,summary,data,created_at) VALUES (?,?,?,?,?,?)")
-      .run(id, kind, actor, summary.slice(0, 500), JSON.stringify({ set: serialSet(set), rows, after, ...extra }), Date.now());
+      .run(id, kind, actor, summary.slice(0, 500), JSON.stringify({ set: serialSet(set), rows, after, ...(contributors.length && { contributors, credits: creditState(c, contributors) }), ...extra }), Date.now());
     return { result, changeId: id };
   });
 }
@@ -115,10 +129,12 @@ export function undoChange(c, id, actor) {
     // sharing these entities blocks undo; insertion order handles tied clocks.
     const laterChange = c.db.prepare(`SELECT 1 FROM change_set c
       WHERE c.rowid > (SELECT rowid FROM change_set WHERE id=?)
-        AND c.kind IN ('merge','delete') AND c.undone_at IS NULL
+        AND c.kind IN ('merge','delete','merge-person','delete-person') AND c.undone_at IS NULL
         AND EXISTS (SELECT 1 FROM json_each(c.data, '$.set.entities') e
           WHERE e.value IN (${marks(ids)})) LIMIT 1`).get(id, ...ids);
-    if (later || laterChange) throw new Error("These entries changed after this, so undoing it would lose that change. Undo the later changes first, or fix it by hand.");
+    // A credit given to or taken from these people since, from any page.
+    const creditsChanged = data.contributors && creditState(c, data.contributors) !== data.credits;
+    if (later || laterChange || creditsChanged) throw new Error("These entries changed after this, so undoing it would lose that change. Undo the later changes first, or fix it by hand.");
     c.db.exec("PRAGMA defer_foreign_keys=ON");
     const tables = predicates(set);
     for (const [table, [where, args]] of tables) c.db.prepare(`DELETE FROM ${table} WHERE ${where}`).run(...args);
@@ -127,6 +143,11 @@ export function undoChange(c, id, actor) {
         const columns = Object.keys(saved);
         c.db.prepare(`INSERT INTO ${table}(${columns.join(",")}) VALUES (${columns.map(() => "?").join(",")})`).run(...columns.map((key) => saved[key]));
       }
+    // People and ensembles a restored credit names come back too: a work
+    // restored after its composer was deleted still has its composer.
+    const named = [...new Set((data.rows.credit || []).map((credit) => credit.contributor_id))];
+    if (named.length)
+      c.db.prepare(`UPDATE entity SET deleted_at=NULL,updated_at=? WHERE kind IN ('person','ensemble') AND deleted_at IS NOT NULL AND id IN (${marks(named)})`).run(Date.now(), ...named);
     if (c.db.prepare("PRAGMA foreign_key_check").all().length) throw new Error("Undo would break the catalogue's links; nothing was changed");
     for (const key of data.suppressions || []) c.db.prepare("DELETE FROM match_suppression WHERE key=?").run(key);
     c.db.prepare("UPDATE change_set SET undone_at=? WHERE id=?").run(Date.now(), id);
@@ -137,8 +158,8 @@ export function undoChange(c, id, actor) {
 
 export function recentChanges(c, limit = 50) {
   return c.db
-    .prepare("SELECT id,kind,actor,summary,created_at,undone_at FROM change_set WHERE kind IN ('merge','delete') ORDER BY created_at DESC LIMIT ?")
-    .all(limit);
+    .prepare(`SELECT id,kind,actor,summary,created_at,undone_at FROM change_set WHERE kind IN (${CHANGE_KINDS.map(() => "?").join(",")}) ORDER BY created_at DESC LIMIT ?`)
+    .all(...CHANGE_KINDS, limit);
 }
 
 // What deleting these works would take with them, for the confirmation.

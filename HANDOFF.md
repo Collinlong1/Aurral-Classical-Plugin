@@ -1,3 +1,11 @@
+# v0.3 Phase 2.6 — contributor merge and delete with undo (issue #62)
+
+Ninth of ten commits in one PR (1.5–1.7, 2.1–2.7). Implements #62, with E11's fix that #62 names; E8 (favourites lost on undoing a work merge) is listed as related but is not part of #62's task and stays open.
+
+`history.js` gains `contributorClosure` (a person's or ensemble's credits, aliases, identities, relations, metadata and reviews all hang off the entity) and change kinds `merge-person` and `delete-person`. Merging people or ensembles (Merge, and 2.5's This is…) and deleting an unused one run through `recordChange`, show in Activity and undo exactly. Because credit edits are audited against the recording, not the person, each change also stores its records' credits as they were right after it; undo refuses when they differ. Undoing any change also brings back a deleted person or ensemble a restored credit names (E11). `mergeContributor` now moves ensemble memberships too. No schema or core change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
 # v0.3 Phase 2.5 — map unreviewed tag names to existing contributors (issue #60)
 
 Eighth of ten commits in one PR (1.5–1.7, 2.1–2.7). Implements #60 only; #60 has no later comments.

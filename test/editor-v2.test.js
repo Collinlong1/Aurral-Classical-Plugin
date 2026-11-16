@@ -394,6 +394,85 @@ test("This is…: an unreviewed name from tags becomes another spelling of a kno
   assert.deepEqual(s.c.db.prepare("SELECT text FROM alias WHERE entity_id=?").all(known).map((row) => row.text), ["Orchestra A"]);
 });
 
+test("contributor merges and deletions are undoable from Activity, exactly, unless a credit changed since", async (t) => {
+  const s = await setup(t);
+  autoMatchTaggedWorks(s.c, { albumId: "A", actor: "admin", allowStructuredTitles: true });
+  const performance = s.c.db.prepare("SELECT target_id AS id FROM credit WHERE source='derived'").get().id;
+  const work = (await s.ok("create-work", { title: "Fixture Concerto", composer: "", movements: ["I"] })).selection;
+  const keep = (await s.ok("create-contributor", { name: "Fixture Pianist", kind: "person" })).selection;
+  const drop = (await s.ok("create-contributor", { name: "F. Pianist", kind: "person" })).selection;
+  const trio = (await s.ok("create-contributor", { name: "Fixture Trio", kind: "ensemble" })).selection;
+  await s.ok("save-entity", { target: drop, aliases: "Pianist F." }, drop);
+  await s.ok("add-member", { target: trio, other: drop }, trio);
+  s.c.credit(performance, drop, "soloist", { instrument: "piano", position: 5 });
+  s.c.credit(work, keep, "soloist", { position: 2 });
+  s.c.externalIdentity(drop, "musicbrainz", "artist", "pianist-mbid", { evidence: { source: "test" } });
+  const dump = () =>
+    JSON.stringify(
+      ["entity", "credit", "alias", "external_identity", "relation", "assertion", "field_resolution"].map((table) => [
+        table,
+        s.c.db
+          .prepare(`SELECT * FROM ${table} WHERE ${table === "entity" ? "id" : table === "credit" ? "contributor_id" : table === "relation" ? "source_id" : ["alias", "external_identity"].includes(table) ? "entity_id" : "target_id"} IN (?,?) ORDER BY 1`)
+          .all(keep, drop)
+          .map((row) => ({ ...row })),
+      ]),
+    );
+  const before = dump();
+  const merged = await s.ok("merge-entity", { target: drop, into: keep, confirm: true }, drop);
+  assert.equal(merged.message, "Merged. Undo it from Activity.");
+  assert.notEqual(dump(), before);
+  // Activity lists it; undo puts every row back as it was.
+  const change = (await s.read({ tab: "activity" })).list.items.find((item) => item.label === "Merged “F. Pianist” into “Fixture Pianist”");
+  assert.ok(change);
+  assert.equal(section((await s.read({ selection: change.selection })).view, "change").items[0].value, "Merge of two people or ensembles");
+  await s.ok("undo-change", { id: change.selection.slice(7) }, change.selection);
+  assert.equal(dump(), before);
+
+  // A credit given to either record since blocks the undo, and nothing changes.
+  await s.ok("merge-entity", { target: drop, into: keep, confirm: true }, drop);
+  const second = (await s.read({ tab: "activity" })).list.items.find((item) => item.label === "Merged “F. Pianist” into “Fixture Pianist”" && !item.badge);
+  s.c.credit(work, keep, "performer", { position: 3 });
+  const after = dump();
+  const refused = await s.mutate("undo-change", { id: second.selection.slice(7) }, second.selection);
+  assert.deepEqual([refused.ok, /changed after this/.test(refused.message)], [false, true]);
+  assert.equal(dump(), after);
+
+  // Deleting an unused person is undoable too.
+  const spare = (await s.ok("create-contributor", { name: "Spare Person", kind: "person" })).selection;
+  const deleted = await s.ok("delete-entity", { target: spare }, spare);
+  assert.match(deleted.message, /Undo it from Activity/);
+  const removal = (await s.read({ tab: "activity" })).list.items.find((item) => item.label === "Deleted “Spare Person”");
+  await s.ok("undo-change", { id: removal.selection.slice(7) }, removal.selection);
+  assert.equal(s.c.db.prepare("SELECT deleted_at FROM entity WHERE id=?").get(spare).deleted_at, null);
+
+  // E11: a work restored after its composer was deleted has its composer back.
+  const composer = (await s.ok("create-contributor", { name: "Fixture Composer", kind: "person" })).selection;
+  const piece = (await s.ok("create-work", { title: "Fixture Sonata", composer, movements: ["I"] })).selection;
+  await s.ok("delete-entity", { target: piece }, piece);
+  await s.ok("delete-entity", { target: composer }, composer);
+  const workChange = (await s.read({ tab: "activity" })).list.items.find((item) => item.label === "Deleted “Fixture Sonata”").selection;
+  await s.ok("undo-change", { id: workChange.slice(7) }, workChange);
+  assert.equal(s.c.db.prepare("SELECT deleted_at FROM entity WHERE id=?").get(composer).deleted_at, null);
+  assert.deepEqual(s.c.db.prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer'").all(piece).map((row) => row.contributor_id), [composer]);
+});
+
+test("a name mapped with This is… stays mapped through rescans, and the mapping can be undone", async (t) => {
+  const s = await setup(t);
+  for (const album of ["A", "B"]) autoMatchTaggedWorks(s.c, { albumId: album, actor: "admin", allowStructuredTitles: true });
+  const named = (name) => s.c.db.prepare("SELECT a.value FROM entity e JOIN field_resolution f ON f.target_id=e.id AND f.field='name' JOIN assertion a ON a.id=f.assertion_id WHERE e.deleted_at IS NULL AND a.value=?").all(JSON.stringify(name)).length;
+  const derived = s.c.db.prepare("SELECT k.contributor_id AS id FROM credit k JOIN field_resolution f ON f.target_id=k.contributor_id AND f.field='name' JOIN assertion a ON a.id=f.assertion_id WHERE a.value=?").get(JSON.stringify("Orchestra A")).id;
+  const known = (await s.ok("create-contributor", { name: "Fixture Philharmonic", kind: "ensemble" })).selection;
+  await s.ok("map-contributor", { target: derived, into: known }, derived);
+  autoMatchTaggedWorks(s.c, { actor: "admin", allowStructuredTitles: true });
+  autoMatchTaggedWorks(s.c, { albumId: "A", actor: "admin", allowStructuredTitles: true });
+  // No "Orchestra A" comes back: the spelling is the Philharmonic's.
+  assert.equal(named("Orchestra A"), 0);
+  const change = (await s.read({ tab: "activity" })).list.items.find((item) => item.label === "Merged “Orchestra A” into “Fixture Philharmonic”");
+  await s.ok("undo-change", { id: change.selection.slice(7) }, change.selection);
+  assert.equal(named("Orchestra A"), 1);
+  assert.equal(s.c.db.prepare("SELECT contributor_id AS id FROM credit WHERE source='derived' AND target_id=(SELECT target_id FROM credit WHERE contributor_id=?)").get(derived).id, derived);
+});
+
 test("send to / remove from Classical overrides detection and closes review items", async (t) => {
   const s = await setup(t);
   const [pop] = s.trackIds("C");
