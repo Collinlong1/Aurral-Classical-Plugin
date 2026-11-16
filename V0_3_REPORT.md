@@ -1,3 +1,32 @@
+# v0.3 Phase 0.08 — L10 / issue #14
+
+Base: `aurral-classical` `3e74192`, including merged L11 PR #100. This follows the handoff sequence. Current #14 has no additional dependencies or later comments changing scope. No other issue is implemented here.
+
+## Result
+
+Tag-sensitive fingerprints now allow the same file ID, path and duration to retain the plugin track link after the core track ID changes. The candidate index includes file ID/path. Ownership is resolved in priority order: unique full core/file/path matches, unique stable file/path matches passing the existing audio checks, then remaining move candidates. This retains L11's exact-copy protection and prevents an old review from stealing an already active newer link with protected metadata.
+
+Before reconciliation builds ownership, the repair checks open track-link reviews with exactly one reused file matching the original file ID/path/duration and tag-sensitive evidence. It requires a unique current file and unique historical claim. An unedited newer active link can be removed through normal detach cleanup, along with only its now-unused auto-added movements, and original movement positions are normalized. Its derived track metadata is removed in foreign-key order. Normal reconciliation then updates the original link, appends its scan evidence and resolves the old review. Track/work repair audits record the cleanup.
+
+The original link's pinned metadata, work fields and attachments, and user/admin picks remain intact. Newer manual fields, pinned classification, manual placements/structural edits, conflicting work assignments, ambiguous historical claims, picked separate interpretations or unknown segment structures prevent automatic deletion. Those cases retain their data and review. The repair is transactional within reconciliation and idempotent.
+
+Different file IDs, paths, durations, decisive audio-hash changes and epoch changes do not gain this fallback. No schema, core, media-tag, provider-request or fingerprint-format change. As scoped in #14, a different file replacing the same stable file ID/path with the same duration to the millisecond could inherit the link when only container hashes are available. Bundle rebuilt.
+
+## Verification
+
+On Node 24.22.1:
+
+- `node --test test/fingerprint.test.js test/sync.test.js test/model.test.js test/editor-v2.test.js`: 121/121 passed.
+- Fifteen new fingerprint/reconciliation tests pass; nine fail on merged base `3e74192`. Cases cover changed core/container IDs, pinned metadata, file/path/duration/audio/epoch boundaries, stable-file ownership with identical audio, an actual M4A title rewrite with measured duration unchanged, old split repair including duplicate movement removal and exact original positions, derived metadata cleanup, original work notes and picks, manual newer track/movement/classification protection, ambiguous reviews, competing historical and current claims, foreign-key integrity and idempotency.
+- `p5.mjs` section E run against base and fix from a scratch copy, retaining its fixture and adding only a guard for the now-absent review. Base: three links, an open dead-end review and three movements. Fix: two active original links, no review and two movements.
+- `p4.mjs` was also run. Its last M4A case changes both core ID and file ID, so it intentionally remains outside the stable-file fallback; this is not the stable-file-ID core behavior documented in the current issue. No core scanner probes (`f1`/`f2`) were rerun locally.
+- `npm run build`: passed. `git diff --check`: passed.
+- Full `npm test`: 399/399 passed (the earlier run also passed 398/398 before the final ambiguity regression was added).
+
+No local browser, Node 26 core scanner or Compose/restart run for #14. The known pre-existing Phase 1 workflow fixture mismatch remains unchanged and outside scope.
+
+---
+
 # v0.3 Phase 0.07 — L11 / issue #16
 
 Base: `aurral-classical` `c2bdc59`, including merged E7 PR #99. This follows the handoff sequence. Current #16 has no additional dependencies or later comments changing scope. No other issue is implemented here.

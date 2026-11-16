@@ -36270,6 +36270,97 @@ async function fingerprint(file) {
   return `${CONTAINER_PREFIX}${await hashRanges(file, [[0, size]])}`;
 }
 
+// src/model/retag-repair.js
+var sameRetaggedFile = (old, fileId, item) => (tagSensitive(old.fingerprint) || tagSensitive(item.fingerprint)) && fileId === item.fileId && old.path === item.path && old.durationMs != null && old.durationMs === item.durationMs;
+function repairRetaggedLinks(c, snapshot2) {
+  const db = c.db, resolved = /* @__PURE__ */ new Set(), blocked = /* @__PURE__ */ new Set(), proposals = [];
+  const reviews = db.prepare(`SELECT v.id AS review_id,v.evidence AS review_evidence,t.*
+    FROM review_item v JOIN track_link t ON t.id=v.target_id
+    WHERE v.kind='track_link' AND v.status='open' AND t.instance_id=? AND t.state!='active'`).all(snapshot2.instanceId);
+  if (!reviews.length) return { resolved, blocked };
+  const files = /* @__PURE__ */ new Map();
+  for (const item of snapshot2.tracks) {
+    const key = JSON.stringify([item.fileId, item.path]);
+    files.set(key, [...files.get(key) || [], item]);
+  }
+  for (const old of reviews) {
+    const review = JSON.parse(old.review_evidence), evidence = JSON.parse(old.evidence);
+    if (review.epochChanged || review.reused?.length !== 1) continue;
+    if (!sameRetaggedFile(evidence, old.file_id, review.reused[0])) continue;
+    const current = (files.get(JSON.stringify([old.file_id, evidence.path])) || []).filter((item) => sameRetaggedFile(evidence, old.file_id, item));
+    if (current.length !== 1) {
+      blocked.add(old.id);
+      continue;
+    }
+    proposals.push({ old, item: current[0] });
+  }
+  const claims = /* @__PURE__ */ new Map();
+  for (const p of proposals) claims.set(p.item, (claims.get(p.item) || 0) + 1);
+  const dirty = (ids) => {
+    const marks2 = ids.map(() => "?").join(",");
+    return db.prepare(`SELECT 1 FROM assertion WHERE target_id IN (${marks2}) AND source='manual' LIMIT 1`).get(...ids) || db.prepare(`SELECT 1 FROM pinned_override WHERE target_id IN (${marks2}) LIMIT 1`).get(...ids) || db.prepare(`SELECT 1 FROM classification WHERE target_id IN (${marks2}) AND pinned=1 LIMIT 1`).get(...ids) || db.prepare(`SELECT 1 FROM audit_event WHERE target_id IN (${marks2}) AND action LIKE 'editor.%'
+        AND action NOT IN ('editor.open','editor.move-tracks-open','editor.choose-album-work','editor.bulk-edit-open','editor.new-album-work') LIMIT 1`).get(...ids);
+  };
+  for (const { old, item } of proposals) {
+    blocked.add(old.id);
+    if (claims.get(item) !== 1) continue;
+    const siblings = db.prepare(`SELECT * FROM track_link WHERE instance_id=? AND file_id=?
+      AND json_extract(evidence,'$.path')=? AND id!=?`).all(snapshot2.instanceId, item.fileId, item.path, old.id);
+    if (siblings.length > 1 || siblings.length === 1 && siblings[0].state !== "active") continue;
+    const newer = siblings[0];
+    if (newer) {
+      const next = JSON.parse(newer.evidence);
+      if (newer.core_id !== item.coreId || next.durationMs !== item.durationMs) continue;
+      const oldItems = db.prepare(`SELECT i.realization_id,i.movement_id,r.work_id,p.source_id AS performance_id FROM realization_item i
+        JOIN segment s ON s.id=i.segment_id JOIN realization r ON r.id=i.realization_id
+        JOIN relation p ON p.id=r.performance_work_id WHERE s.track_link_id=?`).all(old.id);
+      const newItems = db.prepare(`SELECT i.id,i.realization_id,i.movement_id,r.work_id,p.source_id AS performance_id,
+        rc.recording_id FROM realization_item i JOIN segment s ON s.id=i.segment_id
+        JOIN realization r ON r.id=i.realization_id JOIN relation p ON p.id=r.performance_work_id
+        LEFT JOIN segment_content sc ON sc.segment_id=s.id LEFT JOIN recording_content rc ON rc.id=sc.content_id
+        WHERE s.track_link_id=?`).all(newer.id);
+      const originals = new Set(oldItems.flatMap((i) => [i.movement_id, i.performance_id]).filter(Boolean));
+      const ids = [.../* @__PURE__ */ new Set([newer.id, ...newItems.flatMap((i) => [i.movement_id, i.performance_id, i.recording_id]).filter((id) => id && !originals.has(id))])];
+      if (dirty(ids)) continue;
+      if (newItems.some((i) => db.prepare(`SELECT 1 FROM audit_event WHERE target_id=? AND created_at>=?
+        AND action IN ('editor.move-movement','editor.set-movement-order','editor.reorder-movements','editor.add-movement','editor.delete-movement') LIMIT 1`).get(i.work_id, newer.created_at))) continue;
+      if (db.prepare(`SELECT 1 FROM audit_event a,json_each(a.data,'$.values.tracks') t
+        WHERE a.action IN ('editor.assign-album','editor.unassign-tracks','editor.create-work-from-album') AND t.value=? LIMIT 1`).get(newer.id)) continue;
+      if (newItems.some((i) => !oldItems.some((o) => o.work_id === i.work_id))) continue;
+      const oldRealizations = new Set(oldItems.map((i) => i.realization_id));
+      if (newItems.some((i) => !oldRealizations.has(i.realization_id) && (db.prepare("SELECT 1 FROM user_work_state WHERE picked_realization_id=?").get(i.realization_id) || db.prepare("SELECT 1 FROM admin_work_pick WHERE realization_id=?").get(i.realization_id)))) continue;
+      if (db.prepare(`SELECT 1 FROM segment s WHERE s.track_link_id=? AND NOT EXISTS
+        (SELECT 1 FROM realization_item i WHERE i.segment_id=s.id) LIMIT 1`).get(newer.id)) continue;
+      for (const id of new Set(newItems.map((i) => i.id))) c.detachItem(id, { dropRecording: true });
+      const originalMovements = new Set(oldItems.map((i) => i.movement_id)), prunedWorks = /* @__PURE__ */ new Set();
+      for (const movement of new Set(newItems.map((i) => i.movement_id).filter(Boolean))) {
+        if (originalMovements.has(movement) || db.prepare(`SELECT 1 FROM realization_item WHERE movement_id=?
+          UNION SELECT 1 FROM recording_content WHERE movement_id=?`).get(movement, movement)) continue;
+        for (const row of db.prepare("SELECT source_id FROM relation WHERE kind='movement' AND target_id=?").all(movement)) prunedWorks.add(row.source_id);
+        db.prepare("DELETE FROM relation WHERE kind='movement' AND target_id=?").run(movement);
+        db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), movement);
+      }
+      for (const work of prunedWorks) {
+        const parts = db.prepare("SELECT id,position FROM relation WHERE kind='movement' AND source_id=? ORDER BY position,id").all(work);
+        const bump = parts.reduce((max, p) => Math.max(max, p.position), 0) + parts.length + 1;
+        db.prepare("UPDATE relation SET position=position+? WHERE kind='movement' AND source_id=?").run(bump, work);
+        parts.forEach((part, i) => db.prepare("UPDATE relation SET position=? WHERE id=?").run(i + 1, part.id));
+      }
+      for (const work of new Set(newItems.map((i) => i.work_id))) c.audit("work.repair_retag", work, { keep: old.id, removed: newer.id });
+      for (const table of ["field_resolution", "pinned_override", "provider_record", "classification"]) db.prepare(`DELETE FROM ${table} WHERE target_id=?`).run(newer.id);
+      db.prepare("DELETE FROM assertion WHERE target_id=?").run(newer.id);
+      db.prepare("DELETE FROM metadata_target WHERE track_link_id=?").run(newer.id);
+      db.prepare("DELETE FROM track_evidence WHERE track_link_id=?").run(newer.id);
+      db.prepare("UPDATE review_item SET status='resolved' WHERE target_id=? AND status='open'").run(newer.id);
+      db.prepare("DELETE FROM track_link WHERE id=?").run(newer.id);
+      c.audit("track.repair_retag", old.id, { removed: newer.id, generation: snapshot2.generation });
+    }
+    blocked.delete(old.id);
+    resolved.add(old.id);
+  }
+  return { resolved, blocked };
+}
+
 // src/resolver.js
 var DEFAULT_KNOWN_NAMES = {
   "\u0421\u0435\u0440\u0433\u0435\u0439 \u0421\u0435\u0440\u0433\u0435\u0435\u0432\u0438\u0447 \u041F\u0440\u043E\u043A\u043E\u0444\u044C\u0435\u0432": "Sergei Prokofiev",
@@ -37131,6 +37222,7 @@ function match(previous, candidate) {
   if (old.fingerprint && old.fingerprint === candidate.fingerprint) return true;
   if (old.stableFileId && old.stableFileId === candidate.stableFileId && sameAudio(old, candidate))
     return true;
+  if (sameRetaggedFile(old, previous.file_id, candidate)) return true;
   return previous.core_id === candidate.coreId && previous.file_id === candidate.fileId && old.path === candidate.path && sameDuration(old, candidate);
 }
 function reconcile(catalogue, snapshot2) {
@@ -37157,11 +37249,13 @@ function reconcile(catalogue, snapshot2) {
     db.prepare(
       `INSERT INTO core_instance VALUES (?,?,?) ON CONFLICT(id) DO UPDATE SET epoch=excluded.epoch,generation=excluded.generation`
     ).run(snapshot2.instanceId, snapshot2.epoch, snapshot2.generation);
+    const repair = changedEpoch ? { resolved: /* @__PURE__ */ new Set(), blocked: /* @__PURE__ */ new Set() } : repairRetaggedLinks(catalogue, snapshot2);
     const previous = db.prepare("SELECT * FROM track_link WHERE instance_id=?").all(snapshot2.instanceId);
     const index = /* @__PURE__ */ new Map();
     for (const item of tracks) {
       for (const key of [
         json(["core", item.coreId, item.fileId]),
+        json(["file", item.fileId, item.path]),
         ...item.fingerprint ? [json(["hash", item.fingerprint])] : [],
         ...item.stableFileId ? [json(["stable", item.stableFileId])] : []
       ]) {
@@ -37173,27 +37267,36 @@ function reconcile(catalogue, snapshot2) {
       const evidence = JSON.parse(old.evidence);
       const pool = /* @__PURE__ */ new Set([
         ...index.get(json(["core", old.core_id, old.file_id])) || [],
+        ...index.get(json(["file", old.file_id, evidence.path])) || [],
         ...index.get(json(["hash", evidence.fingerprint])) || [],
         ...index.get(json(["stable", evidence.stableFileId])) || []
       ]);
       const exact = [...pool].find(
         (item) => item.coreId === old.core_id && item.fileId === old.file_id && item.path === evidence.path && match(old, item)
       );
+      const sameFile = [...pool].filter((item) => item.fileId === old.file_id && item.path === evidence.path && match(old, item));
       return {
         old,
         exact: changedEpoch ? null : exact,
+        sameFile: !changedEpoch && sameFile.length === 1 ? sameFile[0] : null,
         items: changedEpoch ? [] : exact ? [exact] : [...pool].filter((item) => match(old, item))
       };
     });
-    const exactDemand = /* @__PURE__ */ new Map();
-    for (const c of candidates2)
-      if (c.exact) exactDemand.set(c.exact, (exactDemand.get(c.exact) || 0) + 1);
-    const claimed = /* @__PURE__ */ new Set();
-    for (const c of candidates2)
-      if (c.exact && exactDemand.get(c.exact) === 1) claimed.add(c.exact);
+    const claimed = /* @__PURE__ */ new Set(), owners = /* @__PURE__ */ new Set();
+    for (const key of ["exact", "sameFile"]) {
+      const demand2 = /* @__PURE__ */ new Map();
+      for (const c of candidates2)
+        if (!owners.has(c) && c[key] && !claimed.has(c[key])) demand2.set(c[key], (demand2.get(c[key]) || 0) + 1);
+      for (const c of candidates2)
+        if (!owners.has(c) && c[key] && !claimed.has(c[key]) && demand2.get(c[key]) === 1) {
+          c.items = [c[key]];
+          claimed.add(c[key]);
+          owners.add(c);
+        }
+    }
     const exactClaims = new Set(claimed);
     for (const c of candidates2)
-      if (!c.exact || exactDemand.get(c.exact) !== 1)
+      if (!owners.has(c))
         c.items = c.items.filter((item) => !claimed.has(item));
     const demand = /* @__PURE__ */ new Map();
     for (const c of candidates2)
@@ -37206,6 +37309,7 @@ function reconcile(catalogue, snapshot2) {
       if (items.length === 1 && demand.get(items[0]) === 1) {
         const item = items[0];
         claimed.add(item);
+        if (repair.resolved.has(old.id)) db.prepare("UPDATE review_item SET status='resolved' WHERE kind='track_link' AND target_id=? AND status='open'").run(old.id);
         if (old.state === "active" && old.core_id === item.coreId && old.file_id === item.fileId && withoutCtime(old.evidence) === withoutCtime(json(item))) {
           db.prepare("UPDATE track_link SET state='active',evidence=? WHERE id=?").run(json(item), old.id);
           rows.push({ ...item, id: old.id });
@@ -37227,6 +37331,10 @@ function reconcile(catalogue, snapshot2) {
         const reused = tracks.filter(
           (t) => !exactClaims.has(t) && (t.coreId === old.core_id || t.path === JSON.parse(old.evidence).path)
         );
+        if (repair.blocked.has(old.id) && !items.length && !reused.length) {
+          db.prepare("UPDATE track_link SET state='review' WHERE id=?").run(old.id);
+          continue;
+        }
         if (changedEpoch || items.length || reused.length) {
           db.prepare(
             "UPDATE track_link SET state='review',updated_at=? WHERE id=?"

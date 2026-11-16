@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { transaction } from "./database.js";
 import { json } from "./catalogue.js";
 import { tagSensitive } from "./fingerprint.js";
+import { sameRetaggedFile, repairRetaggedLinks } from "./retag-repair.js";
 import { classificationEvidence } from "./classify-evidence.js";
 
 const sameAudio = (a, b) =>
@@ -35,6 +36,7 @@ function match(previous, candidate) {
     sameAudio(old, candidate)
   )
     return true;
+  if (sameRetaggedFile(old, previous.file_id, candidate)) return true;
   // Paths alone, provider recording IDs and titles never establish identity.
   // The same host track/file at the same path with the same duration is the
   // same recording even when a tag edit changed its size or container hash.
@@ -93,6 +95,7 @@ export function reconcile(catalogue, snapshot) {
     db.prepare(
       `INSERT INTO core_instance VALUES (?,?,?) ON CONFLICT(id) DO UPDATE SET epoch=excluded.epoch,generation=excluded.generation`,
     ).run(snapshot.instanceId, snapshot.epoch, snapshot.generation);
+    const repair = changedEpoch ? { resolved: new Set(), blocked: new Set() } : repairRetaggedLinks(catalogue, snapshot);
     const previous = db
       .prepare("SELECT * FROM track_link WHERE instance_id=?")
       .all(snapshot.instanceId);
@@ -100,6 +103,7 @@ export function reconcile(catalogue, snapshot) {
     for (const item of tracks) {
       for (const key of [
         json(["core", item.coreId, item.fileId]),
+        json(["file", item.fileId, item.path]),
         ...(item.fingerprint ? [json(["hash", item.fingerprint])] : []),
         ...(item.stableFileId ? [json(["stable", item.stableFileId])] : []),
       ]) {
@@ -111,6 +115,7 @@ export function reconcile(catalogue, snapshot) {
       const evidence = JSON.parse(old.evidence);
       const pool = new Set([
         ...(index.get(json(["core", old.core_id, old.file_id])) || []),
+        ...(index.get(json(["file", old.file_id, evidence.path])) || []),
         ...(index.get(json(["hash", evidence.fingerprint])) || []),
         ...(index.get(json(["stable", evidence.stableFileId])) || []),
       ]);
@@ -121,9 +126,11 @@ export function reconcile(catalogue, snapshot) {
           item.path === evidence.path &&
           match(old, item),
       );
+      const sameFile = [...pool].filter((item) => item.fileId === old.file_id && item.path === evidence.path && match(old, item));
       return {
         old,
         exact: changedEpoch ? null : exact,
+        sameFile: !changedEpoch && sameFile.length === 1 ? sameFile[0] : null,
         items: changedEpoch
           ? []
           : exact
@@ -133,15 +140,19 @@ export function reconcile(catalogue, snapshot) {
     });
     // Reserve unambiguous exact identities before considering audio-based
     // moves. An unchanged duplicate must not compete with a moved/deleted one.
-    const exactDemand = new Map();
-    for (const c of candidates)
-      if (c.exact) exactDemand.set(c.exact, (exactDemand.get(c.exact) || 0) + 1);
-    const claimed = new Set();
-    for (const c of candidates)
-      if (c.exact && exactDemand.get(c.exact) === 1) claimed.add(c.exact);
+    const claimed = new Set(), owners = new Set();
+    for (const key of ["exact", "sameFile"]) {
+      const demand = new Map();
+      for (const c of candidates)
+        if (!owners.has(c) && c[key] && !claimed.has(c[key])) demand.set(c[key], (demand.get(c[key]) || 0) + 1);
+      for (const c of candidates)
+        if (!owners.has(c) && c[key] && !claimed.has(c[key]) && demand.get(c[key]) === 1) {
+          c.items = [c[key]]; claimed.add(c[key]); owners.add(c);
+        }
+    }
     const exactClaims = new Set(claimed);
     for (const c of candidates)
-      if (!c.exact || exactDemand.get(c.exact) !== 1)
+      if (!owners.has(c))
         c.items = c.items.filter((item) => !claimed.has(item));
     const demand = new Map();
     for (const c of candidates)
@@ -155,6 +166,7 @@ export function reconcile(catalogue, snapshot) {
       if (items.length === 1 && demand.get(items[0]) === 1) {
         const item = items[0];
         claimed.add(item);
+        if (repair.resolved.has(old.id)) db.prepare("UPDATE review_item SET status='resolved' WHERE kind='track_link' AND target_id=? AND status='open'").run(old.id);
         // An unchanged file needs no new evidence row or audit event; repeated
         // scans otherwise grow the database by one of each per track.
         // The ctime a scan keeps only says whether the file was written
@@ -187,6 +199,10 @@ export function reconcile(catalogue, snapshot) {
             !exactClaims.has(t) &&
             (t.coreId === old.core_id || t.path === JSON.parse(old.evidence).path),
         );
+        if (repair.blocked.has(old.id) && !items.length && !reused.length) {
+          db.prepare("UPDATE track_link SET state='review' WHERE id=?").run(old.id);
+          continue;
+        }
         if (changedEpoch || items.length || reused.length) {
           db.prepare(
             "UPDATE track_link SET state='review',updated_at=? WHERE id=?",
