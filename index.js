@@ -42376,31 +42376,50 @@ function detailsForm(c, entity, kind) {
     fields
   };
 }
-function creditSections(c, target) {
+function creditSections(c, target, { id = "credits", title = "Credits", noun = "credit", edit = false, back = null } = {}) {
+  const list4 = credits(c, target);
+  const extra = back ? { back } : {};
+  const roleOptions = ROLES2.map((role) => ({ value: role, label: roleLabel(role) }));
   return [
     {
       type: "rows",
-      id: "credits",
-      title: "Credits",
-      empty: "No credits yet.",
-      rows: credits(c, target).map((credit) => ({
+      id,
+      title,
+      empty: `No ${noun}s yet.`,
+      rows: list4.map((credit) => ({
         id: credit.id,
         label: credit.name,
-        detail: `${roleLabel(credit.role)}${credit.instrument ? ` \xB7 ${credit.instrument}` : ""}`,
+        detail: [`${roleLabel(credit.role)}${credit.instrument ? ` \xB7 ${credit.instrument}` : ""}`, credit.source === "derived" ? "from tags" : ""].filter(Boolean).join(" \xB7 "),
         selection: credit.contributor_id,
-        actions: [action("Remove", "remove-credit", { target, credit: credit.id }, { tone: "danger" })]
+        actions: [action("Remove", "remove-credit", { target, credit: credit.id, ...extra }, { tone: "danger" })]
       }))
     },
+    ...edit && list4.length ? [
+      {
+        type: "form",
+        id: `edit-${noun}`,
+        title: `Change a ${noun}`,
+        note: "Changing a credit read from tags makes it yours: later scans leave it as you set it.",
+        command: "update-credit",
+        arguments: { target, ...extra },
+        submitLabel: "Save",
+        fields: [
+          { key: "credit", label: noun[0].toUpperCase() + noun.slice(1), type: "select", value: list4[0].id, options: list4.map((credit) => ({ value: credit.id, label: `${credit.name} (${roleLabel(credit.role)})` })) },
+          { key: "role", label: "Role", type: "select", value: list4[0].role, options: roleOptions },
+          { key: "instrument", label: "Instrument or voice", type: "text", value: "", placeholder: "Leave empty to keep it" }
+        ]
+      }
+    ] : [],
     {
       type: "form",
-      id: "add-credit",
-      title: "Add a credit",
+      id: `add-${noun}`,
+      title: `Add a ${noun}`,
       command: "add-credit",
-      arguments: { target },
-      submitLabel: "Add credit",
+      arguments: { target, ...extra },
+      submitLabel: `Add ${noun}`,
       fields: [
         { key: "contributor", label: "Person or ensemble", type: "lookup", lookup: "contributors", value: "", placeholder: "Search people and ensembles", required: true },
-        { key: "role", label: "Role", type: "select", value: "performer", options: ROLES2.map((role) => ({ value: role, label: roleLabel(role) })) },
+        { key: "role", label: "Role", type: "select", value: "performer", options: roleOptions },
         { key: "instrument", label: "Instrument or voice", type: "text", value: "", placeholder: "Optional" }
       ]
     }
@@ -42712,6 +42731,10 @@ function recordingView(c, recording) {
           ]
         }
       ] : [],
+      // Who performs: the credits pages and search show for this recording.
+      ...[...new Set(pws.map((pw) => pw.source_id))].flatMap(
+        (performance2) => creditSections(c, performance2, { id: "performers", title: "Performers", noun: "performer", edit: true, back: recording })
+      ),
       ...creditSections(c, recording)
     ]
   };
@@ -44262,7 +44285,9 @@ function scopeIds(c, scope) {
   }
   return [
     scope,
-    ...c.db.prepare("SELECT target_id FROM relation WHERE kind='movement' AND source_id=?").all(scope).map((r) => r.target_id)
+    ...c.db.prepare("SELECT target_id FROM relation WHERE kind='movement' AND source_id=?").all(scope).map((r) => r.target_id),
+    // A recording's page edits its performance's credits.
+    ...c.db.prepare("SELECT target_id FROM relation WHERE kind='recording_performance' AND source_id=?").all(scope).map((r) => r.target_id)
   ];
 }
 function revision(c, scope = "") {
@@ -44856,8 +44881,9 @@ function apply(c, input, who) {
     ],
     "attach-found-track": ["track", "choice", "movement", "confirmClassical"],
     "detach-track": ["recording", "item"],
-    "add-credit": ["target", "contributor", "role", "instrument"],
-    "remove-credit": ["target", "credit"]
+    "add-credit": ["target", "contributor", "role", "instrument", "back"],
+    "update-credit": ["target", "credit", "role", "instrument", "back"],
+    "remove-credit": ["target", "credit", "back"]
   }[request.command];
   if (!allowed || Object.keys(v).some((key) => !allowed.includes(key)))
     fail2("Unknown editor command or fields");
@@ -44917,6 +44943,23 @@ function apply(c, input, who) {
         "SELECT coalesce(max(position),0)+1 AS n FROM credit WHERE target_id=?"
       ).get(selection).n;
       c.credit(selection, contributor, role, { instrument, position });
+      break;
+    }
+    case "update-credit": {
+      selection = text4(v.target, "entry", { max: 200 });
+      c.entity(selection);
+      const credit = c.db.prepare("SELECT * FROM credit WHERE id=? AND target_id=? AND state='active'").get(text4(v.credit, "credit", { max: 200 }), selection);
+      if (!credit) fail2("Credit does not belong to this entry");
+      const role = text4(v.role, "role", { max: 80 });
+      const instrument = text4(v.instrument ?? "", "instrument", { optional: true, max: 200 }).trim() || credit.instrument;
+      const who2 = c.entity(credit.contributor_id, ["person", "ensemble"]);
+      if (!CREDIT_ROLES.includes(role)) fail2("Choose a role from the list");
+      if (PERSON_ROLES.has(role) && who2.kind !== "person") fail2(`An ensemble can't be credited as ${role}; choose a person or another role`);
+      if (ENSEMBLE_ROLES.has(role) && who2.kind !== "ensemble") fail2(`Only an ensemble can be credited as ${role}`);
+      const same2 = c.db.prepare("SELECT id,state FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ? AND id!=?").get(selection, credit.contributor_id, role, instrument, credit.id);
+      if (same2?.state === "active") fail2("That role credit already exists");
+      if (same2) c.db.prepare("DELETE FROM credit WHERE id=?").run(same2.id);
+      c.db.prepare("UPDATE credit SET role=?,instrument=?,source='manual' WHERE id=?").run(role, instrument, credit.id);
       break;
     }
     case "remove-credit": {
@@ -45096,6 +45139,11 @@ function apply(c, input, who) {
       fail2("Unknown editor command");
   }
   c.audit(`editor.${request.command}`, selection || "", { values: v }, who);
+  if (["add-credit", "update-credit", "remove-credit"].includes(request.command) && v.back != null) {
+    const back = text4(v.back, "page", { max: 200 });
+    c.entity(back);
+    selection = back;
+  }
   return {
     ok: true,
     message: "Saved to the classical catalogue. Audio files are unchanged.",

@@ -96,6 +96,11 @@ function scopeIds(c, scope) {
       .prepare("SELECT target_id FROM relation WHERE kind='movement' AND source_id=?")
       .all(scope)
       .map((r) => r.target_id),
+    // A recording's page edits its performance's credits.
+    ...c.db
+      .prepare("SELECT target_id FROM relation WHERE kind='recording_performance' AND source_id=?")
+      .all(scope)
+      .map((r) => r.target_id),
   ];
 }
 function revision(c, scope = "") {
@@ -801,8 +806,9 @@ function apply(c, input, who) {
     ],
     "attach-found-track": ["track", "choice", "movement", "confirmClassical"],
     "detach-track": ["recording", "item"],
-    "add-credit": ["target", "contributor", "role", "instrument"],
-    "remove-credit": ["target", "credit"],
+    "add-credit": ["target", "contributor", "role", "instrument", "back"],
+    "update-credit": ["target", "credit", "role", "instrument", "back"],
+    "remove-credit": ["target", "credit", "back"],
   }[request.command];
   if (!allowed || Object.keys(v).some((key) => !allowed.includes(key)))
     fail("Unknown editor command or fields");
@@ -871,6 +877,30 @@ function apply(c, input, who) {
         )
         .get(selection).n;
       c.credit(selection, contributor, role, { instrument, position });
+      break;
+    }
+    case "update-credit": {
+      // The admin's own from now on: a derived credit they change is manual.
+      selection = text(v.target, "entry", { max: 200 });
+      c.entity(selection);
+      const credit = c.db
+        .prepare("SELECT * FROM credit WHERE id=? AND target_id=? AND state='active'")
+        .get(text(v.credit, "credit", { max: 200 }), selection);
+      if (!credit) fail("Credit does not belong to this entry");
+      const role = text(v.role, "role", { max: 80 });
+      // Empty keeps the instrument the credit has.
+      const instrument = text(v.instrument ?? "", "instrument", { optional: true, max: 200 }).trim() || credit.instrument;
+      const who = c.entity(credit.contributor_id, ["person", "ensemble"]);
+      if (!CREDIT_ROLES.includes(role)) fail("Choose a role from the list");
+      if (PERSON_ROLES.has(role) && who.kind !== "person") fail(`An ensemble can't be credited as ${role}; choose a person or another role`);
+      if (ENSEMBLE_ROLES.has(role) && who.kind !== "ensemble") fail(`Only an ensemble can be credited as ${role}`);
+      const same = c.db
+        .prepare("SELECT id,state FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ? AND id!=?")
+        .get(selection, credit.contributor_id, role, instrument, credit.id);
+      if (same?.state === "active") fail("That role credit already exists");
+      // A credit removed earlier under the new role gives way to this one.
+      if (same) c.db.prepare("DELETE FROM credit WHERE id=?").run(same.id);
+      c.db.prepare("UPDATE credit SET role=?,instrument=?,source='manual' WHERE id=?").run(role, instrument, credit.id);
       break;
     }
     case "remove-credit": {
@@ -1103,6 +1133,12 @@ function apply(c, input, who) {
       fail("Unknown editor command");
   }
   c.audit(`editor.${request.command}`, selection || "", { values: v }, who);
+  // A credit edited from a recording's page returns to that page.
+  if (["add-credit", "update-credit", "remove-credit"].includes(request.command) && v.back != null) {
+    const back = text(v.back, "page", { max: 200 });
+    c.entity(back);
+    selection = back;
+  }
   return {
     ok: true,
     message: "Saved to the classical catalogue. Audio files are unchanged.",

@@ -1,3 +1,11 @@
+# v0.3 Phase 2.2 — add, edit and remove recording credits (issue #57)
+
+Fifth of ten commits in one PR (1.5–1.7, 2.1–2.7). Implements #57 only; #57 has no later comments.
+
+A recording's editor page gains a Performers section for its performance (the credits pages and search show): each credit, marked "from tags" when a scan derived it, with Remove; "Change a performer" (role, and instrument, kept when left empty); and "Add a performer". New command `update-credit`: the credit becomes `manual`, roles keep the person/ensemble rules, a change into an existing credit is refused, and a removed credit under the new role gives way. `add-credit`, `update-credit` and `remove-credit` take an optional `back` page, so changes made from a recording return to it. The recording page's revision scope now includes its performances, so only that recording's performance can be written from it. Removing a derived credit keeps it removed (1.2); rescans and library passes leave an admin's credits as set (1.4). The recording's own credits section is unchanged. No schema or core change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
 # v0.3 Phase 2.1 — role and unreviewed filters on the performer list (issue #56)
 
 Fourth of ten commits in one PR (1.5–1.7, 2.1–2.7). Implements #56 only; #56 has no later comments.

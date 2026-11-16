@@ -1,3 +1,16 @@
+# v0.3 Phase 2.2 — recording credits / issue #57
+
+## Result
+
+- `editor.js`: `update-credit` (fields `target`, `credit`, `role`, `instrument`, `back`), `back` on `add-credit` and `remove-credit`; `scopeIds` adds a recording's `recording_performance` targets.
+- `editor-v2.js`: `creditSections(c, target, { id, title, noun, edit, back })` serves the work page as before (unchanged ids) and the recording page's Performers section (`performers`, `edit-performer`, `add-performer`).
+
+## Verification
+
+On Node 22.23: full `npm test` 415/415. New editor-v2 test: after matching, a recording's page lists the orchestra read from tags; changing its role makes it manual and returns to the recording; a soloist is added with an instrument, which an empty instrument on a later change keeps; an ensemble role on a person and a change into an existing credit are refused; another recording's performance cannot be written from this page; a library pass and a rescan keep everything as set; removing a credit updates the page. It fails on the 2.1 code.
+
+---
+
 # v0.3 Phase 2.1 — performer list filters / issue #56
 
 ## Result

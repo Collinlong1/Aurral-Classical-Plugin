@@ -214,6 +214,59 @@ test("the performer list filters by role and shows contributors a scan made that
   assert.match((await s.read({ tab: "performers" })).list.placeholder, /role:conductor/);
 });
 
+test("a recording's page edits who performs it: add, change role or instrument, remove; rescans keep it", async (t) => {
+  const s = await setup(t);
+  autoMatchTaggedWorks(s.c, { albumId: "A", actor: "admin", allowStructuredTitles: true });
+  autoMatchTaggedWorks(s.c, { albumId: "B", actor: "admin", allowStructuredTitles: true });
+  const recordingOf = (album) =>
+    s.c.db
+      .prepare(
+        `SELECT DISTINCT rp.source_id AS recording, pw.source_id AS performance FROM realization r JOIN relation pw ON pw.id=r.performance_work_id
+         JOIN relation rp ON rp.kind='recording_performance' AND rp.target_id=pw.source_id
+         JOIN realization_item i ON i.realization_id=r.id JOIN segment g ON g.id=i.segment_id JOIN track_link l ON l.id=g.track_link_id
+         WHERE CAST(json_extract(l.evidence,'$.albumId') AS TEXT)=?`,
+      )
+      .get(album);
+  const { recording, performance } = recordingOf("A");
+  const view = async () => (await s.read({ selection: recording })).view;
+  const performers = async () => section(await view(), "performers").rows.map((row) => [row.label, row.detail]);
+  // The scan read the orchestra from the artist tag.
+  assert.deepEqual(await performers(), [["Orchestra A", "Orchestra · from tags"]]);
+  const derived = section(await view(), "performers").rows[0].id;
+
+  // Change its role: it is the admin's now, and the page stays the recording's.
+  const changed = await s.ok("update-credit", { target: performance, credit: derived, role: "ensemble", instrument: "", back: recording }, recording);
+  assert.equal(changed.selection, recording);
+  assert.deepEqual(await performers(), [["Orchestra A", "Ensemble"]]);
+  assert.deepEqual({ ...s.c.db.prepare("SELECT source,state FROM credit WHERE id=?").get(derived) }, { source: "manual", state: "active" });
+  // Add a soloist; an empty instrument on a later change keeps theirs.
+  const soloist = (await s.ok("create-contributor", { name: "Fixture Pianist", kind: "person" })).selection;
+  await s.ok("add-credit", { target: performance, contributor: soloist, role: "soloist", instrument: "piano", back: recording }, recording);
+  const soloCredit = s.c.db.prepare("SELECT id FROM credit WHERE target_id=? AND contributor_id=?").get(performance, soloist).id;
+  await s.ok("update-credit", { target: performance, credit: soloCredit, role: "performer", instrument: "", back: recording }, recording);
+  assert.deepEqual(await performers(), [["Orchestra A", "Ensemble"], ["Fixture Pianist", "Performer · piano"]]);
+  // Wrong kinds and duplicates explain themselves.
+  assert.equal((await s.mutate("update-credit", { target: performance, credit: soloCredit, role: "orchestra", back: recording }, recording)).ok, false);
+  await s.ok("add-credit", { target: performance, contributor: soloist, role: "soloist", instrument: "piano", back: recording }, recording);
+  const second = s.c.db.prepare("SELECT id FROM credit WHERE target_id=? AND contributor_id=? AND role='soloist'").get(performance, soloist).id;
+  const duplicate = await s.mutate("update-credit", { target: performance, credit: second, role: "performer", instrument: "", back: recording }, recording);
+  assert.deepEqual([duplicate.ok, duplicate.message], [false, "That role credit already exists"]);
+  await s.ok("remove-credit", { target: performance, credit: second, back: recording }, recording);
+  // Only this recording's performance can be written from its page.
+  const other = recordingOf("B");
+  const otherCredit = s.c.db.prepare("SELECT id FROM credit WHERE target_id=?").get(other.performance).id;
+  const outside = await s.mutate("update-credit", { target: other.performance, credit: otherCredit, role: "ensemble", back: recording }, recording);
+  assert.equal(outside.ok, false);
+  // A library pass and a rescan of the album keep the admin's credits as set.
+  autoMatchTaggedWorks(s.c, { actor: "admin", allowStructuredTitles: true });
+  autoMatchTaggedWorks(s.c, { albumId: "A", actor: "admin", allowStructuredTitles: true });
+  assert.deepEqual(await performers(), [["Orchestra A", "Ensemble"], ["Fixture Pianist", "Performer · piano"]]);
+  // Remove: the page shows who is left.
+  await s.ok("remove-credit", { target: performance, credit: soloCredit, back: recording }, recording);
+  assert.deepEqual(await performers(), [["Orchestra A", "Ensemble"]]);
+  assert.ok(section(await view(), "edit-performer"));
+});
+
 test("send to / remove from Classical overrides detection and closes review items", async (t) => {
   const s = await setup(t);
   const [pop] = s.trackIds("C");

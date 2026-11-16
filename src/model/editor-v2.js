@@ -600,31 +600,56 @@ function detailsForm(c, entity, kind) {
     fields,
   };
 }
-function creditSections(c, target) {
+// A target's credits, with forms to add one and (with `edit`) to change one's
+// role or instrument. `back` is the page a change returns to, when the
+// target is not the page itself (a recording's performance). A credit a scan
+// derived from tags says so.
+function creditSections(c, target, { id = "credits", title = "Credits", noun = "credit", edit = false, back = null } = {}) {
+  const list = credits(c, target);
+  const extra = back ? { back } : {};
+  const roleOptions = ROLES.map((role) => ({ value: role, label: roleLabel(role) }));
   return [
     {
       type: "rows",
-      id: "credits",
-      title: "Credits",
-      empty: "No credits yet.",
-      rows: credits(c, target).map((credit) => ({
+      id,
+      title,
+      empty: `No ${noun}s yet.`,
+      rows: list.map((credit) => ({
         id: credit.id,
         label: credit.name,
-        detail: `${roleLabel(credit.role)}${credit.instrument ? ` · ${credit.instrument}` : ""}`,
+        detail: [`${roleLabel(credit.role)}${credit.instrument ? ` · ${credit.instrument}` : ""}`, credit.source === "derived" ? "from tags" : ""].filter(Boolean).join(" · "),
         selection: credit.contributor_id,
-        actions: [action("Remove", "remove-credit", { target, credit: credit.id }, { tone: "danger" })],
+        actions: [action("Remove", "remove-credit", { target, credit: credit.id, ...extra }, { tone: "danger" })],
       })),
     },
+    ...(edit && list.length
+      ? [
+          {
+            type: "form",
+            id: `edit-${noun}`,
+            title: `Change a ${noun}`,
+            note: "Changing a credit read from tags makes it yours: later scans leave it as you set it.",
+            command: "update-credit",
+            arguments: { target, ...extra },
+            submitLabel: "Save",
+            fields: [
+              { key: "credit", label: noun[0].toUpperCase() + noun.slice(1), type: "select", value: list[0].id, options: list.map((credit) => ({ value: credit.id, label: `${credit.name} (${roleLabel(credit.role)})` })) },
+              { key: "role", label: "Role", type: "select", value: list[0].role, options: roleOptions },
+              { key: "instrument", label: "Instrument or voice", type: "text", value: "", placeholder: "Leave empty to keep it" },
+            ],
+          },
+        ]
+      : []),
     {
       type: "form",
-      id: "add-credit",
-      title: "Add a credit",
+      id: `add-${noun}`,
+      title: `Add a ${noun}`,
       command: "add-credit",
-      arguments: { target },
-      submitLabel: "Add credit",
+      arguments: { target, ...extra },
+      submitLabel: `Add ${noun}`,
       fields: [
         { key: "contributor", label: "Person or ensemble", type: "lookup", lookup: "contributors", value: "", placeholder: "Search people and ensembles", required: true },
-        { key: "role", label: "Role", type: "select", value: "performer", options: ROLES.map((role) => ({ value: role, label: roleLabel(role) })) },
+        { key: "role", label: "Role", type: "select", value: "performer", options: roleOptions },
         { key: "instrument", label: "Instrument or voice", type: "text", value: "", placeholder: "Optional" },
       ],
     },
@@ -972,6 +997,10 @@ function recordingView(c, recording) {
             },
           ]
         : []),
+      // Who performs: the credits pages and search show for this recording.
+      ...[...new Set(pws.map((pw) => pw.source_id))].flatMap((performance) =>
+        creditSections(c, performance, { id: "performers", title: "Performers", noun: "performer", edit: true, back: recording }),
+      ),
       ...creditSections(c, recording),
     ],
   };
