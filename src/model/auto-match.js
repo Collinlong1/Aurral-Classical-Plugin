@@ -3,6 +3,7 @@ import { Metadata } from "./metadata.js";
 import { transaction } from "./database.js";
 import { catalogueNumber, cataloguePiece } from "../works.js";
 import { artistCredits, composersOf } from "./credits.js";
+import { deriveCredits } from "./contributors.js";
 
 const MULTI_MOVEMENT =
   /\b(symphon(?:y|ie)|sinfonia|sonata|sonatina|concerto|suite|partita|quartet|quintet|sextet|septet|octet|nonet|trio|serenade|divertimento|cassation|mass|missa|requiem|stabat mater|magnificat|te deum|vespers|cantata|oratorio|passion|variations?|ballet)\b/i;
@@ -770,7 +771,7 @@ function stripWorkPrefixOnce(title, workTitle) {
   return text;
 }
 
-function resolvedName(catalogue, id, field) {
+export function resolvedName(catalogue, id, field) {
   const row = catalogue.db
     .prepare(
       `SELECT a.value FROM field_resolution f JOIN assertion a ON a.id=f.assertion_id
@@ -3097,6 +3098,8 @@ export function autoMatchTaggedWorks(
   for (const group of groups)
     if (createGroup(catalogue, group, actor, index)) created++;
   keyMovementTitles(catalogue, { albumId });
+  // Who plays each newly matched performance, from its tags.
+  deriveCredits(catalogue, { albumId });
   resolveSettledReviews(catalogue, albumId, actor);
   return { created, candidates: groups.length };
 }

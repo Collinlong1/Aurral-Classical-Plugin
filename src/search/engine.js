@@ -5,6 +5,7 @@
 // One document per work, movement, owned recording, contributor and album.
 // Ranking and ambiguity rules are in SEARCH.md.
 import { transaction } from "../model/database.js";
+import { PERFORMING_ROLES, performerNames } from "../model/contributors.js";
 import { catalogueKeys, fold, keyMatches, parseQuery, skeleton, words } from "./normalize.js";
 
 const FIELD = { primary: 0, secondary: 1, skeleton: 2 };
@@ -30,7 +31,7 @@ export const FACETS = [
   ["owned", "Library"],
 ];
 const FACET_KEYS = new Set(FACETS.map(([key]) => key));
-const PERFORMER_ROLES = new Set(["soloist", "performer", "conductor", "orchestra", "ensemble", "choir"]);
+const PERFORMER_ROLES = PERFORMING_ROLES;
 const ENSEMBLE_ROLES = new Set(["orchestra", "ensemble", "choir"]);
 const ROLE_LABEL = { soloist: "Soloist", performer: "Performer", conductor: "Conductor", orchestra: "Orchestra", ensemble: "Ensemble", choir: "Choir", composer: "Composer", arranger: "Arranger", lyricist: "Lyricist" };
 const LIVE = /\b(live|concert|recital|broadcast|in concert|konzert)\b/i;
@@ -127,12 +128,7 @@ export function ownedRecordings(c, tracks = classicalTracks(c), values = resolve
     const people = credits.all(recording.performanceWorkId).map((row) => ({ id: row.contributor_id, role: row.role, name: text(values.get(row.contributor_id)?.name) || "Unknown" }));
     const performers = people.filter((p) => PERFORMER_ROLES.has(p.role));
     // Without credits, the track's own artist names who plays.
-    const tagged = performers.length
-      ? []
-      : text(first.hints.artist || first.hints.albumArtist)
-          .split(/\s+[—–]\s+|\s*;\s*/)
-          .map((name) => name.trim())
-          .filter((name) => name && !list(first.hints.composer).some((composer) => fold(composer) === fold(name)));
+    const tagged = performers.length ? [] : performerNames(first.hints, list(first.hints.composer), fold);
     const albums = [...new Set(recording.items.map((item) => item.track.albumId).filter(Boolean))];
     const mbids = [...new Set(recording.items.map((item) => item.track.hints.recordingMbid).filter(Boolean))].sort();
     const parts = new Map();

@@ -16,6 +16,7 @@ export const CREDIT_ROLES = [
   "composer",
   "soloist",
   "performer",
+  "accompanist",
   "conductor",
   "orchestra",
   "ensemble",
@@ -25,7 +26,7 @@ export const CREDIT_ROLES = [
 ];
 const roles = new Set(CREDIT_ROLES);
 export const CREDIT_SOURCES = new Set(["manual", "derived", "provider"]);
-export const PERSON_ROLES = new Set(["composer", "soloist", "conductor", "arranger", "lyricist"]);
+export const PERSON_ROLES = new Set(["composer", "soloist", "accompanist", "conductor", "arranger", "lyricist"]);
 export const ENSEMBLE_ROLES = new Set(["orchestra", "ensemble", "choir"]);
 const relations = {
   movement: [["work"], ["movement"]],

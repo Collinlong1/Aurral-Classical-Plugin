@@ -26,9 +26,9 @@ const plain = (value) =>
 const clean = (value) => String(value || "").trim().replace(/\s+/g, " ");
 
 const PARTS = /\s*;\s*|\s+\/\s+|\s+[—–-]\s+/;
-const ENSEMBLE =
+export const ENSEMBLE =
   /\b(orchestr\w*|orchester|orkest\w*|philharmoni\w*|symphon\w*|sinfoni\w*|ensemble\w*|quartet\w*|quartett\w*|quatuor|quintet\w*|trio|choir\w*|chor\w*|coro|chorus|consort\w*|singers|players|soloists|camerata|academy|academie|akademie|band|cappella|capella|kammer\w*|virtuos\w*|musici|baroque|collegium|concerto|concert|staatskapelle|gewandhaus\w*|opera|operas|oper|cellists|brass|strings|voices)\b/i;
-const LIST = /,|&|\s(?:and|und|et|e|y|with|feat\.?|featuring)\s/i;
+export const LIST = /,|&|\s(?:and|und|et|e|y|with|feat\.?|featuring)\s/i;
 const NAME = /^[\p{Lu}][\p{L}'’.-]*(?:\s+(?:[\p{Lu}][\p{L}'’.-]*|van|von|der|den|de|des|da|di|du|del|della|la|le|y|zu|ten|ter|af))*$/u;
 
 // Catalogue systems tied to one composer, as the title shows them.

@@ -1,3 +1,11 @@
+# v0.3 Phase 1.4 — derive performer credits (issue #52)
+
+Last of five commits in one PR (0.11, 1.1–1.4). Implements #52 only; #52 has no later comments. 1.5 (identity by aliases and IDs across all contributors) and later items are not started.
+
+New `src/model/contributors.js`. `performerNames` is the artist-tag split moved from `engine.js` and `presentation.js`, each caller keeping its own name folding, so search and pages read exactly as before. `trackCredits` reads one track's credits: a conductor tag names the conductor; Vorbis `PERFORMER` values name players and their instruments ("Martha Argerich (piano)"); without them the artist tag does, split into a list only when every piece is a name or an ensemble. Ensembles (the `credits.js` word list) are orchestra, choir or ensemble by their own name; everyone else is `performer`, shown as "Performer". `contributorFor` reuses the one person or ensemble with that exact folded name or alias, or the holder of a MusicBrainz artist ID; a name two records share gets no credit; new records are marked `unreviewed`. `deriveCredits` runs at the end of `autoMatchTaggedWorks` for performances with no performing credit at all, active or removed, and gives each the credits all its tracks share, as `derived`. `accompanist` is a new person role. Admins' credits are never touched, and a removed derived credit is never added again. No schema or core change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
 # v0.3 Phase 1.3 — conductor, performer and artist ID tag evidence (issue #53)
 
 Fourth of five commits in one PR (0.11, 1.1–1.4). Implements #53 only; #53 has no later comments.

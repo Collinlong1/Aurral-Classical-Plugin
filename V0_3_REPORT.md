@@ -1,3 +1,26 @@
+# v0.3 Phase 1.4 — derived performer credits / issue #52
+
+## Result
+
+- **`performerNames(hints, composers, key)`:** the split on " — ", " – " and ";" with composers left out, moved from `engine.js` `ownedRecordings` and `presentation.js` `performerOf`. Each passes its own folding (`fold` and `words`), so their output is unchanged.
+- **`trackCredits(hints)`:** conductor tag → `conductor` (person); `PERFORMER` values, with a trailing "(instrument)" read as the instrument, else the artist split; a part is split as a list (", ", "&", "and"…) only when every piece is an ensemble or a capitalised name of two or more words, so "Choir of King's College, Cambridge" stays whole. Ensembles take `orchestra`, `choir` or `ensemble` from their name; people are `performer`. Roles are never guessed from a person's name.
+- **`contributorFor(c, index, name, { mbid, kind })`:** an active MusicBrainz artist ID's holder wins; else the single contributor of that kind with that folded name or alias (composers included, so the composer at the piano is one person); a same-named record holding a different ID is someone else; two same-named records → null (no credit, nothing created); otherwise a new record with `data.unreviewed = true` and a derived name. `deriveCredits` does not pass IDs yet: which tag ID belongs to which name is 1.5's rule.
+- **`deriveCredits(c, { albumId })`:** performances on the album (or all, in the library pass) with no credit in a performing role, active or removed. Credits all the performance's tracks share are added after any existing positions, `source='derived'`. Called at the end of `autoMatchTaggedWorks`, so the first library pass after this release backfills existing performances (plan §3 step 1).
+- **Roles:** `accompanist` added to `CREDIT_ROLES` and `PERSON_ROLES`; the search engine's performer roles are `PERFORMING_ROLES`. `credits.js` exports `ENSEMBLE` and `LIST`; `auto-match.js` exports `resolvedName`.
+
+## Verification
+
+On Node 22.23:
+
+- Full `npm test`: 412/412.
+- Apple corpus: every one of the 612 results equals the saved baseline exactly (#52: unaffected).
+- New `test/contributors.test.js` (5 tests): tag reading (conductor, PERFORMER with instruments, orchestra/choir/ensemble, list splitting and a comma inside one ensemble's name, composer left out); derivation once per performance, as unreviewed records, one record per name across albums, nothing added on rescans or the library pass, the work page showing them; a removed derived credit never comes back and an admin's credit is untouched; disagreeing tracks keep only shared credits; the composer at the piano is one person; two same-named people get nothing; an artist ID finds its holder; `accompanist` is a person-only role. With the derivation call disabled, the three matching tests fail.
+- `test/search.test.js` fixture: its people now exist before the scan, so derived credits are theirs, and its hand-made credits replace the derived "performer" credit for that person, as an admin's correction would. Before this change, two "Daniel Barenboim" records (derived and hand-made) tied in the performer section and the role test passed or failed by ID order; three repeated runs now pass.
+
+Not run: browser, Compose or restart checks locally (no Docker); the paired workflows run on the PR.
+
+---
+
 # v0.3 Phase 1.3 — tag evidence / issue #53
 
 ## Result

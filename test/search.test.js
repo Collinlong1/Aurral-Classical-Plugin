@@ -59,6 +59,17 @@ const SONATA = ["I. Adagio sostenuto", "II. Allegretto", "III. Presto agitato"];
 async function library(t) {
   generation = 0;
   const c = await setup(t);
+  const m = new Metadata(c);
+  // Credits: Barenboim plays the sonata and conducts the symphony. The people
+  // exist before the scan, so the credits it derives from the tags are theirs.
+  const person = (name) => {
+    const id = c.createEntity("person");
+    m.manual(id, "name", name, { actor: "test" });
+    return id;
+  };
+  const barenboim = person("Daniel Barenboim");
+  const karajan = person("Herbert von Karajan");
+  const levit = person("Igor Levit");
   scan(c, [
     ...album("levit", MOONLIGHT, SONATA, { composer: "Ludwig van Beethoven", artist: "Igor Levit", mbids: ["l1", "l2", "l3"] }),
     // The same Levit recording on a second release (a box set).
@@ -68,23 +79,16 @@ async function library(t) {
     ...album("dvorak", "Symphony No. 9 in E minor, Op. 95", ["I. Adagio – Allegro molto", "II. Largo"], { composer: "Antonín Dvořák", artist: "Berliner Philharmoniker; Herbert von Karajan" }),
     ...album("dvorak-db", "Symphony No. 9 in E minor, Op. 95", ["I. Adagio – Allegro molto", "II. Largo"], { composer: "Antonín Dvořák", artist: "Chicago Symphony Orchestra; Daniel Barenboim" }),
   ]);
-  const m = new Metadata(c);
   const moonlight = workId(c, "Piano Sonata No. 14");
   m.manual(moonlight, "nickname", "Moonlight", { actor: "test", pin: true });
   m.manual(moonlight, "aliases", ["Sonata quasi una fantasia"], { actor: "test", pin: true });
   m.manual(moonlight, "period", "Classical", { actor: "test", pin: true });
-  // Credits: Barenboim plays the sonata and conducts the symphony.
-  const person = (name) => {
-    const id = c.createEntity("person");
-    m.manual(id, "name", name, { actor: "test" });
-    return id;
-  };
-  const barenboim = person("Daniel Barenboim");
-  const karajan = person("Herbert von Karajan");
-  const levit = person("Igor Levit");
+  // An admin's credit says what the tags could not: it replaces the plain
+  // "performer" credit the scan derived for that person.
   const credit = (album, contributor, role, source = "manual") => {
     const realization = c.db.prepare("SELECT r.performance_work_id FROM realization r WHERE r.label=?").get(`Album ${album}`);
     const performance = c.db.prepare("SELECT source_id FROM relation WHERE id=?").get(realization.performance_work_id).source_id;
+    for (const { id } of c.db.prepare("SELECT id FROM credit WHERE target_id=? AND contributor_id=? AND source='derived' AND state='active'").all(performance, contributor)) c.removeCredit(id);
     return c.credit(performance, contributor, role, { source });
   };
   credit("barenboim", barenboim, "soloist");
