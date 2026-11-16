@@ -1,3 +1,11 @@
+# v0.3 Phase 0.02 — work-merge composers (issue #13)
+
+Branch `fix/v0.3-0.02-work-merge-composers` starts at merged `aurral-classical` `2b50d44` (PR #94, L2 prerequisite). Current #13 has no later comments changing scope. This change implements E2 only.
+
+An editor work merge preserves the kept work's composer credits when present, moves other credit roles, and inherits all dropped composers only if the kept work has none. Both merge directions explain which composers stay and which are not added, with links to merge the contributor entries separately. This includes genuine co-composers: the preview explicitly discloses their omission. The form note now reflects these rules. Automatic merges retain their existing behavior; work merge undo restores the original credits. No core or schema change. Bundle rebuilt.
+
+Verification and probe evidence: `V0_3_REPORT.md`. The known Phase 1 integration fixture mismatch is outside #13 and remains unchanged.
+
 # v0.3 Phase 0.01 — composer aliases (issue #10, November 15, 2026)
 
 Review branch `fix/v0.3-0.01-composer-aliases` starts at `aurral-classical` `762ee5c`. The current issue has no prerequisite issues or later comments. Reference: `v0.3-handoff` `b6f6a3b`, `docs/v0.3-handoff/`. This change implements L2 only; E2 and later phases remain separate.

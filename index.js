@@ -40792,7 +40792,12 @@ function mergeWork(catalogue, keep, drop, actor3, { addMissing = false } = {}) {
     db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), from);
   }
   db.prepare("DELETE FROM relation WHERE kind='movement' AND source_id=?").run(drop);
+  const keepComposers = addMissing && db.prepare("SELECT 1 FROM credit WHERE target_id=? AND role='composer' LIMIT 1").get(keep);
   for (const credit of db.prepare("SELECT * FROM credit WHERE target_id=?").all(drop)) {
+    if (keepComposers && credit.role === "composer") {
+      db.prepare("DELETE FROM credit WHERE id=?").run(credit.id);
+      continue;
+    }
     if (db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?").get(keep, credit.contributor_id, credit.role, credit.instrument))
       db.prepare("DELETE FROM credit WHERE id=?").run(credit.id);
     else db.prepare("UPDATE credit SET target_id=? WHERE id=?").run(keep, credit.id);
@@ -41708,12 +41713,22 @@ function mergeOutcome(c, keep, drop) {
       { label: "Undo", value: "Not possible: check before merging" }
     ];
   }
+  const keptComposers = credits(c, keep).filter((credit) => credit.role === "composer");
+  const droppedComposers = credits(c, drop).filter((credit) => credit.role === "composer");
+  const notAdded = keptComposers.length ? droppedComposers.filter((credit) => !keptComposers.some((kept) => kept.contributor_id === credit.contributor_id)) : [];
+  const composerOutcome = keptComposers.length ? `Kept work's composers stay: ${keptComposers.map((credit) => `\u201C${credit.name}\u201D`).join(", ")}.${notAdded.length ? ` ${notAdded.map((credit) => `\u201C${credit.name}\u201D is not added`).join("; ")}.` : ""}` : droppedComposers.length ? `${droppedComposers.map((credit) => `\u201C${credit.name}\u201D`).join(", ")} move to the kept work, which has no composer.` : "Neither work has a composer.";
   const preview = mergePreview(c, keep, drop, { addMissing: true });
   const movement = (id) => entityLabel(c, id, "movement");
   if (!preview.ok) return [{ label: "Can't merge this way", value: "The movements don't line up. Rename or reorder them so they match, then merge." }];
   return [
     { label: "Stays", value: `\u201C${label(keep)}\u201D, with its title and fields; fields set on the other are not copied`, selection: keep },
     { label: "Removed", value: `\u201C${label(drop)}\u201D` },
+    { label: "Composers", value: composerOutcome.slice(0, 2e3) },
+    ...notAdded.flatMap((dropped) => keptComposers.map((kept) => ({
+      label: "Merge composer entries",
+      value: `\u201C${dropped.name}\u201D with \u201C${kept.name}\u201D`.slice(0, 500),
+      selection: mergeSelection(dropped.contributor_id, kept.contributor_id)
+    }))).slice(0, 20),
     { label: "Recordings after", value: `${realizations(c, keep).length + realizations(c, drop).length}, every track keeps its file` },
     ...preview.mapped.slice(0, 20).map(({ from, to }) => ({ label: movement(from), value: `becomes ${movement(to)}` })),
     ...preview.added.slice(0, 10).map((id) => ({ label: movement(id), value: "added to the kept work, at the end" })),
@@ -41751,7 +41766,7 @@ function mergeView(c, a, b, review) {
         type: "form",
         id: "merge",
         title: "Merge",
-        note: `Choose the entry that stays. Everything from the other moves to it, then the other is removed.${work ? " You can undo it from Activity." : " This can't be undone."}`,
+        note: work ? "Choose the work that stays. Recordings and other credits move to it; its composers stay when present. The other work is removed. You can undo it from Activity." : "Choose the entry that stays. Everything from the other moves to it, then the other is removed. This can't be undone.",
         command: "merge-entity",
         arguments: { target: a, into: b, confirm: true, ...review && { review } },
         submitLabel: "Merge",

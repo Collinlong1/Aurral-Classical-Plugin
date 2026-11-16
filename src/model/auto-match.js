@@ -2343,7 +2343,14 @@ export function mergeWork(catalogue, keep, drop, actor, { addMissing = false } =
     db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), from);
   }
   db.prepare("DELETE FROM relation WHERE kind='movement' AND source_id=?").run(drop);
+  // An editor merge keeps the chosen work's composer identity. Other roles
+  // still move; a work without a composer inherits all dropped composers.
+  const keepComposers = addMissing && db.prepare("SELECT 1 FROM credit WHERE target_id=? AND role='composer' LIMIT 1").get(keep);
   for (const credit of db.prepare("SELECT * FROM credit WHERE target_id=?").all(drop)) {
+    if (keepComposers && credit.role === "composer") {
+      db.prepare("DELETE FROM credit WHERE id=?").run(credit.id);
+      continue;
+    }
     if (
       db
         .prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?")

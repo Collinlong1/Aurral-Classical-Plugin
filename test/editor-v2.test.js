@@ -599,3 +599,84 @@ test("v1 hosts still get the v1 editor", async (t) => {
   assert.equal(page.version, 1);
   assert.ok(s);
 });
+
+const composerCredits = (s, work) => s.c.db.prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer' ORDER BY position,id").all(work).map((r) => r.contributor_id);
+async function spellingWorks(t) {
+  const s = await setup(t);
+  for (const track of s.trackIds("B")) setHints(s, track, { composer: ["L. van Beethoven"], work: "Symphony No. 5 in C minor, Op. 67" });
+  for (const track of s.trackIds("A")) setHints(s, track, { work: "Symphony No. 5 in C minor, Op. 67" });
+  autoMatchTaggedWorks(s.c);
+  const [a, b] = ["A", "B"].map((album) => workOfTrack(s, s.trackIds(album)[0])[0]);
+  assert.notEqual(a, b);
+  return { ...s, a, b };
+}
+function addSpellingAlbum(s, album, composer, generation) {
+  const existing = s.c.db.prepare("SELECT evidence FROM track_link").all().map((row) => JSON.parse(row.evidence));
+  const tracks = existing.filter((track) => track.albumId === "A").map((track, i) => ({
+    ...track, coreId: `${album}-${i}`, fileId: `${album}-${i}`, path: `/library/${album}/${i}.flac`, fingerprint: `audio-sha256-v2:${album}-${i}`,
+    albumId: album, hints: { ...track.hints, album: `Album ${album}`, composer: [composer] },
+  }));
+  const rows = reconcile(s.c, { version: 1, complete: true, instanceId: "i", epoch: "e", generation, tracks: [...existing, ...tracks] });
+  for (const row of rows) classify(s.c, row.id, row.hints);
+  autoMatchTaggedWorks(s.c);
+}
+
+test("#13 a work merge keeps its composers, previews both directions, and later albums join", async (t) => {
+  const s = await spellingWorks(t);
+  const [keptPerson] = composerCredits(s, s.a), [droppedPerson] = composerCredits(s, s.b);
+  const merge = `merge:${s.b}:${s.a}`;
+  const view = (await s.read({ selection: merge })).view;
+  for (const [id, kept, dropped] of [["keep-first", "L. van Beethoven", "Ludwig van Beethoven"], ["keep-second", "Ludwig van Beethoven", "L. van Beethoven"]]) {
+    const items = section(view, id).items;
+    const composers = items.find((item) => item.label === "Composers");
+    assert.ok(composers, "the preview explains composer credits");
+    assert.ok(composers.value.includes(kept));
+    assert.ok(composers.value.includes(`“${dropped}” is not added`));
+    const link = items.find((item) => item.selection?.startsWith("merge:"));
+    assert.ok(link, "the preview links to merging the composer entries");
+    assert.equal((await s.read({ selection: link.selection })).view.title, "Merge two entries");
+  }
+  await s.ok("merge-entity", { target: s.b, into: s.a, confirm: true }, merge);
+  assert.deepEqual(composerCredits(s, s.a), [keptPerson]);
+  addSpellingAlbum(s, "D", "Ludwig van Beethoven", 2);
+  assert.deepEqual(liveWorks(s), [s.a]);
+  assert.ok(s.trackIds("D").every((id) => workOfTrack(s, id).join() === s.a));
+  // L2 covers the other spelling once the admin explicitly merges the people.
+  await s.ok("merge-entity", { target: droppedPerson, into: keptPerson, confirm: true }, `merge:${droppedPerson}:${keptPerson}`);
+  addSpellingAlbum(s, "E", "L. van Beethoven", 3);
+  assert.deepEqual(liveWorks(s), [s.a]);
+  assert.deepEqual(composerCredits(s, s.a), [keptPerson]);
+  assert.ok(s.trackIds("E").every((id) => workOfTrack(s, id).join() === s.a));
+});
+
+test("#13 dropped co-composers are disclosed, other roles move, and undo restores credits", async (t) => {
+  const s = await spellingWorks(t);
+  const co = (await s.ok("create-contributor", { name: "Genuine co-composer", kind: "person" })).selection;
+  s.c.credit(s.b, co, "composer", { position: 2 });
+  s.c.credit(s.b, co, "arranger", { position: 3 });
+  const before = s.c.db.prepare("SELECT * FROM credit WHERE target_id IN (?,?) ORDER BY id").all(s.a, s.b);
+  const step = `merge:${s.b}:${s.a}`;
+  const view = (await s.read({ selection: step })).view;
+  assert.match(section(view, "keep-second").items.find((item) => item.label === "Composers").value, /“Genuine co-composer” is not added/);
+  await s.ok("merge-entity", { target: s.b, into: s.a, confirm: true }, step);
+  assert.equal(composerCredits(s, s.a).length, 1);
+  assert.equal(s.c.db.prepare("SELECT target_id FROM credit WHERE contributor_id=? AND role='arranger'").get(co).target_id, s.a);
+  const history = await s.read({ tab: "activity" });
+  const change = history.list.items.find((item) => item.selection.startsWith("change:"));
+  const undo = (await s.read({ selection: change.selection })).view.actions.find((item) => item.command === "undo-change");
+  await s.ok(undo.command, undo.arguments, change.selection);
+  assert.deepEqual(s.c.db.prepare("SELECT * FROM credit WHERE target_id IN (?,?) ORDER BY id").all(s.a, s.b), before);
+});
+
+test("#13 when the kept work has no composer, all dropped composers move", async (t) => {
+  const s = await spellingWorks(t);
+  s.c.db.prepare("DELETE FROM credit WHERE target_id=? AND role='composer'").run(s.a);
+  const co = (await s.ok("create-contributor", { name: "Second composer", kind: "person" })).selection;
+  s.c.credit(s.b, co, "composer", { position: 2 });
+  const composers = composerCredits(s, s.b);
+  const step = `merge:${s.b}:${s.a}`;
+  const view = (await s.read({ selection: step })).view;
+  assert.match(section(view, "keep-second").items.find((item) => item.label === "Composers").value, /move to the kept work/);
+  await s.ok("merge-entity", { target: s.b, into: s.a, confirm: true }, step);
+  assert.deepEqual(composerCredits(s, s.a), composers);
+});
