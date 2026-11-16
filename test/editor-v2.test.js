@@ -155,6 +155,25 @@ test("movements reorder, add in bulk and delete; credits use their own lookup", 
   assert.equal(section((await s.read({ selection: `${work}!credits` })).view, "credits").rows[0].detail, "Soloist · cello");
   assert.equal((await s.read({ selection: cellist })).view.subtitle, "Performer");
   assert.equal((await s.mutate("delete-entity", { target: cellist }, cellist)).ok, false, "in-use people can't be deleted");
+  // A credit a scan derived: removing it hides it and keeps it removed;
+  // adding it again by hand brings it back as the admin's own.
+  const pianist = (await s.ok("create-contributor", { name: "Alfred Brendel", kind: "person" })).selection;
+  const derived = s.c.credit(work, pianist, "performer", { position: 2, source: "derived" });
+  const creditRows = async () => section((await s.read({ selection: `${work}!credits` })).view, "credits").rows.map((row) => row.label);
+  assert.deepEqual(await creditRows(), ["Pierre Fournier", "Alfred Brendel"]);
+  await s.ok("remove-credit", { target: work, credit: derived }, work);
+  assert.deepEqual(await creditRows(), ["Pierre Fournier"]);
+  assert.deepEqual({ ...s.c.db.prepare("SELECT source,state FROM credit WHERE id=?").get(derived) }, { source: "derived", state: "removed" });
+  assert.equal((await s.mutate("remove-credit", { target: work, credit: derived }, work)).ok, false, "a removed credit can't be removed again");
+  assert.equal((await s.read({ selection: pianist })).view.sections.some((section) => section.rows?.some((row) => row.selection === work)), false);
+  await s.ok("add-credit", { target: work, contributor: pianist, role: "performer", instrument: "" }, work);
+  assert.deepEqual(await creditRows(), ["Pierre Fournier", "Alfred Brendel"]);
+  assert.deepEqual({ ...s.c.db.prepare("SELECT source,state FROM credit WHERE id=?").get(derived) }, { source: "manual", state: "active" });
+  // A manual credit is deleted outright.
+  const manual = s.c.db.prepare("SELECT id FROM credit WHERE target_id=? AND contributor_id=?").get(work, cellist).id;
+  await s.ok("remove-credit", { target: work, credit: manual }, work);
+  assert.equal(s.c.db.prepare("SELECT count(*) AS n FROM credit WHERE id=?").get(manual).n, 0);
+  assert.equal((await s.mutate("delete-entity", { target: cellist }, cellist)).ok, true);
 });
 
 test("send to / remove from Classical overrides detection and closes review items", async (t) => {

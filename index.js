@@ -35608,6 +35608,7 @@ var CREDIT_ROLES = [
   "lyricist"
 ];
 var roles = new Set(CREDIT_ROLES);
+var CREDIT_SOURCES = /* @__PURE__ */ new Set(["manual", "derived", "provider"]);
 var PERSON_ROLES = /* @__PURE__ */ new Set(["composer", "soloist", "conductor", "arranger", "lyricist"]);
 var ENSEMBLE_ROLES = /* @__PURE__ */ new Set(["orchestra", "ensemble", "choir"]);
 var relations = {
@@ -35703,20 +35704,39 @@ var Catalogue = class {
       return id;
     });
   }
-  credit(target, contributor, role, { instrument = null, position = 1, assertionId = null } = {}) {
+  // A credit's source says who made it: an admin (`manual`), a scan from tags
+  // (`derived`) or a provider. A credit removed earlier for the same target,
+  // contributor, role and instrument comes back as this one.
+  credit(target, contributor, role, { instrument = null, position = 1, assertionId = null, source = "manual" } = {}) {
     return transaction(this.db, () => {
       this.entity(target);
       const person = this.entity(contributor, ["person", "ensemble"]);
       if (!roles.has(role) || !positive(position) || PERSON_ROLES.has(role) && person.kind !== "person" || ENSEMBLE_ROLES.has(role) && person.kind !== "ensemble")
         throw new Error("Invalid role/contributor");
+      if (!CREDIT_SOURCES.has(source)) throw new Error("Invalid credit source");
       if (assertionId) {
         const assertion = this.db.prepare("SELECT target_id FROM assertion WHERE id=?").get(assertionId);
         if (assertion?.target_id !== target)
           throw new Error("Credit provenance target mismatch");
       }
+      const removed = this.db.prepare("SELECT id FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ? AND state='removed'").get(target, contributor, role, instrument);
+      if (removed) {
+        this.db.prepare("UPDATE credit SET state='active',source=?,position=?,assertion_id=? WHERE id=?").run(source, position, assertionId, removed.id);
+        return removed.id;
+      }
       const id = randomUUID2();
-      this.db.prepare("INSERT INTO credit(id,target_id,contributor_id,role,instrument,position,assertion_id) VALUES (?,?,?,?,?,?,?)").run(id, target, contributor, role, instrument, position, assertionId);
+      this.db.prepare("INSERT INTO credit(id,target_id,contributor_id,role,instrument,position,assertion_id,source) VALUES (?,?,?,?,?,?,?,?)").run(id, target, contributor, role, instrument, position, assertionId, source);
       return id;
+    });
+  }
+  // A derived credit an admin removes stays as removed, so a later scan does
+  // not derive it again; any other credit is deleted.
+  removeCredit(id) {
+    return transaction(this.db, () => {
+      const credit = this.db.prepare("SELECT source,state FROM credit WHERE id=?").get(id);
+      if (!credit || credit.state !== "active") throw new Error("Unknown credit");
+      if (credit.source === "derived") this.db.prepare("UPDATE credit SET state='removed' WHERE id=?").run(id);
+      else this.db.prepare("DELETE FROM credit WHERE id=?").run(id);
     });
   }
   externalIdentity(entity, provider, recordKind, recordId, { confidence = 1, threshold = 0.95, evidence = {} } = {}) {
@@ -38837,7 +38857,7 @@ function catalogueStamp(c) {
         (SELECT count(*)||':'||coalesce(max(rowid),0) FROM realization_item) AS e,
         (SELECT coalesce(max(updated_at),0)||':'||count(*) FROM classification WHERE state='classical') AS f,
         (SELECT coalesce(max(updated_at),0)||':'||count(*) FROM track_link WHERE state='active') AS g,
-        (SELECT count(*)||':'||coalesce(max(rowid),0) FROM credit) AS h,
+        (SELECT count(*)||':'||coalesce(max(rowid),0)||':'||coalesce(sum(state='active'),0) FROM credit) AS h,
         (SELECT count(*)||':'||coalesce(max(rowid),0) FROM relation) AS i`
   ).get();
   return `v2|${Object.values(row).join("|")}`;
@@ -38878,7 +38898,7 @@ function ownedRecordings(c, tracks = classicalTracks(c), values = resolvedValues
   ).all(...workId ? [workId] : []);
   const credits3 = c.db.prepare(
     `SELECT k.role,k.contributor_id FROM relation pw JOIN credit k ON k.target_id=pw.source_id
-     JOIN entity e ON e.id=k.contributor_id AND e.deleted_at IS NULL WHERE pw.id=? ORDER BY k.position,k.id`
+     JOIN entity e ON e.id=k.contributor_id AND e.deleted_at IS NULL WHERE pw.id=? AND k.state='active' ORDER BY k.position,k.id`
   );
   const byRealization = /* @__PURE__ */ new Map();
   for (const row of rows) {
@@ -38992,7 +39012,7 @@ function buildDocuments(c) {
   const entities2 = c.db.prepare("SELECT id,kind FROM entity WHERE deleted_at IS NULL AND kind IN ('work','movement','person','ensemble','collection')").all();
   const kindOf = new Map(entities2.map((e) => [e.id, e.kind]));
   const creditsOf = /* @__PURE__ */ new Map();
-  for (const row of c.db.prepare("SELECT target_id,contributor_id,role FROM credit ORDER BY position,id").iterate()) {
+  for (const row of c.db.prepare("SELECT target_id,contributor_id,role FROM credit WHERE state='active' ORDER BY position,id").iterate()) {
     if (!kindOf.has(row.contributor_id)) continue;
     if (!creditsOf.has(row.target_id)) creditsOf.set(row.target_id, []);
     creditsOf.get(row.target_id).push({ id: row.contributor_id, role: row.role });
@@ -39694,7 +39714,7 @@ function knownComposerNames(catalogue) {
   const names = /* @__PURE__ */ new Set();
   for (const { id } of catalogue.db.prepare(
     `SELECT DISTINCT c.contributor_id AS id FROM credit c JOIN entity e ON e.id=c.contributor_id
-       WHERE c.role='composer' AND e.deleted_at IS NULL`
+       WHERE c.role='composer' AND c.state='active' AND e.deleted_at IS NULL`
   ).all()) {
     const name = resolvedName(catalogue, id, "name");
     if (typeof name === "string" && words2(name)) names.add(words2(name));
@@ -39815,7 +39835,7 @@ function resolvedName(catalogue, id, field2) {
 function composerNames(catalogue, work) {
   return catalogue.db.prepare(
     `SELECT c.contributor_id AS id FROM credit c JOIN entity e ON e.id=c.contributor_id
-       WHERE c.target_id=? AND c.role='composer' AND e.deleted_at IS NULL ORDER BY c.position`
+       WHERE c.target_id=? AND c.role='composer' AND c.state='active' AND e.deleted_at IS NULL ORDER BY c.position`
   ).all(work).map((row) => resolvedName(catalogue, row.id, "name")).filter((name) => typeof name === "string" && name.trim());
 }
 function similarWorks(catalogue, title, composers = []) {
@@ -39854,7 +39874,7 @@ function composerPeople(catalogue) {
   for (const { id } of catalogue.db.prepare(
     `SELECT id FROM entity WHERE kind='person' AND deleted_at IS NULL
        AND (json_extract(data,'$.roles') LIKE '%composer%'
-         OR EXISTS(SELECT 1 FROM credit WHERE contributor_id=entity.id AND role='composer'))
+         OR EXISTS(SELECT 1 FROM credit WHERE contributor_id=entity.id AND role='composer' AND state='active'))
        ORDER BY created_at,id`
   ).all()) {
     const name = resolvedName(catalogue, id, "name");
@@ -40144,7 +40164,7 @@ function creditMovementComposers(catalogue, metadata, index, recording, track, g
   const work = new Set(group.composers.map(normalized));
   (track.composers || []).filter((name) => !work.has(normalized(name))).forEach((name, i) => {
     const person = composerEntity(catalogue, metadata, index, name, group.composerIds?.[name]);
-    if (!catalogue.db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role='composer'").get(recording, person))
+    if (!catalogue.db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role='composer' AND state='active'").get(recording, person))
       catalogue.credit(recording, person, "composer", { position: i + 1 });
   });
 }
@@ -40312,7 +40332,7 @@ function createGroup(catalogue, group, actor3, index) {
       return Boolean(wanted2) && provablyDifferent(wanted2, catalogueSubject(String(resolvedName(catalogue, id, "title") || "")));
     };
     if (providerWork && heldElsewhere(providerWork)) providerWork = null;
-    const otherComposer = (id) => catalogue.db.prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer'").all(id).some(({ contributor_id: person }) => {
+    const otherComposer = (id) => catalogue.db.prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer' AND state='active'").all(id).some(({ contributor_id: person }) => {
       const mbid = group.composerIds?.[resolvedName(catalogue, person, "name")] || Object.entries(group.composerIds || {}).find(([name]) => index.people.get(words2(name))?.includes(person))?.[1];
       const held2 = artistIdOf(catalogue, person);
       return mbid && held2 && held2 !== mbid;
@@ -40965,11 +40985,12 @@ function mergeContributor(catalogue, keep, drop, actor3) {
   catalogue.db.prepare("UPDATE alias SET entity_id=? WHERE entity_id=?").run(keep, drop);
   for (const credit of catalogue.db.prepare("SELECT * FROM credit WHERE contributor_id=?").all(drop)) {
     const duplicate = catalogue.db.prepare(
-      "SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?"
+      "SELECT id,state FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?"
     ).get(credit.target_id, keep, credit.role, credit.instrument);
-    if (duplicate)
+    if (duplicate) {
+      keepActiveCredit(catalogue.db, duplicate, credit);
       catalogue.db.prepare("DELETE FROM credit WHERE id=?").run(credit.id);
-    else
+    } else
       catalogue.db.prepare("UPDATE credit SET contributor_id=? WHERE id=?").run(keep, credit.id);
   }
   transferIdentities(catalogue.db, keep, drop);
@@ -40994,6 +41015,10 @@ function mergeDuplicateComposers(catalogue, index, actor3) {
     index.people.set(name, [keep]);
   }
   return merged;
+}
+function keepActiveCredit(db, kept, moving) {
+  if (kept.state === "removed" && moving.state === "active")
+    db.prepare("UPDATE credit SET state='active',source=? WHERE id=?").run(moving.source, kept.id);
 }
 function mergeMapping(catalogue, keep, drop, addMissing) {
   const keepMovements = workMovements(catalogue, keep), dropMovements = workMovements(catalogue, drop);
@@ -41036,15 +41061,17 @@ function mergeWork(catalogue, keep, drop, actor3, { addMissing = false } = {}) {
     db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), from);
   }
   db.prepare("DELETE FROM relation WHERE kind='movement' AND source_id=?").run(drop);
-  const keepComposers = addMissing && db.prepare("SELECT 1 FROM credit WHERE target_id=? AND role='composer' LIMIT 1").get(keep);
+  const keepComposers = addMissing && db.prepare("SELECT 1 FROM credit WHERE target_id=? AND role='composer' AND state='active' LIMIT 1").get(keep);
   for (const credit of db.prepare("SELECT * FROM credit WHERE target_id=?").all(drop)) {
     if (keepComposers && credit.role === "composer") {
       db.prepare("DELETE FROM credit WHERE id=?").run(credit.id);
       continue;
     }
-    if (db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?").get(keep, credit.contributor_id, credit.role, credit.instrument))
+    const duplicate = db.prepare("SELECT id,state FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?").get(keep, credit.contributor_id, credit.role, credit.instrument);
+    if (duplicate) {
+      keepActiveCredit(db, duplicate, credit);
       db.prepare("DELETE FROM credit WHERE id=?").run(credit.id);
-    else db.prepare("UPDATE credit SET target_id=? WHERE id=?").run(keep, credit.id);
+    } else db.prepare("UPDATE credit SET target_id=? WHERE id=?").run(keep, credit.id);
   }
   for (const state of db.prepare("SELECT * FROM user_work_state WHERE work_id=?").all(drop)) {
     const kept = db.prepare("SELECT * FROM user_work_state WHERE user_id=? AND work_id=?").get(state.user_id, keep);
@@ -41083,7 +41110,7 @@ function compatibleAutoWorks(catalogue, a, b) {
   if (distinctIdentities(verifiedIdentities(catalogue, a, "work"), verifiedIdentities(catalogue, b, "work"))) return false;
   const composers = (work) => {
     const identities = /* @__PURE__ */ new Map();
-    for (const { contributor_id: person } of catalogue.db.prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer'").all(work)) {
+    for (const { contributor_id: person } of catalogue.db.prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer' AND state='active'").all(work)) {
       const name = words2(resolvedName(catalogue, person, "name"));
       identities.set(name, /* @__PURE__ */ new Set([...identities.get(name) || [], ...verifiedIdentities(catalogue, person, "artist")]));
     }
@@ -41263,7 +41290,7 @@ function repairCompletionSplits(catalogue, albumId, actor3) {
       const metadata = new Metadata(catalogue);
       const index = catalogueIndex(catalogue);
       const group = { composers: [], composerIds: {} };
-      for (const credit of db.prepare("SELECT id,contributor_id FROM credit WHERE target_id=? AND role='composer'").all(keep.work)) {
+      for (const credit of db.prepare("SELECT id,contributor_id FROM credit WHERE target_id=? AND role='composer' AND state='active'").all(keep.work)) {
         const name = resolvedName(catalogue, credit.contributor_id, "name");
         if (shared.includes(words2(name))) group.composers.push(name);
         else db.prepare("DELETE FROM credit WHERE id=?").run(credit.id);
@@ -41652,7 +41679,7 @@ function deleteWorks(c, workIds, actor3, { names }) {
         c.db.prepare("UPDATE review_item SET status='resolved' WHERE target_id=? AND status='open'").run(work);
         const composers = c.db.prepare(
           `SELECT a.value FROM credit k JOIN field_resolution f ON f.target_id=k.contributor_id AND f.field='name'
-             JOIN assertion a ON a.id=f.assertion_id WHERE k.target_id=? AND k.role='composer'`
+             JOIN assertion a ON a.id=f.assertion_id WHERE k.target_id=? AND k.role='composer' AND k.state='active'`
         ).all(work).map((row) => JSON.parse(row.value));
         const mb = c.db.prepare("SELECT record_id FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='work' AND state='active'").all(work);
         for (const key of [
@@ -41793,18 +41820,18 @@ function entities(c, kinds2) {
        ORDER BY created_at,id`
   ).all(...kinds2).map((row) => ({ ...row, data: JSON.parse(row.data), label: entityLabel(c, row.id, row.kind) }));
 }
-var isComposer = (c, person) => person.data.roles?.includes("composer") || !!c.db.prepare("SELECT 1 FROM credit WHERE contributor_id=? AND role='composer' LIMIT 1").get(person.id);
+var isComposer = (c, person) => person.data.roles?.includes("composer") || !!c.db.prepare("SELECT 1 FROM credit WHERE contributor_id=? AND role='composer' AND state='active' LIMIT 1").get(person.id);
 function credits(c, target) {
   return c.db.prepare(
     `SELECT k.* FROM credit k JOIN entity e ON e.id=k.contributor_id
-       WHERE k.target_id=? AND e.deleted_at IS NULL ORDER BY k.position,k.id`
+       WHERE k.target_id=? AND k.state='active' AND e.deleted_at IS NULL ORDER BY k.position,k.id`
   ).all(target).map((row) => ({ ...row, name: entityLabel(c, row.contributor_id) }));
 }
 var composerNames2 = (c, work) => credits(c, work).filter((credit) => credit.role === "composer").map((credit) => credit.name);
 function worksOf(c, contributor) {
   return c.db.prepare(
     `SELECT DISTINCT k.target_id AS id FROM credit k JOIN entity e ON e.id=k.target_id
-       WHERE k.contributor_id=? AND e.kind='work' AND e.deleted_at IS NULL`
+       WHERE k.contributor_id=? AND k.state='active' AND e.kind='work' AND e.deleted_at IS NULL`
   ).all(contributor).map((row) => row.id);
 }
 function realizations(c, work) {
@@ -42000,7 +42027,7 @@ function mergeOutcome(c, keep, drop) {
   const kind = c.entity(keep).kind;
   const label = (id) => labelOf(c, id) || entityLabel(c, id, kind);
   if (kind !== "work") {
-    const moving = c.db.prepare("SELECT count(*) AS n FROM credit WHERE contributor_id=?").get(drop).n;
+    const moving = c.db.prepare("SELECT count(*) AS n FROM credit WHERE contributor_id=? AND state='active'").get(drop).n;
     return [
       { label: "Stays", value: `\u201C${label(keep)}\u201D, with its name and fields`, selection: keep },
       { label: "Removed", value: `\u201C${label(drop)}\u201D` },
@@ -42044,7 +42071,7 @@ function mergeView(c, a, b, review) {
   if (!(MERGEABLE[first.kind] || []).includes(second.kind)) fail("These two entries can't be merged");
   const work = first.kind === "work";
   const label = (id) => `\u201C${labelOf(c, id) || entityLabel(c, id, first.kind)}\u201D`;
-  const weight = (id) => work ? realizations(c, id).length : c.db.prepare("SELECT count(*) AS n FROM credit WHERE contributor_id=?").get(id).n;
+  const weight = (id) => work ? realizations(c, id).length : c.db.prepare("SELECT count(*) AS n FROM credit WHERE contributor_id=? AND state='active'").get(id).n;
   const count = (id) => `${weight(id)} ${work ? "recording" : "credit"}${weight(id) === 1 ? "" : "s"}`;
   const named = { [a]: `${label(a)} (the one you opened \xB7 ${count(a)})`, [b]: `${label(b)} (the other \xB7 ${count(b)})` };
   const back = review ? `review:${review}` : work ? entitySelection(a, 0, "merge") : a;
@@ -42329,7 +42356,7 @@ function contributorView(c, entity, page = 0) {
   const works = worksOf(c, entity.id);
   const creditRows = c.db.prepare(
     `SELECT k.*,e.kind AS target_kind FROM credit k JOIN entity e ON e.id=k.target_id
-       WHERE k.contributor_id=? AND e.deleted_at IS NULL ORDER BY e.kind,k.target_id`
+       WHERE k.contributor_id=? AND k.state='active' AND e.deleted_at IS NULL ORDER BY e.kind,k.target_id`
   ).all(entity.id);
   const sections = [detailsForm(c, entity.id, kind)];
   if (composer)
@@ -43181,7 +43208,7 @@ function listFor(c, tab, q, extra = {}) {
     const composers = /* @__PURE__ */ new Map();
     for (const row of c.db.prepare(
       `SELECT k.target_id,k.contributor_id FROM credit k JOIN entity e ON e.id=k.contributor_id AND e.deleted_at IS NULL
-         WHERE k.role='composer' ORDER BY k.position,k.id`
+         WHERE k.role='composer' AND k.state='active' ORDER BY k.position,k.id`
     ).iterate()) {
       if (!composers.has(row.target_id)) composers.set(row.target_id, []);
       composers.get(row.target_id).push(labels.get(row.contributor_id) || "Untitled person");
@@ -43565,7 +43592,7 @@ function applyV2(c, request, who) {
         const { result, changeId } = deleteWorks(c, [target], who, { names: [entityLabel(c, target, "work")] });
         return { changeId, selection: "", message: `Deleted the work${result.tracks ? `; its ${result.tracks} track${result.tracks === 1 ? " is" : "s are"} no longer in a work` : ""}. Audio files are unchanged. Undo it from Activity.`, tab: "works" };
       }
-      const used = entity.kind === "person" || entity.kind === "ensemble" ? c.db.prepare("SELECT 1 FROM credit WHERE contributor_id=? LIMIT 1").get(target) : entity.kind === "recording" ? c.db.prepare("SELECT 1 FROM recording_content rc JOIN segment_content sc ON sc.content_id=rc.id WHERE rc.recording_id=? LIMIT 1").get(target) : null;
+      const used = entity.kind === "person" || entity.kind === "ensemble" ? c.db.prepare("SELECT 1 FROM credit WHERE contributor_id=? AND state='active' LIMIT 1").get(target) : entity.kind === "recording" ? c.db.prepare("SELECT 1 FROM recording_content rc JOIN segment_content sc ON sc.content_id=rc.id WHERE rc.recording_id=? LIMIT 1").get(target) : null;
       if (used) fail("This entry is still in use. Merge it, or remove what uses it first.");
       c.db.prepare("DELETE FROM credit WHERE target_id=?").run(target);
       c.db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), target);
@@ -43607,7 +43634,7 @@ function applyV2(c, request, who) {
         try {
           transaction(c.db, () => {
             for (const [key, value] of Object.entries(values)) m.manual(work, key, value, { actor: who, pin: true });
-            if (composer && !c.db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role='composer'").get(work, composer)) {
+            if (composer && !c.db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role='composer' AND state='active'").get(work, composer)) {
               const position = (c.db.prepare("SELECT coalesce(max(position),0) AS n FROM credit WHERE target_id=?").get(work).n || 0) + 1;
               c.credit(work, composer, "composer", { position });
             }
@@ -44102,7 +44129,7 @@ function render(c, input) {
   const label = (id) => all.find((e) => e.id === id)?.label || "Untitled entry";
   const composers = all.filter(
     (e) => e.kind === "person" && (e.data.roles?.includes("composer") || c.db.prepare(
-      "SELECT 1 FROM credit WHERE contributor_id=? AND role='composer'"
+      "SELECT 1 FROM credit WHERE contributor_id=? AND role='composer' AND state='active'"
     ).get(e.id))
   );
   const entityType = (e) => e.kind === "person" && composers.some((person) => person.id === e.id) ? "Composer" : kindLabel[e.kind];
@@ -44204,7 +44231,7 @@ function render(c, input) {
             "Add credit"
           )
         );
-      const credits3 = c.db.prepare("SELECT * FROM credit WHERE target_id=? ORDER BY position").all(selected.id);
+      const credits3 = c.db.prepare("SELECT * FROM credit WHERE target_id=? AND state='active' ORDER BY position").all(selected.id);
       if (credits3.length)
         forms.push(
           form(
@@ -44645,7 +44672,7 @@ function apply(c, input, who) {
         max: 200
       }).trim() || null;
       if (c.db.prepare(
-        "SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?"
+        "SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ? AND state='active'"
       ).get(selection, contributor, role, instrument))
         fail2("That role credit already exists");
       const who2 = c.entity(contributor, ["person", "ensemble"]);
@@ -44662,9 +44689,9 @@ function apply(c, input, who) {
       selection = text3(v.target, "entry", { max: 200 });
       c.entity(selection);
       const credit = text3(v.credit, "credit", { max: 200 });
-      if (!c.db.prepare("SELECT 1 FROM credit WHERE id=? AND target_id=?").get(credit, selection))
+      if (!c.db.prepare("SELECT 1 FROM credit WHERE id=? AND target_id=? AND state='active'").get(credit, selection))
         fail2("Credit does not belong to this entry");
-      c.db.prepare("DELETE FROM credit WHERE id=?").run(credit);
+      c.removeCredit(credit);
       break;
     }
     case "create-composer": {
@@ -45031,7 +45058,7 @@ function workMovements2(c, metadata, workId) {
 function credits2(c, metadata, targetId) {
   return c.db.prepare(
     `SELECT role,instrument,contributor_id FROM credit
-       WHERE target_id=? ORDER BY position,id`
+       WHERE target_id=? AND state='active' ORDER BY position,id`
   ).all(targetId).map((row) => ({
     role: row.role,
     instrument: row.instrument,

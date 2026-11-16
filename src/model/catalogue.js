@@ -24,6 +24,7 @@ export const CREDIT_ROLES = [
   "lyricist",
 ];
 const roles = new Set(CREDIT_ROLES);
+export const CREDIT_SOURCES = new Set(["manual", "derived", "provider"]);
 export const PERSON_ROLES = new Set(["composer", "soloist", "conductor", "arranger", "lyricist"]);
 export const ENSEMBLE_ROLES = new Set(["orchestra", "ensemble", "choir"]);
 const relations = {
@@ -162,11 +163,14 @@ export class Catalogue {
       return id;
     });
   }
+  // A credit's source says who made it: an admin (`manual`), a scan from tags
+  // (`derived`) or a provider. A credit removed earlier for the same target,
+  // contributor, role and instrument comes back as this one.
   credit(
     target,
     contributor,
     role,
-    { instrument = null, position = 1, assertionId = null } = {},
+    { instrument = null, position = 1, assertionId = null, source = "manual" } = {},
   ) {
     return transaction(this.db, () => {
       this.entity(target);
@@ -178,6 +182,7 @@ export class Catalogue {
         (ENSEMBLE_ROLES.has(role) && person.kind !== "ensemble")
       )
         throw new Error("Invalid role/contributor");
+      if (!CREDIT_SOURCES.has(source)) throw new Error("Invalid credit source");
       if (assertionId) {
         const assertion = this.db
           .prepare("SELECT target_id FROM assertion WHERE id=?")
@@ -185,11 +190,30 @@ export class Catalogue {
         if (assertion?.target_id !== target)
           throw new Error("Credit provenance target mismatch");
       }
+      const removed = this.db
+        .prepare("SELECT id FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ? AND state='removed'")
+        .get(target, contributor, role, instrument);
+      if (removed) {
+        this.db
+          .prepare("UPDATE credit SET state='active',source=?,position=?,assertion_id=? WHERE id=?")
+          .run(source, position, assertionId, removed.id);
+        return removed.id;
+      }
       const id = randomUUID();
       this.db
-        .prepare("INSERT INTO credit(id,target_id,contributor_id,role,instrument,position,assertion_id) VALUES (?,?,?,?,?,?,?)")
-        .run(id, target, contributor, role, instrument, position, assertionId);
+        .prepare("INSERT INTO credit(id,target_id,contributor_id,role,instrument,position,assertion_id,source) VALUES (?,?,?,?,?,?,?,?)")
+        .run(id, target, contributor, role, instrument, position, assertionId, source);
       return id;
+    });
+  }
+  // A derived credit an admin removes stays as removed, so a later scan does
+  // not derive it again; any other credit is deleted.
+  removeCredit(id) {
+    return transaction(this.db, () => {
+      const credit = this.db.prepare("SELECT source,state FROM credit WHERE id=?").get(id);
+      if (!credit || credit.state !== "active") throw new Error("Unknown credit");
+      if (credit.source === "derived") this.db.prepare("UPDATE credit SET state='removed' WHERE id=?").run(id);
+      else this.db.prepare("DELETE FROM credit WHERE id=?").run(id);
     });
   }
   externalIdentity(

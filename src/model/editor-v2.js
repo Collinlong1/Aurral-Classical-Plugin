@@ -169,13 +169,13 @@ function entities(c, kinds) {
 const isComposer = (c, person) =>
   person.data.roles?.includes("composer") ||
   !!c.db
-    .prepare("SELECT 1 FROM credit WHERE contributor_id=? AND role='composer' LIMIT 1")
+    .prepare("SELECT 1 FROM credit WHERE contributor_id=? AND role='composer' AND state='active' LIMIT 1")
     .get(person.id);
 function credits(c, target) {
   return c.db
     .prepare(
       `SELECT k.* FROM credit k JOIN entity e ON e.id=k.contributor_id
-       WHERE k.target_id=? AND e.deleted_at IS NULL ORDER BY k.position,k.id`,
+       WHERE k.target_id=? AND k.state='active' AND e.deleted_at IS NULL ORDER BY k.position,k.id`,
     )
     .all(target)
     .map((row) => ({ ...row, name: entityLabel(c, row.contributor_id) }));
@@ -188,7 +188,7 @@ function worksOf(c, contributor) {
   return c.db
     .prepare(
       `SELECT DISTINCT k.target_id AS id FROM credit k JOIN entity e ON e.id=k.target_id
-       WHERE k.contributor_id=? AND e.kind='work' AND e.deleted_at IS NULL`,
+       WHERE k.contributor_id=? AND k.state='active' AND e.kind='work' AND e.deleted_at IS NULL`,
     )
     .all(contributor)
     .map((row) => row.id);
@@ -432,7 +432,7 @@ function mergeOutcome(c, keep, drop) {
   const kind = c.entity(keep).kind;
   const label = (id) => labelOf(c, id) || entityLabel(c, id, kind);
   if (kind !== "work") {
-    const moving = c.db.prepare("SELECT count(*) AS n FROM credit WHERE contributor_id=?").get(drop).n;
+    const moving = c.db.prepare("SELECT count(*) AS n FROM credit WHERE contributor_id=? AND state='active'").get(drop).n;
     return [
       { label: "Stays", value: `“${label(keep)}”, with its name and fields`, selection: keep },
       { label: "Removed", value: `“${label(drop)}”` },
@@ -485,7 +485,7 @@ function mergeView(c, a, b, review) {
   if (!(MERGEABLE[first.kind] || []).includes(second.kind)) fail("These two entries can't be merged");
   const work = first.kind === "work";
   const label = (id) => `“${labelOf(c, id) || entityLabel(c, id, first.kind)}”`;
-  const weight = (id) => (work ? realizations(c, id).length : c.db.prepare("SELECT count(*) AS n FROM credit WHERE contributor_id=?").get(id).n);
+  const weight = (id) => (work ? realizations(c, id).length : c.db.prepare("SELECT count(*) AS n FROM credit WHERE contributor_id=? AND state='active'").get(id).n);
   // Duplicates usually share a name, so each is also named by its role.
   const count = (id) => `${weight(id)} ${work ? "recording" : "credit"}${weight(id) === 1 ? "" : "s"}`;
   const named = { [a]: `${label(a)} (the one you opened · ${count(a)})`, [b]: `${label(b)} (the other · ${count(b)})` };
@@ -803,7 +803,7 @@ function contributorView(c, entity, page = 0) {
   const creditRows = c.db
     .prepare(
       `SELECT k.*,e.kind AS target_kind FROM credit k JOIN entity e ON e.id=k.target_id
-       WHERE k.contributor_id=? AND e.deleted_at IS NULL ORDER BY e.kind,k.target_id`,
+       WHERE k.contributor_id=? AND k.state='active' AND e.deleted_at IS NULL ORDER BY e.kind,k.target_id`,
     )
     .all(entity.id);
   const sections = [detailsForm(c, entity.id, kind)];
@@ -1691,7 +1691,7 @@ function listFor(c, tab, q, extra = {}) {
     for (const row of c.db
       .prepare(
         `SELECT k.target_id,k.contributor_id FROM credit k JOIN entity e ON e.id=k.contributor_id AND e.deleted_at IS NULL
-         WHERE k.role='composer' ORDER BY k.position,k.id`,
+         WHERE k.role='composer' AND k.state='active' ORDER BY k.position,k.id`,
       )
       .iterate()) {
       if (!composers.has(row.target_id)) composers.set(row.target_id, []);
@@ -2155,7 +2155,7 @@ export function applyV2(c, request, who) {
       }
       const used =
         entity.kind === "person" || entity.kind === "ensemble"
-          ? c.db.prepare("SELECT 1 FROM credit WHERE contributor_id=? LIMIT 1").get(target)
+          ? c.db.prepare("SELECT 1 FROM credit WHERE contributor_id=? AND state='active' LIMIT 1").get(target)
           : entity.kind === "recording"
             ? c.db.prepare("SELECT 1 FROM recording_content rc JOIN segment_content sc ON sc.content_id=rc.id WHERE rc.recording_id=? LIMIT 1").get(target)
             : null;
@@ -2201,7 +2201,7 @@ export function applyV2(c, request, who) {
         try {
           transaction(c.db, () => {
             for (const [key, value] of Object.entries(values)) m.manual(work, key, value, { actor: who, pin: true });
-            if (composer && !c.db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role='composer'").get(work, composer)) {
+            if (composer && !c.db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role='composer' AND state='active'").get(work, composer)) {
               const position = (c.db.prepare("SELECT coalesce(max(position),0) AS n FROM credit WHERE target_id=?").get(work).n || 0) + 1;
               c.credit(work, composer, "composer", { position });
             }

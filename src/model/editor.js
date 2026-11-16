@@ -226,7 +226,7 @@ function render(c, input) {
       (e.data.roles?.includes("composer") ||
         c.db
           .prepare(
-            "SELECT 1 FROM credit WHERE contributor_id=? AND role='composer'",
+            "SELECT 1 FROM credit WHERE contributor_id=? AND role='composer' AND state='active'",
           )
           .get(e.id)),
   );
@@ -346,7 +346,7 @@ function render(c, input) {
           ),
         );
       const credits = c.db
-        .prepare("SELECT * FROM credit WHERE target_id=? ORDER BY position")
+        .prepare("SELECT * FROM credit WHERE target_id=? AND state='active' ORDER BY position")
         .all(selected.id);
       if (credits.length)
         forms.push(
@@ -856,7 +856,7 @@ function apply(c, input, who) {
       if (
         c.db
           .prepare(
-            "SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?",
+            "SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ? AND state='active'",
           )
           .get(selection, contributor, role, instrument)
       )
@@ -879,11 +879,11 @@ function apply(c, input, who) {
       const credit = text(v.credit, "credit", { max: 200 });
       if (
         !c.db
-          .prepare("SELECT 1 FROM credit WHERE id=? AND target_id=?")
+          .prepare("SELECT 1 FROM credit WHERE id=? AND target_id=? AND state='active'")
           .get(credit, selection)
       )
         fail("Credit does not belong to this entry");
-      c.db.prepare("DELETE FROM credit WHERE id=?").run(credit);
+      c.removeCredit(credit);
       break;
     }
     case "create-composer": {

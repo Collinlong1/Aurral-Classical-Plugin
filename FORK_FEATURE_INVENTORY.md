@@ -1,3 +1,11 @@
+# v0.3 Phase 1.2 — credit provenance (issue #51)
+
+Third of five commits in one PR (0.11, 1.1–1.4). Implements #51 only; #51 has no later comments.
+
+`Catalogue.credit` takes `source` (`manual` by default, `derived`, `provider`). A credit added for a target, contributor, role and instrument that has a removed row comes back as that row, with the new source, so the unique key never blocks an admin re-adding a removed credit. New `Catalogue.removeCredit` marks a derived credit `removed`, so a later scan does not derive it again, and deletes any other. The editor's Remove uses it. Every reader that shows credits or tests a role reads active credits only: work and album pages, both editors, composer detection in matching, the search index and the undo summary. Merges of people or works carry removed rows along, and an active credit wins a collision with a removed one. The search index stamp counts active credits, so a removal rebuilds it. Existing credits are manual and active (1.1), and undo snapshots keep both columns. No schema or core change beyond 1.1; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
 # v0.3 Phase 1.1 — catalogue schema 5 (issue #48)
 
 Second of five commits in one PR (0.11, 1.1–1.4) on `claude/pensive-bardeen-5dat3q`. Implements #48 only, as the plan's §3 specifies; #48 has no later comments.

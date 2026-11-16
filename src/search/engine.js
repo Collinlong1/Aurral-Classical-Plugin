@@ -56,7 +56,7 @@ export function catalogueStamp(c) {
         (SELECT count(*)||':'||coalesce(max(rowid),0) FROM realization_item) AS e,
         (SELECT coalesce(max(updated_at),0)||':'||count(*) FROM classification WHERE state='classical') AS f,
         (SELECT coalesce(max(updated_at),0)||':'||count(*) FROM track_link WHERE state='active') AS g,
-        (SELECT count(*)||':'||coalesce(max(rowid),0) FROM credit) AS h,
+        (SELECT count(*)||':'||coalesce(max(rowid),0)||':'||coalesce(sum(state='active'),0) FROM credit) AS h,
         (SELECT count(*)||':'||coalesce(max(rowid),0) FROM relation) AS i`,
     )
     .get();
@@ -112,7 +112,7 @@ export function ownedRecordings(c, tracks = classicalTracks(c), values = resolve
     .all(...(workId ? [workId] : []));
   const credits = c.db.prepare(
     `SELECT k.role,k.contributor_id FROM relation pw JOIN credit k ON k.target_id=pw.source_id
-     JOIN entity e ON e.id=k.contributor_id AND e.deleted_at IS NULL WHERE pw.id=? ORDER BY k.position,k.id`,
+     JOIN entity e ON e.id=k.contributor_id AND e.deleted_at IS NULL WHERE pw.id=? AND k.state='active' ORDER BY k.position,k.id`,
   );
   const byRealization = new Map();
   for (const row of rows) {
@@ -248,7 +248,7 @@ export function buildDocuments(c) {
   const entities = c.db.prepare("SELECT id,kind FROM entity WHERE deleted_at IS NULL AND kind IN ('work','movement','person','ensemble','collection')").all();
   const kindOf = new Map(entities.map((e) => [e.id, e.kind]));
   const creditsOf = new Map();
-  for (const row of c.db.prepare("SELECT target_id,contributor_id,role FROM credit ORDER BY position,id").iterate()) {
+  for (const row of c.db.prepare("SELECT target_id,contributor_id,role FROM credit WHERE state='active' ORDER BY position,id").iterate()) {
     if (!kindOf.has(row.contributor_id)) continue;
     if (!creditsOf.has(row.target_id)) creditsOf.set(row.target_id, []);
     creditsOf.get(row.target_id).push({ id: row.contributor_id, role: row.role });

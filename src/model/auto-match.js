@@ -601,7 +601,7 @@ function knownComposerNames(catalogue) {
   for (const { id } of catalogue.db
     .prepare(
       `SELECT DISTINCT c.contributor_id AS id FROM credit c JOIN entity e ON e.id=c.contributor_id
-       WHERE c.role='composer' AND e.deleted_at IS NULL`,
+       WHERE c.role='composer' AND c.state='active' AND e.deleted_at IS NULL`,
     )
     .all()) {
     const name = resolvedName(catalogue, id, "name");
@@ -783,7 +783,7 @@ function composerNames(catalogue, work) {
   return catalogue.db
     .prepare(
       `SELECT c.contributor_id AS id FROM credit c JOIN entity e ON e.id=c.contributor_id
-       WHERE c.target_id=? AND c.role='composer' AND e.deleted_at IS NULL ORDER BY c.position`,
+       WHERE c.target_id=? AND c.role='composer' AND c.state='active' AND e.deleted_at IS NULL ORDER BY c.position`,
     )
     .all(work)
     .map((row) => resolvedName(catalogue, row.id, "name"))
@@ -844,7 +844,7 @@ function composerPeople(catalogue) {
     .prepare(
       `SELECT id FROM entity WHERE kind='person' AND deleted_at IS NULL
        AND (json_extract(data,'$.roles') LIKE '%composer%'
-         OR EXISTS(SELECT 1 FROM credit WHERE contributor_id=entity.id AND role='composer'))
+         OR EXISTS(SELECT 1 FROM credit WHERE contributor_id=entity.id AND role='composer' AND state='active'))
        ORDER BY created_at,id`,
     )
     .all()) {
@@ -1267,7 +1267,7 @@ function creditMovementComposers(catalogue, metadata, index, recording, track, g
     .filter((name) => !work.has(normalized(name)))
     .forEach((name, i) => {
       const person = composerEntity(catalogue, metadata, index, name, group.composerIds?.[name]);
-      if (!catalogue.db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role='composer'").get(recording, person))
+      if (!catalogue.db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role='composer' AND state='active'").get(recording, person))
         catalogue.credit(recording, person, "composer", { position: i + 1 });
     });
 }
@@ -1496,7 +1496,7 @@ function createGroup(catalogue, group, actor, index) {
     // is someone else's work.
     const otherComposer = (id) =>
       catalogue.db
-        .prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer'")
+        .prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer' AND state='active'")
         .all(id)
         .some(({ contributor_id: person }) => {
           const mbid = group.composerIds?.[resolvedName(catalogue, person, "name")] ||
@@ -2358,11 +2358,13 @@ export function mergeContributor(catalogue, keep, drop, actor) {
     .all(drop)) {
     const duplicate = catalogue.db
       .prepare(
-        "SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?",
+        "SELECT id,state FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?",
       )
       .get(credit.target_id, keep, credit.role, credit.instrument);
-    if (duplicate)
+    if (duplicate) {
+      keepActiveCredit(catalogue.db, duplicate, credit);
       catalogue.db.prepare("DELETE FROM credit WHERE id=?").run(credit.id);
+    }
     else
       catalogue.db
         .prepare("UPDATE credit SET contributor_id=? WHERE id=?")
@@ -2408,6 +2410,14 @@ function mergeDuplicateComposers(catalogue, index, actor) {
 // must line up (null when they don't). With it (an admin's merge), the
 // movements that line up by title (or by number, where one is untitled) are
 // mapped and the rest are null: they move to the kept work as they are.
+// Two credits a merge makes the same: the kept row stays. When it was
+// removed and the moving one is active, the kept row takes the moving one's
+// source and state, so a merge never hides a live credit behind a removed one.
+function keepActiveCredit(db, kept, moving) {
+  if (kept.state === "removed" && moving.state === "active")
+    db.prepare("UPDATE credit SET state='active',source=? WHERE id=?").run(moving.source, kept.id);
+}
+
 function mergeMapping(catalogue, keep, drop, addMissing) {
   const keepMovements = workMovements(catalogue, keep),
     dropMovements = workMovements(catalogue, drop);
@@ -2459,19 +2469,19 @@ export function mergeWork(catalogue, keep, drop, actor, { addMissing = false } =
   db.prepare("DELETE FROM relation WHERE kind='movement' AND source_id=?").run(drop);
   // An editor merge keeps the chosen work's composer identity. Other roles
   // still move; a work without a composer inherits all dropped composers.
-  const keepComposers = addMissing && db.prepare("SELECT 1 FROM credit WHERE target_id=? AND role='composer' LIMIT 1").get(keep);
+  const keepComposers = addMissing && db.prepare("SELECT 1 FROM credit WHERE target_id=? AND role='composer' AND state='active' LIMIT 1").get(keep);
   for (const credit of db.prepare("SELECT * FROM credit WHERE target_id=?").all(drop)) {
     if (keepComposers && credit.role === "composer") {
       db.prepare("DELETE FROM credit WHERE id=?").run(credit.id);
       continue;
     }
-    if (
-      db
-        .prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?")
-        .get(keep, credit.contributor_id, credit.role, credit.instrument)
-    )
+    const duplicate = db
+      .prepare("SELECT id,state FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?")
+      .get(keep, credit.contributor_id, credit.role, credit.instrument);
+    if (duplicate) {
+      keepActiveCredit(db, duplicate, credit);
       db.prepare("DELETE FROM credit WHERE id=?").run(credit.id);
-    else db.prepare("UPDATE credit SET target_id=? WHERE id=?").run(keep, credit.id);
+    } else db.prepare("UPDATE credit SET target_id=? WHERE id=?").run(keep, credit.id);
   }
   // A user who liked or picked either work keeps that on the merged work. The
   // kept work's own pick wins; the dropped work's pick is now one of its realizations.
@@ -2521,7 +2531,7 @@ function compatibleAutoWorks(catalogue, a, b) {
   if (distinctIdentities(verifiedIdentities(catalogue, a, "work"), verifiedIdentities(catalogue, b, "work"))) return false;
   const composers = (work) => {
     const identities = new Map();
-    for (const { contributor_id: person } of catalogue.db.prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer'").all(work)) {
+    for (const { contributor_id: person } of catalogue.db.prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer' AND state='active'").all(work)) {
       const name = words(resolvedName(catalogue, person, "name"));
       identities.set(name, new Set([...(identities.get(name) || []), ...verifiedIdentities(catalogue, person, "artist")]));
     }
@@ -2766,7 +2776,7 @@ function repairCompletionSplits(catalogue, albumId, actor) {
       const metadata = new Metadata(catalogue);
       const index = catalogueIndex(catalogue);
       const group = { composers: [], composerIds: {} };
-      for (const credit of db.prepare("SELECT id,contributor_id FROM credit WHERE target_id=? AND role='composer'").all(keep.work)) {
+      for (const credit of db.prepare("SELECT id,contributor_id FROM credit WHERE target_id=? AND role='composer' AND state='active'").all(keep.work)) {
         const name = resolvedName(catalogue, credit.contributor_id, "name");
         if (shared.includes(words(name))) group.composers.push(name);
         else db.prepare("DELETE FROM credit WHERE id=?").run(credit.id);

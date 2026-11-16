@@ -82,17 +82,17 @@ async function library(t) {
   const barenboim = person("Daniel Barenboim");
   const karajan = person("Herbert von Karajan");
   const levit = person("Igor Levit");
-  const credit = (album, contributor, role) => {
+  const credit = (album, contributor, role, source = "manual") => {
     const realization = c.db.prepare("SELECT r.performance_work_id FROM realization r WHERE r.label=?").get(`Album ${album}`);
     const performance = c.db.prepare("SELECT source_id FROM relation WHERE id=?").get(realization.performance_work_id).source_id;
-    c.credit(performance, contributor, role);
+    return c.credit(performance, contributor, role, { source });
   };
   credit("barenboim", barenboim, "soloist");
   credit("dvorak-db", barenboim, "conductor");
   credit("dvorak", karajan, "conductor");
   credit("levit", levit, "soloist");
   credit("levit-box", levit, "soloist");
-  return { c, moonlight, barenboim, karajan };
+  return { c, moonlight, barenboim, karajan, credit };
 }
 
 test("catalogue numbers are one key however they are written", () => {
@@ -126,7 +126,7 @@ test("different names, nicknames and catalogue formats find the same work first"
 });
 
 test("combined searches, role-aware filters and one recording across releases", async (t) => {
-  const { c, moonlight, barenboim, karajan } = await library(t);
+  const { c, moonlight, barenboim, karajan, credit } = await library(t);
   // Composer + work + performer finds the recording, and lifts its work.
   const combined = searchCatalogue(c, { q: "Beethoven moonlight levit" });
   const recordings = combined.sections.find((s) => s.id === "recording");
@@ -148,6 +148,13 @@ test("combined searches, role-aware filters and one recording across releases", 
   const facets = searchCatalogue(c, { q: "barenboim" });
   assert.ok(facets.facets.find((f) => f.key === "conductor").options.some((o) => o.value === barenboim));
   assert.match(facets.sections.find((s) => s.id === "performer").items[0].subtitle, /Soloist · Conductor|Conductor · Soloist/);
+  // A derived credit counts until an admin removes it; removing it rebuilds
+  // the index even though no credit row is added or deleted.
+  const conductedBy = () => searchCatalogue(c, { q: "", filters: { conductor: [barenboim] }, kinds: ["recording"] }).sections[0]?.total ?? 0;
+  const derived = credit("dvorak", barenboim, "conductor", "derived");
+  assert.equal(conductedBy(), 2);
+  c.removeCredit(derived);
+  assert.equal(conductedBy(), 1);
   // Period filter from a pinned field.
   assert.deepEqual(searchCatalogue(c, { q: "sonata", filters: { period: ["classical"] }, kinds: ["work"] }).sections[0].items.map((i) => i.ref), [moonlight]);
   // Two different recordings of the sonata stay two.

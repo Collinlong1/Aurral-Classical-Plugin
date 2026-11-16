@@ -1,3 +1,26 @@
+# v0.3 Phase 1.2 — credit provenance / issue #51
+
+## Result
+
+- **API (`catalogue.js`):** `credit(target, contributor, role, { instrument, position, assertionId, source })` checks `source` against `CREDIT_SOURCES` and reactivates a removed row for the same key instead of inserting. `removeCredit(id)` refuses an unknown or already-removed credit, marks a derived one `removed` and deletes a manual or provider one.
+- **Readers filter `state='active'`:** `presentation.js` `credits`; `editor.js` composer test, credit list, duplicate check and Remove (now `removeCredit`); `editor-v2.js` `isComposer`, `credits`, `worksOf`, merge counts, contributor credit rows, composer names, delete-in-use check and the work-merge composer check; `auto-match.js` composer lists, `composerEntity` people, recording composer credits, provider composer checks, work-merge composer test, composer identities and the completion-split repair; `engine.js` `ownedRecordings` credits and `buildDocuments`; `history.js` undo summary.
+- **Kept unfiltered on purpose:** merges (`mergeContributor`, `mergeWork`) move every row, so a removed derived credit stays removed on the merged entity; deletes of a whole entity remove every row; position counters.
+- **Merge collisions:** `keepActiveCredit` makes the kept row active with the moving row's source when the kept one was removed and the moving one is active.
+- **Index stamp:** `catalogueStamp` adds the active-credit count, since a removal changes no row count or rowid.
+- **History:** snapshots are `SELECT *` and restore by column name, so they keep `source` and `state` (1.1).
+
+## Verification
+
+On Node 22.23:
+
+- Full `npm test`: 406/406.
+- New model test `credit provenance: …`: defaults and an invalid source; removing a derived credit keeps it removed and off the work page; a repeat removal is refused; adding it again returns the same row as manual; removing a manual credit deletes it; a person merge where the kept person's credit was removed and the merged one's is live keeps one live credit.
+- Extended `editor-v2` credits test: the editor shows a derived credit, Remove hides it from the work and the contributor and leaves it `removed`, a second Remove is refused, Add brings back the same row as manual, removing a manual credit deletes it, and the person can then be deleted.
+- Extended `search` role-filter test: a derived conductor credit adds a recording to the conductor filter; removing it takes it out again (the stamp notices).
+- All three fail on the 1.1 code; the search one also fails with only `engine.js` reverted.
+
+---
+
 # v0.3 Phase 1.1 — schema 5 / issue #48
 
 ## Result

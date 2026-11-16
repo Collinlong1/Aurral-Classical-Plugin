@@ -177,7 +177,7 @@ function credits(c, metadata, targetId) {
   return c.db
     .prepare(
       `SELECT role,instrument,contributor_id FROM credit
-       WHERE target_id=? ORDER BY position,id`,
+       WHERE target_id=? AND state='active' ORDER BY position,id`,
     )
     .all(targetId)
     .map((row) => ({

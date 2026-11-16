@@ -35,6 +35,7 @@ import {
 } from "../src/model/presentation.js";
 import {
   autoMatchTaggedWorks,
+  mergeContributor,
   repairMovementTitles,
   repairWorkTitles,
 } from "../src/model/auto-match.js";
@@ -650,6 +651,48 @@ test("a 250-movement work with editor-length titles still fits core's page limit
   assert.equal(group.items.length, 2);
   assert.equal(group.missing.length, 200);
   assert.equal(group.movementCount, 250);
+});
+
+test("credit provenance: derived credits removed stay removed, manual ones are deleted, and every reader skips removed", async (t) => {
+  const { c, m } = await setup(t);
+  const work = c.createEntity("work");
+  m.manual(work, "title", "Fixture Concerto", { actor: "admin" });
+  const person = (name) => {
+    const id = c.createEntity("person");
+    m.manual(id, "name", name, { actor: "admin" });
+    return id;
+  };
+  const [composer, soloist, other] = [person("Fixture Composer"), person("Fixture Soloist"), person("Other Soloist")];
+  const composed = c.credit(work, composer, "composer");
+  const played = c.credit(work, soloist, "soloist", { instrument: "piano", position: 2, source: "derived" });
+  const state = (id) => ({ ...c.db.prepare("SELECT source,state FROM credit WHERE id=?").get(id) });
+  assert.deepEqual(state(composed), { source: "manual", state: "active" });
+  assert.deepEqual(state(played), { source: "derived", state: "active" });
+  assert.throws(() => c.credit(work, other, "soloist", { source: "guess" }), /source/);
+
+  c.removeCredit(played);
+  assert.deepEqual(state(played), { source: "derived", state: "removed" });
+  assert.throws(() => c.removeCredit(played), /Unknown credit/);
+  // The work page skips it.
+  assert.deepEqual(renderWork(c, work, { id: 1, role: "user" }).work.credits.map((credit) => credit.name), ["Fixture Composer"]);
+  // Deriving it again finds the removed row and does not add a second one;
+  // the admin adding it brings it back.
+  assert.equal(c.credit(work, soloist, "soloist", { instrument: "piano", position: 2 }), played);
+  assert.deepEqual(state(played), { source: "manual", state: "active" });
+  c.removeCredit(played);
+  assert.equal(c.db.prepare("SELECT count(*) AS n FROM credit WHERE id=?").get(played).n, 0);
+
+  // A merge never hides a live credit behind a removed one: other soloist's
+  // derived credit was removed; merging in a person with the same credit live
+  // keeps it live.
+  const removed = c.credit(work, other, "soloist", { source: "derived" });
+  c.removeCredit(removed);
+  const twin = person("Other Soloist (2)");
+  c.credit(work, twin, "soloist", { source: "derived" });
+  mergeContributor(c, other, twin, "admin");
+  assert.deepEqual(c.db.prepare("SELECT contributor_id,source,state FROM credit WHERE target_id=? AND role='soloist'").all(work).map((row) => ({ ...row })), [
+    { contributor_id: other, source: "derived", state: "active" },
+  ]);
 });
 
 test("wrong kinds, cycles, parent movements, sequence slots and cross-performance play plans fail", async (t) => {
