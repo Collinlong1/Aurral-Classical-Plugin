@@ -6,7 +6,7 @@ Plugin (#18): the work page and album presentation are cut to core's page limits
 
 Core (#49, core `bd41154`): one item naming a track that is no longer in its album (the plugin's catalogue lags the Library until its next scan, and a retag changes ids) no longer fails the whole page with a 502. The item is left out, including one on an album that no longer exists; a recording or album group left with no items is dropped, and the count is logged at info. Malformed ids, bad ranges and items from another album still fail. Generic and additive: no API, schema or capability change.
 
-Verification: `V0_3_REPORT.md`.
+Workflows: both integration workflows pin core `bd41154`; the Phase 1 workflow now prepares the fixture work before its smoke test, which fixes its failure since Phase 4. Verification: `V0_3_REPORT.md`.
 
 # v0.3 Phase 0.08 — preserve tag-sensitive retags and repair old split links (issue #14)
 

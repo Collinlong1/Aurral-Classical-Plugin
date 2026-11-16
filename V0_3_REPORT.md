@@ -11,7 +11,8 @@ Base: plugin `aurral-classical` `2bcc91d` (merged L10 PR #101); core `aurral-cla
 
 - Plugin, Node 22.23: `npm test` 400/400; `node --test test/model.test.js` 35/35 on Node 22 and 26.12. The new 250-movement case (2,000-character titles, an emoji at the cut, long tag artist and album) fails on base `2bcc91d` and passes with the fix. `npm run build` and `git diff --check` pass.
 - Core, Node 26.12: `pnpm run check` clean (unsafe-any 1089, unchanged); `pnpm test` 2668/2668 across 388 files. The extended presentation case in `.tests/plugins/plugins.test.ts` (stale tracks in a work recording, a mixed recording, a recording on a retagged-away album, an empty album group and a mixed group) fails on base and passes with the fix; the existing other-album 502 case still passes.
-- Not run: browser checks, Compose/restart, `pnpm eden test`, remote paired CI. `.github/workflows/phase3-integration.yml` still pins the earlier core commit.
+- Workflows: both integration workflows now pin core `bd41154` (this fix, on the November 16 sync). The Phase 1 workflow's long-standing failure is fixed: it ran `dev/smoke.mjs` without `dev/editor-fixtures.mjs prepare`, so `/config/phase4-fixture.json` did not exist, and its core pin `aecbb96` predated the work-page routes the smoke test uses.
+- Not run locally: browser checks, Compose/restart (no Docker here), `pnpm eden test`. The paired workflows run on the PR.
 
 ---
 

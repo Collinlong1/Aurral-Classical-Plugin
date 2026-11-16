@@ -17,7 +17,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: Collinlong1/aurral
-          ref: aecbb96625340cb3a1bd469787211cfe9bedcab5
+          # Same core as the work-view workflow: the smoke test reads the
+          # work page and saves comparisons through the v0.2 hooks.
+          ref: bd4115454467f6e73cb3c616f88e9268b6984936
           path: core
       - uses: actions/setup-node@v4
         with:
@@ -37,6 +39,8 @@ jobs:
             if docker compose -f compose.dev.yaml exec -T aurral node -e 'fetch("http://127.0.0.1:3001/api/health/live").then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))'; then break; fi
             sleep 1
           done
+          # The smoke test plays the fixture work this step records.
+          docker compose -f compose.dev.yaml exec -T aurral node /plugin/dev/editor-fixtures.mjs prepare
           docker compose -f compose.dev.yaml exec -T aurral node /plugin/dev/smoke.mjs
           docker compose -f compose.dev.yaml restart aurral
           for attempt in $(seq 1 60); do
