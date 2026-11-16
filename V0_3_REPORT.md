@@ -1,3 +1,30 @@
+# v0.3 Phase 0.06 — E7 / issue #17
+
+Base: `aurral-classical` `1108102`, including merged E10 PR #98. This follows the handoff sequence. Current #17 has no additional dependencies or later comments changing scope. No other issue is implemented here.
+
+## Result
+
+The later-change guard now considers only active merge/delete rows whose serialized entity set overlaps the snapshot being undone. Selection rows and unrelated destructive history no longer block undo. Insertion order, rather than millisecond timestamps, determines which snapshot is later, so equal timestamps cannot bypass the overlap guard.
+
+A related path in the same selection workflow logs the preselected work as the target of a navigation event. Navigation-only audit actions (`open`, `move-tracks-open`, `bulk-edit-open`, `choose-album-work`, `new-album-work`) no longer count as later edits. Actual edits and assignments still use the existing audit guard. Later overlapping merges and deletions remain refused, without changing attachments or undo markers; their newest change can still be undone.
+
+No expiry or deletion of selection rows is needed. E10's reused-track deletion guard remains intact. This change does not alter restoration semantics or add undo for renames/reorders, and leaves E8/E9 separate. No schema, core, media-tag or provider-request changes. Bundle rebuilt.
+
+## Verification
+
+On Node 24.22.1:
+
+- `node --test test/editor-v2.test.js test/editor-v0.2-workflow.test.js test/auto-match.test.js`: 69/69 passed.
+- Nine new editor tests cover Group/Cancel, a preselected work, choosing a work and cancelling, Edit together/Cancel, unrelated later merges/deletions, overlapping merges/deletions with equal timestamps, and deletion undo after Group while tracks remain free. They verify exact attachment restoration, selection rows remaining present, unrelated changes remaining active, refusal atomicity, newest overlapping undo and foreign-key integrity.
+- Eight new regressions fail on merged base `1108102`; the overlapping-deletion refusal already passed there through its audit guard.
+- `f7.mjs` compared against base `1108102`: the Group-only undo refusal becomes successful undo. Renaming/reordering the work or adding a new album still refuses undo. `f8.mjs` was also run: its album C names both composer spellings, so after E2 it creates a different work rather than joining the kept one; undo is allowed there. That case no longer validates the attached-album guard; `f7` c2 does. The probes' unrelated review, favourite-state and rename/reorder-undo findings are outside #17.
+- `npm run build`: passed. `git diff --check`: passed.
+- Full `npm test`: 376/376 passed.
+
+No local browser or Compose/restart run for #17. The known pre-existing Phase 1 workflow fixture mismatch remains unchanged and outside scope.
+
+---
+
 # v0.3 Phase 0.05 — E10 / issue #15
 
 Base: `aurral-classical` `89d3351`, including merged L3 PR #97. This follows the handoff sequence. Current #15 has no additional dependencies or later comments changing scope. No other issue is implemented here.

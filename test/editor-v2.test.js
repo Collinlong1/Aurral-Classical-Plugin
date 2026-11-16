@@ -944,3 +944,79 @@ test("#15 repair drops only the later exact duplicate recording and preserves pi
   autoMatchTaggedWorks(s.c);
   assert.equal(s.c.db.prepare("SELECT count(*) AS n FROM realization WHERE work_id=?").get(s.work).n, 5);
 });
+
+const latestMerge = (s) => s.c.db.prepare("SELECT id,created_at FROM change_set WHERE kind='merge' ORDER BY rowid DESC").get();
+for (const selection of ["group", "group-preselected", "choose-work", "bulk"]) {
+  test(`#17 opening and cancelling ${selection} does not block merge undo`, async (t) => {
+    const s = await spellingWorks(t);
+    const before = s.c.db.prepare("SELECT * FROM realization_item ORDER BY id").all();
+    await s.ok("merge-entity", { target: s.b, into: s.a, confirm: true }, `merge:${s.b}:${s.a}`);
+    const change = latestMerge(s);
+    let opened = selection === "bulk"
+      ? await s.ok("bulk-edit-open", { works: [s.a] })
+      : await s.ok("move-tracks-open", { albumId: "A", tracks: [s.trackIds("A")[0]], ...(selection === "group-preselected" && { work: s.a }) }, "album:A");
+    if (selection === "choose-work") opened = await s.ok("choose-album-work", { albumId: "A", work: s.a, move: opened.selection.split("!").at(-1) }, opened.selection);
+    await s.ok("open", { selection: selection === "group-preselected" || selection === "choose-work" ? s.a : "" }, opened.selection);
+    await s.ok("undo-change", { id: change.id }, `change:${change.id}`);
+    assert.deepEqual(liveWorks(s).sort(), [s.a, s.b].sort());
+    assert.deepEqual(s.c.db.prepare("SELECT * FROM realization_item ORDER BY id").all(), before);
+    assert.ok(s.c.db.prepare("SELECT 1 FROM change_set WHERE kind='selection'").get(), "selection still exists; no expiry or purge required");
+  });
+}
+
+for (const kind of ["merge", "delete"]) {
+  test(`#17 a later unrelated ${kind} does not block an earlier merge undo`, async (t) => {
+    const s = await spellingWorks(t);
+    await s.ok("merge-entity", { target: s.b, into: s.a, confirm: true }, `merge:${s.b}:${s.a}`);
+    const change = latestMerge(s);
+    const other = (await s.ok("create-work", { title: "Unrelated sketch", movements: [] })).selection;
+    if (kind === "delete") await s.ok("delete-entity", { target: other }, other);
+    else {
+      const extra = (await s.ok("create-work", { title: "Another unrelated sketch", movements: [] })).selection;
+      await s.ok("merge-entity", { target: extra, into: other, confirm: true }, `merge:${extra}:${other}`);
+    }
+    const later = s.c.db.prepare("SELECT id FROM change_set WHERE kind=? ORDER BY rowid DESC").get(kind).id;
+    // Ensure the former global timestamp guard sees this later row.
+    s.c.db.prepare("UPDATE change_set SET created_at=? WHERE id=?").run(change.created_at + 1, later);
+    const unrelatedBefore = s.c.db.prepare("SELECT * FROM entity WHERE id=?").get(other);
+    await s.ok("undo-change", { id: change.id }, `change:${change.id}`);
+    assert.deepEqual(s.c.db.prepare("SELECT * FROM entity WHERE id=?").get(other), unrelatedBefore);
+    assert.equal(s.c.db.prepare("SELECT undone_at FROM change_set WHERE id=?").get(later).undone_at, null);
+    assert.ok(live(s, s.a) && live(s, s.b));
+  });
+}
+
+for (const kind of ["merge", "delete"]) {
+  test(`#17 a later overlapping ${kind} still blocks undo, even with equal timestamps`, async (t) => {
+    const s = await spellingWorks(t);
+    await s.ok("merge-entity", { target: s.b, into: s.a, confirm: true }, `merge:${s.b}:${s.a}`);
+    const first = latestMerge(s);
+    if (kind === "delete") await s.ok("delete-entity", { target: s.a }, s.a);
+    else {
+      const extra = (await s.ok("create-work", { title: "Another version", movements: [] })).selection;
+      // The merge's audit targets the dropped extra work, so overlap with the
+      // retained work must also be detected from the saved entity sets.
+      await s.ok("merge-entity", { target: extra, into: s.a, confirm: true }, `merge:${extra}:${s.a}`);
+    }
+    const later = s.c.db.prepare("SELECT id FROM change_set WHERE kind=? ORDER BY rowid DESC").get(kind).id;
+    s.c.db.prepare("UPDATE change_set SET created_at=? WHERE id=?").run(first.created_at, later);
+    const before = s.c.db.prepare("SELECT * FROM realization_item ORDER BY id").all();
+    const refused = await s.mutate("undo-change", { id: first.id }, `change:${first.id}`);
+    assert.equal(refused.ok, false);
+    assert.match(refused.message, /entries changed after this/);
+    assert.deepEqual(s.c.db.prepare("SELECT * FROM realization_item ORDER BY id").all(), before);
+    assert.equal(s.c.db.prepare("SELECT undone_at FROM change_set WHERE id=?").get(first.id).undone_at, null);
+    await s.ok("undo-change", { id: later }, `change:${later}`);
+    assert.deepEqual(s.c.db.prepare("PRAGMA foreign_key_check").all(), []);
+  });
+}
+
+test("#17 group selection does not block deletion undo while tracks remain free", async (t) => {
+  const s = await removalFixture(t);
+  const before = s.c.db.prepare("SELECT * FROM realization_item ORDER BY id").all();
+  await s.ok("delete-entity", { target: s.work }, s.work);
+  const change = deletionChange(s);
+  await s.ok("move-tracks-open", { albumId: "A", tracks: s.trackIds("A") }, "album:A");
+  await s.ok("undo-change", { id: change }, `change:${change}`);
+  assert.deepEqual(s.c.db.prepare("SELECT * FROM realization_item ORDER BY id").all(), before);
+});
