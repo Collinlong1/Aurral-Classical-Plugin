@@ -1161,8 +1161,22 @@ function mapEach(rawMovements, rawTracks, setSubject) {
     }
   }
   if (result.every(Boolean)) return result;
-  if (movements.length === tracks.length) return movements.map((m) => m.id);
+  if (movements.length === tracks.length && inOrder(movements, tracks)) return movements.map((m) => m.id);
   return mapBySections(rawMovements, rawTracks);
+}
+
+// As many tracks as movements lines them up in order only when no track says
+// otherwise: its number is not its movement's, or its name is another
+// movement's. Excerpts on two albums (Prélude, Sarabande, Gigue and then
+// Allemande, Courante, Menuet) are never one another's movements.
+function inOrder(movements, tracks) {
+  const variation = tracks.some((track) => track.variation) || movements.some((m) => m.variation);
+  return movements.every((m, i) => {
+    const parts = movementParts(tracks[i].movementTitle);
+    const number = parts.piece || variation ? m.index : (m.index ?? m.position);
+    if (parts.index && parts.index !== number) return false;
+    return !parts.text || !movements.some((other) => other.id !== m.id && other.text === parts.text);
+  });
 }
 
 const albumOrder = (a, b) =>

@@ -1,3 +1,13 @@
+# v0.3 Phase 0.10 — excerpts never line up with another album's movements by order (L1, issue #19)
+
+Branch `claude/pensive-bardeen-5dat3q` starts at `aurral-classical` `f055abe`, including merged C1 PR #102 (core C1 merged as core PR #58). Current #19 has no additional dependencies or later scope comments. This implements L1 only.
+
+`mapEach` lined an album's tracks up with a work's movements by order whenever the counts matched, even when no track matched by name or number. Excerpts on two albums (BWV 1007's Prélude, Sarabande and Gigue, then its Allemande, Courante and Menuet) were placed on each other's movements with no review. The count fallback now applies only when no track contradicts it: a track's number must be its movement's (`index`, else position; a variation's or set piece's number is its index alone), and no track may name another of the work's movements. Otherwise the album falls through to the existing section mapping, work expansion and `movement-mismatch` review. Untitled and agreeing tracks still line up by order. `mergeMapping` uses the same path. Plugin only; no schema or core change; bundle rebuilt.
+
+Data repair is not automatic, as the issue specifies. A new read-only report, `node scripts/model-admin.mjs movement-numbers MODEL_FOLDER [--json]`, lists tracks whose title numbers a different movement than the one they are on, so an admin can move them in the editor.
+
+Verification: `V0_3_REPORT.md`.
+
 # v0.3 Phase 0.09 — keep presentations within core limits and past stale tracks (C1, issues #18 and core #49)
 
 Branch `claude/pensive-bardeen-5dat3q` in both repositories, starting at plugin `aurral-classical` `2bcc91d` (including merged L10 PR #101) and core `aurral-classical` `a4fe84d` (fork `main` synced through upstream #1891). Neither issue has later scope comments. This implements C1 only, both halves, which do not depend on each other.

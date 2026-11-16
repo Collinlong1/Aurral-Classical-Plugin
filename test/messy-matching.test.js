@@ -16,6 +16,7 @@ import { reconcile, classify } from "../src/model/reconcile.js";
 import { renderAlbumPresentation, renderWork } from "../src/model/presentation.js";
 import { renderV2 } from "../src/model/editor-v2.js";
 import { autoMatchLibrary } from "../src/model/runtime.js";
+import { movementNumberReport } from "../src/model/movement-report.js";
 import path from "node:path";
 
 const decide = (hints) => classificationEvidence(hints).decision;
@@ -437,6 +438,67 @@ test("matching: a movement number never maps a track onto a differently named mo
   assert.equal(mapToMovements(partita, tracks("1. Preludio. Non allegro", "2. Gavotte", "3. Gigue")), null);
   // The same number with the same first word still maps.
   assert.deepEqual(mapToMovements(partita, tracks("I. Preludio (Live)", "VII. Gigue")), ["m1", "m7"]);
+  // As many tracks as movements is no reason when the tracks say otherwise:
+  // their numbers are other movements', or their names are.
+  const excerpts = ["I. Prélude", "IV. Sarabande", "VI. Gigue"].map((title, i) => ({ id: `e${i + 1}`, position: i + 1, title, ...movementParts(title) }));
+  assert.equal(mapToMovements(excerpts, tracks("II. Allemande", "III. Courante", "V. Menuet")), null);
+  assert.equal(mapToMovements(excerpts, tracks("Allemande", "Gigue", "Courante")), null);
+  // Untitled or unnumbered tracks still line up by order, and so do
+  // numbers that agree with the movements' own.
+  assert.deepEqual(mapToMovements(excerpts, tracks("Movement 1", "Movement 2", "Movement 3")), ["e1", "e2", "e3"]);
+  assert.deepEqual(mapToMovements(excerpts, tracks("I. Praeludium", "IV. Sarabanda", "VI. Giga")), ["e1", "e2", "e3"]);
+  const sonata = ["I. Allegro", "II. Adagio", "III. Allegro"].map((title, i) => ({ id: `s${i + 1}`, position: i + 1, title, ...movementParts(title) }));
+  assert.deepEqual(mapToMovements(sonata, tracks("1. Allegro con brio", "2. Adagio cantabile", "3. Rondo")), ["s1", "s2", "s3"]);
+});
+
+test("matching: excerpts on two albums never land on each other's movements by position", async (t) => {
+  const bach = (title) => ({ title, composer: ["Johann Sebastian Bach"], genres: ["Classical"] });
+  const suite = (movements) => movements.map((m) => `Cello Suite No. 1 in G major, BWV 1007: ${m}`).map(bach);
+  const c = await catalogueWith(t, [
+    { id: "odd", album: "Encores", albumArtist: "Cellist", artist: "Cellist", titles: suite(["I. Prélude", "IV. Sarabande", "VI. Gigue"]) },
+    { id: "even", album: "More Encores", albumArtist: "Cellist", artist: "Cellist", titles: suite(["II. Allemande", "III. Courante", "V. Menuet I & II"]) },
+  ]);
+  for (const albumId of ["odd", "even"]) autoMatchTaggedWorks(c, { albumId, actor: "admin", allowStructuredTitles: true });
+  const [[work, odd]] = renderAlbumPresentation(c, "odd").groups.map((group) => [group.workId, group.items.map((item) => item.title)]);
+  assert.ok(work);
+  assert.deepEqual(odd, ["I. Prélude", "IV. Sarabande", "VI. Gigue"]);
+  // The second album waits for an admin instead of playing "II. Allemande"
+  // as "I. Prélude". It is no fuller recording of the suite, so it does not
+  // extend the work either.
+  assert.ok(!renderAlbumPresentation(c, "even")?.groups.some((group) => group.workId === work));
+  assert.deepEqual(workMovementTitles(c, work), ["I. Prélude", "IV. Sarabande", "VI. Gigue"]);
+  const reviews = c.db
+    .prepare("SELECT json_extract(evidence,'$.albumId') AS album FROM review_item WHERE status='open' AND json_extract(evidence,'$.reason')='movement-mismatch'")
+    .all()
+    .map((row) => row.album);
+  assert.deepEqual(reviews, ["even"]);
+
+  // What earlier versions stored: the second album on the first album's
+  // movements by order. Nothing moves it back; the report lists it.
+  assert.deepEqual(movementNumberReport(c.db), []);
+  const movements = workMovementTitles(c, work, true);
+  const performance = c.createEntity("performance");
+  const performanceWork = c.relate("performance_work", performance, work);
+  const recording = c.createEntity("recording");
+  c.relate("recording_performance", recording, performance);
+  const realization = c.realization(work, performanceWork, "More Encores");
+  c.db
+    .prepare("SELECT id FROM track_link WHERE CAST(json_extract(evidence,'$.albumId') AS TEXT)='even' ORDER BY core_id")
+    .all()
+    .forEach((link, i) => {
+      const content = c.recordingContent(recording, performanceWork, { movement: movements[i], position: i + 1 });
+      const segment = c.segment(link.id, { startMs: 0, endMs: 1000 });
+      c.segmentContent(segment, content);
+      c.realizationItem(realization, segment, { movement: movements[i], sequence: i + 1 });
+    });
+  assert.deepEqual(
+    movementNumberReport(c.db).map((row) => [row.albumId, row.title.split(": ")[1], row.movement]),
+    [
+      ["even", "II. Allemande", "I. Prélude"],
+      ["even", "III. Courante", "IV. Sarabande"],
+      ["even", "V. Menuet I & II", "VI. Gigue"],
+    ],
+  );
 });
 
 test("matching: a title naming a whole piece is a work; a set with its own opus is one work", async (t) => {
