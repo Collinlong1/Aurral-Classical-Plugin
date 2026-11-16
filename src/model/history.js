@@ -107,9 +107,17 @@ export function undoChange(c, id, actor) {
     }
     const ids = list(set.entities);
     const later = c.db
-      .prepare(`SELECT 1 FROM audit_event WHERE id>? AND target_id IN (${marks(ids)}) LIMIT 1`)
+      .prepare(`SELECT 1 FROM audit_event WHERE id>? AND target_id IN (${marks(ids)})
+         AND action NOT IN ('editor.open','editor.move-tracks-open','editor.bulk-edit-open',
+           'editor.choose-album-work','editor.new-album-work') LIMIT 1`)
       .get(data.after, ...ids);
-    const laterChange = c.db.prepare("SELECT 1 FROM change_set WHERE created_at>? AND undone_at IS NULL AND id!=? LIMIT 1").get(row.created_at, id);
+    // Selection tokens are not edits. Only a later live destructive snapshot
+    // sharing these entities blocks undo; insertion order handles tied clocks.
+    const laterChange = c.db.prepare(`SELECT 1 FROM change_set c
+      WHERE c.rowid > (SELECT rowid FROM change_set WHERE id=?)
+        AND c.kind IN ('merge','delete') AND c.undone_at IS NULL
+        AND EXISTS (SELECT 1 FROM json_each(c.data, '$.set.entities') e
+          WHERE e.value IN (${marks(ids)})) LIMIT 1`).get(id, ...ids);
     if (later || laterChange) throw new Error("These entries changed after this, so undoing it would lose that change. Undo the later changes first, or fix it by hand.");
     c.db.exec("PRAGMA defer_foreign_keys=ON");
     const tables = predicates(set);

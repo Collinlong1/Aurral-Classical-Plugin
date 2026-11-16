@@ -1,3 +1,11 @@
+# v0.3 Phase 0.06 — scope undo conflicts to real overlapping changes (issue #17)
+
+Branch `fix/v0.3-0.06-scope-undo-conflicts` starts at `aurral-classical` `1108102`, including merged E10 PR #98. Current #17 has no additional dependencies or later scope comments. This implements E7 only.
+
+Selection rows no longer block earlier undo. A later change-set row must be an active merge or deletion whose saved entity set overlaps the earlier snapshot. Persistent insertion order also catches changes with equal timestamps. Navigation-only audit events from opening/cancelling Group, Edit together and related forms are ignored; actual edits and assignments retain their audit protection. Later overlapping destructive changes still block undo and the newer change remains undoable. No schema, core, media or provider-request change; bundle rebuilt.
+
+Verification and f7/f8 probe evidence: `V0_3_REPORT.md`. E10's reassigned-track guard remains covered. E8/E9 and the known Phase 1 fixture mismatch remain outside scope.
+
 # v0.3 Phase 0.05 — safe deletion undo and duplicate recording repair (issue #15)
 
 Branch `fix/v0.3-0.05-safe-deletion-undo` starts at `aurral-classical` `89d3351`, including merged L3 PR #97. Current #15 has no additional dependencies or later scope comments. This implements E10 only.
