@@ -1,3 +1,13 @@
+# v0.3 Phase 0.09 — keep presentations within core limits and past stale tracks (C1, issues #18 and core #49)
+
+Branch `claude/pensive-bardeen-5dat3q` in both repositories, starting at plugin `aurral-classical` `2bcc91d` (including merged L10 PR #101) and core `aurral-classical` `a4fe84d` (fork `main` synced through upstream #1891). Neither issue has later scope comments. This implements C1 only, both halves, which do not depend on each other.
+
+Plugin (#18): the work page and album presentation are cut to core's page limits as their last step. Text fields stop at 500 characters with an ellipsis, never splitting an emoji (description 10,000; instrument and record label 200), and work movements, missing movements and movement parts stop at 200. `complete` and `movementCount` still describe the whole work. Stored data is unchanged; bundle rebuilt.
+
+Core (#49, core `bd41154`): one item naming a track that is no longer in its album (the plugin's catalogue lags the Library until its next scan, and a retag changes ids) no longer fails the whole page with a 502. The item is left out, including one on an album that no longer exists; a recording or album group left with no items is dropped, and the count is logged at info. Malformed ids, bad ranges and items from another album still fail. Generic and additive: no API, schema or capability change.
+
+Verification: `V0_3_REPORT.md`.
+
 # v0.3 Phase 0.08 — preserve tag-sensitive retags and repair old split links (issue #14)
 
 Branch `fix/v0.3-0.08-preserve-retagged-file-links` starts at `aurral-classical` `3e74192`, including merged L11 PR #100. Current #14 has no additional dependencies or later scope comments. This implements L10 only.

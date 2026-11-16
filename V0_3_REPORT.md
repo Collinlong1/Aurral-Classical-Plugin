@@ -1,3 +1,20 @@
+# v0.3 Phase 0.09 — C1 / issues #18 and core #49
+
+Base: plugin `aurral-classical` `2bcc91d` (merged L10 PR #101); core `aurral-classical` `a4fe84d`. This follows the handoff sequence (C1 after L10). No other issue is implemented here.
+
+## Result
+
+- **Plugin #18:** `renderWork` and `renderAlbumPresentation` end with a fit step mirroring core's schema. Titles, names, labels and item text are cut to 500 characters, description to 10,000, instrument and record label to 200; a cut ends in "…" and never on half a surrogate pair. Work movements, missing movements and parts are cut to 200. `complete` is computed before the cut and `movementCount` stays the real count, so a 250-movement work still reads as incomplete with 250 movements.
+- **Core #49 (`bd41154`):** `playableItems` drops an item whose track is not playable in its album, or whose album is gone (`PluginTargetMissing`), instead of throwing. Work recordings and album groups left empty are dropped; a recording the plugin sent with no items still shows. The throws for a track id that is not a positive integer, a bad range, an item from another album, and any other album lookup failure are unchanged. The dropped count is logged at info under `plugin:<id>`.
+
+## Verification
+
+- Plugin, Node 22.23: `npm test` 400/400; `node --test test/model.test.js` 35/35 on Node 22 and 26.12. The new 250-movement case (2,000-character titles, an emoji at the cut, long tag artist and album) fails on base `2bcc91d` and passes with the fix. `npm run build` and `git diff --check` pass.
+- Core, Node 26.12: `pnpm run check` clean (unsafe-any 1089, unchanged); `pnpm test` 2668/2668 across 388 files. The extended presentation case in `.tests/plugins/plugins.test.ts` (stale tracks in a work recording, a mixed recording, a recording on a retagged-away album, an empty album group and a mixed group) fails on base and passes with the fix; the existing other-album 502 case still passes.
+- Not run: browser checks, Compose/restart, `pnpm eden test`, remote paired CI. `.github/workflows/phase3-integration.yml` still pins the earlier core commit.
+
+---
+
 # v0.3 Phase 0.08 — L10 / issue #14
 
 Base: `aurral-classical` `3e74192`, including merged L11 PR #100. This follows the handoff sequence. Current #14 has no additional dependencies or later comments changing scope. No other issue is implemented here.

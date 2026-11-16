@@ -25,6 +25,60 @@ class DisplayValues {
 const entityValue = (metadata, id, field, fallback) =>
   text(metadata.resolve(id, field).value, fallback);
 const evidenceOf = (row) => JSON.parse(row.evidence);
+
+// Core rejects a whole page whose text or movement lists run past its limits,
+// and editor titles, field edits and tags can be longer. Pages are cut to fit.
+const TEXT_LIMIT = 500;
+const MOVEMENT_LIMIT = 200;
+function clip(value, max = TEXT_LIMIT) {
+  if (typeof value !== "string" || value.length <= max) return value;
+  // Never end on half a surrogate pair.
+  const cut = value.slice(0, max - 1).replace(/[\uD800-\uDBFF]$/, "");
+  return `${cut.trimEnd()}…`;
+}
+const fitMovement = (movement) => ({ ...movement, title: clip(movement.title) });
+const fitMovements = (movements) => movements.slice(0, MOVEMENT_LIMIT).map(fitMovement);
+const fitCredit = (credit) => ({ ...credit, name: clip(credit.name), instrument: clip(credit.instrument, 200) });
+const fitItem = (item) => ({
+  ...item,
+  title: clip(item.title),
+  artist: clip(item.artist),
+  performer: clip(item.performer),
+  album: clip(item.album),
+});
+function fitWork(view) {
+  const { work } = view;
+  return {
+    ...view,
+    work: {
+      ...work,
+      title: clip(work.title),
+      nickname: clip(work.nickname),
+      description: clip(work.description, 10000),
+      credits: work.credits.map(fitCredit),
+      movements: fitMovements(work.movements),
+      collections: work.collections.map((collection) => ({ ...collection, title: clip(collection.title) })),
+    },
+    recordings: view.recordings.map((recording) => ({
+      ...recording,
+      label: clip(recording.label),
+      performer: clip(recording.performer),
+      recordLabel: clip(recording.recordLabel, 200),
+      credits: recording.credits.map(fitCredit),
+      parts: recording.parts.slice(0, MOVEMENT_LIMIT),
+      releases: recording.releases.map((release) => ({ ...release, album: clip(release.album) })),
+      items: recording.items.map(fitItem),
+      missing: fitMovements(recording.missing),
+    })),
+  };
+}
+const fitGroup = (group) => ({
+  ...group,
+  title: clip(group.title),
+  composer: clip(group.composer),
+  items: group.items.map(fitItem),
+  missing: fitMovements(group.missing),
+});
 const trackTitle = (evidence) =>
   text(evidence.hints?.title, path.basename(evidence.path || "Track"));
 
@@ -339,10 +393,14 @@ export function renderAlbumPresentation(c, albumId) {
     .map(({ first, ...group }) => group);
   // Matched works have work pages even when each work occupies one track.
   if (!groups.some((group) => group.workId || group.items.length > 1)) return null;
-  return { version: 1, albumId: album, supportsToggle: true, groups };
+  return { version: 1, albumId: album, supportsToggle: true, groups: groups.map(fitGroup) };
 }
 
 export function renderWork(c, workId, user) {
+  return fitWork(workPage(c, workId, user));
+}
+
+function workPage(c, workId, user) {
   c.entity(workId, "work");
   const metadata = new DisplayValues(c);
   const movements = workMovements(c, metadata, workId);

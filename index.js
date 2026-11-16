@@ -44821,6 +44821,56 @@ var DisplayValues = class {
 };
 var entityValue = (metadata, id, field2, fallback) => text4(metadata.resolve(id, field2).value, fallback);
 var evidenceOf = (row) => JSON.parse(row.evidence);
+var TEXT_LIMIT = 500;
+var MOVEMENT_LIMIT = 200;
+function clip(value, max = TEXT_LIMIT) {
+  if (typeof value !== "string" || value.length <= max) return value;
+  const cut = value.slice(0, max - 1).replace(/[\uD800-\uDBFF]$/, "");
+  return `${cut.trimEnd()}\u2026`;
+}
+var fitMovement = (movement) => ({ ...movement, title: clip(movement.title) });
+var fitMovements = (movements) => movements.slice(0, MOVEMENT_LIMIT).map(fitMovement);
+var fitCredit = (credit) => ({ ...credit, name: clip(credit.name), instrument: clip(credit.instrument, 200) });
+var fitItem = (item) => ({
+  ...item,
+  title: clip(item.title),
+  artist: clip(item.artist),
+  performer: clip(item.performer),
+  album: clip(item.album)
+});
+function fitWork(view) {
+  const { work } = view;
+  return {
+    ...view,
+    work: {
+      ...work,
+      title: clip(work.title),
+      nickname: clip(work.nickname),
+      description: clip(work.description, 1e4),
+      credits: work.credits.map(fitCredit),
+      movements: fitMovements(work.movements),
+      collections: work.collections.map((collection) => ({ ...collection, title: clip(collection.title) }))
+    },
+    recordings: view.recordings.map((recording) => ({
+      ...recording,
+      label: clip(recording.label),
+      performer: clip(recording.performer),
+      recordLabel: clip(recording.recordLabel, 200),
+      credits: recording.credits.map(fitCredit),
+      parts: recording.parts.slice(0, MOVEMENT_LIMIT),
+      releases: recording.releases.map((release) => ({ ...release, album: clip(release.album) })),
+      items: recording.items.map(fitItem),
+      missing: fitMovements(recording.missing)
+    }))
+  };
+}
+var fitGroup = (group) => ({
+  ...group,
+  title: clip(group.title),
+  composer: clip(group.composer),
+  items: group.items.map(fitItem),
+  missing: fitMovements(group.missing)
+});
 var trackTitle2 = (evidence) => text4(evidence.hints?.title, path8.basename(evidence.path || "Track"));
 function actor2(input) {
   const user = input?.user;
@@ -45040,9 +45090,12 @@ function renderAlbumPresentation(c, albumId) {
   });
   const groups = [...works, ...pieceGroups(c, album, following)].sort(compareAlbumGroups).map(({ first, ...group }) => group);
   if (!groups.some((group) => group.workId || group.items.length > 1)) return null;
-  return { version: 1, albumId: album, supportsToggle: true, groups };
+  return { version: 1, albumId: album, supportsToggle: true, groups: groups.map(fitGroup) };
 }
 function renderWork(c, workId, user) {
+  return fitWork(workPage(c, workId, user));
+}
+function workPage(c, workId, user) {
   c.entity(workId, "work");
   const metadata = new DisplayValues(c);
   const movements = workMovements2(c, metadata, workId);
