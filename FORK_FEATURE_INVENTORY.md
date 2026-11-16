@@ -1,3 +1,83 @@
+# v0.3 Phase 2.7 — identity and credit conflict review actions (issue #63)
+
+Last of ten commits in one PR (1.5–1.7, 2.1–2.7). Implements #63 only; #63 has no later comments. E3 (#27) itself, for auto-match reviews, stays open; this applies its durable-dismissal rule to the two contributor review kinds, as #63 asks.
+
+Review kinds: `contributor_identity` "same-name-different-id" (1.5) and new "ambiguous-name" (a tag name two records share: derivation credits neither and asks on the recording), and new `credit_conflict` (after matching, tags whose tracks all name a conductor other than the one an admin credited, by name or alias). Their review pages get Decide rows: Merge… and Keep separate (stores `distinctKey` per pair) for the first; one "Use this record" per candidate, with what each is known for, for the second; "Keep" the credited conductor or "Use" the tags' for the third. Every such review carries an evidence key; one an admin dismissed or decided is not raised again for the same target and key (E3's rule), and changed tags ask again. New command `use-contributor`; `keep-distinct` handles contributors. No schema or core change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
+# v0.3 Phase 2.6 — contributor merge and delete with undo (issue #62)
+
+Ninth of ten commits in one PR (1.5–1.7, 2.1–2.7). Implements #62, with E11's fix that #62 names; E8 (favourites lost on undoing a work merge) is listed as related but is not part of #62's task and stays open.
+
+`history.js` gains `contributorClosure` (a person's or ensemble's credits, aliases, identities, relations, metadata and reviews all hang off the entity) and change kinds `merge-person` and `delete-person`. Merging people or ensembles (Merge, and 2.5's This is…) and deleting an unused one run through `recordChange`, show in Activity and undo exactly. Because credit edits are audited against the recording, not the person, each change also stores its records' credits as they were right after it; undo refuses when they differ. Undoing any change also brings back a deleted person or ensemble a restored credit names (E11). `mergeContributor` now moves ensemble memberships too. No schema or core change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
+# v0.3 Phase 2.5 — map unreviewed tag names to existing contributors (issue #60)
+
+Eighth of ten commits in one PR (1.5–1.7, 2.1–2.7). Implements #60 only; #60 has no later comments.
+
+A contributor a scan made from a tag spelling (1.4) and nobody has edited shows "This is…" at the top of its page: a people or ensembles lookup (same kind only) and "Use this record". New command `map-contributor` merges it into the chosen record with `mergeContributor`, which keeps the tag spelling as an alias, moves its credits and closes its open reviews; the next scan of any album with that spelling lands on the chosen record (1.5's alias rule). 2.6 makes the merge undoable. No schema or core change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
+# v0.3 Phase 2.4 — bulk assign performers and change credit roles (issue #61)
+
+Seventh of ten commits in one PR (1.5–1.7, 2.1–2.7). Implements #61 only; #61 has no later comments.
+
+An album page's ticked tracks gain "Set performers…" (remembered with `rememberAlbumTracks`, as grouping does): a page listing the recordings those tracks belong to with their current performers, and a form setting a person or ensemble, role, instrument, and whether their other performers are kept or replaced. A contributor's page gains "Change role on all credits…": a preview of every performing credit and a from/to role form. Each recording or credit is changed in its own savepoint, as bulk-edit does; one that fails is reported ("Updated 1 of 2 … Not changed: …") and the others keep the change. Credits set this way are manual; replaced derived credits stay removed. Contributor pages now label performance credits "Work · Album" and open the recording. New `dev/editor-credits-browser.mjs`, added to the work-view workflow. No schema or core change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
+# v0.3 Phase 2.3 — contributor details, aliases and ensemble membership (issue #58)
+
+Sixth of ten commits in one PR (1.5–1.7, 2.1–2.7). Implements #58 only; #58 has no later comments.
+
+A person's Details form gains Sort name and Instruments beside Name, Other spellings, Dates and Notes; an ensemble's gains Sort name and Founded. Every other spelling saved, and a contributor's old name when renamed (now for ensembles too, as L2 did for people), is written once to the `alias` table, so tags spelled that way land on the record. Contributor pages gain Members (an ensemble) or Ensembles (a person), each with Remove and an add form using new `people` and `ensembles` lookups; commands `add-member` and `remove-member` store `member_of` relations (1.6). No schema or core change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
+# v0.3 Phase 2.2 — add, edit and remove recording credits (issue #57)
+
+Fifth of ten commits in one PR (1.5–1.7, 2.1–2.7). Implements #57 only; #57 has no later comments.
+
+A recording's editor page gains a Performers section for its performance (the credits pages and search show): each credit, marked "from tags" when a scan derived it, with Remove; "Change a performer" (role, and instrument, kept when left empty); and "Add a performer". New command `update-credit`: the credit becomes `manual`, roles keep the person/ensemble rules, a change into an existing credit is refused, and a removed credit under the new role gives way. `add-credit`, `update-credit` and `remove-credit` take an optional `back` page, so changes made from a recording return to it. The recording page's revision scope now includes its performances, so only that recording's performance can be written from it. Removing a derived credit keeps it removed (1.2); rescans and library passes leave an admin's credits as set (1.4). The recording's own credits section is unchanged. No schema or core change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
+# v0.3 Phase 2.1 — role and unreviewed filters on the performer list (issue #56)
+
+Fourth of ten commits in one PR (1.5–1.7, 2.1–2.7). Implements #56 only; #56 has no later comments.
+
+The editor's Performers list shows each contributor's credit roles ("Person · Conductor", "Ensemble · Orchestra") and an "Unreviewed" badge on records a scan made from tags (1.4) that nobody has edited by hand. Admin pages v2 have no list-filter control and Phase 2 is plugin-only, so the filters are search words, named in the search placeholder: `role:conductor`, `role:performer` (soloists, performers, accompanists), `role:ensemble`, any other credit role, and `unreviewed`; they combine with each other and with ordinary search words. The list stays paged at 100. No schema or core change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
+# v0.3 Phase 1.7 — index contributor IDs, roles, instruments and sort keys (issue #59)
+
+Third of ten commits in one PR (1.5–1.7, 2.1–2.7). Implements #59 only; #59 has no later comments.
+
+The search index adds a `role` facet (a recording's performers' credit roles, and each performer's own) and puts credit instruments into the existing `instrument` facet, on recording and performer documents only, so work results are unchanged. Performer facets already carry contributor IDs whenever a recording has credits; tag-name values (`name:…`) are now also dropped across a reissue group once any of its releases has credits. Every document stores `sort_title` (folded; a contributor's `sortName` when set), `sort_key` (its first catalogue number, numbers zero-padded so they sort naturally; a movement's position) and `sort_date`. The index stamp is now `v3`, so existing indexes rebuild. `accompanist` has a role label. No schema change beyond 1.1; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
+# v0.3 Phase 1.6 — persist reissue links between performances (issue #54)
+
+Second of ten commits in one PR (1.5–1.7, 2.1–2.7). Implements #54 only; #54 has no later comments.
+
+New `src/model/reissues.js`. After matching (and after credits are derived), `linkReissues` stores a `same_recording` relation for each pair of performances of a work that the v0.2 rule (`sameRecording`: same MusicBrainz recordings, or the same performers with every part and track within two seconds, never on one album) joins. `groupRecordings` reads the stored state first: a link joins, an admin's unlink (`unlinkReissue`, audited as `reissue.unlink`) keeps apart, and the rule decides only pairs with neither; matching never links a pair an admin took apart until `relinkReissue`. The work page and the search index use it. New relation kinds `same_recording` and `member_of` (for 2.3). The first library pass backfills links for existing recordings (plan §3 step 2). No schema or core change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
+# v0.3 Phase 1.5 — contributor identity by aliases and MusicBrainz IDs (issue #55)
+
+First of ten commits in one PR (1.5–1.7, 2.1–2.7) on `claude/pensive-bardeen-5dat3q`, from `aurral-classical` `ea1eb8d` (merged PR #104). Implements #55 only; #55 has no later comments.
+
+Composer matching now finds every person by name and alias, not only known composers, so a composer and a performer of one name with no conflicting ID are one person; the automatic merge of same-named records stays composers-only (plan S18). Derived credits use a track's MusicBrainz artist IDs when the artist tag lists exactly as many names, in order, and every track of the performance agrees. `contributorFor`: an ID's holder wins under any spelling; a lone same-named record without an ID gains it; a same-named record holding another ID is someone else, so a new record is made and a `contributor_identity` review (`same-name-different-id`) opens. Exact folded names and aliases only; no fuzzy matching. No schema or core change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
 # v0.3 Phase 1.4 — derive performer credits (issue #52)
 
 Last of five commits in one PR (0.11, 1.1–1.4). Implements #52 only; #52 has no later comments. 1.5 (identity by aliases and IDs across all contributors) and later items are not started.

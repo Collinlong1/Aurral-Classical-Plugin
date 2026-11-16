@@ -2,14 +2,15 @@
 // Everything here reads and writes the plugin catalogue only; audio is never touched.
 import path from "node:path";
 import { randomUUID } from "node:crypto";
-import { CREDIT_ROLES } from "./catalogue.js";
+import { CREDIT_ROLES, PERSON_ROLES, ENSEMBLE_ROLES } from "./catalogue.js";
 import { Metadata } from "./metadata.js";
 import { transaction } from "./database.js";
 import { classify } from "./reconcile.js";
 import { searchText, matchesSearch, ownedTracks } from "./editor-search.js";
 import { searchCatalogue } from "../search/engine.js";
 import { readValues } from "../tags.js";
-import { deleteWorks, deletionImpact, recentChanges, recordChange, undoChange } from "./history.js";
+import { contributorFor, contributorIndex } from "./contributors.js";
+import { CHANGE_KINDS, deleteWorks, deletionImpact, recentChanges, recordChange, undoChange } from "./history.js";
 import {
   mapToMovements,
   distinctKey,
@@ -115,13 +116,17 @@ const FIELDS = {
   ],
   person: [
     ["name", "Name", "text"],
-    ["aliases", "Other spellings", "lines", "One per line, for example Tchaikovsky / Tschaikowsky."],
+    ["sortName", "Sort name", "text", "How lists order them, for example Beethoven, Ludwig van."],
+    ["aliases", "Other spellings", "lines", "One per line, for example Tchaikovsky / Tschaikowsky. Tags spelled any of these ways land on this person."],
+    ["instruments", "Instruments", "lines", "What they play or sing, one per line."],
     ["date", "Dates", "text", "Year or full date, for example 1770 or 1770-12-16."],
     ["description", "Notes", "textarea"],
   ],
   ensemble: [
     ["name", "Name", "text"],
-    ["aliases", "Other names", "lines", "One per line."],
+    ["sortName", "Sort name", "text", "How lists order it, for example Berlin Philharmonic."],
+    ["aliases", "Other names", "lines", "One per line. Tags naming it any of these ways land on this ensemble."],
+    ["date", "Founded", "text", "Year or full date."],
     ["description", "Notes", "textarea"],
   ],
   movement: [
@@ -332,6 +337,12 @@ function reviewLabel(c, review) {
       return { label: labelOf(c, review.target_id) || "Catalogue entry", detail: identityQuestion(c, review) };
     case "track_link":
       return { label: trackName || "Track", detail: "File changed or moved; link needs checking" };
+    case "contributor_identity":
+      return review.evidence.reason === "ambiguous-name"
+        ? { label: `“${review.evidence.name}” on ${performanceLabel(c, review.target_id)}`.slice(0, 500), detail: "Tags name someone two records share; which one plays?" }
+        : { label: labelOf(c, review.target_id) || review.evidence.name || "Contributor", detail: "Same name as someone else, with a different MusicBrainz ID: the same or different?" };
+    case "credit_conflict":
+      return { label: performanceLabel(c, review.target_id), detail: `Tags now name “${review.evidence.tagged}” as conductor; you credited someone else` };
     default:
       return {
         label: labelOf(c, review.target_id) || trackName || "Catalogue entry",
@@ -600,31 +611,56 @@ function detailsForm(c, entity, kind) {
     fields,
   };
 }
-function creditSections(c, target) {
+// A target's credits, with forms to add one and (with `edit`) to change one's
+// role or instrument. `back` is the page a change returns to, when the
+// target is not the page itself (a recording's performance). A credit a scan
+// derived from tags says so.
+function creditSections(c, target, { id = "credits", title = "Credits", noun = "credit", edit = false, back = null } = {}) {
+  const list = credits(c, target);
+  const extra = back ? { back } : {};
+  const roleOptions = ROLES.map((role) => ({ value: role, label: roleLabel(role) }));
   return [
     {
       type: "rows",
-      id: "credits",
-      title: "Credits",
-      empty: "No credits yet.",
-      rows: credits(c, target).map((credit) => ({
+      id,
+      title,
+      empty: `No ${noun}s yet.`,
+      rows: list.map((credit) => ({
         id: credit.id,
         label: credit.name,
-        detail: `${roleLabel(credit.role)}${credit.instrument ? ` · ${credit.instrument}` : ""}`,
+        detail: [`${roleLabel(credit.role)}${credit.instrument ? ` · ${credit.instrument}` : ""}`, credit.source === "derived" ? "from tags" : ""].filter(Boolean).join(" · "),
         selection: credit.contributor_id,
-        actions: [action("Remove", "remove-credit", { target, credit: credit.id }, { tone: "danger" })],
+        actions: [action("Remove", "remove-credit", { target, credit: credit.id, ...extra }, { tone: "danger" })],
       })),
     },
+    ...(edit && list.length
+      ? [
+          {
+            type: "form",
+            id: `edit-${noun}`,
+            title: `Change a ${noun}`,
+            note: "Changing a credit read from tags makes it yours: later scans leave it as you set it.",
+            command: "update-credit",
+            arguments: { target, ...extra },
+            submitLabel: "Save",
+            fields: [
+              { key: "credit", label: noun[0].toUpperCase() + noun.slice(1), type: "select", value: list[0].id, options: list.map((credit) => ({ value: credit.id, label: `${credit.name} (${roleLabel(credit.role)})` })) },
+              { key: "role", label: "Role", type: "select", value: list[0].role, options: roleOptions },
+              { key: "instrument", label: "Instrument or voice", type: "text", value: "", placeholder: "Leave empty to keep it" },
+            ],
+          },
+        ]
+      : []),
     {
       type: "form",
-      id: "add-credit",
-      title: "Add a credit",
+      id: `add-${noun}`,
+      title: `Add a ${noun}`,
       command: "add-credit",
-      arguments: { target },
-      submitLabel: "Add credit",
+      arguments: { target, ...extra },
+      submitLabel: `Add ${noun}`,
       fields: [
         { key: "contributor", label: "Person or ensemble", type: "lookup", lookup: "contributors", value: "", placeholder: "Search people and ensembles", required: true },
-        { key: "role", label: "Role", type: "select", value: "performer", options: ROLES.map((role) => ({ value: role, label: roleLabel(role) })) },
+        { key: "role", label: "Role", type: "select", value: "performer", options: roleOptions },
         { key: "instrument", label: "Instrument or voice", type: "text", value: "", placeholder: "Optional" },
       ],
     },
@@ -846,24 +882,78 @@ function contributorView(c, entity, page = 0) {
       ...paged(
         other.map((credit) => ({
           id: credit.id,
-          label: entityLabel(c, credit.target_id, credit.target_kind),
+          label: credit.target_kind === "performance" ? performanceLabel(c, credit.target_id) : entityLabel(c, credit.target_id, credit.target_kind),
           detail: `${roleLabel(credit.role)}${credit.instrument ? ` · ${credit.instrument}` : ""}`,
-          selection: credit.target_id,
+          selection: creditTargetPage(c, credit.target_id),
         })),
         page,
         entity.id,
         "Credits",
       ),
     });
+  // A scan made this record from a tag spelling nobody has reviewed: it may
+  // be someone the catalogue already has.
+  const unreviewed =
+    entity.data.unreviewed === true && !c.db.prepare("SELECT 1 FROM assertion WHERE target_id=? AND source='manual' LIMIT 1").get(entity.id);
+  if (unreviewed)
+    sections.unshift({
+      type: "form",
+      id: "map",
+      title: "This is…",
+      note: `A scan made “${name}” from file tags. If it's ${kind === "ensemble" ? "an ensemble" : "someone"} already here, choose them: “${name}” becomes another spelling of theirs, its credits move to them, and later scans land there.`,
+      command: "map-contributor",
+      arguments: { target: entity.id },
+      submitLabel: "Use this record",
+      fields: [
+        kind === "ensemble"
+          ? { key: "into", label: "Ensemble", type: "lookup", lookup: "ensembles", value: "", placeholder: "Search ensembles", required: true }
+          : { key: "into", label: "Person", type: "lookup", lookup: "people", value: "", placeholder: "Search people", required: true },
+      ],
+    });
+  // Who plays in an ensemble, and which ensembles a person plays in.
+  const members = c.db
+    .prepare(`SELECT ${kind === "ensemble" ? "source_id" : "target_id"} AS id FROM relation WHERE kind='member_of' AND ${kind === "ensemble" ? "target_id" : "source_id"}=? ORDER BY position,id`)
+    .all(entity.id)
+    .map((row) => row.id);
+  sections.push(
+    {
+      type: "rows",
+      id: "members",
+      title: kind === "ensemble" ? "Members" : "Ensembles",
+      empty: kind === "ensemble" ? "No members yet." : "Not a member of an ensemble yet.",
+      rows: members
+        .map((id) => ({
+          id,
+          label: entityLabel(c, id, kind === "ensemble" ? "person" : "ensemble"),
+          selection: id,
+          actions: [action("Remove", "remove-member", { target: entity.id, other: id }, { tone: "danger" })],
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
+    },
+    {
+      type: "form",
+      id: "add-member",
+      title: kind === "ensemble" ? "Add a member" : "Add to an ensemble",
+      command: "add-member",
+      arguments: { target: entity.id },
+      submitLabel: "Add",
+      fields: [
+        kind === "ensemble"
+          ? { key: "other", label: "Person", type: "lookup", lookup: "people", value: "", placeholder: "Search people", required: true }
+          : { key: "other", label: "Ensemble", type: "lookup", lookup: "ensembles", value: "", placeholder: "Search ensembles", required: true },
+      ],
+    },
+  );
   sections.push(mergeForm(entity.id, kind === "ensemble" ? "contributors" : composer ? "composers" : "contributors", kind === "ensemble" ? "ensemble" : "person", "Moves every credit to the entry you choose, then removes this one."));
   return {
     crumbs: [],
     title: name,
     subtitle: composer ? "Composer" : kind === "ensemble" ? "Ensemble, orchestra or choir" : "Performer",
     badges: [{ label: `${creditRows.length} credit${creditRows.length === 1 ? "" : "s"}`, tone: "muted" }],
-    actions: creditRows.length
-      ? []
-      : [action("Delete", "delete-entity", { target: entity.id }, { tone: "danger", confirm: `Delete “${name}”?` })],
+    actions: [
+      ...(creditRows.some((credit) => PERFORMING_ROLES.has(credit.role)) ? [open("Change role on all credits…", `roles:${entity.id}`)] : []),
+      ...(creditRows.length ? [] : [action("Delete", "delete-entity", { target: entity.id }, { tone: "danger", confirm: `Delete “${name}”?` })]),
+    ],
     sections,
   };
 }
@@ -972,6 +1062,10 @@ function recordingView(c, recording) {
             },
           ]
         : []),
+      // Who performs: the credits pages and search show for this recording.
+      ...[...new Set(pws.map((pw) => pw.source_id))].flatMap((performance) =>
+        creditSections(c, performance, { id: "performers", title: "Performers", noun: "performer", edit: true, back: recording }),
+      ),
       ...creditSections(c, recording),
     ],
   };
@@ -1180,6 +1274,7 @@ function albumView(c, albumId, chosenWork, page = 0, move = "") {
       }),
       select: { key: "tracks", actions: [
         action("Group selected tracks", "move-tracks-open", { albumId, page: String(page), ...(chosenWork && { work: chosenWork }) }),
+        action("Set performers…", "performers-open", { albumId, page: String(page) }),
         action("Send to Classical", "set-classification", { state: "classical" }),
         action("Remove from Classical", "set-classification", { state: "not_classical" }, { tone: "danger", confirm: "Remove these tracks from Aurral Classical? They stay in your Aurral library." }),
         action("Remove from work", "unassign-tracks", { albumId, page: String(page) }, { tone: "danger", confirm: "Take these tracks out of their works? The works and the audio stay." }),
@@ -1316,6 +1411,9 @@ function reviewView(c, id) {
     actions.unshift(action("Allow this work again", "allow-work", { id }));
   const distinct = review.kind === "identity" && review.evidence.reason === "duplicate-work" && entity && live(review.evidence.keep);
   if (distinct) pairs.push({ other: review.evidence.keep });
+  // Two people of one name with different IDs: merge, or keep apart for good.
+  const sameName = review.kind === "contributor_identity" && review.evidence.reason === "same-name-different-id" && entity;
+  if (sameName) for (const other of (review.evidence.others || []).filter(live).slice(0, 5)) pairs.push({ other });
   const next = nextReview(c, id);
   // Decisions about a pair live in Decide; the header keeps navigation.
   if (!pairs.length) {
@@ -1383,11 +1481,31 @@ function reviewView(c, id) {
     rows.push({
       id: "separate",
       label: "Keep separate",
-      detail: distinct ? "They are different works. Matching won't suggest merging them again." : "They are different. Nothing is merged or linked, and this item closes.",
-      actions: [distinct ? action("Keep separate", "keep-distinct", { id }) : action("Keep separate", "resolve-review", { id })],
+      detail: sameName ? "They are different people. This isn't asked again." : distinct ? "They are different works. Matching won't suggest merging them again." : "They are different. Nothing is merged or linked, and this item closes.",
+      actions: [distinct || sameName ? action("Keep separate", "keep-distinct", { id }) : action("Keep separate", "resolve-review", { id })],
     });
     if (next) rows.push({ id: "skip", label: "Skip", detail: "Decide later; the next item opens.", actions: [open("Skip", `review:${next}`)] });
     sections.push({ type: "rows", id: "decide", title: "Decide", rows });
+  }
+  // Which record a tag name means, or whose credit holds.
+  const choices = [];
+  if (review.kind === "contributor_identity" && review.evidence.reason === "ambiguous-name")
+    for (const candidate of (review.evidence.candidates || []).filter(live).slice(0, 5))
+      choices.push({
+        id: `use-${candidate}`,
+        label: `Use “${labelOf(c, candidate) || "Untitled"}”`.slice(0, 500),
+        detail: contributorSummary(c, candidate),
+        selection: candidate,
+        actions: [action("Use this record", "use-contributor", { id, contributor: candidate })],
+      });
+  if (review.kind === "credit_conflict") {
+    for (const credited of (review.evidence.credited || []).filter(live))
+      choices.push({ id: `keep-${credited}`, label: `Keep “${labelOf(c, credited) || "Untitled"}”`.slice(0, 500), detail: "Your credit stays; this isn't asked again unless the tags change.", selection: credited, actions: [action("Keep", "resolve-review", { id })] });
+    choices.push({ id: "tagged", label: `Use “${review.evidence.tagged}”`.slice(0, 500), detail: "The tags' conductor replaces yours on this recording.", actions: [action("Use this record", "use-contributor", { id, contributor: "tagged" })] });
+  }
+  if (choices.length) {
+    if (next) choices.push({ id: "skip", label: "Skip", detail: "Decide later; the next item opens.", actions: [open("Skip", `review:${next}`)] });
+    sections.push({ type: "rows", id: "decide", title: "Decide", rows: choices });
   }
   // Fix the entry here: its own fields, without leaving the queue.
   if (entity && (review.kind !== "identity" || identity)) sections.push({ ...detailsForm(c, review.target_id, entity.kind), title: `Edit ${entity.kind}` });
@@ -1518,14 +1636,14 @@ function historyList(c) {
   return recentChanges(c, 100).map((change) => ({
     id: `change:${change.id}`,
     label: change.summary,
-    detail: [new Date(change.created_at).toISOString().slice(0, 16).replace("T", " "), change.kind === "merge" ? "Merge" : "Deletion"].join(" · "),
+    detail: [new Date(change.created_at).toISOString().slice(0, 16).replace("T", " "), change.kind.startsWith("merge") ? "Merge" : "Deletion"].join(" · "),
     ...(change.undone_at ? { badge: { label: "Undone", tone: "muted" } } : {}),
     selection: `change:${change.id}`,
     search: change.summary,
   }));
 }
 function changeView(c, id) {
-  const row = c.db.prepare("SELECT * FROM change_set WHERE id=? AND kind IN ('merge','delete')").get(id);
+  const row = c.db.prepare(`SELECT * FROM change_set WHERE id=? AND kind IN (${CHANGE_KINDS.map(() => "?").join(",")})`).get(id, ...CHANGE_KINDS);
   if (!row) fail("That change isn't in the history");
   const data = JSON.parse(row.data);
   const impact = data.impact || {};
@@ -1543,10 +1661,11 @@ function changeView(c, id) {
         id: "change",
         title: "What changed",
         items: [
-          { label: "Kind", value: row.kind === "merge" ? "Merge of two works" : "Deletion" },
+          { label: "Kind", value: { merge: "Merge of two works", "merge-person": "Merge of two people or ensembles", "delete-person": "Deletion of a person or ensemble" }[row.kind] || "Deletion" },
           ...(impact.movements != null ? [{ label: "Movements", value: String(impact.movements) }, { label: "Recordings", value: String(impact.recordings) }, { label: "Tracks taken out of works", value: String(impact.tracks) }] : []),
           { label: "Audio files", value: "Never changed" },
           ...(data.works || []).filter((work) => c.db.prepare("SELECT 1 FROM entity WHERE id=? AND deleted_at IS NULL").get(work)).map((work) => ({ label: "Work", value: entityLabel(c, work, "work"), selection: work })),
+          ...(data.contributors || []).filter((id) => c.db.prepare("SELECT 1 FROM entity WHERE id=? AND deleted_at IS NULL").get(id)).map((id) => ({ label: "Entry", value: labelOf(c, id) || "Untitled", selection: id })),
         ],
       },
     ],
@@ -1565,6 +1684,139 @@ const BULK_FIELDS = [
   ["key", "Key", "text"],
   ["instrumentation", "Instrumentation", "lines"],
 ];
+// What a contributor is known for, to tell same-named records apart.
+function contributorSummary(c, id) {
+  const roles = c.db.prepare("SELECT role,count(*) AS n FROM credit WHERE contributor_id=? AND state='active' GROUP BY role ORDER BY n DESC").all(id);
+  const mbid = c.db.prepare("SELECT record_id FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='artist' AND state='active'").get(id)?.record_id;
+  return [roles.map((row) => `${roleLabel(row.role)} on ${row.n}`).join(", ") || "No credits yet", mbid && `MusicBrainz ${mbid.slice(0, 8)}`].filter(Boolean).join(" · ").slice(0, 500);
+}
+
+// A performance by what it plays and where: "Symphony No. 5 · Album A".
+function performanceLabel(c, performance) {
+  const row = c.db
+    .prepare("SELECT r.work_id,r.label FROM realization r JOIN relation pw ON pw.id=r.performance_work_id WHERE pw.source_id=? ORDER BY r.rowid LIMIT 1")
+    .get(performance);
+  return row ? [entityLabel(c, row.work_id, "work"), row.label].filter(Boolean).join(" · ") : entityLabel(c, performance, "performance");
+}
+// The page a credit's target opens: a performance opens its recording.
+const creditTargetPage = (c, id) =>
+  c.db.prepare("SELECT source_id FROM relation WHERE kind='recording_performance' AND target_id=? ORDER BY position LIMIT 1").get(id)?.source_id || id;
+const creditTargetLabel = (c, id) => {
+  const kind = c.db.prepare("SELECT kind FROM entity WHERE id=?").get(id)?.kind;
+  return kind === "performance" ? performanceLabel(c, id) : entityLabel(c, id, kind);
+};
+const PERFORMING_ROLES = new Set(["soloist", "performer", "accompanist", "conductor", "orchestra", "ensemble", "choir"]);
+const checkRole = (entity, role) => {
+  if (!CREDIT_ROLES.includes(role) || role === "composer") fail("Choose a performing role", "role");
+  if (PERSON_ROLES.has(role) && entity.kind !== "person") fail(`An ensemble can't be credited as ${role}; choose a person or another role`, "role");
+  if (ENSEMBLE_ROLES.has(role) && entity.kind !== "ensemble") fail(`Only an ensemble can be credited as ${role}`, "role");
+};
+// The performances (recordings) a set of tracks belongs to, in album order.
+export function performancesOfTracks(c, tracks) {
+  const found = [];
+  for (const track of tracks)
+    for (const { performance } of c.db
+      .prepare(
+        `SELECT DISTINCT pw.source_id AS performance FROM segment s JOIN realization_item i ON i.segment_id=s.id
+         JOIN realization r ON r.id=i.realization_id JOIN relation pw ON pw.id=r.performance_work_id WHERE s.track_link_id=?`,
+      )
+      .all(track))
+      if (!found.includes(performance)) found.push(performance);
+  return found;
+}
+function selectedPerformances(c, token) {
+  const row = c.db.prepare("SELECT data FROM change_set WHERE id=? AND kind='selection'").get(token);
+  if (!row) fail("Those ticked tracks are no longer remembered. Tick them again.");
+  const { albumId, tracks } = JSON.parse(row.data);
+  return { albumId, tracks, performances: performancesOfTracks(c, tracks) };
+}
+
+// Set who performs the recordings of ticked album tracks.
+function performersView(c, token) {
+  const { albumId, tracks, performances } = selectedPerformances(c, token);
+  const outside = tracks.filter((track) => !performancesOfTracks(c, [track]).length).length;
+  const roleOptions = [...PERFORMING_ROLES].map((role) => ({ value: role, label: roleLabel(role) }));
+  return {
+    crumbs: [{ label: albums(c, albumId).get(albumId)?.title || "Album", selection: albumSelection(albumId, "", 0) }],
+    title: `Set performers on ${performances.length} recording${performances.length === 1 ? "" : "s"}`,
+    subtitle: `${tracks.length} selected track${tracks.length === 1 ? "" : "s"}${outside ? `; ${outside} not in a work yet` : ""}`,
+    badges: [],
+    actions: [open("Back to the album", albumSelection(albumId, "", 0))],
+    sections: [
+      {
+        type: "form",
+        id: "set-performers",
+        title: "Performer",
+        note: "Each recording is changed on its own; one that can't be is reported and the others keep the change. Credits set here are yours: later scans leave them as set.",
+        command: "set-performers",
+        arguments: { token },
+        submitLabel: `Apply to ${performances.length} recording${performances.length === 1 ? "" : "s"}`,
+        fields: [
+          { key: "contributor", label: "Person or ensemble", type: "lookup", lookup: "contributors", value: "", placeholder: "Search people and ensembles", required: true },
+          { key: "role", label: "Role", type: "select", value: "performer", options: roleOptions },
+          { key: "instrument", label: "Instrument or voice", type: "text", value: "", placeholder: "Optional" },
+          { key: "mode", label: "Their other performers", type: "select", value: "add", options: [{ value: "add", label: "Keep them" }, { value: "replace", label: "Replace them" }] },
+        ],
+      },
+      {
+        type: "rows",
+        id: "recordings",
+        title: "Recordings",
+        empty: "None of these tracks is in a work yet. Group them first.",
+        rows: performances.map((performance) => ({
+          id: performance,
+          label: performanceLabel(c, performance),
+          detail: credits(c, performance).filter((credit) => PERFORMING_ROLES.has(credit.role)).map((credit) => `${credit.name} (${roleLabel(credit.role)})`).join(", ") || "No performers yet",
+          selection: creditTargetPage(c, performance),
+        })),
+      },
+    ],
+  };
+}
+
+// Change one of a contributor's roles on every credit, after a preview.
+function rolesView(c, id) {
+  const entity = c.entity(id, ["person", "ensemble"]);
+  const label = entityLabel(c, id, entity.kind);
+  const rows = c.db.prepare("SELECT * FROM credit WHERE contributor_id=? AND state='active' ORDER BY role,target_id").all(id).filter((credit) => PERFORMING_ROLES.has(credit.role));
+  const roles = [...new Set(rows.map((credit) => credit.role))];
+  const allowed = [...PERFORMING_ROLES].filter((role) => entity.kind === "person" ? !ENSEMBLE_ROLES.has(role) : !PERSON_ROLES.has(role));
+  return {
+    crumbs: [{ label, selection: id }],
+    title: `Change ${label}'s role`,
+    subtitle: `${rows.length} performing credit${rows.length === 1 ? "" : "s"}`,
+    badges: [],
+    actions: [open("Back", id)],
+    sections: [
+      {
+        type: "form",
+        id: "change-roles",
+        title: "Change role on all credits",
+        note: "Every credit with the first role gets the second. Each credit is changed on its own; one that can't be is reported. Changed credits are yours: later scans leave them as set.",
+        command: "change-roles",
+        arguments: { target: id },
+        submitLabel: "Change roles",
+        fields: [
+          { key: "from", label: "From", type: "select", value: roles[0] || "", options: roles.map((role) => ({ value: role, label: `${roleLabel(role)} (${rows.filter((credit) => credit.role === role).length})` })) },
+          { key: "to", label: "To", type: "select", value: allowed.find((role) => role !== roles[0]) || "", options: allowed.map((role) => ({ value: role, label: roleLabel(role) })) },
+        ],
+      },
+      {
+        type: "rows",
+        id: "credits",
+        title: "Credits",
+        empty: "No performing credits.",
+        rows: rows.slice(0, 500).map((credit) => ({
+          id: credit.id,
+          label: creditTargetLabel(c, credit.target_id),
+          detail: `${roleLabel(credit.role)}${credit.instrument ? ` · ${credit.instrument}` : ""}${credit.source === "derived" ? " · from tags" : ""}`,
+          selection: creditTargetPage(c, credit.target_id),
+        })),
+      },
+    ],
+  };
+}
+
 function bulkView(c, token) {
   const works = bulkWorks(c, token);
   return {
@@ -1724,14 +1976,28 @@ function listFor(c, tab, q, extra = {}) {
     const people = entities(c, tab === "composers" ? ["person"] : ["person", "ensemble"]).filter((entity) =>
       tab === "composers" ? isComposer(c, entity) : entity.kind === "ensemble" || !isComposer(c, entity),
     );
+    // Every contributor's performing roles in one query.
+    const rolesOf = new Map();
+    if (tab === "performers")
+      for (const row of c.db.prepare("SELECT DISTINCT contributor_id,role FROM credit WHERE state='active' AND role!='composer'").iterate())
+        rolesOf.set(row.contributor_id, [...(rolesOf.get(row.contributor_id) || []), row.role]);
+    const edited = new Set(c.db.prepare("SELECT DISTINCT target_id FROM assertion WHERE source='manual'").all().map((row) => row.target_id));
     return people.map((entity) => {
       const works = tab === "composers" ? worksOf(c, entity.id).length : null;
+      const roles = (rolesOf.get(entity.id) || []).sort((a, b) => CREDIT_ROLES.indexOf(a) - CREDIT_ROLES.indexOf(b));
+      // Made from tags by a scan, and nobody has edited it since.
+      const unreviewed = entity.data.unreviewed === true && !edited.has(entity.id);
       return {
         id: entity.id,
         label: entity.label,
-        detail: tab === "composers" ? `${works} work${works === 1 ? "" : "s"}` : entity.kind === "ensemble" ? "Ensemble" : "Person",
+        detail:
+          tab === "composers"
+            ? `${works} work${works === 1 ? "" : "s"}`
+            : [entity.kind === "ensemble" ? "Ensemble" : "Person", roles.map(roleLabel).join(", ")].filter(Boolean).join(" · "),
+        ...(tab === "performers" && unreviewed && { badge: { label: "Unreviewed", tone: "warning" } }),
         selection: entity.id,
         search: entity.label,
+        facts: { kind: entity.kind, roles, unreviewed },
       };
     });
   }
@@ -1771,6 +2037,29 @@ const LIST_SELECT = {
     ],
   },
 };
+
+// Filter words in a list's search: on Performers, "role:conductor" (or any
+// credit role; "role:performer" is anyone who performs other than as
+// conductor, "role:ensemble" any ensemble) and "unreviewed" (made from tags,
+// never edited). The other words search as before.
+const PERFORMING = new Set(["soloist", "performer", "accompanist"]);
+function listFilters(tab, q) {
+  if (tab !== "performers") return { text: q, keep: () => true };
+  const tests = [];
+  const text = q
+    .split(/\s+/)
+    .filter((word) => {
+      const role = word.match(/^role:([a-z]+)$/i)?.[1]?.toLowerCase();
+      if (role === "ensemble") tests.push((facts) => facts.kind === "ensemble");
+      else if (role === "performer") tests.push((facts) => facts.roles.some((r) => PERFORMING.has(r)));
+      else if (role && CREDIT_ROLES.includes(role)) tests.push((facts) => facts.roles.includes(role));
+      else if (/^unreviewed$/i.test(word)) tests.push((facts) => facts.unreviewed);
+      else return true;
+      return false;
+    })
+    .join(" ");
+  return { text, keep: (item) => !item.facts || tests.every((test) => test(item.facts)) };
+}
 
 // The list row that stands for a selection: an album page for the album, a
 // track for its album, an entry's page for the entry.
@@ -1813,6 +2102,10 @@ export function renderV2(c, query, revision, { downloads = null, maintenance = n
       ? subject.review ? "review" : subjectRow?.kind === "work" ? "works" : subjectRow && isComposer(c, { id: subject.a, data: JSON.parse(subjectRow.data) }) ? "composers" : "performers"
       : selection.startsWith("slskd:") || selection === "maintenance" || selection.startsWith("change:")
       ? "activity"
+        : selection.startsWith("roles:")
+          ? "performers"
+        : selection.startsWith("performers:")
+          ? "albums"
         : selection.startsWith("bulk:")
           ? "works"
       : selection.startsWith("album:") || selection.startsWith("track:")
@@ -1828,7 +2121,8 @@ export function renderV2(c, query, revision, { downloads = null, maintenance = n
               : "works";
   }
   const all = listFor(c, tab, q, { downloads });
-  const filtered = q && tab !== "search" ? all.filter((item) => matchesSearch(item.search, q)) : all;
+  const { text: words, keep } = listFilters(tab, q);
+  const filtered = all.filter(keep).filter((item) => !words || tab === "search" || matchesSearch(item.search, words));
   // An empty offset (a link that opens an entry, or a reload of one) shows
   // the page of the list that holds the open entry.
   if (query.offset === "" && selection) {
@@ -1846,6 +2140,8 @@ export function renderV2(c, query, revision, { downloads = null, maintenance = n
   else if (selection.startsWith("change:")) view = changeView(c, selection.slice(7));
   else if (selection === "maintenance") view = maintenanceView(maintenance);
   else if (selection.startsWith("bulk:")) view = bulkView(c, selection.slice(5));
+  else if (selection.startsWith("performers:")) view = performersView(c, selection.slice(11));
+  else if (selection.startsWith("roles:")) view = rolesView(c, selection.slice(6));
   else if (selection.startsWith("merge:")) {
     const { a, b, review } = parseMergeSelection(selection);
     view = mergeView(c, a, b, review);
@@ -1898,8 +2194,8 @@ export function renderV2(c, query, revision, { downloads = null, maintenance = n
     ],
     tab,
     list: {
-      placeholder: { works: "Search works or composers", composers: "Search composers", performers: "Search performers", albums: "Search albums, tracks or performers", review: "Search review items", search: "Works, catalogue numbers, performers, albums…", activity: "Search merges, deletions and slskd searches" }[tab],
-      items: filtered.slice(offset, offset + PAGE).map(({ search, classical, ...item }) => item),
+      placeholder: { works: "Search works or composers", composers: "Search composers", performers: "Search performers; role:conductor, role:performer, role:ensemble, unreviewed", albums: "Search albums, tracks or performers", review: "Search review items", search: "Works, catalogue numbers, performers, albums…", activity: "Search merges, deletions and slskd searches" }[tab],
+      items: filtered.slice(offset, offset + PAGE).map(({ search, classical, facts, ...item }) => item),
       total: filtered.length,
       offset,
       empty: {
@@ -1932,6 +2228,10 @@ export function lookupV2(c, query) {
       .filter((entity) => kind === "contributors" || isComposer(c, entity))
       .filter((entity) => !q || matchesSearch(entity.label, q))
       .map((entity) => ({ value: entity.id, label: entity.label, detail: entity.kind === "ensemble" ? "Ensemble" : isComposer(c, entity) ? "Composer" : "Person" }));
+  else if (kind === "people" || kind === "ensembles")
+    options = entities(c, [kind === "people" ? "person" : "ensemble"])
+      .filter((entity) => !q || matchesSearch(entity.label, q))
+      .map((entity) => ({ value: entity.id, label: entity.label, detail: kind === "people" ? (isComposer(c, entity) ? "Composer" : "Person") : "Ensemble" }));
   else if (kind === "tracks")
     options = q
       ? ownedTracks(c)
@@ -1956,6 +2256,8 @@ export const V2_COMMANDS = {
   open: ["selection"],
   "save-entity": null,
   "set-blank": ["target", "field"],
+  "add-member": ["target", "other"],
+  "remove-member": ["target", "other"],
   "move-movement": ["work", "movement", "direction"],
   "set-movement-order": ["work", "movements", "positions", "order"],
   "delete-movement": ["work", "movement"],
@@ -1964,11 +2266,16 @@ export const V2_COMMANDS = {
   "merge-open": ["target", "into"],
   "delete-works": ["works"],
   "bulk-edit-open": ["works"],
+  "performers-open": ["albumId", "tracks", "page"],
+  "set-performers": ["token", "contributor", "role", "instrument", "mode"],
+  "change-roles": ["target", "from", "to"],
+  "map-contributor": ["target", "into"],
   "bulk-edit": ["token", "period", "form", "key", "instrumentation", "composer"],
   "bulk-unpin": ["token"],
   "undo-change": ["id"],
   "allow-work": ["id"],
   "keep-distinct": ["id"],
+  "use-contributor": ["id", "contributor"],
   "move-identity": ["id"],
   "set-classification": ["tracks", "state"],
   "choose-album-work": ["albumId", "work", "page", "move"],
@@ -1985,6 +2292,24 @@ export const V2_COMMANDS = {
   "choose-provider-value": ["id", "field", "assertion"],
   "relink-track": ["id", "candidate"],
 };
+
+// Merge two people or ensembles as one undoable change.
+function mergePeople(c, keep, drop, who) {
+  return recordChange(
+    c,
+    { kind: "merge-person", summary: `Merged “${labelOf(c, drop) || "an entry"}” into “${labelOf(c, keep) || "an entry"}”`, contributors: [keep, drop], actor: who },
+    () => mergeContributor(c, keep, drop, who),
+  );
+}
+
+// An alias for a contributor, once per spelling.
+function addAlias(c, entity, text) {
+  const spelling = String(text ?? "").trim();
+  if (!spelling) return;
+  const fold = searchText(spelling);
+  if (c.db.prepare("SELECT text FROM alias WHERE entity_id=?").all(entity).some((row) => searchText(row.text) === fold)) return;
+  c.alias(entity, spelling);
+}
 
 function createWork(c, m, who, { title, composer, movements }) {
   const work = c.createEntity("work");
@@ -2077,12 +2402,35 @@ export function applyV2(c, request, who) {
         if (JSON.stringify(next) === JSON.stringify(current)) continue;
         if ((key === "title" || key === "name") && !next) fail(`${key === "name" ? "Name" : "Title"} can't be empty. Use Mark blank to clear it on purpose.`);
         if (key === "date" && next && !validDate(next)) fail("Use a valid year, year-month or full ISO date", key);
+        // A renamed contributor keeps the old name as an alias, so tags
+        // spelled that way still land on them; every other spelling given
+        // is one too.
+        if (key === "name" && (entity.kind === "person" || entity.kind === "ensemble") && current.trim()) addAlias(c, target, current);
+        if (key === "aliases" && (entity.kind === "person" || entity.kind === "ensemble")) for (const spelling of next) addAlias(c, target, spelling);
         // Classical edits are authoritative: pin them so provider refreshes never overwrite them.
-        if (key === "name" && entity.kind === "person" && current.trim()) c.alias(target, current);
         m.manual(target, key, next, { actor: who, pin: true });
         changed++;
       }
       return { selection: target, message: changed ? `Saved ${changed} change${changed === 1 ? "" : "s"}.` : "No changes to save." };
+    }
+    case "add-member":
+    case "remove-member": {
+      // From either page: a person's or an ensemble's.
+      const target = str(v.target, "entry", { max: 200 });
+      const other = str(v.other, request.command === "add-member" ? "person or ensemble" : "member", { max: 200, field: "other" });
+      const [first, second] = [c.entity(target, ["person", "ensemble"]), c.entity(other, ["person", "ensemble"])];
+      if (first.kind === second.kind) fail(first.kind === "person" ? "Choose an ensemble" : "Choose a person", "other");
+      const [person, ensemble] = first.kind === "person" ? [target, other] : [other, target];
+      const existing = c.db.prepare("SELECT id FROM relation WHERE kind='member_of' AND source_id=? AND target_id=?").get(person, ensemble);
+      if (request.command === "add-member") {
+        if (existing) fail("Already a member", "other");
+        const position = c.db.prepare("SELECT coalesce(max(position),0)+1 AS n FROM relation WHERE kind='member_of' AND source_id=?").get(person).n;
+        c.relate("member_of", person, ensemble, { position });
+      } else {
+        if (!existing) fail("Not a member");
+        c.db.prepare("DELETE FROM relation WHERE id=?").run(existing.id);
+      }
+      return { selection: target, message: request.command === "add-member" ? "Member added." : "Member removed." };
     }
     case "set-blank": {
       const target = str(v.target, "entry", { max: 200 });
@@ -2160,10 +2508,21 @@ export function applyV2(c, request, who) {
             ? c.db.prepare("SELECT 1 FROM recording_content rc JOIN segment_content sc ON sc.content_id=rc.id WHERE rc.recording_id=? LIMIT 1").get(target)
             : null;
       if (used) fail("This entry is still in use. Merge it, or remove what uses it first.");
+      if (entity.kind === "person" || entity.kind === "ensemble") {
+        const { changeId } = recordChange(
+          c,
+          { kind: "delete-person", summary: `Deleted “${entityLabel(c, target, entity.kind)}”`, contributors: [target], actor: who },
+          () => {
+            c.db.prepare("DELETE FROM credit WHERE target_id=?").run(target);
+            c.db.prepare("DELETE FROM relation WHERE kind='member_of' AND (source_id=? OR target_id=?)").run(target, target);
+            c.db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), target);
+          },
+        );
+        return { changeId, selection: "", message: "Deleted. Undo it from Activity.", tab: "performers" };
+      }
       c.db.prepare("DELETE FROM credit WHERE target_id=?").run(target);
       c.db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), target);
-      const tab = entity.kind === "person" || entity.kind === "ensemble" ? "performers" : "works";
-      return { selection: "", message: "Deleted.", tab };
+      return { selection: "", message: "Deleted.", tab: "works" };
     }
     case "delete-works": {
       const works = Array.isArray(v.works) ? [...new Set(v.works.filter((x) => typeof x === "string"))] : [];
@@ -2214,6 +2573,83 @@ export function applyV2(c, request, who) {
       }
       return { selection: `bulk:${token}`, message: `Updated ${changed} of ${works.length} work${works.length === 1 ? "" : "s"}.${failed.length ? ` Not changed: ${failed.slice(0, 3).join("; ")}${failed.length > 3 ? ` and ${failed.length - 3} more` : ""}.` : ""}`.slice(0, 500) };
     }
+    case "performers-open": {
+      const albumId = str(v.albumId, "album", { max: 200 });
+      return { selection: `performers:${rememberAlbumTracks(c, albumId, v.tracks, who)}`, message: "" };
+    }
+    case "set-performers": {
+      const token = str(v.token, "selection", { max: 200 });
+      const { performances } = selectedPerformances(c, token);
+      if (!performances.length) fail("None of these tracks is in a work yet. Group them first.");
+      const contributor = c.entity(str(v.contributor, "person or ensemble", { max: 200, field: "contributor" }), ["person", "ensemble"]);
+      const role = str(v.role, "role", { max: 80 });
+      const instrument = str(v.instrument ?? "", "instrument", { optional: true, max: 200 }).trim() || null;
+      checkRole(contributor, role);
+      const replace = v.mode === "replace";
+      let changed = 0;
+      const failed = [];
+      // Each recording in its own savepoint: one that fails keeps the others'.
+      for (const performance of performances) {
+        try {
+          transaction(c.db, () => {
+            if (replace)
+              for (const { id } of c.db.prepare(`SELECT id FROM credit WHERE target_id=? AND state='active' AND role IN (${[...PERFORMING_ROLES].map(() => "?").join(",")})`).all(performance, ...PERFORMING_ROLES))
+                c.removeCredit(id);
+            const same = c.db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ? AND state='active'").get(performance, contributor.id, role, instrument);
+            if (!same) {
+              const position = c.db.prepare("SELECT coalesce(max(position),0)+1 AS n FROM credit WHERE target_id=?").get(performance).n;
+              c.credit(performance, contributor.id, role, { instrument, position });
+            }
+            c.audit("editor.set-performers", performance, { contributor: contributor.id, role, instrument, replace }, who);
+          });
+          changed++;
+        } catch (error) {
+          failed.push(`${performanceLabel(c, performance)}: ${error.message}`);
+        }
+      }
+      return { selection: `performers:${token}`, message: `Updated ${changed} of ${performances.length} recording${performances.length === 1 ? "" : "s"}.${failed.length ? ` Not changed: ${failed.slice(0, 3).join("; ")}${failed.length > 3 ? ` and ${failed.length - 3} more` : ""}.` : ""}`.slice(0, 500) };
+    }
+    case "map-contributor": {
+      // "This is…": a name a scan read from tags is a record the admin knows.
+      const target = str(v.target, "entry", { max: 200 });
+      const into = str(v.into, "person or ensemble", { max: 200, field: "into" });
+      if (target === into) fail("Choose a different entry", "into");
+      const drop = c.entity(target, ["person", "ensemble"]);
+      const keep = c.entity(into, ["person", "ensemble"]);
+      if (drop.kind !== keep.kind) fail(drop.kind === "person" ? "Choose a person" : "Choose an ensemble", "into");
+      const spelling = entityLabel(c, target, drop.kind);
+      const { changeId } = mergePeople(c, into, target, who);
+      c.db.prepare("UPDATE review_item SET status='resolved' WHERE target_id=? AND status='open'").run(target);
+      return { changeId, selection: into, message: `“${spelling}” is now “${entityLabel(c, into, keep.kind)}”: tags spelled that way land here. Undo it from Activity.`.slice(0, 500) };
+    }
+    case "change-roles": {
+      const target = c.entity(str(v.target, "person or ensemble", { max: 200 }), ["person", "ensemble"]);
+      const from = str(v.from, "role", { max: 80, field: "from" });
+      const to = str(v.to, "role", { max: 80, field: "to" });
+      if (from === to) fail("Choose a different role", "to");
+      checkRole(target, to);
+      const credits_ = c.db.prepare("SELECT * FROM credit WHERE contributor_id=? AND role=? AND state='active' ORDER BY target_id").all(target.id, from);
+      if (!credits_.length) fail(`No credits as ${roleLabel(from).toLowerCase()} to change`, "from");
+      let changed = 0;
+      const failed = [];
+      for (const credit of credits_) {
+        try {
+          transaction(c.db, () => {
+            const same = c.db
+              .prepare("SELECT id,state FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?")
+              .get(credit.target_id, target.id, to, credit.instrument);
+            if (same?.state === "active") throw new Error(`already credited as ${roleLabel(to).toLowerCase()}`);
+            if (same) c.db.prepare("DELETE FROM credit WHERE id=?").run(same.id);
+            c.db.prepare("UPDATE credit SET role=?,source='manual' WHERE id=?").run(to, credit.id);
+            c.audit("editor.change-roles", credit.target_id, { contributor: target.id, from, to }, who);
+          });
+          changed++;
+        } catch (error) {
+          failed.push(`${creditTargetLabel(c, credit.target_id)}: ${error.message}`);
+        }
+      }
+      return { selection: `roles:${target.id}`, message: `Changed ${changed} of ${credits_.length} credit${credits_.length === 1 ? "" : "s"} to ${roleLabel(to).toLowerCase()}.${failed.length ? ` Not changed: ${failed.slice(0, 3).join("; ")}${failed.length > 3 ? ` and ${failed.length - 3} more` : ""}.` : ""}`.slice(0, 500) };
+    }
     case "bulk-unpin": {
       const token = str(v.token, "selection", { max: 200 });
       const works = bulkWorks(c, token);
@@ -2236,15 +2672,44 @@ export function applyV2(c, request, who) {
       }
       return { selection: undone.works?.[0] && c.db.prepare("SELECT 1 FROM entity WHERE id=? AND deleted_at IS NULL").get(undone.works[0]) ? undone.works[0] : `change:${id}`, message: `Undone: ${undone.summary}.` };
     }
+    case "use-contributor": {
+      const id = str(v.id, "review item", { max: 200 });
+      const review = c.db.prepare("SELECT * FROM review_item WHERE id=? AND status='open' AND kind IN ('contributor_identity','credit_conflict')").get(id);
+      if (!review) fail("This review item is already resolved");
+      const evidence = JSON.parse(review.evidence);
+      const performance = review.target_id;
+      c.entity(performance, "performance");
+      const position = () => c.db.prepare("SELECT coalesce(max(position),0)+1 AS n FROM credit WHERE target_id=?").get(performance).n;
+      let chosen;
+      if (review.kind === "contributor_identity") {
+        chosen = str(v.contributor, "person or ensemble", { max: 200 });
+        if (!(evidence.candidates || []).includes(chosen)) fail("Choose one of the records the tag name fits");
+        c.entity(chosen, ["person", "ensemble"]);
+        if (!c.db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ? AND state='active'").get(performance, chosen, evidence.role, evidence.instrument ?? null))
+          c.credit(performance, chosen, evidence.role, { instrument: evidence.instrument ?? null, position: position() });
+      } else {
+        if (v.contributor !== "tagged") fail("Choose the tags' conductor, or keep yours");
+        chosen = contributorFor(c, contributorIndex(c), evidence.tagged, { kind: "person" });
+        if (!chosen) fail(`Several people are named “${evidence.tagged}”; credit the right one from the recording's page`);
+        for (const { id: credit } of c.db.prepare("SELECT id FROM credit WHERE target_id=? AND role='conductor' AND state='active'").all(performance)) c.removeCredit(credit);
+        c.credit(performance, chosen, "conductor", { position: position() });
+      }
+      c.db.prepare("UPDATE review_item SET status='resolved' WHERE id=?").run(id);
+      const next = nextReview(c, id);
+      return { selection: next ? `review:${next}` : "", tab: "review", message: `Credited “${labelOf(c, chosen) || "them"}” on ${performanceLabel(c, performance)}.`.slice(0, 500) };
+    }
     case "keep-distinct": {
       const id = str(v.id, "review item", { max: 200 });
       const review = c.db.prepare("SELECT * FROM review_item WHERE id=? AND status='open'").get(id);
       if (!review) fail("This review item is already resolved");
-      const keep = JSON.parse(review.evidence).keep;
-      if (typeof keep === "string")
-        c.db.prepare("INSERT INTO match_suppression VALUES (?,?,?,?,?) ON CONFLICT(key) DO NOTHING").run(distinctKey(review.target_id, keep), entityLabel(c, review.target_id, "work"), "distinct", who, Date.now());
+      const evidence = JSON.parse(review.evidence);
+      const people = review.kind === "contributor_identity";
+      for (const other of people ? evidence.others || [] : [evidence.keep])
+        if (typeof other === "string")
+          c.db.prepare("INSERT INTO match_suppression VALUES (?,?,?,?,?) ON CONFLICT(key) DO NOTHING").run(distinctKey(review.target_id, other), labelOf(c, review.target_id) || "Untitled", "distinct", who, Date.now());
       c.db.prepare("UPDATE review_item SET status='resolved' WHERE id=?").run(id);
-      return { selection: "", message: "Kept as two works; matching won't merge them or ask again." };
+      const next = nextReview(c, id);
+      return { selection: next ? `review:${next}` : "", tab: "review", message: people ? "Kept as different people; this isn't asked again." : "Kept as two works; matching won't merge them or ask again." };
     }
     case "move-identity": {
       // The admin confirms a provider match the catalogue held back: link it
@@ -2313,7 +2778,7 @@ export function applyV2(c, request, who) {
         added = merged.added || [];
       } else if (["person", "ensemble"].includes(drop.kind)) {
         if (!["person", "ensemble"].includes(keep.kind)) fail("Choose a person or ensemble");
-        mergeContributor(c, into, target, who);
+        ({ changeId } = mergePeople(c, into, target, who));
       } else fail("This kind of entry can't be merged");
       // The entry merged away has nothing left to review.
       c.db.prepare("UPDATE review_item SET status='resolved' WHERE target_id=? AND status='open'").run(target);
@@ -2325,7 +2790,7 @@ export function applyV2(c, request, who) {
       if (fromReview) {
         c.db.prepare("UPDATE review_item SET status='resolved' WHERE id=? AND status='open'").run(fromReview);
         const next = nextReview(c, fromReview);
-        return { selection: next ? `review:${next}` : "", tab: "review", message: `Merged into “${labelOf(c, into) || "the entry that stays"}”.${drop.kind === "work" ? " Undo it from Activity." : ""}`.slice(0, 500), ...(drop.kind === "work" && { changeId }) };
+        return { selection: next ? `review:${next}` : "", tab: "review", message: `Merged into “${labelOf(c, into) || "the entry that stays"}”. Undo it from Activity.`.slice(0, 500), changeId };
       }
       if (added.length) {
         // Open the kept work at its Movements, on the page of the first one
@@ -2340,7 +2805,7 @@ export function applyV2(c, request, who) {
           message: `Merged. Added ${added.length} movement${added.length === 1 ? "" : "s"} the work didn't have (${names}${added.length > 3 ? ` and ${added.length - 3} more` : ""}) at the end of Movements; use Reorder movements to put ${added.length === 1 ? "it" : "them"} in order. Undo it from Activity.`.slice(0, 500),
         };
       }
-      return { selection: into, message: drop.kind === "work" ? "Merged. Undo it from Activity." : "Merged.", ...(drop.kind === "work" && { changeId }) };
+      return { selection: into, message: "Merged. Undo it from Activity.", changeId };
     }
     case "set-classification": {
       const tracks = Array.isArray(v.tracks) ? v.tracks : [];

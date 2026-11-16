@@ -1,3 +1,132 @@
+# v0.3 Phase 2.7 — contributor reviews / issue #63
+
+## Result
+
+- `contributors.js`: `raiseReview` (skips a resolved review with the same kind, target and `evidence.key`); `contributorFor` raises its same-name review through it; `deriveCredits` raises `ambiguous-name` on the performance for a name two records hold; `conductorConflicts` (called after `deriveCredits` in `autoMatchTaggedWorks`) raises `credit_conflict` for performances with a manual conductor credit whose tracks all name another conductor.
+- `editor-v2.js`: `reviewLabel` cases; `reviewView` Decide rows (same-name pairs reuse the existing merge rows; `ambiguous-name` and `credit_conflict` rows via `contributorSummary`); `keep-distinct` writes a suppression per contributor pair and opens the next review; `use-contributor` (`id`, `contributor`: a candidate, or `tagged` for a conflict) credits the chosen record (manual; for a conflict, the old conductor credits are removed) and resolves the review. Dismiss (`resolve-review`) is remembered through the evidence key.
+
+## Verification
+
+On Node 22.23: full `npm test` 422/422; Apple corpus identical to the baseline. New editor-v2 test: two John Williamses with different IDs offer Merge… and Keep separate, which stores the pair; two ensembles each named "Orchestra A" and "Orchestra B" make the scan ask on both recordings instead of crediting; Use this record credits the chosen one (manual) and resolves it; the dismissed one stays dismissed through rescans; a manual conductor and a different tagged conductor raise a conflict whose Keep is remembered through rescans, a changed tag asks again, and Use replaces the conductor with the tags', after which rescans raise nothing. It fails on the 2.6 code.
+
+---
+
+# v0.3 Phase 2.6 — contributor undo / issue #62
+
+## Result
+
+- `history.js`: `contributorClosure`, `CHANGE_KINDS`, `recordChange(..., { contributors })` (snapshot of both records, plus their credit state after the change), `undoChange` (credit-state check; un-deletes people and ensembles named by restored credits; later merge-person/delete-person changes block as merges and deletions do), `recentChanges` lists all four kinds.
+- `editor-v2.js`: `mergePeople` wraps `mergeContributor` for `merge-entity` (people and ensembles) and `map-contributor`; `delete-entity` for a person or ensemble records `delete-person` (it also drops their memberships); Activity labels the new kinds; merge replies say "Undo it from Activity."
+- `auto-match.js` `mergeContributor`: memberships move to the kept record; one it already has is dropped.
+
+## Verification
+
+On Node 22.23: full `npm test` 421/421. New editor-v2 tests: a merge of two people (credits on a recording and a work, an alias, a membership, a MusicBrainz identity) is listed in Activity and its undo restores every row of both records exactly; after a second merge, a credit given to the kept person blocks the undo and nothing changes; deleting an unused person is undoable; deleting a work, then its composer, then undoing the work's deletion brings the composer back, credited (E11). A name mapped with This is… stays mapped through a library pass and a rescan, and its undo brings the tag-made record back with its credit. Both fail on the 2.5 code.
+
+---
+
+# v0.3 Phase 2.5 — map a name / issue #60
+
+## Result
+
+`editor-v2.js`: `contributorView` puts a `map` form first for an unreviewed contributor (data `unreviewed`, no manual assertion); `map-contributor` (`target`, `into`) requires two different records of the same kind, merges, resolves the dropped record's reviews and opens the chosen record.
+
+## Verification
+
+On Node 22.23: full `npm test` 419/419. New editor-v2 test: after matching, the tag-made "Orchestra A" offers This is… with an ensembles lookup; a hand-made record does not; mapping to a person is refused; mapping to "Fixture Philharmonic" opens it, deletes "Orchestra A", moves its credit and keeps "Orchestra A" as an alias. It fails on the 2.4 code. New `test/contributors.test.js` case: after "S. Richter" is merged into "Sviatoslav Richter", a second album tagged "S. Richter" is credited to Sviatoslav Richter and no new record is made. It guards the rule this relies on (aliases, 1.5) and also passes on the 2.4 code.
+
+---
+
+# v0.3 Phase 2.4 — bulk credits / issue #61
+
+## Result
+
+- `editor-v2.js`: commands `performers-open` (album, ticked tracks → `performers:<token>`), `set-performers` (`token`, `contributor`, `role`, `instrument`, `mode` add/replace), `change-roles` (`target`, `from`, `to`); views `performersView` and `rolesView`; helpers `performancesOfTracks`, `performanceLabel`, `creditTargetPage`, `checkRole` (performing roles only, person/ensemble rules checked before anything changes). Album select bar gains "Set performers…"; contributor pages with performing credits gain "Change role on all credits…".
+- `editor.js` `scopeIds`: `performers:<token>` covers the selection and its performances; `roles:<id>` covers the contributor and every target they are credited on.
+- A role change into a credit that already exists is reported for that credit; a removed credit under the new role gives way.
+
+## Verification
+
+On Node 22.23: full `npm test` 417/417. New editor-v2 test: ticked album tracks open a one-recording page listing its tag-made orchestra; adding a conductor keeps it; replacing with an orchestra removes it (kept `removed`); an ensemble as conductor is refused; with a database trigger blocking the recording, the result reports "Updated 0 of 1 … blocked" and the old performers stay; Change role previews two credits, and with one blocked changes the other and reports it, then changes the second on retry; an ensemble to soloist is refused; contributor rows read "Symphony No. 5 · Album …" and open the recording. It fails on the 2.3 code. `dev/editor-credits-browser.mjs` passes at 1280 and 390 px locally against core `bd41154`: ticking eight box-set tracks, Set performers… on two recordings, then Change role on all credits… from the conductor's page.
+
+---
+
+# v0.3 Phase 2.3 — contributor details / issue #58
+
+## Result
+
+`editor-v2.js`: `FIELDS.person` and `FIELDS.ensemble` (the `sortName`, `instruments` and `date` fields from schema 5); `save-entity` calls `addAlias` (one alias per folded spelling) for a renamed person or ensemble and for each saved spelling; `contributorView` adds the members section and form; `add-member`/`remove-member` in `V2_COMMANDS` and `applyV2` (the page's entity is `target`, so the revision scope covers it; the other side must be the other kind); `lookupV2` gains `people` and `ensembles`. Members list alphabetically.
+
+## Verification
+
+On Node 22.23: full `npm test` 416/416. New editor-v2 test: a person's sort name, spellings, instruments and dates save and read back; renaming keeps the old name; every alias resolves through `contributorFor`; saving spellings again adds none; an ensemble's rename keeps its old name; members added from the ensemble's page and from a person's page show on both; a repeat or same-kind add is refused; removal updates both; the `people` lookup offers people only. It fails on the 2.2 code.
+
+---
+
+# v0.3 Phase 2.2 — recording credits / issue #57
+
+## Result
+
+- `editor.js`: `update-credit` (fields `target`, `credit`, `role`, `instrument`, `back`), `back` on `add-credit` and `remove-credit`; `scopeIds` adds a recording's `recording_performance` targets.
+- `editor-v2.js`: `creditSections(c, target, { id, title, noun, edit, back })` serves the work page as before (unchanged ids) and the recording page's Performers section (`performers`, `edit-performer`, `add-performer`).
+
+## Verification
+
+On Node 22.23: full `npm test` 415/415. New editor-v2 test: after matching, a recording's page lists the orchestra read from tags; changing its role makes it manual and returns to the recording; a soloist is added with an instrument, which an empty instrument on a later change keeps; an ensemble role on a person and a change into an existing credit are refused; another recording's performance cannot be written from this page; a library pass and a rescan keep everything as set; removing a credit updates the page. It fails on the 2.1 code.
+
+---
+
+# v0.3 Phase 2.1 — performer list filters / issue #56
+
+## Result
+
+`editor-v2.js`: `listFor` reads every contributor's active non-composer roles and every manually edited entity in one query each, and returns `facts` per row (kind, roles, unreviewed), stripped before the list is sent; `listFilters` turns `role:…` and `unreviewed` words into tests and leaves the other words to the existing search. An unknown role is an ordinary search word.
+
+## Verification
+
+On Node 22.23: full `npm test` 414/414. New editor-v2 test: four contributors (three unreviewed, one edited by hand) show their roles and badges; `role:conductor`, `role:performer`, `role:ensemble`, `unreviewed` and combinations with words and each other return the expected rows; the placeholder names the filters. It fails on the 1.7 code. `dev/editor-list-places-browser.mjs` (core's renderer, synthetic data) passes at 1280 and 390 px against core `bd41154` locally.
+
+---
+
+# v0.3 Phase 1.7 — search index / issue #59
+
+## Result
+
+`engine.js`: `FACETS` gains `role`; `creditFacets` adds `role` and credit `instrument` facets to recording and performer documents; `recordingGroupFacets` keeps tag-name performer values only while no release in the group has credits; documents carry `sort` (`sort_title`, `sort_key`, `sort_date`), written to the schema-5 columns; `ownedRecordings` returns each credit's instrument; `catalogueStamp` is `v3`. A credit's role or instrument changed through the editor rebuilds the index through the editor's audit row (part of the stamp); a raw database update would not, so the test changes the instrument through the catalogue API.
+
+## Verification
+
+On Node 22.23: full `npm test` 413/413; Apple corpus identical to the baseline. Extended `combined searches, role-aware filters…` (`test/search.test.js`): the role facet offers conductor, orchestra and soloist for "barenboim"; the role filter finds the two conducted recordings; a soloist credit with an instrument makes the instrument filter find exactly that recording; no `name:` performer values remain; the Moonlight sonata's stored sort title and key (`op:000027:000002`); the stamp starts `v3|`. It fails on the 1.6 code. Existing search assertions pass unchanged.
+
+---
+
+# v0.3 Phase 1.6 — reissue links / issue #54
+
+## Result
+
+- `reissues.js`: `linkReissues(c, { albumId })` for the works on the album (or every work in the library pass), `unlinkReissue`, `relinkReissue`. Links are stored source < target with distinct positions (the relation table's unique keys).
+- `engine.js`: `reissueState(c)` returns stored links and the latest admin decisions (from `audit_event`, as `unassignedByAdmin` reads album decisions); `groupRecordings(recordings, state)` applies them before the rule; `ownedRecordings` returns each recording's `performanceId`; `classicalTracks` and `resolvedValues` are exported for `linkReissues`. The search index stamp already counts relations, so a link or unlink rebuilds it.
+- `presentation.js` `recordingsOf` passes the state.
+
+## Verification
+
+On Node 22.23: full `npm test` 413/413; Apple corpus identical to the baseline. Extended `the work page lists one entry per recording` (`test/search.test.js`): Levit's two releases are stored as one link; with the box set retagged to a different recording ID they stay one entry; after an admin's unlink they are two, a full library pass with the original tags adds no link back and search lists them as two recordings; relinking makes them one again. It fails on the 1.5 code (the module does not exist there).
+
+---
+
+# v0.3 Phase 1.5 — contributor identity / issue #55
+
+## Result
+
+- `auto-match.js` `composerPeople` indexes every person (name, `aliases` field, `alias` table); `canonicalComposers`, `composerEntity` and the ambiguous-composer check therefore see performers too. `mergeDuplicateComposers` filters to composers (`isComposer`), so performers of one name are never merged automatically.
+- `contributors.js`: `artistIds` aligns `artistMbids` with the artist tag's names only on equal counts; `deriveCredits` keeps an ID only when every track gives the same one; `contributorFor` follows the identity rule above and opens `contributor_identity` for a new record whose name another record holds. A name two records share without an ID still gets no credit (2.7 adds its review).
+
+## Verification
+
+On Node 22.23: full `npm test` 413/413; Apple corpus identical to the baseline (612/612). New `identity: …` test in `test/contributors.test.js`: Rachmaninoff matched first as the pianist on a Chopin album, then as the composer, is one person with both roles; two "John Williams" albums with different IDs make two records, the second with one open review; "Johnny Williams" with the second ID is credited to that record; one ID for two names is not used. It fails on base `ea1eb8d`.
+
+---
+
 # v0.3 Phase 1.4 — derived performer credits / issue #52
 
 ## Result

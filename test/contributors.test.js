@@ -197,3 +197,68 @@ test("accompanist is a role for a person, not an ensemble", async (t) => {
   assert.ok(c.credit(work, pianist, "accompanist"));
   assert.throws(() => c.credit(work, quartet, "accompanist"), /Invalid role/);
 });
+
+test("identity: composer and performer of one name are one person; an artist ID wins; another ID is someone else", async (t) => {
+  const chopin = ["I. Grave – Doppio movimento", "II. Scherzo", "III. Marche funèbre", "IV. Finale"].map((m) => ({
+    title: `Piano Sonata No. 2 in B-flat minor, Op. 35: ${m}`,
+    composer: ["Frédéric Chopin"],
+  }));
+  const rachmaninoff = ["I. Moderato", "II. Adagio sostenuto", "III. Allegro scherzando"].map((m) => ({
+    title: `Piano Concerto No. 2 in C minor, Op. 18: ${m}`,
+    composer: ["Sergei Rachmaninoff"],
+  }));
+  const c = await catalogueWith(t, [
+    // Rachmaninoff plays Chopin before any of his own works is matched.
+    { id: "plays", artist: "Sergei Rachmaninoff", titles: chopin },
+    { id: "own", artist: "Philadelphia Orchestra", titles: rachmaninoff },
+    // Two John Williamses (the guitarist and the composer), each album
+    // tagged with its artist's own ID.
+    { id: "jw1", artist: "John Williams", titles: fifth, hints: { artistMbids: ["jw-guitar"] } },
+    { id: "jw2", artist: "John Williams", titles: fifth, hints: { artistMbids: ["jw-composer"] } },
+    { id: "jw3", artist: "Johnny Williams", titles: fifth, hints: { artistMbids: ["jw-composer"] } },
+    // Two names, one ID: whose it is is a guess, so none is used.
+    { id: "pair", artist: "Martha Argerich; Nelson Freire", titles: fifth, hints: { artistMbids: ["only-one"] } },
+  ]);
+  for (const album of ["plays", "own", "jw1", "jw2", "jw3", "pair"]) match(c, album);
+  const people = (name) => contributorIndex(c).person.get(name) || [];
+  // One Rachmaninoff, credited as the pianist and as the composer.
+  assert.equal(people("sergei rachmaninoff").length, 1);
+  assert.deepEqual(
+    c.db.prepare("SELECT DISTINCT role FROM credit WHERE contributor_id=? AND state='active' ORDER BY role").all(people("sergei rachmaninoff")[0]).map((row) => row.role),
+    ["composer", "performer"],
+  );
+  // Two John Williamses: the first gained its ID, the second is a new record
+  // an admin is asked about; "Johnny Williams" carries the second's ID.
+  const williams = people("john williams");
+  assert.equal(williams.length, 2);
+  const idOf = (id) => c.db.prepare("SELECT record_id FROM external_identity WHERE entity_id=? AND record_kind='artist'").get(id)?.record_id;
+  assert.deepEqual(williams.map(idOf), ["jw-guitar", "jw-composer"]);
+  assert.equal(credits(c, "jw3")[0].name, "John Williams");
+  assert.deepEqual(
+    c.db.prepare("SELECT target_id,json_extract(evidence,'$.reason') AS reason FROM review_item WHERE kind='contributor_identity' AND status='open'").all().map((row) => [row.target_id, row.reason]),
+    [[williams[1], "same-name-different-id"]],
+  );
+  assert.deepEqual(people("martha argerich").map(idOf), [undefined]);
+  assert.deepEqual(people("nelson freire").map(idOf), [undefined]);
+});
+
+test("a name mapped to a known contributor: later albums with that spelling land on them", async (t) => {
+  const { mergeContributor } = await import("../src/model/auto-match.js");
+  const c = await catalogueWith(t, [
+    { id: "first", artist: "S. Richter", titles: fifth },
+    { id: "second", artist: "S. Richter", titles: fifth.map((track) => ({ ...track, title: track.title.replace("Symphony No. 5", "Symphony No.5") })) },
+  ]);
+  const metadata = new Metadata(c);
+  const richter = c.createEntity("person");
+  metadata.manual(richter, "name", "Sviatoslav Richter", { actor: "admin" });
+  match(c, "first");
+  const [derived] = credits(c, "first");
+  assert.equal(derived.name, "S. Richter");
+  const spelled = c.db.prepare("SELECT contributor_id AS id FROM credit WHERE id=?").get(derived.id).id;
+  // What the editor's "This is…" does.
+  mergeContributor(c, richter, spelled, "admin");
+  match(c, "second");
+  const landed = c.db.prepare("SELECT DISTINCT contributor_id AS id FROM credit WHERE state='active' AND role='performer'").all().map((row) => row.id);
+  assert.deepEqual(landed, [richter]);
+  assert.deepEqual(contributorIndex(c).person.get("s richter"), [richter]);
+});

@@ -44,17 +44,27 @@ function ensembleRole(name) {
   return "ensemble";
 }
 
-// The credits one track's tags name: { name, kind, role, instrument }.
+// MusicBrainz artist IDs belong to names only when the artist tag lists as
+// many names as there are IDs, in the same order (as MusicBrainz taggers
+// write them). Otherwise which ID is whose is a guess, and none is used.
+function artistIds(hints) {
+  const ids = list(hints.artistMbids);
+  const names = (text(hints.artist) || text(hints.albumArtist)).split(/\s+[—–]\s+|\s*;\s*/).map((name) => name.trim()).filter(Boolean).flatMap(splitList);
+  return ids.length && ids.length === names.length ? new Map(names.map((name, i) => [words(name), ids[i]])) : new Map();
+}
+
+// The credits one track's tags name: { name, kind, role, instrument, mbid }.
 // PERFORMER tags ("Martha Argerich (piano)") name players and instruments;
 // without them the artist tag does. A conductor tag names the conductor.
 export function trackCredits(hints = {}) {
   const conductor = text(hints.conductor);
+  const ids = artistIds(hints);
   const credits = [];
   const add = (name, instrument = null) => {
     const clean = name.trim();
     if (!clean || words(clean) === words(conductor) || credits.some((credit) => words(credit.name) === words(clean))) return;
     const kind = isEnsemble(clean) ? "ensemble" : "person";
-    credits.push({ name: clean, kind, role: kind === "ensemble" ? ensembleRole(clean) : "performer", instrument });
+    credits.push({ name: clean, kind, role: kind === "ensemble" ? ensembleRole(clean) : "performer", instrument, mbid: ids.get(words(clean)) || null });
   };
   const tagged = list(hints.performers);
   if (tagged.length)
@@ -63,7 +73,7 @@ export function trackCredits(hints = {}) {
       add(name, instrument?.trim() || null);
     }
   else for (const name of performerNames(hints)) for (const piece of splitList(name)) add(piece);
-  if (conductor && !isEnsemble(conductor)) credits.unshift({ name: conductor, kind: "person", role: "conductor", instrument: null });
+  if (conductor && !isEnsemble(conductor)) credits.unshift({ name: conductor, kind: "person", role: "conductor", instrument: null, mbid: ids.get(words(conductor)) || null });
   return credits;
 }
 
@@ -81,13 +91,34 @@ export function contributorIndex(c) {
   return byName;
 }
 
-// The one record for a name: the holder of its MusicBrainz artist ID, else
-// the one contributor of that kind with this exact name or alias, else a new,
-// unreviewed one. A name two records share is ambiguous: null, so nothing is
-// credited to either until an admin tells them apart.
+// A review an admin dismissed or decided is not raised again for the same
+// target and evidence (`evidence.key`): new evidence asks again (E3's rule).
+export function raiseReview(c, kind, target, evidence) {
+  const settled = c.db
+    .prepare("SELECT 1 FROM review_item WHERE kind=? AND target_id=? AND status='resolved' AND json_extract(evidence,'$.key')=? LIMIT 1")
+    .get(kind, target, evidence.key);
+  if (settled) return false;
+  c.review(kind, target, evidence);
+  return true;
+}
+
+const artistIdOf = (c, id) =>
+  c.db.prepare("SELECT record_id FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='artist' AND state='active'").get(id)?.record_id || null;
+
+// The one record for a name. Exact folded names and aliases only, never a
+// fuzzy match:
+//   - the holder of the MusicBrainz artist ID, whatever its name;
+//   - with an ID, the one same-named record holding no ID gains it; a
+//     same-named record holding another ID is someone else, so a new record
+//     is made and a contributor_identity review asks an admin;
+//   - without an ID, the one record of that kind with this name or alias;
+//   - a name two records share, with nothing to tell them apart, is
+//     ambiguous: null, so nothing is credited to either;
+//   - otherwise a new, unreviewed record.
 export function contributorFor(c, index, name, { mbid = null, kind = "person", metadata = new Metadata(c) } = {}) {
   const key = words(name);
   if (!key) return null;
+  const existing = index[kind].get(key) || [];
   if (mbid) {
     const known = c.db
       .prepare(
@@ -96,20 +127,18 @@ export function contributorFor(c, index, name, { mbid = null, kind = "person", m
       )
       .get(mbid, kind)?.entity_id;
     if (known) return known;
-  }
-  const existing = index[kind].get(key) || [];
-  if (existing.length > 1) return null;
-  if (existing.length === 1) {
-    // Another ID on the same name is someone else.
-    const other = mbid && c.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='artist' AND state='active'").get(existing[0]);
-    if (!other) {
-      if (mbid) c.externalIdentity(existing[0], "musicbrainz", "artist", mbid, { evidence: { source: "tags" } });
-      return existing[0];
+    const unidentified = existing.filter((id) => !artistIdOf(c, id));
+    if (unidentified.length === 1) {
+      c.externalIdentity(unidentified[0], "musicbrainz", "artist", mbid, { evidence: { source: "tags" } });
+      return unidentified[0];
     }
-  }
+  } else if (existing.length > 1) return null;
+  else if (existing.length === 1) return existing[0];
   const id = c.createEntity(kind, { unreviewed: true });
   metadata.derived(id, "name", name);
   if (mbid) c.externalIdentity(id, "musicbrainz", "artist", mbid, { evidence: { source: "tags" } });
+  if (existing.length)
+    raiseReview(c, "contributor_identity", id, { reason: "same-name-different-id", name, mbid, others: existing, key: `${words(name)}|${mbid}` });
   index[kind].set(key, [...existing, id]);
   return id;
 }
@@ -145,17 +174,66 @@ export function deriveCredits(c, { albumId = null } = {}) {
     const perTrack = tracksOf.all(performance).map((row) => trackCredits(JSON.parse(row.evidence).hints || {}));
     if (!perTrack.length) continue;
     const signature = (credit) => `${credit.role}|${credit.kind}|${words(credit.name)}|${credit.instrument || ""}`;
-    const shared = perTrack[0].filter((credit) => perTrack.every((credits) => credits.some((other) => signature(other) === signature(credit))));
+    // An ID counts only when every track gives the same one.
+    const shared = perTrack[0]
+      .filter((credit) => perTrack.every((credits) => credits.some((other) => signature(other) === signature(credit))))
+      .map((credit) => {
+        const ids = new Set(perTrack.map((credits) => credits.find((other) => signature(other) === signature(credit)).mbid));
+        return { ...credit, mbid: ids.size === 1 ? [...ids][0] : null };
+      });
     if (!shared.length) continue;
     index ??= contributorIndex(c);
     metadata ??= new Metadata(c);
     let position = c.db.prepare("SELECT coalesce(max(position),0) AS n FROM credit WHERE target_id=?").get(performance).n;
     for (const credit of shared) {
-      const contributor = contributorFor(c, index, credit.name, { kind: credit.kind, metadata });
-      if (!contributor) continue;
+      const contributor = contributorFor(c, index, credit.name, { kind: credit.kind, mbid: credit.mbid, metadata });
+      if (!contributor) {
+        // The name fits two records: an admin says which one plays.
+        const candidates = index[credit.kind].get(words(credit.name)) || [];
+        if (candidates.length > 1)
+          raiseReview(c, "contributor_identity", performance, {
+            reason: "ambiguous-name",
+            name: credit.name,
+            kind: credit.kind,
+            role: credit.role,
+            instrument: credit.instrument,
+            candidates,
+            key: `ambiguous|${words(credit.name)}|${credit.role}`,
+          });
+        continue;
+      }
       c.credit(performance, contributor, credit.role, { instrument: credit.instrument, position: ++position, source: "derived" });
       added++;
     }
   }
   return added;
+}
+
+// A conductor an admin credited by hand, and tags that now name someone
+// else: the admin decides. Derivation never touches their credit.
+export function conductorConflicts(c, { albumId = null } = {}) {
+  const rows = c.db
+    .prepare(
+      `SELECT DISTINCT k.target_id AS performance FROM credit k
+       JOIN relation pw ON pw.source_id=k.target_id AND pw.kind='performance_work' JOIN realization r ON r.performance_work_id=pw.id
+       JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id AND t.state='active'
+       WHERE k.role='conductor' AND k.source='manual' AND k.state='active'
+       ${albumId == null ? "" : "AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?"}`,
+    )
+    .all(...(albumId == null ? [] : [String(albumId)]));
+  const tracksOf = c.db.prepare(
+    `SELECT DISTINCT t.evidence FROM relation pw JOIN realization r ON r.performance_work_id=pw.id JOIN realization_item i ON i.realization_id=r.id
+     JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id AND t.state='active' WHERE pw.kind='performance_work' AND pw.source_id=?`,
+  );
+  let raised = 0;
+  for (const { performance } of rows) {
+    const tagged = [...new Set(tracksOf.all(performance).map((row) => text(JSON.parse(row.evidence).hints?.conductor)))];
+    // Only when every track names the same conductor.
+    if (tagged.length !== 1 || !tagged[0]) continue;
+    const credited = c.db.prepare("SELECT contributor_id AS id FROM credit WHERE target_id=? AND role='conductor' AND state='active' ORDER BY id").all(performance).map((row) => row.id);
+    const names = credited.flatMap((id) => [resolvedName(c, id, "name"), ...c.db.prepare("SELECT text FROM alias WHERE entity_id=?").all(id).map((row) => row.text)]).map((name) => words(String(name ?? "")));
+    if (names.includes(words(tagged[0]))) continue;
+    if (raiseReview(c, "credit_conflict", performance, { reason: "conductor", role: "conductor", tagged: tagged[0], credited, key: `conductor|${words(tagged[0])}|${credited.join(",")}` })) raised++;
+  }
+  return raised;
 }

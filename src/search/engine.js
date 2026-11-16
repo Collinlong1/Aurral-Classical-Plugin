@@ -23,6 +23,7 @@ export const FACETS = [
   ["performer", "Performer"],
   ["conductor", "Conductor"],
   ["ensemble", "Ensemble"],
+  ["role", "Role"],
   ["period", "Period"],
   ["form", "Form"],
   ["instrument", "Instrument"],
@@ -33,7 +34,7 @@ export const FACETS = [
 const FACET_KEYS = new Set(FACETS.map(([key]) => key));
 const PERFORMER_ROLES = PERFORMING_ROLES;
 const ENSEMBLE_ROLES = new Set(["orchestra", "ensemble", "choir"]);
-const ROLE_LABEL = { soloist: "Soloist", performer: "Performer", conductor: "Conductor", orchestra: "Orchestra", ensemble: "Ensemble", choir: "Choir", composer: "Composer", arranger: "Arranger", lyricist: "Lyricist" };
+const ROLE_LABEL = { soloist: "Soloist", performer: "Performer", accompanist: "Accompanist", conductor: "Conductor", orchestra: "Orchestra", ensemble: "Ensemble", choir: "Choir", composer: "Composer", arranger: "Arranger", lyricist: "Lyricist" };
 const LIVE = /\b(live|concert|recital|broadcast|in concert|konzert)\b/i;
 
 const text = (value) => (typeof value === "string" ? value.trim() : Array.isArray(value) ? value.filter((v) => typeof v === "string").join("; ") : "");
@@ -61,11 +62,12 @@ export function catalogueStamp(c) {
         (SELECT count(*)||':'||coalesce(max(rowid),0) FROM relation) AS i`,
     )
     .get();
-  return `v2|${Object.values(row).join("|")}`;
+  // v3: contributor roles, credit instruments and sort keys.
+  return `v3|${Object.values(row).join("|")}`;
 }
 
 // Every resolved display value, read once.
-function resolvedValues(c) {
+export function resolvedValues(c) {
   const values = new Map();
   for (const row of c.db
     .prepare(
@@ -79,7 +81,7 @@ function resolvedValues(c) {
   return values;
 }
 
-function classicalTracks(c) {
+export function classicalTracks(c) {
   const tracks = new Map();
   for (const row of c.db
     .prepare(
@@ -104,28 +106,29 @@ const yearOf = (value) => {
 export function ownedRecordings(c, tracks = classicalTracks(c), values = resolvedValues(c), { workId = null } = {}) {
   const rows = c.db
     .prepare(
-      `SELECT r.id AS realization,r.work_id,r.performance_work_id,r.label,i.movement_id,i.sequence,s.track_link_id,s.start_ms,s.end_ms
-       FROM realization r JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
+      `SELECT r.id AS realization,r.work_id,r.performance_work_id,pw.source_id AS performance_id,r.label,i.movement_id,i.sequence,s.track_link_id,s.start_ms,s.end_ms
+       FROM realization r JOIN relation pw ON pw.id=r.performance_work_id
+       JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
        JOIN entity w ON w.id=r.work_id AND w.deleted_at IS NULL
        ${workId ? "WHERE r.work_id=?" : ""}
        ORDER BY r.id,i.sequence,i.occurrence,i.id`,
     )
     .all(...(workId ? [workId] : []));
   const credits = c.db.prepare(
-    `SELECT k.role,k.contributor_id FROM relation pw JOIN credit k ON k.target_id=pw.source_id
+    `SELECT k.role,k.instrument,k.contributor_id FROM relation pw JOIN credit k ON k.target_id=pw.source_id
      JOIN entity e ON e.id=k.contributor_id AND e.deleted_at IS NULL WHERE pw.id=? AND k.state='active' ORDER BY k.position,k.id`,
   );
   const byRealization = new Map();
   for (const row of rows) {
     const track = tracks.get(row.track_link_id);
     if (!track) continue;
-    if (!byRealization.has(row.realization)) byRealization.set(row.realization, { id: row.realization, workId: row.work_id, performanceWorkId: row.performance_work_id, label: row.label, items: [] });
+    if (!byRealization.has(row.realization)) byRealization.set(row.realization, { id: row.realization, workId: row.work_id, performanceWorkId: row.performance_work_id, performanceId: row.performance_id, label: row.label, items: [] });
     byRealization.get(row.realization).items.push({ movementId: row.movement_id, sequence: row.sequence, track, startMs: row.start_ms, endMs: row.end_ms });
   }
   const recordings = [];
   for (const recording of byRealization.values()) {
     const first = recording.items[0].track;
-    const people = credits.all(recording.performanceWorkId).map((row) => ({ id: row.contributor_id, role: row.role, name: text(values.get(row.contributor_id)?.name) || "Unknown" }));
+    const people = credits.all(recording.performanceWorkId).map((row) => ({ id: row.contributor_id, role: row.role, instrument: row.instrument, name: text(values.get(row.contributor_id)?.name) || "Unknown" }));
     const performers = people.filter((p) => PERFORMER_ROLES.has(p.role));
     // Without credits, the track's own artist names who plays.
     const tagged = performers.length ? [] : performerNames(first.hints, list(first.hints.composer), fold);
@@ -184,11 +187,36 @@ export function sameRecording(a, b) {
   return a.trackMs.length === b.trackMs.length && a.trackMs.every((ms, i) => Math.abs(ms - b.trackMs[i]) <= 2000);
 }
 
-// Realizations grouped into recordings: [{ key, realizations: [...] }].
-export function groupRecordings(recordings) {
+const performancePair = (a, b) => (a < b ? `${a}|${b}` : `${b}|${a}`);
+// Stored reissue decisions: { linked, unlinked } sets of performance pairs.
+// Matching links what the rule joins (`same_recording`); an admin's latest
+// link or unlink of a pair holds.
+export function reissueState(c) {
+  const linked = new Set(c.db.prepare("SELECT source_id,target_id FROM relation WHERE kind='same_recording'").all().map((row) => performancePair(row.source_id, row.target_id)));
+  const unlinked = new Set();
+  for (const row of c.db.prepare("SELECT action,data FROM audit_event WHERE action IN ('reissue.link','reissue.unlink') ORDER BY id").iterate()) {
+    const { a, b } = JSON.parse(row.data);
+    if (row.action === "reissue.unlink") unlinked.add(performancePair(a, b));
+    else unlinked.delete(performancePair(a, b));
+  }
+  return { linked, unlinked };
+}
+
+// Realizations grouped into recordings: [{ key, realizations: [...] }]. With
+// the stored `state`, a link joins and an admin's unlink keeps apart; the
+// rule decides only pairs with neither.
+export function groupRecordings(recordings, state = null) {
+  const same = (a, b) => {
+    if (state && a.performanceId && b.performanceId && a.performanceId !== b.performanceId) {
+      const key = performancePair(a.performanceId, b.performanceId);
+      if (state.linked.has(key)) return true;
+      if (state.unlinked.has(key)) return false;
+    }
+    return sameRecording(a, b);
+  };
   const groups = [];
   for (const recording of recordings) {
-    const group = groups.find((g) => g.realizations.some((other) => sameRecording(recording, other)));
+    const group = groups.find((g) => g.realizations.some((other) => same(recording, other)));
     if (group) group.realizations.push(recording);
     else groups.push({ key: recording.id, realizations: [recording] });
   }
@@ -213,13 +241,14 @@ export function ensureSearchIndex(c, { force = false } = {}) {
   const docs = buildDocuments(c);
   transaction(c.db, () => {
     for (const table of ["search_term", "search_key", "search_facet", "search_doc"]) c.db.exec(`DELETE FROM ${table}`);
-    const insertDoc = c.db.prepare("INSERT INTO search_doc(id,kind,ref,work_id,title,subtitle,detail,owned,boost,data) VALUES (?,?,?,?,?,?,?,?,?,?)");
+    const insertDoc = c.db.prepare("INSERT INTO search_doc(id,kind,ref,work_id,title,subtitle,detail,owned,boost,data,sort_title,sort_key,sort_date) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)");
     const insertTerm = c.db.prepare("INSERT OR IGNORE INTO search_term VALUES (?,?,?)");
     const insertKey = c.db.prepare("INSERT OR IGNORE INTO search_key VALUES (?,?)");
     const insertFacet = c.db.prepare("INSERT OR IGNORE INTO search_facet VALUES (?,?,?,?)");
     docs.forEach((doc, index) => {
       const id = index + 1;
-      insertDoc.run(id, doc.kind, doc.ref, doc.workId ?? null, doc.title.slice(0, 500), doc.subtitle.slice(0, 500), doc.detail.slice(0, 500), doc.owned ? 1 : 0, doc.boost || 0, JSON.stringify(doc.data || {}));
+      const sort = doc.sort || {};
+      insertDoc.run(id, doc.kind, doc.ref, doc.workId ?? null, doc.title.slice(0, 500), doc.subtitle.slice(0, 500), doc.detail.slice(0, 500), doc.owned ? 1 : 0, doc.boost || 0, JSON.stringify(doc.data || {}), String(sort.title || "").slice(0, 200), String(sort.key || "").slice(0, 200), String(sort.date || "").slice(0, 20));
       const terms = new Set();
       for (const value of doc.primary) addTerms(terms, id, value, FIELD.primary);
       for (const value of doc.secondary) addTerms(terms, id, value, FIELD.secondary);
@@ -244,10 +273,10 @@ export function buildDocuments(c) {
   const entities = c.db.prepare("SELECT id,kind FROM entity WHERE deleted_at IS NULL AND kind IN ('work','movement','person','ensemble','collection')").all();
   const kindOf = new Map(entities.map((e) => [e.id, e.kind]));
   const creditsOf = new Map();
-  for (const row of c.db.prepare("SELECT target_id,contributor_id,role FROM credit WHERE state='active' ORDER BY position,id").iterate()) {
+  for (const row of c.db.prepare("SELECT target_id,contributor_id,role,instrument FROM credit WHERE state='active' ORDER BY position,id").iterate()) {
     if (!kindOf.has(row.contributor_id)) continue;
     if (!creditsOf.has(row.target_id)) creditsOf.set(row.target_id, []);
-    creditsOf.get(row.target_id).push({ id: row.contributor_id, role: row.role });
+    creditsOf.get(row.target_id).push({ id: row.contributor_id, role: row.role, instrument: row.instrument });
   }
   const movementsOf = new Map();
   const workOfMovement = new Map();
@@ -263,7 +292,7 @@ export function buildDocuments(c) {
     collectionsOf.get(row.target_id).push(row.source_id);
   }
   const recordings = ownedRecordings(c, tracks, values);
-  const groups = groupRecordings(recordings);
+  const groups = groupRecordings(recordings, reissueState(c));
   const recordingsOf = new Map();
   for (const group of groups) {
     const workId = group.realizations[0].workId;
@@ -304,6 +333,7 @@ export function buildDocuments(c) {
       keys: workKeys.set(id, keysOf(title, list(v.catalogue), list(v.aliases), text(v.nickname))).get(id),
       facets: [...facets, ...dedupeFacets(recordingFacets.filter(([facet]) => facet !== "year" && facet !== "type")), ["owned", owned ? "owned" : "missing", owned ? "In your library" : "Not in your library"]],
       data: { nickname: text(v.nickname) },
+      sort: { title: sortTitle(v, title), key: sortKey(workKeys.get(id)), date: sortDate(v.date) },
     });
   }
 
@@ -329,6 +359,7 @@ export function buildDocuments(c) {
         keys: keysOf(title),
         facets: [...(workFacets.get(workId) || []), ["owned", owned ? "owned" : "missing", owned ? "In your library" : "Not in your library"]],
         data: { position: index + 1 },
+        sort: { title: fold(movementTitle), key: String(index + 1).padStart(6, "0"), date: "" },
       });
     });
   }
@@ -354,7 +385,8 @@ export function buildDocuments(c) {
       primary: [...lead.performerNames, ...lead.people.flatMap((p) => list(values.get(p.id)?.aliases))],
       secondary: [title, text(work.nickname), ...list(work.aliases), ...composers, ...albums],
       keys: keysOf(title, list(work.catalogue), list(work.aliases)),
-      facets: [...(workFacets.get(lead.workId) || []), ...recordingGroupFacets(group, name), ["type", complete ? "complete" : "partial", complete ? "Complete work" : "Excerpt or incomplete"], ["owned", "owned", "In your library"]],
+      facets: [...(workFacets.get(lead.workId) || []), ...recordingGroupFacets(group, name), ...creditFacets(group.realizations.flatMap((r) => r.people)), ["type", complete ? "complete" : "partial", complete ? "Complete work" : "Excerpt or incomplete"], ["owned", "owned", "In your library"]],
+      sort: { title: fold(title), key: sortKey(workKeys.get(lead.workId)), date: years.length ? String(Math.min(...years)) : "" },
       data: {
         realizations: group.realizations.map((r) => r.id),
         albums: [...new Set(group.realizations.flatMap((r) => r.albums))],
@@ -367,9 +399,10 @@ export function buildDocuments(c) {
   const roles = new Map();
   for (const [target, list_] of creditsOf)
     for (const k of list_) {
-      if (!roles.has(k.id)) roles.set(k.id, { roles: new Set(), works: 0, recordings: 0 });
+      if (!roles.has(k.id)) roles.set(k.id, { roles: new Set(), credits: [], works: 0, recordings: 0 });
       const entry = roles.get(k.id);
       entry.roles.add(k.role);
+      entry.credits.push(k);
       if (kindOf.get(target) === "work") entry.works++;
       else entry.recordings++;
     }
@@ -386,7 +419,8 @@ export function buildDocuments(c) {
       if (role === "conductor") facets.push(["conductor", id, display]);
       if (ENSEMBLE_ROLES.has(role)) facets.push(["ensemble", id, display]);
     }
-    const common = { ref: id, title: display, owned: true, primary: [display, ...list(v.aliases)], secondary: [], keys: [], facets: dedupeFacets(facets) };
+    if (performerRoles.length) facets.push(...creditFacets(entry.credits.filter((k) => PERFORMER_ROLES.has(k.role))));
+    const common = { ref: id, title: display, owned: true, primary: [display, ...list(v.aliases)], secondary: [], keys: [], facets: dedupeFacets(facets), sort: { title: sortTitle(v, display), key: "", date: sortDate(v.date) } };
     const label = [...entry.roles].map((role) => ROLE_LABEL[role] || role).join(" · ");
     if (isComposer) docs.push({ ...common, kind: "composer", subtitle: "Composer", detail: `${entry.works} work${entry.works === 1 ? "" : "s"}`, boost: KIND_BOOST.composer, data: { roles: [...entry.roles] } });
     if (performerRoles.length) docs.push({ ...common, kind: "performer", subtitle: label, detail: "", boost: KIND_BOOST.performer, data: { roles: performerRoles } });
@@ -415,6 +449,7 @@ export function buildDocuments(c) {
       keys: [...new Set([...keysOf(album.title), ...works.flatMap((w) => workKeys.get(w) || [])])],
       facets: dedupeFacets([...works.flatMap((w) => workFacets.get(w) || []), ...(album.year ? [["year", String(album.year), String(album.year)]] : []), ["owned", "owned", "In your library"]]),
       data: { works },
+      sort: { title: fold(album.title), key: "", date: album.year ? String(album.year) : "" },
     });
   }
   return docs;
@@ -422,18 +457,39 @@ export function buildDocuments(c) {
 
 function recordingGroupFacets(group, name) {
   const facets = [];
+  // Tag names stand in for performers only while no release has credits.
+  const credited = group.realizations.some((recording) => recording.people.length);
   for (const recording of group.realizations) {
     for (const person of recording.people) {
       facets.push(["performer", person.id, person.name || name(person.id)]);
       if (person.role === "conductor") facets.push(["conductor", person.id, person.name]);
       if (ENSEMBLE_ROLES.has(person.role)) facets.push(["ensemble", person.id, person.name]);
     }
-    for (const performer of recording.taggedPerformers) facets.push(["performer", `name:${fold(performer)}`, performer]);
+    if (!credited) for (const performer of recording.taggedPerformers) facets.push(["performer", `name:${fold(performer)}`, performer]);
     if (recording.year) facets.push(["year", String(recording.year), String(recording.year)]);
     if (recording.live) facets.push(["type", "live", "Live"]);
   }
   return dedupeFacets(facets);
 }
+
+// What performers' credits add: their roles, and the instruments they play.
+function creditFacets(credits) {
+  const facets = [];
+  for (const credit of credits) {
+    if (!PERFORMER_ROLES.has(credit.role)) continue;
+    facets.push(["role", credit.role, ROLE_LABEL[credit.role] || credit.role]);
+    if (text(credit.instrument)) facets.push(["instrument", fold(credit.instrument), text(credit.instrument)]);
+  }
+  return facets;
+}
+
+// Sort keys stored beside each document, so lists sort without reading
+// every one: a folded title (a person's sort name when set), the first
+// catalogue number with its numbers padded ("op:000027:000002" sorts after
+// "op:000009"), and a year or date.
+const sortTitle = (values, title) => fold(text(values.sortName) || title);
+const sortKey = (keys = []) => (keys[0] ? keys[0].replace(/\d+/g, (digits) => digits.padStart(6, "0")) : "");
+const sortDate = (value) => (typeof value === "string" && /^\d{4}/.test(value.trim()) ? value.trim().slice(0, 10) : "");
 
 function dedupeFacets(facets) {
   const seen = new Set();

@@ -34,6 +34,9 @@ const relations = {
   performance_work: [["performance"], ["work"]],
   recording_performance: [["recording"], ["performance"]],
   work_relation: [["work"], ["work"]],
+  // v0.3: one performance on several releases; a person in an ensemble.
+  same_recording: [["performance"], ["performance"]],
+  member_of: [["person"], ["ensemble"]],
   recording_relation: [["recording"], ["recording"]],
 };
 export const json = (value) => JSON.stringify(value);

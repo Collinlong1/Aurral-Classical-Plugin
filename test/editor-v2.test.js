@@ -176,6 +176,377 @@ test("movements reorder, add in bulk and delete; credits use their own lookup", 
   assert.equal((await s.mutate("delete-entity", { target: cellist }, cellist)).ok, true);
 });
 
+test("the performer list filters by role and shows contributors a scan made that nobody has reviewed", async (t) => {
+  const s = await setup(t);
+  const m = new Metadata(s.c);
+  const contributor = (name, kind, data = {}) => {
+    const id = s.c.createEntity(kind, data);
+    (data.unreviewed ? m.derived : m.manual).call(m, id, "name", name, ...(data.unreviewed ? [] : [{ actor: "admin" }]));
+    return id;
+  };
+  const work = (await s.ok("create-work", { title: "Fixture Concerto", composer: "", movements: ["I"] })).selection;
+  const conductor = contributor("Fixture Conductor", "person", { unreviewed: true });
+  const pianist = contributor("Fixture Pianist", "person", { unreviewed: true });
+  const orchestra = contributor("Fixture Orchestra", "ensemble", { unreviewed: true });
+  const edited = contributor("Edited Violinist", "person", { unreviewed: true });
+  m.manual(edited, "name", "Edited Violinist", { actor: "admin" });
+  s.c.credit(work, conductor, "conductor", { source: "derived" });
+  s.c.credit(work, pianist, "soloist", { position: 2, source: "derived" });
+  s.c.credit(work, orchestra, "orchestra", { position: 3, source: "derived" });
+  s.c.credit(work, edited, "performer", { position: 4, source: "derived" });
+  const rows = async (q = "") => (await s.read({ tab: "performers", q })).list.items.filter((item) => item.label.startsWith("Fixture") || item.label.startsWith("Edited"));
+  const labels = async (q) => (await rows(q)).map((item) => item.label).sort();
+  assert.deepEqual((await rows()).map((item) => [item.label, item.detail, item.badge?.label ?? null]).sort(), [
+    ["Edited Violinist", "Person · Performer", null],
+    ["Fixture Conductor", "Person · Conductor", "Unreviewed"],
+    ["Fixture Orchestra", "Ensemble · Orchestra", "Unreviewed"],
+    ["Fixture Pianist", "Person · Soloist", "Unreviewed"],
+  ]);
+  assert.deepEqual(await labels("role:conductor"), ["Fixture Conductor"]);
+  assert.deepEqual(await labels("role:performer"), ["Edited Violinist", "Fixture Pianist"]);
+  assert.deepEqual(await labels("role:ensemble"), ["Fixture Orchestra"]);
+  // An admin's edit counts as reviewed; filters and words combine.
+  assert.deepEqual(await labels("unreviewed"), ["Fixture Conductor", "Fixture Orchestra", "Fixture Pianist"]);
+  assert.deepEqual(await labels("unreviewed pianist"), ["Fixture Pianist"]);
+  assert.deepEqual(await labels("role:performer unreviewed"), ["Fixture Pianist"]);
+  // An unknown role is just a search word.
+  assert.deepEqual(await labels("role:harpist"), []);
+  assert.match((await s.read({ tab: "performers" })).list.placeholder, /role:conductor/);
+});
+
+test("a recording's page edits who performs it: add, change role or instrument, remove; rescans keep it", async (t) => {
+  const s = await setup(t);
+  autoMatchTaggedWorks(s.c, { albumId: "A", actor: "admin", allowStructuredTitles: true });
+  autoMatchTaggedWorks(s.c, { albumId: "B", actor: "admin", allowStructuredTitles: true });
+  const recordingOf = (album) =>
+    s.c.db
+      .prepare(
+        `SELECT DISTINCT rp.source_id AS recording, pw.source_id AS performance FROM realization r JOIN relation pw ON pw.id=r.performance_work_id
+         JOIN relation rp ON rp.kind='recording_performance' AND rp.target_id=pw.source_id
+         JOIN realization_item i ON i.realization_id=r.id JOIN segment g ON g.id=i.segment_id JOIN track_link l ON l.id=g.track_link_id
+         WHERE CAST(json_extract(l.evidence,'$.albumId') AS TEXT)=?`,
+      )
+      .get(album);
+  const { recording, performance } = recordingOf("A");
+  const view = async () => (await s.read({ selection: recording })).view;
+  const performers = async () => section(await view(), "performers").rows.map((row) => [row.label, row.detail]);
+  // The scan read the orchestra from the artist tag.
+  assert.deepEqual(await performers(), [["Orchestra A", "Orchestra · from tags"]]);
+  const derived = section(await view(), "performers").rows[0].id;
+
+  // Change its role: it is the admin's now, and the page stays the recording's.
+  const changed = await s.ok("update-credit", { target: performance, credit: derived, role: "ensemble", instrument: "", back: recording }, recording);
+  assert.equal(changed.selection, recording);
+  assert.deepEqual(await performers(), [["Orchestra A", "Ensemble"]]);
+  assert.deepEqual({ ...s.c.db.prepare("SELECT source,state FROM credit WHERE id=?").get(derived) }, { source: "manual", state: "active" });
+  // Add a soloist; an empty instrument on a later change keeps theirs.
+  const soloist = (await s.ok("create-contributor", { name: "Fixture Pianist", kind: "person" })).selection;
+  await s.ok("add-credit", { target: performance, contributor: soloist, role: "soloist", instrument: "piano", back: recording }, recording);
+  const soloCredit = s.c.db.prepare("SELECT id FROM credit WHERE target_id=? AND contributor_id=?").get(performance, soloist).id;
+  await s.ok("update-credit", { target: performance, credit: soloCredit, role: "performer", instrument: "", back: recording }, recording);
+  assert.deepEqual(await performers(), [["Orchestra A", "Ensemble"], ["Fixture Pianist", "Performer · piano"]]);
+  // Wrong kinds and duplicates explain themselves.
+  assert.equal((await s.mutate("update-credit", { target: performance, credit: soloCredit, role: "orchestra", back: recording }, recording)).ok, false);
+  await s.ok("add-credit", { target: performance, contributor: soloist, role: "soloist", instrument: "piano", back: recording }, recording);
+  const second = s.c.db.prepare("SELECT id FROM credit WHERE target_id=? AND contributor_id=? AND role='soloist'").get(performance, soloist).id;
+  const duplicate = await s.mutate("update-credit", { target: performance, credit: second, role: "performer", instrument: "", back: recording }, recording);
+  assert.deepEqual([duplicate.ok, duplicate.message], [false, "That role credit already exists"]);
+  await s.ok("remove-credit", { target: performance, credit: second, back: recording }, recording);
+  // Only this recording's performance can be written from its page.
+  const other = recordingOf("B");
+  const otherCredit = s.c.db.prepare("SELECT id FROM credit WHERE target_id=?").get(other.performance).id;
+  const outside = await s.mutate("update-credit", { target: other.performance, credit: otherCredit, role: "ensemble", back: recording }, recording);
+  assert.equal(outside.ok, false);
+  // A library pass and a rescan of the album keep the admin's credits as set.
+  autoMatchTaggedWorks(s.c, { actor: "admin", allowStructuredTitles: true });
+  autoMatchTaggedWorks(s.c, { albumId: "A", actor: "admin", allowStructuredTitles: true });
+  assert.deepEqual(await performers(), [["Orchestra A", "Ensemble"], ["Fixture Pianist", "Performer · piano"]]);
+  // Remove: the page shows who is left.
+  await s.ok("remove-credit", { target: performance, credit: soloCredit, back: recording }, recording);
+  assert.deepEqual(await performers(), [["Orchestra A", "Ensemble"]]);
+  assert.ok(section(await view(), "edit-performer"));
+});
+
+test("contributor details: sort name, spellings, instruments and dates; renames keep the old name; ensemble members", async (t) => {
+  const s = await setup(t);
+  const { contributorFor, contributorIndex } = await import("../src/model/contributors.js");
+  const pianist = (await s.ok("create-contributor", { name: "Sviatoslav Richter", kind: "person" })).selection;
+  const trio = (await s.ok("create-contributor", { name: "Fixture Trio", kind: "ensemble" })).selection;
+  const details = async (id) => Object.fromEntries(section((await s.read({ selection: id })).view, "details").fields.map((f) => [f.key, f.value]));
+  await s.ok("save-entity", { target: pianist, sortName: "Richter, Sviatoslav", aliases: "Swjatoslaw Richter\nS. Richter", instruments: "piano", date: "1915" }, pianist);
+  await s.ok("save-entity", { target: pianist, name: "Sviatoslav Teofilovich Richter" }, pianist);
+  assert.deepEqual(await details(pianist), {
+    name: "Sviatoslav Teofilovich Richter",
+    sortName: "Richter, Sviatoslav",
+    aliases: ["Swjatoslaw Richter", "S. Richter"],
+    instruments: ["piano"],
+    date: "1915",
+    description: "",
+  });
+  // The old name and every spelling are aliases: a tag spelled any of those
+  // ways finds this person.
+  const aliases = s.c.db.prepare("SELECT text FROM alias WHERE entity_id=? ORDER BY text").all(pianist).map((row) => row.text);
+  assert.deepEqual(aliases, ["S. Richter", "Sviatoslav Richter", "Swjatoslaw Richter"]);
+  for (const spelling of aliases) assert.equal(contributorFor(s.c, contributorIndex(s.c), spelling), pianist, spelling);
+  // Saving the same spellings again adds none.
+  await s.ok("save-entity", { target: pianist, aliases: "Swjatoslaw Richter\nS. Richter\nRichter" }, pianist);
+  assert.equal(s.c.db.prepare("SELECT count(*) AS n FROM alias WHERE entity_id=?").get(pianist).n, 4);
+  // Ensembles: renamed, founded, with members added from either page.
+  await s.ok("save-entity", { target: trio, name: "Fixture Piano Trio", date: "1960" }, trio);
+  assert.deepEqual(s.c.db.prepare("SELECT text FROM alias WHERE entity_id=?").all(trio).map((row) => row.text), ["Fixture Trio"]);
+  const cellist = (await s.ok("create-contributor", { name: "Fixture Cellist", kind: "person" })).selection;
+  await s.ok("add-member", { target: trio, other: pianist }, trio);
+  await s.ok("add-member", { target: cellist, other: trio }, cellist);
+  const rows = async (id) => section((await s.read({ selection: id })).view, "members").rows.map((row) => row.label);
+  assert.deepEqual(await rows(trio), ["Fixture Cellist", "Sviatoslav Teofilovich Richter"]);
+  assert.deepEqual(await rows(pianist), ["Fixture Piano Trio"]);
+  assert.equal(section((await s.read({ selection: pianist })).view, "members").title, "Ensembles");
+  assert.equal((await s.mutate("add-member", { target: trio, other: pianist }, trio)).message, "Already a member");
+  assert.equal((await s.mutate("add-member", { target: trio, other: trio }, trio)).ok, false);
+  await s.ok("remove-member", { target: pianist, other: trio }, pianist);
+  assert.deepEqual(await rows(trio), ["Fixture Cellist"]);
+  // The people lookup offers people only.
+  assert.deepEqual((await s.read({ lookup: "people", q: "fixture" })).options.map((o) => o.label), ["Fixture Cellist"]);
+});
+
+test("bulk credits: set performers on ticked album tracks and change a contributor's role everywhere", async (t) => {
+  const s = await setup(t);
+  for (const album of ["A", "B"]) autoMatchTaggedWorks(s.c, { albumId: album, actor: "admin", allowStructuredTitles: true });
+  const performanceOf = (album) =>
+    s.c.db
+      .prepare(
+        `SELECT DISTINCT pw.source_id AS p FROM realization r JOIN relation pw ON pw.id=r.performance_work_id JOIN realization_item i ON i.realization_id=r.id
+         JOIN segment g ON g.id=i.segment_id JOIN track_link l ON l.id=g.track_link_id WHERE CAST(json_extract(l.evidence,'$.albumId') AS TEXT)=?`,
+      )
+      .get(album).p;
+  const [a, b] = [performanceOf("A"), performanceOf("B")];
+  const performers = (performance) =>
+    s.c.db
+      .prepare("SELECT a.value AS name,k.role,k.source FROM credit k JOIN field_resolution f ON f.target_id=k.contributor_id AND f.field='name' JOIN assertion a ON a.id=f.assertion_id WHERE k.target_id=? AND k.state='active' ORDER BY k.position")
+      .all(performance)
+      .map((row) => [JSON.parse(row.name), row.role, row.source]);
+  const conductor = (await s.ok("create-contributor", { name: "Fixture Conductor", kind: "person" })).selection;
+  const ensemble = (await s.ok("create-contributor", { name: "Fixture Philharmonic", kind: "ensemble" })).selection;
+
+  // Tick album A's tracks, then Set performers…: the page lists the recording
+  // they belong to with who performs it now.
+  const opened = await s.ok("performers-open", { albumId: "A", tracks: s.trackIds("A"), page: "0" }, "album:A");
+  assert.match(opened.selection, /^performers:/);
+  const view = (await s.read({ selection: opened.selection })).view;
+  assert.equal(view.title, "Set performers on 1 recording");
+  assert.deepEqual(section(view, "recordings").rows.map((row) => row.detail), ["Orchestra A (Orchestra)"]);
+  await s.ok("set-performers", { token: opened.selection.slice(11), contributor: conductor, role: "conductor", instrument: "", mode: "add" }, opened.selection);
+  assert.deepEqual(performers(a), [["Orchestra A", "orchestra", "derived"], ["Fixture Conductor", "conductor", "manual"]]);
+  // Replace: the tag-made orchestra is removed (and stays removed), the new one is the admin's.
+  await s.ok("set-performers", { token: opened.selection.slice(11), contributor: ensemble, role: "orchestra", instrument: "", mode: "replace" }, opened.selection);
+  assert.deepEqual(performers(a), [["Fixture Philharmonic", "orchestra", "manual"]]);
+  assert.equal(s.c.db.prepare("SELECT state FROM credit WHERE target_id=? AND source='derived'").get(a).state, "removed");
+  // A role the contributor can't hold is refused before anything changes.
+  assert.equal((await s.mutate("set-performers", { token: opened.selection.slice(11), contributor: ensemble, role: "conductor", mode: "add" }, opened.selection)).ok, false);
+  // A recording that can't be changed is reported, and its old performers stay.
+  s.c.db.exec(`CREATE TRIGGER block_a BEFORE INSERT ON credit WHEN NEW.target_id='${a}' BEGIN SELECT RAISE(ABORT,'blocked for the test'); END`);
+  const blocked = await s.ok("set-performers", { token: opened.selection.slice(11), contributor: conductor, role: "soloist", instrument: "", mode: "replace" }, opened.selection);
+  assert.match(blocked.message, /Updated 0 of 1 recording\. Not changed: .*blocked for the test/);
+  assert.deepEqual(performers(a), [["Fixture Philharmonic", "orchestra", "manual"]]);
+  s.c.db.exec("DROP TRIGGER block_a");
+
+  // Change role on all credits: a preview, then each credit on its own.
+  s.c.credit(a, conductor, "performer", { position: 5 });
+  s.c.credit(b, conductor, "performer", { position: 5, source: "derived" });
+  const roles = (await s.read({ selection: conductor })).view.actions.find((item) => item.label === "Change role on all credits…");
+  assert.equal(roles.arguments.selection, `roles:${conductor}`);
+  const preview = (await s.read({ selection: `roles:${conductor}` })).view;
+  assert.deepEqual(section(preview, "credits").rows.map((row) => row.detail).sort(), ["Performer", "Performer · from tags"]);
+  assert.deepEqual(section(preview, "change-roles").fields[0].options.map((o) => o.label), ["Performer (2)"]);
+  s.c.db.exec(`CREATE TRIGGER block_b BEFORE UPDATE ON credit WHEN OLD.target_id='${b}' BEGIN SELECT RAISE(ABORT,'blocked for the test'); END`);
+  const changed = await s.ok("change-roles", { target: conductor, from: "performer", to: "soloist" }, `roles:${conductor}`);
+  assert.match(changed.message, /Changed 1 of 2 credits to soloist\. Not changed: .*blocked for the test/);
+  s.c.db.exec("DROP TRIGGER block_b");
+  assert.deepEqual(performers(a).filter(([name]) => name === "Fixture Conductor"), [["Fixture Conductor", "soloist", "manual"]]);
+  assert.deepEqual(performers(b).filter(([name]) => name === "Fixture Conductor"), [["Fixture Conductor", "performer", "derived"]]);
+  await s.ok("change-roles", { target: conductor, from: "performer", to: "soloist" }, `roles:${conductor}`);
+  assert.deepEqual(performers(b).filter(([name]) => name === "Fixture Conductor"), [["Fixture Conductor", "soloist", "manual"]]);
+  // A role an ensemble can't hold is refused.
+  assert.equal((await s.mutate("change-roles", { target: ensemble, from: "orchestra", to: "soloist" }, `roles:${ensemble}`)).ok, false);
+  // Contributor pages label a recording by work and album, and open the recording.
+  const row = section((await s.read({ selection: conductor })).view, "credits").rows[0];
+  assert.match(row.label, /Symphony No\. ?5.* · Album [AB]/);
+  assert.equal(s.c.db.prepare("SELECT kind FROM entity WHERE id=?").get(row.selection).kind, "recording");
+});
+
+test("This is…: an unreviewed name from tags becomes another spelling of a known contributor", async (t) => {
+  const s = await setup(t);
+  autoMatchTaggedWorks(s.c, { albumId: "A", actor: "admin", allowStructuredTitles: true });
+  const derived = s.c.db.prepare("SELECT contributor_id AS id FROM credit WHERE source='derived'").get().id;
+  const known = (await s.ok("create-contributor", { name: "Fixture Philharmonic", kind: "ensemble" })).selection;
+  const person = (await s.ok("create-contributor", { name: "Fixture Person", kind: "person" })).selection;
+  const form = section((await s.read({ selection: derived })).view, "map");
+  assert.equal(form.title, "This is…");
+  assert.equal(form.fields[0].lookup, "ensembles");
+  // A record nobody made from tags has no such question.
+  assert.equal(section((await s.read({ selection: known })).view, "map"), undefined);
+  assert.equal((await s.mutate("map-contributor", { target: derived, into: person }, derived)).ok, false);
+  const mapped = await s.ok("map-contributor", { target: derived, into: known }, derived);
+  assert.equal(mapped.selection, known);
+  assert.match(mapped.message, /“Orchestra A” is now “Fixture Philharmonic”/);
+  assert.equal(s.c.db.prepare("SELECT deleted_at FROM entity WHERE id=?").get(derived).deleted_at !== null, true);
+  assert.equal(s.c.db.prepare("SELECT count(*) AS n FROM credit WHERE contributor_id=? AND state='active'").get(known).n, 1);
+  assert.deepEqual(s.c.db.prepare("SELECT text FROM alias WHERE entity_id=?").all(known).map((row) => row.text), ["Orchestra A"]);
+});
+
+test("contributor merges and deletions are undoable from Activity, exactly, unless a credit changed since", async (t) => {
+  const s = await setup(t);
+  autoMatchTaggedWorks(s.c, { albumId: "A", actor: "admin", allowStructuredTitles: true });
+  const performance = s.c.db.prepare("SELECT target_id AS id FROM credit WHERE source='derived'").get().id;
+  const work = (await s.ok("create-work", { title: "Fixture Concerto", composer: "", movements: ["I"] })).selection;
+  const keep = (await s.ok("create-contributor", { name: "Fixture Pianist", kind: "person" })).selection;
+  const drop = (await s.ok("create-contributor", { name: "F. Pianist", kind: "person" })).selection;
+  const trio = (await s.ok("create-contributor", { name: "Fixture Trio", kind: "ensemble" })).selection;
+  await s.ok("save-entity", { target: drop, aliases: "Pianist F." }, drop);
+  await s.ok("add-member", { target: trio, other: drop }, trio);
+  s.c.credit(performance, drop, "soloist", { instrument: "piano", position: 5 });
+  s.c.credit(work, keep, "soloist", { position: 2 });
+  s.c.externalIdentity(drop, "musicbrainz", "artist", "pianist-mbid", { evidence: { source: "test" } });
+  const dump = () =>
+    JSON.stringify(
+      ["entity", "credit", "alias", "external_identity", "relation", "assertion", "field_resolution"].map((table) => [
+        table,
+        s.c.db
+          .prepare(`SELECT * FROM ${table} WHERE ${table === "entity" ? "id" : table === "credit" ? "contributor_id" : table === "relation" ? "source_id" : ["alias", "external_identity"].includes(table) ? "entity_id" : "target_id"} IN (?,?) ORDER BY 1`)
+          .all(keep, drop)
+          .map((row) => ({ ...row })),
+      ]),
+    );
+  const before = dump();
+  const merged = await s.ok("merge-entity", { target: drop, into: keep, confirm: true }, drop);
+  assert.equal(merged.message, "Merged. Undo it from Activity.");
+  assert.notEqual(dump(), before);
+  // Activity lists it; undo puts every row back as it was.
+  const change = (await s.read({ tab: "activity" })).list.items.find((item) => item.label === "Merged “F. Pianist” into “Fixture Pianist”");
+  assert.ok(change);
+  assert.equal(section((await s.read({ selection: change.selection })).view, "change").items[0].value, "Merge of two people or ensembles");
+  await s.ok("undo-change", { id: change.selection.slice(7) }, change.selection);
+  assert.equal(dump(), before);
+
+  // A credit given to either record since blocks the undo, and nothing changes.
+  await s.ok("merge-entity", { target: drop, into: keep, confirm: true }, drop);
+  const second = (await s.read({ tab: "activity" })).list.items.find((item) => item.label === "Merged “F. Pianist” into “Fixture Pianist”" && !item.badge);
+  s.c.credit(work, keep, "performer", { position: 3 });
+  const after = dump();
+  const refused = await s.mutate("undo-change", { id: second.selection.slice(7) }, second.selection);
+  assert.deepEqual([refused.ok, /changed after this/.test(refused.message)], [false, true]);
+  assert.equal(dump(), after);
+
+  // Deleting an unused person is undoable too.
+  const spare = (await s.ok("create-contributor", { name: "Spare Person", kind: "person" })).selection;
+  const deleted = await s.ok("delete-entity", { target: spare }, spare);
+  assert.match(deleted.message, /Undo it from Activity/);
+  const removal = (await s.read({ tab: "activity" })).list.items.find((item) => item.label === "Deleted “Spare Person”");
+  await s.ok("undo-change", { id: removal.selection.slice(7) }, removal.selection);
+  assert.equal(s.c.db.prepare("SELECT deleted_at FROM entity WHERE id=?").get(spare).deleted_at, null);
+
+  // E11: a work restored after its composer was deleted has its composer back.
+  const composer = (await s.ok("create-contributor", { name: "Fixture Composer", kind: "person" })).selection;
+  const piece = (await s.ok("create-work", { title: "Fixture Sonata", composer, movements: ["I"] })).selection;
+  await s.ok("delete-entity", { target: piece }, piece);
+  await s.ok("delete-entity", { target: composer }, composer);
+  const workChange = (await s.read({ tab: "activity" })).list.items.find((item) => item.label === "Deleted “Fixture Sonata”").selection;
+  await s.ok("undo-change", { id: workChange.slice(7) }, workChange);
+  assert.equal(s.c.db.prepare("SELECT deleted_at FROM entity WHERE id=?").get(composer).deleted_at, null);
+  assert.deepEqual(s.c.db.prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer'").all(piece).map((row) => row.contributor_id), [composer]);
+});
+
+test("a name mapped with This is… stays mapped through rescans, and the mapping can be undone", async (t) => {
+  const s = await setup(t);
+  for (const album of ["A", "B"]) autoMatchTaggedWorks(s.c, { albumId: album, actor: "admin", allowStructuredTitles: true });
+  const named = (name) => s.c.db.prepare("SELECT a.value FROM entity e JOIN field_resolution f ON f.target_id=e.id AND f.field='name' JOIN assertion a ON a.id=f.assertion_id WHERE e.deleted_at IS NULL AND a.value=?").all(JSON.stringify(name)).length;
+  const derived = s.c.db.prepare("SELECT k.contributor_id AS id FROM credit k JOIN field_resolution f ON f.target_id=k.contributor_id AND f.field='name' JOIN assertion a ON a.id=f.assertion_id WHERE a.value=?").get(JSON.stringify("Orchestra A")).id;
+  const known = (await s.ok("create-contributor", { name: "Fixture Philharmonic", kind: "ensemble" })).selection;
+  await s.ok("map-contributor", { target: derived, into: known }, derived);
+  autoMatchTaggedWorks(s.c, { actor: "admin", allowStructuredTitles: true });
+  autoMatchTaggedWorks(s.c, { albumId: "A", actor: "admin", allowStructuredTitles: true });
+  // No "Orchestra A" comes back: the spelling is the Philharmonic's.
+  assert.equal(named("Orchestra A"), 0);
+  const change = (await s.read({ tab: "activity" })).list.items.find((item) => item.label === "Merged “Orchestra A” into “Fixture Philharmonic”");
+  await s.ok("undo-change", { id: change.selection.slice(7) }, change.selection);
+  assert.equal(named("Orchestra A"), 1);
+  assert.equal(s.c.db.prepare("SELECT contributor_id AS id FROM credit WHERE source='derived' AND target_id=(SELECT target_id FROM credit WHERE contributor_id=?)").get(derived).id, derived);
+});
+
+test("identity and credit reviews: merge or keep apart, use one record, keep or replace a conductor; dismissals hold", async (t) => {
+  const s = await setup(t);
+  const { contributorFor, contributorIndex } = await import("../src/model/contributors.js");
+  const m = new Metadata(s.c);
+  const make = (name, kind) => {
+    const id = s.c.createEntity(kind);
+    m.manual(id, "name", name, { actor: "admin" });
+    return id;
+  };
+  const open = () => s.c.db.prepare("SELECT id,kind,target_id,json_extract(evidence,'$.reason') AS reason FROM review_item WHERE status='open' AND kind IN ('contributor_identity','credit_conflict') ORDER BY created_at").all();
+  const decide = async (review) => section((await s.read({ selection: `review:${review}` })).view, "decide").rows;
+  const rescan = () => {
+    autoMatchTaggedWorks(s.c, { actor: "admin", allowStructuredTitles: true });
+    for (const album of ["A", "B"]) autoMatchTaggedWorks(s.c, { albumId: album, actor: "admin", allowStructuredTitles: true });
+  };
+
+  // Same name, different MusicBrainz IDs: merge or keep apart for good.
+  const first = contributorFor(s.c, contributorIndex(s.c), "John Williams", { mbid: "jw-guitar" });
+  const second = contributorFor(s.c, contributorIndex(s.c), "John Williams", { mbid: "jw-composer" });
+  const [identity] = open();
+  assert.deepEqual([identity.kind, identity.target_id, identity.reason], ["contributor_identity", second, "same-name-different-id"]);
+  assert.deepEqual((await decide(identity.id)).map((row) => row.id), [`merge-${first}`, "separate"]);
+  await s.ok("keep-distinct", { id: identity.id }, `review:${identity.id}`);
+  assert.ok(s.c.db.prepare("SELECT 1 FROM match_suppression WHERE key=?").get(`distinct:${[first, second].sort().join("|")}`));
+
+  // A tag name two records share: the scan credits neither and asks.
+  const [orchestraA, orchestraA2] = [make("Orchestra A", "ensemble"), make("Orchestra A", "ensemble")];
+  const [orchestraB] = [make("Orchestra B", "ensemble"), make("Orchestra B", "ensemble")];
+  rescan();
+  const ambiguous = open().filter((review) => review.reason === "ambiguous-name");
+  assert.equal(ambiguous.length, 2);
+  const onA = ambiguous.find((review) => s.c.db.prepare("SELECT 1 FROM review_item WHERE id=? AND json_extract(evidence,'$.name')='Orchestra A'").get(review.id));
+  const onB = ambiguous.find((review) => review !== onA);
+  assert.deepEqual((await decide(onA.id)).filter((row) => row.id.startsWith("use-")).map((row) => row.selection).sort(), [orchestraA, orchestraA2].sort());
+  await s.ok("use-contributor", { id: onA.id, contributor: orchestraA2 }, `review:${onA.id}`);
+  assert.deepEqual(
+    s.c.db.prepare("SELECT contributor_id,role,source FROM credit WHERE target_id=? AND state='active'").all(onA.target_id).map((row) => ({ ...row })),
+    [{ contributor_id: orchestraA2, role: "orchestra", source: "manual" }],
+  );
+  // Dismissed on B: the next scans don't ask again about the same thing.
+  await s.ok("resolve-review", { id: onB.id }, `review:${onB.id}`);
+  rescan();
+  assert.equal(open().filter((review) => review.reason === "ambiguous-name").length, 0);
+  assert.ok(orchestraB);
+
+  // Tags name a different conductor than the one an admin credited.
+  const performance = onA.target_id;
+  const conductor = make("Fixture Conductor", "person");
+  s.c.credit(performance, conductor, "conductor", { position: 9 });
+  const tagConductor = (name) =>
+    s.c.db.prepare("UPDATE track_link SET evidence=json_set(evidence,'$.hints.conductor',?) WHERE CAST(json_extract(evidence,'$.albumId') AS TEXT)='A'").run(name);
+  tagConductor("Tag Conductor");
+  rescan();
+  let [conflict] = open();
+  assert.deepEqual([conflict.kind, conflict.target_id], ["credit_conflict", performance]);
+  assert.deepEqual((await decide(conflict.id)).map((row) => row.label), ["Keep “Fixture Conductor”", "Use “Tag Conductor”"]);
+  // Keep: remembered until the tags change.
+  await s.ok("resolve-review", { id: conflict.id }, `review:${conflict.id}`);
+  rescan();
+  assert.deepEqual(open(), []);
+  tagConductor("Other Conductor");
+  rescan();
+  [conflict] = open();
+  assert.equal(conflict.kind, "credit_conflict");
+  await s.ok("use-contributor", { id: conflict.id, contributor: "tagged" }, `review:${conflict.id}`);
+  const conductors = s.c.db
+    .prepare("SELECT a.value FROM credit k JOIN field_resolution f ON f.target_id=k.contributor_id AND f.field='name' JOIN assertion a ON a.id=f.assertion_id WHERE k.target_id=? AND k.role='conductor' AND k.state='active'")
+    .all(performance)
+    .map((row) => JSON.parse(row.value));
+  assert.deepEqual(conductors, ["Other Conductor"]);
+  rescan();
+  assert.deepEqual(open(), []);
+});
+
 test("send to / remove from Classical overrides detection and closes review items", async (t) => {
   const s = await setup(t);
   const [pop] = s.trackIds("C");

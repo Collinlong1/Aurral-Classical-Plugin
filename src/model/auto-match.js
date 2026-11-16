@@ -3,7 +3,8 @@ import { Metadata } from "./metadata.js";
 import { transaction } from "./database.js";
 import { catalogueNumber, cataloguePiece } from "../works.js";
 import { artistCredits, composersOf } from "./credits.js";
-import { deriveCredits } from "./contributors.js";
+import { conductorConflicts, deriveCredits } from "./contributors.js";
+import { linkReissues } from "./reissues.js";
 
 const MULTI_MOVEMENT =
   /\b(symphon(?:y|ie)|sinfonia|sonata|sonatina|concerto|suite|partita|quartet|quintet|sextet|septet|octet|nonet|trio|serenade|divertimento|cassation|mass|missa|requiem|stabat mater|magnificat|te deum|vespers|cantata|oratorio|passion|variations?|ballet)\b/i;
@@ -839,15 +840,13 @@ export function catalogueIndex(catalogue) {
   return { works, aliases, people: composerPeople(catalogue) };
 }
 
+// Every person by name and alias. A composer and a performer of the same
+// name, with no conflicting ID, are one person: Rachmaninoff at the piano is
+// Rachmaninoff the composer.
 function composerPeople(catalogue) {
   const people = new Map();
   for (const { id } of catalogue.db
-    .prepare(
-      `SELECT id FROM entity WHERE kind='person' AND deleted_at IS NULL
-       AND (json_extract(data,'$.roles') LIKE '%composer%'
-         OR EXISTS(SELECT 1 FROM credit WHERE contributor_id=entity.id AND role='composer' AND state='active'))
-       ORDER BY created_at,id`,
-    )
+    .prepare("SELECT id FROM entity WHERE kind='person' AND deleted_at IS NULL ORDER BY created_at,id")
     .all()) {
     const name = resolvedName(catalogue, id, "name");
     if (typeof name !== "string" || !words(name)) continue;
@@ -2372,6 +2371,16 @@ export function mergeContributor(catalogue, keep, drop, actor) {
         .run(keep, credit.id);
   }
   transferIdentities(catalogue.db, keep, drop);
+  // Ensemble memberships move too; one the kept record already has is dropped.
+  for (const relation of catalogue.db.prepare("SELECT * FROM relation WHERE kind='member_of' AND (source_id=? OR target_id=?)").all(drop, drop)) {
+    const [source, target] = [relation.source_id === drop ? keep : relation.source_id, relation.target_id === drop ? keep : relation.target_id];
+    const exists = source === target || catalogue.db.prepare("SELECT 1 FROM relation WHERE kind='member_of' AND source_id=? AND target_id=?").get(source, target);
+    if (exists) catalogue.db.prepare("DELETE FROM relation WHERE id=?").run(relation.id);
+    else {
+      const position = catalogue.db.prepare("SELECT coalesce(max(position),0)+1 AS n FROM relation WHERE kind='member_of' AND source_id=?").get(source).n;
+      catalogue.db.prepare("UPDATE relation SET source_id=?,target_id=?,position=? WHERE id=?").run(source, target, position, relation.id);
+    }
+  }
   catalogue.db
     .prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?")
     .run(Date.now(), Date.now(), drop);
@@ -2379,12 +2388,19 @@ export function mergeContributor(catalogue, keep, drop, actor) {
 }
 
 // Merge composers that earlier auto-match passes created once per album.
+// Composers only: same-named performers are never merged automatically.
+const isComposer = (catalogue, id) =>
+  catalogue.db
+    .prepare(
+      `SELECT 1 FROM entity WHERE id=? AND deleted_at IS NULL AND (json_extract(data,'$.roles') LIKE '%composer%'
+         OR EXISTS(SELECT 1 FROM credit WHERE contributor_id=entity.id AND role='composer' AND state='active'))`,
+    )
+    .get(id);
 function mergeDuplicateComposers(catalogue, index, actor) {
   let merged = 0;
   for (const [name, candidates] of index.people) {
     // Shared aliases are ambiguous, never evidence for an automatic merge.
-    const ids = candidates.filter((id) => words(resolvedName(catalogue, id, "name") || "") === name &&
-      catalogue.db.prepare("SELECT 1 FROM entity WHERE id=? AND deleted_at IS NULL").get(id));
+    const ids = candidates.filter((id) => words(resolvedName(catalogue, id, "name") || "") === name && isComposer(catalogue, id));
     if (ids.length < 2) continue;
     const auto = ids.filter(
       (id) =>
@@ -3098,8 +3114,12 @@ export function autoMatchTaggedWorks(
   for (const group of groups)
     if (createGroup(catalogue, group, actor, index)) created++;
   keyMovementTitles(catalogue, { albumId });
-  // Who plays each newly matched performance, from its tags.
+  // Who plays each newly matched performance, from its tags; and where the
+  // tags now disagree with a conductor an admin set.
   deriveCredits(catalogue, { albumId });
+  conductorConflicts(catalogue, { albumId });
+  // One performance on several releases, stored once its performers are known.
+  linkReissues(catalogue, { albumId });
   resolveSettledReviews(catalogue, albumId, actor);
   return { created, candidates: groups.length };
 }

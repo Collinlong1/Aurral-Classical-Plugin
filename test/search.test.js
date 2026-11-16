@@ -7,6 +7,7 @@ import { Metadata } from "../src/model/metadata.js";
 import { reconcile, classify } from "../src/model/reconcile.js";
 import { autoMatchTaggedWorks } from "../src/model/auto-match.js";
 import { searchCatalogue, ensureSearchIndex } from "../src/search/engine.js";
+import { relinkReissue, unlinkReissue } from "../src/model/reissues.js";
 import { catalogueKeys, parseQuery } from "../src/search/normalize.js";
 
 async function setup(t) {
@@ -159,6 +160,25 @@ test("combined searches, role-aware filters and one recording across releases", 
   assert.equal(conductedBy(), 2);
   c.removeCredit(derived);
   assert.equal(conductedBy(), 1);
+  // Credits' roles and instruments filter recordings; tag names no longer
+  // stand in for performers once credits exist.
+  const roleFacet = searchCatalogue(c, { q: "barenboim" }).facets.find((f) => f.key === "role");
+  assert.deepEqual(roleFacet.options.map((o) => o.value).sort(), ["conductor", "orchestra", "soloist"]);
+  assert.equal(searchCatalogue(c, { q: "", filters: { role: ["conductor"] }, kinds: ["recording"] }).sections[0].total, 2);
+  const soloist = c.db.prepare("SELECT id,target_id FROM credit WHERE contributor_id=? AND role='soloist'").get(barenboim);
+  c.removeCredit(soloist.id);
+  c.credit(soloist.target_id, barenboim, "soloist", { instrument: "piano" });
+  assert.deepEqual(
+    searchCatalogue(c, { q: "", filters: { instrument: ["piano"] }, kinds: ["recording"] }).sections[0].items.map((i) => i.title),
+    ["Daniel Barenboim"],
+  );
+  assert.equal(c.db.prepare("SELECT count(*) AS n FROM search_facet WHERE facet='performer' AND value LIKE 'name:%'").get().n, 0);
+  // Sort keys are stored with each document.
+  assert.deepEqual({ ...c.db.prepare("SELECT sort_title,sort_key FROM search_doc WHERE kind='work' AND ref=?").get(moonlight) }, {
+    sort_title: "piano sonata no 14 in c sharp minor op 27 no 2",
+    sort_key: "op:000027:000002",
+  });
+  assert.match(c.db.prepare("SELECT stamp FROM search_state").get().stamp, /^v3\|/);
   // Period filter from a pinned field.
   assert.deepEqual(searchCatalogue(c, { q: "sonata", filters: { period: ["classical"] }, kinds: ["work"] }).sections[0].items.map((i) => i.ref), [moonlight]);
   // Two different recordings of the sonata stay two.
@@ -234,4 +254,25 @@ test("the work page lists one entry per recording, with its releases, parts and 
   assert.ok(barenboim.complete);
   assert.deepEqual(barenboim.items.map((i) => i.movementIds.length), [1, 1, 1]);
   assert.deepEqual(barenboim.items.map((i) => i.movementIds[0]), view.work.movements.map((m) => m.id));
+
+  // The grouping is stored: it holds when the tags stop saying so, and an
+  // admin's unlink holds through later matching until they link it again.
+  const performanceOf = (realization) =>
+    c.db.prepare("SELECT pw.source_id AS p FROM realization r JOIN relation pw ON pw.id=r.performance_work_id WHERE r.id=?").get(realization).p;
+  const [first, second] = levit.releases.map((release) => performanceOf(release.realizationId));
+  const links = () => c.db.prepare("SELECT count(*) AS n FROM relation WHERE kind='same_recording'").get().n;
+  const entries = () => renderWork(c, moonlight, { id: 7, role: "user" }).recordings.length;
+  assert.equal(links(), 1);
+  const boxMbids = (value) =>
+    c.db.prepare("UPDATE track_link SET evidence=json_set(evidence,'$.hints.recordingMbid',?) WHERE CAST(json_extract(evidence,'$.albumId') AS TEXT)='levit-box'").run(value);
+  boxMbids("retagged");
+  assert.equal(entries(), 2, "a stored link outlasts the tags");
+  boxMbids("l1");
+  unlinkReissue(c, first, second, "admin");
+  assert.equal(entries(), 3);
+  autoMatchTaggedWorks(c, { actor: "admin", allowStructuredTitles: true });
+  assert.deepEqual([links(), entries()], [0, 3], "matching never links a pair an admin took apart");
+  assert.equal(searchCatalogue(c, { q: "moonlight levit", kinds: ["recording"] }).sections[0].total, 2);
+  relinkReissue(c, first, second, "admin");
+  assert.deepEqual([links(), entries()], [1, 2]);
 });

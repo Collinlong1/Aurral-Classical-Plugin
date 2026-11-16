@@ -70,6 +70,11 @@ jobs:
         env:
           AURRAL_CORE_PATH: ${{ github.workspace }}/core
         run: node dev/editor-list-places-browser.mjs
+      - name: Set performers and change roles in bulk
+        working-directory: plugin
+        env:
+          AURRAL_CORE_PATH: ${{ github.workspace }}/core
+        run: node dev/editor-credits-browser.mjs
       - name: Start synthetic instance and verify comparisons
         working-directory: plugin
         env:
