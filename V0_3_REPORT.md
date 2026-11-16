@@ -1,3 +1,30 @@
+# v0.3 Phase 0.05 — E10 / issue #15
+
+Base: `aurral-classical` `89d3351`, including merged L3 PR #97. This follows the handoff sequence. Current #15 has no additional dependencies or later comments changing scope. No other issue is implemented here.
+
+## Result
+
+Deletion undo collects the saved segments' track-link IDs before restoring anything. If any track currently has a realization item, it refuses with “These tracks are in a work again; take them out first, then undo”. The check is specific to deletion undo, so ordinary merge undo continues to restore its existing live items. Refusal changes neither attachments nor the undone marker.
+
+The library-wide matching pass also repairs existing duplicate realizations within one live work. It compares complete ordered mappings of track link, movement, occurrence, segment kind, start and end. Only exact duplicates are removed, keeping the oldest performance (then realization insertion order as a tie-break), and detaching the later realization with `detachItem`. Equivalent user/admin picks move to the surviving realization first. A repair audit records the survivor and removed ID. The repair is transactional and idempotent.
+
+This is deliberately more conservative than comparing unordered file sets: different ranges, orderings, partial recordings and other files stay separate. No schema, core, media-tag or provider-request change. Bundle rebuilt. E7's global history guard and E11's missing-contributor behavior remain separate issues.
+
+## Verification
+
+On Node 24.22.1:
+
+- `node --test test/editor-v2.test.js test/editor-v0.2-workflow.test.js test/auto-match.test.js`: 60/60 passed.
+- Four new editor tests cover deletion/allow/match/undo refusal, partial manual reassignment refusal, unchanged attachment rows and undo markers on refusal, foreign-key integrity, successful undo after scans with free tracks, exact-duplicate repair, pick preservation, idempotency, library-pass invocation, and preservation of differing ranges, orderings, partial recordings and different files. Existing merge undo tests pass.
+- `g3.mjs` run against merged base `89d3351` and the fix via `PLUGIN_SRC`: base permits both unsafe undo cases and leaves four tracks in two works; fix refuses both and leaves zero tracks in two works. Immediate undo and undo after two scans still restore exactly. E11 probe cases remain outside this issue.
+- `g4.mjs` with the fix: undo is refused; after two more scans there is one work, one realization and zero tracks attached twice.
+- `npm run build`: passed. `git diff --check`: passed.
+- Full `npm test`: 367/367 passed.
+
+No local browser or Compose/restart run for #15. The known pre-existing Phase 1 workflow fixture mismatch remains unchanged and outside scope.
+
+---
+
 # v0.3 Phase 0.04 — L3 / issue #11
 
 Base: `aurral-classical` `0efd6b2`, including merged E1 PR #96 and the earlier L2/E2 fixes. This follows the handoff sequence. Current #11 has no further dependencies or later comments changing scope. No other issue is implemented here.

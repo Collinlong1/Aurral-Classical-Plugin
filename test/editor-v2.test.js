@@ -6,7 +6,7 @@ import { readEditor, mutateEditor } from "../src/model/editor.js";
 import { openCatalogue } from "../src/model/catalogue.js";
 import { Metadata } from "../src/model/metadata.js";
 import { reconcile, classify } from "../src/model/reconcile.js";
-import { autoMatchTaggedWorks, repairMergedIdentities, mergeDuplicateAutoWorks, distinctKey } from "../src/model/auto-match.js";
+import { autoMatchTaggedWorks, repairMergedIdentities, mergeDuplicateAutoWorks, distinctKey, repairDuplicateRealizations } from "../src/model/auto-match.js";
 import { mutateEditor as mutateRaw } from "../src/model/editor.js";
 import { tempFolders } from "./helpers.js";
 import { renderAlbumPresentation } from "../src/model/presentation.js";
@@ -866,4 +866,81 @@ test("#11 a skipped mapping does not cancel removal when another track is explic
   autoMatchTaggedWorks(s.c);
   assert.deepEqual(workOfTrack(s, removed), []);
   assert.deepEqual(workOfTrack(s, assigned), [s.work]);
+});
+
+const deletionChange = (s) => s.c.db.prepare("SELECT id FROM change_set WHERE kind='delete' ORDER BY rowid DESC").get().id;
+for (const reuse of ["match", "manual"]) {
+  test(`#15 deletion undo refuses tracks reused by ${reuse} without changing the catalogue`, async (t) => {
+    const s = await removalFixture(t);
+    await s.ok("delete-entity", { target: s.work }, s.work);
+    const change = deletionChange(s);
+    if (reuse === "match") {
+      autoMatchTaggedWorks(s.c);
+      const review = s.c.db.prepare("SELECT id FROM review_item WHERE status='open' AND json_extract(evidence,'$.reason')='deleted-work'").get();
+      await s.ok("allow-work", { id: review.id }, `review:${review.id}`);
+      autoMatchTaggedWorks(s.c);
+    } else {
+      const work = (await s.ok("create-work", { title: "Different work", movements: [] })).selection;
+      const opened = await s.ok("choose-album-work", { albumId: "A", work }, "album:A");
+      const form = section((await s.read({ selection: opened.selection })).view, "assign");
+      await s.ok("assign-album", { ...form.arguments, mapping: form.arguments.tracks.map((_, i) => i === 0 ? "new" : "") }, opened.selection);
+    }
+    const before = s.c.db.prepare("SELECT * FROM realization_item ORDER BY id").all();
+    const result = await s.mutate("undo-change", { id: change }, `change:${change}`);
+    assert.equal(result.ok, false);
+    assert.match(result.message, /tracks are in a work again; take them out first, then undo/);
+    assert.deepEqual(s.c.db.prepare("SELECT * FROM realization_item ORDER BY id").all(), before);
+    assert.equal(s.c.db.prepare("SELECT undone_at FROM change_set WHERE id=?").get(change).undone_at, null);
+    assert.deepEqual(s.c.db.prepare("PRAGMA foreign_key_check").all(), []);
+  });
+}
+
+test("#15 deletion undo still succeeds when tracks remain free, including after scans", async (t) => {
+  const s = await removalFixture(t);
+  const before = s.c.db.prepare("SELECT * FROM realization_item ORDER BY id").all();
+  await s.ok("delete-entity", { target: s.work }, s.work);
+  const change = deletionChange(s);
+  autoMatchTaggedWorks(s.c); autoMatchTaggedWorks(s.c);
+  await s.ok("undo-change", { id: change }, `change:${change}`);
+  assert.deepEqual(s.c.db.prepare("SELECT * FROM realization_item ORDER BY id").all(), before);
+});
+
+function duplicateRecording(s, source, { ranges = false, reverse = false, partial = false } = {}) {
+  const performance = s.c.createEntity("performance");
+  const pw = s.c.relate("performance_work", performance, s.work);
+  const realization = s.c.realization(s.work, pw, "Duplicate fixture");
+  const rows = s.c.db.prepare(`SELECT i.*,s.track_link_id FROM realization_item i
+    JOIN segment s ON s.id=i.segment_id WHERE i.realization_id=? ORDER BY i.sequence`).all(source);
+  if (reverse) rows.reverse();
+  if (partial) rows.pop();
+  rows.forEach((row, i) => {
+    const recording = s.c.createEntity("recording", { durationMs: 60000 });
+    s.c.relate("recording_performance", recording, performance);
+    const content = s.c.recordingContent(recording, pw, { movement: row.movement_id });
+    const segment = s.c.segment(row.track_link_id, ranges ? { startMs: 100, endMs: 50000, kind: "range" } : { kind: "whole" });
+    s.c.segmentContent(segment, content);
+    s.c.realizationItem(realization, segment, { movement: row.movement_id, sequence: i + 1 });
+  });
+  return realization;
+}
+
+test("#15 repair drops only the later exact duplicate recording and preserves picks", async (t) => {
+  const s = await removalFixture(t);
+  const original = realizationOf(s, s.work), duplicate = duplicateRecording(s, original);
+  const ranges = duplicateRecording(s, original, { ranges: true });
+  const reordered = duplicateRecording(s, original, { reverse: true });
+  const partial = duplicateRecording(s, original, { partial: true });
+  s.c.db.prepare("INSERT INTO user_work_state VALUES (2,?,1,?,1)").run(s.work, duplicate);
+  s.c.db.prepare("INSERT INTO admin_work_pick VALUES (?,?,1,1)").run(s.work, duplicate);
+  assert.equal(repairDuplicateRealizations(s.c), 1);
+  assert.equal(s.c.db.prepare("SELECT 1 FROM realization WHERE id=?").get(duplicate), undefined);
+  for (const id of [original, ranges, reordered, partial]) assert.ok(s.c.db.prepare("SELECT 1 FROM realization WHERE id=?").get(id));
+  assert.equal(s.c.db.prepare("SELECT picked_realization_id FROM user_work_state WHERE user_id=2").get().picked_realization_id, original);
+  assert.equal(s.c.db.prepare("SELECT realization_id FROM admin_work_pick WHERE work_id=?").get(s.work).realization_id, original);
+  assert.equal(repairDuplicateRealizations(s.c), 0);
+  assert.deepEqual(s.c.db.prepare("PRAGMA foreign_key_check").all(), []);
+  // The library pass runs the same repair, while a different album's files remain.
+  duplicateRecording(s, original);
+  autoMatchTaggedWorks(s.c);
+  assert.equal(s.c.db.prepare("SELECT count(*) AS n FROM realization WHERE work_id=?").get(s.work).n, 5);
 });
