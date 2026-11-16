@@ -41049,6 +41049,7 @@ function autoMatchTaggedWorks(catalogue, {
     if (createGroup(catalogue, group, actor3, index)) created++;
   keyMovementTitles(catalogue, { albumId });
   deriveCredits(catalogue, { albumId });
+  conductorConflicts(catalogue, { albumId });
   linkReissues(catalogue, { albumId });
   resolveSettledReviews(catalogue, albumId, actor3);
   return { created, candidates: groups.length };
@@ -41112,6 +41113,12 @@ function contributorIndex(c) {
   }
   return byName;
 }
+function raiseReview(c, kind, target, evidence) {
+  const settled = c.db.prepare("SELECT 1 FROM review_item WHERE kind=? AND target_id=? AND status='resolved' AND json_extract(evidence,'$.key')=? LIMIT 1").get(kind, target, evidence.key);
+  if (settled) return false;
+  c.review(kind, target, evidence);
+  return true;
+}
 var artistIdOf2 = (c, id) => c.db.prepare("SELECT record_id FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='artist' AND state='active'").get(id)?.record_id || null;
 function contributorFor(c, index, name, { mbid = null, kind = "person", metadata = new Metadata(c) } = {}) {
   const key = words3(name);
@@ -41134,7 +41141,7 @@ function contributorFor(c, index, name, { mbid = null, kind = "person", metadata
   metadata.derived(id, "name", name);
   if (mbid) c.externalIdentity(id, "musicbrainz", "artist", mbid, { evidence: { source: "tags" } });
   if (existing.length)
-    c.review("contributor_identity", id, { reason: "same-name-different-id", name, mbid, others: existing });
+    raiseReview(c, "contributor_identity", id, { reason: "same-name-different-id", name, mbid, others: existing, key: `${words3(name)}|${mbid}` });
   index[kind].set(key, [...existing, id]);
   return id;
 }
@@ -41172,12 +41179,48 @@ function deriveCredits(c, { albumId = null } = {}) {
     let position = c.db.prepare("SELECT coalesce(max(position),0) AS n FROM credit WHERE target_id=?").get(performance2).n;
     for (const credit of shared) {
       const contributor = contributorFor(c, index, credit.name, { kind: credit.kind, mbid: credit.mbid, metadata });
-      if (!contributor) continue;
+      if (!contributor) {
+        const candidates2 = index[credit.kind].get(words3(credit.name)) || [];
+        if (candidates2.length > 1)
+          raiseReview(c, "contributor_identity", performance2, {
+            reason: "ambiguous-name",
+            name: credit.name,
+            kind: credit.kind,
+            role: credit.role,
+            instrument: credit.instrument,
+            candidates: candidates2,
+            key: `ambiguous|${words3(credit.name)}|${credit.role}`
+          });
+        continue;
+      }
       c.credit(performance2, contributor, credit.role, { instrument: credit.instrument, position: ++position, source: "derived" });
       added++;
     }
   }
   return added;
+}
+function conductorConflicts(c, { albumId = null } = {}) {
+  const rows = c.db.prepare(
+    `SELECT DISTINCT k.target_id AS performance FROM credit k
+       JOIN relation pw ON pw.source_id=k.target_id AND pw.kind='performance_work' JOIN realization r ON r.performance_work_id=pw.id
+       JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id AND t.state='active'
+       WHERE k.role='conductor' AND k.source='manual' AND k.state='active'
+       ${albumId == null ? "" : "AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?"}`
+  ).all(...albumId == null ? [] : [String(albumId)]);
+  const tracksOf = c.db.prepare(
+    `SELECT DISTINCT t.evidence FROM relation pw JOIN realization r ON r.performance_work_id=pw.id JOIN realization_item i ON i.realization_id=r.id
+     JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id AND t.state='active' WHERE pw.kind='performance_work' AND pw.source_id=?`
+  );
+  let raised = 0;
+  for (const { performance: performance2 } of rows) {
+    const tagged = [...new Set(tracksOf.all(performance2).map((row) => text2(JSON.parse(row.evidence).hints?.conductor)))];
+    if (tagged.length !== 1 || !tagged[0]) continue;
+    const credited = c.db.prepare("SELECT contributor_id AS id FROM credit WHERE target_id=? AND role='conductor' AND state='active' ORDER BY id").all(performance2).map((row) => row.id);
+    const names = credited.flatMap((id) => [resolvedName(c, id, "name"), ...c.db.prepare("SELECT text FROM alias WHERE entity_id=?").all(id).map((row) => row.text)]).map((name) => words3(String(name ?? "")));
+    if (names.includes(words3(tagged[0]))) continue;
+    if (raiseReview(c, "credit_conflict", performance2, { reason: "conductor", role: "conductor", tagged: tagged[0], credited, key: `conductor|${words3(tagged[0])}|${credited.join(",")}` })) raised++;
+  }
+  return raised;
 }
 
 // src/search/engine.js
@@ -42169,6 +42212,10 @@ function reviewLabel(c, review) {
       return { label: labelOf(c, review.target_id) || "Catalogue entry", detail: identityQuestion(c, review) };
     case "track_link":
       return { label: trackName || "Track", detail: "File changed or moved; link needs checking" };
+    case "contributor_identity":
+      return review.evidence.reason === "ambiguous-name" ? { label: `\u201C${review.evidence.name}\u201D on ${performanceLabel(c, review.target_id)}`.slice(0, 500), detail: "Tags name someone two records share; which one plays?" } : { label: labelOf(c, review.target_id) || review.evidence.name || "Contributor", detail: "Same name as someone else, with a different MusicBrainz ID: the same or different?" };
+    case "credit_conflict":
+      return { label: performanceLabel(c, review.target_id), detail: `Tags now name \u201C${review.evidence.tagged}\u201D as conductor; you credited someone else` };
     default:
       return {
         label: labelOf(c, review.target_id) || trackName || "Catalogue entry",
@@ -43167,6 +43214,8 @@ function reviewView(c, id) {
     actions.unshift(action("Allow this work again", "allow-work", { id }));
   const distinct = review.kind === "identity" && review.evidence.reason === "duplicate-work" && entity && live(review.evidence.keep);
   if (distinct) pairs.push({ other: review.evidence.keep });
+  const sameName = review.kind === "contributor_identity" && review.evidence.reason === "same-name-different-id" && entity;
+  if (sameName) for (const other of (review.evidence.others || []).filter(live).slice(0, 5)) pairs.push({ other });
   const next = nextReview(c, id);
   if (!pairs.length) {
     actions.push(action("Dismiss", "resolve-review", { id }));
@@ -43227,11 +43276,30 @@ function reviewView(c, id) {
     rows.push({
       id: "separate",
       label: "Keep separate",
-      detail: distinct ? "They are different works. Matching won't suggest merging them again." : "They are different. Nothing is merged or linked, and this item closes.",
-      actions: [distinct ? action("Keep separate", "keep-distinct", { id }) : action("Keep separate", "resolve-review", { id })]
+      detail: sameName ? "They are different people. This isn't asked again." : distinct ? "They are different works. Matching won't suggest merging them again." : "They are different. Nothing is merged or linked, and this item closes.",
+      actions: [distinct || sameName ? action("Keep separate", "keep-distinct", { id }) : action("Keep separate", "resolve-review", { id })]
     });
     if (next) rows.push({ id: "skip", label: "Skip", detail: "Decide later; the next item opens.", actions: [open("Skip", `review:${next}`)] });
     sections.push({ type: "rows", id: "decide", title: "Decide", rows });
+  }
+  const choices = [];
+  if (review.kind === "contributor_identity" && review.evidence.reason === "ambiguous-name")
+    for (const candidate of (review.evidence.candidates || []).filter(live).slice(0, 5))
+      choices.push({
+        id: `use-${candidate}`,
+        label: `Use \u201C${labelOf(c, candidate) || "Untitled"}\u201D`.slice(0, 500),
+        detail: contributorSummary(c, candidate),
+        selection: candidate,
+        actions: [action("Use this record", "use-contributor", { id, contributor: candidate })]
+      });
+  if (review.kind === "credit_conflict") {
+    for (const credited of (review.evidence.credited || []).filter(live))
+      choices.push({ id: `keep-${credited}`, label: `Keep \u201C${labelOf(c, credited) || "Untitled"}\u201D`.slice(0, 500), detail: "Your credit stays; this isn't asked again unless the tags change.", selection: credited, actions: [action("Keep", "resolve-review", { id })] });
+    choices.push({ id: "tagged", label: `Use \u201C${review.evidence.tagged}\u201D`.slice(0, 500), detail: "The tags' conductor replaces yours on this recording.", actions: [action("Use this record", "use-contributor", { id, contributor: "tagged" })] });
+  }
+  if (choices.length) {
+    if (next) choices.push({ id: "skip", label: "Skip", detail: "Decide later; the next item opens.", actions: [open("Skip", `review:${next}`)] });
+    sections.push({ type: "rows", id: "decide", title: "Decide", rows: choices });
   }
   if (entity && (review.kind !== "identity" || identity2)) sections.push({ ...detailsForm(c, review.target_id, entity.kind), title: `Edit ${entity.kind}` });
   if (identity2?.holder && entity?.kind === "work" && live(identity2.holder) && c.db.prepare("SELECT kind FROM entity WHERE id=?").get(identity2.holder)?.kind === "work")
@@ -43393,6 +43461,11 @@ var BULK_FIELDS = [
   ["key", "Key", "text"],
   ["instrumentation", "Instrumentation", "lines"]
 ];
+function contributorSummary(c, id) {
+  const roles2 = c.db.prepare("SELECT role,count(*) AS n FROM credit WHERE contributor_id=? AND state='active' GROUP BY role ORDER BY n DESC").all(id);
+  const mbid = c.db.prepare("SELECT record_id FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='artist' AND state='active'").get(id)?.record_id;
+  return [roles2.map((row) => `${roleLabel(row.role)} on ${row.n}`).join(", ") || "No credits yet", mbid && `MusicBrainz ${mbid.slice(0, 8)}`].filter(Boolean).join(" \xB7 ").slice(0, 500);
+}
 function performanceLabel(c, performance2) {
   const row = c.db.prepare("SELECT r.work_id,r.label FROM realization r JOIN relation pw ON pw.id=r.performance_work_id WHERE pw.source_id=? ORDER BY r.rowid LIMIT 1").get(performance2);
   return row ? [entityLabel(c, row.work_id, "work"), row.label].filter(Boolean).join(" \xB7 ") : entityLabel(c, performance2, "performance");
@@ -43868,6 +43941,7 @@ var V2_COMMANDS = {
   "undo-change": ["id"],
   "allow-work": ["id"],
   "keep-distinct": ["id"],
+  "use-contributor": ["id", "contributor"],
   "move-identity": ["id"],
   "set-classification": ["tracks", "state"],
   "choose-album-work": ["albumId", "work", "page", "move"],
@@ -44233,15 +44307,44 @@ function applyV2(c, request, who) {
       }
       return { selection: undone.works?.[0] && c.db.prepare("SELECT 1 FROM entity WHERE id=? AND deleted_at IS NULL").get(undone.works[0]) ? undone.works[0] : `change:${id}`, message: `Undone: ${undone.summary}.` };
     }
+    case "use-contributor": {
+      const id = str(v.id, "review item", { max: 200 });
+      const review = c.db.prepare("SELECT * FROM review_item WHERE id=? AND status='open' AND kind IN ('contributor_identity','credit_conflict')").get(id);
+      if (!review) fail("This review item is already resolved");
+      const evidence = JSON.parse(review.evidence);
+      const performance2 = review.target_id;
+      c.entity(performance2, "performance");
+      const position = () => c.db.prepare("SELECT coalesce(max(position),0)+1 AS n FROM credit WHERE target_id=?").get(performance2).n;
+      let chosen;
+      if (review.kind === "contributor_identity") {
+        chosen = str(v.contributor, "person or ensemble", { max: 200 });
+        if (!(evidence.candidates || []).includes(chosen)) fail("Choose one of the records the tag name fits");
+        c.entity(chosen, ["person", "ensemble"]);
+        if (!c.db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ? AND state='active'").get(performance2, chosen, evidence.role, evidence.instrument ?? null))
+          c.credit(performance2, chosen, evidence.role, { instrument: evidence.instrument ?? null, position: position() });
+      } else {
+        if (v.contributor !== "tagged") fail("Choose the tags' conductor, or keep yours");
+        chosen = contributorFor(c, contributorIndex(c), evidence.tagged, { kind: "person" });
+        if (!chosen) fail(`Several people are named \u201C${evidence.tagged}\u201D; credit the right one from the recording's page`);
+        for (const { id: credit } of c.db.prepare("SELECT id FROM credit WHERE target_id=? AND role='conductor' AND state='active'").all(performance2)) c.removeCredit(credit);
+        c.credit(performance2, chosen, "conductor", { position: position() });
+      }
+      c.db.prepare("UPDATE review_item SET status='resolved' WHERE id=?").run(id);
+      const next = nextReview(c, id);
+      return { selection: next ? `review:${next}` : "", tab: "review", message: `Credited \u201C${labelOf(c, chosen) || "them"}\u201D on ${performanceLabel(c, performance2)}.`.slice(0, 500) };
+    }
     case "keep-distinct": {
       const id = str(v.id, "review item", { max: 200 });
       const review = c.db.prepare("SELECT * FROM review_item WHERE id=? AND status='open'").get(id);
       if (!review) fail("This review item is already resolved");
-      const keep = JSON.parse(review.evidence).keep;
-      if (typeof keep === "string")
-        c.db.prepare("INSERT INTO match_suppression VALUES (?,?,?,?,?) ON CONFLICT(key) DO NOTHING").run(distinctKey(review.target_id, keep), entityLabel(c, review.target_id, "work"), "distinct", who, Date.now());
+      const evidence = JSON.parse(review.evidence);
+      const people = review.kind === "contributor_identity";
+      for (const other of people ? evidence.others || [] : [evidence.keep])
+        if (typeof other === "string")
+          c.db.prepare("INSERT INTO match_suppression VALUES (?,?,?,?,?) ON CONFLICT(key) DO NOTHING").run(distinctKey(review.target_id, other), labelOf(c, review.target_id) || "Untitled", "distinct", who, Date.now());
       c.db.prepare("UPDATE review_item SET status='resolved' WHERE id=?").run(id);
-      return { selection: "", message: "Kept as two works; matching won't merge them or ask again." };
+      const next = nextReview(c, id);
+      return { selection: next ? `review:${next}` : "", tab: "review", message: people ? "Kept as different people; this isn't asked again." : "Kept as two works; matching won't merge them or ask again." };
     }
     case "move-identity": {
       const id = str(v.id, "review item", { max: 200 });

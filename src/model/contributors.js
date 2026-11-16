@@ -91,6 +91,17 @@ export function contributorIndex(c) {
   return byName;
 }
 
+// A review an admin dismissed or decided is not raised again for the same
+// target and evidence (`evidence.key`): new evidence asks again (E3's rule).
+export function raiseReview(c, kind, target, evidence) {
+  const settled = c.db
+    .prepare("SELECT 1 FROM review_item WHERE kind=? AND target_id=? AND status='resolved' AND json_extract(evidence,'$.key')=? LIMIT 1")
+    .get(kind, target, evidence.key);
+  if (settled) return false;
+  c.review(kind, target, evidence);
+  return true;
+}
+
 const artistIdOf = (c, id) =>
   c.db.prepare("SELECT record_id FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='artist' AND state='active'").get(id)?.record_id || null;
 
@@ -127,7 +138,7 @@ export function contributorFor(c, index, name, { mbid = null, kind = "person", m
   metadata.derived(id, "name", name);
   if (mbid) c.externalIdentity(id, "musicbrainz", "artist", mbid, { evidence: { source: "tags" } });
   if (existing.length)
-    c.review("contributor_identity", id, { reason: "same-name-different-id", name, mbid, others: existing });
+    raiseReview(c, "contributor_identity", id, { reason: "same-name-different-id", name, mbid, others: existing, key: `${words(name)}|${mbid}` });
   index[kind].set(key, [...existing, id]);
   return id;
 }
@@ -176,10 +187,53 @@ export function deriveCredits(c, { albumId = null } = {}) {
     let position = c.db.prepare("SELECT coalesce(max(position),0) AS n FROM credit WHERE target_id=?").get(performance).n;
     for (const credit of shared) {
       const contributor = contributorFor(c, index, credit.name, { kind: credit.kind, mbid: credit.mbid, metadata });
-      if (!contributor) continue;
+      if (!contributor) {
+        // The name fits two records: an admin says which one plays.
+        const candidates = index[credit.kind].get(words(credit.name)) || [];
+        if (candidates.length > 1)
+          raiseReview(c, "contributor_identity", performance, {
+            reason: "ambiguous-name",
+            name: credit.name,
+            kind: credit.kind,
+            role: credit.role,
+            instrument: credit.instrument,
+            candidates,
+            key: `ambiguous|${words(credit.name)}|${credit.role}`,
+          });
+        continue;
+      }
       c.credit(performance, contributor, credit.role, { instrument: credit.instrument, position: ++position, source: "derived" });
       added++;
     }
   }
   return added;
+}
+
+// A conductor an admin credited by hand, and tags that now name someone
+// else: the admin decides. Derivation never touches their credit.
+export function conductorConflicts(c, { albumId = null } = {}) {
+  const rows = c.db
+    .prepare(
+      `SELECT DISTINCT k.target_id AS performance FROM credit k
+       JOIN relation pw ON pw.source_id=k.target_id AND pw.kind='performance_work' JOIN realization r ON r.performance_work_id=pw.id
+       JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id AND t.state='active'
+       WHERE k.role='conductor' AND k.source='manual' AND k.state='active'
+       ${albumId == null ? "" : "AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?"}`,
+    )
+    .all(...(albumId == null ? [] : [String(albumId)]));
+  const tracksOf = c.db.prepare(
+    `SELECT DISTINCT t.evidence FROM relation pw JOIN realization r ON r.performance_work_id=pw.id JOIN realization_item i ON i.realization_id=r.id
+     JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id AND t.state='active' WHERE pw.kind='performance_work' AND pw.source_id=?`,
+  );
+  let raised = 0;
+  for (const { performance } of rows) {
+    const tagged = [...new Set(tracksOf.all(performance).map((row) => text(JSON.parse(row.evidence).hints?.conductor)))];
+    // Only when every track names the same conductor.
+    if (tagged.length !== 1 || !tagged[0]) continue;
+    const credited = c.db.prepare("SELECT contributor_id AS id FROM credit WHERE target_id=? AND role='conductor' AND state='active' ORDER BY id").all(performance).map((row) => row.id);
+    const names = credited.flatMap((id) => [resolvedName(c, id, "name"), ...c.db.prepare("SELECT text FROM alias WHERE entity_id=?").all(id).map((row) => row.text)]).map((name) => words(String(name ?? "")));
+    if (names.includes(words(tagged[0]))) continue;
+    if (raiseReview(c, "credit_conflict", performance, { reason: "conductor", role: "conductor", tagged: tagged[0], credited, key: `conductor|${words(tagged[0])}|${credited.join(",")}` })) raised++;
+  }
+  return raised;
 }

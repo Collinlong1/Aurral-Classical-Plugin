@@ -3,7 +3,7 @@ import { Metadata } from "./metadata.js";
 import { transaction } from "./database.js";
 import { catalogueNumber, cataloguePiece } from "../works.js";
 import { artistCredits, composersOf } from "./credits.js";
-import { deriveCredits } from "./contributors.js";
+import { conductorConflicts, deriveCredits } from "./contributors.js";
 import { linkReissues } from "./reissues.js";
 
 const MULTI_MOVEMENT =
@@ -3114,8 +3114,10 @@ export function autoMatchTaggedWorks(
   for (const group of groups)
     if (createGroup(catalogue, group, actor, index)) created++;
   keyMovementTitles(catalogue, { albumId });
-  // Who plays each newly matched performance, from its tags.
+  // Who plays each newly matched performance, from its tags; and where the
+  // tags now disagree with a conductor an admin set.
   deriveCredits(catalogue, { albumId });
+  conductorConflicts(catalogue, { albumId });
   // One performance on several releases, stored once its performers are known.
   linkReissues(catalogue, { albumId });
   resolveSettledReviews(catalogue, albumId, actor);

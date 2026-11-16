@@ -473,6 +473,80 @@ test("a name mapped with This is… stays mapped through rescans, and the mappin
   assert.equal(s.c.db.prepare("SELECT contributor_id AS id FROM credit WHERE source='derived' AND target_id=(SELECT target_id FROM credit WHERE contributor_id=?)").get(derived).id, derived);
 });
 
+test("identity and credit reviews: merge or keep apart, use one record, keep or replace a conductor; dismissals hold", async (t) => {
+  const s = await setup(t);
+  const { contributorFor, contributorIndex } = await import("../src/model/contributors.js");
+  const m = new Metadata(s.c);
+  const make = (name, kind) => {
+    const id = s.c.createEntity(kind);
+    m.manual(id, "name", name, { actor: "admin" });
+    return id;
+  };
+  const open = () => s.c.db.prepare("SELECT id,kind,target_id,json_extract(evidence,'$.reason') AS reason FROM review_item WHERE status='open' AND kind IN ('contributor_identity','credit_conflict') ORDER BY created_at").all();
+  const decide = async (review) => section((await s.read({ selection: `review:${review}` })).view, "decide").rows;
+  const rescan = () => {
+    autoMatchTaggedWorks(s.c, { actor: "admin", allowStructuredTitles: true });
+    for (const album of ["A", "B"]) autoMatchTaggedWorks(s.c, { albumId: album, actor: "admin", allowStructuredTitles: true });
+  };
+
+  // Same name, different MusicBrainz IDs: merge or keep apart for good.
+  const first = contributorFor(s.c, contributorIndex(s.c), "John Williams", { mbid: "jw-guitar" });
+  const second = contributorFor(s.c, contributorIndex(s.c), "John Williams", { mbid: "jw-composer" });
+  const [identity] = open();
+  assert.deepEqual([identity.kind, identity.target_id, identity.reason], ["contributor_identity", second, "same-name-different-id"]);
+  assert.deepEqual((await decide(identity.id)).map((row) => row.id), [`merge-${first}`, "separate"]);
+  await s.ok("keep-distinct", { id: identity.id }, `review:${identity.id}`);
+  assert.ok(s.c.db.prepare("SELECT 1 FROM match_suppression WHERE key=?").get(`distinct:${[first, second].sort().join("|")}`));
+
+  // A tag name two records share: the scan credits neither and asks.
+  const [orchestraA, orchestraA2] = [make("Orchestra A", "ensemble"), make("Orchestra A", "ensemble")];
+  const [orchestraB] = [make("Orchestra B", "ensemble"), make("Orchestra B", "ensemble")];
+  rescan();
+  const ambiguous = open().filter((review) => review.reason === "ambiguous-name");
+  assert.equal(ambiguous.length, 2);
+  const onA = ambiguous.find((review) => s.c.db.prepare("SELECT 1 FROM review_item WHERE id=? AND json_extract(evidence,'$.name')='Orchestra A'").get(review.id));
+  const onB = ambiguous.find((review) => review !== onA);
+  assert.deepEqual((await decide(onA.id)).filter((row) => row.id.startsWith("use-")).map((row) => row.selection).sort(), [orchestraA, orchestraA2].sort());
+  await s.ok("use-contributor", { id: onA.id, contributor: orchestraA2 }, `review:${onA.id}`);
+  assert.deepEqual(
+    s.c.db.prepare("SELECT contributor_id,role,source FROM credit WHERE target_id=? AND state='active'").all(onA.target_id).map((row) => ({ ...row })),
+    [{ contributor_id: orchestraA2, role: "orchestra", source: "manual" }],
+  );
+  // Dismissed on B: the next scans don't ask again about the same thing.
+  await s.ok("resolve-review", { id: onB.id }, `review:${onB.id}`);
+  rescan();
+  assert.equal(open().filter((review) => review.reason === "ambiguous-name").length, 0);
+  assert.ok(orchestraB);
+
+  // Tags name a different conductor than the one an admin credited.
+  const performance = onA.target_id;
+  const conductor = make("Fixture Conductor", "person");
+  s.c.credit(performance, conductor, "conductor", { position: 9 });
+  const tagConductor = (name) =>
+    s.c.db.prepare("UPDATE track_link SET evidence=json_set(evidence,'$.hints.conductor',?) WHERE CAST(json_extract(evidence,'$.albumId') AS TEXT)='A'").run(name);
+  tagConductor("Tag Conductor");
+  rescan();
+  let [conflict] = open();
+  assert.deepEqual([conflict.kind, conflict.target_id], ["credit_conflict", performance]);
+  assert.deepEqual((await decide(conflict.id)).map((row) => row.label), ["Keep “Fixture Conductor”", "Use “Tag Conductor”"]);
+  // Keep: remembered until the tags change.
+  await s.ok("resolve-review", { id: conflict.id }, `review:${conflict.id}`);
+  rescan();
+  assert.deepEqual(open(), []);
+  tagConductor("Other Conductor");
+  rescan();
+  [conflict] = open();
+  assert.equal(conflict.kind, "credit_conflict");
+  await s.ok("use-contributor", { id: conflict.id, contributor: "tagged" }, `review:${conflict.id}`);
+  const conductors = s.c.db
+    .prepare("SELECT a.value FROM credit k JOIN field_resolution f ON f.target_id=k.contributor_id AND f.field='name' JOIN assertion a ON a.id=f.assertion_id WHERE k.target_id=? AND k.role='conductor' AND k.state='active'")
+    .all(performance)
+    .map((row) => JSON.parse(row.value));
+  assert.deepEqual(conductors, ["Other Conductor"]);
+  rescan();
+  assert.deepEqual(open(), []);
+});
+
 test("send to / remove from Classical overrides detection and closes review items", async (t) => {
   const s = await setup(t);
   const [pop] = s.trackIds("C");

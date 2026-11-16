@@ -1,3 +1,11 @@
+# v0.3 Phase 2.7 — identity and credit conflict review actions (issue #63)
+
+Last of ten commits in one PR (1.5–1.7, 2.1–2.7). Implements #63 only; #63 has no later comments. E3 (#27) itself, for auto-match reviews, stays open; this applies its durable-dismissal rule to the two contributor review kinds, as #63 asks.
+
+Review kinds: `contributor_identity` "same-name-different-id" (1.5) and new "ambiguous-name" (a tag name two records share: derivation credits neither and asks on the recording), and new `credit_conflict` (after matching, tags whose tracks all name a conductor other than the one an admin credited, by name or alias). Their review pages get Decide rows: Merge… and Keep separate (stores `distinctKey` per pair) for the first; one "Use this record" per candidate, with what each is known for, for the second; "Keep" the credited conductor or "Use" the tags' for the third. Every such review carries an evidence key; one an admin dismissed or decided is not raised again for the same target and key (E3's rule), and changed tags ask again. New command `use-contributor`; `keep-distinct` handles contributors. No schema or core change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
 # v0.3 Phase 2.6 — contributor merge and delete with undo (issue #62)
 
 Ninth of ten commits in one PR (1.5–1.7, 2.1–2.7). Implements #62, with E11's fix that #62 names; E8 (favourites lost on undoing a work merge) is listed as related but is not part of #62's task and stays open.

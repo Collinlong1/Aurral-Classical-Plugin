@@ -1,3 +1,16 @@
+# v0.3 Phase 2.7 — contributor reviews / issue #63
+
+## Result
+
+- `contributors.js`: `raiseReview` (skips a resolved review with the same kind, target and `evidence.key`); `contributorFor` raises its same-name review through it; `deriveCredits` raises `ambiguous-name` on the performance for a name two records hold; `conductorConflicts` (called after `deriveCredits` in `autoMatchTaggedWorks`) raises `credit_conflict` for performances with a manual conductor credit whose tracks all name another conductor.
+- `editor-v2.js`: `reviewLabel` cases; `reviewView` Decide rows (same-name pairs reuse the existing merge rows; `ambiguous-name` and `credit_conflict` rows via `contributorSummary`); `keep-distinct` writes a suppression per contributor pair and opens the next review; `use-contributor` (`id`, `contributor`: a candidate, or `tagged` for a conflict) credits the chosen record (manual; for a conflict, the old conductor credits are removed) and resolves the review. Dismiss (`resolve-review`) is remembered through the evidence key.
+
+## Verification
+
+On Node 22.23: full `npm test` 422/422; Apple corpus identical to the baseline. New editor-v2 test: two John Williamses with different IDs offer Merge… and Keep separate, which stores the pair; two ensembles each named "Orchestra A" and "Orchestra B" make the scan ask on both recordings instead of crediting; Use this record credits the chosen one (manual) and resolves it; the dismissed one stays dismissed through rescans; a manual conductor and a different tagged conductor raise a conflict whose Keep is remembered through rescans, a changed tag asks again, and Use replaces the conductor with the tags', after which rescans raise nothing. It fails on the 2.6 code.
+
+---
+
 # v0.3 Phase 2.6 — contributor undo / issue #62
 
 ## Result
