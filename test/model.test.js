@@ -577,6 +577,80 @@ test("Phase 4 groups an album by work and isolates user picks with an admin fall
   ]);
 });
 
+// Core's page schema: text up to 500 characters (a description 10,000), and
+// at most 200 movements, missing movements or movement parts.
+function assertFitsCore(value, key = "") {
+  if (typeof value === "string")
+    assert.ok(value.length <= (key === "description" ? 10000 : 500), `${key} is ${value.length} characters`);
+  else if (Array.isArray(value)) {
+    if (["movements", "missing", "parts"].includes(key)) assert.ok(value.length <= 200, `${key} has ${value.length} entries`);
+    for (const entry of value) assertFitsCore(entry, key);
+  } else if (value && typeof value === "object")
+    for (const [name, entry] of Object.entries(value)) assertFitsCore(entry, name);
+}
+
+test("a 250-movement work with editor-length titles still fits core's page limits", async (t) => {
+  const { c, m } = await setup(t);
+  // An editor title may run to 2,000 characters; this one ends on an emoji
+  // whose two halves straddle the cut.
+  const long = (word) => `${word} ${"x".repeat(497 - word.length)}🎻 and more`.padEnd(2000, " y");
+  const work = c.createEntity("work");
+  m.manual(work, "title", long("Variations"), { actor: "admin" });
+  const movements = Array.from({ length: 250 }, (_, index) => {
+    const movement = c.createEntity("movement");
+    m.manual(movement, "title", index ? `Variation ${index}` : long("Theme"), { actor: "admin" });
+    c.relate("movement", work, movement, { position: index + 1 });
+    return movement;
+  });
+  const tracks = reconcile(
+    c,
+    snapshot(
+      [0, 1].map((index) =>
+        track(index + 1, {
+          coreId: String(index + 1),
+          fileId: String(index + 1),
+          albumId: "long-album",
+          hints: { title: `Track ${index + 1}`, album: long("Album"), artist: long("Orchestra") },
+        }),
+      ),
+    ),
+  );
+  for (const link of tracks) classify(c, link.id, {}, { manual: "classical", actor: "admin" });
+  const performance = c.createEntity("performance");
+  const performanceWork = c.relate("performance_work", performance, work);
+  const recording = c.createEntity("recording");
+  c.relate("recording_performance", recording, performance);
+  const realization = c.realization(work, performanceWork, "Two movements");
+  tracks.forEach((link, index) => {
+    const content = c.recordingContent(recording, performanceWork, { movement: movements[index], position: index + 1 });
+    const segment = c.segment(link.id, { startMs: 0, endMs: 2000 });
+    c.segmentContent(segment, content);
+    c.realizationItem(realization, segment, { movement: movements[index], sequence: index + 1 });
+  });
+
+  const page = renderWork(c, work, { id: 2, role: "user" });
+  assertFitsCore(page);
+  // Cut before the emoji rather than through it.
+  assert.equal(page.work.title, `Variations ${"x".repeat(487)}…`);
+  assert.ok(page.work.title.startsWith("Variations x"));
+  assert.equal(page.work.movements.length, 200);
+  assert.ok(page.work.movements[0].title.startsWith("Theme x"));
+  assert.equal(page.work.movements[1].title, "Variation 1");
+  const [shown] = page.recordings;
+  assert.equal(shown.items.length, 2);
+  assert.equal(shown.missing.length, 200);
+  assert.equal(shown.missing[0].title, "Variation 2");
+  // The cut is display only: the recording is still incomplete.
+  assert.equal(shown.complete, false);
+
+  const album = renderAlbumPresentation(c, "long-album");
+  assertFitsCore(album);
+  const [group] = album.groups;
+  assert.equal(group.items.length, 2);
+  assert.equal(group.missing.length, 200);
+  assert.equal(group.movementCount, 250);
+});
+
 test("wrong kinds, cycles, parent movements, sequence slots and cross-performance play plans fail", async (t) => {
   const { c } = await setup(t);
   const w = c.createEntity("work"),
