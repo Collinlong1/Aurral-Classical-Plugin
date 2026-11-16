@@ -40861,11 +40861,15 @@ function mergeDuplicateAutoWorks(catalogue, { actor: actor3 = null } = {}) {
           if (!keptDistinct(catalogue, ids[0], id)) catalogue.review("identity", id, { reason: "duplicate-work", keep: ids[0], evidence: "same title, no number" });
         continue;
       }
-      const auto = (id) => catalogue.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work'").get(id) && !hasManualEdits(catalogue, [id, ...workMovements(catalogue, id).map((m) => m.id)]);
+      const hasAlbumWork = (id) => catalogue.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work'").get(id);
+      const auto = (id) => hasAlbumWork(id) && !hasManualEdits(catalogue, [id, ...workMovements(catalogue, id).map((m) => m.id)]);
       const keep = ids.find((id) => !auto(id)) || ids[0];
-      if (ids.filter((id) => !auto(id)).length > 1) continue;
+      const severalEdited = ids.filter((id) => !auto(id)).length > 1;
       for (const id of ids.filter((id2) => id2 !== keep))
         if (keptDistinct(catalogue, keep, id)) continue;
+        else if (!hasAlbumWork(keep) || !hasAlbumWork(id))
+          catalogue.review("identity", id, { reason: "duplicate-work", keep, evidence: "work not created by automatic matching" });
+        else if (severalEdited) continue;
         else if (!compatibleAutoWorks(catalogue, keep, id)) catalogue.review("identity", id, { reason: "duplicate-work", keep, evidence: "different MusicBrainz identities" });
         else if (mergeWork(catalogue, keep, id, actor3)) works++;
         else catalogue.review("identity", id, { reason: "duplicate-work", keep });
@@ -41392,11 +41396,14 @@ var fail = (message, field2) => {
   throw new EditorV2Error(message, 400, field2);
 };
 function warnDuplicate(c, title, composers, createAnyway) {
-  if (createAnyway === true) return;
   const similar = similarWorks(c, title, composers);
-  if (!similar.length) return;
+  if (createAnyway === true || !similar.length) return similar;
   const names = similar.slice(0, 3).map((id) => `\u201C${labelOf(c, id) || "Untitled work"}\u201D`).join(", ");
   throw new EditorV2Error(`A similar work already exists: ${names}. Assign to it instead, or tick \u201CCreate anyway\u201D.`, 409);
+}
+function rememberDistinct(c, work, similar, who) {
+  for (const other of similar)
+    c.db.prepare("INSERT INTO match_suppression VALUES (?,?,?,?,?) ON CONFLICT(key) DO NOTHING").run(distinctKey(work, other), entityLabel(c, work, "work"), "distinct", who, Date.now());
 }
 var CREATE_ANYWAY = { key: "createAnyway", label: "Create anyway", type: "checkbox", value: false, help: "Only if no existing work is the same piece." };
 var PAGE = 100;
@@ -43561,7 +43568,7 @@ function applyV2(c, request, who) {
       const title = str(v.title, "work title", { max: 2e3, field: "title" }).trim();
       let composer = str(v.composer ?? "", "composer", { optional: true, max: 200 });
       const composerName = str(v.composerName ?? "", "composer name", { optional: true, max: 500 }).trim();
-      warnDuplicate(c, title, composer ? [labelOf(c, composer)].filter(Boolean) : composerName ? [composerName] : [], v.createAnyway);
+      const similar = warnDuplicate(c, title, composer ? [labelOf(c, composer)].filter(Boolean) : composerName ? [composerName] : [], v.createAnyway);
       if (composer) c.entity(composer, "person");
       else if (composerName) {
         const existing = entities(c, ["person"]).filter((person) => searchText(person.label) === searchText(composerName) && isComposer(c, person));
@@ -43579,6 +43586,7 @@ function applyV2(c, request, who) {
         composer,
         movements: ordered.map((track) => movementTitle({ title: track.title, work: track.evidence.hints?.work }, title) || track.title)
       });
+      rememberDistinct(c, work, similar, who);
       const movements = workMovements(c, work).map((movement) => movement.id);
       assignTracks(c, m, who, work, tracks, movements, { move: selected });
       return { selection: selected ? albumSelection(albumId, "", pageOf(v)) : work, message: `Created \u201C${title}\u201D with ${movements.length} movements.`, ...selected && { focus: "tracks" } };
@@ -44387,10 +44395,11 @@ function apply(c, input, who) {
       const movements = (Array.isArray(v.movements) ? v.movements.join("\n") : text3(v.movements ?? "", "movement titles", { optional: true })).split("\n").map((s) => s.trim()).filter(Boolean);
       if (movements.length > 100)
         fail2("Create no more than 100 movements at a time");
-      warnDuplicate(c, title, composer ? [m.resolve(composer, "name").value].filter(Boolean) : [], v.createAnyway);
+      const similar = warnDuplicate(c, title, composer ? [m.resolve(composer, "name").value].filter(Boolean) : [], v.createAnyway);
       selection = c.createEntity("work");
       manual(selection, "title", title);
       if (composer) c.credit(selection, composer, "composer");
+      rememberDistinct(c, selection, similar, who);
       movements.forEach((title2, i) => {
         const id = c.createEntity("movement");
         manual(id, "title", title2);

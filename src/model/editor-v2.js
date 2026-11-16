@@ -35,11 +35,16 @@ const fail = (message, field) => {
 };
 // Creating a work that probably exists already asks for confirmation first.
 export function warnDuplicate(c, title, composers, createAnyway) {
-  if (createAnyway === true) return;
   const similar = similarWorks(c, title, composers);
-  if (!similar.length) return;
+  if (createAnyway === true || !similar.length) return similar;
   const names = similar.slice(0, 3).map((id) => `“${labelOf(c, id) || "Untitled work"}”`).join(", ");
   throw new EditorV2Error(`A similar work already exists: ${names}. Assign to it instead, or tick “Create anyway”.`, 409);
+}
+// A deliberate new work stays separate from every similar entry the admin saw.
+export function rememberDistinct(c, work, similar, who) {
+  for (const other of similar)
+    c.db.prepare("INSERT INTO match_suppression VALUES (?,?,?,?,?) ON CONFLICT(key) DO NOTHING")
+      .run(distinctKey(work, other), entityLabel(c, work, "work"), "distinct", who, Date.now());
 }
 const CREATE_ANYWAY = { key: "createAnyway", label: "Create anyway", type: "checkbox", value: false, help: "Only if no existing work is the same piece." };
 const PAGE = 100;
@@ -2467,7 +2472,7 @@ export function applyV2(c, request, who) {
       const title = str(v.title, "work title", { max: 2000, field: "title" }).trim();
       let composer = str(v.composer ?? "", "composer", { optional: true, max: 200 });
       const composerName = str(v.composerName ?? "", "composer name", { optional: true, max: 500 }).trim();
-      warnDuplicate(c, title, composer ? [labelOf(c, composer)].filter(Boolean) : composerName ? [composerName] : [], v.createAnyway);
+      const similar = warnDuplicate(c, title, composer ? [labelOf(c, composer)].filter(Boolean) : composerName ? [composerName] : [], v.createAnyway);
       if (composer) c.entity(composer, "person");
       else if (composerName) {
         const existing = entities(c, ["person"]).filter((person) => searchText(person.label) === searchText(composerName) && isComposer(c, person));
@@ -2485,6 +2490,7 @@ export function applyV2(c, request, who) {
         composer,
         movements: ordered.map((track) => movementTitle({ title: track.title, work: track.evidence.hints?.work }, title) || track.title),
       });
+      rememberDistinct(c, work, similar, who);
       const movements = workMovements(c, work).map((movement) => movement.id);
       assignTracks(c, m, who, work, tracks, movements, { move: selected });
       return { selection: selected ? albumSelection(albumId, "", pageOf(v)) : work, message: `Created “${title}” with ${movements.length} movements.`, ...(selected && { focus: "tracks" }) };
