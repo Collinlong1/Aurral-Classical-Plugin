@@ -176,6 +176,44 @@ test("movements reorder, add in bulk and delete; credits use their own lookup", 
   assert.equal((await s.mutate("delete-entity", { target: cellist }, cellist)).ok, true);
 });
 
+test("the performer list filters by role and shows contributors a scan made that nobody has reviewed", async (t) => {
+  const s = await setup(t);
+  const m = new Metadata(s.c);
+  const contributor = (name, kind, data = {}) => {
+    const id = s.c.createEntity(kind, data);
+    (data.unreviewed ? m.derived : m.manual).call(m, id, "name", name, ...(data.unreviewed ? [] : [{ actor: "admin" }]));
+    return id;
+  };
+  const work = (await s.ok("create-work", { title: "Fixture Concerto", composer: "", movements: ["I"] })).selection;
+  const conductor = contributor("Fixture Conductor", "person", { unreviewed: true });
+  const pianist = contributor("Fixture Pianist", "person", { unreviewed: true });
+  const orchestra = contributor("Fixture Orchestra", "ensemble", { unreviewed: true });
+  const edited = contributor("Edited Violinist", "person", { unreviewed: true });
+  m.manual(edited, "name", "Edited Violinist", { actor: "admin" });
+  s.c.credit(work, conductor, "conductor", { source: "derived" });
+  s.c.credit(work, pianist, "soloist", { position: 2, source: "derived" });
+  s.c.credit(work, orchestra, "orchestra", { position: 3, source: "derived" });
+  s.c.credit(work, edited, "performer", { position: 4, source: "derived" });
+  const rows = async (q = "") => (await s.read({ tab: "performers", q })).list.items.filter((item) => item.label.startsWith("Fixture") || item.label.startsWith("Edited"));
+  const labels = async (q) => (await rows(q)).map((item) => item.label).sort();
+  assert.deepEqual((await rows()).map((item) => [item.label, item.detail, item.badge?.label ?? null]).sort(), [
+    ["Edited Violinist", "Person · Performer", null],
+    ["Fixture Conductor", "Person · Conductor", "Unreviewed"],
+    ["Fixture Orchestra", "Ensemble · Orchestra", "Unreviewed"],
+    ["Fixture Pianist", "Person · Soloist", "Unreviewed"],
+  ]);
+  assert.deepEqual(await labels("role:conductor"), ["Fixture Conductor"]);
+  assert.deepEqual(await labels("role:performer"), ["Edited Violinist", "Fixture Pianist"]);
+  assert.deepEqual(await labels("role:ensemble"), ["Fixture Orchestra"]);
+  // An admin's edit counts as reviewed; filters and words combine.
+  assert.deepEqual(await labels("unreviewed"), ["Fixture Conductor", "Fixture Orchestra", "Fixture Pianist"]);
+  assert.deepEqual(await labels("unreviewed pianist"), ["Fixture Pianist"]);
+  assert.deepEqual(await labels("role:performer unreviewed"), ["Fixture Pianist"]);
+  // An unknown role is just a search word.
+  assert.deepEqual(await labels("role:harpist"), []);
+  assert.match((await s.read({ tab: "performers" })).list.placeholder, /role:conductor/);
+});
+
 test("send to / remove from Classical overrides detection and closes review items", async (t) => {
   const s = await setup(t);
   const [pop] = s.trackIds("C");

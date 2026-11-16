@@ -1,3 +1,15 @@
+# v0.3 Phase 2.1 — performer list filters / issue #56
+
+## Result
+
+`editor-v2.js`: `listFor` reads every contributor's active non-composer roles and every manually edited entity in one query each, and returns `facts` per row (kind, roles, unreviewed), stripped before the list is sent; `listFilters` turns `role:…` and `unreviewed` words into tests and leaves the other words to the existing search. An unknown role is an ordinary search word.
+
+## Verification
+
+On Node 22.23: full `npm test` 414/414. New editor-v2 test: four contributors (three unreviewed, one edited by hand) show their roles and badges; `role:conductor`, `role:performer`, `role:ensemble`, `unreviewed` and combinations with words and each other return the expected rows; the placeholder names the filters. It fails on the 1.7 code. `dev/editor-list-places-browser.mjs` (core's renderer, synthetic data) passes at 1280 and 390 px against core `bd41154` locally.
+
+---
+
 # v0.3 Phase 1.7 — search index / issue #59
 
 ## Result

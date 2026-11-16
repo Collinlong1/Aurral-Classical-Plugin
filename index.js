@@ -43442,14 +43442,23 @@ function listFor(c, tab, q, extra = {}) {
     const people = entities(c, tab === "composers" ? ["person"] : ["person", "ensemble"]).filter(
       (entity) => tab === "composers" ? isComposer2(c, entity) : entity.kind === "ensemble" || !isComposer2(c, entity)
     );
+    const rolesOf = /* @__PURE__ */ new Map();
+    if (tab === "performers")
+      for (const row of c.db.prepare("SELECT DISTINCT contributor_id,role FROM credit WHERE state='active' AND role!='composer'").iterate())
+        rolesOf.set(row.contributor_id, [...rolesOf.get(row.contributor_id) || [], row.role]);
+    const edited = new Set(c.db.prepare("SELECT DISTINCT target_id FROM assertion WHERE source='manual'").all().map((row) => row.target_id));
     return people.map((entity) => {
       const works = tab === "composers" ? worksOf(c, entity.id).length : null;
+      const roles2 = (rolesOf.get(entity.id) || []).sort((a, b) => CREDIT_ROLES.indexOf(a) - CREDIT_ROLES.indexOf(b));
+      const unreviewed = entity.data.unreviewed === true && !edited.has(entity.id);
       return {
         id: entity.id,
         label: entity.label,
-        detail: tab === "composers" ? `${works} work${works === 1 ? "" : "s"}` : entity.kind === "ensemble" ? "Ensemble" : "Person",
+        detail: tab === "composers" ? `${works} work${works === 1 ? "" : "s"}` : [entity.kind === "ensemble" ? "Ensemble" : "Person", roles2.map(roleLabel).join(", ")].filter(Boolean).join(" \xB7 "),
+        ...tab === "performers" && unreviewed && { badge: { label: "Unreviewed", tone: "warning" } },
         selection: entity.id,
-        search: entity.label
+        search: entity.label,
+        facts: { kind: entity.kind, roles: roles2, unreviewed }
       };
     });
   }
@@ -43482,6 +43491,21 @@ var LIST_SELECT = {
     ]
   }
 };
+var PERFORMING = /* @__PURE__ */ new Set(["soloist", "performer", "accompanist"]);
+function listFilters(tab, q) {
+  if (tab !== "performers") return { text: q, keep: () => true };
+  const tests = [];
+  const text6 = q.split(/\s+/).filter((word) => {
+    const role = word.match(/^role:([a-z]+)$/i)?.[1]?.toLowerCase();
+    if (role === "ensemble") tests.push((facts) => facts.kind === "ensemble");
+    else if (role === "performer") tests.push((facts) => facts.roles.some((r) => PERFORMING.has(r)));
+    else if (role && CREDIT_ROLES.includes(role)) tests.push((facts) => facts.roles.includes(role));
+    else if (/^unreviewed$/i.test(word)) tests.push((facts) => facts.unreviewed);
+    else return true;
+    return false;
+  }).join(" ");
+  return { text: text6, keep: (item) => !item.facts || tests.every((test) => test(item.facts)) };
+}
 function listKey(c, selection) {
   if (selection.startsWith("album:")) return `album:${parseAlbumSelection(selection).albumId}`;
   if (selection.startsWith("track:")) {
@@ -43515,7 +43539,8 @@ function renderV2(c, query, revision2, { downloads = null, maintenance: maintena
     tab = subject ? subject.review ? "review" : subjectRow?.kind === "work" ? "works" : subjectRow && isComposer2(c, { id: subject.a, data: JSON.parse(subjectRow.data) }) ? "composers" : "performers" : selection.startsWith("slskd:") || selection === "maintenance" || selection.startsWith("change:") ? "activity" : selection.startsWith("bulk:") ? "works" : selection.startsWith("album:") || selection.startsWith("track:") ? "albums" : selection.startsWith("review:") ? "review" : selection.startsWith("new:") ? { work: "works", composer: "composers", performer: "performers" }[selection.slice(4)] || "works" : kind?.kind === "person" ? isComposer2(c, { id: parseEntitySelection(selection).id, data: JSON.parse(kind.data) }) ? "composers" : "performers" : kind?.kind === "ensemble" ? "performers" : "works";
   }
   const all = listFor(c, tab, q, { downloads });
-  const filtered = q && tab !== "search" ? all.filter((item) => matchesSearch(item.search, q)) : all;
+  const { text: words5, keep } = listFilters(tab, q);
+  const filtered = all.filter(keep).filter((item) => !words5 || tab === "search" || matchesSearch(item.search, words5));
   if (query.offset === "" && selection) {
     const key = listKey(c, selection);
     const index = filtered.findIndex((item) => item.selection === key);
@@ -43575,8 +43600,8 @@ function renderV2(c, query, revision2, { downloads = null, maintenance: maintena
     ],
     tab,
     list: {
-      placeholder: { works: "Search works or composers", composers: "Search composers", performers: "Search performers", albums: "Search albums, tracks or performers", review: "Search review items", search: "Works, catalogue numbers, performers, albums\u2026", activity: "Search merges, deletions and slskd searches" }[tab],
-      items: filtered.slice(offset, offset + PAGE).map(({ search: search2, classical, ...item }) => item),
+      placeholder: { works: "Search works or composers", composers: "Search composers", performers: "Search performers; role:conductor, role:performer, role:ensemble, unreviewed", albums: "Search albums, tracks or performers", review: "Search review items", search: "Works, catalogue numbers, performers, albums\u2026", activity: "Search merges, deletions and slskd searches" }[tab],
+      items: filtered.slice(offset, offset + PAGE).map(({ search: search2, classical, facts, ...item }) => item),
       total: filtered.length,
       offset,
       empty: {

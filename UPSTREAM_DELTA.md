@@ -1,3 +1,11 @@
+# v0.3 Phase 2.1 — role and unreviewed filters on the performer list (issue #56)
+
+Fourth of ten commits in one PR (1.5–1.7, 2.1–2.7). Implements #56 only; #56 has no later comments.
+
+The editor's Performers list shows each contributor's credit roles ("Person · Conductor", "Ensemble · Orchestra") and an "Unreviewed" badge on records a scan made from tags (1.4) that nobody has edited by hand. Admin pages v2 have no list-filter control and Phase 2 is plugin-only, so the filters are search words, named in the search placeholder: `role:conductor`, `role:performer` (soloists, performers, accompanists), `role:ensemble`, any other credit role, and `unreviewed`; they combine with each other and with ordinary search words. The list stays paged at 100. No schema or core change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
 # v0.3 Phase 1.7 — index contributor IDs, roles, instruments and sort keys (issue #59)
 
 Third of ten commits in one PR (1.5–1.7, 2.1–2.7). Implements #59 only; #59 has no later comments.
