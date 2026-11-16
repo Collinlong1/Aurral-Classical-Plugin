@@ -1,3 +1,11 @@
+# v0.3 Phase 0.08 — preserve tag-sensitive retags and repair old split links (issue #14)
+
+Branch `fix/v0.3-0.08-preserve-retagged-file-links` starts at `aurral-classical` `3e74192`, including merged L11 PR #100. Current #14 has no additional dependencies or later scope comments. This implements L10 only.
+
+For tag-sensitive hashes, the same file ID, path and duration now retain the plugin link even when the host track ID and container hash change. Reconciliation indexes this evidence and reserves full core/file/path matches before stable file/path matches, then other candidates, preserving L11 ownership and manual newer links. Unambiguous old reused-file reviews can recover the original link and remove an unedited duplicate link plus its unused auto-added movement. Original metadata, work placement and picks stay; ambiguous, manually edited, conflicting or structurally uncertain cases remain for review. No schema, core, media or fingerprint-format change; bundle rebuilt.
+
+Verification and current probe interpretation: `V0_3_REPORT.md`. The scoped limitation remains that a same-duration replacement at the same stable file ID/path cannot be distinguished with a container hash alone. The known Phase 1 fixture mismatch remains outside scope.
+
 # v0.3 Phase 0.07 — reserve exact file matches before duplicate-audio moves (issue #16)
 
 Branch `fix/v0.3-0.07-claim-exact-file-matches` starts at `aurral-classical` `c2bdc59`, including merged E7 PR #99. Current #16 has no additional dependencies or later scope comments. This implements L11 only.
