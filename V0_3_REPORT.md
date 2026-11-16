@@ -1,3 +1,15 @@
+# v0.3 Phase 1.7 — search index / issue #59
+
+## Result
+
+`engine.js`: `FACETS` gains `role`; `creditFacets` adds `role` and credit `instrument` facets to recording and performer documents; `recordingGroupFacets` keeps tag-name performer values only while no release in the group has credits; documents carry `sort` (`sort_title`, `sort_key`, `sort_date`), written to the schema-5 columns; `ownedRecordings` returns each credit's instrument; `catalogueStamp` is `v3`. A credit's role or instrument changed through the editor rebuilds the index through the editor's audit row (part of the stamp); a raw database update would not, so the test changes the instrument through the catalogue API.
+
+## Verification
+
+On Node 22.23: full `npm test` 413/413; Apple corpus identical to the baseline. Extended `combined searches, role-aware filters…` (`test/search.test.js`): the role facet offers conductor, orchestra and soloist for "barenboim"; the role filter finds the two conducted recordings; a soloist credit with an instrument makes the instrument filter find exactly that recording; no `name:` performer values remain; the Moonlight sonata's stored sort title and key (`op:000027:000002`); the stamp starts `v3|`. It fails on the 1.6 code. Existing search assertions pass unchanged.
+
+---
+
 # v0.3 Phase 1.6 — reissue links / issue #54
 
 ## Result

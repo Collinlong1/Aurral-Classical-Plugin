@@ -160,6 +160,25 @@ test("combined searches, role-aware filters and one recording across releases", 
   assert.equal(conductedBy(), 2);
   c.removeCredit(derived);
   assert.equal(conductedBy(), 1);
+  // Credits' roles and instruments filter recordings; tag names no longer
+  // stand in for performers once credits exist.
+  const roleFacet = searchCatalogue(c, { q: "barenboim" }).facets.find((f) => f.key === "role");
+  assert.deepEqual(roleFacet.options.map((o) => o.value).sort(), ["conductor", "orchestra", "soloist"]);
+  assert.equal(searchCatalogue(c, { q: "", filters: { role: ["conductor"] }, kinds: ["recording"] }).sections[0].total, 2);
+  const soloist = c.db.prepare("SELECT id,target_id FROM credit WHERE contributor_id=? AND role='soloist'").get(barenboim);
+  c.removeCredit(soloist.id);
+  c.credit(soloist.target_id, barenboim, "soloist", { instrument: "piano" });
+  assert.deepEqual(
+    searchCatalogue(c, { q: "", filters: { instrument: ["piano"] }, kinds: ["recording"] }).sections[0].items.map((i) => i.title),
+    ["Daniel Barenboim"],
+  );
+  assert.equal(c.db.prepare("SELECT count(*) AS n FROM search_facet WHERE facet='performer' AND value LIKE 'name:%'").get().n, 0);
+  // Sort keys are stored with each document.
+  assert.deepEqual({ ...c.db.prepare("SELECT sort_title,sort_key FROM search_doc WHERE kind='work' AND ref=?").get(moonlight) }, {
+    sort_title: "piano sonata no 14 in c sharp minor op 27 no 2",
+    sort_key: "op:000027:000002",
+  });
+  assert.match(c.db.prepare("SELECT stamp FROM search_state").get().stamp, /^v3\|/);
   // Period filter from a pinned field.
   assert.deepEqual(searchCatalogue(c, { q: "sonata", filters: { period: ["classical"] }, kinds: ["work"] }).sections[0].items.map((i) => i.ref), [moonlight]);
   // Two different recordings of the sonata stay two.

@@ -1,3 +1,11 @@
+# v0.3 Phase 1.7 — index contributor IDs, roles, instruments and sort keys (issue #59)
+
+Third of ten commits in one PR (1.5–1.7, 2.1–2.7). Implements #59 only; #59 has no later comments.
+
+The search index adds a `role` facet (a recording's performers' credit roles, and each performer's own) and puts credit instruments into the existing `instrument` facet, on recording and performer documents only, so work results are unchanged. Performer facets already carry contributor IDs whenever a recording has credits; tag-name values (`name:…`) are now also dropped across a reissue group once any of its releases has credits. Every document stores `sort_title` (folded; a contributor's `sortName` when set), `sort_key` (its first catalogue number, numbers zero-padded so they sort naturally; a movement's position) and `sort_date`. The index stamp is now `v3`, so existing indexes rebuild. `accompanist` has a role label. No schema change beyond 1.1; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
 # v0.3 Phase 1.6 — persist reissue links between performances (issue #54)
 
 Second of ten commits in one PR (1.5–1.7, 2.1–2.7). Implements #54 only; #54 has no later comments.
