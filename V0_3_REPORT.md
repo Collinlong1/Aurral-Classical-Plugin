@@ -1,3 +1,29 @@
+# v0.3 Phase 0.10 — L1 / issue #19
+
+Base: `aurral-classical` `f055abe`, including merged C1 PR #102. This follows the handoff sequence (L1 after C1). No other issue is implemented here.
+
+## Result
+
+- **Count fallback (`auto-match.js`, `mapEach`):** as many tracks as movements lines them up by order only when every track agrees with its movement. Its number, if any, must equal the movement's index, or its position when the movement has no number; for variations and pieces numbered within a set, the index alone, as the name-and-number mapping already does. Its name must not be another of the work's movements. Otherwise `mapEach` falls through to `mapBySections`, and the album caller tries its existing fold and expansion steps before opening a `movement-mismatch` review. `mergeMapping` reuses the same function, so a work merge no longer joins contradicting movements by order either.
+- **Kept:** untitled or unnumbered tracks ("Movement 1") and tracks whose numbers agree with the movements' own ("1. Allegro con brio", "2. Adagio cantabile", "3. Rondo" on a three-movement sonata) still line up by order.
+- **Repair listing (`src/model/movement-report.js`, `scripts/model-admin.mjs movement-numbers`):** read only, run by an admin. It lists active tracks whose title's movement number differs from their movement's number, grouped by work, with album and track ids. Set-piece numbers ("No. 3") are skipped. Editions numbered differently, or a track holding several movements, can be listed correctly; the output says so. README documents it beside the classification report.
+
+Risk, as scoped in #19: an album that previously joined by order with differently worded or numbered movements now goes to review instead.
+
+## Verification
+
+On Node 22.23:
+
+- Full `npm test`: 401/401, including the corpus suites (`corpus`, `corpus-apple`, `corpus-nonclassical`) that CI runs separately. No corpus album relied on the contradicting fallback.
+- `test/messy-matching.test.js`: 38/38 on Node 22 and 26.12.
+- Extended `a movement number never maps a track onto a differently named movement` with the excerpt cases: contradicting numbers and contradicting names return null; untitled tracks and agreeing numbers still map by order. New `excerpts on two albums never land on each other's movements by position`: the two-album BWV 1007 case leaves the work at its three movements and opens one `movement-mismatch` review for the second album. It then stores the old positional placement and checks that the report lists exactly the three misplaced tracks. Both tests fail on base `f055abe` (the second album's Allemande, Courante and Menuet played as Prélude, Sarabande and Gigue) and pass with the fix.
+- `movement-numbers` smoke-tested on an empty catalogue (text and `--json`).
+- `npm run build` and `git diff --check` pass.
+
+The `p1.mjs` review probe was not rerun; the two-album test reproduces its L1 case. No browser, Compose or restart run locally (no Docker); the paired workflows run on the PR.
+
+---
+
 # v0.3 Phase 0.09 — C1 / issues #18 and core #49
 
 Base: plugin `aurral-classical` `2bcc91d` (merged L10 PR #101); core `aurral-classical` `a4fe84d`. This follows the handoff sequence (C1 after L10). No other issue is implemented here.

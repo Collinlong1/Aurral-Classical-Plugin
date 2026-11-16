@@ -217,6 +217,13 @@ it changes). Pins are never changed by a scan. `--album <id>` limits it to one
 album, `--all` includes ordinary tracks, `--json` prints the data. An admin can
 get one album's summary from its menu: **Classical report**.
 
+`node scripts/model-admin.mjs movement-numbers ./model-copy` lists, the same
+read-only way, tracks whose title numbers a different movement than the one
+they are on ("II. Allemande" on "I. Prélude"). Before v0.3 Phase 0.10 an album
+with as many tracks as a work's movements could be matched by order even when
+its numbers disagreed; nothing moves those tracks automatically, so move them
+in the editor. Editions numbered differently can be listed correctly.
+
 ## Test corpus
 
 `test/corpus/albums.js` is a library of classical albums written as tags: well
