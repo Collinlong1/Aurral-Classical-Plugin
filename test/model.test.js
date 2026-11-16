@@ -10,6 +10,7 @@ import {
   restoreDatabase,
   validateDatabase,
   transaction,
+  SCHEMA_VERSION,
 } from "../src/model/database.js";
 import { Metadata } from "../src/model/metadata.js";
 import { ModelJobs } from "../src/model/jobs.js";
@@ -901,12 +902,13 @@ test("failed migrations roll back DDL and versions; consistent backups restore a
   const backup = path.join(folders.root, "snapshot.sqlite");
   await c.backup(backup);
   c.close();
+  const next = SCHEMA_VERSION + 1;
   const bad = {
-    version: 5,
+    version: next,
     sql: "CREATE TABLE should_rollback(id); INSERT INTO no_such_table VALUES (1);",
   };
   await assert.rejects(
-    openDatabase(folders.dataFolder, { migrations: [bad], maxVersion: 5 }),
+    openDatabase(folders.dataFolder, { migrations: [bad], maxVersion: next }),
     /no such table/,
   );
   const restored = await openCatalogue(folders.dataFolder);
@@ -921,12 +923,12 @@ test("failed migrations roll back DDL and versions; consistent backups restore a
   );
   assert.equal(
     restored.db.prepare("PRAGMA user_version").get().user_version,
-    4,
+    SCHEMA_VERSION,
   );
   restored.close();
   const upgraded = await openDatabase(folders.dataFolder, {
-    migrations: [{ version: 5, sql: "CREATE TABLE future(id);" }],
-    maxVersion: 5,
+    migrations: [{ version: next, sql: "CREATE TABLE future(id);" }],
+    maxVersion: next,
   });
   upgraded.db.close();
   await assert.rejects(openCatalogue(folders.dataFolder), /newer/);
@@ -952,7 +954,7 @@ test("schema 1 upgrades to user-scoped Phase 4 state without changing catalogue 
   const upgraded = await openCatalogue(folders.dataFolder);
   assert.equal(
     upgraded.db.prepare("PRAGMA user_version").get().user_version,
-    4,
+    SCHEMA_VERSION,
   );
   assert.equal(upgraded.entity(work).kind, "work");
   // v0.2 (schema 4): the derived search index and the undo/suppression tables.
@@ -974,10 +976,66 @@ test("schema 1 upgrades to user-scoped Phase 4 state without changing catalogue 
   assert.ok((await fs.readdir(path.join(folders.dataFolder, "backups"))).some((file) => file.startsWith("before-v4-")));
 });
 
+test("schema 4 migrates to 5 additively, and its backup restores for the schema 4 build", async (t) => {
+  const folders = await tempFolders();
+  t.after(() => fs.rm(folders.root, { recursive: true, force: true }));
+  const v4 = { migrations: migrations.filter((m) => m.version <= 4), maxVersion: 4 };
+  const old = await openDatabase(folders.dataFolder, v4);
+  const [work, person, ensemble] = ["00000000-0000-4000-8000-000000000051", "00000000-0000-4000-8000-000000000052", "00000000-0000-4000-8000-000000000053"];
+  const entity = old.db.prepare("INSERT INTO entity VALUES (?, ?, '{}', 1, 1, 1, NULL)");
+  entity.run(work, "work");
+  entity.run(person, "person");
+  entity.run(ensemble, "ensemble");
+  old.db.prepare("INSERT INTO credit VALUES ('credit-1', ?, ?, 'composer', NULL, 1, NULL)").run(work, person);
+  old.db.prepare("INSERT INTO credit VALUES ('credit-2', ?, ?, 'orchestra', NULL, 2, NULL)").run(work, ensemble);
+  old.db.prepare("INSERT INTO search_doc(id,kind,ref,work_id,title) VALUES (1,'work',?,?,'Fixture Work')").run(work, work);
+  const counts = (db) =>
+    Object.fromEntries(["entity", "credit", "search_doc", "field_definition", "relation", "assertion"].map((table) => [table, db.prepare(`SELECT count(*) AS n FROM ${table}`).get().n]));
+  const before = counts(old.db);
+  old.db.close();
+
+  const c = await openCatalogue(folders.dataFolder);
+  assert.equal(c.db.prepare("PRAGMA user_version").get().user_version, 5);
+  assert.deepEqual(counts(c.db), { ...before, field_definition: before.field_definition + 4 });
+  // Existing credits read as manual and active; search sort keys start empty.
+  assert.deepEqual(c.db.prepare("SELECT id,source,state FROM credit ORDER BY id").all().map((row) => ({ ...row })), [
+    { id: "credit-1", source: "manual", state: "active" },
+    { id: "credit-2", source: "manual", state: "active" },
+  ]);
+  assert.deepEqual({ ...c.db.prepare("SELECT sort_title,sort_key,sort_date FROM search_doc").get() }, { sort_title: "", sort_key: "", sort_date: "" });
+  for (const table of ["user_recording_state", "saved_queue", "tag_backup"])
+    assert.equal(c.db.prepare(`SELECT count(*) AS n FROM ${table}`).get().n, 0, table);
+  for (const index of ["credit_contributor", "credit_target", "search_doc_sort_title", "tag_backup_track", "saved_queue_user"])
+    assert.ok(c.db.prepare("SELECT 1 FROM sqlite_master WHERE type='index' AND name=?").get(index), index);
+  assert.deepEqual(
+    c.db.prepare("SELECT key,type FROM field_definition WHERE key IN ('sortName','location','instruments','recordingDate') ORDER BY key").all().map((row) => [row.key, row.type]),
+    [["instruments", "array"], ["location", "string"], ["recordingDate", "string"], ["sortName", "string"]],
+  );
+  // Credit provenance is checked by the database too.
+  assert.throws(() => c.db.prepare("UPDATE credit SET source='guess' WHERE id='credit-1'").run(), /CHECK/);
+  assert.throws(() => c.db.prepare("UPDATE credit SET state='hidden' WHERE id='credit-1'").run(), /CHECK/);
+  // A credit made through the catalogue is manual and active.
+  const made = c.credit(work, person, "performer");
+  assert.deepEqual({ ...c.db.prepare("SELECT source,state FROM credit WHERE id=?").get(made) }, { source: "manual", state: "active" });
+  const filename = c.filename;
+  c.close();
+
+  // Rollback: the automatic backup, restored offline, opens with the schema 4 build.
+  const backup = (await fs.readdir(path.join(folders.dataFolder, "backups"))).find((file) => file.startsWith("before-v5-"));
+  assert.ok(backup);
+  await assert.rejects(restoreDatabase(path.join(folders.dataFolder, "backups", backup), filename, { offline: true, maxVersion: 3 }), /newer/);
+  await restoreDatabase(path.join(folders.dataFolder, "backups", backup), filename, { offline: true, maxVersion: 4 });
+  const restored = await openDatabase(folders.dataFolder, v4);
+  assert.equal(restored.db.prepare("PRAGMA user_version").get().user_version, 4);
+  assert.deepEqual(counts(restored.db), before);
+  assert.deepEqual(restored.db.prepare("PRAGMA table_info(credit)").all().map((column) => column.name), ["id", "target_id", "contributor_id", "role", "instrument", "position", "assertion_id"]);
+  restored.db.close();
+});
+
 test("process death during DDL leaves the old schema recoverable", async (t) => {
   const { c, folders } = await setup(t);
   c.close();
-  const script = `import { DatabaseSync } from 'node:sqlite';const d=new DatabaseSync(${JSON.stringify(c.filename)});d.exec('BEGIN IMMEDIATE; CREATE TABLE interrupted(id); PRAGMA user_version=5');process.kill(process.pid,'SIGKILL');`;
+  const script = `import { DatabaseSync } from 'node:sqlite';const d=new DatabaseSync(${JSON.stringify(c.filename)});d.exec('BEGIN IMMEDIATE; CREATE TABLE interrupted(id); PRAGMA user_version=${SCHEMA_VERSION + 1}');process.kill(process.pid,'SIGKILL');`;
   const child = spawnSync(
     process.execPath,
     ["--input-type=module", "-e", script],
@@ -987,7 +1045,7 @@ test("process death during DDL leaves the old schema recoverable", async (t) => 
   const reopened = await openCatalogue(folders.dataFolder);
   assert.equal(
     reopened.db.prepare("PRAGMA user_version").get().user_version,
-    4,
+    SCHEMA_VERSION,
   );
   assert.equal(
     reopened.db

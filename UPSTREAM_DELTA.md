@@ -1,3 +1,13 @@
+# v0.3 Phase 1.1 — catalogue schema 5 (issue #48)
+
+Second of five commits in one PR (0.11, 1.1–1.4) on `claude/pensive-bardeen-5dat3q`. Implements #48 only, as the plan's §3 specifies; #48 has no later comments.
+
+Migration 5 (`src/model/schema.js`, `SCHEMA_VERSION = 5`) is additive, runs in one transaction, and `openDatabase` takes the `backups/before-v5-*.sqlite` backup first. It adds `credit.source` (`manual`, `derived`, `provider`) and `credit.state` (`active`, `removed`), both checked by the database, and indexes on `credit(contributor_id)` and `credit(target_id)`. It adds the `sortName`, `location`, `instruments` and `recordingDate` fields, and the `user_recording_state`, `saved_queue` (D4 = plugin-owned comparisons, as #76 is titled) and `tag_backup` tables. It also adds `search_doc.sort_title`, `sort_key` and `sort_date` with a `(kind, sort_title)` index. Existing credits read as manual and active; nothing existing is rewritten. `Catalogue.credit` now names its insert columns. Nothing reads the new columns or tables yet; 1.2 onward does.
+
+Rollback: stop the plugin, restore the `before-v5-*.sqlite` backup offline with `restoreDatabase` (`scripts/model-admin.mjs restore MODEL_FOLDER BACKUP --offline`), and install the previous plugin build, as V0_2_REPORT.md describes for schema 4.
+
+Verification: `V0_3_REPORT.md`.
+
 # v0.3 Phase 0.11 — variation ranges, Variatio, dash-joined sections and returning arias (L6/L7/L8/L13, issue #20)
 
 Branch `claude/pensive-bardeen-5dat3q` starts at `aurral-classical` `c61dcea`, including merged L1 PR #103. Current #20 has no later scope comments. This implements L6, L7, L8 and L13 together, as #20 asks, from `variations-prototype.patch` (applied cleanly; prototype comments replaced). It is the first of five commits in one PR with Phase 1.1–1.4.

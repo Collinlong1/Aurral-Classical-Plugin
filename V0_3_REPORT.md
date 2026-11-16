@@ -1,3 +1,19 @@
+# v0.3 Phase 1.1 — schema 5 / issue #48
+
+## Result
+
+Migration 5 as in the plan's §3 table, with two additions in the same spirit: `CHECK` constraints on `credit.source` and `credit.state` (the plan checks them in `Catalogue.credit`; the database now refuses other values too), and an index on `saved_queue(user_id)` for the per-person list. `favourite` on `user_recording_state` has the same `CHECK(favourite IN (0,1))` as `user_work_state`. The only code change outside the schema is `Catalogue.credit` naming its insert columns, which a positional `VALUES` with the two new columns would break. The undo history (`history.js`) already snapshots `SELECT *` and restores by column name, so new snapshots keep `source` and `state` and older snapshots restore with the defaults.
+
+## Verification
+
+On Node 22.23:
+
+- Full `npm test`: 405/405.
+- New `schema 4 migrates to 5 additively, and its backup restores for the schema 4 build`: a schema-4 file holding a work, a person, an ensemble, two credits and a search document migrates to 5. Row counts are unchanged (four new field definitions aside), existing credits are `manual`/`active`, sort keys are empty, new tables are empty, the indexes exist, and the database rejects other `source`/`state` values. The `before-v5-*` backup restores offline: it is refused for a schema-3 build and opens with the schema-4 build, with the same counts and the original seven credit columns. It fails on the schema-4 code.
+- The migration-failure, interrupted-DDL and schema-1 upgrade tests now take the current and next version from `SCHEMA_VERSION` instead of hard-coding 4 and 5, so they keep testing "newer than shipped".
+
+---
+
 # v0.3 Phase 0.11 — L6/L7/L8/L13 / issue #20
 
 Base: `aurral-classical` `c61dcea`, including merged L1 PR #103. This follows the handoff sequence (Batch B after L1).

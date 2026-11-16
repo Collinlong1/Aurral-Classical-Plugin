@@ -187,7 +187,7 @@ export class Catalogue {
       }
       const id = randomUUID();
       this.db
-        .prepare("INSERT INTO credit VALUES (?,?,?,?,?,?,?)")
+        .prepare("INSERT INTO credit(id,target_id,contributor_id,role,instrument,position,assertion_id) VALUES (?,?,?,?,?,?,?)")
         .run(id, target, contributor, role, instrument, position, assertionId);
       return id;
     });
