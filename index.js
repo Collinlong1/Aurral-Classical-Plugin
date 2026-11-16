@@ -41229,6 +41229,35 @@ function resolveSettledReviews(catalogue, albumId, actor3) {
   }
   return resolved;
 }
+function repairDuplicateRealizations(catalogue, { actor: actor3 = null } = {}) {
+  return transaction(catalogue.db, () => {
+    const db = catalogue.db, seen = /* @__PURE__ */ new Map();
+    let repaired = 0;
+    const items = db.prepare(`SELECT i.id,i.movement_id,i.occurrence,s.track_link_id,s.kind,s.start_ms,s.end_ms
+      FROM realization_item i JOIN segment s ON s.id=i.segment_id
+      WHERE i.realization_id=? ORDER BY i.sequence`);
+    const realizations2 = db.prepare(`SELECT r.* FROM realization r
+      JOIN entity w ON w.id=r.work_id AND w.deleted_at IS NULL
+      JOIN relation pw ON pw.id=r.performance_work_id JOIN entity p ON p.id=pw.source_id
+      ORDER BY p.created_at,r.rowid`).all();
+    for (const realization of realizations2) {
+      const rows = items.all(realization.id);
+      if (!rows.length) continue;
+      const key = JSON.stringify([realization.work_id, rows.map(({ id, ...mapping }) => mapping)]);
+      const keep = seen.get(key);
+      if (!keep) {
+        seen.set(key, realization.id);
+        continue;
+      }
+      db.prepare("UPDATE user_work_state SET picked_realization_id=? WHERE picked_realization_id=?").run(keep, realization.id);
+      db.prepare("UPDATE admin_work_pick SET realization_id=? WHERE realization_id=?").run(keep, realization.id);
+      for (const row of rows) catalogue.detachItem(row.id, { dropRecording: true });
+      catalogue.audit("work.repair_duplicate_realization", realization.work_id, { keep, removed: realization.id }, actor3);
+      repaired++;
+    }
+    return repaired;
+  });
+}
 function autoMatchTaggedWorks(catalogue, {
   albumId = null,
   actor: actor3 = null,
@@ -41245,6 +41274,7 @@ function autoMatchTaggedWorks(catalogue, {
   );
   repairMergedIdentities(catalogue);
   mergeDuplicateAutoWorks(catalogue, { actor: actor3 });
+  if (albumId == null) repairDuplicateRealizations(catalogue, { actor: actor3 });
   if (albumId != null) repairMovementTitles(catalogue, { albumId });
   if (albumId == null) {
     releaseRangeWorks(catalogue, { actor: actor3 });
@@ -41343,6 +41373,12 @@ function undoChange(c, id, actor3) {
     if (row.undone_at) throw new Error("That change was undone already");
     const data = JSON.parse(row.data);
     const set = parseSet(data.set);
+    if (row.kind === "delete") {
+      const tracks = [...new Set((data.rows.segment || []).map((segment) => segment.track_link_id))];
+      const attached = c.db.prepare(`SELECT 1 FROM realization_item i JOIN segment s ON s.id=i.segment_id WHERE s.track_link_id=? LIMIT 1`);
+      if (tracks.some((track) => attached.get(track)))
+        throw new Error("These tracks are in a work again; take them out first, then undo");
+    }
     const ids = list2(set.entities);
     const later = c.db.prepare(`SELECT 1 FROM audit_event WHERE id>? AND target_id IN (${marks(ids)}) LIMIT 1`).get(data.after, ...ids);
     const laterChange = c.db.prepare("SELECT 1 FROM change_set WHERE created_at>? AND undone_at IS NULL AND id!=? LIMIT 1").get(row.created_at, id);

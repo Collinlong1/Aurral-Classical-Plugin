@@ -2926,6 +2926,36 @@ function resolveSettledReviews(catalogue, albumId, actor) {
   return resolved;
 }
 
+// Earlier deletion undos could leave the same complete recording twice in
+// one work. Compare the full ordered mapping, including ranges and repeats.
+export function repairDuplicateRealizations(catalogue, { actor = null } = {}) {
+  return transaction(catalogue.db, () => {
+    const db = catalogue.db, seen = new Map();
+    let repaired = 0;
+    const items = db.prepare(`SELECT i.id,i.movement_id,i.occurrence,s.track_link_id,s.kind,s.start_ms,s.end_ms
+      FROM realization_item i JOIN segment s ON s.id=i.segment_id
+      WHERE i.realization_id=? ORDER BY i.sequence`);
+    const realizations = db.prepare(`SELECT r.* FROM realization r
+      JOIN entity w ON w.id=r.work_id AND w.deleted_at IS NULL
+      JOIN relation pw ON pw.id=r.performance_work_id JOIN entity p ON p.id=pw.source_id
+      ORDER BY p.created_at,r.rowid`).all();
+    for (const realization of realizations) {
+      const rows = items.all(realization.id);
+      if (!rows.length) continue;
+      const key = JSON.stringify([realization.work_id, rows.map(({ id, ...mapping }) => mapping)]);
+      const keep = seen.get(key);
+      if (!keep) { seen.set(key, realization.id); continue; }
+      // Equivalent picks keep pointing at the surviving recording.
+      db.prepare("UPDATE user_work_state SET picked_realization_id=? WHERE picked_realization_id=?").run(keep, realization.id);
+      db.prepare("UPDATE admin_work_pick SET realization_id=? WHERE realization_id=?").run(keep, realization.id);
+      for (const row of rows) catalogue.detachItem(row.id, { dropRecording: true });
+      catalogue.audit("work.repair_duplicate_realization", realization.work_id, { keep, removed: realization.id }, actor);
+      repaired++;
+    }
+    return repaired;
+  });
+}
+
 export function autoMatchTaggedWorks(
   catalogue,
   {
@@ -2945,6 +2975,7 @@ export function autoMatchTaggedWorks(
   );
   repairMergedIdentities(catalogue);
   mergeDuplicateAutoWorks(catalogue, { actor });
+  if (albumId == null) repairDuplicateRealizations(catalogue, { actor });
   // Titles stored before composer prefixes were read past ("Rachmaninoff:
   // …: I. Vivace") read as the movement again.
   if (albumId != null) repairMovementTitles(catalogue, { albumId });

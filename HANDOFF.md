@@ -1,3 +1,11 @@
+# v0.3 Phase 0.05 — safe deletion undo and duplicate recording repair (issue #15)
+
+Branch `fix/v0.3-0.05-safe-deletion-undo` starts at `aurral-classical` `89d3351`, including merged L3 PR #97. Current #15 has no additional dependencies or later scope comments. This implements E10 only.
+
+Before restoring a deletion, undo now refuses if any track from the saved segments has a current realization item. The refusal leaves the catalogue and undo marker unchanged. Undo of merges keeps its existing behavior. The library match pass also removes later duplicate realizations only when their complete ordered track/movement/occurrence/range mappings are identical within the same work, using detachItem and retaining equivalent user/admin picks. Different files, ranges, ordering or partial recordings remain separate. No schema, core, media or provider-request change; bundle rebuilt.
+
+Verification and base/fixed g3/g4 probe evidence: `V0_3_REPORT.md`. E7's separate global history guard and E11's contributor deletion behavior are unchanged. The known Phase 1 fixture mismatch remains outside scope.
+
 # v0.3 Phase 0.04 — preserve track removals and edited movement lists (issue #11)
 
 Branch `fix/v0.3-0.04-preserve-track-removals` starts at `aurral-classical` `0efd6b2`, including merged E1 PR #96. Current #11 has no further dependencies or later scope comments. This implements L3 only.

@@ -99,6 +99,12 @@ export function undoChange(c, id, actor) {
     if (row.undone_at) throw new Error("That change was undone already");
     const data = JSON.parse(row.data);
     const set = parseSet(data.set);
+    if (row.kind === "delete") {
+      const tracks = [...new Set((data.rows.segment || []).map((segment) => segment.track_link_id))];
+      const attached = c.db.prepare(`SELECT 1 FROM realization_item i JOIN segment s ON s.id=i.segment_id WHERE s.track_link_id=? LIMIT 1`);
+      if (tracks.some((track) => attached.get(track)))
+        throw new Error("These tracks are in a work again; take them out first, then undo");
+    }
     const ids = list(set.entities);
     const later = c.db
       .prepare(`SELECT 1 FROM audit_event WHERE id>? AND target_id IN (${marks(ids)}) LIMIT 1`)
