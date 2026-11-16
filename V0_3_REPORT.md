@@ -1,3 +1,31 @@
+# v0.3 Phase 0.04 — L3 / issue #11
+
+Base: `aurral-classical` `0efd6b2`, including merged E1 PR #96 and the earlier L2/E2 fixes. This follows the handoff sequence. Current #11 has no further dependencies or later comments changing scope. No other issue is implemented here.
+
+## Result
+
+`extendRealization` now skips tracks whose latest effective `editor.unassign-tracks` / `editor.assign-album` event is a removal. The lookup uses the track IDs in the audit payload and audit ID ordering. A skipped mapping is not an assignment. A newer explicit assignment restores eligibility; a later removal keeps the track out again. When no track is eligible, extension returns without a no-op extension audit.
+
+For a work or its movements with manual edits, or an editor action changing the work's structure, extension checks all pending tracks and sections against available existing movements before writing. If any section would need a new movement, it returns false and creates the existing `movement-mismatch` review, leaving recordings, movement positions and attachments unchanged. This avoids partially applying earlier tracks before encountering a later mismatch.
+
+Filling an existing movement remains allowed on edited works. Unedited works still gain genuinely missing movements, independently of another track being explicitly removed. A removal does not delete the catalogue movement; mistaken removals can be corrected through manual assignment.
+
+No schema, core, media-tag or provider-request changes. No new storage table or repair pass. Bundle rebuilt.
+
+## Verification
+
+On Node 24.22.1:
+
+- Seven new editor tests pass; six fail on merged base `0efd6b2` (the existing-movement behavior already passed there).
+- `node --test test/editor-v2.test.js test/auto-match.test.js test/messy-matching.test.js`: 85/85 passed. Cases cover the Applause removal across three rescans, newer assignment and subsequent removal, skipped mappings, extension by a different new track, work/movement/order edits, stable mismatch reviews, no partial writes, and filling existing movements on edited works.
+- Review probe `p2.mjs` run against base `0efd6b2` and this branch via `PLUGIN_SRC`: section A reattaches Applause on the base, while the fixed run leaves it out. Other sections concern previously fixed L2 or unrelated work-title/blank-field behavior and do not expand #11's scope.
+- `npm run build`: passed. `git diff --check`: passed.
+- Full `npm test`: 363/363 passed.
+
+No local browser or Compose/restart run for #11. The known pre-existing Phase 1 workflow fixture mismatch remains unchanged and outside scope.
+
+---
+
 # v0.3 Phase 0.03 — E1 / issue #12
 
 Base: `aurral-classical` `15618a1`, containing merged E2 PR #95 and L2 PR #94. The handoff sequence places E1 next. Current #12 declares no further dependencies and has no later comments changing scope. No other issue is implemented here.
