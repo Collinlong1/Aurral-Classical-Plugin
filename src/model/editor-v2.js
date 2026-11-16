@@ -2,7 +2,7 @@
 // Everything here reads and writes the plugin catalogue only; audio is never touched.
 import path from "node:path";
 import { randomUUID } from "node:crypto";
-import { CREDIT_ROLES } from "./catalogue.js";
+import { CREDIT_ROLES, PERSON_ROLES, ENSEMBLE_ROLES } from "./catalogue.js";
 import { Metadata } from "./metadata.js";
 import { transaction } from "./database.js";
 import { classify } from "./reconcile.js";
@@ -875,9 +875,9 @@ function contributorView(c, entity, page = 0) {
       ...paged(
         other.map((credit) => ({
           id: credit.id,
-          label: entityLabel(c, credit.target_id, credit.target_kind),
+          label: credit.target_kind === "performance" ? performanceLabel(c, credit.target_id) : entityLabel(c, credit.target_id, credit.target_kind),
           detail: `${roleLabel(credit.role)}${credit.instrument ? ` · ${credit.instrument}` : ""}`,
-          selection: credit.target_id,
+          selection: creditTargetPage(c, credit.target_id),
         })),
         page,
         entity.id,
@@ -924,9 +924,10 @@ function contributorView(c, entity, page = 0) {
     title: name,
     subtitle: composer ? "Composer" : kind === "ensemble" ? "Ensemble, orchestra or choir" : "Performer",
     badges: [{ label: `${creditRows.length} credit${creditRows.length === 1 ? "" : "s"}`, tone: "muted" }],
-    actions: creditRows.length
-      ? []
-      : [action("Delete", "delete-entity", { target: entity.id }, { tone: "danger", confirm: `Delete “${name}”?` })],
+    actions: [
+      ...(creditRows.some((credit) => PERFORMING_ROLES.has(credit.role)) ? [open("Change role on all credits…", `roles:${entity.id}`)] : []),
+      ...(creditRows.length ? [] : [action("Delete", "delete-entity", { target: entity.id }, { tone: "danger", confirm: `Delete “${name}”?` })]),
+    ],
     sections,
   };
 }
@@ -1247,6 +1248,7 @@ function albumView(c, albumId, chosenWork, page = 0, move = "") {
       }),
       select: { key: "tracks", actions: [
         action("Group selected tracks", "move-tracks-open", { albumId, page: String(page), ...(chosenWork && { work: chosenWork }) }),
+        action("Set performers…", "performers-open", { albumId, page: String(page) }),
         action("Send to Classical", "set-classification", { state: "classical" }),
         action("Remove from Classical", "set-classification", { state: "not_classical" }, { tone: "danger", confirm: "Remove these tracks from Aurral Classical? They stay in your Aurral library." }),
         action("Remove from work", "unassign-tracks", { albumId, page: String(page) }, { tone: "danger", confirm: "Take these tracks out of their works? The works and the audio stay." }),
@@ -1632,6 +1634,132 @@ const BULK_FIELDS = [
   ["key", "Key", "text"],
   ["instrumentation", "Instrumentation", "lines"],
 ];
+// A performance by what it plays and where: "Symphony No. 5 · Album A".
+function performanceLabel(c, performance) {
+  const row = c.db
+    .prepare("SELECT r.work_id,r.label FROM realization r JOIN relation pw ON pw.id=r.performance_work_id WHERE pw.source_id=? ORDER BY r.rowid LIMIT 1")
+    .get(performance);
+  return row ? [entityLabel(c, row.work_id, "work"), row.label].filter(Boolean).join(" · ") : entityLabel(c, performance, "performance");
+}
+// The page a credit's target opens: a performance opens its recording.
+const creditTargetPage = (c, id) =>
+  c.db.prepare("SELECT source_id FROM relation WHERE kind='recording_performance' AND target_id=? ORDER BY position LIMIT 1").get(id)?.source_id || id;
+const creditTargetLabel = (c, id) => {
+  const kind = c.db.prepare("SELECT kind FROM entity WHERE id=?").get(id)?.kind;
+  return kind === "performance" ? performanceLabel(c, id) : entityLabel(c, id, kind);
+};
+const PERFORMING_ROLES = new Set(["soloist", "performer", "accompanist", "conductor", "orchestra", "ensemble", "choir"]);
+const checkRole = (entity, role) => {
+  if (!CREDIT_ROLES.includes(role) || role === "composer") fail("Choose a performing role", "role");
+  if (PERSON_ROLES.has(role) && entity.kind !== "person") fail(`An ensemble can't be credited as ${role}; choose a person or another role`, "role");
+  if (ENSEMBLE_ROLES.has(role) && entity.kind !== "ensemble") fail(`Only an ensemble can be credited as ${role}`, "role");
+};
+// The performances (recordings) a set of tracks belongs to, in album order.
+export function performancesOfTracks(c, tracks) {
+  const found = [];
+  for (const track of tracks)
+    for (const { performance } of c.db
+      .prepare(
+        `SELECT DISTINCT pw.source_id AS performance FROM segment s JOIN realization_item i ON i.segment_id=s.id
+         JOIN realization r ON r.id=i.realization_id JOIN relation pw ON pw.id=r.performance_work_id WHERE s.track_link_id=?`,
+      )
+      .all(track))
+      if (!found.includes(performance)) found.push(performance);
+  return found;
+}
+function selectedPerformances(c, token) {
+  const row = c.db.prepare("SELECT data FROM change_set WHERE id=? AND kind='selection'").get(token);
+  if (!row) fail("Those ticked tracks are no longer remembered. Tick them again.");
+  const { albumId, tracks } = JSON.parse(row.data);
+  return { albumId, tracks, performances: performancesOfTracks(c, tracks) };
+}
+
+// Set who performs the recordings of ticked album tracks.
+function performersView(c, token) {
+  const { albumId, tracks, performances } = selectedPerformances(c, token);
+  const outside = tracks.filter((track) => !performancesOfTracks(c, [track]).length).length;
+  const roleOptions = [...PERFORMING_ROLES].map((role) => ({ value: role, label: roleLabel(role) }));
+  return {
+    crumbs: [{ label: albums(c, albumId).get(albumId)?.title || "Album", selection: albumSelection(albumId, "", 0) }],
+    title: `Set performers on ${performances.length} recording${performances.length === 1 ? "" : "s"}`,
+    subtitle: `${tracks.length} selected track${tracks.length === 1 ? "" : "s"}${outside ? `; ${outside} not in a work yet` : ""}`,
+    badges: [],
+    actions: [open("Back to the album", albumSelection(albumId, "", 0))],
+    sections: [
+      {
+        type: "form",
+        id: "set-performers",
+        title: "Performer",
+        note: "Each recording is changed on its own; one that can't be is reported and the others keep the change. Credits set here are yours: later scans leave them as set.",
+        command: "set-performers",
+        arguments: { token },
+        submitLabel: `Apply to ${performances.length} recording${performances.length === 1 ? "" : "s"}`,
+        fields: [
+          { key: "contributor", label: "Person or ensemble", type: "lookup", lookup: "contributors", value: "", placeholder: "Search people and ensembles", required: true },
+          { key: "role", label: "Role", type: "select", value: "performer", options: roleOptions },
+          { key: "instrument", label: "Instrument or voice", type: "text", value: "", placeholder: "Optional" },
+          { key: "mode", label: "Their other performers", type: "select", value: "add", options: [{ value: "add", label: "Keep them" }, { value: "replace", label: "Replace them" }] },
+        ],
+      },
+      {
+        type: "rows",
+        id: "recordings",
+        title: "Recordings",
+        empty: "None of these tracks is in a work yet. Group them first.",
+        rows: performances.map((performance) => ({
+          id: performance,
+          label: performanceLabel(c, performance),
+          detail: credits(c, performance).filter((credit) => PERFORMING_ROLES.has(credit.role)).map((credit) => `${credit.name} (${roleLabel(credit.role)})`).join(", ") || "No performers yet",
+          selection: creditTargetPage(c, performance),
+        })),
+      },
+    ],
+  };
+}
+
+// Change one of a contributor's roles on every credit, after a preview.
+function rolesView(c, id) {
+  const entity = c.entity(id, ["person", "ensemble"]);
+  const label = entityLabel(c, id, entity.kind);
+  const rows = c.db.prepare("SELECT * FROM credit WHERE contributor_id=? AND state='active' ORDER BY role,target_id").all(id).filter((credit) => PERFORMING_ROLES.has(credit.role));
+  const roles = [...new Set(rows.map((credit) => credit.role))];
+  const allowed = [...PERFORMING_ROLES].filter((role) => entity.kind === "person" ? !ENSEMBLE_ROLES.has(role) : !PERSON_ROLES.has(role));
+  return {
+    crumbs: [{ label, selection: id }],
+    title: `Change ${label}'s role`,
+    subtitle: `${rows.length} performing credit${rows.length === 1 ? "" : "s"}`,
+    badges: [],
+    actions: [open("Back", id)],
+    sections: [
+      {
+        type: "form",
+        id: "change-roles",
+        title: "Change role on all credits",
+        note: "Every credit with the first role gets the second. Each credit is changed on its own; one that can't be is reported. Changed credits are yours: later scans leave them as set.",
+        command: "change-roles",
+        arguments: { target: id },
+        submitLabel: "Change roles",
+        fields: [
+          { key: "from", label: "From", type: "select", value: roles[0] || "", options: roles.map((role) => ({ value: role, label: `${roleLabel(role)} (${rows.filter((credit) => credit.role === role).length})` })) },
+          { key: "to", label: "To", type: "select", value: allowed.find((role) => role !== roles[0]) || "", options: allowed.map((role) => ({ value: role, label: roleLabel(role) })) },
+        ],
+      },
+      {
+        type: "rows",
+        id: "credits",
+        title: "Credits",
+        empty: "No performing credits.",
+        rows: rows.slice(0, 500).map((credit) => ({
+          id: credit.id,
+          label: creditTargetLabel(c, credit.target_id),
+          detail: `${roleLabel(credit.role)}${credit.instrument ? ` · ${credit.instrument}` : ""}${credit.source === "derived" ? " · from tags" : ""}`,
+          selection: creditTargetPage(c, credit.target_id),
+        })),
+      },
+    ],
+  };
+}
+
 function bulkView(c, token) {
   const works = bulkWorks(c, token);
   return {
@@ -1917,6 +2045,10 @@ export function renderV2(c, query, revision, { downloads = null, maintenance = n
       ? subject.review ? "review" : subjectRow?.kind === "work" ? "works" : subjectRow && isComposer(c, { id: subject.a, data: JSON.parse(subjectRow.data) }) ? "composers" : "performers"
       : selection.startsWith("slskd:") || selection === "maintenance" || selection.startsWith("change:")
       ? "activity"
+        : selection.startsWith("roles:")
+          ? "performers"
+        : selection.startsWith("performers:")
+          ? "albums"
         : selection.startsWith("bulk:")
           ? "works"
       : selection.startsWith("album:") || selection.startsWith("track:")
@@ -1951,6 +2083,8 @@ export function renderV2(c, query, revision, { downloads = null, maintenance = n
   else if (selection.startsWith("change:")) view = changeView(c, selection.slice(7));
   else if (selection === "maintenance") view = maintenanceView(maintenance);
   else if (selection.startsWith("bulk:")) view = bulkView(c, selection.slice(5));
+  else if (selection.startsWith("performers:")) view = performersView(c, selection.slice(11));
+  else if (selection.startsWith("roles:")) view = rolesView(c, selection.slice(6));
   else if (selection.startsWith("merge:")) {
     const { a, b, review } = parseMergeSelection(selection);
     view = mergeView(c, a, b, review);
@@ -2075,6 +2209,9 @@ export const V2_COMMANDS = {
   "merge-open": ["target", "into"],
   "delete-works": ["works"],
   "bulk-edit-open": ["works"],
+  "performers-open": ["albumId", "tracks", "page"],
+  "set-performers": ["token", "contributor", "role", "instrument", "mode"],
+  "change-roles": ["target", "from", "to"],
   "bulk-edit": ["token", "period", "form", "key", "instrumentation", "composer"],
   "bulk-unpin": ["token"],
   "undo-change": ["id"],
@@ -2356,6 +2493,70 @@ export function applyV2(c, request, who) {
         }
       }
       return { selection: `bulk:${token}`, message: `Updated ${changed} of ${works.length} work${works.length === 1 ? "" : "s"}.${failed.length ? ` Not changed: ${failed.slice(0, 3).join("; ")}${failed.length > 3 ? ` and ${failed.length - 3} more` : ""}.` : ""}`.slice(0, 500) };
+    }
+    case "performers-open": {
+      const albumId = str(v.albumId, "album", { max: 200 });
+      return { selection: `performers:${rememberAlbumTracks(c, albumId, v.tracks, who)}`, message: "" };
+    }
+    case "set-performers": {
+      const token = str(v.token, "selection", { max: 200 });
+      const { performances } = selectedPerformances(c, token);
+      if (!performances.length) fail("None of these tracks is in a work yet. Group them first.");
+      const contributor = c.entity(str(v.contributor, "person or ensemble", { max: 200, field: "contributor" }), ["person", "ensemble"]);
+      const role = str(v.role, "role", { max: 80 });
+      const instrument = str(v.instrument ?? "", "instrument", { optional: true, max: 200 }).trim() || null;
+      checkRole(contributor, role);
+      const replace = v.mode === "replace";
+      let changed = 0;
+      const failed = [];
+      // Each recording in its own savepoint: one that fails keeps the others'.
+      for (const performance of performances) {
+        try {
+          transaction(c.db, () => {
+            if (replace)
+              for (const { id } of c.db.prepare(`SELECT id FROM credit WHERE target_id=? AND state='active' AND role IN (${[...PERFORMING_ROLES].map(() => "?").join(",")})`).all(performance, ...PERFORMING_ROLES))
+                c.removeCredit(id);
+            const same = c.db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ? AND state='active'").get(performance, contributor.id, role, instrument);
+            if (!same) {
+              const position = c.db.prepare("SELECT coalesce(max(position),0)+1 AS n FROM credit WHERE target_id=?").get(performance).n;
+              c.credit(performance, contributor.id, role, { instrument, position });
+            }
+            c.audit("editor.set-performers", performance, { contributor: contributor.id, role, instrument, replace }, who);
+          });
+          changed++;
+        } catch (error) {
+          failed.push(`${performanceLabel(c, performance)}: ${error.message}`);
+        }
+      }
+      return { selection: `performers:${token}`, message: `Updated ${changed} of ${performances.length} recording${performances.length === 1 ? "" : "s"}.${failed.length ? ` Not changed: ${failed.slice(0, 3).join("; ")}${failed.length > 3 ? ` and ${failed.length - 3} more` : ""}.` : ""}`.slice(0, 500) };
+    }
+    case "change-roles": {
+      const target = c.entity(str(v.target, "person or ensemble", { max: 200 }), ["person", "ensemble"]);
+      const from = str(v.from, "role", { max: 80, field: "from" });
+      const to = str(v.to, "role", { max: 80, field: "to" });
+      if (from === to) fail("Choose a different role", "to");
+      checkRole(target, to);
+      const credits_ = c.db.prepare("SELECT * FROM credit WHERE contributor_id=? AND role=? AND state='active' ORDER BY target_id").all(target.id, from);
+      if (!credits_.length) fail(`No credits as ${roleLabel(from).toLowerCase()} to change`, "from");
+      let changed = 0;
+      const failed = [];
+      for (const credit of credits_) {
+        try {
+          transaction(c.db, () => {
+            const same = c.db
+              .prepare("SELECT id,state FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?")
+              .get(credit.target_id, target.id, to, credit.instrument);
+            if (same?.state === "active") throw new Error(`already credited as ${roleLabel(to).toLowerCase()}`);
+            if (same) c.db.prepare("DELETE FROM credit WHERE id=?").run(same.id);
+            c.db.prepare("UPDATE credit SET role=?,source='manual' WHERE id=?").run(to, credit.id);
+            c.audit("editor.change-roles", credit.target_id, { contributor: target.id, from, to }, who);
+          });
+          changed++;
+        } catch (error) {
+          failed.push(`${creditTargetLabel(c, credit.target_id)}: ${error.message}`);
+        }
+      }
+      return { selection: `roles:${target.id}`, message: `Changed ${changed} of ${credits_.length} credit${credits_.length === 1 ? "" : "s"} to ${roleLabel(to).toLowerCase()}.${failed.length ? ` Not changed: ${failed.slice(0, 3).join("; ")}${failed.length > 3 ? ` and ${failed.length - 3} more` : ""}.` : ""}`.slice(0, 500) };
     }
     case "bulk-unpin": {
       const token = str(v.token, "selection", { max: 200 });

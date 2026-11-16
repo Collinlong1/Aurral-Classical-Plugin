@@ -1,3 +1,17 @@
+# v0.3 Phase 2.4 — bulk credits / issue #61
+
+## Result
+
+- `editor-v2.js`: commands `performers-open` (album, ticked tracks → `performers:<token>`), `set-performers` (`token`, `contributor`, `role`, `instrument`, `mode` add/replace), `change-roles` (`target`, `from`, `to`); views `performersView` and `rolesView`; helpers `performancesOfTracks`, `performanceLabel`, `creditTargetPage`, `checkRole` (performing roles only, person/ensemble rules checked before anything changes). Album select bar gains "Set performers…"; contributor pages with performing credits gain "Change role on all credits…".
+- `editor.js` `scopeIds`: `performers:<token>` covers the selection and its performances; `roles:<id>` covers the contributor and every target they are credited on.
+- A role change into a credit that already exists is reported for that credit; a removed credit under the new role gives way.
+
+## Verification
+
+On Node 22.23: full `npm test` 417/417. New editor-v2 test: ticked album tracks open a one-recording page listing its tag-made orchestra; adding a conductor keeps it; replacing with an orchestra removes it (kept `removed`); an ensemble as conductor is refused; with a database trigger blocking the recording, the result reports "Updated 0 of 1 … blocked" and the old performers stay; Change role previews two credits, and with one blocked changes the other and reports it, then changes the second on retry; an ensemble to soloist is refused; contributor rows read "Symphony No. 5 · Album …" and open the recording. It fails on the 2.3 code. `dev/editor-credits-browser.mjs` passes at 1280 and 390 px locally against core `bd41154`: ticking eight box-set tracks, Set performers… on two recordings, then Change role on all credits… from the conductor's page.
+
+---
+
 # v0.3 Phase 2.3 — contributor details / issue #58
 
 ## Result

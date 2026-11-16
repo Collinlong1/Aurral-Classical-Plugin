@@ -309,6 +309,71 @@ test("contributor details: sort name, spellings, instruments and dates; renames 
   assert.deepEqual((await s.read({ lookup: "people", q: "fixture" })).options.map((o) => o.label), ["Fixture Cellist"]);
 });
 
+test("bulk credits: set performers on ticked album tracks and change a contributor's role everywhere", async (t) => {
+  const s = await setup(t);
+  for (const album of ["A", "B"]) autoMatchTaggedWorks(s.c, { albumId: album, actor: "admin", allowStructuredTitles: true });
+  const performanceOf = (album) =>
+    s.c.db
+      .prepare(
+        `SELECT DISTINCT pw.source_id AS p FROM realization r JOIN relation pw ON pw.id=r.performance_work_id JOIN realization_item i ON i.realization_id=r.id
+         JOIN segment g ON g.id=i.segment_id JOIN track_link l ON l.id=g.track_link_id WHERE CAST(json_extract(l.evidence,'$.albumId') AS TEXT)=?`,
+      )
+      .get(album).p;
+  const [a, b] = [performanceOf("A"), performanceOf("B")];
+  const performers = (performance) =>
+    s.c.db
+      .prepare("SELECT a.value AS name,k.role,k.source FROM credit k JOIN field_resolution f ON f.target_id=k.contributor_id AND f.field='name' JOIN assertion a ON a.id=f.assertion_id WHERE k.target_id=? AND k.state='active' ORDER BY k.position")
+      .all(performance)
+      .map((row) => [JSON.parse(row.name), row.role, row.source]);
+  const conductor = (await s.ok("create-contributor", { name: "Fixture Conductor", kind: "person" })).selection;
+  const ensemble = (await s.ok("create-contributor", { name: "Fixture Philharmonic", kind: "ensemble" })).selection;
+
+  // Tick album A's tracks, then Set performers…: the page lists the recording
+  // they belong to with who performs it now.
+  const opened = await s.ok("performers-open", { albumId: "A", tracks: s.trackIds("A"), page: "0" }, "album:A");
+  assert.match(opened.selection, /^performers:/);
+  const view = (await s.read({ selection: opened.selection })).view;
+  assert.equal(view.title, "Set performers on 1 recording");
+  assert.deepEqual(section(view, "recordings").rows.map((row) => row.detail), ["Orchestra A (Orchestra)"]);
+  await s.ok("set-performers", { token: opened.selection.slice(11), contributor: conductor, role: "conductor", instrument: "", mode: "add" }, opened.selection);
+  assert.deepEqual(performers(a), [["Orchestra A", "orchestra", "derived"], ["Fixture Conductor", "conductor", "manual"]]);
+  // Replace: the tag-made orchestra is removed (and stays removed), the new one is the admin's.
+  await s.ok("set-performers", { token: opened.selection.slice(11), contributor: ensemble, role: "orchestra", instrument: "", mode: "replace" }, opened.selection);
+  assert.deepEqual(performers(a), [["Fixture Philharmonic", "orchestra", "manual"]]);
+  assert.equal(s.c.db.prepare("SELECT state FROM credit WHERE target_id=? AND source='derived'").get(a).state, "removed");
+  // A role the contributor can't hold is refused before anything changes.
+  assert.equal((await s.mutate("set-performers", { token: opened.selection.slice(11), contributor: ensemble, role: "conductor", mode: "add" }, opened.selection)).ok, false);
+  // A recording that can't be changed is reported, and its old performers stay.
+  s.c.db.exec(`CREATE TRIGGER block_a BEFORE INSERT ON credit WHEN NEW.target_id='${a}' BEGIN SELECT RAISE(ABORT,'blocked for the test'); END`);
+  const blocked = await s.ok("set-performers", { token: opened.selection.slice(11), contributor: conductor, role: "soloist", instrument: "", mode: "replace" }, opened.selection);
+  assert.match(blocked.message, /Updated 0 of 1 recording\. Not changed: .*blocked for the test/);
+  assert.deepEqual(performers(a), [["Fixture Philharmonic", "orchestra", "manual"]]);
+  s.c.db.exec("DROP TRIGGER block_a");
+
+  // Change role on all credits: a preview, then each credit on its own.
+  s.c.credit(a, conductor, "performer", { position: 5 });
+  s.c.credit(b, conductor, "performer", { position: 5, source: "derived" });
+  const roles = (await s.read({ selection: conductor })).view.actions.find((item) => item.label === "Change role on all credits…");
+  assert.equal(roles.arguments.selection, `roles:${conductor}`);
+  const preview = (await s.read({ selection: `roles:${conductor}` })).view;
+  assert.deepEqual(section(preview, "credits").rows.map((row) => row.detail).sort(), ["Performer", "Performer · from tags"]);
+  assert.deepEqual(section(preview, "change-roles").fields[0].options.map((o) => o.label), ["Performer (2)"]);
+  s.c.db.exec(`CREATE TRIGGER block_b BEFORE UPDATE ON credit WHEN OLD.target_id='${b}' BEGIN SELECT RAISE(ABORT,'blocked for the test'); END`);
+  const changed = await s.ok("change-roles", { target: conductor, from: "performer", to: "soloist" }, `roles:${conductor}`);
+  assert.match(changed.message, /Changed 1 of 2 credits to soloist\. Not changed: .*blocked for the test/);
+  s.c.db.exec("DROP TRIGGER block_b");
+  assert.deepEqual(performers(a).filter(([name]) => name === "Fixture Conductor"), [["Fixture Conductor", "soloist", "manual"]]);
+  assert.deepEqual(performers(b).filter(([name]) => name === "Fixture Conductor"), [["Fixture Conductor", "performer", "derived"]]);
+  await s.ok("change-roles", { target: conductor, from: "performer", to: "soloist" }, `roles:${conductor}`);
+  assert.deepEqual(performers(b).filter(([name]) => name === "Fixture Conductor"), [["Fixture Conductor", "soloist", "manual"]]);
+  // A role an ensemble can't hold is refused.
+  assert.equal((await s.mutate("change-roles", { target: ensemble, from: "orchestra", to: "soloist" }, `roles:${ensemble}`)).ok, false);
+  // Contributor pages label a recording by work and album, and open the recording.
+  const row = section((await s.read({ selection: conductor })).view, "credits").rows[0];
+  assert.match(row.label, /Symphony No\. ?5.* · Album [AB]/);
+  assert.equal(s.c.db.prepare("SELECT kind FROM entity WHERE id=?").get(row.selection).kind, "recording");
+});
+
 test("send to / remove from Classical overrides detection and closes review items", async (t) => {
   const s = await setup(t);
   const [pop] = s.trackIds("C");

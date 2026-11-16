@@ -7,7 +7,7 @@ import { classify } from "./reconcile.js";
 import { searchText, matchesSearch, ownedTracks } from "./editor-search.js";
 import { searchDiagnostics } from "../source.js";
 import { ensureSearchIndex } from "../search/engine.js";
-import { renderV2, lookupV2, applyV2, V2_COMMANDS, EditorV2Error, warnDuplicate, rememberDistinct, parseAlbumSelection, parseEntitySelection, finishWorkMutation, nextReview, parseMergeSelection } from "./editor-v2.js";
+import { renderV2, lookupV2, applyV2, V2_COMMANDS, EditorV2Error, warnDuplicate, rememberDistinct, parseAlbumSelection, parseEntitySelection, finishWorkMutation, nextReview, parseMergeSelection, performancesOfTracks } from "./editor-v2.js";
 
 class EditorError extends Error {
   // `field`: the form field the message is about; v2 hosts show it there.
@@ -61,6 +61,18 @@ function scopeIds(c, scope) {
   if (scope.startsWith("merge:")) {
     const { a, b, review } = parseMergeSelection(scope);
     return [a, b, ...(review ? [review] : [])];
+  }
+  // Setting performers on selected album tracks: the selection and the
+  // performances it reaches.
+  if (scope.startsWith("performers:")) {
+    const token = scope.slice(11);
+    const row = c.db.prepare("SELECT data FROM change_set WHERE id=? AND kind='selection'").get(token);
+    return [token, ...(row ? performancesOfTracks(c, JSON.parse(row.data).tracks || []) : [])];
+  }
+  // Changing a contributor's role everywhere: them and what they're credited on.
+  if (scope.startsWith("roles:")) {
+    const id = scope.slice(6);
+    return [id, ...c.db.prepare("SELECT DISTINCT target_id FROM credit WHERE contributor_id=? AND state='active'").all(id).map((row) => row.target_id)];
   }
   if (scope.startsWith("bulk:")) {
     const row = c.db.prepare("SELECT data FROM change_set WHERE id=? AND kind='selection'").get(scope.slice(5));

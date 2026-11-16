@@ -1,3 +1,11 @@
+# v0.3 Phase 2.4 — bulk assign performers and change credit roles (issue #61)
+
+Seventh of ten commits in one PR (1.5–1.7, 2.1–2.7). Implements #61 only; #61 has no later comments.
+
+An album page's ticked tracks gain "Set performers…" (remembered with `rememberAlbumTracks`, as grouping does): a page listing the recordings those tracks belong to with their current performers, and a form setting a person or ensemble, role, instrument, and whether their other performers are kept or replaced. A contributor's page gains "Change role on all credits…": a preview of every performing credit and a from/to role form. Each recording or credit is changed in its own savepoint, as bulk-edit does; one that fails is reported ("Updated 1 of 2 … Not changed: …") and the others keep the change. Credits set this way are manual; replaced derived credits stay removed. Contributor pages now label performance credits "Work · Album" and open the recording. New `dev/editor-credits-browser.mjs`, added to the work-view workflow. No schema or core change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
 # v0.3 Phase 2.3 — contributor details, aliases and ensemble membership (issue #58)
 
 Sixth of ten commits in one PR (1.5–1.7, 2.1–2.7). Implements #58 only; #58 has no later comments.
