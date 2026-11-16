@@ -374,6 +374,26 @@ test("bulk credits: set performers on ticked album tracks and change a contribut
   assert.equal(s.c.db.prepare("SELECT kind FROM entity WHERE id=?").get(row.selection).kind, "recording");
 });
 
+test("This is…: an unreviewed name from tags becomes another spelling of a known contributor", async (t) => {
+  const s = await setup(t);
+  autoMatchTaggedWorks(s.c, { albumId: "A", actor: "admin", allowStructuredTitles: true });
+  const derived = s.c.db.prepare("SELECT contributor_id AS id FROM credit WHERE source='derived'").get().id;
+  const known = (await s.ok("create-contributor", { name: "Fixture Philharmonic", kind: "ensemble" })).selection;
+  const person = (await s.ok("create-contributor", { name: "Fixture Person", kind: "person" })).selection;
+  const form = section((await s.read({ selection: derived })).view, "map");
+  assert.equal(form.title, "This is…");
+  assert.equal(form.fields[0].lookup, "ensembles");
+  // A record nobody made from tags has no such question.
+  assert.equal(section((await s.read({ selection: known })).view, "map"), undefined);
+  assert.equal((await s.mutate("map-contributor", { target: derived, into: person }, derived)).ok, false);
+  const mapped = await s.ok("map-contributor", { target: derived, into: known }, derived);
+  assert.equal(mapped.selection, known);
+  assert.match(mapped.message, /“Orchestra A” is now “Fixture Philharmonic”/);
+  assert.equal(s.c.db.prepare("SELECT deleted_at FROM entity WHERE id=?").get(derived).deleted_at !== null, true);
+  assert.equal(s.c.db.prepare("SELECT count(*) AS n FROM credit WHERE contributor_id=? AND state='active'").get(known).n, 1);
+  assert.deepEqual(s.c.db.prepare("SELECT text FROM alias WHERE entity_id=?").all(known).map((row) => row.text), ["Orchestra A"]);
+});
+
 test("send to / remove from Classical overrides detection and closes review items", async (t) => {
   const s = await setup(t);
   const [pop] = s.trackIds("C");

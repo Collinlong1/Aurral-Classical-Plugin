@@ -42637,6 +42637,20 @@ function contributorView(c, entity, page = 0) {
         "Credits"
       )
     });
+  const unreviewed = entity.data.unreviewed === true && !c.db.prepare("SELECT 1 FROM assertion WHERE target_id=? AND source='manual' LIMIT 1").get(entity.id);
+  if (unreviewed)
+    sections.unshift({
+      type: "form",
+      id: "map",
+      title: "This is\u2026",
+      note: `A scan made \u201C${name}\u201D from file tags. If it's ${kind === "ensemble" ? "an ensemble" : "someone"} already here, choose them: \u201C${name}\u201D becomes another spelling of theirs, its credits move to them, and later scans land there.`,
+      command: "map-contributor",
+      arguments: { target: entity.id },
+      submitLabel: "Use this record",
+      fields: [
+        kind === "ensemble" ? { key: "into", label: "Ensemble", type: "lookup", lookup: "ensembles", value: "", placeholder: "Search ensembles", required: true } : { key: "into", label: "Person", type: "lookup", lookup: "people", value: "", placeholder: "Search people", required: true }
+      ]
+    });
   const members = c.db.prepare(`SELECT ${kind === "ensemble" ? "source_id" : "target_id"} AS id FROM relation WHERE kind='member_of' AND ${kind === "ensemble" ? "target_id" : "source_id"}=? ORDER BY position,id`).all(entity.id).map((row) => row.id);
   sections.push(
     {
@@ -43829,6 +43843,7 @@ var V2_COMMANDS = {
   "performers-open": ["albumId", "tracks", "page"],
   "set-performers": ["token", "contributor", "role", "instrument", "mode"],
   "change-roles": ["target", "from", "to"],
+  "map-contributor": ["target", "into"],
   "bulk-edit": ["token", "period", "form", "key", "instrumentation", "composer"],
   "bulk-unpin": ["token"],
   "undo-change": ["id"],
@@ -44120,6 +44135,18 @@ function applyV2(c, request, who) {
         }
       }
       return { selection: `performers:${token}`, message: `Updated ${changed} of ${performances.length} recording${performances.length === 1 ? "" : "s"}.${failed.length ? ` Not changed: ${failed.slice(0, 3).join("; ")}${failed.length > 3 ? ` and ${failed.length - 3} more` : ""}.` : ""}`.slice(0, 500) };
+    }
+    case "map-contributor": {
+      const target = str(v.target, "entry", { max: 200 });
+      const into = str(v.into, "person or ensemble", { max: 200, field: "into" });
+      if (target === into) fail("Choose a different entry", "into");
+      const drop = c.entity(target, ["person", "ensemble"]);
+      const keep = c.entity(into, ["person", "ensemble"]);
+      if (drop.kind !== keep.kind) fail(drop.kind === "person" ? "Choose a person" : "Choose an ensemble", "into");
+      const spelling = entityLabel(c, target, drop.kind);
+      mergeContributor(c, into, target, who);
+      c.db.prepare("UPDATE review_item SET status='resolved' WHERE target_id=? AND status='open'").run(target);
+      return { selection: into, message: `\u201C${spelling}\u201D is now \u201C${entityLabel(c, into, keep.kind)}\u201D: tags spelled that way land here.`.slice(0, 500) };
     }
     case "change-roles": {
       const target = c.entity(str(v.target, "person or ensemble", { max: 200 }), ["person", "ensemble"]);

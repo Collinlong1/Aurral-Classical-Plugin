@@ -1,3 +1,11 @@
+# v0.3 Phase 2.5 — map unreviewed tag names to existing contributors (issue #60)
+
+Eighth of ten commits in one PR (1.5–1.7, 2.1–2.7). Implements #60 only; #60 has no later comments.
+
+A contributor a scan made from a tag spelling (1.4) and nobody has edited shows "This is…" at the top of its page: a people or ensembles lookup (same kind only) and "Use this record". New command `map-contributor` merges it into the chosen record with `mergeContributor`, which keeps the tag spelling as an alias, moves its credits and closes its open reviews; the next scan of any album with that spelling lands on the chosen record (1.5's alias rule). 2.6 makes the merge undoable. No schema or core change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
 # v0.3 Phase 2.4 — bulk assign performers and change credit roles (issue #61)
 
 Seventh of ten commits in one PR (1.5–1.7, 2.1–2.7). Implements #61 only; #61 has no later comments.

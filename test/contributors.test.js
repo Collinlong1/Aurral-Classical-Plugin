@@ -241,3 +241,24 @@ test("identity: composer and performer of one name are one person; an artist ID 
   assert.deepEqual(people("martha argerich").map(idOf), [undefined]);
   assert.deepEqual(people("nelson freire").map(idOf), [undefined]);
 });
+
+test("a name mapped to a known contributor: later albums with that spelling land on them", async (t) => {
+  const { mergeContributor } = await import("../src/model/auto-match.js");
+  const c = await catalogueWith(t, [
+    { id: "first", artist: "S. Richter", titles: fifth },
+    { id: "second", artist: "S. Richter", titles: fifth.map((track) => ({ ...track, title: track.title.replace("Symphony No. 5", "Symphony No.5") })) },
+  ]);
+  const metadata = new Metadata(c);
+  const richter = c.createEntity("person");
+  metadata.manual(richter, "name", "Sviatoslav Richter", { actor: "admin" });
+  match(c, "first");
+  const [derived] = credits(c, "first");
+  assert.equal(derived.name, "S. Richter");
+  const spelled = c.db.prepare("SELECT contributor_id AS id FROM credit WHERE id=?").get(derived.id).id;
+  // What the editor's "This is…" does.
+  mergeContributor(c, richter, spelled, "admin");
+  match(c, "second");
+  const landed = c.db.prepare("SELECT DISTINCT contributor_id AS id FROM credit WHERE state='active' AND role='performer'").all().map((row) => row.id);
+  assert.deepEqual(landed, [richter]);
+  assert.deepEqual(contributorIndex(c).person.get("s richter"), [richter]);
+});

@@ -1,3 +1,15 @@
+# v0.3 Phase 2.5 — map a name / issue #60
+
+## Result
+
+`editor-v2.js`: `contributorView` puts a `map` form first for an unreviewed contributor (data `unreviewed`, no manual assertion); `map-contributor` (`target`, `into`) requires two different records of the same kind, merges, resolves the dropped record's reviews and opens the chosen record.
+
+## Verification
+
+On Node 22.23: full `npm test` 419/419. New editor-v2 test: after matching, the tag-made "Orchestra A" offers This is… with an ensembles lookup; a hand-made record does not; mapping to a person is refused; mapping to "Fixture Philharmonic" opens it, deletes "Orchestra A", moves its credit and keeps "Orchestra A" as an alias. It fails on the 2.4 code. New `test/contributors.test.js` case: after "S. Richter" is merged into "Sviatoslav Richter", a second album tagged "S. Richter" is credited to Sviatoslav Richter and no new record is made. It guards the rule this relies on (aliases, 1.5) and also passes on the 2.4 code.
+
+---
+
 # v0.3 Phase 2.4 — bulk credits / issue #61
 
 ## Result
