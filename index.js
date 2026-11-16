@@ -39960,15 +39960,41 @@ function extendRealization(catalogue, group, actor3, people) {
     const held2 = new Set(
       catalogue.db.prepare("SELECT movement_id FROM realization_item WHERE realization_id=?").all(realization.id).map((row) => row.movement_id)
     );
+    const pending = ordered.filter((track) => !track.attached && !trackUnassignedByAdmin(catalogue, track.id));
+    if (!pending.length) return false;
+    const eligible = new Set(pending.map((track) => track.id));
+    const existingMovement = (section, used) => {
+      const parts = movementParts(section);
+      const sameName = workMovements(catalogue, realization.work_id).filter((m) => !used.has(m.id) && parts.text && m.text === parts.text);
+      return sameName.length === 1 ? sameName[0] : sameName.find((m) => parts.index && (m.index ?? m.position) === parts.index);
+    };
+    const workIds = [realization.work_id, ...workMovements(catalogue, realization.work_id).map((m) => m.id)];
+    if (pending.length && (editedInEditor(catalogue, workIds) || hasManualEdits(catalogue, workIds))) {
+      const reserved = new Set(held2);
+      for (const track of pending) {
+        const named = movementTitle({ title: track.parsedTitle, work: track.evidence.hints?.work }, workTitle);
+        for (const section of sectionTitles(named || "")) {
+          const existing = existingMovement(section, reserved);
+          if (!existing) {
+            catalogue.review("auto_match", pending[0].id, {
+              reason: "movement-mismatch",
+              work: realization.work_id,
+              albumId: group.albumId,
+              tracks: pending.map((t) => t.id)
+            });
+            return false;
+          }
+          reserved.add(existing.id);
+        }
+      }
+    }
     for (const [index, track] of ordered.entries()) {
-      if (track.attached) continue;
+      if (!eligible.has(track.id)) continue;
       const before = ordered.slice(0, index).reverse().map((other) => itemOf.get(realization.id, other.id)).find(Boolean);
       const named = movementTitle({ title: track.parsedTitle, work: track.evidence.hints?.work }, workTitle);
       let after = before?.movement_id || null;
       const movements = sectionTitles(named || "").map((section) => {
-        const parts = movementParts(section);
-        const sameName = workMovements(catalogue, realization.work_id).filter((m) => !held2.has(m.id) && parts.text && m.text === parts.text);
-        const existing = sameName.length === 1 ? sameName[0] : sameName.find((m) => parts.index && (m.index ?? m.position) === parts.index);
+        const existing = existingMovement(section, held2);
         let movement = existing?.id;
         if (!movement) {
           const position = after ? catalogue.db.prepare("SELECT position FROM relation WHERE kind='movement' AND source_id=? AND target_id=?").get(realization.work_id, after).position + 1 : 1;
@@ -40004,6 +40030,14 @@ function extendRealization(catalogue, group, actor3, people) {
     );
     return added > 0;
   });
+}
+function trackUnassignedByAdmin(catalogue, track) {
+  return catalogue.db.prepare(`SELECT a.action FROM audit_event a
+    WHERE a.action IN ('editor.unassign-tracks','editor.assign-album')
+      AND EXISTS (SELECT 1 FROM json_each(a.data, '$.values.tracks') t
+        WHERE t.value=? AND (a.action='editor.unassign-tracks'
+          OR coalesce(json_extract(a.data, '$.values.mapping[' || t.key || ']'), '') != ''))
+    ORDER BY a.id DESC LIMIT 1`).get(track)?.action === "editor.unassign-tracks";
 }
 function unassignedByAdmin(catalogue, work, albumId) {
   return catalogue.db.prepare(

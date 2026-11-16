@@ -762,3 +762,108 @@ test("#12 duplicate repair asks for a decision when neither work has an album-wo
   assert.deepEqual(liveWorks(s).sort(), works.sort());
   assert.equal(s.c.db.prepare("SELECT count(*) AS n FROM review_item WHERE kind='identity' AND status='open' AND json_extract(evidence,'$.reason')='duplicate-work'").get().n, 1);
 });
+
+async function removalFixture(t) {
+  const s = await setup(t);
+  s.workTitle = "Symphony No. 5 in C minor, Op. 67";
+  for (const album of ["A", "B"]) for (const track of s.trackIds(album)) setHints(s, track, { work: s.workTitle });
+  autoMatchTaggedWorks(s.c);
+  [s.work] = liveWorks(s);
+  return s;
+}
+function appendATrack(s, title, generation = 2) {
+  const tracks = s.c.db.prepare("SELECT evidence FROM track_link").all().map((row) => JSON.parse(row.evidence));
+  const source = tracks.find((track) => track.albumId === "A");
+  const i = tracks.filter((track) => track.albumId === "A").length;
+  tracks.push({ ...source, coreId: `A-${i}`, fileId: `A-${i}`, path: `/library/A/${i}.flac`, fingerprint: `audio-sha256-v2:A-${i}`,
+    hints: { ...source.hints, title: `${s.workTitle}: ${title}`, trackNumber: i + 1 } });
+  const rows = reconcile(s.c, { version: 1, complete: true, instanceId: "i", epoch: "e", generation, tracks });
+  for (const row of rows) classify(s.c, row.id, row.hints);
+  return s.trackIds("A").at(-1);
+}
+const workParts = (s) => s.c.db.prepare("SELECT target_id,position FROM relation WHERE kind='movement' AND source_id=? ORDER BY position").all(s.work);
+const detachTrack = (s, track) => {
+  for (const { id } of s.c.db.prepare("SELECT i.id FROM realization_item i JOIN segment g ON g.id=i.segment_id WHERE g.track_link_id=?").all(track))
+    s.c.detachItem(id, { dropRecording: true });
+};
+
+test("#11 a removed Applause track stays out across scans until manually assigned", async (t) => {
+  const s = await removalFixture(t);
+  const applause = appendATrack(s, "Applause");
+  autoMatchTaggedWorks(s.c);
+  assert.deepEqual(workOfTrack(s, applause), [s.work]);
+  const movement = workParts(s).at(-1).target_id;
+  await s.ok("unassign-tracks", { albumId: "A", tracks: [applause] }, "album:A");
+  for (let pass = 0; pass < 3; pass++) {
+    autoMatchTaggedWorks(s.c);
+    assert.deepEqual(workOfTrack(s, applause), []);
+  }
+  assert.equal(workParts(s).length, 5, "removal does not delete the catalogue movement");
+  await s.ok("assign-album", { albumId: "A", work: s.work, tracks: [applause], mapping: [movement] }, "album:A");
+  assert.deepEqual(workOfTrack(s, applause), [s.work]);
+  // Simulate a missing attachment after the newer explicit assignment: the old
+  // removal must no longer prevent filling an existing catalogue movement.
+  detachTrack(s, applause);
+  autoMatchTaggedWorks(s.c);
+  assert.deepEqual(workOfTrack(s, applause), [s.work]);
+  await s.ok("unassign-tracks", { albumId: "A", tracks: [applause] }, "album:A");
+  autoMatchTaggedWorks(s.c);
+  assert.deepEqual(workOfTrack(s, applause), []);
+});
+
+test("#11 one removed track does not prevent a different new track from extending an unedited work", async (t) => {
+  const s = await removalFixture(t);
+  const removed = s.trackIds("A")[1];
+  await s.ok("unassign-tracks", { albumId: "A", tracks: [removed] }, "album:A");
+  const applause = appendATrack(s, "Applause");
+  autoMatchTaggedWorks(s.c);
+  assert.deepEqual(workOfTrack(s, removed), []);
+  assert.deepEqual(workOfTrack(s, applause), [s.work]);
+});
+
+for (const edit of ["work", "movement", "order"]) {
+  test(`#11 extension of a work with an edited ${edit} is atomic when a new movement is needed`, async (t) => {
+    const s = await removalFixture(t);
+    const parts = workParts(s);
+    if (edit === "work") await s.ok("save-entity", { target: s.work, description: "Keep this movement list" }, s.work);
+    else if (edit === "movement") await s.ok("save-entity", { target: parts[3].target_id, title: "IV. Finale" }, parts[3].target_id);
+    else await s.ok("move-movement", { work: s.work, movement: parts[3].target_id, direction: "up" }, s.work);
+    const missing = s.trackIds("A")[1];
+    detachTrack(s, missing);
+    const applause = appendATrack(s, "Applause");
+    const before = { parts: workParts(s), recordings: s.c.db.prepare("SELECT count(*) AS n FROM entity WHERE kind='recording'").get().n };
+    for (let pass = 0; pass < 2; pass++) {
+      autoMatchTaggedWorks(s.c);
+      assert.deepEqual(workOfTrack(s, missing), [], "no partial attachment before the mismatch");
+      assert.deepEqual(workOfTrack(s, applause), []);
+      assert.deepEqual(workParts(s), before.parts);
+      assert.equal(s.c.db.prepare("SELECT count(*) AS n FROM entity WHERE kind='recording'").get().n, before.recordings);
+    }
+    const reviews = s.c.db.prepare("SELECT evidence FROM review_item WHERE kind='auto_match' AND status='open' AND json_extract(evidence,'$.reason')='movement-mismatch'").all();
+    assert.equal(reviews.length, 1);
+    assert.equal(JSON.parse(reviews[0].evidence).work, s.work);
+  });
+}
+
+test("#11 edited works can still fill an existing movement without changing their structure", async (t) => {
+  const s = await removalFixture(t);
+  await s.ok("save-entity", { target: s.work, description: "Keep this movement list" }, s.work);
+  const missing = s.trackIds("A")[1], before = workParts(s);
+  detachTrack(s, missing);
+  autoMatchTaggedWorks(s.c);
+  assert.deepEqual(workOfTrack(s, missing), [s.work]);
+  assert.deepEqual(workParts(s), before);
+});
+
+test("#11 a skipped mapping does not cancel removal when another track is explicitly assigned", async (t) => {
+  const s = await removalFixture(t);
+  const [removed, assigned] = s.trackIds("A"), parts = workParts(s);
+  await s.ok("unassign-tracks", { albumId: "A", tracks: [removed] }, "album:A");
+  await s.ok("assign-album", { albumId: "A", work: s.work, tracks: [removed, assigned], mapping: ["", parts[1].target_id] }, "album:A");
+  // The newer event names both tracks, but only one was assigned. Recovering
+  // its missing attachment must not turn the skipped removal into permission.
+  detachTrack(s, assigned);
+  autoMatchTaggedWorks(s.c);
+  assert.deepEqual(workOfTrack(s, removed), []);
+  assert.deepEqual(workOfTrack(s, assigned), [s.work]);
+});

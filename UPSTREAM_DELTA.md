@@ -1,3 +1,11 @@
+# v0.3 Phase 0.04 — preserve track removals and edited movement lists (issue #11)
+
+Branch `fix/v0.3-0.04-preserve-track-removals` starts at `aurral-classical` `0efd6b2`, including merged E1 PR #96. Current #11 has no further dependencies or later scope comments. This implements L3 only.
+
+Automatic extension respects the latest per-track unassign/assign audit decision. Removed tracks stay out until explicitly assigned; a skipped mapping does not count as assignment. For a work or movement edited manually, or a work whose order was edited, extension first verifies that every eligible track fits existing movements. A needed new movement raises movement-mismatch before any partial attachment or structural change. Edited works can still fill existing movements, and unedited works can still gain new movements. No schema, core, media or provider-request change; bundle rebuilt.
+
+Verification and before/after probe evidence: `V0_3_REPORT.md`. The known Phase 1 integration fixture mismatch remains outside this issue.
+
 # v0.3 Phase 0.03 — preserve deliberate separate works (issue #12)
 
 Branch `fix/v0.3-0.03-preserve-distinct-works` starts at `aurral-classical` `15618a1`, which includes merged E2 PR #95 and L2 PR #94. Current #12 has no extra dependencies or later scope comments. This implements E1 only.

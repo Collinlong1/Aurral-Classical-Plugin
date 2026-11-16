@@ -1221,8 +1221,36 @@ function extendRealization(catalogue, group, actor, people) {
     const held = new Set(
       catalogue.db.prepare("SELECT movement_id FROM realization_item WHERE realization_id=?").all(realization.id).map((row) => row.movement_id),
     );
+    const pending = ordered.filter((track) => !track.attached && !trackUnassignedByAdmin(catalogue, track.id));
+    if (!pending.length) return false;
+    const eligible = new Set(pending.map((track) => track.id));
+    const existingMovement = (section, used) => {
+      const parts = movementParts(section);
+      const sameName = workMovements(catalogue, realization.work_id).filter((m) => !used.has(m.id) && parts.text && m.text === parts.text);
+      return sameName.length === 1 ? sameName[0] : sameName.find((m) => parts.index && (m.index ?? m.position) === parts.index);
+    };
+    const workIds = [realization.work_id, ...workMovements(catalogue, realization.work_id).map((m) => m.id)];
+    if (pending.length && (editedInEditor(catalogue, workIds) || hasManualEdits(catalogue, workIds))) {
+      // Check the whole extension before writing: a later unmatched section
+      // must not leave earlier tracks attached or movement positions shifted.
+      const reserved = new Set(held);
+      for (const track of pending) {
+        const named = movementTitle({ title: track.parsedTitle, work: track.evidence.hints?.work }, workTitle);
+        for (const section of sectionTitles(named || "")) {
+          const existing = existingMovement(section, reserved);
+          if (!existing) {
+            catalogue.review("auto_match", pending[0].id, {
+              reason: "movement-mismatch", work: realization.work_id,
+              albumId: group.albumId, tracks: pending.map((t) => t.id),
+            });
+            return false;
+          }
+          reserved.add(existing.id);
+        }
+      }
+    }
     for (const [index, track] of ordered.entries()) {
-      if (track.attached) continue;
+      if (!eligible.has(track.id)) continue;
       const before = ordered
         .slice(0, index)
         .reverse()
@@ -1236,9 +1264,7 @@ function extendRealization(catalogue, group, actor, people) {
         // A movement the work has and this recording lacks ("Missing I.
         // Allegro vivace") takes the track when their names agree; the number
         // alone only settles which of two same-named movements it is.
-        const parts = movementParts(section);
-        const sameName = workMovements(catalogue, realization.work_id).filter((m) => !held.has(m.id) && parts.text && m.text === parts.text);
-        const existing = sameName.length === 1 ? sameName[0] : sameName.find((m) => parts.index && (m.index ?? m.position) === parts.index);
+        const existing = existingMovement(section, held);
         let movement = existing?.id;
         if (!movement) {
           const position = after
@@ -1278,6 +1304,17 @@ function extendRealization(catalogue, group, actor, people) {
     );
     return added > 0;
   });
+}
+
+// A per-track removal holds until a newer explicit assignment of that track.
+// A skipped mapping in an assignment form is not an assignment.
+function trackUnassignedByAdmin(catalogue, track) {
+  return catalogue.db.prepare(`SELECT a.action FROM audit_event a
+    WHERE a.action IN ('editor.unassign-tracks','editor.assign-album')
+      AND EXISTS (SELECT 1 FROM json_each(a.data, '$.values.tracks') t
+        WHERE t.value=? AND (a.action='editor.unassign-tracks'
+          OR coalesce(json_extract(a.data, '$.values.mapping[' || t.key || ']'), '') != ''))
+    ORDER BY a.id DESC LIMIT 1`).get(track)?.action === "editor.unassign-tracks";
 }
 
 // The editor's latest word on this album and work, from its audit trail:
