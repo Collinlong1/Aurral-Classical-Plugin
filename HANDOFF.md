@@ -1,3 +1,11 @@
+# v0.3 Phase 0.07 — reserve exact file matches before duplicate-audio moves (issue #16)
+
+Branch `fix/v0.3-0.07-claim-exact-file-matches` starts at `aurral-classical` `c2bdc59`, including merged E7 PR #99. Current #16 has no additional dependencies or later scope comments. This implements L11 only.
+
+Reconciliation reserves unique exact core/file/path matches first, then excludes them from other candidate and reused-identity pools before calculating demand. Moving or deleting one identical-audio copy no longer sends unchanged copies to review, including multiple files sharing a core track. Ambiguous moves, conflicting historical exact claims and epoch changes retain conservative review behavior. Link IDs, pinned metadata and unchanged-file evidence reuse are covered. No schema, core, media or fingerprint-format change; bundle rebuilt.
+
+Verification and p4/interrupted-scan evidence: `V0_3_REPORT.md`. L10's tag-sensitive retag identity issue and other probe findings remain separate. The known Phase 1 fixture mismatch remains outside scope.
+
 # v0.3 Phase 0.06 — scope undo conflicts to real overlapping changes (issue #17)
 
 Branch `fix/v0.3-0.06-scope-undo-conflicts` starts at `aurral-classical` `1108102`, including merged E10 PR #98. Current #17 has no additional dependencies or later scope comments. This implements E7 only.

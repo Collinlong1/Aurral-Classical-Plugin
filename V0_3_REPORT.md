@@ -1,3 +1,30 @@
+# v0.3 Phase 0.07 — L11 / issue #16
+
+Base: `aurral-classical` `c2bdc59`, including merged E7 PR #99. This follows the handoff sequence. Current #16 has no additional dependencies or later comments changing scope. No other issue is implemented here.
+
+## Result
+
+Reconciliation first reserves unique exact matches (same core track, file and path, passing the existing audio-identity check). It then removes those items from other candidate pools before calculating demand. Claimed exact items also do not count as reused identities for a missing copy; this matters when multiple files share one core track ID.
+
+The existing update path preserves link IDs, pinned metadata, classification and attachment references. Unchanged exact copies still use the no-new-evidence path. Deleting one identical copy leaves its link missing and remaining exact copies active. Moving a single copy can use the one remaining unclaimed candidate. Two indistinguishable moves remain in review, and their candidate lists exclude the already claimed exact copy.
+
+Conflicting historical exact claims remain ambiguous rather than arbitrarily choosing one, and a changed core epoch still requires review. No schema, core, media-tag, provider-request or fingerprint-format changes. L10's tag-sensitive retag issue is not implemented here. Bundle rebuilt.
+
+## Verification
+
+On Node 24.22.1:
+
+- `node --test test/sync.test.js test/model.test.js test/scan-checkpoints.test.js`: 54/54 passed.
+- Eight new sync tests cover duplicate-audio moves in both prior-row orders, changed core/file IDs with stable plugin links and pinned fields, evidence reuse, deleting one of 28 copies, genuinely ambiguous moves, epoch changes, conflicting historical exact claims, shared core track IDs, and a real 28-file identical-audio scan/move/delete sequence. Six fail on merged base `c2bdc59`; epoch-change and historical-claim safety already passed there.
+- `p4.mjs` run on the base and fix via `PLUGIN_SRC`: the duplicate-audio rename changes from both links in review to both active. The TWV and tag-sensitive retag cases are unrelated findings and remain outside #16.
+- `g1.same-audio.mjs B` run after updating its scratch fixture path: a real rescan process is killed after 12 files and resumed. Final state equals uninterrupted control. The post-kill catalogue remains at 28 active links with integrity OK and no foreign-key errors. Final state has 27 active links and one review; this scenario also deletes a file and adds four indistinguishable files, so that remaining ambiguity is intentional. Unlike the defect, the exact copies stay active. Only scenario B was run.
+- `npm run build`: passed. `git diff --check`: passed.
+- Full `npm test`: 384/384 passed.
+
+No local browser or Compose/restart run for #16. The known pre-existing Phase 1 workflow fixture mismatch remains unchanged and outside scope.
+
+---
+
 # v0.3 Phase 0.06 — E7 / issue #17
 
 Base: `aurral-classical` `1108102`, including merged E10 PR #98. This follows the handoff sequence. Current #17 has no additional dependencies or later comments changing scope. No other issue is implemented here.
