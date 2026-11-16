@@ -267,6 +267,48 @@ test("a recording's page edits who performs it: add, change role or instrument, 
   assert.ok(section(await view(), "edit-performer"));
 });
 
+test("contributor details: sort name, spellings, instruments and dates; renames keep the old name; ensemble members", async (t) => {
+  const s = await setup(t);
+  const { contributorFor, contributorIndex } = await import("../src/model/contributors.js");
+  const pianist = (await s.ok("create-contributor", { name: "Sviatoslav Richter", kind: "person" })).selection;
+  const trio = (await s.ok("create-contributor", { name: "Fixture Trio", kind: "ensemble" })).selection;
+  const details = async (id) => Object.fromEntries(section((await s.read({ selection: id })).view, "details").fields.map((f) => [f.key, f.value]));
+  await s.ok("save-entity", { target: pianist, sortName: "Richter, Sviatoslav", aliases: "Swjatoslaw Richter\nS. Richter", instruments: "piano", date: "1915" }, pianist);
+  await s.ok("save-entity", { target: pianist, name: "Sviatoslav Teofilovich Richter" }, pianist);
+  assert.deepEqual(await details(pianist), {
+    name: "Sviatoslav Teofilovich Richter",
+    sortName: "Richter, Sviatoslav",
+    aliases: ["Swjatoslaw Richter", "S. Richter"],
+    instruments: ["piano"],
+    date: "1915",
+    description: "",
+  });
+  // The old name and every spelling are aliases: a tag spelled any of those
+  // ways finds this person.
+  const aliases = s.c.db.prepare("SELECT text FROM alias WHERE entity_id=? ORDER BY text").all(pianist).map((row) => row.text);
+  assert.deepEqual(aliases, ["S. Richter", "Sviatoslav Richter", "Swjatoslaw Richter"]);
+  for (const spelling of aliases) assert.equal(contributorFor(s.c, contributorIndex(s.c), spelling), pianist, spelling);
+  // Saving the same spellings again adds none.
+  await s.ok("save-entity", { target: pianist, aliases: "Swjatoslaw Richter\nS. Richter\nRichter" }, pianist);
+  assert.equal(s.c.db.prepare("SELECT count(*) AS n FROM alias WHERE entity_id=?").get(pianist).n, 4);
+  // Ensembles: renamed, founded, with members added from either page.
+  await s.ok("save-entity", { target: trio, name: "Fixture Piano Trio", date: "1960" }, trio);
+  assert.deepEqual(s.c.db.prepare("SELECT text FROM alias WHERE entity_id=?").all(trio).map((row) => row.text), ["Fixture Trio"]);
+  const cellist = (await s.ok("create-contributor", { name: "Fixture Cellist", kind: "person" })).selection;
+  await s.ok("add-member", { target: trio, other: pianist }, trio);
+  await s.ok("add-member", { target: cellist, other: trio }, cellist);
+  const rows = async (id) => section((await s.read({ selection: id })).view, "members").rows.map((row) => row.label);
+  assert.deepEqual(await rows(trio), ["Fixture Cellist", "Sviatoslav Teofilovich Richter"]);
+  assert.deepEqual(await rows(pianist), ["Fixture Piano Trio"]);
+  assert.equal(section((await s.read({ selection: pianist })).view, "members").title, "Ensembles");
+  assert.equal((await s.mutate("add-member", { target: trio, other: pianist }, trio)).message, "Already a member");
+  assert.equal((await s.mutate("add-member", { target: trio, other: trio }, trio)).ok, false);
+  await s.ok("remove-member", { target: pianist, other: trio }, pianist);
+  assert.deepEqual(await rows(trio), ["Fixture Cellist"]);
+  // The people lookup offers people only.
+  assert.deepEqual((await s.read({ lookup: "people", q: "fixture" })).options.map((o) => o.label), ["Fixture Cellist"]);
+});
+
 test("send to / remove from Classical overrides detection and closes review items", async (t) => {
   const s = await setup(t);
   const [pop] = s.trackIds("C");

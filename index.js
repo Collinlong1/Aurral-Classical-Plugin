@@ -41990,13 +41990,17 @@ var FIELDS = {
   ],
   person: [
     ["name", "Name", "text"],
-    ["aliases", "Other spellings", "lines", "One per line, for example Tchaikovsky / Tschaikowsky."],
+    ["sortName", "Sort name", "text", "How lists order them, for example Beethoven, Ludwig van."],
+    ["aliases", "Other spellings", "lines", "One per line, for example Tchaikovsky / Tschaikowsky. Tags spelled any of these ways land on this person."],
+    ["instruments", "Instruments", "lines", "What they play or sing, one per line."],
     ["date", "Dates", "text", "Year or full date, for example 1770 or 1770-12-16."],
     ["description", "Notes", "textarea"]
   ],
   ensemble: [
     ["name", "Name", "text"],
-    ["aliases", "Other names", "lines", "One per line."],
+    ["sortName", "Sort name", "text", "How lists order it, for example Berlin Philharmonic."],
+    ["aliases", "Other names", "lines", "One per line. Tags naming it any of these ways land on this ensemble."],
+    ["date", "Founded", "text", "Year or full date."],
     ["description", "Notes", "textarea"]
   ],
   movement: [
@@ -42633,6 +42637,32 @@ function contributorView(c, entity, page = 0) {
         "Credits"
       )
     });
+  const members = c.db.prepare(`SELECT ${kind === "ensemble" ? "source_id" : "target_id"} AS id FROM relation WHERE kind='member_of' AND ${kind === "ensemble" ? "target_id" : "source_id"}=? ORDER BY position,id`).all(entity.id).map((row) => row.id);
+  sections.push(
+    {
+      type: "rows",
+      id: "members",
+      title: kind === "ensemble" ? "Members" : "Ensembles",
+      empty: kind === "ensemble" ? "No members yet." : "Not a member of an ensemble yet.",
+      rows: members.map((id) => ({
+        id,
+        label: entityLabel(c, id, kind === "ensemble" ? "person" : "ensemble"),
+        selection: id,
+        actions: [action("Remove", "remove-member", { target: entity.id, other: id }, { tone: "danger" })]
+      })).sort((a, b) => a.label.localeCompare(b.label))
+    },
+    {
+      type: "form",
+      id: "add-member",
+      title: kind === "ensemble" ? "Add a member" : "Add to an ensemble",
+      command: "add-member",
+      arguments: { target: entity.id },
+      submitLabel: "Add",
+      fields: [
+        kind === "ensemble" ? { key: "other", label: "Person", type: "lookup", lookup: "people", value: "", placeholder: "Search people", required: true } : { key: "other", label: "Ensemble", type: "lookup", lookup: "ensembles", value: "", placeholder: "Search ensembles", required: true }
+      ]
+    }
+  );
   sections.push(mergeForm(entity.id, kind === "ensemble" ? "contributors" : composer ? "composers" : "contributors", kind === "ensemble" ? "ensemble" : "person", "Moves every credit to the entry you choose, then removes this one."));
   return {
     crumbs: [],
@@ -43651,6 +43681,8 @@ function lookupV2(c, query) {
     options = entities(c, ["work"]).map((work) => ({ value: work.id, label: work.label, detail: composerNames2(c, work.id).join(", ") || void 0 })).filter((option2) => !q || matchesSearch(`${option2.label} ${option2.detail || ""}`, q));
   else if (kind === "composers" || kind === "contributors")
     options = entities(c, kind === "composers" ? ["person"] : ["person", "ensemble"]).filter((entity) => kind === "contributors" || isComposer2(c, entity)).filter((entity) => !q || matchesSearch(entity.label, q)).map((entity) => ({ value: entity.id, label: entity.label, detail: entity.kind === "ensemble" ? "Ensemble" : isComposer2(c, entity) ? "Composer" : "Person" }));
+  else if (kind === "people" || kind === "ensembles")
+    options = entities(c, [kind === "people" ? "person" : "ensemble"]).filter((entity) => !q || matchesSearch(entity.label, q)).map((entity) => ({ value: entity.id, label: entity.label, detail: kind === "people" ? isComposer2(c, entity) ? "Composer" : "Person" : "Ensemble" }));
   else if (kind === "tracks")
     options = q ? ownedTracks(c).filter((track) => matchesSearch(track.search, q)).map((track) => ({ value: track.id, label: track.title, detail: [track.artist, track.album].filter(Boolean).join(" \xB7 ") })) : [];
   else fail("Unknown lookup");
@@ -43665,6 +43697,8 @@ var V2_COMMANDS = {
   open: ["selection"],
   "save-entity": null,
   "set-blank": ["target", "field"],
+  "add-member": ["target", "other"],
+  "remove-member": ["target", "other"],
   "move-movement": ["work", "movement", "direction"],
   "set-movement-order": ["work", "movements", "positions", "order"],
   "delete-movement": ["work", "movement"],
@@ -43694,6 +43728,13 @@ var V2_COMMANDS = {
   "choose-provider-value": ["id", "field", "assertion"],
   "relink-track": ["id", "candidate"]
 };
+function addAlias(c, entity, text6) {
+  const spelling = String(text6 ?? "").trim();
+  if (!spelling) return;
+  const fold2 = searchText(spelling);
+  if (c.db.prepare("SELECT text FROM alias WHERE entity_id=?").all(entity).some((row) => searchText(row.text) === fold2)) return;
+  c.alias(entity, spelling);
+}
 function createWork(c, m, who, { title, composer, movements }) {
   const work = c.createEntity("work");
   m.manual(work, "title", title, { actor: who, pin: true });
@@ -43777,11 +43818,30 @@ function applyV2(c, request, who) {
         if (JSON.stringify(next) === JSON.stringify(current)) continue;
         if ((key === "title" || key === "name") && !next) fail(`${key === "name" ? "Name" : "Title"} can't be empty. Use Mark blank to clear it on purpose.`);
         if (key === "date" && next && !validDate(next)) fail("Use a valid year, year-month or full ISO date", key);
-        if (key === "name" && entity.kind === "person" && current.trim()) c.alias(target, current);
+        if (key === "name" && (entity.kind === "person" || entity.kind === "ensemble") && current.trim()) addAlias(c, target, current);
+        if (key === "aliases" && (entity.kind === "person" || entity.kind === "ensemble")) for (const spelling of next) addAlias(c, target, spelling);
         m.manual(target, key, next, { actor: who, pin: true });
         changed++;
       }
       return { selection: target, message: changed ? `Saved ${changed} change${changed === 1 ? "" : "s"}.` : "No changes to save." };
+    }
+    case "add-member":
+    case "remove-member": {
+      const target = str(v.target, "entry", { max: 200 });
+      const other = str(v.other, request.command === "add-member" ? "person or ensemble" : "member", { max: 200, field: "other" });
+      const [first, second] = [c.entity(target, ["person", "ensemble"]), c.entity(other, ["person", "ensemble"])];
+      if (first.kind === second.kind) fail(first.kind === "person" ? "Choose an ensemble" : "Choose a person", "other");
+      const [person, ensemble] = first.kind === "person" ? [target, other] : [other, target];
+      const existing = c.db.prepare("SELECT id FROM relation WHERE kind='member_of' AND source_id=? AND target_id=?").get(person, ensemble);
+      if (request.command === "add-member") {
+        if (existing) fail("Already a member", "other");
+        const position = c.db.prepare("SELECT coalesce(max(position),0)+1 AS n FROM relation WHERE kind='member_of' AND source_id=?").get(person).n;
+        c.relate("member_of", person, ensemble, { position });
+      } else {
+        if (!existing) fail("Not a member");
+        c.db.prepare("DELETE FROM relation WHERE id=?").run(existing.id);
+      }
+      return { selection: target, message: request.command === "add-member" ? "Member added." : "Member removed." };
     }
     case "set-blank": {
       const target = str(v.target, "entry", { max: 200 });

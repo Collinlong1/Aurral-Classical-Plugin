@@ -1,3 +1,11 @@
+# v0.3 Phase 2.3 — contributor details, aliases and ensemble membership (issue #58)
+
+Sixth of ten commits in one PR (1.5–1.7, 2.1–2.7). Implements #58 only; #58 has no later comments.
+
+A person's Details form gains Sort name and Instruments beside Name, Other spellings, Dates and Notes; an ensemble's gains Sort name and Founded. Every other spelling saved, and a contributor's old name when renamed (now for ensembles too, as L2 did for people), is written once to the `alias` table, so tags spelled that way land on the record. Contributor pages gain Members (an ensemble) or Ensembles (a person), each with Remove and an add form using new `people` and `ensembles` lookups; commands `add-member` and `remove-member` store `member_of` relations (1.6). No schema or core change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
 # v0.3 Phase 2.2 — add, edit and remove recording credits (issue #57)
 
 Fifth of ten commits in one PR (1.5–1.7, 2.1–2.7). Implements #57 only; #57 has no later comments.

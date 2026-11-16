@@ -1,3 +1,15 @@
+# v0.3 Phase 2.3 — contributor details / issue #58
+
+## Result
+
+`editor-v2.js`: `FIELDS.person` and `FIELDS.ensemble` (the `sortName`, `instruments` and `date` fields from schema 5); `save-entity` calls `addAlias` (one alias per folded spelling) for a renamed person or ensemble and for each saved spelling; `contributorView` adds the members section and form; `add-member`/`remove-member` in `V2_COMMANDS` and `applyV2` (the page's entity is `target`, so the revision scope covers it; the other side must be the other kind); `lookupV2` gains `people` and `ensembles`. Members list alphabetically.
+
+## Verification
+
+On Node 22.23: full `npm test` 416/416. New editor-v2 test: a person's sort name, spellings, instruments and dates save and read back; renaming keeps the old name; every alias resolves through `contributorFor`; saving spellings again adds none; an ensemble's rename keeps its old name; members added from the ensemble's page and from a person's page show on both; a repeat or same-kind add is refused; removal updates both; the `people` lookup offers people only. It fails on the 2.2 code.
+
+---
+
 # v0.3 Phase 2.2 — recording credits / issue #57
 
 ## Result
