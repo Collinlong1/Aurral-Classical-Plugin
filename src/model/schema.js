@@ -199,4 +199,36 @@ CREATE TABLE match_suppression (
 );
 `,
   },
+  {
+    // v0.3: contributor identity. Additive only; existing credits read as
+    // manual and active, and nothing existing is rewritten.
+    version: 5,
+    sql: `
+ALTER TABLE credit ADD COLUMN source TEXT NOT NULL DEFAULT 'manual' CHECK(source IN ('manual','derived','provider'));
+ALTER TABLE credit ADD COLUMN state TEXT NOT NULL DEFAULT 'active' CHECK(state IN ('active','removed'));
+CREATE INDEX credit_contributor ON credit(contributor_id);
+CREATE INDEX credit_target ON credit(target_id);
+INSERT INTO field_definition VALUES ('sortName','string'),('location','string'),('instruments','array'),('recordingDate','string');
+CREATE TABLE user_recording_state (
+ user_id INTEGER NOT NULL CHECK(user_id>0), performance_id TEXT NOT NULL REFERENCES entity(id),
+ favourite INTEGER NOT NULL DEFAULT 0 CHECK(favourite IN (0,1)), updated_at INTEGER NOT NULL,
+ PRIMARY KEY(user_id,performance_id)
+);
+CREATE TABLE saved_queue (
+ id TEXT PRIMARY KEY, user_id INTEGER NOT NULL CHECK(user_id>0), name TEXT NOT NULL,
+ work_id TEXT REFERENCES entity(id), items TEXT NOT NULL CHECK(json_valid(items)), created_at INTEGER NOT NULL
+);
+CREATE INDEX saved_queue_user ON saved_queue(user_id);
+CREATE TABLE tag_backup (
+ id TEXT PRIMARY KEY, track_link_id TEXT NOT NULL REFERENCES track_link(id), path TEXT NOT NULL, fingerprint TEXT,
+ tags TEXT NOT NULL CHECK(json_valid(tags)), written TEXT NOT NULL CHECK(json_valid(written)), run_id TEXT NOT NULL,
+ actor TEXT NOT NULL, created_at INTEGER NOT NULL, restored_at INTEGER
+);
+CREATE INDEX tag_backup_track ON tag_backup(track_link_id);
+ALTER TABLE search_doc ADD COLUMN sort_title TEXT NOT NULL DEFAULT '';
+ALTER TABLE search_doc ADD COLUMN sort_key TEXT NOT NULL DEFAULT '';
+ALTER TABLE search_doc ADD COLUMN sort_date TEXT NOT NULL DEFAULT '';
+CREATE INDEX search_doc_sort_title ON search_doc(kind,sort_title);
+`,
+  },
 ];

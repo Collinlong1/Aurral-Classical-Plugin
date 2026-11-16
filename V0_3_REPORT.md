@@ -1,3 +1,110 @@
+# v0.3 Phase 1.4 — derived performer credits / issue #52
+
+## Result
+
+- **`performerNames(hints, composers, key)`:** the split on " — ", " – " and ";" with composers left out, moved from `engine.js` `ownedRecordings` and `presentation.js` `performerOf`. Each passes its own folding (`fold` and `words`), so their output is unchanged.
+- **`trackCredits(hints)`:** conductor tag → `conductor` (person); `PERFORMER` values, with a trailing "(instrument)" read as the instrument, else the artist split; a part is split as a list (", ", "&", "and"…) only when every piece is an ensemble or a capitalised name of two or more words, so "Choir of King's College, Cambridge" stays whole. Ensembles take `orchestra`, `choir` or `ensemble` from their name; people are `performer`. Roles are never guessed from a person's name.
+- **`contributorFor(c, index, name, { mbid, kind })`:** an active MusicBrainz artist ID's holder wins; else the single contributor of that kind with that folded name or alias (composers included, so the composer at the piano is one person); a same-named record holding a different ID is someone else; two same-named records → null (no credit, nothing created); otherwise a new record with `data.unreviewed = true` and a derived name. `deriveCredits` does not pass IDs yet: which tag ID belongs to which name is 1.5's rule.
+- **`deriveCredits(c, { albumId })`:** performances on the album (or all, in the library pass) with no credit in a performing role, active or removed. Credits all the performance's tracks share are added after any existing positions, `source='derived'`. Called at the end of `autoMatchTaggedWorks`, so the first library pass after this release backfills existing performances (plan §3 step 1).
+- **Roles:** `accompanist` added to `CREDIT_ROLES` and `PERSON_ROLES`; the search engine's performer roles are `PERFORMING_ROLES`. `credits.js` exports `ENSEMBLE` and `LIST`; `auto-match.js` exports `resolvedName`.
+
+## Verification
+
+On Node 22.23:
+
+- Full `npm test`: 412/412.
+- Apple corpus: every one of the 612 results equals the saved baseline exactly (#52: unaffected).
+- New `test/contributors.test.js` (5 tests): tag reading (conductor, PERFORMER with instruments, orchestra/choir/ensemble, list splitting and a comma inside one ensemble's name, composer left out); derivation once per performance, as unreviewed records, one record per name across albums, nothing added on rescans or the library pass, the work page showing them; a removed derived credit never comes back and an admin's credit is untouched; disagreeing tracks keep only shared credits; the composer at the piano is one person; two same-named people get nothing; an artist ID finds its holder; `accompanist` is a person-only role. With the derivation call disabled, the three matching tests fail.
+- `test/search.test.js` fixture: its people now exist before the scan, so derived credits are theirs, and its hand-made credits replace the derived "performer" credit for that person, as an admin's correction would. Before this change, two "Daniel Barenboim" records (derived and hand-made) tied in the performer section and the role test passed or failed by ID order; three repeated runs now pass.
+
+Not run: browser, Compose or restart checks locally (no Docker); the paired workflows run on the PR.
+
+---
+
+# v0.3 Phase 1.3 — tag evidence / issue #53
+
+## Result
+
+`readTags` returns `conductor` (`tag.conductor`: Vorbis `CONDUCTOR`, ID3 `TPE3`) and `performers` (Vorbis `PERFORMER` values, unparsed; the instrument stays in the text for 1.4). The model's fallback for unreadable files has both, empty. `scanFile` adds `conductor`, `performers` and `artistMbids` to hints only when non-empty. ID3 musician credits (`TMCL`) and MP4 have no `PERFORMER` equivalent read here, as #53 scopes it.
+
+## Verification
+
+On Node 22.23:
+
+- Full `npm test`: 407/407.
+- New tagger test: FLAC and MP3 each read their conductor; FLAC reads two `PERFORMER` values and two artist IDs from one `;`-joined value; MP3 has none of those; an untagged FLAC reads empty values.
+- Extended `rescans reuse unchanged fingerprints and add no evidence rows` (`test/sync.test.js`): one file tagged with a conductor, two performers and an artist ID, one untagged. The tagged file's hints carry all three; the untagged file's hints have none of the new keys; a rescan adds no evidence rows and leaves both files' hints identical.
+- Both fail on the 1.2 code.
+
+---
+
+# v0.3 Phase 1.2 — credit provenance / issue #51
+
+## Result
+
+- **API (`catalogue.js`):** `credit(target, contributor, role, { instrument, position, assertionId, source })` checks `source` against `CREDIT_SOURCES` and reactivates a removed row for the same key instead of inserting. `removeCredit(id)` refuses an unknown or already-removed credit, marks a derived one `removed` and deletes a manual or provider one.
+- **Readers filter `state='active'`:** `presentation.js` `credits`; `editor.js` composer test, credit list, duplicate check and Remove (now `removeCredit`); `editor-v2.js` `isComposer`, `credits`, `worksOf`, merge counts, contributor credit rows, composer names, delete-in-use check and the work-merge composer check; `auto-match.js` composer lists, `composerEntity` people, recording composer credits, provider composer checks, work-merge composer test, composer identities and the completion-split repair; `engine.js` `ownedRecordings` credits and `buildDocuments`; `history.js` undo summary.
+- **Kept unfiltered on purpose:** merges (`mergeContributor`, `mergeWork`) move every row, so a removed derived credit stays removed on the merged entity; deletes of a whole entity remove every row; position counters.
+- **Merge collisions:** `keepActiveCredit` makes the kept row active with the moving row's source when the kept one was removed and the moving one is active.
+- **Index stamp:** `catalogueStamp` adds the active-credit count, since a removal changes no row count or rowid.
+- **History:** snapshots are `SELECT *` and restore by column name, so they keep `source` and `state` (1.1).
+
+## Verification
+
+On Node 22.23:
+
+- Full `npm test`: 406/406.
+- New model test `credit provenance: …`: defaults and an invalid source; removing a derived credit keeps it removed and off the work page; a repeat removal is refused; adding it again returns the same row as manual; removing a manual credit deletes it; a person merge where the kept person's credit was removed and the merged one's is live keeps one live credit.
+- Extended `editor-v2` credits test: the editor shows a derived credit, Remove hides it from the work and the contributor and leaves it `removed`, a second Remove is refused, Add brings back the same row as manual, removing a manual credit deletes it, and the person can then be deleted.
+- Extended `search` role-filter test: a derived conductor credit adds a recording to the conductor filter; removing it takes it out again (the stamp notices).
+- All three fail on the 1.1 code; the search one also fails with only `engine.js` reverted.
+
+---
+
+# v0.3 Phase 1.1 — schema 5 / issue #48
+
+## Result
+
+Migration 5 as in the plan's §3 table, with two additions in the same spirit: `CHECK` constraints on `credit.source` and `credit.state` (the plan checks them in `Catalogue.credit`; the database now refuses other values too), and an index on `saved_queue(user_id)` for the per-person list. `favourite` on `user_recording_state` has the same `CHECK(favourite IN (0,1))` as `user_work_state`. The only code change outside the schema is `Catalogue.credit` naming its insert columns, which a positional `VALUES` with the two new columns would break. The undo history (`history.js`) already snapshots `SELECT *` and restores by column name, so new snapshots keep `source` and `state` and older snapshots restore with the defaults.
+
+## Verification
+
+On Node 22.23:
+
+- Full `npm test`: 405/405.
+- New `schema 4 migrates to 5 additively, and its backup restores for the schema 4 build`: a schema-4 file holding a work, a person, an ensemble, two credits and a search document migrates to 5. Row counts are unchanged (four new field definitions aside), existing credits are `manual`/`active`, sort keys are empty, new tables are empty, the indexes exist, and the database rejects other `source`/`state` values. The `before-v5-*` backup restores offline: it is refused for a schema-3 build and opens with the schema-4 build, with the same counts and the original seven credit columns. It fails on the schema-4 code.
+- The migration-failure, interrupted-DDL and schema-1 upgrade tests now take the current and next version from `SCHEMA_VERSION` instead of hard-coding 4 and 5, so they keep testing "newer than shipped".
+
+---
+
+# v0.3 Phase 0.11 — L6/L7/L8/L13 / issue #20
+
+Base: `aurral-classical` `c61dcea`, including merged L1 PR #103. This follows the handoff sequence (Batch B after L1).
+
+## Result
+
+- **Prototype applied:** `variations-prototype.patch` applies cleanly on top of L1 (offsets only). Its parts, each now with a plain comment: `rawSections` and `expandSection` (ranges, lists, dash before a section; L6, L8), `variatio` in the three variation patterns and `asVariation` returning the number, used as the index in `mapEach` (L7), variation numbers compared first in `namedMovement` (L7, L6), a named section taking the earliest free movement of that name (L6, L13), and `returnsAtEnd` in `candidates` (L13). As #20 warns, fuga and finale are not added to the dash split, so "III. Adagio ma non troppo - Fuga" stays one movement.
+- **Data repair (not in the prototype):** the library pass found works to split only by movement titles containing " / ". It now reads each movement title through `sectionTitles`, so works an older version made with a "Variations 1-3" or "Theme and Var. 1" movement are split too. `splitCombinedMovements` is unchanged and still splits only unedited works that matching made.
+- **Corpus scorer:** `score()` in `test/corpus/apple.js` also returns `matched`, the share of an album's tracks in a group with a work. `test/corpus-apple.test.js` fails when `matched` falls and compares row wording only while `matched` is unchanged. The baseline is re-saved with `node scripts/corpus.mjs --apple --update-baseline`.
+
+## Corpus baseline
+
+Comparing the scorer's results for the code before and after this change (same scorer), 10 of 612 results move, all the same way: `matched` rises (0–0.32 to 0.97–1), `parts` falls, and grouping and false joins are unchanged everywhere. They are the five results #20 traced (store 1640004922, work-tags 1608042390 and 1640004922, messy 1467953807 and 1691120087) plus store and work-tags 1691120087 and the three styles of 476935391 (Gould's 1981 Goldberg, previously unmatched because of its closing "Aria da capo"; L13). Every row in these ten results whose Apple part names a variation was checked against the row's own variation number, in the full shared catalogue: 267 rows, 0 on the wrong variation. `parts` falls only because rows now show the work's movement names, the issue's documented side effect; changing row wording is out of scope. The re-saved file also records eight results (862972382, 1452145443, 1648305509, 269682146, 734587111, 752033492, 884005057 across styles) whose values were already those on the code before this change; earlier phases improved them without re-saving.
+
+## Verification
+
+On Node 22.23:
+
+- Full `npm test`: 404/404.
+- New `variation ranges, Variatio and a returning Aria join one work in either order`: Paganini per-variation album vs "Variations 2-3", Goldberg "Variations 1-3" vs "Variatio 1–3", Goldberg "Aria … Aria" vs "Aria … Aria da capo", each in both scan orders. Each run makes one work, puts a range track on every variation it holds, never names a movement for the range, keeps the closing Aria as its own movement and opens no review.
+- New `sections split on a range, a list or a dash before a section`: ranges (arabic and roman), "and" and comma lists, "Introduction - Variation 1 - Tema"; "Theme - Andante", "III. Adagio ma non troppo - Fuga", "Allegro, ma non troppo", "Return Home / Heimkehr" and "Variations 3-3" stay whole; "Variation 3" maps to "Variatio 3 a 1 Clav.".
+- New `the library pass splits a movement an older version named for a range`: a work stored as "Aria", "Variations 1-3" is split by the library pass alone (the other album held out of it), then the other album joins with no missing movements or review. With the old " / "-only query it fails.
+- The three new tests fail on base `c61dcea`. The existing `several variations a movement` test now uses a `combineMovements` helper extracted from its own setup and passes on both.
+
+Not rerun: the `p6`/`p7`/`f3`/`f5` review probes (the new tests cover their cases). No browser, Compose or restart run locally (no Docker).
+
+---
+
 # v0.3 Phase 0.10 — L1 / issue #19
 
 Base: `aurral-classical` `f055abe`, including merged C1 PR #102. This follows the handoff sequence (L1 after C1). No other issue is implemented here.

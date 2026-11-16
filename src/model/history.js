@@ -178,7 +178,7 @@ export function deleteWorks(c, workIds, actor, { names }) {
         const composers = c.db
           .prepare(
             `SELECT a.value FROM credit k JOIN field_resolution f ON f.target_id=k.contributor_id AND f.field='name'
-             JOIN assertion a ON a.id=f.assertion_id WHERE k.target_id=? AND k.role='composer'`,
+             JOIN assertion a ON a.id=f.assertion_id WHERE k.target_id=? AND k.role='composer' AND k.state='active'`,
           )
           .all(work)
           .map((row) => JSON.parse(row.value));

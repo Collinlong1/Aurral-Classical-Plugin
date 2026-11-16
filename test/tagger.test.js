@@ -65,6 +65,31 @@ test("a failed atomic replacement preserves original audio and the persisted bac
   assert.deepEqual(await fs.readFile(path.join(folders.dataFolder,"originals.json")),backup);
 });
 
+test("conductor, performer and artist ID tags are read in each format that has them", async () => {
+  for (const ext of ["flac", "mp3"]) {
+    const file = await copyFixture(`sine.${ext}`, path.join(folders.libraryFolder, `credits.${ext}`));
+    const f = File.createFromPath(file);
+    try {
+      f.tag.conductor = "Claudio Abbado";
+      const xiph = f.getTag(TagTypes.Xiph, false);
+      if (xiph) {
+        xiph.setFieldAsStrings("PERFORMER", "Maurizio Pollini (piano)", "Wiener Philharmoniker");
+        xiph.setFieldAsStrings("MUSICBRAINZ_ARTISTID", "id-1; id-2");
+      }
+      f.save();
+    } finally {
+      f.dispose();
+    }
+    const tags = readTags(file);
+    assert.equal(tags.conductor, "Claudio Abbado", ext);
+    // PERFORMER is a Vorbis comment; other formats have no such field.
+    assert.deepEqual(tags.performers, ext === "flac" ? ["Maurizio Pollini (piano)", "Wiener Philharmoniker"] : [], ext);
+    assert.deepEqual(tags.artistMbids, ext === "flac" ? ["id-1", "id-2"] : [], ext);
+  }
+  const plain = readTags(await copyFixture("sine.flac", path.join(folders.libraryFolder, "plain.flac")));
+  assert.deepEqual([plain.conductor, plain.performers], ["", []]);
+});
+
 function otherTags(file) {
   const f = File.createFromPath(file);
   try {

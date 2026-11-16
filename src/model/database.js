@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { migrations as shippedMigrations } from "./schema.js";
 
-export const SCHEMA_VERSION = 4;
+export const SCHEMA_VERSION = 5;
 
 export function validateDatabase(db) {
   if (

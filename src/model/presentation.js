@@ -5,6 +5,7 @@ import { NUMBERED_SET, isCollectionLike, numberedPiece, movementTitle, splitTitl
 import { catalogueNumber } from "../works.js";
 import { composersOf } from "./credits.js";
 import { groupRecordings, ownedRecordings } from "../search/engine.js";
+import { performerNames } from "./contributors.js";
 
 const text = (value, fallback) =>
   typeof value === "string" && value.trim() ? value.trim() : fallback;
@@ -127,10 +128,7 @@ const words = (value) =>
 // heads the work, so rows name only who plays.
 function performerOf(hints) {
   const artist = text(hints?.artist, text(hints?.albumArtist, ""));
-  const composers = new Set(composersOf(hints || {}).map(words));
-  const performers = artist
-    .split(/\s+[—–]\s+|\s*;\s*/)
-    .filter((name) => name && !composers.has(words(name)));
+  const performers = performerNames(hints || {}, composersOf(hints || {}), words);
   return performers.length ? performers.join(", ") : artist;
 }
 
@@ -177,7 +175,7 @@ function credits(c, metadata, targetId) {
   return c.db
     .prepare(
       `SELECT role,instrument,contributor_id FROM credit
-       WHERE target_id=? ORDER BY position,id`,
+       WHERE target_id=? AND state='active' ORDER BY position,id`,
     )
     .all(targetId)
     .map((row) => ({

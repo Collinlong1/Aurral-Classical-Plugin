@@ -1,3 +1,45 @@
+# v0.3 Phase 1.4 — derive performer credits (issue #52)
+
+Last of five commits in one PR (0.11, 1.1–1.4). Implements #52 only; #52 has no later comments. 1.5 (identity by aliases and IDs across all contributors) and later items are not started.
+
+New `src/model/contributors.js`. `performerNames` is the artist-tag split moved from `engine.js` and `presentation.js`, each caller keeping its own name folding, so search and pages read exactly as before. `trackCredits` reads one track's credits: a conductor tag names the conductor; Vorbis `PERFORMER` values name players and their instruments ("Martha Argerich (piano)"); without them the artist tag does, split into a list only when every piece is a name or an ensemble. Ensembles (the `credits.js` word list) are orchestra, choir or ensemble by their own name; everyone else is `performer`, shown as "Performer". `contributorFor` reuses the one person or ensemble with that exact folded name or alias, or the holder of a MusicBrainz artist ID; a name two records share gets no credit; new records are marked `unreviewed`. `deriveCredits` runs at the end of `autoMatchTaggedWorks` for performances with no performing credit at all, active or removed, and gives each the credits all its tracks share, as `derived`. `accompanist` is a new person role. Admins' credits are never touched, and a removed derived credit is never added again. No schema or core change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
+# v0.3 Phase 1.3 — conductor, performer and artist ID tag evidence (issue #53)
+
+Fourth of five commits in one PR (0.11, 1.1–1.4). Implements #53 only; #53 has no later comments.
+
+`readTags` (`src/tags.js`) now reads the conductor (taglib's own field, so FLAC, Opus and MP3 alike) and every Vorbis `PERFORMER` value ("Martha Argerich (piano)"); artist IDs were already read. The library scan (`runtime.js` `scanFile`) stores `conductor`, `performers` and `artistMbids` in a track's hints only when set, as it does `grouping`, so a file without them keeps its stored evidence byte for byte and a rescan adds no evidence rows. Nothing reads the new hints yet; 1.4 does. No schema or core change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
+# v0.3 Phase 1.2 — credit provenance (issue #51)
+
+Third of five commits in one PR (0.11, 1.1–1.4). Implements #51 only; #51 has no later comments.
+
+`Catalogue.credit` takes `source` (`manual` by default, `derived`, `provider`). A credit added for a target, contributor, role and instrument that has a removed row comes back as that row, with the new source, so the unique key never blocks an admin re-adding a removed credit. New `Catalogue.removeCredit` marks a derived credit `removed`, so a later scan does not derive it again, and deletes any other. The editor's Remove uses it. Every reader that shows credits or tests a role reads active credits only: work and album pages, both editors, composer detection in matching, the search index and the undo summary. Merges of people or works carry removed rows along, and an active credit wins a collision with a removed one. The search index stamp counts active credits, so a removal rebuilds it. Existing credits are manual and active (1.1), and undo snapshots keep both columns. No schema or core change beyond 1.1; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
+# v0.3 Phase 1.1 — catalogue schema 5 (issue #48)
+
+Second of five commits in one PR (0.11, 1.1–1.4) on `claude/pensive-bardeen-5dat3q`. Implements #48 only, as the plan's §3 specifies; #48 has no later comments.
+
+Migration 5 (`src/model/schema.js`, `SCHEMA_VERSION = 5`) is additive, runs in one transaction, and `openDatabase` takes the `backups/before-v5-*.sqlite` backup first. It adds `credit.source` (`manual`, `derived`, `provider`) and `credit.state` (`active`, `removed`), both checked by the database, and indexes on `credit(contributor_id)` and `credit(target_id)`. It adds the `sortName`, `location`, `instruments` and `recordingDate` fields, and the `user_recording_state`, `saved_queue` (D4 = plugin-owned comparisons, as #76 is titled) and `tag_backup` tables. It also adds `search_doc.sort_title`, `sort_key` and `sort_date` with a `(kind, sort_title)` index. Existing credits read as manual and active; nothing existing is rewritten. `Catalogue.credit` now names its insert columns. Nothing reads the new columns or tables yet; 1.2 onward does.
+
+Rollback: stop the plugin, restore the `before-v5-*.sqlite` backup offline with `restoreDatabase` (`scripts/model-admin.mjs restore MODEL_FOLDER BACKUP --offline`), and install the previous plugin build, as V0_2_REPORT.md describes for schema 4.
+
+Verification: `V0_3_REPORT.md`.
+
+# v0.3 Phase 0.11 — variation ranges, Variatio, dash-joined sections and returning arias (L6/L7/L8/L13, issue #20)
+
+Branch `claude/pensive-bardeen-5dat3q` starts at `aurral-classical` `c61dcea`, including merged L1 PR #103. Current #20 has no later scope comments. This implements L6, L7, L8 and L13 together, as #20 asks, from `variations-prototype.patch` (applied cleanly; prototype comments replaced). It is the first of five commits in one PR with Phase 1.1–1.4.
+
+One splitter (`rawSections`) serves `sectionTitles`, `trackSections` and `mapBySections`: it splits on " / " and on a spaced dash before a variation, theme or coda, and expands a range ("Variations 1-3", "Vars. IV–VI") or a list of sections ("Theme and Var. 1") into one section each. "Variatio" is a variation; a variation maps by its number; a named section (theme, introduction, aria, fugue…) takes the earliest free movement of that name; a theme that returns at the end ("Aria … Aria") no longer leaves the work unmatched. The library pass now repairs works older versions made with range or list movements, not only " / " ones (unedited automatic works only). The Apple corpus scorer gains `matched` (share of tracks in a work), so an unmatched album can no longer score as perfect; the baseline is re-saved. No schema or core change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
 # v0.3 Phase 0.10 — excerpts never line up with another album's movements by order (L1, issue #19)
 
 Branch `claude/pensive-bardeen-5dat3q` starts at `aurral-classical` `f055abe`, including merged C1 PR #102 (core C1 merged as core PR #58). Current #19 has no additional dependencies or later scope comments. This implements L1 only.

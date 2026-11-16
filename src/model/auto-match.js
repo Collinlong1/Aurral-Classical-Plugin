@@ -3,6 +3,7 @@ import { Metadata } from "./metadata.js";
 import { transaction } from "./database.js";
 import { catalogueNumber, cataloguePiece } from "../works.js";
 import { artistCredits, composersOf } from "./credits.js";
+import { deriveCredits } from "./contributors.js";
 
 const MULTI_MOVEMENT =
   /\b(symphon(?:y|ie)|sinfonia|sonata|sonatina|concerto|suite|partita|quartet|quintet|sextet|septet|octet|nonet|trio|serenade|divertimento|cassation|mass|missa|requiem|stabat mater|magnificat|te deum|vespers|cantata|oratorio|passion|variations?|ballet)\b/i;
@@ -414,7 +415,7 @@ function candidates(
           : new Set(positions).size !== positions.length
             ? "two tracks share a disc and track number"
             : // MusicBrainz telling four "Promenade"s apart tells them apart.
-              new Set(group.tracks.map(pieceName)).size !== group.tracks.length
+              new Set(group.tracks.map(pieceName)).size !== group.tracks.length && !returnsAtEnd(group.tracks)
               ? "two tracks share a title"
               : null;
     if (explain)
@@ -538,6 +539,13 @@ function numberedElsewhere(title, workTitle) {
 // One piece is one title and, when MusicBrainz names it, one MusicBrainz
 // name: four "Promenade"s it names apart are four pieces; a Christe and a
 // Kyrie II it files under one "Kyrie" are two.
+// A theme that returns to close the work (Goldberg's "Aria" first and last)
+// is no second piece under the same title.
+const returnsAtEnd = (tracks) => {
+  const ordered = [...tracks].sort(albumOrder);
+  const names = ordered.map(pieceName);
+  return ordered.length > 2 && names[0] === names.at(-1) && new Set(names.slice(0, -1)).size === names.length - 1;
+};
 const pieceName = (track) => `${normalized(track.title)}|${normalized(track.providerMovement || "")}`;
 function splitScattered(groups) {
   return groups.flatMap((group) => {
@@ -594,7 +602,7 @@ function knownComposerNames(catalogue) {
   for (const { id } of catalogue.db
     .prepare(
       `SELECT DISTINCT c.contributor_id AS id FROM credit c JOIN entity e ON e.id=c.contributor_id
-       WHERE c.role='composer' AND e.deleted_at IS NULL`,
+       WHERE c.role='composer' AND c.state='active' AND e.deleted_at IS NULL`,
     )
     .all()) {
     const name = resolvedName(catalogue, id, "name");
@@ -763,7 +771,7 @@ function stripWorkPrefixOnce(title, workTitle) {
   return text;
 }
 
-function resolvedName(catalogue, id, field) {
+export function resolvedName(catalogue, id, field) {
   const row = catalogue.db
     .prepare(
       `SELECT a.value FROM field_resolution f JOIN assertion a ON a.id=f.assertion_id
@@ -776,7 +784,7 @@ function composerNames(catalogue, work) {
   return catalogue.db
     .prepare(
       `SELECT c.contributor_id AS id FROM credit c JOIN entity e ON e.id=c.contributor_id
-       WHERE c.target_id=? AND c.role='composer' AND e.deleted_at IS NULL ORDER BY c.position`,
+       WHERE c.target_id=? AND c.role='composer' AND c.state='active' AND e.deleted_at IS NULL ORDER BY c.position`,
     )
     .all(work)
     .map((row) => resolvedName(catalogue, row.id, "name"))
@@ -837,7 +845,7 @@ function composerPeople(catalogue) {
     .prepare(
       `SELECT id FROM entity WHERE kind='person' AND deleted_at IS NULL
        AND (json_extract(data,'$.roles') LIKE '%composer%'
-         OR EXISTS(SELECT 1 FROM credit WHERE contributor_id=entity.id AND role='composer'))
+         OR EXISTS(SELECT 1 FROM credit WHERE contributor_id=entity.id AND role='composer' AND state='active'))
        ORDER BY created_at,id`,
     )
     .all()) {
@@ -978,6 +986,18 @@ function namedMovement(movements, title, used, setSubject) {
   const free = movements.filter((m) => !used.has(m.id));
   let found = free.filter((m) => m.text && m.text === text);
   if (found.length !== 1) found = free.filter((m) => m.title && sameNameAbbreviated(m.title, title));
+  // A variation is its number, whatever words follow: "Variation 3" is
+  // "Variatio 3 a 1 Clav.", never "Variations 1-3".
+  if (found.length !== 1) {
+    const wanted = asVariation(title);
+    if (wanted.variation && wanted.number) {
+      found = free.filter((m) => {
+        const own = asVariation(m.title || "");
+        return own.variation && own.number === wanted.number;
+      });
+      if (found.length === 1) return found[0];
+    }
+  }
   if (found.length !== 1) {
     const piece = pieceNumber(title, setSubject);
     found = piece == null ? [] : free.filter((m) => movementPiece(m, setSubject) === piece);
@@ -990,9 +1010,41 @@ function namedMovement(movements, title, used, setSubject) {
 // "XIII. Agitato / Intermezzo: A tempo rubato". Only when every part starts
 // as a section does (a number, a variation, theme, coda, intermezzo,
 // introduction), so "Return Home / Heimkehr" stays one song.
-const SECTION_START = /^(?:(?:[ivxlc]+|\d+)[a-d]?[.)]\s|(?:var(?:iation|iazione)?\.?|theme|thema|tema|coda|intermezzo|introduction|introduzione)(?![\p{L}]))/iu;
+const SECTION_START = /^(?:(?:[ivxlc]+|\d+)[a-d]?[.)]\s|(?:var(?:iation|iatio|iazione)?\.?|theme|thema|tema|coda|intermezzo|introduction|introduzione)(?![\p{L}]))/iu;
+// A range or list of variations is one section per variation: "Variations
+// 1-3", "Vars. 4–6", "Variations 1 and 2", "Theme and Var. 1". A list splits
+// only when every piece is a section or a number after a variation, so
+// "Allegro, ma non troppo" stays whole.
+const VAR_WORD = "var(?:iations|iationen|iation|iatio|iazioni|iazione|s)?\\.?";
+const VAR_NUM = "(?:\\d+|[ivxlc]+)";
+const VAR_RANGE = new RegExp(`^${VAR_WORD}\\s*(?:(?:nos?|nr)\\.?\\s*)?(${VAR_NUM})\\s*[-–—]\\s*(${VAR_NUM})$`, "iu");
+const VAR_ONE = new RegExp(`^${VAR_WORD}\\s*(?:(?:nos?|nr)\\.?\\s*)?(${VAR_NUM})$`, "iu");
+const numberOf = (text) => (/^\d+$/.test(text) ? Number(text) : romanValue(text.toLowerCase()));
+function expandSection(part) {
+  const range = part.match(VAR_RANGE);
+  if (range) {
+    const [from, to] = [numberOf(range[1]), numberOf(range[2])];
+    if (from && to && to > from && to - from < 40) return Array.from({ length: to - from + 1 }, (_, i) => `Variation ${from + i}`);
+  }
+  const pieces = part.split(/\s*,\s*|\s+(?:&|and|und|et)\s+/i).map(clean).filter(Boolean);
+  if (pieces.length < 2) return [part];
+  const out = [];
+  let afterVariation = false;
+  for (const piece of pieces) {
+    const one = piece.match(VAR_ONE);
+    if (one && numberOf(one[1])) (out.push(`Variation ${numberOf(one[1])}`), (afterVariation = true));
+    else if (afterVariation && /^(?:\d+|[ivxlc]+)$/i.test(piece) && numberOf(piece)) out.push(`Variation ${numberOf(piece)}`);
+    else if (SECTION_START.test(piece)) (out.push(piece), (afterVariation = false));
+    else return [part];
+  }
+  return out;
+}
+const rawSections = (title) =>
+  clean(title)
+    .split(/\s+\/\s+|\s+[–—-]\s+(?=var(?:iation|iatio|iazione)?\.?\s|(?:theme|thema|tema|coda)(?![\p{L}]))/iu)
+    .flatMap(expandSection);
 export function sectionTitles(title) {
-  const parts = clean(title).split(/\s+\/\s+|\s+[–—-]\s+(?=var(?:iation|iazione)?\.?\s)/i);
+  const parts = rawSections(title);
   return parts.length > 1 && parts.every((part) => SECTION_START.test(part)) ? parts : [clean(title)];
 }
 const combined = (movement) => sectionTitles(movement.title || "").length > 1;
@@ -1004,7 +1056,7 @@ const combined = (movement) => sectionTitles(movement.title || "").length > 1;
 // variation ("Variation 12: Tempo di minuetto", "Variation No. 12") is that
 // variation whatever tempo words follow ("XII. Tempo di menuetto"); other
 // numbered sections need the same number and words.
-const VARIATION = /^(?:var(?:iation|iazione)?s?|variazioni)\s+(?:(?:no|nr|n)\s+)?(?=\d|[ivxlc]+\b)/;
+const VARIATION = /^(?:var(?:iation|iatio|iazione)?s?|variazioni|variationen)\s+(?:(?:no|nr|n)\s+)?(?=\d|[ivxlc]+\b)/;
 function sectionParts(section) {
   let value = words(section).replace(/\b(?:tema|thema)\b/g, "theme");
   const variation = VARIATION.test(value);
@@ -1019,13 +1071,10 @@ const sameSection = (a, b) =>
     : a.text === b.text;
 // A track's sections: "Introduction. Allegro vivace - Variation No. 1
 // (Precedente)" is two.
-const trackSections = (text) =>
-  clean(text)
-    .split(/\s+\/\s+|\s+[–—-]\s+(?=var(?:iation|iazione)?\.?\s)/i)
-    .map(sectionParts);
+const trackSections = (text) => sectionTitles(text).map(sectionParts);
 function mapBySections(movements, tracks) {
-  if (!movements.some((m) => / \/ /.test(m.title || ""))) return null;
-  const sections = movements.map((m) => clean(m.title).split(/\s+\/\s+/).map(sectionParts));
+  if (!movements.some(combined)) return null;
+  const sections = movements.map((m) => sectionTitles(m.title || "").map(sectionParts));
   const result = [];
   let at = 0,
     offset = 0;
@@ -1068,20 +1117,21 @@ export function mapToMovements(movements, tracks, { setSubject = "", sections = 
 // "Variation 12: Tempo di minuetto", "Variation No. 10 L'istesso tempo" and
 // "XII. Tempo di menuetto" are variation twelve and ten whatever tempo words
 // follow; "Tema" and "Thema" are "Theme".
-const VARIATION_TITLE = /^var(?:iation|iazione)?\.?\s*(?:(?:no|nr|n)\.?\s*)?(\d+|[ivxlc]+)(?![\p{L}\d])[\s:.,]*(.*)$/iu;
+const VARIATION_TITLE = /^var(?:iation|iatio|iazione)?\.?\s*(?:(?:no|nr|n)\.?\s*)?(\d+|[ivxlc]+)(?![\p{L}\d])[\s:.,]*(.*)$/iu;
 function asVariation(title) {
   const text = clean(title).replace(/^(?:tema|thema)(?![\p{L}])/iu, "Theme");
   const variation = text.match(VARIATION_TITLE);
-  return variation ? { title: `${variation[1]}. ${variation[2]}`, variation: true } : { title: text, variation: false };
+  return variation ? { title: `${variation[1]}. ${variation[2]}`, variation: true, number: numberOf(variation[1]) } : { title: text, variation: false };
 }
 function mapEach(rawMovements, rawTracks, setSubject) {
   const movements = rawMovements.map((m) => {
-    const { title, variation } = asVariation(m.title || "");
-    return variation || title !== clean(m.title) ? { ...m, ...movementParts(title), variation } : m;
+    const { title, variation, number } = asVariation(m.title || "");
+    // A bare "Variation 3" has its number too.
+    return variation || title !== clean(m.title) ? { ...m, ...movementParts(title), ...(variation && number && { index: number }), variation } : m;
   });
   const tracks = rawTracks.map((track) => {
-    const { title, variation } = asVariation(track.movementTitle || "");
-    return { ...track, movementTitle: title, variation };
+    const { title, variation, number } = asVariation(track.movementTitle || "");
+    return { ...track, movementTitle: title, variation, variationNumber: variation ? number : null };
   });
   const used = new Set(),
     result = [];
@@ -1089,6 +1139,7 @@ function mapEach(rawMovements, rawTracks, setSubject) {
   let previous = null;
   for (const track of tracks) {
     const parts = movementParts(track.movementTitle);
+    if (track.variationNumber) parts.index = track.variationNumber;
     let found = movements.filter(
       (m) => !used.has(m.id) && m.text && m.text === parts.text,
     );
@@ -1104,6 +1155,19 @@ function mapEach(rawMovements, rawTracks, setSubject) {
     if (found.length !== 1) {
       const named = namedMovement(movements, track.movementTitle, used, setSubject);
       if (named) found = [named];
+    }
+    // A named section ("Theme", "Aria", "Fuga") is the earliest free movement
+    // of that name, with or without the words after it: "Tema. L'istesso
+    // tempo" is "Theme", "Fuga" is "Fugue", "Aria" is "Aria da capo".
+    if (found.length !== 1 && !parts.index && parts.text) {
+      const key = (text) => firstWord(text).replace(/^fug(?:a|e)$/, "fugue");
+      if (/^(?:theme|introduction|introduzione|coda|finale|aria|fugue|intermezzo)$/.test(key(parts.text))) {
+        const near = movements.filter(
+          (m) => !used.has(m.id) && m.text && !m.index && key(m.text) === key(parts.text) &&
+            (m.text === parts.text || firstWord(m.text) !== firstWord(parts.text) || m.text.startsWith(`${parts.text} `) || parts.text.startsWith(`${m.text} `)),
+        );
+        if (near.length) found = [near[0]];
+      }
     }
     // A variation's number is its index alone, never a position.
     const variation = track.variation || movements.some((m) => m.variation);
@@ -1204,7 +1268,7 @@ function creditMovementComposers(catalogue, metadata, index, recording, track, g
     .filter((name) => !work.has(normalized(name)))
     .forEach((name, i) => {
       const person = composerEntity(catalogue, metadata, index, name, group.composerIds?.[name]);
-      if (!catalogue.db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role='composer'").get(recording, person))
+      if (!catalogue.db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role='composer' AND state='active'").get(recording, person))
         catalogue.credit(recording, person, "composer", { position: i + 1 });
     });
 }
@@ -1433,7 +1497,7 @@ function createGroup(catalogue, group, actor, index) {
     // is someone else's work.
     const otherComposer = (id) =>
       catalogue.db
-        .prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer'")
+        .prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer' AND state='active'")
         .all(id)
         .some(({ contributor_id: person }) => {
           const mbid = group.composerIds?.[resolvedName(catalogue, person, "name")] ||
@@ -2295,11 +2359,13 @@ export function mergeContributor(catalogue, keep, drop, actor) {
     .all(drop)) {
     const duplicate = catalogue.db
       .prepare(
-        "SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?",
+        "SELECT id,state FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?",
       )
       .get(credit.target_id, keep, credit.role, credit.instrument);
-    if (duplicate)
+    if (duplicate) {
+      keepActiveCredit(catalogue.db, duplicate, credit);
       catalogue.db.prepare("DELETE FROM credit WHERE id=?").run(credit.id);
+    }
     else
       catalogue.db
         .prepare("UPDATE credit SET contributor_id=? WHERE id=?")
@@ -2345,6 +2411,14 @@ function mergeDuplicateComposers(catalogue, index, actor) {
 // must line up (null when they don't). With it (an admin's merge), the
 // movements that line up by title (or by number, where one is untitled) are
 // mapped and the rest are null: they move to the kept work as they are.
+// Two credits a merge makes the same: the kept row stays. When it was
+// removed and the moving one is active, the kept row takes the moving one's
+// source and state, so a merge never hides a live credit behind a removed one.
+function keepActiveCredit(db, kept, moving) {
+  if (kept.state === "removed" && moving.state === "active")
+    db.prepare("UPDATE credit SET state='active',source=? WHERE id=?").run(moving.source, kept.id);
+}
+
 function mergeMapping(catalogue, keep, drop, addMissing) {
   const keepMovements = workMovements(catalogue, keep),
     dropMovements = workMovements(catalogue, drop);
@@ -2396,19 +2470,19 @@ export function mergeWork(catalogue, keep, drop, actor, { addMissing = false } =
   db.prepare("DELETE FROM relation WHERE kind='movement' AND source_id=?").run(drop);
   // An editor merge keeps the chosen work's composer identity. Other roles
   // still move; a work without a composer inherits all dropped composers.
-  const keepComposers = addMissing && db.prepare("SELECT 1 FROM credit WHERE target_id=? AND role='composer' LIMIT 1").get(keep);
+  const keepComposers = addMissing && db.prepare("SELECT 1 FROM credit WHERE target_id=? AND role='composer' AND state='active' LIMIT 1").get(keep);
   for (const credit of db.prepare("SELECT * FROM credit WHERE target_id=?").all(drop)) {
     if (keepComposers && credit.role === "composer") {
       db.prepare("DELETE FROM credit WHERE id=?").run(credit.id);
       continue;
     }
-    if (
-      db
-        .prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?")
-        .get(keep, credit.contributor_id, credit.role, credit.instrument)
-    )
+    const duplicate = db
+      .prepare("SELECT id,state FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?")
+      .get(keep, credit.contributor_id, credit.role, credit.instrument);
+    if (duplicate) {
+      keepActiveCredit(db, duplicate, credit);
       db.prepare("DELETE FROM credit WHERE id=?").run(credit.id);
-    else db.prepare("UPDATE credit SET target_id=? WHERE id=?").run(keep, credit.id);
+    } else db.prepare("UPDATE credit SET target_id=? WHERE id=?").run(keep, credit.id);
   }
   // A user who liked or picked either work keeps that on the merged work. The
   // kept work's own pick wins; the dropped work's pick is now one of its realizations.
@@ -2458,7 +2532,7 @@ function compatibleAutoWorks(catalogue, a, b) {
   if (distinctIdentities(verifiedIdentities(catalogue, a, "work"), verifiedIdentities(catalogue, b, "work"))) return false;
   const composers = (work) => {
     const identities = new Map();
-    for (const { contributor_id: person } of catalogue.db.prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer'").all(work)) {
+    for (const { contributor_id: person } of catalogue.db.prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer' AND state='active'").all(work)) {
       const name = words(resolvedName(catalogue, person, "name"));
       identities.set(name, new Set([...(identities.get(name) || []), ...verifiedIdentities(catalogue, person, "artist")]));
     }
@@ -2703,7 +2777,7 @@ function repairCompletionSplits(catalogue, albumId, actor) {
       const metadata = new Metadata(catalogue);
       const index = catalogueIndex(catalogue);
       const group = { composers: [], composerIds: {} };
-      for (const credit of db.prepare("SELECT id,contributor_id FROM credit WHERE target_id=? AND role='composer'").all(keep.work)) {
+      for (const credit of db.prepare("SELECT id,contributor_id FROM credit WHERE target_id=? AND role='composer' AND state='active'").all(keep.work)) {
         const name = resolvedName(catalogue, credit.contributor_id, "name");
         if (shared.includes(words(name))) group.composers.push(name);
         else db.prepare("DELETE FROM credit WHERE id=?").run(credit.id);
@@ -2999,15 +3073,19 @@ export function autoMatchTaggedWorks(
     fileCollectionsFromTags(catalogue, { actor });
     repairWorkTitles(catalogue);
     repairMovementTitles(catalogue);
-    // Works an album made with several variations a movement.
-    for (const { work } of catalogue.db
+    // Works an album made with several variations a movement: joined by
+    // " / " or a dash, a range ("Variations 1-3") or a list ("Theme and Var.
+    // 1"). Only unedited works matching made are split.
+    const combinedWorks = new Set();
+    for (const { work, value } of catalogue.db
       .prepare(
-        `SELECT DISTINCT r.source_id AS work FROM relation r JOIN metadata_target m ON m.entity_id=r.target_id
+        `SELECT r.source_id AS work,a.value FROM relation r JOIN metadata_target m ON m.entity_id=r.target_id
          JOIN field_resolution f ON f.target_id=m.id AND f.field='title' JOIN assertion a ON a.id=f.assertion_id
-         WHERE r.kind='movement' AND a.value LIKE '% / %'`,
+         WHERE r.kind='movement'`,
       )
       .all())
-      splitCombinedMovements(catalogue, work, actor);
+      if (!combinedWorks.has(work) && sectionTitles(String(JSON.parse(value) ?? "")).length > 1) combinedWorks.add(work);
+    for (const work of combinedWorks) splitCombinedMovements(catalogue, work, actor);
     const metadata = new Metadata(catalogue);
     for (const { id } of catalogue.db
       .prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL")
@@ -3020,6 +3098,8 @@ export function autoMatchTaggedWorks(
   for (const group of groups)
     if (createGroup(catalogue, group, actor, index)) created++;
   keyMovementTitles(catalogue, { albumId });
+  // Who plays each newly matched performance, from its tags.
+  deriveCredits(catalogue, { albumId });
   resolveSettledReviews(catalogue, albumId, actor);
   return { created, candidates: groups.length };
 }

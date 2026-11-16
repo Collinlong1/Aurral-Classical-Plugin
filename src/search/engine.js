@@ -5,6 +5,7 @@
 // One document per work, movement, owned recording, contributor and album.
 // Ranking and ambiguity rules are in SEARCH.md.
 import { transaction } from "../model/database.js";
+import { PERFORMING_ROLES, performerNames } from "../model/contributors.js";
 import { catalogueKeys, fold, keyMatches, parseQuery, skeleton, words } from "./normalize.js";
 
 const FIELD = { primary: 0, secondary: 1, skeleton: 2 };
@@ -30,7 +31,7 @@ export const FACETS = [
   ["owned", "Library"],
 ];
 const FACET_KEYS = new Set(FACETS.map(([key]) => key));
-const PERFORMER_ROLES = new Set(["soloist", "performer", "conductor", "orchestra", "ensemble", "choir"]);
+const PERFORMER_ROLES = PERFORMING_ROLES;
 const ENSEMBLE_ROLES = new Set(["orchestra", "ensemble", "choir"]);
 const ROLE_LABEL = { soloist: "Soloist", performer: "Performer", conductor: "Conductor", orchestra: "Orchestra", ensemble: "Ensemble", choir: "Choir", composer: "Composer", arranger: "Arranger", lyricist: "Lyricist" };
 const LIVE = /\b(live|concert|recital|broadcast|in concert|konzert)\b/i;
@@ -56,7 +57,7 @@ export function catalogueStamp(c) {
         (SELECT count(*)||':'||coalesce(max(rowid),0) FROM realization_item) AS e,
         (SELECT coalesce(max(updated_at),0)||':'||count(*) FROM classification WHERE state='classical') AS f,
         (SELECT coalesce(max(updated_at),0)||':'||count(*) FROM track_link WHERE state='active') AS g,
-        (SELECT count(*)||':'||coalesce(max(rowid),0) FROM credit) AS h,
+        (SELECT count(*)||':'||coalesce(max(rowid),0)||':'||coalesce(sum(state='active'),0) FROM credit) AS h,
         (SELECT count(*)||':'||coalesce(max(rowid),0) FROM relation) AS i`,
     )
     .get();
@@ -112,7 +113,7 @@ export function ownedRecordings(c, tracks = classicalTracks(c), values = resolve
     .all(...(workId ? [workId] : []));
   const credits = c.db.prepare(
     `SELECT k.role,k.contributor_id FROM relation pw JOIN credit k ON k.target_id=pw.source_id
-     JOIN entity e ON e.id=k.contributor_id AND e.deleted_at IS NULL WHERE pw.id=? ORDER BY k.position,k.id`,
+     JOIN entity e ON e.id=k.contributor_id AND e.deleted_at IS NULL WHERE pw.id=? AND k.state='active' ORDER BY k.position,k.id`,
   );
   const byRealization = new Map();
   for (const row of rows) {
@@ -127,12 +128,7 @@ export function ownedRecordings(c, tracks = classicalTracks(c), values = resolve
     const people = credits.all(recording.performanceWorkId).map((row) => ({ id: row.contributor_id, role: row.role, name: text(values.get(row.contributor_id)?.name) || "Unknown" }));
     const performers = people.filter((p) => PERFORMER_ROLES.has(p.role));
     // Without credits, the track's own artist names who plays.
-    const tagged = performers.length
-      ? []
-      : text(first.hints.artist || first.hints.albumArtist)
-          .split(/\s+[—–]\s+|\s*;\s*/)
-          .map((name) => name.trim())
-          .filter((name) => name && !list(first.hints.composer).some((composer) => fold(composer) === fold(name)));
+    const tagged = performers.length ? [] : performerNames(first.hints, list(first.hints.composer), fold);
     const albums = [...new Set(recording.items.map((item) => item.track.albumId).filter(Boolean))];
     const mbids = [...new Set(recording.items.map((item) => item.track.hints.recordingMbid).filter(Boolean))].sort();
     const parts = new Map();
@@ -248,7 +244,7 @@ export function buildDocuments(c) {
   const entities = c.db.prepare("SELECT id,kind FROM entity WHERE deleted_at IS NULL AND kind IN ('work','movement','person','ensemble','collection')").all();
   const kindOf = new Map(entities.map((e) => [e.id, e.kind]));
   const creditsOf = new Map();
-  for (const row of c.db.prepare("SELECT target_id,contributor_id,role FROM credit ORDER BY position,id").iterate()) {
+  for (const row of c.db.prepare("SELECT target_id,contributor_id,role FROM credit WHERE state='active' ORDER BY position,id").iterate()) {
     if (!kindOf.has(row.contributor_id)) continue;
     if (!creditsOf.has(row.target_id)) creditsOf.set(row.target_id, []);
     creditsOf.get(row.target_id).push({ id: row.contributor_id, role: row.role });

@@ -4056,8 +4056,8 @@ var require_byteVector = __commonJS({
         }
         return IConv.decode(data, this._encoding);
       }
-      encode(text5) {
-        return IConv.encode(text5, this._encoding);
+      encode(text6) {
+        return IConv.encode(text6, this._encoding);
       }
     };
     exports.Encoding = Encoding;
@@ -4298,19 +4298,19 @@ var require_byteVector = __commonJS({
        * @param length Number of characters from the string to store in the ByteVector. Must be a
        *        positive 32-bit integer.
        */
-      static fromString(text5, type, length = Number.MAX_SAFE_INTEGER) {
-        utils_1.Guards.notNullOrUndefined(text5, "text");
+      static fromString(text6, type, length = Number.MAX_SAFE_INTEGER) {
+        utils_1.Guards.notNullOrUndefined(text6, "text");
         if (!Number.isInteger(length) || !Number.isSafeInteger(length) || length < 0) {
           throw new Error("Argument out of range exception: length is invalid");
         }
         const vector = type === StringType2.UTF16 ? new _ByteVector(new Uint8Array([255, 254])) : _ByteVector.empty();
-        if (!text5) {
+        if (!text6) {
           return vector;
         }
-        if (text5.length > length) {
-          text5 = text5.substring(0, length);
+        if (text6.length > length) {
+          text6 = text6.substring(0, length);
         }
-        const textBytes = Encoding.getEncoding(type, vector).encode(text5);
+        const textBytes = Encoding.getEncoding(type, vector).encode(text6);
         vector.addByteArray(textBytes);
         return vector;
       }
@@ -8440,12 +8440,12 @@ var require_genres = __commonJS({
         const index = _Genres.VIDEO_GENRES.indexOf(name);
         return index < 0 ? 255 : index;
       }
-      static stringToByte(text5, allowParenthesis) {
+      static stringToByte(text6, allowParenthesis) {
         if (allowParenthesis) {
           const trimRegex = /^\(+|\)+$/g;
-          text5 = text5.replace(trimRegex, "");
+          text6 = text6.replace(trimRegex, "");
         }
-        const normalized3 = text5.trim();
+        const normalized3 = text6.trim();
         if (!/^\d+$/.test(normalized3)) {
           return 255;
         }
@@ -9990,14 +9990,14 @@ var require_apeTag = __commonJS({
        * @remarks Stored in the `Year` item
        */
       get year() {
-        let text5 = this.getStringValue("Year");
-        if (!text5) {
+        let text6 = this.getStringValue("Year");
+        if (!text6) {
           return 0;
         }
-        let asInt = Number.parseInt(text5, 10);
+        let asInt = Number.parseInt(text6, 10);
         if (Number.isNaN(asInt)) {
-          text5 = text5.substring(0, 4);
-          asInt = Number.parseInt(text5, 10);
+          text6 = text6.substring(0, 4);
+          asInt = Number.parseInt(text6, 10);
           if (Number.isNaN(asInt)) {
             return 0;
           }
@@ -10315,14 +10315,14 @@ var require_apeTag = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_TRACK_GAIN` item
        */
       get replayGainTrackGain() {
-        let text5 = this.getStringValue("REPLAYGAIN_TRACK_GAIN");
-        if (!text5) {
+        let text6 = this.getStringValue("REPLAYGAIN_TRACK_GAIN");
+        if (!text6) {
           return NaN;
         }
-        if (text5.toLowerCase().endsWith("db")) {
-          text5 = text5.substring(0, text5.length - 2).trim();
+        if (text6.toLowerCase().endsWith("db")) {
+          text6 = text6.substring(0, text6.length - 2).trim();
         }
-        return Number.parseFloat(text5);
+        return Number.parseFloat(text6);
       }
       /**
        * @inheritDoc
@@ -10332,8 +10332,8 @@ var require_apeTag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.removeItem("REPLAYGAIN_TRACK_GAIN");
         } else {
-          const text5 = `${value.toFixed(2)} dB`;
-          this.setStringValue("REPLAYGAIN_TRACK_GAIN", text5);
+          const text6 = `${value.toFixed(2)} dB`;
+          this.setStringValue("REPLAYGAIN_TRACK_GAIN", text6);
         }
       }
       /**
@@ -10341,8 +10341,8 @@ var require_apeTag = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_TRACK_PEAK` item
        */
       get replayGainTrackPeak() {
-        const text5 = this.getStringValue("REPLAYGAIN_TRACK_PEAK");
-        return text5 ? Number.parseFloat(text5) : NaN;
+        const text6 = this.getStringValue("REPLAYGAIN_TRACK_PEAK");
+        return text6 ? Number.parseFloat(text6) : NaN;
       }
       /**
        * @inheritDoc
@@ -10352,8 +10352,8 @@ var require_apeTag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.removeItem("REPLAYGAIN_TRACK_PEAK");
         } else {
-          const text5 = value.toFixed(6).toString();
-          this.setStringValue("REPLAYGAIN_TRACK_PEAK", text5);
+          const text6 = value.toFixed(6).toString();
+          this.setStringValue("REPLAYGAIN_TRACK_PEAK", text6);
         }
       }
       /**
@@ -10361,14 +10361,14 @@ var require_apeTag = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_ALBUM_GAIN` item
        */
       get replayGainAlbumGain() {
-        let text5 = this.getStringValue("REPLAYGAIN_ALBUM_GAIN");
-        if (!text5) {
+        let text6 = this.getStringValue("REPLAYGAIN_ALBUM_GAIN");
+        if (!text6) {
           return NaN;
         }
-        if (text5.toLowerCase().endsWith("db")) {
-          text5 = text5.substring(0, text5.length - 2).trim();
+        if (text6.toLowerCase().endsWith("db")) {
+          text6 = text6.substring(0, text6.length - 2).trim();
         }
-        return Number.parseFloat(text5);
+        return Number.parseFloat(text6);
       }
       /**
        * @inheritDoc
@@ -10378,8 +10378,8 @@ var require_apeTag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.removeItem("REPLAYGAIN_ALBUM_GAIN");
         } else {
-          const text5 = `${value.toFixed(2).toString()} dB`;
-          this.setStringValue("REPLAYGAIN_ALBUM_GAIN", text5);
+          const text6 = `${value.toFixed(2).toString()} dB`;
+          this.setStringValue("REPLAYGAIN_ALBUM_GAIN", text6);
         }
       }
       /**
@@ -10387,8 +10387,8 @@ var require_apeTag = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_ALBUM_PEAK` item
        */
       get replayGainAlbumPeak() {
-        const text5 = this.getStringValue("REPLAYGAIN_ALBUM_PEAK");
-        return text5 ? Number.parseFloat(text5) : NaN;
+        const text6 = this.getStringValue("REPLAYGAIN_ALBUM_PEAK");
+        return text6 ? Number.parseFloat(text6) : NaN;
       }
       /**
        * @inheritDoc
@@ -10398,8 +10398,8 @@ var require_apeTag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.removeItem("REPLAYGAIN_ALBUM_PEAK");
         } else {
-          const text5 = value.toFixed(6).toString();
-          this.setStringValue("REPLAYGAIN_ALBUM_PEAK", text5);
+          const text6 = value.toFixed(6).toString();
+          this.setStringValue("REPLAYGAIN_ALBUM_PEAK", text6);
         }
       }
       /**
@@ -10631,11 +10631,11 @@ var require_apeTag = __commonJS({
         return item ? item.text : [];
       }
       getUint32Value(key, index) {
-        const text5 = this.getStringValue(key);
-        if (!text5) {
+        const text6 = this.getStringValue(key);
+        if (!text6) {
           return 0;
         }
-        const values = text5.split("/", index + 2);
+        const values = text6.split("/", index + 2);
         if (values.length < index + 1) {
           return 0;
         }
@@ -14597,9 +14597,9 @@ var require_synchronizedLyricsFrame = __commonJS({
        *     displayed. See {@link TimestampFormat} for possible values.
        * @param text Text for the point in time
        */
-      constructor(time, text5) {
+      constructor(time, text6) {
         utils_1.Guards.uint(time, "time");
-        this.text = text5;
+        this.text = text6;
         this._time = time;
       }
       /**
@@ -14879,13 +14879,13 @@ var require_synchronizedLyricsFrame = __commonJS({
           if (lyricsLength < 0) {
             throw new errors_1.CorruptFileError("Text delimiter for synchronized lyric not found");
           }
-          const text5 = data.subarray(offset, lyricsLength).toString(this.textEncoding);
+          const text6 = data.subarray(offset, lyricsLength).toString(this.textEncoding);
           offset += lyricsLength + delim.length;
           if (offset + 4 > data.length) {
             break;
           }
           const time = data.subarray(offset, 4).toUint();
-          l.push(new SynchronizedText(time, text5));
+          l.push(new SynchronizedText(time, text6));
           offset += 4;
         }
         this._text = l;
@@ -15034,22 +15034,22 @@ var require_textInformationFrame = __commonJS({
         if (version2 !== 3 || this.frameId !== frameIdentifiers_1.FrameIdentifiers.TDRC) {
           return super.render(version2);
         }
-        const text5 = this.toString();
-        if (text5.length < 10 || text5[4] !== "-" || text5[7] !== "-") {
+        const text6 = this.toString();
+        if (text6.length < 10 || text6[4] !== "-" || text6[7] !== "-") {
           return super.render(version2);
         }
         const output = byteVector_1.ByteVector.empty();
         let frame = new _TextInformationFrame(new frameHeader_1.Id3v2FrameHeader(frameIdentifiers_1.FrameIdentifiers.TYER));
-        frame.text = [text5.substring(0, 4)];
+        frame.text = [text6.substring(0, 4)];
         output.addByteVector(frame.render(version2));
         frame = new _TextInformationFrame(new frameHeader_1.Id3v2FrameHeader(frameIdentifiers_1.FrameIdentifiers.TDAT));
-        frame.text = [text5.substring(5, 7) + text5.substring(8, 10)];
+        frame.text = [text6.substring(5, 7) + text6.substring(8, 10)];
         output.addByteVector(frame.render(version2));
-        if (text5.length < 16 || text5[10] !== "T" || text5[13] !== ":") {
+        if (text6.length < 16 || text6[10] !== "T" || text6[13] !== ":") {
           return output;
         }
         frame = new _TextInformationFrame(new frameHeader_1.Id3v2FrameHeader(frameIdentifiers_1.FrameIdentifiers.TIME));
-        frame.text = [text5.substring(11, 13) + text5.substring(14, 16)];
+        frame.text = [text6.substring(11, 13) + text6.substring(14, 16)];
         output.addByteVector(frame.render(version2));
         return output;
       }
@@ -15140,10 +15140,10 @@ var require_textInformationFrame = __commonJS({
         }
         const encoding = _TextInformationFrame.correctEncoding(this.textEncoding, version2);
         const v = byteVector_1.ByteVector.empty();
-        let text5 = this._textFields;
+        let text6 = this._textFields;
         v.addByte(encoding);
         if (version2 > 3 && this.frameId === frameIdentifiers_1.FrameIdentifiers.TCON) {
-          text5 = text5.map((g) => {
+          text6 = text6.map((g) => {
             switch (g) {
               case _TextInformationFrame.COVER_STRING:
                 return _TextInformationFrame.COVER_ABBREV;
@@ -15161,24 +15161,24 @@ var require_textInformationFrame = __commonJS({
         const isTxxx = this.frameId === frameIdentifiers_1.FrameIdentifiers.TXXX;
         if (version2 > 3 || isTxxx) {
           if (isTxxx) {
-            if (text5.length === 0) {
-              text5 = [null, null];
-            } else if (text5.length === 1) {
-              text5 = [text5[0], null];
+            if (text6.length === 0) {
+              text6 = [null, null];
+            } else if (text6.length === 1) {
+              text6 = [text6[0], null];
             }
           }
-          for (let i = 0; i < text5.length; i++) {
+          for (let i = 0; i < text6.length; i++) {
             if (i !== 0) {
               v.addByteVector(byteVector_1.ByteVector.getTextDelimiter(encoding));
             }
-            if (text5[i]) {
-              v.addByteVector(byteVector_1.ByteVector.fromString(text5[i], encoding));
+            if (text6[i]) {
+              v.addByteVector(byteVector_1.ByteVector.fromString(text6[i], encoding));
             }
           }
         } else if (this.frameId === frameIdentifiers_1.FrameIdentifiers.TCON) {
           const numericGenres = [];
           const textGenres = [];
-          for (const s of text5) {
+          for (const s of text6) {
             if (id3v2Settings_1.default.useNumericGenres) {
               switch (s) {
                 case _TextInformationFrame.COVER_STRING:
@@ -15202,7 +15202,7 @@ var require_textInformationFrame = __commonJS({
           const genreString = `${numericGenres.join("")}${textGenres.join(";")}`;
           v.addByteVector(byteVector_1.ByteVector.fromString(genreString, encoding));
         } else {
-          v.addByteVector(byteVector_1.ByteVector.fromString(text5.join("/"), encoding));
+          v.addByteVector(byteVector_1.ByteVector.fromString(text6.join("/"), encoding));
         }
         return v;
       }
@@ -15341,8 +15341,8 @@ var require_textInformationFrame = __commonJS({
        * Gets the description stored in the current instance.
        */
       get description() {
-        const text5 = super.text;
-        return text5.length > 0 ? text5[0] : void 0;
+        const text6 = super.text;
+        return text6.length > 0 ? text6[0] : void 0;
       }
       /**
        * Sets the description stored in the current instance.
@@ -15350,13 +15350,13 @@ var require_textInformationFrame = __commonJS({
        * @param value Description to store in the current instance.
        */
       set description(value) {
-        let text5 = super.text;
-        if (text5.length > 0) {
-          text5[0] = value;
+        let text6 = super.text;
+        if (text6.length > 0) {
+          text6[0] = value;
         } else {
-          text5 = [value];
+          text6 = [value];
         }
-        super.text = text5;
+        super.text = text6;
       }
       /**
        * Gets the text contained in the current instance.
@@ -15364,11 +15364,11 @@ var require_textInformationFrame = __commonJS({
        * current instance. The value must be reassigned for the value to change.
        */
       get text() {
-        const text5 = super.text;
-        if (text5.length < 2) {
+        const text6 = super.text;
+        if (text6.length < 2) {
           return [];
         }
-        return text5.slice(1);
+        return text6.slice(1);
       }
       /**
        * Sets the text contained in the current instance.
@@ -15593,8 +15593,8 @@ var require_urlLinkFrame = __commonJS({
             }
           }
         }
-        const text5 = textFields.join("/");
-        return byteVector_1.ByteVector.concatenate(isWxxx ? encoding : void 0, byteVector_1.ByteVector.fromString(text5, byteVector_1.StringType.Latin1));
+        const text6 = textFields.join("/");
+        return byteVector_1.ByteVector.concatenate(isWxxx ? encoding : void 0, byteVector_1.ByteVector.fromString(text6, byteVector_1.StringType.Latin1));
       }
     };
     exports.UrlLinkFrame = UrlLinkFrame;
@@ -15653,8 +15653,8 @@ var require_urlLinkFrame = __commonJS({
        * Gets the description stored in the current instance.
        */
       get description() {
-        const text5 = super.text;
-        return text5.length > 0 ? text5[0] : void 0;
+        const text6 = super.text;
+        return text6.length > 0 ? text6[0] : void 0;
       }
       /**
        * Sets the description stored in the current instance.
@@ -15662,13 +15662,13 @@ var require_urlLinkFrame = __commonJS({
        */
       set description(value) {
         const normalizedValue = value || void 0;
-        let text5 = super.text;
-        if (text5.length > 0) {
-          text5[0] = normalizedValue;
+        let text6 = super.text;
+        if (text6.length > 0) {
+          text6[0] = normalizedValue;
         } else {
-          text5 = [normalizedValue];
+          text6 = [normalizedValue];
         }
-        super.text = text5;
+        super.text = text6;
       }
       /**
        * Gets the text contained in the current instance.
@@ -15676,13 +15676,13 @@ var require_urlLinkFrame = __commonJS({
        * current instance. The value must be reassigned for the value to change.
        */
       get text() {
-        const text5 = super.text;
-        if (text5.length < 2) {
+        const text6 = super.text;
+        if (text6.length < 2) {
           return [];
         }
-        const newText = new Array(text5.length - 1);
+        const newText = new Array(text6.length - 1);
         for (let i = 0; i < newText.length; i++) {
-          newText[i] = text5[i + 1];
+          newText[i] = text6[i + 1];
         }
         return newText;
       }
@@ -16522,11 +16522,11 @@ var require_id3v2Tag = __commonJS({
        * @remarks Stored in the `TBPM` frame
        */
       get beatsPerMinute() {
-        const text5 = this.getTextAsString(frameIdentifiers_1.FrameIdentifiers.TBPM);
-        if (!text5) {
+        const text6 = this.getTextAsString(frameIdentifiers_1.FrameIdentifiers.TBPM);
+        if (!text6) {
           return 0;
         }
-        const num = Number.parseFloat(text5);
+        const num = Number.parseFloat(text6);
         return Number.isNaN(num) || num < 0 ? 0 : Math.round(num);
       }
       /**
@@ -16742,14 +16742,14 @@ var require_id3v2Tag = __commonJS({
        * @remarks via a TXXX `REPLAY_GAIN_TRACK_GAIN` frame
        */
       get replayGainTrackGain() {
-        let text5 = this.getUserTextAsString("REPLAYGAIN_TRACK_GAIN", false);
-        if (!text5) {
+        let text6 = this.getUserTextAsString("REPLAYGAIN_TRACK_GAIN", false);
+        if (!text6) {
           return NaN;
         }
-        if (text5.toLowerCase().endsWith("db")) {
-          text5 = text5.substring(0, text5.length - 2).trim();
+        if (text6.toLowerCase().endsWith("db")) {
+          text6 = text6.substring(0, text6.length - 2).trim();
         }
-        return Number.parseFloat(text5);
+        return Number.parseFloat(text6);
       }
       /**
        * @inheritDoc
@@ -16759,8 +16759,8 @@ var require_id3v2Tag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.setUserTextAsString("REPLAYGAIN_TRACK_GAIN", void 0, false);
         } else {
-          const text5 = `${value.toFixed(2).toString()} dB`;
-          this.setUserTextAsString("REPLAYGAIN_TRACK_GAIN", text5, false);
+          const text6 = `${value.toFixed(2).toString()} dB`;
+          this.setUserTextAsString("REPLAYGAIN_TRACK_GAIN", text6, false);
         }
       }
       /**
@@ -16768,8 +16768,8 @@ var require_id3v2Tag = __commonJS({
        * @remarks via a TXXX `REPLAYGAIN_TRACK_PEAK` frame
        */
       get replayGainTrackPeak() {
-        const text5 = this.getUserTextAsString("REPLAYGAIN_TRACK_PEAK", false);
-        return text5 ? Number.parseFloat(text5) : NaN;
+        const text6 = this.getUserTextAsString("REPLAYGAIN_TRACK_PEAK", false);
+        return text6 ? Number.parseFloat(text6) : NaN;
       }
       /**
        * @inheritDoc
@@ -16779,8 +16779,8 @@ var require_id3v2Tag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.setUserTextAsString("REPLAYGAIN_TRACK_PEAK", void 0, false);
         } else {
-          const text5 = value.toFixed(6).toString();
-          this.setUserTextAsString("REPLAYGAIN_TRACK_PEAK", text5, false);
+          const text6 = value.toFixed(6).toString();
+          this.setUserTextAsString("REPLAYGAIN_TRACK_PEAK", text6, false);
         }
       }
       /**
@@ -16788,14 +16788,14 @@ var require_id3v2Tag = __commonJS({
        * @remarks via a TXXX `REPLAYGAIN_ALBUM_GAIN` frame
        */
       get replayGainAlbumGain() {
-        let text5 = this.getUserTextAsString("REPLAYGAIN_ALBUM_GAIN", false);
-        if (!text5) {
+        let text6 = this.getUserTextAsString("REPLAYGAIN_ALBUM_GAIN", false);
+        if (!text6) {
           return NaN;
         }
-        if (text5.toLowerCase().endsWith("db")) {
-          text5 = text5.substring(0, text5.length - 2).trim();
+        if (text6.toLowerCase().endsWith("db")) {
+          text6 = text6.substring(0, text6.length - 2).trim();
         }
-        return Number.parseFloat(text5);
+        return Number.parseFloat(text6);
       }
       /**
        * @inheritDoc
@@ -16805,8 +16805,8 @@ var require_id3v2Tag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.setUserTextAsString("REPLAYGAIN_ALBUM_GAIN", void 0, false);
         } else {
-          const text5 = `${value.toFixed(2).toString()} dB`;
-          this.setUserTextAsString("REPLAYGAIN_ALBUM_GAIN", text5, false);
+          const text6 = `${value.toFixed(2).toString()} dB`;
+          this.setUserTextAsString("REPLAYGAIN_ALBUM_GAIN", text6, false);
         }
       }
       /**
@@ -16814,8 +16814,8 @@ var require_id3v2Tag = __commonJS({
        * @remarks via a TXXX `REPLAYGAIN_ALBUM_PEAK` frame
        */
       get replayGainAlbumPeak() {
-        const text5 = this.getUserTextAsString("REPLAYGAIN_ALBUM_PEAK", false);
-        return text5 ? Number.parseFloat(text5) : NaN;
+        const text6 = this.getUserTextAsString("REPLAYGAIN_ALBUM_PEAK", false);
+        return text6 ? Number.parseFloat(text6) : NaN;
       }
       /**
        * @inheritDoc
@@ -16825,8 +16825,8 @@ var require_id3v2Tag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.setUserTextAsString("REPLAYGAIN_ALBUM_PEAK", void 0, false);
         } else {
-          const text5 = value.toFixed(6).toString();
-          this.setUserTextAsString("REPLAYGAIN_ALBUM_PEAK", text5, false);
+          const text6 = value.toFixed(6).toString();
+          this.setUserTextAsString("REPLAYGAIN_ALBUM_PEAK", text6, false);
         }
       }
       /**
@@ -17161,12 +17161,12 @@ var require_id3v2Tag = __commonJS({
        * @param text Text to set for the specified frame or `undefined`/`null`/`""` to remove all
        *     frames with that identifier.
        */
-      setTextFrame(ident, ...text5) {
+      setTextFrame(ident, ...text6) {
         utils_1.Guards.truthy(ident, "ident");
         let empty = true;
-        if (text5) {
-          for (let i = 0; empty && i < text5.length; i++) {
-            if (text5[i]) {
+        if (text6) {
+          for (let i = 0; empty && i < text6.length; i++) {
+            if (text6[i]) {
               empty = false;
             }
           }
@@ -17182,7 +17182,7 @@ var require_id3v2Tag = __commonJS({
             urlFrame = urlLinkFrame_1.UrlLinkFrame.fromIdentity(ident);
             this.addFrame(urlFrame);
           }
-          urlFrame.text = text5;
+          urlFrame.text = text6;
           urlFrame.textEncoding = id3v2Settings_1.default.defaultEncoding;
         } else {
           const frames = this.getFramesByClassType(frame_1.FrameClassType.TextInformationFrame);
@@ -17191,7 +17191,7 @@ var require_id3v2Tag = __commonJS({
             frame = textInformationFrame_1.TextInformationFrame.fromIdentifier(ident);
             this.addFrame(frame);
           }
-          frame.text = text5;
+          frame.text = text6;
           frame.textEncoding = id3v2Settings_1.default.defaultEncoding;
         }
       }
@@ -17256,11 +17256,11 @@ var require_id3v2Tag = __commonJS({
         return frame ? frame.text : [];
       }
       getTextAsUint32(ident, index) {
-        const text5 = this.getTextAsString(ident);
-        if (text5 === null || text5 === void 0) {
+        const text6 = this.getTextAsString(ident);
+        if (text6 === null || text6 === void 0) {
           return 0;
         }
-        const values = text5.split("/", index + 2);
+        const values = text6.split("/", index + 2);
         if (values.length < index + 1) {
           return 0;
         }
@@ -17282,21 +17282,21 @@ var require_id3v2Tag = __commonJS({
         const result = frame ? frame.text.join(";") : void 0;
         return result || void 0;
       }
-      setUfidText(owner, text5) {
+      setUfidText(owner, text6) {
         const frames = this.getFramesByClassType(frame_1.FrameClassType.UniqueFileIdentifierFrame);
         let frame = uniqueFileIdentifierFrame_1.default.find(frames, owner);
-        if (!text5 && frame) {
+        if (!text6 && frame) {
           this.removeFrame(frame);
         } else {
-          const identifier = byteVector_1.ByteVector.fromString(text5, byteVector_1.StringType.UTF8);
+          const identifier = byteVector_1.ByteVector.fromString(text6, byteVector_1.StringType.UTF8);
           frame = uniqueFileIdentifierFrame_1.default.fromData(owner, identifier);
           this.addFrame(frame);
         }
       }
-      setUserTextAsString(description, text5, caseSensitive = true) {
+      setUserTextAsString(description, text6, caseSensitive = true) {
         const frames = this.getFramesByClassType(frame_1.FrameClassType.UserTextInformationFrame);
         let frame = textInformationFrame_1.UserTextInformationFrame.findUserTextInformationFrame(frames, description, caseSensitive);
-        if (!text5) {
+        if (!text6) {
           if (frame) {
             this.removeFrame(frame);
           }
@@ -17305,7 +17305,7 @@ var require_id3v2Tag = __commonJS({
             frame = textInformationFrame_1.UserTextInformationFrame.fromDescription(description, id3v2Settings_1.default.defaultEncoding);
             this.addFrame(frame);
           }
-          frame.text = text5.split(";");
+          frame.text = text6.split(";");
         }
       }
     };
@@ -19969,11 +19969,11 @@ var require_asfTag = __commonJS({
        *     https://docs.microsoft.com/en-us/windows/win32/wmformat/wm-year
        */
       get year() {
-        const text5 = this.getDescriptorString("WM/Year");
-        if (!text5 || text5.length < 4) {
+        const text6 = this.getDescriptorString("WM/Year");
+        if (!text6 || text6.length < 4) {
           return 0;
         }
-        const parsed = Number.parseInt(text5.substring(0, 4), 10);
+        const parsed = Number.parseInt(text6.substring(0, 4), 10);
         return Number.isNaN(parsed) ? 0 : parsed;
       }
       /**
@@ -20349,8 +20349,8 @@ var require_asfTag = __commonJS({
         if (Number.isNaN(value)) {
           this.removeDescriptors("ReplayGain/Track");
         } else {
-          const text5 = value.toFixed(2);
-          this.setDescriptorString(`${text5} dB`, "ReplayGain/Track");
+          const text6 = value.toFixed(2);
+          this.setDescriptorString(`${text6} dB`, "ReplayGain/Track");
         }
       }
       /**
@@ -20369,8 +20369,8 @@ var require_asfTag = __commonJS({
         if (Number.isNaN(value)) {
           this.removeDescriptors("ReplayGain/Track Peak");
         } else {
-          const text5 = value.toFixed(6);
-          this.setDescriptorString(text5, "ReplayGain/Track Peak");
+          const text6 = value.toFixed(6);
+          this.setDescriptorString(text6, "ReplayGain/Track Peak");
         }
       }
       /**
@@ -20396,8 +20396,8 @@ var require_asfTag = __commonJS({
         if (Number.isNaN(value)) {
           this.removeDescriptors("ReplayGain/Album");
         } else {
-          const text5 = value.toFixed(2);
-          this.setDescriptorString(`${text5} dB`, "ReplayGain/Album");
+          const text6 = value.toFixed(2);
+          this.setDescriptorString(`${text6} dB`, "ReplayGain/Album");
         }
       }
       /**
@@ -20416,8 +20416,8 @@ var require_asfTag = __commonJS({
         if (Number.isNaN(value)) {
           this.removeDescriptors("ReplayGain/Album Peak");
         } else {
-          const text5 = value.toFixed(6);
-          this.setDescriptorString(text5, "ReplayGain/Album Peak");
+          const text6 = value.toFixed(6);
+          this.setDescriptorString(text6, "ReplayGain/Album Peak");
         }
       }
       /**
@@ -24175,11 +24175,11 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `DATE` field
        */
       get year() {
-        const text5 = this.getFieldFirstValue("DATE");
-        if (!text5) {
+        const text6 = this.getFieldFirstValue("DATE");
+        if (!text6) {
           return 0;
         }
-        const parsedText = Number.parseInt(text5.substring(0, 4), 10);
+        const parsedText = Number.parseInt(text6.substring(0, 4), 10);
         return Number.isNaN(parsedText) ? 0 : parsedText;
       }
       /**
@@ -24199,11 +24199,11 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `TRACKNUMBER` field
        */
       get track() {
-        const text5 = this.getFieldFirstValue("TRACKNUMBER");
-        if (!text5) {
+        const text6 = this.getFieldFirstValue("TRACKNUMBER");
+        if (!text6) {
           return 0;
         }
-        const splitText = text5.split("/");
+        const splitText = text6.split("/");
         const parsedText = Number.parseInt(splitText[0], 10);
         return Number.isNaN(parsedText) ? 0 : parsedText;
       }
@@ -24222,16 +24222,16 @@ var require_xiphComment = __commonJS({
        *     used if `TRACKTOTAL` is not available.
        */
       get trackCount() {
-        let text5 = this.getFieldFirstValue("TRACKTOTAL");
-        if (text5) {
-          const parsedValue = Number.parseInt(text5, 10);
+        let text6 = this.getFieldFirstValue("TRACKTOTAL");
+        if (text6) {
+          const parsedValue = Number.parseInt(text6, 10);
           if (!Number.isNaN(parsedValue)) {
             return parsedValue;
           }
         }
-        text5 = this.getFieldFirstValue("TRACKNUMBER");
-        if (text5) {
-          const textSplit = text5.split("/");
+        text6 = this.getFieldFirstValue("TRACKNUMBER");
+        if (text6) {
+          const textSplit = text6.split("/");
           if (textSplit.length > 1) {
             const parsedValue = Number.parseInt(textSplit[1], 10);
             if (!Number.isNaN(parsedValue)) {
@@ -24254,11 +24254,11 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `DISCNUMBER` field
        */
       get disc() {
-        const text5 = this.getFieldFirstValue("DISCNUMBER");
-        if (!text5) {
+        const text6 = this.getFieldFirstValue("DISCNUMBER");
+        if (!text6) {
           return 0;
         }
-        const splitText = text5.split("/");
+        const splitText = text6.split("/");
         const parsedText = Number.parseInt(splitText[0], 10);
         return Number.isNaN(parsedText) ? 0 : parsedText;
       }
@@ -24277,16 +24277,16 @@ var require_xiphComment = __commonJS({
        *     used if `DISCTOTAL` is not available.
        */
       get discCount() {
-        let text5 = this.getFieldFirstValue("DISCTOTAL");
-        if (text5) {
-          const parsedValue = Number.parseInt(text5, 10);
+        let text6 = this.getFieldFirstValue("DISCTOTAL");
+        if (text6) {
+          const parsedValue = Number.parseInt(text6, 10);
           if (!Number.isNaN(parsedValue)) {
             return parsedValue;
           }
         }
-        text5 = this.getFieldFirstValue("DISCNUMBER");
-        if (text5) {
-          const textSplit = text5.split("/");
+        text6 = this.getFieldFirstValue("DISCNUMBER");
+        if (text6) {
+          const textSplit = text6.split("/");
           if (textSplit.length > 1) {
             const parsedValue = Number.parseInt(textSplit[1], 10);
             if (!Number.isNaN(parsedValue)) {
@@ -24340,11 +24340,11 @@ var require_xiphComment = __commonJS({
        *     behavior can be controlled Stored in the {@link XiphSettings.useTempoToStoreBpm}.
        */
       get beatsPerMinute() {
-        let text5 = this.getFieldFirstValue("TEMPO");
-        if (!text5) {
-          text5 = this.getFieldFirstValue("BPM");
+        let text6 = this.getFieldFirstValue("TEMPO");
+        if (!text6) {
+          text6 = this.getFieldFirstValue("BPM");
         }
-        const parsedNumber = Number.parseInt(text5, 10);
+        const parsedNumber = Number.parseInt(text6, 10);
         return Number.isNaN(parsedNumber) ? 0 : parsedNumber;
       }
       /**
@@ -24396,8 +24396,8 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `DATETAGGED` field
        */
       get dateTagged() {
-        const text5 = this.getFieldFirstValue("DATETAGGED");
-        const date = new Date(text5);
+        const text6 = this.getFieldFirstValue("DATETAGGED");
+        const date = new Date(text6);
         return Number.isNaN(date.getTime()) ? void 0 : date;
       }
       /**
@@ -24601,8 +24601,8 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_TRACK_GAIN` field
        */
       get replayGainTrackGain() {
-        const text5 = this.getFieldFirstValue("REPLAYGAIN_TRACK_GAIN");
-        return Number.parseFloat(text5);
+        const text6 = this.getFieldFirstValue("REPLAYGAIN_TRACK_GAIN");
+        return Number.parseFloat(text6);
       }
       /**
        * @inheritDoc
@@ -24620,8 +24620,8 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_TRACK_PEAK` field
        */
       get replayGainTrackPeak() {
-        const text5 = this.getFieldFirstValue("REPLAYGAIN_TRACK_PEAK");
-        return Number.parseFloat(text5);
+        const text6 = this.getFieldFirstValue("REPLAYGAIN_TRACK_PEAK");
+        return Number.parseFloat(text6);
       }
       /**
        * @inheritDoc
@@ -24639,8 +24639,8 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_ALBUM_GAIN` field
        */
       get replayGainAlbumGain() {
-        const text5 = this.getFieldFirstValue("REPLAYGAIN_ALBUM_GAIN");
-        return Number.parseFloat(text5);
+        const text6 = this.getFieldFirstValue("REPLAYGAIN_ALBUM_GAIN");
+        return Number.parseFloat(text6);
       }
       /**
        * @inheritDoc
@@ -24658,8 +24658,8 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_ALBUM_PEAK` field
        */
       get replayGainAlbumPeak() {
-        const text5 = this.getFieldFirstValue("REPLAYGAIN_ALBUM_PEAK");
-        return Number.parseFloat(text5);
+        const text6 = this.getFieldFirstValue("REPLAYGAIN_ALBUM_PEAK");
+        return Number.parseFloat(text6);
       }
       /**
        * @inheritDoc
@@ -29424,8 +29424,8 @@ var require_appleTag = __commonJS({
       }
       /** @inheritDoc */
       get genres() {
-        let text5 = this.getQuickTimeStrings(mpeg4BoxType_1.default.GEN);
-        if (text5.length === 0) {
+        let text6 = this.getQuickTimeStrings(mpeg4BoxType_1.default.GEN);
+        if (text6.length === 0) {
           for (const data of this.getQuickTimeData(mpeg4BoxType_1.default.GNRE)) {
             const index = data.toUshort(true);
             if (index === 0) {
@@ -29435,11 +29435,11 @@ var require_appleTag = __commonJS({
             if (!str2) {
               continue;
             }
-            text5 = [str2];
+            text6 = [str2];
             break;
           }
         }
-        return text5;
+        return text6;
       }
       /** @inheritDoc */
       set genres(v) {
@@ -29548,8 +29548,8 @@ var require_appleTag = __commonJS({
       }
       /** @inheritDoc */
       get dateTagged() {
-        for (const text5 of this.getQuickTimeStrings(mpeg4BoxType_1.default.DTAG)) {
-          const date = new Date(text5);
+        for (const text6 of this.getQuickTimeStrings(mpeg4BoxType_1.default.DTAG)) {
+          const date = new Date(text6);
           if (!isNaN(date.getTime())) {
             return date;
           }
@@ -29694,14 +29694,14 @@ var require_appleTag = __commonJS({
       }
       /** @inheritDoc */
       get replayGainTrackGain() {
-        let text5 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_TRACK_GAIN");
-        if (!text5) {
+        let text6 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_TRACK_GAIN");
+        if (!text6) {
           return NaN;
         }
-        if (text5.toLowerCase().endsWith("db")) {
-          text5 = text5.substring(0, text5.length - 2).trim();
+        if (text6.toLowerCase().endsWith("db")) {
+          text6 = text6.substring(0, text6.length - 2).trim();
         }
-        return Number.parseFloat(text5);
+        return Number.parseFloat(text6);
       }
       /** @inheritDoc */
       set replayGainTrackGain(v) {
@@ -29710,24 +29710,24 @@ var require_appleTag = __commonJS({
       }
       /** @inheritDoc */
       get replayGainTrackPeak() {
-        const text5 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_TRACK_PEAK");
-        return text5 ? Number.parseFloat(text5) : NaN;
+        const text6 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_TRACK_PEAK");
+        return text6 ? Number.parseFloat(text6) : NaN;
       }
       /** @inheritDoc */
       set replayGainTrackPeak(v) {
-        const text5 = Number.isNaN(v) ? void 0 : v.toFixed(6);
-        this.setItunesStrings("com.apple.iTunes", "REPLAYGAIN_TRACK_PEAK", text5);
+        const text6 = Number.isNaN(v) ? void 0 : v.toFixed(6);
+        this.setItunesStrings("com.apple.iTunes", "REPLAYGAIN_TRACK_PEAK", text6);
       }
       /** @inheritDoc */
       get replayGainAlbumGain() {
-        let text5 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_ALBUM_GAIN");
-        if (!text5) {
+        let text6 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_ALBUM_GAIN");
+        if (!text6) {
           return NaN;
         }
-        if (text5.toLowerCase().endsWith("db")) {
-          text5 = text5.substring(0, text5.length - 2).trim();
+        if (text6.toLowerCase().endsWith("db")) {
+          text6 = text6.substring(0, text6.length - 2).trim();
         }
-        return Number.parseFloat(text5);
+        return Number.parseFloat(text6);
       }
       set replayGainAlbumGain(v) {
         const value = Number.isNaN(v) ? void 0 : `${v.toFixed(2)} dB`;
@@ -29735,13 +29735,13 @@ var require_appleTag = __commonJS({
       }
       /** @inheritDoc */
       get replayGainAlbumPeak() {
-        const text5 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_ALBUM_PEAK");
-        return text5 ? Number.parseFloat(text5) : NaN;
+        const text6 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_ALBUM_PEAK");
+        return text6 ? Number.parseFloat(text6) : NaN;
       }
       /** @inheritDoc */
       set replayGainAlbumPeak(v) {
-        const text5 = Number.isNaN(v) ? void 0 : v.toFixed(6);
-        this.setItunesStrings("com.apple.iTunes", "REPLAYGAIN_ALBUM_PEAK", text5);
+        const text6 = Number.isNaN(v) ? void 0 : v.toFixed(6);
+        this.setItunesStrings("com.apple.iTunes", "REPLAYGAIN_ALBUM_PEAK", text6);
       }
       /** @inheritDoc */
       get initialKey() {
@@ -29855,8 +29855,8 @@ var require_appleTag = __commonJS({
       getQuickTimeStrings(boxType) {
         return this._ilstBox.getQuickTimeDataBoxes(boxType).filter((b) => utils_1.NumberUtils.hasFlag(b.flags, appleDataBox_1.AppleDataBoxFlagType.ContainsText, true)).reduce((accum, b) => {
           if (b.text) {
-            for (const text5 of b.text.split(";")) {
-              utils_1.ArrayUtils.safePush(accum, text5.trim());
+            for (const text6 of b.text.split(";")) {
+              utils_1.ArrayUtils.safePush(accum, text6.trim());
             }
           }
           return accum;
@@ -32942,12 +32942,12 @@ var require_aviStream = __commonJS({
        * Constructs and initializes a new instance with a specified stream header.
        * @param list RiffList containing the stream headers
        */
-      constructor(list3) {
-        utils_1.Guards.truthy(list3, "list");
-        if (list3.type !== _AviStream.LIST_TYPE) {
+      constructor(list4) {
+        utils_1.Guards.truthy(list4, "list");
+        if (list4.type !== _AviStream.LIST_TYPE) {
           throw new errors_1.CorruptFileError("Stream header list does not have correct type");
         }
-        const streamHeaderData = list3.getValues(_AviStream.HEADER_CHUNK_ID);
+        const streamHeaderData = list4.getValues(_AviStream.HEADER_CHUNK_ID);
         if (streamHeaderData.length !== 1) {
           throw new errors_1.CorruptFileError("Stream header list does not contain valid stream header chunks");
         }
@@ -32972,7 +32972,7 @@ var require_aviStream = __commonJS({
         this._top = streamHeaderDatum.subarray(50, 2).toUshort(false);
         this._right = streamHeaderDatum.subarray(52, 2).toUshort(false);
         this._bottom = streamHeaderDatum.subarray(54, 2).toUshort(false);
-        const streamFormatData = list3.getValues(_AviStream.FORMAT_CHUNK_ID);
+        const streamFormatData = list4.getValues(_AviStream.FORMAT_CHUNK_ID);
         if (streamFormatData.length !== 1) {
           throw new errors_1.CorruptFileError("Stream header list is missing stream format chunk");
         }
@@ -33147,12 +33147,12 @@ var require_aviHeader = __commonJS({
        * Constructs and initializes a new instance by reading information from a RIFF list.
        * @param list List containing the data for the AVI headers
        */
-      constructor(list3) {
-        utils_1.Guards.truthy(list3, "list");
-        if (list3.type !== _AviHeader.HEADER_LIST_TYPE) {
-          throw new errors_1.CorruptFileError(`Expected ${_AviHeader.HEADER_LIST_TYPE} list but got ${list3.type}`);
+      constructor(list4) {
+        utils_1.Guards.truthy(list4, "list");
+        if (list4.type !== _AviHeader.HEADER_LIST_TYPE) {
+          throw new errors_1.CorruptFileError(`Expected ${_AviHeader.HEADER_LIST_TYPE} list but got ${list4.type}`);
         }
-        const mainHeaderValues = list3.getValues(_AviHeader.HEADER_CHUNK_ID);
+        const mainHeaderValues = list4.getValues(_AviHeader.HEADER_CHUNK_ID);
         if (mainHeaderValues.length === 0) {
           throw new errors_1.CorruptFileError("Could not find AVI main header data");
         }
@@ -33170,7 +33170,7 @@ var require_aviHeader = __commonJS({
         this._width = mainHeaderData.subarray(32, 4).toUint(false);
         this._height = mainHeaderData.subarray(36, 4).toUint(false);
         this._durationMilliseconds = this._totalFrames * this._microsecondsPerFrame / 1e3;
-        const streamHeaderLists = list3.getLists(aviStream_1.AviStream.LIST_TYPE);
+        const streamHeaderLists = list4.getLists(aviStream_1.AviStream.LIST_TYPE);
         this._streams = streamHeaderLists.map((l) => new aviStream_1.AviStream(l));
         this._codecs = this._streams.map((s) => s.codec).filter((c) => !!c);
       }
@@ -33410,11 +33410,11 @@ var require_riffList = __commonJS({
        * @param type Type ID of the list
        */
       static fromEmpty(type) {
-        const list3 = new _RiffList();
-        list3._isLoaded = true;
-        list3._type = type;
-        list3._originalDataSize = 4;
-        return list3;
+        const list4 = new _RiffList();
+        list4._isLoaded = true;
+        list4._type = type;
+        list4._originalDataSize = 4;
+        return list4;
       }
       /**
        * Constructs and initializes a new instance, lazily, from a position in a file.
@@ -33432,13 +33432,13 @@ var require_riffList = __commonJS({
         if (listHeader.subarray(0, 4).toString(byteVector_1.StringType.Latin1) !== _RiffList.IDENTIFIER_FOURCC) {
           throw new Error("Cannot read RIFF list from non-list chunk");
         }
-        const list3 = new _RiffList();
-        list3._chunkStart = position;
-        list3._originalDataSize = listHeader.subarray(4, 4).toUint(false);
-        list3._file = file;
-        list3._isLoaded = false;
-        list3._type = listHeader.subarray(8, 4).toString(byteVector_1.StringType.Latin1);
-        return list3;
+        const list4 = new _RiffList();
+        list4._chunkStart = position;
+        list4._originalDataSize = listHeader.subarray(4, 4).toUint(false);
+        list4._file = file;
+        list4._isLoaded = false;
+        list4._type = listHeader.subarray(8, 4).toString(byteVector_1.StringType.Latin1);
+        return list4;
       }
       // #endregion
       // #region Properties
@@ -33630,10 +33630,10 @@ var require_riffListTag = __commonJS({
     var utils_1 = require_utils();
     var RiffListTag = class extends tag_1.Tag {
       // #region Constructors
-      constructor(list3) {
+      constructor(list4) {
         super();
         this._stringType = byteVector_1.StringType.UTF8;
-        this._list = list3;
+        this._list = list4;
       }
       // #endregion
       // #region Properties
@@ -33769,8 +33769,8 @@ var require_infoTag = __commonJS({
     var utils_1 = require_utils();
     var InfoTag = class _InfoTag extends riffListTag_1.default {
       // #region Constructors
-      constructor(list3) {
-        super(list3);
+      constructor(list4) {
+        super(list4);
       }
       /**
        * Constructs and initializes a new, empty instance.
@@ -33783,9 +33783,9 @@ var require_infoTag = __commonJS({
        * a file.
        * @param list List that contains the contents of the tag
        */
-      static fromList(list3) {
-        utils_1.Guards.truthy(list3, "list");
-        return new _InfoTag(list3);
+      static fromList(list4) {
+        utils_1.Guards.truthy(list4, "list");
+        return new _InfoTag(list4);
       }
       // #endregion
       // #region Properties
@@ -34000,17 +34000,17 @@ var require_movieIdTag = __commonJS({
     var utils_1 = require_utils();
     var MovieIdTag = class _MovieIdTag extends riffListTag_1.default {
       // #region Constructors
-      constructor(list3) {
-        super(list3);
+      constructor(list4) {
+        super(list4);
       }
       /**
        * Constructs and initializes a new instance by reading the contents of a raw RIFF list stored
        * a file.
        * @param list List that contains the contents of the tag
        */
-      static fromList(list3) {
-        utils_1.Guards.truthy(list3, "list");
-        return new _MovieIdTag(list3);
+      static fromList(list4) {
+        utils_1.Guards.truthy(list4, "list");
+        return new _MovieIdTag(list4);
       }
       /**
        * Constructs and initializes a new, empty instance.
@@ -35421,11 +35421,43 @@ CREATE TABLE match_suppression (
  key TEXT PRIMARY KEY, title TEXT NOT NULL, reason TEXT NOT NULL, actor TEXT, created_at INTEGER NOT NULL
 );
 `
+  },
+  {
+    // v0.3: contributor identity. Additive only; existing credits read as
+    // manual and active, and nothing existing is rewritten.
+    version: 5,
+    sql: `
+ALTER TABLE credit ADD COLUMN source TEXT NOT NULL DEFAULT 'manual' CHECK(source IN ('manual','derived','provider'));
+ALTER TABLE credit ADD COLUMN state TEXT NOT NULL DEFAULT 'active' CHECK(state IN ('active','removed'));
+CREATE INDEX credit_contributor ON credit(contributor_id);
+CREATE INDEX credit_target ON credit(target_id);
+INSERT INTO field_definition VALUES ('sortName','string'),('location','string'),('instruments','array'),('recordingDate','string');
+CREATE TABLE user_recording_state (
+ user_id INTEGER NOT NULL CHECK(user_id>0), performance_id TEXT NOT NULL REFERENCES entity(id),
+ favourite INTEGER NOT NULL DEFAULT 0 CHECK(favourite IN (0,1)), updated_at INTEGER NOT NULL,
+ PRIMARY KEY(user_id,performance_id)
+);
+CREATE TABLE saved_queue (
+ id TEXT PRIMARY KEY, user_id INTEGER NOT NULL CHECK(user_id>0), name TEXT NOT NULL,
+ work_id TEXT REFERENCES entity(id), items TEXT NOT NULL CHECK(json_valid(items)), created_at INTEGER NOT NULL
+);
+CREATE INDEX saved_queue_user ON saved_queue(user_id);
+CREATE TABLE tag_backup (
+ id TEXT PRIMARY KEY, track_link_id TEXT NOT NULL REFERENCES track_link(id), path TEXT NOT NULL, fingerprint TEXT,
+ tags TEXT NOT NULL CHECK(json_valid(tags)), written TEXT NOT NULL CHECK(json_valid(written)), run_id TEXT NOT NULL,
+ actor TEXT NOT NULL, created_at INTEGER NOT NULL, restored_at INTEGER
+);
+CREATE INDEX tag_backup_track ON tag_backup(track_link_id);
+ALTER TABLE search_doc ADD COLUMN sort_title TEXT NOT NULL DEFAULT '';
+ALTER TABLE search_doc ADD COLUMN sort_key TEXT NOT NULL DEFAULT '';
+ALTER TABLE search_doc ADD COLUMN sort_date TEXT NOT NULL DEFAULT '';
+CREATE INDEX search_doc_sort_title ON search_doc(kind,sort_title);
+`
   }
 ];
 
 // src/model/database.js
-var SCHEMA_VERSION = 4;
+var SCHEMA_VERSION = 5;
 function validateDatabase(db) {
   if (db.prepare("PRAGMA integrity_check").get().integrity_check !== "ok" || db.prepare("PRAGMA foreign_key_check").all().length)
     throw new Error("Classical database integrity check failed");
@@ -35568,6 +35600,7 @@ var CREDIT_ROLES = [
   "composer",
   "soloist",
   "performer",
+  "accompanist",
   "conductor",
   "orchestra",
   "ensemble",
@@ -35576,7 +35609,8 @@ var CREDIT_ROLES = [
   "lyricist"
 ];
 var roles = new Set(CREDIT_ROLES);
-var PERSON_ROLES = /* @__PURE__ */ new Set(["composer", "soloist", "conductor", "arranger", "lyricist"]);
+var CREDIT_SOURCES = /* @__PURE__ */ new Set(["manual", "derived", "provider"]);
+var PERSON_ROLES = /* @__PURE__ */ new Set(["composer", "soloist", "accompanist", "conductor", "arranger", "lyricist"]);
 var ENSEMBLE_ROLES = /* @__PURE__ */ new Set(["orchestra", "ensemble", "choir"]);
 var relations = {
   movement: [["work"], ["movement"]],
@@ -35671,20 +35705,39 @@ var Catalogue = class {
       return id;
     });
   }
-  credit(target, contributor, role, { instrument = null, position = 1, assertionId = null } = {}) {
+  // A credit's source says who made it: an admin (`manual`), a scan from tags
+  // (`derived`) or a provider. A credit removed earlier for the same target,
+  // contributor, role and instrument comes back as this one.
+  credit(target, contributor, role, { instrument = null, position = 1, assertionId = null, source = "manual" } = {}) {
     return transaction(this.db, () => {
       this.entity(target);
       const person = this.entity(contributor, ["person", "ensemble"]);
       if (!roles.has(role) || !positive(position) || PERSON_ROLES.has(role) && person.kind !== "person" || ENSEMBLE_ROLES.has(role) && person.kind !== "ensemble")
         throw new Error("Invalid role/contributor");
+      if (!CREDIT_SOURCES.has(source)) throw new Error("Invalid credit source");
       if (assertionId) {
         const assertion = this.db.prepare("SELECT target_id FROM assertion WHERE id=?").get(assertionId);
         if (assertion?.target_id !== target)
           throw new Error("Credit provenance target mismatch");
       }
+      const removed = this.db.prepare("SELECT id FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ? AND state='removed'").get(target, contributor, role, instrument);
+      if (removed) {
+        this.db.prepare("UPDATE credit SET state='active',source=?,position=?,assertion_id=? WHERE id=?").run(source, position, assertionId, removed.id);
+        return removed.id;
+      }
       const id = randomUUID2();
-      this.db.prepare("INSERT INTO credit VALUES (?,?,?,?,?,?,?)").run(id, target, contributor, role, instrument, position, assertionId);
+      this.db.prepare("INSERT INTO credit(id,target_id,contributor_id,role,instrument,position,assertion_id,source) VALUES (?,?,?,?,?,?,?,?)").run(id, target, contributor, role, instrument, position, assertionId, source);
       return id;
+    });
+  }
+  // A derived credit an admin removes stays as removed, so a later scan does
+  // not derive it again; any other credit is deleted.
+  removeCredit(id) {
+    return transaction(this.db, () => {
+      const credit = this.db.prepare("SELECT source,state FROM credit WHERE id=?").get(id);
+      if (!credit || credit.state !== "active") throw new Error("Unknown credit");
+      if (credit.source === "derived") this.db.prepare("UPDATE credit SET state='removed' WHERE id=?").run(id);
+      else this.db.prepare("DELETE FROM credit WHERE id=?").run(id);
     });
   }
   externalIdentity(entity, provider, recordKind, recordId, { confidence = 1, threshold = 0.95, evidence = {} } = {}) {
@@ -35871,16 +35924,16 @@ var Catalogue = class {
       return true;
     });
   }
-  alias(entity, text5, { language = null, kind = "alternate", assertionId = null } = {}) {
+  alias(entity, text6, { language = null, kind = "alternate", assertionId = null } = {}) {
     this.entity(entity);
-    if (typeof text5 !== "string" || !text5.trim())
+    if (typeof text6 !== "string" || !text6.trim())
       throw new Error("Invalid alias");
     const id = randomUUID2();
     this.db.prepare("INSERT INTO alias VALUES (?,?,?,?,?,?,?)").run(
       id,
       entity,
-      text5,
-      text5.normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase(),
+      text6,
+      text6.normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase(),
       language,
       kind,
       assertionId
@@ -36560,11 +36613,11 @@ function isSoloistRelation(rel) {
 }
 var unique = (values) => [...new Set(values.filter(Boolean))];
 function isPlaceholder(name) {
-  const text5 = String(name || "").trim();
-  return text5.startsWith("[") && text5.endsWith("]");
+  const text6 = String(name || "").trim();
+  return text6.startsWith("[") && text6.endsWith("]");
 }
-function isLatin(text5) {
-  for (const ch of String(text5 || "")) {
+function isLatin(text6) {
+  for (const ch of String(text6 || "")) {
     if (new RegExp("\\p{L}", "u").test(ch) && !new RegExp("\\p{Script=Latin}", "u").test(ch)) return false;
   }
   return true;
@@ -36578,7 +36631,7 @@ function genreNames(entity) {
   names.delete("");
   return names;
 }
-var escapeRegex = (text5) => text5.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+var escapeRegex = (text6) => text6.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 function addPerson(people, person) {
   if (person && people.every((p) => p.id !== person.id)) people.push(person);
 }
@@ -36667,10 +36720,10 @@ var ClassicalResolver = class _ClassicalResolver {
   // classical genre wins over "pop" or "rock" on the same entity, but not
   // over Christmas, soundtrack or crossover genres.
   classifyGenres(genres) {
-    const list3 = [...genres];
-    if (list3.some((g) => this.isHardNonClassicalGenre(g))) return false;
-    if (list3.some((g) => this.isClassicalGenre(g))) return true;
-    if (list3.some((g) => this.isNonClassicalGenre(g))) return false;
+    const list4 = [...genres];
+    if (list4.some((g) => this.isHardNonClassicalGenre(g))) return false;
+    if (list4.some((g) => this.isClassicalGenre(g))) return true;
+    if (list4.some((g) => this.isNonClassicalGenre(g))) return false;
     return null;
   }
   async isNonClassicalArtist(artist) {
@@ -37049,12 +37102,12 @@ var CATALOGUE_OWNERS = [
   [/,\s*Z\.?\s*\d/, "purcell"]
 ];
 var surnameOf = (name) => plain(name).split(" ").filter(Boolean).at(-1) || "";
-var hasWord = (text5, word) => word.length >= 3 && ` ${plain(text5)} `.includes(` ${word} `);
+var hasWord = (text6, word) => word.length >= 3 && ` ${plain(text6)} `.includes(` ${word} `);
 function performerLike(part, albumArtists) {
-  const words4 = plain(part);
-  if (!words4) return true;
+  const words5 = plain(part);
+  if (!words5) return true;
   if (ENSEMBLE.test(part) || LIST.test(part)) return true;
-  return albumArtists.some((artist) => artist === words4 || ` ${artist} `.includes(` ${words4} `) || ` ${words4} `.includes(` ${artist} `));
+  return albumArtists.some((artist) => artist === words5 || ` ${artist} `.includes(` ${words5} `) || ` ${words5} `.includes(` ${artist} `));
 }
 function artistCredits(hints = {}, { knownComposers = null } = {}) {
   if (Array.isArray(hints.composer) && hints.composer.length) return null;
@@ -37062,8 +37115,8 @@ function artistCredits(hints = {}, { knownComposers = null } = {}) {
   if (parts.length < 2) return null;
   const albumArtists = clean(hints.albumArtist).split(/\s*(?:;|,|&|\/|\s+(?:and|und|with)\s+)\s*/i).map(plain).filter((name) => name.length >= 3);
   const candidates2 = parts.filter((part) => !performerLike(part, albumArtists)).filter((name) => {
-    const words4 = name.split(/\s+/);
-    return words4.length <= 5 && !/\d|:/.test(name) && NAME.test(name) && parts.filter((part) => plain(part) === plain(name)).length === 1;
+    const words5 = name.split(/\s+/);
+    return words5.length <= 5 && !/\d|:/.test(name) && NAME.test(name) && parts.filter((part) => plain(part) === plain(name)).length === 1;
   }).map((name) => ({ name, evidence: corroboration(name, hints, knownComposers) }));
   const backed = candidates2.filter((candidate) => candidate.evidence.length);
   const chosen = candidates2.length === 1 ? candidates2[0] : backed.length === 1 ? backed[0] : null;
@@ -37092,7 +37145,7 @@ function composersOf(hints = {}, options) {
 }
 
 // src/model/classify-evidence.js
-var escape = (text5) => text5.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+var escape = (text6) => text6.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 var wordList = (terms) => new RegExp(
   `(?<![\\p{L}\\p{N}_])(?:${[...new Set(terms.map(normGenre))].sort((a, b) => b.length - a.length).map(escape).join("|")})(?![\\p{L}\\p{N}_])`,
   "u"
@@ -37809,6 +37862,10 @@ function readTags(filePath) {
       // Every album artist ID: taglib's own property has only the first.
       albumArtistMbids: [...new Set([...albumArtistIdsField.read(file), text(tag.musicBrainzReleaseArtistId)].flatMap((v) => texts(v.split(/[;/]/))))],
       artistMbids: artistIdsField.read(file).flatMap((value) => texts(value.split(/[;/]/))),
+      conductor: text(tag.conductor),
+      // Vorbis PERFORMER, one value a performer, often with the instrument
+      // in brackets: "Martha Argerich (piano)".
+      performers: texts(xiphOf(file)?.getField("PERFORMER") ?? []),
       genres: texts(tag.genres ?? []).flatMap((genre) => texts(genre.split(";"))),
       composer: texts(tag.composers ?? []),
       work: workField.read(file)[0] ?? "",
@@ -37894,10 +37951,10 @@ var CATALOGUES = [
 var OPUS = /\bop(?:us|\.)?\s*(\d+[a-z]?)(?:\s*,?\s*(?:no\.?|nr\.?|n°)\s*(\d+))?/i;
 var PIECE = /^\s*,?\s*(?:no\.?|nr\.?|n°)\s*(\d+[a-z]{0,3})(?![a-z\d])/i;
 function catalogueMatch(title) {
-  const text5 = String(title || "");
+  const text6 = String(title || "");
   for (const [pattern, prefix] of CATALOGUES) {
-    const match2 = text5.match(pattern);
-    if (match2) return { prefix, number: match2[1].replace(/\s+/g, ""), end: match2.index + match2[0].length, text: text5 };
+    const match2 = text6.match(pattern);
+    if (match2) return { prefix, number: match2[1].replace(/\s+/g, ""), end: match2.index + match2[0].length, text: text6 };
   }
   return null;
 }
@@ -37913,14 +37970,14 @@ function cataloguePiece(title) {
   return match2 ? match2.text.slice(match2.end).match(PIECE)?.[1]?.toLowerCase() || "" : "";
 }
 function shortWorkTitle(title) {
-  let text5 = String(title || "").split(":")[0];
-  text5 = text5.replace(OPUS, " ");
-  for (const [pattern] of CATALOGUES) text5 = text5.replace(pattern, " ");
-  text5 = text5.replace(/\bin\s+[A-G](?:[- ]?(?:flat|sharp|♭|♯|b|#))?\s*(?:major|minor|maj|min|dur|moll)\b/gi, " ").replace(/\b(?:no|nr|n°)\.?\s*(?=\d)/gi, " ").replace(/[“”"'’,;()[\]]/g, " ");
-  return searchWords(text5);
+  let text6 = String(title || "").split(":")[0];
+  text6 = text6.replace(OPUS, " ");
+  for (const [pattern] of CATALOGUES) text6 = text6.replace(pattern, " ");
+  text6 = text6.replace(/\bin\s+[A-G](?:[- ]?(?:flat|sharp|♭|♯|b|#))?\s*(?:major|minor|maj|min|dur|moll)\b/gi, " ").replace(/\b(?:no|nr|n°)\.?\s*(?=\d)/gi, " ").replace(/[“”"'’,;()[\]]/g, " ");
+  return searchWords(text6);
 }
-function searchWords(text5) {
-  return String(text5 || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim().split(/\s+/).filter(Boolean).join(" ");
+function searchWords(text6) {
+  return String(text6 || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim().split(/\s+/).filter(Boolean).join(" ");
 }
 function surname(person) {
   if (!person) return "";
@@ -38075,8 +38132,8 @@ var NUMBERED = new RegExp(
 var SYSTEM = new Map(SYSTEMS);
 var SUBNUMBERED = /* @__PURE__ */ new Set(["op", "hob", "woo", "s", "d", "k"]);
 var NO_BEFORE = /(?:no|nr|n°|num|number|#)\.?\s*$|\/\s*$/i;
-function catalogueKeys(text5) {
-  const source = String(text5 ?? "").normalize("NFC");
+function catalogueKeys(text6) {
+  const source = String(text6 ?? "").normalize("NFC");
   const found = [];
   for (const match2 of source.matchAll(HOBOKEN)) {
     if (!match2[1]) continue;
@@ -38100,8 +38157,8 @@ function catalogueKeys(text5) {
 }
 var keyMatches = (query, key) => key === query || key.startsWith(`${query}:`);
 var STOP = /* @__PURE__ */ new Set(["no", "nr", "num", "number", "in", "the", "a", "an", "of", "and", "de", "la", "le", "der", "die", "das", "von", "van", "op", "opus"]);
-function parseQuery(text5) {
-  let rest = String(text5 ?? "");
+function parseQuery(text6) {
+  let rest = String(text6 ?? "");
   const keys = catalogueKeys(rest);
   for (const item of [...keys].reverse()) rest = `${rest.slice(0, item.start)} ${rest.slice(item.end)}`;
   const all = words(rest);
@@ -38147,8 +38204,8 @@ var has = (haystack, name) => {
   const wanted = words(name);
   return wanted.length > 0 && wanted.every((word) => haystack.includes(` ${word} `));
 };
-var coverage = (haystack, text5) => {
-  const wanted = words(text5).filter((word) => word.length > 1);
+var coverage = (haystack, text6) => {
+  const wanted = words(text6).filter((word) => word.length > 1);
   return wanted.length ? wanted.filter((word) => haystack.includes(` ${word} `)).length / wanted.length : 0;
 };
 function scoreFolder(folder, info, { albumTitle = "", movements = [] } = {}) {
@@ -38759,545 +38816,6 @@ async function moveIntoPlace(ctx, id, record, directory) {
   return record.kind === "album" ? { done: true } : { done: true, path: path5.basename(files[0].target) };
 }
 
-// src/search/engine.js
-var FIELD = { primary: 0, secondary: 1, skeleton: 2 };
-var KIND_BOOST = { work: 12, recording: 6, composer: 7, performer: 5, release: 3, movement: 1 };
-var SECTIONS = [
-  ["work", "Works"],
-  ["recording", "Recordings"],
-  ["composer", "Composers"],
-  ["performer", "Performers"],
-  ["release", "Albums"],
-  ["movement", "Movements"]
-];
-var FACETS = [
-  ["composer", "Composer"],
-  ["performer", "Performer"],
-  ["conductor", "Conductor"],
-  ["ensemble", "Ensemble"],
-  ["period", "Period"],
-  ["form", "Form"],
-  ["instrument", "Instrument"],
-  ["type", "Recording type"],
-  ["year", "Year"],
-  ["owned", "Library"]
-];
-var FACET_KEYS = new Set(FACETS.map(([key]) => key));
-var PERFORMER_ROLES = /* @__PURE__ */ new Set(["soloist", "performer", "conductor", "orchestra", "ensemble", "choir"]);
-var ENSEMBLE_ROLES2 = /* @__PURE__ */ new Set(["orchestra", "ensemble", "choir"]);
-var ROLE_LABEL = { soloist: "Soloist", performer: "Performer", conductor: "Conductor", orchestra: "Orchestra", ensemble: "Ensemble", choir: "Choir", composer: "Composer", arranger: "Arranger", lyricist: "Lyricist" };
-var LIVE = /\b(live|concert|recital|broadcast|in concert|konzert)\b/i;
-var text2 = (value) => typeof value === "string" ? value.trim() : Array.isArray(value) ? value.filter((v) => typeof v === "string").join("; ") : "";
-var list = (value) => Array.isArray(value) ? value.filter((v) => typeof v === "string" && v.trim()).map((v) => v.trim()) : typeof value === "string" && value.trim() ? [value.trim()] : [];
-var parse3 = (value, fallback) => {
-  try {
-    return JSON.parse(value);
-  } catch {
-    return fallback;
-  }
-};
-function catalogueStamp(c) {
-  const row = c.db.prepare(
-    `SELECT (SELECT coalesce(max(id),0) FROM audit_event) AS a,
-        (SELECT coalesce(max(rowid),0) FROM assertion) AS b,
-        (SELECT count(*) FROM entity WHERE deleted_at IS NULL) AS c,
-        (SELECT coalesce(max(updated_at),0) FROM entity) AS d,
-        (SELECT count(*)||':'||coalesce(max(rowid),0) FROM realization_item) AS e,
-        (SELECT coalesce(max(updated_at),0)||':'||count(*) FROM classification WHERE state='classical') AS f,
-        (SELECT coalesce(max(updated_at),0)||':'||count(*) FROM track_link WHERE state='active') AS g,
-        (SELECT count(*)||':'||coalesce(max(rowid),0) FROM credit) AS h,
-        (SELECT count(*)||':'||coalesce(max(rowid),0) FROM relation) AS i`
-  ).get();
-  return `v2|${Object.values(row).join("|")}`;
-}
-function resolvedValues(c) {
-  const values = /* @__PURE__ */ new Map();
-  for (const row of c.db.prepare(
-    `SELECT f.target_id,f.field,a.value FROM field_resolution f JOIN assertion a ON a.id=f.assertion_id
-       WHERE f.field IN ('title','name','nickname','aliases','catalogue','key','form','period','instrumentation','date')`
-  ).iterate()) {
-    if (!values.has(row.target_id)) values.set(row.target_id, {});
-    values.get(row.target_id)[row.field] = parse3(row.value, null);
-  }
-  return values;
-}
-function classicalTracks(c) {
-  const tracks = /* @__PURE__ */ new Map();
-  for (const row of c.db.prepare(
-    `SELECT t.id,t.core_id,t.evidence FROM track_link t JOIN classification k ON k.target_id=t.id
-       WHERE t.state='active' AND k.state='classical'`
-  ).iterate()) {
-    const evidence = parse3(row.evidence, {});
-    tracks.set(row.id, { id: row.id, coreId: String(row.core_id), albumId: evidence.albumId == null ? null : String(evidence.albumId), durationMs: Number(evidence.durationMs) || 0, hints: evidence.hints || {} });
-  }
-  return tracks;
-}
-var yearOf = (value) => {
-  const match2 = String(value || "").match(/\b(1[5-9]\d\d|20\d\d)\b/);
-  return match2 ? Number(match2[1]) : null;
-};
-function ownedRecordings(c, tracks = classicalTracks(c), values = resolvedValues(c), { workId = null } = {}) {
-  const rows = c.db.prepare(
-    `SELECT r.id AS realization,r.work_id,r.performance_work_id,r.label,i.movement_id,i.sequence,s.track_link_id,s.start_ms,s.end_ms
-       FROM realization r JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
-       JOIN entity w ON w.id=r.work_id AND w.deleted_at IS NULL
-       ${workId ? "WHERE r.work_id=?" : ""}
-       ORDER BY r.id,i.sequence,i.occurrence,i.id`
-  ).all(...workId ? [workId] : []);
-  const credits3 = c.db.prepare(
-    `SELECT k.role,k.contributor_id FROM relation pw JOIN credit k ON k.target_id=pw.source_id
-     JOIN entity e ON e.id=k.contributor_id AND e.deleted_at IS NULL WHERE pw.id=? ORDER BY k.position,k.id`
-  );
-  const byRealization = /* @__PURE__ */ new Map();
-  for (const row of rows) {
-    const track = tracks.get(row.track_link_id);
-    if (!track) continue;
-    if (!byRealization.has(row.realization)) byRealization.set(row.realization, { id: row.realization, workId: row.work_id, performanceWorkId: row.performance_work_id, label: row.label, items: [] });
-    byRealization.get(row.realization).items.push({ movementId: row.movement_id, sequence: row.sequence, track, startMs: row.start_ms, endMs: row.end_ms });
-  }
-  const recordings = [];
-  for (const recording of byRealization.values()) {
-    const first = recording.items[0].track;
-    const people = credits3.all(recording.performanceWorkId).map((row) => ({ id: row.contributor_id, role: row.role, name: text2(values.get(row.contributor_id)?.name) || "Unknown" }));
-    const performers = people.filter((p) => PERFORMER_ROLES.has(p.role));
-    const tagged = performers.length ? [] : text2(first.hints.artist || first.hints.albumArtist).split(/\s+[—–]\s+|\s*;\s*/).map((name) => name.trim()).filter((name) => name && !list(first.hints.composer).some((composer) => fold(composer) === fold(name)));
-    const albums2 = [...new Set(recording.items.map((item) => item.track.albumId).filter(Boolean))];
-    const mbids = [...new Set(recording.items.map((item) => item.track.hints.recordingMbid).filter(Boolean))].sort();
-    const parts = /* @__PURE__ */ new Map();
-    for (const item of recording.items) {
-      const ms = item.endMs != null ? item.endMs - item.startMs : Math.max(0, item.track.durationMs - (item.startMs || 0));
-      const key = item.movementId || `seq:${item.sequence}`;
-      parts.set(key, (parts.get(key) || 0) + ms);
-    }
-    const trackMs = [];
-    for (const item of recording.items) {
-      const last = trackMs.at(-1);
-      const ms = item.endMs != null ? item.endMs - item.startMs : Math.max(0, item.track.durationMs - (item.startMs || 0));
-      if (last && last.track === item.track.id && last.start === item.startMs) continue;
-      trackMs.push({ track: item.track.id, start: item.startMs, ms });
-    }
-    recordings.push({
-      ...recording,
-      trackMs: trackMs.map((entry) => entry.ms),
-      people: performers,
-      taggedPerformers: tagged,
-      performerNames: performers.length ? performers.map((p) => p.name) : tagged,
-      albums: albums2,
-      album: text2(recording.label) || text2(first.hints.album),
-      label: text2(first.hints.label),
-      year: yearOf(first.hints.date) ?? yearOf(first.hints.year),
-      mbids,
-      parts,
-      durationMs: [...parts.values()].reduce((sum, ms) => sum + ms, 0),
-      live: LIVE.test(`${first.hints.album || ""} ${recording.label || ""}`)
-    });
-  }
-  return recordings;
-}
-function sameRecording(a, b) {
-  if (a.workId !== b.workId || a.id === b.id) return false;
-  if (a.albums.some((album) => b.albums.includes(album))) return false;
-  if (a.mbids.length && b.mbids.length) return a.mbids.length === b.mbids.length && a.mbids.every((id, i) => id === b.mbids[i]);
-  const names = (r) => r.performerNames.map(fold).filter(Boolean).sort().join("|");
-  if (!names(a) || names(a) !== names(b)) return false;
-  if (a.parts.size !== b.parts.size || a.parts.size === 0) return false;
-  for (const [key, ms] of a.parts) {
-    const other = b.parts.get(key);
-    if (other == null || Math.abs(other - ms) > 2e3) return false;
-  }
-  return a.trackMs.length === b.trackMs.length && a.trackMs.every((ms, i) => Math.abs(ms - b.trackMs[i]) <= 2e3);
-}
-function groupRecordings(recordings) {
-  const groups = [];
-  for (const recording of recordings) {
-    const group = groups.find((g) => g.realizations.some((other) => sameRecording(recording, other)));
-    if (group) group.realizations.push(recording);
-    else groups.push({ key: recording.id, realizations: [recording] });
-  }
-  return groups;
-}
-function addTerms(terms, doc, value, field2) {
-  for (const word of words(value)) {
-    terms.add(`${word}\0${doc}\0${field2}`);
-    const skel = field2 === FIELD.primary ? skeleton(word) : "";
-    if (skel) terms.add(`${skel}\0${doc}\0${FIELD.skeleton}`);
-  }
-}
-function ensureSearchIndex(c, { force = false } = {}) {
-  const started = performance.now();
-  const stamp = catalogueStamp(c);
-  const state = c.db.prepare("SELECT stamp,docs FROM search_state WHERE id=1").get();
-  if (!force && state?.stamp === stamp) return { rebuilt: false, docs: state.docs, ms: performance.now() - started };
-  const docs = buildDocuments(c);
-  transaction(c.db, () => {
-    for (const table of ["search_term", "search_key", "search_facet", "search_doc"]) c.db.exec(`DELETE FROM ${table}`);
-    const insertDoc = c.db.prepare("INSERT INTO search_doc(id,kind,ref,work_id,title,subtitle,detail,owned,boost,data) VALUES (?,?,?,?,?,?,?,?,?,?)");
-    const insertTerm = c.db.prepare("INSERT OR IGNORE INTO search_term VALUES (?,?,?)");
-    const insertKey = c.db.prepare("INSERT OR IGNORE INTO search_key VALUES (?,?)");
-    const insertFacet = c.db.prepare("INSERT OR IGNORE INTO search_facet VALUES (?,?,?,?)");
-    docs.forEach((doc, index) => {
-      const id = index + 1;
-      insertDoc.run(id, doc.kind, doc.ref, doc.workId ?? null, doc.title.slice(0, 500), doc.subtitle.slice(0, 500), doc.detail.slice(0, 500), doc.owned ? 1 : 0, doc.boost || 0, JSON.stringify(doc.data || {}));
-      const terms = /* @__PURE__ */ new Set();
-      for (const value of doc.primary) addTerms(terms, id, value, FIELD.primary);
-      for (const value of doc.secondary) addTerms(terms, id, value, FIELD.secondary);
-      for (const entry of terms) {
-        const [term, , field2] = entry.split("\0");
-        insertTerm.run(term, id, Number(field2));
-      }
-      for (const key of doc.keys) insertKey.run(key, id);
-      for (const [facet, value, label] of doc.facets) insertFacet.run(facet, String(value).slice(0, 200), id, String(label).slice(0, 200));
-    });
-    c.db.prepare("INSERT INTO search_state VALUES (1,?,?,?) ON CONFLICT(id) DO UPDATE SET stamp=excluded.stamp,built_at=excluded.built_at,docs=excluded.docs").run(stamp, Date.now(), docs.length);
-  });
-  return { rebuilt: true, docs: docs.length, ms: performance.now() - started };
-}
-var keysOf = (...sources) => [...new Set(sources.flat().flatMap((value) => catalogueKeys(value).map((item) => item.key)))];
-function buildDocuments(c) {
-  const values = resolvedValues(c);
-  const tracks = classicalTracks(c);
-  const name = (id) => text2(values.get(id)?.name) || text2(values.get(id)?.title) || "";
-  const entities2 = c.db.prepare("SELECT id,kind FROM entity WHERE deleted_at IS NULL AND kind IN ('work','movement','person','ensemble','collection')").all();
-  const kindOf = new Map(entities2.map((e) => [e.id, e.kind]));
-  const creditsOf = /* @__PURE__ */ new Map();
-  for (const row of c.db.prepare("SELECT target_id,contributor_id,role FROM credit ORDER BY position,id").iterate()) {
-    if (!kindOf.has(row.contributor_id)) continue;
-    if (!creditsOf.has(row.target_id)) creditsOf.set(row.target_id, []);
-    creditsOf.get(row.target_id).push({ id: row.contributor_id, role: row.role });
-  }
-  const movementsOf = /* @__PURE__ */ new Map();
-  const workOfMovement = /* @__PURE__ */ new Map();
-  for (const row of c.db.prepare("SELECT source_id,target_id FROM relation WHERE kind='movement' ORDER BY position,occurrence,id").iterate()) {
-    if (kindOf.get(row.source_id) !== "work" || !kindOf.has(row.target_id)) continue;
-    if (!movementsOf.has(row.source_id)) movementsOf.set(row.source_id, []);
-    movementsOf.get(row.source_id).push(row.target_id);
-    workOfMovement.set(row.target_id, row.source_id);
-  }
-  const collectionsOf = /* @__PURE__ */ new Map();
-  for (const row of c.db.prepare("SELECT source_id,target_id FROM relation WHERE kind='collection_member'").iterate()) {
-    if (!collectionsOf.has(row.target_id)) collectionsOf.set(row.target_id, []);
-    collectionsOf.get(row.target_id).push(row.source_id);
-  }
-  const recordings = ownedRecordings(c, tracks, values);
-  const groups = groupRecordings(recordings);
-  const recordingsOf2 = /* @__PURE__ */ new Map();
-  for (const group of groups) {
-    const workId = group.realizations[0].workId;
-    if (!recordingsOf2.has(workId)) recordingsOf2.set(workId, []);
-    recordingsOf2.get(workId).push(group);
-  }
-  const composersOf2 = (workId) => (creditsOf.get(workId) || []).filter((k) => k.role === "composer");
-  const workTitle = (workId) => text2(values.get(workId)?.title) || "Untitled work";
-  const docs = [];
-  const workFacets = /* @__PURE__ */ new Map();
-  const workKeys = /* @__PURE__ */ new Map();
-  for (const { id } of entities2.filter((e) => e.kind === "work")) {
-    const v = values.get(id) || {};
-    const title = workTitle(id);
-    const composers = composersOf2(id);
-    const facets = [];
-    for (const k of composers) facets.push(["composer", k.id, name(k.id)]);
-    if (text2(v.period)) facets.push(["period", fold(v.period), text2(v.period)]);
-    if (text2(v.form)) facets.push(["form", fold(v.form), text2(v.form)]);
-    for (const instrument of list(v.instrumentation)) facets.push(["instrument", fold(instrument), instrument]);
-    workFacets.set(id, facets);
-    const groupsHere = recordingsOf2.get(id) || [];
-    const recordingFacets = groupsHere.flatMap((group) => recordingGroupFacets(group, name));
-    const owned = groupsHere.length > 0;
-    docs.push({
-      kind: "work",
-      ref: id,
-      workId: id,
-      title,
-      subtitle: composers.map((k) => name(k.id)).filter(Boolean).join(", "),
-      detail: [text2(v.nickname) && `\u201C${text2(v.nickname)}\u201D`, owned ? `${groupsHere.length} recording${groupsHere.length === 1 ? "" : "s"}` : "Not in your library"].filter(Boolean).join(" \xB7 "),
-      owned,
-      boost: KIND_BOOST.work,
-      primary: [title, text2(v.nickname), ...list(v.aliases), ...list(v.catalogue)],
-      secondary: [...composers.map((k) => name(k.id)), ...composers.flatMap((k) => list(values.get(k.id)?.aliases)), text2(v.key), text2(v.form), ...(collectionsOf.get(id) || []).map(name)],
-      keys: workKeys.set(id, keysOf(title, list(v.catalogue), list(v.aliases), text2(v.nickname))).get(id),
-      facets: [...facets, ...dedupeFacets(recordingFacets.filter(([facet]) => facet !== "year" && facet !== "type")), ["owned", owned ? "owned" : "missing", owned ? "In your library" : "Not in your library"]],
-      data: { nickname: text2(v.nickname) }
-    });
-  }
-  for (const [workId, movements] of movementsOf) {
-    const title = workTitle(workId);
-    const composers = composersOf2(workId).map((k) => name(k.id));
-    const owned = (recordingsOf2.get(workId) || []).length > 0;
-    movements.forEach((movement, index) => {
-      const v = values.get(movement) || {};
-      const movementTitle2 = text2(v.title) || `Movement ${index + 1}`;
-      docs.push({
-        kind: "movement",
-        ref: movement,
-        workId,
-        title: movementTitle2,
-        subtitle: [title, composers.join(", ")].filter(Boolean).join(" \xB7 "),
-        detail: "",
-        owned,
-        boost: KIND_BOOST.movement,
-        primary: [movementTitle2, ...list(v.aliases)],
-        secondary: [title, text2(values.get(workId)?.nickname), ...composers],
-        keys: keysOf(title),
-        facets: [...workFacets.get(workId) || [], ["owned", owned ? "owned" : "missing", owned ? "In your library" : "Not in your library"]],
-        data: { position: index + 1 }
-      });
-    });
-  }
-  for (const group of groups) {
-    const lead = group.realizations[0];
-    const work = values.get(lead.workId) || {};
-    const title = workTitle(lead.workId);
-    const composers = composersOf2(lead.workId).map((k) => name(k.id));
-    const albums3 = [...new Set(group.realizations.map((r) => r.album).filter(Boolean))];
-    const years = group.realizations.map((r) => r.year).filter(Boolean);
-    const complete = (movementsOf.get(lead.workId) || []).every((m) => group.realizations.some((r) => r.parts.has(m)));
-    docs.push({
-      kind: "recording",
-      ref: group.key,
-      workId: lead.workId,
-      title: lead.performerNames.join(", ") || albums3[0] || "Recording",
-      subtitle: [title, composers.join(", ")].filter(Boolean).join(" \xB7 "),
-      detail: [albums3.join(" / "), years.length ? Math.min(...years) : null, group.realizations.length > 1 ? `${group.realizations.length} releases` : null].filter(Boolean).join(" \xB7 "),
-      owned: true,
-      boost: KIND_BOOST.recording,
-      primary: [...lead.performerNames, ...lead.people.flatMap((p) => list(values.get(p.id)?.aliases))],
-      secondary: [title, text2(work.nickname), ...list(work.aliases), ...composers, ...albums3],
-      keys: keysOf(title, list(work.catalogue), list(work.aliases)),
-      facets: [...workFacets.get(lead.workId) || [], ...recordingGroupFacets(group, name), ["type", complete ? "complete" : "partial", complete ? "Complete work" : "Excerpt or incomplete"], ["owned", "owned", "In your library"]],
-      data: {
-        realizations: group.realizations.map((r) => r.id),
-        albums: [...new Set(group.realizations.flatMap((r) => r.albums))],
-        roles: Object.fromEntries(lead.people.map((p) => [p.id, p.role]))
-      }
-    });
-  }
-  const roles2 = /* @__PURE__ */ new Map();
-  for (const [target, list_] of creditsOf)
-    for (const k of list_) {
-      if (!roles2.has(k.id)) roles2.set(k.id, { roles: /* @__PURE__ */ new Set(), works: 0, recordings: 0 });
-      const entry = roles2.get(k.id);
-      entry.roles.add(k.role);
-      if (kindOf.get(target) === "work") entry.works++;
-      else entry.recordings++;
-    }
-  for (const [id, entry] of roles2) {
-    const v = values.get(id) || {};
-    const display2 = name(id);
-    if (!display2) continue;
-    const isComposer2 = entry.roles.has("composer");
-    const performerRoles = [...entry.roles].filter((role) => PERFORMER_ROLES.has(role));
-    const facets = [];
-    if (isComposer2) facets.push(["composer", id, display2]);
-    for (const role of performerRoles) {
-      facets.push(["performer", id, display2]);
-      if (role === "conductor") facets.push(["conductor", id, display2]);
-      if (ENSEMBLE_ROLES2.has(role)) facets.push(["ensemble", id, display2]);
-    }
-    const common = { ref: id, title: display2, owned: true, primary: [display2, ...list(v.aliases)], secondary: [], keys: [], facets: dedupeFacets(facets) };
-    const label = [...entry.roles].map((role) => ROLE_LABEL[role] || role).join(" \xB7 ");
-    if (isComposer2) docs.push({ ...common, kind: "composer", subtitle: "Composer", detail: `${entry.works} work${entry.works === 1 ? "" : "s"}`, boost: KIND_BOOST.composer, data: { roles: [...entry.roles] } });
-    if (performerRoles.length) docs.push({ ...common, kind: "performer", subtitle: label, detail: "", boost: KIND_BOOST.performer, data: { roles: performerRoles } });
-  }
-  const albums2 = /* @__PURE__ */ new Map();
-  for (const track of tracks.values()) {
-    if (!track.albumId) continue;
-    if (!albums2.has(track.albumId)) albums2.set(track.albumId, { title: text2(track.hints.album) || "Unknown album", artist: text2(track.hints.albumArtist || track.hints.artist), year: yearOf(track.hints.date) ?? yearOf(track.hints.year), tracks: 0, works: /* @__PURE__ */ new Set() });
-    albums2.get(track.albumId).tracks++;
-  }
-  for (const recording of recordings) for (const album of recording.albums) albums2.get(album)?.works.add(recording.workId);
-  for (const [albumId, album] of albums2) {
-    const works = [...album.works];
-    docs.push({
-      kind: "release",
-      ref: albumId,
-      title: album.title,
-      subtitle: album.artist,
-      detail: [album.year, `${album.tracks} track${album.tracks === 1 ? "" : "s"}`].filter(Boolean).join(" \xB7 "),
-      owned: true,
-      boost: KIND_BOOST.release,
-      primary: [album.title],
-      secondary: [album.artist, ...works.map(workTitle)],
-      keys: [.../* @__PURE__ */ new Set([...keysOf(album.title), ...works.flatMap((w) => workKeys.get(w) || [])])],
-      facets: dedupeFacets([...works.flatMap((w) => workFacets.get(w) || []), ...album.year ? [["year", String(album.year), String(album.year)]] : [], ["owned", "owned", "In your library"]]),
-      data: { works }
-    });
-  }
-  return docs;
-}
-function recordingGroupFacets(group, name) {
-  const facets = [];
-  for (const recording of group.realizations) {
-    for (const person of recording.people) {
-      facets.push(["performer", person.id, person.name || name(person.id)]);
-      if (person.role === "conductor") facets.push(["conductor", person.id, person.name]);
-      if (ENSEMBLE_ROLES2.has(person.role)) facets.push(["ensemble", person.id, person.name]);
-    }
-    for (const performer of recording.taggedPerformers) facets.push(["performer", `name:${fold(performer)}`, performer]);
-    if (recording.year) facets.push(["year", String(recording.year), String(recording.year)]);
-    if (recording.live) facets.push(["type", "live", "Live"]);
-  }
-  return dedupeFacets(facets);
-}
-function dedupeFacets(facets) {
-  const seen = /* @__PURE__ */ new Set();
-  return facets.filter(([facet, value]) => !seen.has(`${facet}\0${value}`) && seen.add(`${facet}\0${value}`));
-}
-var PREFIX_END = "\u{10FFFF}";
-function wordMatches(c, word) {
-  const out = /* @__PURE__ */ new Map();
-  const better = (doc, weight) => out.set(doc, Math.max(out.get(doc) || 0, weight));
-  const rows = word.length >= 2 ? c.db.prepare("SELECT term,doc,field FROM search_term WHERE term>=? AND term<? AND field<2").all(word, word + PREFIX_END) : c.db.prepare("SELECT term,doc,field FROM search_term WHERE term=? AND field<2").all(word);
-  for (const row of rows) {
-    const exact = row.term === word;
-    better(row.doc, row.field === FIELD.primary ? exact ? 10 : 6 : exact ? 4 : 2.5);
-  }
-  const skel = skeleton(word);
-  if (skel) for (const row of c.db.prepare("SELECT doc FROM search_term WHERE term=? AND field=2").all(skel)) better(row.doc, 5);
-  return out;
-}
-function keyMatchesDocs(c, key) {
-  const out = /* @__PURE__ */ new Map();
-  for (const row of c.db.prepare("SELECT key,doc FROM search_key WHERE key>=? AND key<?").all(key, key + PREFIX_END)) {
-    if (!keyMatches(key, row.key)) continue;
-    out.set(row.doc, Math.max(out.get(row.doc) || 0, row.key === key ? 40 : 18));
-  }
-  return out;
-}
-var intersect = (a, b) => {
-  const out = /* @__PURE__ */ new Map();
-  for (const [doc, weight] of a) if (b.has(doc)) out.set(doc, weight + b.get(doc));
-  return out;
-};
-function normalizeFilters(raw) {
-  const filters = {};
-  for (const [key, value] of Object.entries(raw || {})) {
-    if (!FACET_KEYS.has(key)) continue;
-    const values = [].concat(value).filter((v) => typeof v === "string" && v && v.length <= 200).slice(0, 10);
-    if (values.length) filters[key] = values;
-  }
-  return filters;
-}
-function searchCatalogue(c, { q = "", filters = {}, kinds: kinds2 = null, limit = 8, offset = 0, ensure = true } = {}) {
-  const started = performance.now();
-  const index = ensure ? ensureSearchIndex(c) : { rebuilt: false, docs: c.db.prepare("SELECT docs FROM search_state WHERE id=1").get()?.docs ?? 0, ms: 0 };
-  const query = parseQuery(String(q).slice(0, 200));
-  const wanted = normalizeFilters(filters);
-  let scores = null;
-  for (const key of query.keys) scores = scores ? intersect(scores, keyMatchesDocs(c, key)) : keyMatchesDocs(c, key);
-  for (const word of query.words) {
-    if (scores && !scores.size) break;
-    const found = wordMatches(c, word);
-    scores = scores ? intersect(scores, found) : found;
-  }
-  if (scores) {
-    for (const word of query.optional) for (const [doc, weight] of wordMatches(c, word)) if (scores.has(doc)) scores.set(doc, scores.get(doc) + weight * 0.1);
-  }
-  if (!scores) {
-    if (!Object.keys(wanted).length) return emptyResult(q, index, started);
-    scores = new Map(c.db.prepare("SELECT id FROM search_doc").all().map((row) => [row.id, 0]));
-  }
-  for (const [facet, values] of Object.entries(wanted)) {
-    const allowed = new Set(
-      c.db.prepare(`SELECT doc FROM search_facet WHERE facet=? AND value IN (${values.map(() => "?").join(",")})`).all(facet, ...values).map((row) => row.doc)
-    );
-    for (const doc of [...scores.keys()]) if (!allowed.has(doc)) scores.delete(doc);
-  }
-  const ids = [...scores.keys()];
-  const docs = /* @__PURE__ */ new Map();
-  for (let i = 0; i < ids.length; i += 500) {
-    const chunk = ids.slice(i, i + 500);
-    for (const row of c.db.prepare(`SELECT * FROM search_doc WHERE id IN (${chunk.map(() => "?").join(",")})`).all(...chunk)) docs.set(row.id, row);
-  }
-  const folded = fold(q);
-  const ranked = [];
-  for (const [id, weight] of scores) {
-    const doc = docs.get(id);
-    if (!doc || kinds2 && !kinds2.includes(doc.kind)) continue;
-    const data = parse3(doc.data, {});
-    const exact = folded && (fold(doc.title) === folded || fold(data.nickname) === folded) ? 25 : 0;
-    ranked.push({ doc, data, score: weight + doc.boost + exact + (doc.owned ? 2 : 0) });
-  }
-  const workDocs = new Map(ranked.filter((r) => r.doc.kind === "work").map((r) => [r.doc.ref, r]));
-  const viaRecording = /* @__PURE__ */ new Map();
-  for (const r of ranked) {
-    if (r.doc.kind !== "recording" || workDocs.has(r.doc.work_id)) continue;
-    const best = viaRecording.get(r.doc.work_id);
-    if (!best || best.score < r.score) viaRecording.set(r.doc.work_id, r);
-  }
-  if (viaRecording.size && (!kinds2 || kinds2.includes("work"))) {
-    const ids2 = [...viaRecording.keys()];
-    for (let i = 0; i < ids2.length; i += 500) {
-      const chunk = ids2.slice(i, i + 500);
-      for (const doc of c.db.prepare(`SELECT * FROM search_doc WHERE kind='work' AND ref IN (${chunk.map(() => "?").join(",")})`).all(...chunk))
-        ranked.push({ doc, data: parse3(doc.data, {}), score: viaRecording.get(doc.ref).score - KIND_BOOST.recording + KIND_BOOST.work - 4, via: "recording" });
-    }
-  }
-  ranked.sort((a, b) => b.score - a.score || a.doc.title.localeCompare(b.doc.title) || a.doc.id - b.doc.id);
-  const sections = [];
-  for (const [kind, title] of SECTIONS) {
-    const all = ranked.filter((r) => r.doc.kind === kind);
-    if (!all.length) continue;
-    sections.push({ id: kind, title, total: all.length, items: all.slice(offset, offset + limit).map(resultItem) });
-  }
-  const facets = facetCounts(c, ranked.map((r) => r.doc.id), wanted);
-  return {
-    version: 1,
-    query: String(q),
-    filters: wanted,
-    keys: query.keys,
-    total: ranked.length,
-    // The best match leads, whatever its kind: works rank first among equals.
-    best: ranked[0] ? resultItem(ranked[0]) : null,
-    sections,
-    facets,
-    index: { docs: index.docs, rebuilt: index.rebuilt, buildMs: Math.round(index.ms) },
-    ms: Math.round(performance.now() - started)
-  };
-}
-function emptyResult(q, index, started) {
-  return { version: 1, query: String(q), filters: {}, keys: [], total: 0, best: null, sections: [], facets: [], index: { docs: index.docs, rebuilt: index.rebuilt, buildMs: Math.round(index.ms) }, ms: Math.round(performance.now() - started) };
-}
-function resultItem({ doc, data, via }) {
-  return {
-    id: `${doc.kind}:${doc.ref}`,
-    kind: doc.kind,
-    ref: doc.ref,
-    workId: doc.work_id || null,
-    title: doc.title,
-    subtitle: doc.subtitle,
-    detail: via === "recording" ? [doc.detail, "Matched through a recording"].filter(Boolean).join(" \xB7 ") : doc.detail,
-    owned: doc.owned === 1,
-    ...doc.kind === "recording" && { realizations: data.realizations || [], albums: data.albums || [] },
-    ...doc.kind === "release" && { albumId: doc.ref }
-  };
-}
-function facetCounts(c, docIds, wanted) {
-  if (!docIds.length) return [];
-  const counts = /* @__PURE__ */ new Map();
-  for (let i = 0; i < docIds.length; i += 500) {
-    const chunk = docIds.slice(i, i + 500);
-    for (const row of c.db.prepare(`SELECT facet,value,label,count(*) AS n FROM search_facet WHERE doc IN (${chunk.map(() => "?").join(",")}) GROUP BY facet,value`).all(...chunk)) {
-      const key = `${row.facet}\0${row.value}`;
-      const prior = counts.get(key);
-      counts.set(key, { facet: row.facet, value: row.value, label: row.label, count: (prior?.count || 0) + row.n });
-    }
-  }
-  return FACETS.map(([key, label]) => ({
-    key,
-    label,
-    selected: wanted[key] || [],
-    options: [...counts.values()].filter((entry) => entry.facet === key).sort((a, b) => key === "year" ? Number(b.value) - Number(a.value) : b.count - a.count || a.label.localeCompare(b.label)).slice(0, 50).map(({ value, label: optionLabel, count }) => ({ value, label: optionLabel, count }))
-  })).filter((facet) => facet.options.length || facet.selected.length);
-}
-
-// src/model/editor-v2.js
-import path6 from "node:path";
-import { randomUUID as randomUUID10 } from "node:crypto";
-
-// src/model/history.js
-import { randomUUID as randomUUID9 } from "node:crypto";
-
 // src/model/auto-match.js
 import { createHash as createHash3 } from "node:crypto";
 var MULTI_MOVEMENT = /\b(symphon(?:y|ie)|sinfonia|sonata|sonatina|concerto|suite|partita|quartet|quintet|sextet|septet|octet|nonet|trio|serenade|divertimento|cassation|mass|missa|requiem|stabat mater|magnificat|te deum|vespers|cantata|oratorio|passion|variations?|ballet)\b/i;
@@ -39313,15 +38831,15 @@ var sameCatalogue = (a, b) => {
 var identity = (...values) => createHash3("sha256").update(JSON.stringify(values)).digest("hex");
 var NUMBERED_SET = new RegExp("(?<!\\p{L})(pr[e\xE9]ludes|[e\xE9]tudes|nocturnes|mazurkas|waltzes|valses|impromptus|ballades|polonaises|bagatelles|intermezzi|consolations|po[e\xE8]mes|morceaux|songs without words|lieder ohne worte)(?!\\p{L})", "iu");
 function withoutComposer(title, composers = []) {
-  const text5 = clean3(title);
-  const match2 = text5.match(/^([^:]{2,60}):\s+(\S.*)$/);
-  if (!match2) return text5;
+  const text6 = clean3(title);
+  const match2 = text6.match(/^([^:]{2,60}):\s+(\S.*)$/);
+  if (!match2) return text6;
   const prefix = nameKey(match2[1]);
   const named = (Array.isArray(composers) ? composers : [composers]).some((name) => {
     const full = nameKey(name);
     return Boolean(full) && (prefix === full || prefix === full.split(" ").at(-1));
   });
-  return named ? clean3(match2[2]) : text5;
+  return named ? clean3(match2[2]) : text6;
 }
 function nameKey(name) {
   return normalized(name).replace(/[^\p{L}\p{N}]+/gu, " ").trim().replace(/ts?ch/g, "ch").replace(/ff\b/g, "v").replace(/w/g, "v").replace(/[yj]/g, "i").replace(/kh/g, "h");
@@ -39330,27 +38848,27 @@ var WORK_HEAD = /^(.+?)(?:\s*[:;]\s+|\s+[–—-]\s+|:(?=["“„'‘]))(.+)$/;
 var titleHead = (title) => splitTitle(title).head;
 var COMMA_MOVEMENT = /^(.{4,}?),\s+((?:[IVXLC]+|\d{1,2})\.\s+(?!\d)\S.*)$/;
 function splitTitle(title) {
-  const text5 = clean3(title);
-  const match2 = text5.match(WORK_HEAD);
-  const comma = text5.match(COMMA_MOVEMENT);
+  const text6 = clean3(title);
+  const match2 = text6.match(WORK_HEAD);
+  const comma = text6.match(COMMA_MOVEMENT);
   if (comma && (!match2 || comma[1].length < match2[1].length) && (catalogueNumber(comma[1]) || MULTI_MOVEMENT.test(comma[1])))
     return { head: clean3(comma[1]), tail: clean3(comma[2]) };
-  return match2 ? { head: clean3(match2[1]), tail: clean3(match2[2]) } : { head: "", tail: text5 };
+  return match2 ? { head: clean3(match2[1]), tail: clean3(match2[2]) } : { head: "", tail: text6 };
 }
 function standalonePiece(hints, workTitle, tag = hints.work) {
   const tagged = clean3(tag);
   const title = clean3(hints.title);
   if (!tagged || tagged.includes(":") || isCollectionLike(tagged) || title.includes(":")) return false;
   const head = words2(workTitle);
-  const text5 = words2(title);
-  return text5 === head || text5.startsWith(`${head} `) && splitTitle(title).head === "" && !MOVEMENT_PREFIX.test(stripWorkPrefix(title, workTitle));
+  const text6 = words2(title);
+  return text6 === head || text6.startsWith(`${head} `) && splitTitle(title).head === "" && !MOVEMENT_PREFIX.test(stripWorkPrefix(title, workTitle));
 }
-var isCatalogueRange = (text5) => /\d+[a-z]?\s*[-–—]\s*\d+/i.test(text5) || [...String(text5).matchAll(/\b(\d+)\s*\/\s*(\d+)\b(?![a-z])/gi)].some(([, a, b]) => Number(b) > Number(a));
-var catalogued = (text5) => Boolean(catalogueNumber(text5)) && !isCatalogueRange(text5);
-var catalogueSet = (text5) => NUMBERED_SET.test(text5) && catalogued(text5);
+var isCatalogueRange = (text6) => /\d+[a-z]?\s*[-–—]\s*\d+/i.test(text6) || [...String(text6).matchAll(/\b(\d+)\s*\/\s*(\d+)\b(?![a-z])/gi)].some(([, a, b]) => Number(b) > Number(a));
+var catalogued = (text6) => Boolean(catalogueNumber(text6)) && !isCatalogueRange(text6);
+var catalogueSet = (text6) => NUMBERED_SET.test(text6) && catalogued(text6);
 var COUNTED_COLLECTION = new RegExp("(?<!\\p{L})(?:\\d+|zwei|drei|vier|f\xFCnf|sechs|sieben|acht|neun|zehn|elf|zw\xF6lf|dreizehn|vierzehn|deux|trois|quatre|cinq|six|sept|huit|neuf|dix|douze|two|three|four|five|six|seven|eight|nine|ten|twelve)\\s+(?:\\p{L}+\\s+)?(?:lieder|songs?|m\xE9lodies|melodies|chants|ges\xE4nge)(?!\\p{L})", "iu");
 var WITH_FUGUE = new RegExp("(?<!\\p{L})(?:fugue|fuga|fuge|fughetta)(?!\\p{L})", "iu");
-var readsAsWork = (text5) => Boolean(text5) && (!isCollectionLike(text5) && (MULTI_MOVEMENT.test(text5) || catalogued(text5)) || catalogueSet(text5) || (COUNTED_COLLECTION.test(text5) || WITH_FUGUE.test(text5)) && catalogued(text5));
+var readsAsWork = (text6) => Boolean(text6) && (!isCollectionLike(text6) && (MULTI_MOVEMENT.test(text6) || catalogued(text6)) || catalogueSet(text6) || (COUNTED_COLLECTION.test(text6) || WITH_FUGUE.test(text6)) && catalogued(text6));
 var BOOK_IN_BRACKETS = /\s*\(([^()]*?(?:book|livre|teil|heft|vol\.?|volume)\s+(?:[ivx]+|\d+))(?:[^()]*)\)/iu;
 function withBook(title) {
   const book = title.match(BOOK_IN_BRACKETS);
@@ -39531,7 +39049,7 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
         // Op. 11") is a whole piece; one movement of a symphony is not.
         !group.standalone && group.tracks.length < 2 && !catalogueSet(group.work) && !group.excerpt ? "only one track of a work with movements on this album" : new Set(positions).size !== positions.length ? "two tracks share a disc and track number" : (
           // MusicBrainz telling four "Promenade"s apart tells them apart.
-          new Set(group.tracks.map(pieceName)).size !== group.tracks.length ? "two tracks share a title" : null
+          new Set(group.tracks.map(pieceName)).size !== group.tracks.length && !returnsAtEnd(group.tracks) ? "two tracks share a title" : null
         )
       )
     );
@@ -39608,6 +39126,11 @@ function numberedElsewhere(title, workTitle) {
   const numbers = clean3(workTitle).split(/\s*[,·;]\s*|\s+\/\s+/).map(catalogueSubject).concat(catalogueSubject(workTitle)).filter(Boolean);
   return !numbers.some((number) => own === number || own.startsWith(`${number}:`) || number.startsWith(`${own}:`));
 }
+var returnsAtEnd = (tracks) => {
+  const ordered = [...tracks].sort(albumOrder);
+  const names = ordered.map(pieceName);
+  return ordered.length > 2 && names[0] === names.at(-1) && new Set(names.slice(0, -1)).size === names.length - 1;
+};
 var pieceName = (track) => `${normalized(track.title)}|${normalized(track.providerMovement || "")}`;
 function splitScattered(groups) {
   return groups.flatMap((group) => {
@@ -39657,7 +39180,7 @@ function knownComposerNames(catalogue) {
   const names = /* @__PURE__ */ new Set();
   for (const { id } of catalogue.db.prepare(
     `SELECT DISTINCT c.contributor_id AS id FROM credit c JOIN entity e ON e.id=c.contributor_id
-       WHERE c.role='composer' AND e.deleted_at IS NULL`
+       WHERE c.role='composer' AND c.state='active' AND e.deleted_at IS NULL`
   ).all()) {
     const name = resolvedName(catalogue, id, "name");
     if (typeof name === "string" && words2(name)) names.add(words2(name));
@@ -39712,13 +39235,13 @@ function romanValue(value) {
   return total || null;
 }
 function movementParts(title) {
-  const text5 = words2(title);
+  const text6 = words2(title);
   const part = clean3(title).match(/^([ivxlc]+|\d+)[a-d][.)]\s+(.*)$/i);
-  const match2 = part ? [part[0], part[1].toLowerCase(), words2(part[2])] : text5.match(/^(no\s+)?((?:[ivxlc]+)|\d+)\s+(.*)$/)?.filter((_, i) => i !== 1);
-  if (!match2) return { index: null, text: text5 };
+  const match2 = part ? [part[0], part[1].toLowerCase(), words2(part[2])] : text6.match(/^(no\s+)?((?:[ivxlc]+)|\d+)\s+(.*)$/)?.filter((_, i) => i !== 1);
+  if (!match2) return { index: null, text: text6 };
   const index = /^\d+$/.test(match2[1]) ? Number(match2[1]) : romanValue(match2[1]);
-  const piece = !part && /^no\s/.test(text5);
-  return index ? { index, text: match2[2], ...piece && { piece: true } } : { index: null, text: text5 };
+  const piece = !part && /^no\s/.test(text6);
+  return index ? { index, text: match2[2], ...piece && { piece: true } } : { index: null, text: text6 };
 }
 function movementTitle(track, workTitle) {
   const fromTitle = stripWorkPrefix(clean3(track.title), workTitle);
@@ -39737,26 +39260,26 @@ function stripWorkPrefix(title, workTitle, depth = 0) {
   const again2 = stripWorkPrefixOnce(withoutRepeatedComposer(stripped, workTitle), workTitle);
   return depth < 2 && again2 !== stripped && words2(stripped).includes(words2(workTitle)) ? stripWorkPrefix(again2, workTitle, depth + 1) : stripped;
 }
-var withoutRepeatedComposer = (text5, workTitle) => {
-  const match2 = clean3(text5).match(/^([^:]{2,60}):\s+(\S.*)$/);
-  return match2 && words2(match2[2]).startsWith(words2(workTitle)) && words2(match2[1]).split(" ").length <= 3 ? match2[2] : text5;
+var withoutRepeatedComposer = (text6, workTitle) => {
+  const match2 = clean3(text6).match(/^([^:]{2,60}):\s+(\S.*)$/);
+  return match2 && words2(match2[2]).startsWith(words2(workTitle)) && words2(match2[1]).split(" ").length <= 3 ? match2[2] : text6;
 };
 function stripWorkPrefixOnce(title, workTitle) {
-  const text5 = clean3(title);
-  const separators = [...text5.matchAll(SEPARATOR)];
-  const tailAt = (match2) => clean3(text5.slice(match2.index + match2[0].length));
+  const text6 = clean3(title);
+  const separators = [...text6.matchAll(SEPARATOR)];
+  const tailAt = (match2) => clean3(text6.slice(match2.index + match2[0].length));
   for (const match2 of separators) {
     const tail = tailAt(match2);
     if (tail && MOVEMENT_PREFIX.test(tail)) return tail;
   }
   const workWords = words2(workTitle);
   const workCatalogue = catalogueNumber(workTitle).toLowerCase();
-  const comma = splitTitle(text5);
-  if (comma.head && text5.startsWith(`${comma.head},`) && (workWords && words2(comma.head) === workWords || workCatalogue && catalogueNumber(comma.head).toLowerCase() === workCatalogue))
+  const comma = splitTitle(text6);
+  if (comma.head && text6.startsWith(`${comma.head},`) && (workWords && words2(comma.head) === workWords || workCatalogue && catalogueNumber(comma.head).toLowerCase() === workCatalogue))
     return comma.tail;
   const workName = words2(String(workTitle).split(",")[0]);
   for (const match2 of separators) {
-    const head = text5.slice(0, match2.index);
+    const head = text6.slice(0, match2.index);
     const tail = tailAt(match2);
     const headWords = words2(head);
     const namesWork = workWords && (headWords === workWords || headWords.startsWith(`${workWords} `) || workWords.startsWith(`${headWords} `)) || workCatalogue && catalogueNumber(head).toLowerCase() === workCatalogue || workName.length >= 4 && words2(head.split(",")[0]) === workName;
@@ -39764,9 +39287,9 @@ function stripWorkPrefixOnce(title, workTitle) {
     return clean3(tail.match(NICKNAME)?.[1] ?? tail);
   }
   const set = clean3(workTitle);
-  const rest = set && NUMBERED_SET.test(set) && normalized(text5).startsWith(normalized(set)) ? text5.slice(set.length).match(/^[,\s]+(no\.?\s*\d+\b.*)$/i) : null;
+  const rest = set && NUMBERED_SET.test(set) && normalized(text6).startsWith(normalized(set)) ? text6.slice(set.length).match(/^[,\s]+(no\.?\s*\d+\b.*)$/i) : null;
   if (rest) return rest[1].charAt(0).toUpperCase() + rest[1].slice(1);
-  return text5;
+  return text6;
 }
 function resolvedName(catalogue, id, field2) {
   const row = catalogue.db.prepare(
@@ -39778,7 +39301,7 @@ function resolvedName(catalogue, id, field2) {
 function composerNames(catalogue, work) {
   return catalogue.db.prepare(
     `SELECT c.contributor_id AS id FROM credit c JOIN entity e ON e.id=c.contributor_id
-       WHERE c.target_id=? AND c.role='composer' AND e.deleted_at IS NULL ORDER BY c.position`
+       WHERE c.target_id=? AND c.role='composer' AND c.state='active' AND e.deleted_at IS NULL ORDER BY c.position`
   ).all(work).map((row) => resolvedName(catalogue, row.id, "name")).filter((name) => typeof name === "string" && name.trim());
 }
 function similarWorks(catalogue, title, composers = []) {
@@ -39786,7 +39309,7 @@ function similarWorks(catalogue, title, composers = []) {
   const wanted = workKey(title, composers);
   const named = composers.map(words2).filter(Boolean).length > 0;
   const people = (key) => JSON.parse(key)[0].join("|");
-  const bare = (text5) => words2(text5).replace(KEY_PHRASE, " ").replace(new RegExp(CATALOGUE.source, "g"), " ").replace(/\s+/g, " ").trim();
+  const bare = (text6) => words2(text6).replace(KEY_PHRASE, " ").replace(new RegExp(CATALOGUE.source, "g"), " ").replace(/\s+/g, " ").trim();
   return catalogue.db.prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL ORDER BY created_at,id").all().map((row) => row.id).filter((id) => {
     const existing = resolvedName(catalogue, id, "title");
     if (typeof existing !== "string" || !existing.trim()) return false;
@@ -39817,7 +39340,7 @@ function composerPeople(catalogue) {
   for (const { id } of catalogue.db.prepare(
     `SELECT id FROM entity WHERE kind='person' AND deleted_at IS NULL
        AND (json_extract(data,'$.roles') LIKE '%composer%'
-         OR EXISTS(SELECT 1 FROM credit WHERE contributor_id=entity.id AND role='composer'))
+         OR EXISTS(SELECT 1 FROM credit WHERE contributor_id=entity.id AND role='composer' AND state='active'))
        ORDER BY created_at,id`
   ).all()) {
     const name = resolvedName(catalogue, id, "name");
@@ -39905,7 +39428,7 @@ function abbreviates(short, long) {
   return at === short.length;
 }
 function sameNameAbbreviated(a, b) {
-  const tokens = (text5) => normalized(text5).replace(/^(?:[ivxlc]+|\d+)[.)]\s+/, "").replace(/[^\p{L}\p{N}.]+/gu, " ").trim().split(" ").filter(Boolean);
+  const tokens = (text6) => normalized(text6).replace(/^(?:[ivxlc]+|\d+)[.)]\s+/, "").replace(/[^\p{L}\p{N}.]+/gu, " ").trim().split(" ").filter(Boolean);
   const [x, y] = [tokens(a), tokens(b)];
   if (!x.length || x.length !== y.length) return false;
   let abbreviated = 0;
@@ -39919,23 +39442,58 @@ function sameNameAbbreviated(a, b) {
   return abbreviated > 0;
 }
 function namedMovement(movements, title, used, setSubject) {
-  const text5 = movementParts(title).text;
+  const text6 = movementParts(title).text;
   const free = movements.filter((m) => !used.has(m.id));
-  let found = free.filter((m) => m.text && m.text === text5);
+  let found = free.filter((m) => m.text && m.text === text6);
   if (found.length !== 1) found = free.filter((m) => m.title && sameNameAbbreviated(m.title, title));
+  if (found.length !== 1) {
+    const wanted = asVariation(title);
+    if (wanted.variation && wanted.number) {
+      found = free.filter((m) => {
+        const own = asVariation(m.title || "");
+        return own.variation && own.number === wanted.number;
+      });
+      if (found.length === 1) return found[0];
+    }
+  }
   if (found.length !== 1) {
     const piece = pieceNumber(title, setSubject);
     found = piece == null ? [] : free.filter((m) => movementPiece(m, setSubject) === piece);
   }
   return found.length === 1 ? found[0] : null;
 }
-var SECTION_START = /^(?:(?:[ivxlc]+|\d+)[a-d]?[.)]\s|(?:var(?:iation|iazione)?\.?|theme|thema|tema|coda|intermezzo|introduction|introduzione)(?![\p{L}]))/iu;
+var SECTION_START = /^(?:(?:[ivxlc]+|\d+)[a-d]?[.)]\s|(?:var(?:iation|iatio|iazione)?\.?|theme|thema|tema|coda|intermezzo|introduction|introduzione)(?![\p{L}]))/iu;
+var VAR_WORD = "var(?:iations|iationen|iation|iatio|iazioni|iazione|s)?\\.?";
+var VAR_NUM = "(?:\\d+|[ivxlc]+)";
+var VAR_RANGE = new RegExp(`^${VAR_WORD}\\s*(?:(?:nos?|nr)\\.?\\s*)?(${VAR_NUM})\\s*[-\u2013\u2014]\\s*(${VAR_NUM})$`, "iu");
+var VAR_ONE = new RegExp(`^${VAR_WORD}\\s*(?:(?:nos?|nr)\\.?\\s*)?(${VAR_NUM})$`, "iu");
+var numberOf = (text6) => /^\d+$/.test(text6) ? Number(text6) : romanValue(text6.toLowerCase());
+function expandSection(part) {
+  const range2 = part.match(VAR_RANGE);
+  if (range2) {
+    const [from, to] = [numberOf(range2[1]), numberOf(range2[2])];
+    if (from && to && to > from && to - from < 40) return Array.from({ length: to - from + 1 }, (_, i) => `Variation ${from + i}`);
+  }
+  const pieces = part.split(/\s*,\s*|\s+(?:&|and|und|et)\s+/i).map(clean3).filter(Boolean);
+  if (pieces.length < 2) return [part];
+  const out = [];
+  let afterVariation = false;
+  for (const piece of pieces) {
+    const one = piece.match(VAR_ONE);
+    if (one && numberOf(one[1])) out.push(`Variation ${numberOf(one[1])}`), afterVariation = true;
+    else if (afterVariation && /^(?:\d+|[ivxlc]+)$/i.test(piece) && numberOf(piece)) out.push(`Variation ${numberOf(piece)}`);
+    else if (SECTION_START.test(piece)) out.push(piece), afterVariation = false;
+    else return [part];
+  }
+  return out;
+}
+var rawSections = (title) => clean3(title).split(/\s+\/\s+|\s+[–—-]\s+(?=var(?:iation|iatio|iazione)?\.?\s|(?:theme|thema|tema|coda)(?![\p{L}]))/iu).flatMap(expandSection);
 function sectionTitles(title) {
-  const parts = clean3(title).split(/\s+\/\s+|\s+[–—-]\s+(?=var(?:iation|iazione)?\.?\s)/i);
+  const parts = rawSections(title);
   return parts.length > 1 && parts.every((part) => SECTION_START.test(part)) ? parts : [clean3(title)];
 }
 var combined = (movement) => sectionTitles(movement.title || "").length > 1;
-var VARIATION = /^(?:var(?:iation|iazione)?s?|variazioni)\s+(?:(?:no|nr|n)\s+)?(?=\d|[ivxlc]+\b)/;
+var VARIATION = /^(?:var(?:iation|iatio|iazione)?s?|variazioni|variationen)\s+(?:(?:no|nr|n)\s+)?(?=\d|[ivxlc]+\b)/;
 function sectionParts(section) {
   let value = words2(section).replace(/\b(?:tema|thema)\b/g, "theme");
   const variation = VARIATION.test(value);
@@ -39945,10 +39503,10 @@ function sectionParts(section) {
   return number ? { number, variation, text: (numbered[2] || "").trim() } : { number: null, variation, text: value.trim() };
 }
 var sameSection = (a, b) => a.number != null || b.number != null ? a.number === b.number && (a.variation || b.variation || a.text === b.text) : a.text === b.text;
-var trackSections = (text5) => clean3(text5).split(/\s+\/\s+|\s+[–—-]\s+(?=var(?:iation|iazione)?\.?\s)/i).map(sectionParts);
+var trackSections = (text6) => sectionTitles(text6).map(sectionParts);
 function mapBySections(movements, tracks) {
-  if (!movements.some((m) => / \/ /.test(m.title || ""))) return null;
-  const sections = movements.map((m) => clean3(m.title).split(/\s+\/\s+/).map(sectionParts));
+  if (!movements.some(combined)) return null;
+  const sections = movements.map((m) => sectionTitles(m.title || "").map(sectionParts));
   const result = [];
   let at = 0, offset = 0;
   for (const track of tracks) {
@@ -39978,26 +39536,27 @@ function mapToMovements(movements, tracks, { setSubject = "", sections = false }
   mapped.forEach((id, i) => result[owners[i]].push(id));
   return result.map((ids) => ids.length === 1 ? ids[0] : [...new Set(ids)].length === 1 ? ids[0] : ids);
 }
-var VARIATION_TITLE = /^var(?:iation|iazione)?\.?\s*(?:(?:no|nr|n)\.?\s*)?(\d+|[ivxlc]+)(?![\p{L}\d])[\s:.,]*(.*)$/iu;
+var VARIATION_TITLE = /^var(?:iation|iatio|iazione)?\.?\s*(?:(?:no|nr|n)\.?\s*)?(\d+|[ivxlc]+)(?![\p{L}\d])[\s:.,]*(.*)$/iu;
 function asVariation(title) {
-  const text5 = clean3(title).replace(/^(?:tema|thema)(?![\p{L}])/iu, "Theme");
-  const variation = text5.match(VARIATION_TITLE);
-  return variation ? { title: `${variation[1]}. ${variation[2]}`, variation: true } : { title: text5, variation: false };
+  const text6 = clean3(title).replace(/^(?:tema|thema)(?![\p{L}])/iu, "Theme");
+  const variation = text6.match(VARIATION_TITLE);
+  return variation ? { title: `${variation[1]}. ${variation[2]}`, variation: true, number: numberOf(variation[1]) } : { title: text6, variation: false };
 }
 function mapEach(rawMovements, rawTracks, setSubject) {
   const movements = rawMovements.map((m) => {
-    const { title, variation } = asVariation(m.title || "");
-    return variation || title !== clean3(m.title) ? { ...m, ...movementParts(title), variation } : m;
+    const { title, variation, number } = asVariation(m.title || "");
+    return variation || title !== clean3(m.title) ? { ...m, ...movementParts(title), ...variation && number && { index: number }, variation } : m;
   });
   const tracks = rawTracks.map((track) => {
-    const { title, variation } = asVariation(track.movementTitle || "");
-    return { ...track, movementTitle: title, variation };
+    const { title, variation, number } = asVariation(track.movementTitle || "");
+    return { ...track, movementTitle: title, variation, variationNumber: variation ? number : null };
   });
   const used = /* @__PURE__ */ new Set(), result = [];
-  const firstWord = (text5) => text5.split(" ")[0];
+  const firstWord = (text6) => text6.split(" ")[0];
   let previous = null;
   for (const track of tracks) {
     const parts = movementParts(track.movementTitle);
+    if (track.variationNumber) parts.index = track.variationNumber;
     let found = movements.filter(
       (m) => !used.has(m.id) && m.text && m.text === parts.text
     );
@@ -40008,6 +39567,15 @@ function mapEach(rawMovements, rawTracks, setSubject) {
     if (found.length !== 1) {
       const named = namedMovement(movements, track.movementTitle, used, setSubject);
       if (named) found = [named];
+    }
+    if (found.length !== 1 && !parts.index && parts.text) {
+      const key = (text6) => firstWord(text6).replace(/^fug(?:a|e)$/, "fugue");
+      if (/^(?:theme|introduction|introduzione|coda|finale|aria|fugue|intermezzo)$/.test(key(parts.text))) {
+        const near = movements.filter(
+          (m) => !used.has(m.id) && m.text && !m.index && key(m.text) === key(parts.text) && (m.text === parts.text || firstWord(m.text) !== firstWord(parts.text) || m.text.startsWith(`${parts.text} `) || parts.text.startsWith(`${m.text} `))
+        );
+        if (near.length) found = [near[0]];
+      }
     }
     const variation = track.variation || movements.some((m) => m.variation);
     if (found.length !== 1 && parts.index)
@@ -40062,7 +39630,7 @@ function creditMovementComposers(catalogue, metadata, index, recording, track, g
   const work = new Set(group.composers.map(normalized));
   (track.composers || []).filter((name) => !work.has(normalized(name))).forEach((name, i) => {
     const person = composerEntity(catalogue, metadata, index, name, group.composerIds?.[name]);
-    if (!catalogue.db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role='composer'").get(recording, person))
+    if (!catalogue.db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role='composer' AND state='active'").get(recording, person))
       catalogue.credit(recording, person, "composer", { position: i + 1 });
   });
 }
@@ -40230,7 +39798,7 @@ function createGroup(catalogue, group, actor3, index) {
       return Boolean(wanted2) && provablyDifferent(wanted2, catalogueSubject(String(resolvedName(catalogue, id, "title") || "")));
     };
     if (providerWork && heldElsewhere(providerWork)) providerWork = null;
-    const otherComposer = (id) => catalogue.db.prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer'").all(id).some(({ contributor_id: person }) => {
+    const otherComposer = (id) => catalogue.db.prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer' AND state='active'").all(id).some(({ contributor_id: person }) => {
       const mbid = group.composerIds?.[resolvedName(catalogue, person, "name")] || Object.entries(group.composerIds || {}).find(([name]) => index.people.get(words2(name))?.includes(person))?.[1];
       const held2 = artistIdOf(catalogue, person);
       return mbid && held2 && held2 !== mbid;
@@ -40424,10 +39992,10 @@ function createGroup(catalogue, group, actor3, index) {
 }
 function placeTrack(catalogue, realization, performanceWork, recording, segment, movement) {
   const db = catalogue.db;
-  const list3 = Array.isArray(movement) ? movement : [movement];
+  const list4 = Array.isArray(movement) ? movement : [movement];
   let sequence = db.prepare("SELECT coalesce(max(sequence),0) AS n FROM realization_item WHERE realization_id=?").get(realization).n;
   let position = db.prepare("SELECT coalesce(max(position),0) AS n FROM recording_content WHERE recording_id=?").get(recording).n;
-  list3.forEach((id, j) => {
+  list4.forEach((id, j) => {
     const content = catalogue.recordingContent(recording, performanceWork, { movement: id, position: ++position });
     catalogue.segmentContent(segment, content);
     const occurrence = id ? db.prepare("SELECT count(*) AS n FROM realization_item WHERE realization_id=? AND movement_id=?").get(realization, id).n + 1 : 1;
@@ -40561,10 +40129,10 @@ function excerptsOnly(catalogue, work) {
 }
 var ACT_WORD = /^(?:act|atto|akt|acte|aufzug|scene|scena|szene|prologue|prolog|prologo)$/;
 function namesWithin(a, b, workTitle) {
-  const strip = (text5) => {
-    const list3 = words2(text5).split(" ").filter(Boolean).filter((word, i, all) => !ACT_WORD.test(word) && !(i > 0 && ACT_WORD.test(all[i - 1]) && romanValue(word)));
-    for (const word of words2(workTitle).split(" ")) if (list3.includes(word) && list3.length > 1) list3.splice(list3.indexOf(word), 1);
-    return list3;
+  const strip = (text6) => {
+    const list4 = words2(text6).split(" ").filter(Boolean).filter((word, i, all) => !ACT_WORD.test(word) && !(i > 0 && ACT_WORD.test(all[i - 1]) && romanValue(word)));
+    for (const word of words2(workTitle).split(" ")) if (list4.includes(word) && list4.length > 1) list4.splice(list4.indexOf(word), 1);
+    return list4;
   };
   const [x, y] = [strip(a), strip(b)];
   const [short, long] = x.length <= y.length ? [x, y] : [y, x];
@@ -40619,7 +40187,7 @@ function expandIncompleteWork(catalogue, metadata, work, existing, ordered, setS
     const rest = words2(movement.title).split(" ").filter(Boolean);
     for (const word of workWords) if (rest.includes(word)) rest.splice(rest.indexOf(word), 1);
     if (rest.length < 2) continue;
-    const named = ordered.map((track, i) => [i, words2(movementParts(track.movementTitle).text).split(" ")]).filter(([i, text5]) => !mapped[i] && rest.every((word) => text5.includes(word)));
+    const named = ordered.map((track, i) => [i, words2(movementParts(track.movementTitle).text).split(" ")]).filter(([i, text6]) => !mapped[i] && rest.every((word) => text6.includes(word)));
     if (named.length !== 1) continue;
     mapped[named[0][0]] = movement;
     used.add(movement.id);
@@ -40726,7 +40294,7 @@ function foldRepeatedMovements(catalogue, work, existing, setSubject, actor3) {
   const ids = [work, ...existing.map((m) => m.id)];
   const madeByMatching = catalogue.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work'").get(work);
   if (!madeByMatching || editedInEditor(catalogue, ids) || hasManualEdits(catalogue, ids)) return false;
-  const tokens = (text5) => words2(text5).split(" ").filter(Boolean);
+  const tokens = (text6) => words2(text6).split(" ").filter(Boolean);
   const within = (short, long) => {
     const rest = [...long];
     return short.length > 1 && short.every((token) => {
@@ -40883,11 +40451,12 @@ function mergeContributor(catalogue, keep, drop, actor3) {
   catalogue.db.prepare("UPDATE alias SET entity_id=? WHERE entity_id=?").run(keep, drop);
   for (const credit of catalogue.db.prepare("SELECT * FROM credit WHERE contributor_id=?").all(drop)) {
     const duplicate = catalogue.db.prepare(
-      "SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?"
+      "SELECT id,state FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?"
     ).get(credit.target_id, keep, credit.role, credit.instrument);
-    if (duplicate)
+    if (duplicate) {
+      keepActiveCredit(catalogue.db, duplicate, credit);
       catalogue.db.prepare("DELETE FROM credit WHERE id=?").run(credit.id);
-    else
+    } else
       catalogue.db.prepare("UPDATE credit SET contributor_id=? WHERE id=?").run(keep, credit.id);
   }
   transferIdentities(catalogue.db, keep, drop);
@@ -40912,6 +40481,10 @@ function mergeDuplicateComposers(catalogue, index, actor3) {
     index.people.set(name, [keep]);
   }
   return merged;
+}
+function keepActiveCredit(db, kept, moving) {
+  if (kept.state === "removed" && moving.state === "active")
+    db.prepare("UPDATE credit SET state='active',source=? WHERE id=?").run(moving.source, kept.id);
 }
 function mergeMapping(catalogue, keep, drop, addMissing) {
   const keepMovements = workMovements(catalogue, keep), dropMovements = workMovements(catalogue, drop);
@@ -40954,15 +40527,17 @@ function mergeWork(catalogue, keep, drop, actor3, { addMissing = false } = {}) {
     db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), from);
   }
   db.prepare("DELETE FROM relation WHERE kind='movement' AND source_id=?").run(drop);
-  const keepComposers = addMissing && db.prepare("SELECT 1 FROM credit WHERE target_id=? AND role='composer' LIMIT 1").get(keep);
+  const keepComposers = addMissing && db.prepare("SELECT 1 FROM credit WHERE target_id=? AND role='composer' AND state='active' LIMIT 1").get(keep);
   for (const credit of db.prepare("SELECT * FROM credit WHERE target_id=?").all(drop)) {
     if (keepComposers && credit.role === "composer") {
       db.prepare("DELETE FROM credit WHERE id=?").run(credit.id);
       continue;
     }
-    if (db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?").get(keep, credit.contributor_id, credit.role, credit.instrument))
+    const duplicate = db.prepare("SELECT id,state FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?").get(keep, credit.contributor_id, credit.role, credit.instrument);
+    if (duplicate) {
+      keepActiveCredit(db, duplicate, credit);
       db.prepare("DELETE FROM credit WHERE id=?").run(credit.id);
-    else db.prepare("UPDATE credit SET target_id=? WHERE id=?").run(keep, credit.id);
+    } else db.prepare("UPDATE credit SET target_id=? WHERE id=?").run(keep, credit.id);
   }
   for (const state of db.prepare("SELECT * FROM user_work_state WHERE work_id=?").all(drop)) {
     const kept = db.prepare("SELECT * FROM user_work_state WHERE user_id=? AND work_id=?").get(state.user_id, keep);
@@ -41001,7 +40576,7 @@ function compatibleAutoWorks(catalogue, a, b) {
   if (distinctIdentities(verifiedIdentities(catalogue, a, "work"), verifiedIdentities(catalogue, b, "work"))) return false;
   const composers = (work) => {
     const identities = /* @__PURE__ */ new Map();
-    for (const { contributor_id: person } of catalogue.db.prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer'").all(work)) {
+    for (const { contributor_id: person } of catalogue.db.prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer' AND state='active'").all(work)) {
       const name = words2(resolvedName(catalogue, person, "name"));
       identities.set(name, /* @__PURE__ */ new Set([...identities.get(name) || [], ...verifiedIdentities(catalogue, person, "artist")]));
     }
@@ -41136,7 +40711,7 @@ function repairCompletionSplits(catalogue, albumId, actor3) {
     );
     const names = (work) => composerNames(catalogue, work).map(words2);
     const shared = names(works[0]).filter((name) => works.every((work) => names(work).includes(name)));
-    if (!shared.length || realizations2.some((list3) => list3.length !== 1 || list3[0].elsewhere > 0) || works.some((work) => hasManualEdits(catalogue, [work, ...workMovements(catalogue, work).map((m) => m.id)])))
+    if (!shared.length || realizations2.some((list4) => list4.length !== 1 || list4[0].elsewhere > 0) || works.some((work) => hasManualEdits(catalogue, [work, ...workMovements(catalogue, work).map((m) => m.id)])))
       continue;
     const order = works.map((work, i) => ({ work, realization: realizations2[i][0] })).sort((a, b) => a.realization.first - b.realization.first);
     const [keep, ...drops] = order;
@@ -41181,7 +40756,7 @@ function repairCompletionSplits(catalogue, albumId, actor3) {
       const metadata = new Metadata(catalogue);
       const index = catalogueIndex(catalogue);
       const group = { composers: [], composerIds: {} };
-      for (const credit of db.prepare("SELECT id,contributor_id FROM credit WHERE target_id=? AND role='composer'").all(keep.work)) {
+      for (const credit of db.prepare("SELECT id,contributor_id FROM credit WHERE target_id=? AND role='composer' AND state='active'").all(keep.work)) {
         const name = resolvedName(catalogue, credit.contributor_id, "name");
         if (shared.includes(words2(name))) group.composers.push(name);
         else db.prepare("DELETE FROM credit WHERE id=?").run(credit.id);
@@ -41202,18 +40777,18 @@ var KEY = /\bin\s+([a-h])(?:[\s-]?(flat|sharp|♭|♯))?\s+(major|minor)\b/i;
 var CATALOGUE_TEXT = /\b(?:op(?:us|\.)?\s*\d+[a-z]?(?:\s*,?\s*no\.?\s*\d+)?|(?:BWV|HWV|RV|WoO|TWV|K(?:V|\.)?|D\.?|Hob\.?\s*[IVXL]+[a-z]?:?)\s*\d+[a-z]?)/gi;
 var tidyCatalogue = (value) => clean3(value).replace(/^op(?:us|\.)?\s*/i, "Op. ").replace(/\s*,?\s*no\.?\s*(\d)/i, " No. $1");
 function workFieldsFromTitle(title) {
-  const text5 = clean3(title);
+  const text6 = clean3(title);
   const fields = {};
-  const key = text5.match(KEY);
+  const key = text6.match(KEY);
   if (key)
     fields.key = `${key[1].toUpperCase()}${key[2] ? `-${key[2].toLowerCase().replace("\u266D", "flat").replace("\u266F", "sharp")}` : ""} ${key[3].toLowerCase()}`;
-  const catalogue = [...new Set((text5.match(CATALOGUE_TEXT) || []).map(tidyCatalogue))];
+  const catalogue = [...new Set((text6.match(CATALOGUE_TEXT) || []).map(tidyCatalogue))];
   if (catalogue.length) fields.catalogue = catalogue;
-  const form2 = text5.match(MULTI_MOVEMENT);
+  const form2 = text6.match(MULTI_MOVEMENT);
   if (form2) fields.form = form2[1].toLowerCase();
-  const nickname = text5.match(/["“„«]([^"”»]+)["”»]/);
+  const nickname = text6.match(/["“„«]([^"”»]+)["”»]/);
   if (nickname) fields.nickname = clean3(nickname[1]);
-  const instrument = text5.match(INSTRUMENT);
+  const instrument = text6.match(INSTRUMENT);
   if (instrument)
     fields.instrumentation = instrument[1].toLowerCase().split(/\s+and\s+/).map((name) => name[0].toUpperCase() + name.slice(1));
   return fields;
@@ -41409,12 +40984,14 @@ function autoMatchTaggedWorks(catalogue, {
     fileCollectionsFromTags(catalogue, { actor: actor3 });
     repairWorkTitles(catalogue);
     repairMovementTitles(catalogue);
-    for (const { work } of catalogue.db.prepare(
-      `SELECT DISTINCT r.source_id AS work FROM relation r JOIN metadata_target m ON m.entity_id=r.target_id
+    const combinedWorks = /* @__PURE__ */ new Set();
+    for (const { work, value } of catalogue.db.prepare(
+      `SELECT r.source_id AS work,a.value FROM relation r JOIN metadata_target m ON m.entity_id=r.target_id
          JOIN field_resolution f ON f.target_id=m.id AND f.field='title' JOIN assertion a ON a.id=f.assertion_id
-         WHERE r.kind='movement' AND a.value LIKE '% / %'`
+         WHERE r.kind='movement'`
     ).all())
-      splitCombinedMovements(catalogue, work, actor3);
+      if (!combinedWorks.has(work) && sectionTitles(String(JSON.parse(value) ?? "")).length > 1) combinedWorks.add(work);
+    for (const work of combinedWorks) splitCombinedMovements(catalogue, work, actor3);
     const metadata = new Metadata(catalogue);
     for (const { id } of catalogue.db.prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL").all())
       deriveWorkFields(catalogue, id, metadata);
@@ -41425,13 +41002,667 @@ function autoMatchTaggedWorks(catalogue, {
   for (const group of groups)
     if (createGroup(catalogue, group, actor3, index)) created++;
   keyMovementTitles(catalogue, { albumId });
+  deriveCredits(catalogue, { albumId });
   resolveSettledReviews(catalogue, albumId, actor3);
   return { created, candidates: groups.length };
 }
 
+// src/model/contributors.js
+var words3 = (value) => String(value || "").normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+var text2 = (value) => typeof value === "string" ? value.trim() : "";
+var list = (value) => (Array.isArray(value) ? value : value ? [value] : []).map(text2).filter(Boolean);
+var PERFORMING_ROLES = /* @__PURE__ */ new Set(["soloist", "performer", "accompanist", "conductor", "orchestra", "ensemble", "choir"]);
+function performerNames(hints = {}, composers = list(hints.composer), key = words3) {
+  const skip = new Set(composers.map(key));
+  return (text2(hints.artist) || text2(hints.albumArtist)).split(/\s+[—–]\s+|\s*;\s*/).map((name) => name.trim()).filter((name) => name && !skip.has(key(name)));
+}
+var isEnsemble = (name) => ENSEMBLE.test(name);
+var personName = (name) => new RegExp("^\\p{Lu}", "u").test(name) && name.split(/\s+/).length >= 2;
+function splitList(name) {
+  if (!LIST.test(name)) return [name];
+  const pieces = name.split(/\s*,\s*|\s+(?:&|and|und|et|e|y|with)\s+/i).map((piece) => piece.trim()).filter(Boolean);
+  return pieces.length > 1 && pieces.every((piece) => isEnsemble(piece) || personName(piece)) ? pieces : [name];
+}
+function ensembleRole(name) {
+  if (/\b(orchestr\w*|orchester|orkest\w*|philharmoni\w*|symphon\w*|sinfoni\w*|staatskapelle|gewandhaus\w*)\b/i.test(name)) return "orchestra";
+  if (/\b(choir\w*|chor\w*|coro|chorus|singers|voices)\b/i.test(name)) return "choir";
+  return "ensemble";
+}
+function trackCredits(hints = {}) {
+  const conductor = text2(hints.conductor);
+  const credits3 = [];
+  const add = (name, instrument = null) => {
+    const clean4 = name.trim();
+    if (!clean4 || words3(clean4) === words3(conductor) || credits3.some((credit) => words3(credit.name) === words3(clean4))) return;
+    const kind = isEnsemble(clean4) ? "ensemble" : "person";
+    credits3.push({ name: clean4, kind, role: kind === "ensemble" ? ensembleRole(clean4) : "performer", instrument });
+  };
+  const tagged = list(hints.performers);
+  if (tagged.length)
+    for (const value of tagged) {
+      const [, name, instrument] = value.match(/^(.*?)\s*\(([^()]+)\)\s*$/) || [null, value, null];
+      add(name, instrument?.trim() || null);
+    }
+  else for (const name of performerNames(hints)) for (const piece of splitList(name)) add(piece);
+  if (conductor && !isEnsemble(conductor)) credits3.unshift({ name: conductor, kind: "person", role: "conductor", instrument: null });
+  return credits3;
+}
+function contributorIndex(c) {
+  const byName = { person: /* @__PURE__ */ new Map(), ensemble: /* @__PURE__ */ new Map() };
+  for (const { id, kind } of c.db.prepare("SELECT id,kind FROM entity WHERE kind IN ('person','ensemble') AND deleted_at IS NULL ORDER BY created_at,id").all()) {
+    const other = resolvedName(c, id, "aliases");
+    const names = [resolvedName(c, id, "name"), ...Array.isArray(other) ? other : [], ...c.db.prepare("SELECT text FROM alias WHERE entity_id=?").all(id).map((row) => row.text)];
+    for (const name of names) {
+      const key = words3(String(name ?? ""));
+      if (key) byName[kind].set(key, [.../* @__PURE__ */ new Set([...byName[kind].get(key) || [], id])]);
+    }
+  }
+  return byName;
+}
+function contributorFor(c, index, name, { mbid = null, kind = "person", metadata = new Metadata(c) } = {}) {
+  const key = words3(name);
+  if (!key) return null;
+  if (mbid) {
+    const known = c.db.prepare(
+      `SELECT x.entity_id FROM external_identity x JOIN entity e ON e.id=x.entity_id
+         WHERE x.provider='musicbrainz' AND x.record_kind='artist' AND x.record_id=? AND x.state='active' AND e.deleted_at IS NULL AND e.kind=?`
+    ).get(mbid, kind)?.entity_id;
+    if (known) return known;
+  }
+  const existing = index[kind].get(key) || [];
+  if (existing.length > 1) return null;
+  if (existing.length === 1) {
+    const other = mbid && c.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='artist' AND state='active'").get(existing[0]);
+    if (!other) {
+      if (mbid) c.externalIdentity(existing[0], "musicbrainz", "artist", mbid, { evidence: { source: "tags" } });
+      return existing[0];
+    }
+  }
+  const id = c.createEntity(kind, { unreviewed: true });
+  metadata.derived(id, "name", name);
+  if (mbid) c.externalIdentity(id, "musicbrainz", "artist", mbid, { evidence: { source: "tags" } });
+  index[kind].set(key, [...existing, id]);
+  return id;
+}
+function deriveCredits(c, { albumId = null } = {}) {
+  const performances = c.db.prepare(
+    `SELECT DISTINCT pw.source_id AS performance FROM realization r
+       JOIN relation pw ON pw.id=r.performance_work_id
+       JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
+       JOIN track_link t ON t.id=s.track_link_id AND t.state='active'
+       JOIN entity p ON p.id=pw.source_id AND p.deleted_at IS NULL
+       ${albumId == null ? "" : "WHERE CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?"}`
+  ).all(...albumId == null ? [] : [String(albumId)]).map((row) => row.performance);
+  const credited = c.db.prepare(`SELECT 1 FROM credit WHERE target_id=? AND role IN (${[...PERFORMING_ROLES].map(() => "?").join(",")}) LIMIT 1`);
+  const tracksOf = c.db.prepare(
+    `SELECT DISTINCT t.id,t.evidence FROM relation pw JOIN realization r ON r.performance_work_id=pw.id
+     JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
+     JOIN track_link t ON t.id=s.track_link_id AND t.state='active'
+     WHERE pw.kind='performance_work' AND pw.source_id=? ORDER BY t.id`
+  );
+  let index = null;
+  let metadata = null;
+  let added = 0;
+  for (const performance2 of performances) {
+    if (credited.get(performance2, ...PERFORMING_ROLES)) continue;
+    const perTrack = tracksOf.all(performance2).map((row) => trackCredits(JSON.parse(row.evidence).hints || {}));
+    if (!perTrack.length) continue;
+    const signature = (credit) => `${credit.role}|${credit.kind}|${words3(credit.name)}|${credit.instrument || ""}`;
+    const shared = perTrack[0].filter((credit) => perTrack.every((credits3) => credits3.some((other) => signature(other) === signature(credit))));
+    if (!shared.length) continue;
+    index ??= contributorIndex(c);
+    metadata ??= new Metadata(c);
+    let position = c.db.prepare("SELECT coalesce(max(position),0) AS n FROM credit WHERE target_id=?").get(performance2).n;
+    for (const credit of shared) {
+      const contributor = contributorFor(c, index, credit.name, { kind: credit.kind, metadata });
+      if (!contributor) continue;
+      c.credit(performance2, contributor, credit.role, { instrument: credit.instrument, position: ++position, source: "derived" });
+      added++;
+    }
+  }
+  return added;
+}
+
+// src/search/engine.js
+var FIELD = { primary: 0, secondary: 1, skeleton: 2 };
+var KIND_BOOST = { work: 12, recording: 6, composer: 7, performer: 5, release: 3, movement: 1 };
+var SECTIONS = [
+  ["work", "Works"],
+  ["recording", "Recordings"],
+  ["composer", "Composers"],
+  ["performer", "Performers"],
+  ["release", "Albums"],
+  ["movement", "Movements"]
+];
+var FACETS = [
+  ["composer", "Composer"],
+  ["performer", "Performer"],
+  ["conductor", "Conductor"],
+  ["ensemble", "Ensemble"],
+  ["period", "Period"],
+  ["form", "Form"],
+  ["instrument", "Instrument"],
+  ["type", "Recording type"],
+  ["year", "Year"],
+  ["owned", "Library"]
+];
+var FACET_KEYS = new Set(FACETS.map(([key]) => key));
+var PERFORMER_ROLES = PERFORMING_ROLES;
+var ENSEMBLE_ROLES2 = /* @__PURE__ */ new Set(["orchestra", "ensemble", "choir"]);
+var ROLE_LABEL = { soloist: "Soloist", performer: "Performer", conductor: "Conductor", orchestra: "Orchestra", ensemble: "Ensemble", choir: "Choir", composer: "Composer", arranger: "Arranger", lyricist: "Lyricist" };
+var LIVE = /\b(live|concert|recital|broadcast|in concert|konzert)\b/i;
+var text3 = (value) => typeof value === "string" ? value.trim() : Array.isArray(value) ? value.filter((v) => typeof v === "string").join("; ") : "";
+var list2 = (value) => Array.isArray(value) ? value.filter((v) => typeof v === "string" && v.trim()).map((v) => v.trim()) : typeof value === "string" && value.trim() ? [value.trim()] : [];
+var parse3 = (value, fallback) => {
+  try {
+    return JSON.parse(value);
+  } catch {
+    return fallback;
+  }
+};
+function catalogueStamp(c) {
+  const row = c.db.prepare(
+    `SELECT (SELECT coalesce(max(id),0) FROM audit_event) AS a,
+        (SELECT coalesce(max(rowid),0) FROM assertion) AS b,
+        (SELECT count(*) FROM entity WHERE deleted_at IS NULL) AS c,
+        (SELECT coalesce(max(updated_at),0) FROM entity) AS d,
+        (SELECT count(*)||':'||coalesce(max(rowid),0) FROM realization_item) AS e,
+        (SELECT coalesce(max(updated_at),0)||':'||count(*) FROM classification WHERE state='classical') AS f,
+        (SELECT coalesce(max(updated_at),0)||':'||count(*) FROM track_link WHERE state='active') AS g,
+        (SELECT count(*)||':'||coalesce(max(rowid),0)||':'||coalesce(sum(state='active'),0) FROM credit) AS h,
+        (SELECT count(*)||':'||coalesce(max(rowid),0) FROM relation) AS i`
+  ).get();
+  return `v2|${Object.values(row).join("|")}`;
+}
+function resolvedValues(c) {
+  const values = /* @__PURE__ */ new Map();
+  for (const row of c.db.prepare(
+    `SELECT f.target_id,f.field,a.value FROM field_resolution f JOIN assertion a ON a.id=f.assertion_id
+       WHERE f.field IN ('title','name','nickname','aliases','catalogue','key','form','period','instrumentation','date')`
+  ).iterate()) {
+    if (!values.has(row.target_id)) values.set(row.target_id, {});
+    values.get(row.target_id)[row.field] = parse3(row.value, null);
+  }
+  return values;
+}
+function classicalTracks(c) {
+  const tracks = /* @__PURE__ */ new Map();
+  for (const row of c.db.prepare(
+    `SELECT t.id,t.core_id,t.evidence FROM track_link t JOIN classification k ON k.target_id=t.id
+       WHERE t.state='active' AND k.state='classical'`
+  ).iterate()) {
+    const evidence = parse3(row.evidence, {});
+    tracks.set(row.id, { id: row.id, coreId: String(row.core_id), albumId: evidence.albumId == null ? null : String(evidence.albumId), durationMs: Number(evidence.durationMs) || 0, hints: evidence.hints || {} });
+  }
+  return tracks;
+}
+var yearOf = (value) => {
+  const match2 = String(value || "").match(/\b(1[5-9]\d\d|20\d\d)\b/);
+  return match2 ? Number(match2[1]) : null;
+};
+function ownedRecordings(c, tracks = classicalTracks(c), values = resolvedValues(c), { workId = null } = {}) {
+  const rows = c.db.prepare(
+    `SELECT r.id AS realization,r.work_id,r.performance_work_id,r.label,i.movement_id,i.sequence,s.track_link_id,s.start_ms,s.end_ms
+       FROM realization r JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
+       JOIN entity w ON w.id=r.work_id AND w.deleted_at IS NULL
+       ${workId ? "WHERE r.work_id=?" : ""}
+       ORDER BY r.id,i.sequence,i.occurrence,i.id`
+  ).all(...workId ? [workId] : []);
+  const credits3 = c.db.prepare(
+    `SELECT k.role,k.contributor_id FROM relation pw JOIN credit k ON k.target_id=pw.source_id
+     JOIN entity e ON e.id=k.contributor_id AND e.deleted_at IS NULL WHERE pw.id=? AND k.state='active' ORDER BY k.position,k.id`
+  );
+  const byRealization = /* @__PURE__ */ new Map();
+  for (const row of rows) {
+    const track = tracks.get(row.track_link_id);
+    if (!track) continue;
+    if (!byRealization.has(row.realization)) byRealization.set(row.realization, { id: row.realization, workId: row.work_id, performanceWorkId: row.performance_work_id, label: row.label, items: [] });
+    byRealization.get(row.realization).items.push({ movementId: row.movement_id, sequence: row.sequence, track, startMs: row.start_ms, endMs: row.end_ms });
+  }
+  const recordings = [];
+  for (const recording of byRealization.values()) {
+    const first = recording.items[0].track;
+    const people = credits3.all(recording.performanceWorkId).map((row) => ({ id: row.contributor_id, role: row.role, name: text3(values.get(row.contributor_id)?.name) || "Unknown" }));
+    const performers = people.filter((p) => PERFORMER_ROLES.has(p.role));
+    const tagged = performers.length ? [] : performerNames(first.hints, list2(first.hints.composer), fold);
+    const albums2 = [...new Set(recording.items.map((item) => item.track.albumId).filter(Boolean))];
+    const mbids = [...new Set(recording.items.map((item) => item.track.hints.recordingMbid).filter(Boolean))].sort();
+    const parts = /* @__PURE__ */ new Map();
+    for (const item of recording.items) {
+      const ms = item.endMs != null ? item.endMs - item.startMs : Math.max(0, item.track.durationMs - (item.startMs || 0));
+      const key = item.movementId || `seq:${item.sequence}`;
+      parts.set(key, (parts.get(key) || 0) + ms);
+    }
+    const trackMs = [];
+    for (const item of recording.items) {
+      const last = trackMs.at(-1);
+      const ms = item.endMs != null ? item.endMs - item.startMs : Math.max(0, item.track.durationMs - (item.startMs || 0));
+      if (last && last.track === item.track.id && last.start === item.startMs) continue;
+      trackMs.push({ track: item.track.id, start: item.startMs, ms });
+    }
+    recordings.push({
+      ...recording,
+      trackMs: trackMs.map((entry) => entry.ms),
+      people: performers,
+      taggedPerformers: tagged,
+      performerNames: performers.length ? performers.map((p) => p.name) : tagged,
+      albums: albums2,
+      album: text3(recording.label) || text3(first.hints.album),
+      label: text3(first.hints.label),
+      year: yearOf(first.hints.date) ?? yearOf(first.hints.year),
+      mbids,
+      parts,
+      durationMs: [...parts.values()].reduce((sum, ms) => sum + ms, 0),
+      live: LIVE.test(`${first.hints.album || ""} ${recording.label || ""}`)
+    });
+  }
+  return recordings;
+}
+function sameRecording(a, b) {
+  if (a.workId !== b.workId || a.id === b.id) return false;
+  if (a.albums.some((album) => b.albums.includes(album))) return false;
+  if (a.mbids.length && b.mbids.length) return a.mbids.length === b.mbids.length && a.mbids.every((id, i) => id === b.mbids[i]);
+  const names = (r) => r.performerNames.map(fold).filter(Boolean).sort().join("|");
+  if (!names(a) || names(a) !== names(b)) return false;
+  if (a.parts.size !== b.parts.size || a.parts.size === 0) return false;
+  for (const [key, ms] of a.parts) {
+    const other = b.parts.get(key);
+    if (other == null || Math.abs(other - ms) > 2e3) return false;
+  }
+  return a.trackMs.length === b.trackMs.length && a.trackMs.every((ms, i) => Math.abs(ms - b.trackMs[i]) <= 2e3);
+}
+function groupRecordings(recordings) {
+  const groups = [];
+  for (const recording of recordings) {
+    const group = groups.find((g) => g.realizations.some((other) => sameRecording(recording, other)));
+    if (group) group.realizations.push(recording);
+    else groups.push({ key: recording.id, realizations: [recording] });
+  }
+  return groups;
+}
+function addTerms(terms, doc, value, field2) {
+  for (const word of words(value)) {
+    terms.add(`${word}\0${doc}\0${field2}`);
+    const skel = field2 === FIELD.primary ? skeleton(word) : "";
+    if (skel) terms.add(`${skel}\0${doc}\0${FIELD.skeleton}`);
+  }
+}
+function ensureSearchIndex(c, { force = false } = {}) {
+  const started = performance.now();
+  const stamp = catalogueStamp(c);
+  const state = c.db.prepare("SELECT stamp,docs FROM search_state WHERE id=1").get();
+  if (!force && state?.stamp === stamp) return { rebuilt: false, docs: state.docs, ms: performance.now() - started };
+  const docs = buildDocuments(c);
+  transaction(c.db, () => {
+    for (const table of ["search_term", "search_key", "search_facet", "search_doc"]) c.db.exec(`DELETE FROM ${table}`);
+    const insertDoc = c.db.prepare("INSERT INTO search_doc(id,kind,ref,work_id,title,subtitle,detail,owned,boost,data) VALUES (?,?,?,?,?,?,?,?,?,?)");
+    const insertTerm = c.db.prepare("INSERT OR IGNORE INTO search_term VALUES (?,?,?)");
+    const insertKey = c.db.prepare("INSERT OR IGNORE INTO search_key VALUES (?,?)");
+    const insertFacet = c.db.prepare("INSERT OR IGNORE INTO search_facet VALUES (?,?,?,?)");
+    docs.forEach((doc, index) => {
+      const id = index + 1;
+      insertDoc.run(id, doc.kind, doc.ref, doc.workId ?? null, doc.title.slice(0, 500), doc.subtitle.slice(0, 500), doc.detail.slice(0, 500), doc.owned ? 1 : 0, doc.boost || 0, JSON.stringify(doc.data || {}));
+      const terms = /* @__PURE__ */ new Set();
+      for (const value of doc.primary) addTerms(terms, id, value, FIELD.primary);
+      for (const value of doc.secondary) addTerms(terms, id, value, FIELD.secondary);
+      for (const entry of terms) {
+        const [term, , field2] = entry.split("\0");
+        insertTerm.run(term, id, Number(field2));
+      }
+      for (const key of doc.keys) insertKey.run(key, id);
+      for (const [facet, value, label] of doc.facets) insertFacet.run(facet, String(value).slice(0, 200), id, String(label).slice(0, 200));
+    });
+    c.db.prepare("INSERT INTO search_state VALUES (1,?,?,?) ON CONFLICT(id) DO UPDATE SET stamp=excluded.stamp,built_at=excluded.built_at,docs=excluded.docs").run(stamp, Date.now(), docs.length);
+  });
+  return { rebuilt: true, docs: docs.length, ms: performance.now() - started };
+}
+var keysOf = (...sources) => [...new Set(sources.flat().flatMap((value) => catalogueKeys(value).map((item) => item.key)))];
+function buildDocuments(c) {
+  const values = resolvedValues(c);
+  const tracks = classicalTracks(c);
+  const name = (id) => text3(values.get(id)?.name) || text3(values.get(id)?.title) || "";
+  const entities2 = c.db.prepare("SELECT id,kind FROM entity WHERE deleted_at IS NULL AND kind IN ('work','movement','person','ensemble','collection')").all();
+  const kindOf = new Map(entities2.map((e) => [e.id, e.kind]));
+  const creditsOf = /* @__PURE__ */ new Map();
+  for (const row of c.db.prepare("SELECT target_id,contributor_id,role FROM credit WHERE state='active' ORDER BY position,id").iterate()) {
+    if (!kindOf.has(row.contributor_id)) continue;
+    if (!creditsOf.has(row.target_id)) creditsOf.set(row.target_id, []);
+    creditsOf.get(row.target_id).push({ id: row.contributor_id, role: row.role });
+  }
+  const movementsOf = /* @__PURE__ */ new Map();
+  const workOfMovement = /* @__PURE__ */ new Map();
+  for (const row of c.db.prepare("SELECT source_id,target_id FROM relation WHERE kind='movement' ORDER BY position,occurrence,id").iterate()) {
+    if (kindOf.get(row.source_id) !== "work" || !kindOf.has(row.target_id)) continue;
+    if (!movementsOf.has(row.source_id)) movementsOf.set(row.source_id, []);
+    movementsOf.get(row.source_id).push(row.target_id);
+    workOfMovement.set(row.target_id, row.source_id);
+  }
+  const collectionsOf = /* @__PURE__ */ new Map();
+  for (const row of c.db.prepare("SELECT source_id,target_id FROM relation WHERE kind='collection_member'").iterate()) {
+    if (!collectionsOf.has(row.target_id)) collectionsOf.set(row.target_id, []);
+    collectionsOf.get(row.target_id).push(row.source_id);
+  }
+  const recordings = ownedRecordings(c, tracks, values);
+  const groups = groupRecordings(recordings);
+  const recordingsOf2 = /* @__PURE__ */ new Map();
+  for (const group of groups) {
+    const workId = group.realizations[0].workId;
+    if (!recordingsOf2.has(workId)) recordingsOf2.set(workId, []);
+    recordingsOf2.get(workId).push(group);
+  }
+  const composersOf2 = (workId) => (creditsOf.get(workId) || []).filter((k) => k.role === "composer");
+  const workTitle = (workId) => text3(values.get(workId)?.title) || "Untitled work";
+  const docs = [];
+  const workFacets = /* @__PURE__ */ new Map();
+  const workKeys = /* @__PURE__ */ new Map();
+  for (const { id } of entities2.filter((e) => e.kind === "work")) {
+    const v = values.get(id) || {};
+    const title = workTitle(id);
+    const composers = composersOf2(id);
+    const facets = [];
+    for (const k of composers) facets.push(["composer", k.id, name(k.id)]);
+    if (text3(v.period)) facets.push(["period", fold(v.period), text3(v.period)]);
+    if (text3(v.form)) facets.push(["form", fold(v.form), text3(v.form)]);
+    for (const instrument of list2(v.instrumentation)) facets.push(["instrument", fold(instrument), instrument]);
+    workFacets.set(id, facets);
+    const groupsHere = recordingsOf2.get(id) || [];
+    const recordingFacets = groupsHere.flatMap((group) => recordingGroupFacets(group, name));
+    const owned = groupsHere.length > 0;
+    docs.push({
+      kind: "work",
+      ref: id,
+      workId: id,
+      title,
+      subtitle: composers.map((k) => name(k.id)).filter(Boolean).join(", "),
+      detail: [text3(v.nickname) && `\u201C${text3(v.nickname)}\u201D`, owned ? `${groupsHere.length} recording${groupsHere.length === 1 ? "" : "s"}` : "Not in your library"].filter(Boolean).join(" \xB7 "),
+      owned,
+      boost: KIND_BOOST.work,
+      primary: [title, text3(v.nickname), ...list2(v.aliases), ...list2(v.catalogue)],
+      secondary: [...composers.map((k) => name(k.id)), ...composers.flatMap((k) => list2(values.get(k.id)?.aliases)), text3(v.key), text3(v.form), ...(collectionsOf.get(id) || []).map(name)],
+      keys: workKeys.set(id, keysOf(title, list2(v.catalogue), list2(v.aliases), text3(v.nickname))).get(id),
+      facets: [...facets, ...dedupeFacets(recordingFacets.filter(([facet]) => facet !== "year" && facet !== "type")), ["owned", owned ? "owned" : "missing", owned ? "In your library" : "Not in your library"]],
+      data: { nickname: text3(v.nickname) }
+    });
+  }
+  for (const [workId, movements] of movementsOf) {
+    const title = workTitle(workId);
+    const composers = composersOf2(workId).map((k) => name(k.id));
+    const owned = (recordingsOf2.get(workId) || []).length > 0;
+    movements.forEach((movement, index) => {
+      const v = values.get(movement) || {};
+      const movementTitle2 = text3(v.title) || `Movement ${index + 1}`;
+      docs.push({
+        kind: "movement",
+        ref: movement,
+        workId,
+        title: movementTitle2,
+        subtitle: [title, composers.join(", ")].filter(Boolean).join(" \xB7 "),
+        detail: "",
+        owned,
+        boost: KIND_BOOST.movement,
+        primary: [movementTitle2, ...list2(v.aliases)],
+        secondary: [title, text3(values.get(workId)?.nickname), ...composers],
+        keys: keysOf(title),
+        facets: [...workFacets.get(workId) || [], ["owned", owned ? "owned" : "missing", owned ? "In your library" : "Not in your library"]],
+        data: { position: index + 1 }
+      });
+    });
+  }
+  for (const group of groups) {
+    const lead = group.realizations[0];
+    const work = values.get(lead.workId) || {};
+    const title = workTitle(lead.workId);
+    const composers = composersOf2(lead.workId).map((k) => name(k.id));
+    const albums3 = [...new Set(group.realizations.map((r) => r.album).filter(Boolean))];
+    const years = group.realizations.map((r) => r.year).filter(Boolean);
+    const complete = (movementsOf.get(lead.workId) || []).every((m) => group.realizations.some((r) => r.parts.has(m)));
+    docs.push({
+      kind: "recording",
+      ref: group.key,
+      workId: lead.workId,
+      title: lead.performerNames.join(", ") || albums3[0] || "Recording",
+      subtitle: [title, composers.join(", ")].filter(Boolean).join(" \xB7 "),
+      detail: [albums3.join(" / "), years.length ? Math.min(...years) : null, group.realizations.length > 1 ? `${group.realizations.length} releases` : null].filter(Boolean).join(" \xB7 "),
+      owned: true,
+      boost: KIND_BOOST.recording,
+      primary: [...lead.performerNames, ...lead.people.flatMap((p) => list2(values.get(p.id)?.aliases))],
+      secondary: [title, text3(work.nickname), ...list2(work.aliases), ...composers, ...albums3],
+      keys: keysOf(title, list2(work.catalogue), list2(work.aliases)),
+      facets: [...workFacets.get(lead.workId) || [], ...recordingGroupFacets(group, name), ["type", complete ? "complete" : "partial", complete ? "Complete work" : "Excerpt or incomplete"], ["owned", "owned", "In your library"]],
+      data: {
+        realizations: group.realizations.map((r) => r.id),
+        albums: [...new Set(group.realizations.flatMap((r) => r.albums))],
+        roles: Object.fromEntries(lead.people.map((p) => [p.id, p.role]))
+      }
+    });
+  }
+  const roles2 = /* @__PURE__ */ new Map();
+  for (const [target, list_] of creditsOf)
+    for (const k of list_) {
+      if (!roles2.has(k.id)) roles2.set(k.id, { roles: /* @__PURE__ */ new Set(), works: 0, recordings: 0 });
+      const entry = roles2.get(k.id);
+      entry.roles.add(k.role);
+      if (kindOf.get(target) === "work") entry.works++;
+      else entry.recordings++;
+    }
+  for (const [id, entry] of roles2) {
+    const v = values.get(id) || {};
+    const display2 = name(id);
+    if (!display2) continue;
+    const isComposer2 = entry.roles.has("composer");
+    const performerRoles = [...entry.roles].filter((role) => PERFORMER_ROLES.has(role));
+    const facets = [];
+    if (isComposer2) facets.push(["composer", id, display2]);
+    for (const role of performerRoles) {
+      facets.push(["performer", id, display2]);
+      if (role === "conductor") facets.push(["conductor", id, display2]);
+      if (ENSEMBLE_ROLES2.has(role)) facets.push(["ensemble", id, display2]);
+    }
+    const common = { ref: id, title: display2, owned: true, primary: [display2, ...list2(v.aliases)], secondary: [], keys: [], facets: dedupeFacets(facets) };
+    const label = [...entry.roles].map((role) => ROLE_LABEL[role] || role).join(" \xB7 ");
+    if (isComposer2) docs.push({ ...common, kind: "composer", subtitle: "Composer", detail: `${entry.works} work${entry.works === 1 ? "" : "s"}`, boost: KIND_BOOST.composer, data: { roles: [...entry.roles] } });
+    if (performerRoles.length) docs.push({ ...common, kind: "performer", subtitle: label, detail: "", boost: KIND_BOOST.performer, data: { roles: performerRoles } });
+  }
+  const albums2 = /* @__PURE__ */ new Map();
+  for (const track of tracks.values()) {
+    if (!track.albumId) continue;
+    if (!albums2.has(track.albumId)) albums2.set(track.albumId, { title: text3(track.hints.album) || "Unknown album", artist: text3(track.hints.albumArtist || track.hints.artist), year: yearOf(track.hints.date) ?? yearOf(track.hints.year), tracks: 0, works: /* @__PURE__ */ new Set() });
+    albums2.get(track.albumId).tracks++;
+  }
+  for (const recording of recordings) for (const album of recording.albums) albums2.get(album)?.works.add(recording.workId);
+  for (const [albumId, album] of albums2) {
+    const works = [...album.works];
+    docs.push({
+      kind: "release",
+      ref: albumId,
+      title: album.title,
+      subtitle: album.artist,
+      detail: [album.year, `${album.tracks} track${album.tracks === 1 ? "" : "s"}`].filter(Boolean).join(" \xB7 "),
+      owned: true,
+      boost: KIND_BOOST.release,
+      primary: [album.title],
+      secondary: [album.artist, ...works.map(workTitle)],
+      keys: [.../* @__PURE__ */ new Set([...keysOf(album.title), ...works.flatMap((w) => workKeys.get(w) || [])])],
+      facets: dedupeFacets([...works.flatMap((w) => workFacets.get(w) || []), ...album.year ? [["year", String(album.year), String(album.year)]] : [], ["owned", "owned", "In your library"]]),
+      data: { works }
+    });
+  }
+  return docs;
+}
+function recordingGroupFacets(group, name) {
+  const facets = [];
+  for (const recording of group.realizations) {
+    for (const person of recording.people) {
+      facets.push(["performer", person.id, person.name || name(person.id)]);
+      if (person.role === "conductor") facets.push(["conductor", person.id, person.name]);
+      if (ENSEMBLE_ROLES2.has(person.role)) facets.push(["ensemble", person.id, person.name]);
+    }
+    for (const performer of recording.taggedPerformers) facets.push(["performer", `name:${fold(performer)}`, performer]);
+    if (recording.year) facets.push(["year", String(recording.year), String(recording.year)]);
+    if (recording.live) facets.push(["type", "live", "Live"]);
+  }
+  return dedupeFacets(facets);
+}
+function dedupeFacets(facets) {
+  const seen = /* @__PURE__ */ new Set();
+  return facets.filter(([facet, value]) => !seen.has(`${facet}\0${value}`) && seen.add(`${facet}\0${value}`));
+}
+var PREFIX_END = "\u{10FFFF}";
+function wordMatches(c, word) {
+  const out = /* @__PURE__ */ new Map();
+  const better = (doc, weight) => out.set(doc, Math.max(out.get(doc) || 0, weight));
+  const rows = word.length >= 2 ? c.db.prepare("SELECT term,doc,field FROM search_term WHERE term>=? AND term<? AND field<2").all(word, word + PREFIX_END) : c.db.prepare("SELECT term,doc,field FROM search_term WHERE term=? AND field<2").all(word);
+  for (const row of rows) {
+    const exact = row.term === word;
+    better(row.doc, row.field === FIELD.primary ? exact ? 10 : 6 : exact ? 4 : 2.5);
+  }
+  const skel = skeleton(word);
+  if (skel) for (const row of c.db.prepare("SELECT doc FROM search_term WHERE term=? AND field=2").all(skel)) better(row.doc, 5);
+  return out;
+}
+function keyMatchesDocs(c, key) {
+  const out = /* @__PURE__ */ new Map();
+  for (const row of c.db.prepare("SELECT key,doc FROM search_key WHERE key>=? AND key<?").all(key, key + PREFIX_END)) {
+    if (!keyMatches(key, row.key)) continue;
+    out.set(row.doc, Math.max(out.get(row.doc) || 0, row.key === key ? 40 : 18));
+  }
+  return out;
+}
+var intersect = (a, b) => {
+  const out = /* @__PURE__ */ new Map();
+  for (const [doc, weight] of a) if (b.has(doc)) out.set(doc, weight + b.get(doc));
+  return out;
+};
+function normalizeFilters(raw) {
+  const filters = {};
+  for (const [key, value] of Object.entries(raw || {})) {
+    if (!FACET_KEYS.has(key)) continue;
+    const values = [].concat(value).filter((v) => typeof v === "string" && v && v.length <= 200).slice(0, 10);
+    if (values.length) filters[key] = values;
+  }
+  return filters;
+}
+function searchCatalogue(c, { q = "", filters = {}, kinds: kinds2 = null, limit = 8, offset = 0, ensure = true } = {}) {
+  const started = performance.now();
+  const index = ensure ? ensureSearchIndex(c) : { rebuilt: false, docs: c.db.prepare("SELECT docs FROM search_state WHERE id=1").get()?.docs ?? 0, ms: 0 };
+  const query = parseQuery(String(q).slice(0, 200));
+  const wanted = normalizeFilters(filters);
+  let scores = null;
+  for (const key of query.keys) scores = scores ? intersect(scores, keyMatchesDocs(c, key)) : keyMatchesDocs(c, key);
+  for (const word of query.words) {
+    if (scores && !scores.size) break;
+    const found = wordMatches(c, word);
+    scores = scores ? intersect(scores, found) : found;
+  }
+  if (scores) {
+    for (const word of query.optional) for (const [doc, weight] of wordMatches(c, word)) if (scores.has(doc)) scores.set(doc, scores.get(doc) + weight * 0.1);
+  }
+  if (!scores) {
+    if (!Object.keys(wanted).length) return emptyResult(q, index, started);
+    scores = new Map(c.db.prepare("SELECT id FROM search_doc").all().map((row) => [row.id, 0]));
+  }
+  for (const [facet, values] of Object.entries(wanted)) {
+    const allowed = new Set(
+      c.db.prepare(`SELECT doc FROM search_facet WHERE facet=? AND value IN (${values.map(() => "?").join(",")})`).all(facet, ...values).map((row) => row.doc)
+    );
+    for (const doc of [...scores.keys()]) if (!allowed.has(doc)) scores.delete(doc);
+  }
+  const ids = [...scores.keys()];
+  const docs = /* @__PURE__ */ new Map();
+  for (let i = 0; i < ids.length; i += 500) {
+    const chunk = ids.slice(i, i + 500);
+    for (const row of c.db.prepare(`SELECT * FROM search_doc WHERE id IN (${chunk.map(() => "?").join(",")})`).all(...chunk)) docs.set(row.id, row);
+  }
+  const folded = fold(q);
+  const ranked = [];
+  for (const [id, weight] of scores) {
+    const doc = docs.get(id);
+    if (!doc || kinds2 && !kinds2.includes(doc.kind)) continue;
+    const data = parse3(doc.data, {});
+    const exact = folded && (fold(doc.title) === folded || fold(data.nickname) === folded) ? 25 : 0;
+    ranked.push({ doc, data, score: weight + doc.boost + exact + (doc.owned ? 2 : 0) });
+  }
+  const workDocs = new Map(ranked.filter((r) => r.doc.kind === "work").map((r) => [r.doc.ref, r]));
+  const viaRecording = /* @__PURE__ */ new Map();
+  for (const r of ranked) {
+    if (r.doc.kind !== "recording" || workDocs.has(r.doc.work_id)) continue;
+    const best = viaRecording.get(r.doc.work_id);
+    if (!best || best.score < r.score) viaRecording.set(r.doc.work_id, r);
+  }
+  if (viaRecording.size && (!kinds2 || kinds2.includes("work"))) {
+    const ids2 = [...viaRecording.keys()];
+    for (let i = 0; i < ids2.length; i += 500) {
+      const chunk = ids2.slice(i, i + 500);
+      for (const doc of c.db.prepare(`SELECT * FROM search_doc WHERE kind='work' AND ref IN (${chunk.map(() => "?").join(",")})`).all(...chunk))
+        ranked.push({ doc, data: parse3(doc.data, {}), score: viaRecording.get(doc.ref).score - KIND_BOOST.recording + KIND_BOOST.work - 4, via: "recording" });
+    }
+  }
+  ranked.sort((a, b) => b.score - a.score || a.doc.title.localeCompare(b.doc.title) || a.doc.id - b.doc.id);
+  const sections = [];
+  for (const [kind, title] of SECTIONS) {
+    const all = ranked.filter((r) => r.doc.kind === kind);
+    if (!all.length) continue;
+    sections.push({ id: kind, title, total: all.length, items: all.slice(offset, offset + limit).map(resultItem) });
+  }
+  const facets = facetCounts(c, ranked.map((r) => r.doc.id), wanted);
+  return {
+    version: 1,
+    query: String(q),
+    filters: wanted,
+    keys: query.keys,
+    total: ranked.length,
+    // The best match leads, whatever its kind: works rank first among equals.
+    best: ranked[0] ? resultItem(ranked[0]) : null,
+    sections,
+    facets,
+    index: { docs: index.docs, rebuilt: index.rebuilt, buildMs: Math.round(index.ms) },
+    ms: Math.round(performance.now() - started)
+  };
+}
+function emptyResult(q, index, started) {
+  return { version: 1, query: String(q), filters: {}, keys: [], total: 0, best: null, sections: [], facets: [], index: { docs: index.docs, rebuilt: index.rebuilt, buildMs: Math.round(index.ms) }, ms: Math.round(performance.now() - started) };
+}
+function resultItem({ doc, data, via }) {
+  return {
+    id: `${doc.kind}:${doc.ref}`,
+    kind: doc.kind,
+    ref: doc.ref,
+    workId: doc.work_id || null,
+    title: doc.title,
+    subtitle: doc.subtitle,
+    detail: via === "recording" ? [doc.detail, "Matched through a recording"].filter(Boolean).join(" \xB7 ") : doc.detail,
+    owned: doc.owned === 1,
+    ...doc.kind === "recording" && { realizations: data.realizations || [], albums: data.albums || [] },
+    ...doc.kind === "release" && { albumId: doc.ref }
+  };
+}
+function facetCounts(c, docIds, wanted) {
+  if (!docIds.length) return [];
+  const counts = /* @__PURE__ */ new Map();
+  for (let i = 0; i < docIds.length; i += 500) {
+    const chunk = docIds.slice(i, i + 500);
+    for (const row of c.db.prepare(`SELECT facet,value,label,count(*) AS n FROM search_facet WHERE doc IN (${chunk.map(() => "?").join(",")}) GROUP BY facet,value`).all(...chunk)) {
+      const key = `${row.facet}\0${row.value}`;
+      const prior = counts.get(key);
+      counts.set(key, { facet: row.facet, value: row.value, label: row.label, count: (prior?.count || 0) + row.n });
+    }
+  }
+  return FACETS.map(([key, label]) => ({
+    key,
+    label,
+    selected: wanted[key] || [],
+    options: [...counts.values()].filter((entry) => entry.facet === key).sort((a, b) => key === "year" ? Number(b.value) - Number(a.value) : b.count - a.count || a.label.localeCompare(b.label)).slice(0, 50).map(({ value, label: optionLabel, count }) => ({ value, label: optionLabel, count }))
+  })).filter((facet) => facet.options.length || facet.selected.length);
+}
+
+// src/model/editor-v2.js
+import path6 from "node:path";
+import { randomUUID as randomUUID10 } from "node:crypto";
+
 // src/model/history.js
-var list2 = (ids) => [...ids];
-var marks = (ids) => list2(ids).map(() => "?").join(",") || "NULL";
+import { randomUUID as randomUUID9 } from "node:crypto";
+var list3 = (ids) => [...ids];
+var marks = (ids) => list3(ids).map(() => "?").join(",") || "NULL";
 function workClosure(c, workIds) {
   const db = c.db;
   const entities2 = new Set(workIds);
@@ -41443,15 +41674,15 @@ function workClosure(c, workIds) {
   for (const id of performances) entities2.add(id);
   for (const row of all("SELECT source_id AS id FROM relation WHERE kind='recording_performance' AND target_id IN ($)", performances)) entities2.add(row.id);
   const realizations2 = new Set(all("SELECT id FROM realization WHERE work_id IN ($)", workIds).map((row) => row.id));
-  const segments = new Set(all("SELECT segment_id AS id FROM realization_item WHERE realization_id IN ($)", list2(realizations2)).map((row) => row.id));
+  const segments = new Set(all("SELECT segment_id AS id FROM realization_item WHERE realization_id IN ($)", list3(realizations2)).map((row) => row.id));
   const contents = new Set(
-    all("SELECT id FROM recording_content WHERE performance_work_id IN ($)", list2(relations2)).map((row) => row.id)
+    all("SELECT id FROM recording_content WHERE performance_work_id IN ($)", list3(relations2)).map((row) => row.id)
   );
-  for (const row of all("SELECT content_id AS id FROM segment_content WHERE segment_id IN ($)", list2(segments))) contents.add(row.id);
+  for (const row of all("SELECT content_id AS id FROM segment_content WHERE segment_id IN ($)", list3(segments))) contents.add(row.id);
   return { entities: entities2, relations: relations2, realizations: realizations2, segments, contents };
 }
 function predicates(set) {
-  const e = list2(set.entities), r = list2(set.realizations), s = list2(set.segments), k = list2(set.contents), pw = list2(set.relations);
+  const e = list3(set.entities), r = list3(set.realizations), s = list3(set.segments), k = list3(set.contents), pw = list3(set.relations);
   const any = (column, ids) => [`${column} IN (${marks(ids)})`, ids];
   const or = (...parts) => [parts.map(([sql]) => sql).join(" OR "), parts.flatMap(([, ids]) => ids)];
   return [
@@ -41481,7 +41712,7 @@ function snapshot(c, set) {
   for (const [table, [where, ids]] of predicates(set)) rows[table] = c.db.prepare(`SELECT * FROM ${table} WHERE ${where}`).all(...ids).map((row) => ({ ...row }));
   return rows;
 }
-var serialSet = (set) => Object.fromEntries(Object.entries(set).map(([key, ids]) => [key, list2(ids)]));
+var serialSet = (set) => Object.fromEntries(Object.entries(set).map(([key, ids]) => [key, list3(ids)]));
 var parseSet = (data) => Object.fromEntries(Object.entries(data).map(([key, ids]) => [key, new Set(ids)]));
 function recordChange(c, { kind, summary, works, actor: actor3, extra = {} }, change) {
   return transaction(c.db, () => {
@@ -41507,7 +41738,7 @@ function undoChange(c, id, actor3) {
       if (tracks.some((track) => attached.get(track)))
         throw new Error("These tracks are in a work again; take them out first, then undo");
     }
-    const ids = list2(set.entities);
+    const ids = list3(set.entities);
     const later = c.db.prepare(`SELECT 1 FROM audit_event WHERE id>? AND target_id IN (${marks(ids)})
          AND action NOT IN ('editor.open','editor.move-tracks-open','editor.bulk-edit-open',
            'editor.choose-album-work','editor.new-album-work') LIMIT 1`).get(data.after, ...ids);
@@ -41542,7 +41773,7 @@ function deletionImpact(c, workIds) {
     works: workIds.length,
     movements: count("SELECT count(*) AS n FROM relation WHERE kind='movement' AND source_id IN ($)", workIds),
     recordings: set.realizations.size,
-    tracks: count("SELECT count(DISTINCT s.track_link_id) AS n FROM segment s WHERE s.id IN ($)", list2(set.segments))
+    tracks: count("SELECT count(DISTINCT s.track_link_id) AS n FROM segment s WHERE s.id IN ($)", list3(set.segments))
   };
 }
 function deleteWorks(c, workIds, actor3, { names }) {
@@ -41568,7 +41799,7 @@ function deleteWorks(c, workIds, actor3, { names }) {
         c.db.prepare("UPDATE review_item SET status='resolved' WHERE target_id=? AND status='open'").run(work);
         const composers = c.db.prepare(
           `SELECT a.value FROM credit k JOIN field_resolution f ON f.target_id=k.contributor_id AND f.field='name'
-             JOIN assertion a ON a.id=f.assertion_id WHERE k.target_id=? AND k.role='composer'`
+             JOIN assertion a ON a.id=f.assertion_id WHERE k.target_id=? AND k.role='composer' AND k.state='active'`
         ).all(work).map((row) => JSON.parse(row.value));
         const mb = c.db.prepare("SELECT record_id FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='work' AND state='active'").all(work);
         for (const key of [
@@ -41709,18 +41940,18 @@ function entities(c, kinds2) {
        ORDER BY created_at,id`
   ).all(...kinds2).map((row) => ({ ...row, data: JSON.parse(row.data), label: entityLabel(c, row.id, row.kind) }));
 }
-var isComposer = (c, person) => person.data.roles?.includes("composer") || !!c.db.prepare("SELECT 1 FROM credit WHERE contributor_id=? AND role='composer' LIMIT 1").get(person.id);
+var isComposer = (c, person) => person.data.roles?.includes("composer") || !!c.db.prepare("SELECT 1 FROM credit WHERE contributor_id=? AND role='composer' AND state='active' LIMIT 1").get(person.id);
 function credits(c, target) {
   return c.db.prepare(
     `SELECT k.* FROM credit k JOIN entity e ON e.id=k.contributor_id
-       WHERE k.target_id=? AND e.deleted_at IS NULL ORDER BY k.position,k.id`
+       WHERE k.target_id=? AND k.state='active' AND e.deleted_at IS NULL ORDER BY k.position,k.id`
   ).all(target).map((row) => ({ ...row, name: entityLabel(c, row.contributor_id) }));
 }
 var composerNames2 = (c, work) => credits(c, work).filter((credit) => credit.role === "composer").map((credit) => credit.name);
 function worksOf(c, contributor) {
   return c.db.prepare(
     `SELECT DISTINCT k.target_id AS id FROM credit k JOIN entity e ON e.id=k.target_id
-       WHERE k.contributor_id=? AND e.kind='work' AND e.deleted_at IS NULL`
+       WHERE k.contributor_id=? AND k.state='active' AND e.kind='work' AND e.deleted_at IS NULL`
   ).all(contributor).map((row) => row.id);
 }
 function realizations(c, work) {
@@ -41916,7 +42147,7 @@ function mergeOutcome(c, keep, drop) {
   const kind = c.entity(keep).kind;
   const label = (id) => labelOf(c, id) || entityLabel(c, id, kind);
   if (kind !== "work") {
-    const moving = c.db.prepare("SELECT count(*) AS n FROM credit WHERE contributor_id=?").get(drop).n;
+    const moving = c.db.prepare("SELECT count(*) AS n FROM credit WHERE contributor_id=? AND state='active'").get(drop).n;
     return [
       { label: "Stays", value: `\u201C${label(keep)}\u201D, with its name and fields`, selection: keep },
       { label: "Removed", value: `\u201C${label(drop)}\u201D` },
@@ -41960,7 +42191,7 @@ function mergeView(c, a, b, review) {
   if (!(MERGEABLE[first.kind] || []).includes(second.kind)) fail("These two entries can't be merged");
   const work = first.kind === "work";
   const label = (id) => `\u201C${labelOf(c, id) || entityLabel(c, id, first.kind)}\u201D`;
-  const weight = (id) => work ? realizations(c, id).length : c.db.prepare("SELECT count(*) AS n FROM credit WHERE contributor_id=?").get(id).n;
+  const weight = (id) => work ? realizations(c, id).length : c.db.prepare("SELECT count(*) AS n FROM credit WHERE contributor_id=? AND state='active'").get(id).n;
   const count = (id) => `${weight(id)} ${work ? "recording" : "credit"}${weight(id) === 1 ? "" : "s"}`;
   const named = { [a]: `${label(a)} (the one you opened \xB7 ${count(a)})`, [b]: `${label(b)} (the other \xB7 ${count(b)})` };
   const back = review ? `review:${review}` : work ? entitySelection(a, 0, "merge") : a;
@@ -42245,7 +42476,7 @@ function contributorView(c, entity, page = 0) {
   const works = worksOf(c, entity.id);
   const creditRows = c.db.prepare(
     `SELECT k.*,e.kind AS target_kind FROM credit k JOIN entity e ON e.id=k.target_id
-       WHERE k.contributor_id=? AND e.deleted_at IS NULL ORDER BY e.kind,k.target_id`
+       WHERE k.contributor_id=? AND k.state='active' AND e.deleted_at IS NULL ORDER BY e.kind,k.target_id`
   ).all(entity.id);
   const sections = [detailsForm(c, entity.id, kind)];
   if (composer)
@@ -43097,7 +43328,7 @@ function listFor(c, tab, q, extra = {}) {
     const composers = /* @__PURE__ */ new Map();
     for (const row of c.db.prepare(
       `SELECT k.target_id,k.contributor_id FROM credit k JOIN entity e ON e.id=k.contributor_id AND e.deleted_at IS NULL
-         WHERE k.role='composer' ORDER BY k.position,k.id`
+         WHERE k.role='composer' AND k.state='active' ORDER BY k.position,k.id`
     ).iterate()) {
       if (!composers.has(row.target_id)) composers.set(row.target_id, []);
       composers.get(row.target_id).push(labels.get(row.contributor_id) || "Untitled person");
@@ -43481,7 +43712,7 @@ function applyV2(c, request, who) {
         const { result, changeId } = deleteWorks(c, [target], who, { names: [entityLabel(c, target, "work")] });
         return { changeId, selection: "", message: `Deleted the work${result.tracks ? `; its ${result.tracks} track${result.tracks === 1 ? " is" : "s are"} no longer in a work` : ""}. Audio files are unchanged. Undo it from Activity.`, tab: "works" };
       }
-      const used = entity.kind === "person" || entity.kind === "ensemble" ? c.db.prepare("SELECT 1 FROM credit WHERE contributor_id=? LIMIT 1").get(target) : entity.kind === "recording" ? c.db.prepare("SELECT 1 FROM recording_content rc JOIN segment_content sc ON sc.content_id=rc.id WHERE rc.recording_id=? LIMIT 1").get(target) : null;
+      const used = entity.kind === "person" || entity.kind === "ensemble" ? c.db.prepare("SELECT 1 FROM credit WHERE contributor_id=? AND state='active' LIMIT 1").get(target) : entity.kind === "recording" ? c.db.prepare("SELECT 1 FROM recording_content rc JOIN segment_content sc ON sc.content_id=rc.id WHERE rc.recording_id=? LIMIT 1").get(target) : null;
       if (used) fail("This entry is still in use. Merge it, or remove what uses it first.");
       c.db.prepare("DELETE FROM credit WHERE target_id=?").run(target);
       c.db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), target);
@@ -43523,7 +43754,7 @@ function applyV2(c, request, who) {
         try {
           transaction(c.db, () => {
             for (const [key, value] of Object.entries(values)) m.manual(work, key, value, { actor: who, pin: true });
-            if (composer && !c.db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role='composer'").get(work, composer)) {
+            if (composer && !c.db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role='composer' AND state='active'").get(work, composer)) {
               const position = (c.db.prepare("SELECT coalesce(max(position),0) AS n FROM credit WHERE target_id=?").get(work).n || 0) + 1;
               c.credit(work, composer, "composer", { position });
             }
@@ -43877,7 +44108,7 @@ var actor = (input) => {
     );
   return String(input.user.id);
 };
-function text3(value, label, { optional = false, max = 1e4, field: field2 } = {}) {
+function text4(value, label, { optional = false, max = 1e4, field: field2 } = {}) {
   if (typeof value !== "string" || value.length > max || !optional && !value.trim())
     fail2(`Enter a valid ${label}`, field2);
   return value;
@@ -44002,7 +44233,7 @@ var movementRows = (c, work) => c.db.prepare(
   "SELECT * FROM relation WHERE kind='movement' AND source_id=? ORDER BY position"
 ).all(work);
 function render(c, input) {
-  const m = new Metadata(c), all = entries(c), query = input.query || {}, q = normalized2(text3(query.q || "", "search", { optional: true, max: 200 }));
+  const m = new Metadata(c), all = entries(c), query = input.query || {}, q = normalized2(text4(query.q || "", "search", { optional: true, max: 200 }));
   const offset = Number(query.offset || 0);
   if (!Number.isSafeInteger(offset) || offset < 0 || offset > 1e7)
     fail2("Invalid page offset");
@@ -44018,7 +44249,7 @@ function render(c, input) {
   const label = (id) => all.find((e) => e.id === id)?.label || "Untitled entry";
   const composers = all.filter(
     (e) => e.kind === "person" && (e.data.roles?.includes("composer") || c.db.prepare(
-      "SELECT 1 FROM credit WHERE contributor_id=? AND role='composer'"
+      "SELECT 1 FROM credit WHERE contributor_id=? AND role='composer' AND state='active'"
     ).get(e.id))
   );
   const entityType = (e) => e.kind === "person" && composers.some((person) => person.id === e.id) ? "Composer" : kindLabel[e.kind];
@@ -44120,7 +44351,7 @@ function render(c, input) {
             "Add credit"
           )
         );
-      const credits3 = c.db.prepare("SELECT * FROM credit WHERE target_id=? ORDER BY position").all(selected.id);
+      const credits3 = c.db.prepare("SELECT * FROM credit WHERE target_id=? AND state='active' ORDER BY position").all(selected.id);
       if (credits3.length)
         forms.push(
           form(
@@ -44519,7 +44750,7 @@ function apply(c, input, who) {
   let selection;
   switch (request.command) {
     case "attach-found-track": {
-      const parts = text3(v.choice, "recording and performance", {
+      const parts = text4(v.choice, "recording and performance", {
         max: 200
       }).split("|");
       if (parts.length !== 2)
@@ -44544,7 +44775,7 @@ function apply(c, input, who) {
       );
     }
     case "create-contributor": {
-      const name = text3(v.name, "contributor name", { max: 500, field: "name" }).trim();
+      const name = text4(v.name, "contributor name", { max: 500, field: "name" }).trim();
       if (!["person", "ensemble"].includes(v.kind))
         fail2("Select a valid contributor type");
       selection = c.createEntity(v.kind, {
@@ -44554,14 +44785,14 @@ function apply(c, input, who) {
       break;
     }
     case "add-credit": {
-      selection = text3(v.target, "entry", { max: 200 });
+      selection = text4(v.target, "entry", { max: 200 });
       c.entity(selection, ["work", "recording", "performance", "release"]);
-      const contributor = text3(v.contributor, "contributor", { max: 200, field: "contributor" }), role = text3(v.role, "role", { max: 80 }), instrument = text3(v.instrument, "instrument", {
+      const contributor = text4(v.contributor, "contributor", { max: 200, field: "contributor" }), role = text4(v.role, "role", { max: 80 }), instrument = text4(v.instrument, "instrument", {
         optional: true,
         max: 200
       }).trim() || null;
       if (c.db.prepare(
-        "SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?"
+        "SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ? AND state='active'"
       ).get(selection, contributor, role, instrument))
         fail2("That role credit already exists");
       const who2 = c.entity(contributor, ["person", "ensemble"]);
@@ -44575,28 +44806,28 @@ function apply(c, input, who) {
       break;
     }
     case "remove-credit": {
-      selection = text3(v.target, "entry", { max: 200 });
+      selection = text4(v.target, "entry", { max: 200 });
       c.entity(selection);
-      const credit = text3(v.credit, "credit", { max: 200 });
-      if (!c.db.prepare("SELECT 1 FROM credit WHERE id=? AND target_id=?").get(credit, selection))
+      const credit = text4(v.credit, "credit", { max: 200 });
+      if (!c.db.prepare("SELECT 1 FROM credit WHERE id=? AND target_id=? AND state='active'").get(credit, selection))
         fail2("Credit does not belong to this entry");
-      c.db.prepare("DELETE FROM credit WHERE id=?").run(credit);
+      c.removeCredit(credit);
       break;
     }
     case "create-composer": {
-      const name = text3(v.name, "composer name", { max: 500, field: "name" }).trim();
+      const name = text4(v.name, "composer name", { max: 500, field: "name" }).trim();
       selection = c.createEntity("person", { roles: ["composer"] });
       manual(selection, "name", name);
       break;
     }
     case "create-work": {
-      const title = text3(v.title, "work title", { max: 2e3, field: "title" }).trim();
-      const composer = text3(v.composer ?? "", "composer", {
+      const title = text4(v.title, "work title", { max: 2e3, field: "title" }).trim();
+      const composer = text4(v.composer ?? "", "composer", {
         optional: true,
         max: 200
       });
       if (composer) c.entity(composer, "person");
-      const movements = (Array.isArray(v.movements) ? v.movements.join("\n") : text3(v.movements ?? "", "movement titles", { optional: true })).split("\n").map((s) => s.trim()).filter(Boolean);
+      const movements = (Array.isArray(v.movements) ? v.movements.join("\n") : text4(v.movements ?? "", "movement titles", { optional: true })).split("\n").map((s) => s.trim()).filter(Boolean);
       if (movements.length > 100)
         fail2("Create no more than 100 movements at a time");
       const similar = warnDuplicate(c, title, composer ? [m.resolve(composer, "name").value].filter(Boolean) : [], v.createAnyway);
@@ -44612,12 +44843,12 @@ function apply(c, input, who) {
       break;
     }
     case "edit-field": {
-      const target = text3(v.target, "entry", { max: 200 }), key = text3(v.field, "field", { max: 80 });
+      const target = text4(v.target, "entry", { max: 200 }), key = text4(v.field, "field", { max: 80 });
       c.entity(target);
       const definition = c.db.prepare("SELECT type FROM field_definition WHERE key=?").get(key);
       if (!definition || !["string", "array"].includes(definition.type))
         fail2("This field is not editable");
-      const raw = text3(v.value, "value", { optional: true });
+      const raw = text4(v.value, "value", { optional: true });
       if (typeof v.blank !== "boolean" || typeof v.pin !== "boolean")
         fail2("Invalid override options");
       const value = v.blank ? null : definition.type === "array" ? raw.split("\n").map((s) => s.trim()).filter(Boolean) : raw;
@@ -44628,9 +44859,9 @@ function apply(c, input, who) {
       break;
     }
     case "use-provider": {
-      selection = text3(v.target, "entry", { max: 200 });
+      selection = text4(v.target, "entry", { max: 200 });
       c.entity(selection);
-      const field2 = text3(v.field, "field", { max: 80 });
+      const field2 = text4(v.field, "field", { max: 80 });
       if (!c.db.prepare("SELECT 1 FROM field_definition WHERE key=?").get(field2))
         fail2("Unknown metadata field");
       m.useProvider(selection, field2, {
@@ -44639,9 +44870,9 @@ function apply(c, input, who) {
       break;
     }
     case "add-movement": {
-      selection = text3(v.work, "work", { max: 200 });
+      selection = text4(v.work, "work", { max: 200 });
       c.entity(selection, "work");
-      const titles = (Array.isArray(v.title) ? v.title : [text3(v.title, "movement title", { max: 2e3, field: "title" })]).map((title) => String(title).trim()).filter(Boolean);
+      const titles = (Array.isArray(v.title) ? v.title : [text4(v.title, "movement title", { max: 2e3, field: "title" })]).map((title) => String(title).trim()).filter(Boolean);
       if (!titles.length) fail2("Enter a movement title", "title");
       if (titles.length > 100) fail2("Add no more than 100 movements at a time");
       for (const title of titles) {
@@ -44655,7 +44886,7 @@ function apply(c, input, who) {
       break;
     }
     case "reorder-movements": {
-      selection = text3(v.work, "work", { max: 200 });
+      selection = text4(v.work, "work", { max: 200 });
       c.entity(selection, "work");
       const rows = movementRows(c, selection), ids = rows.map((r) => r.target_id);
       if (!Array.isArray(v.order) || v.order.length !== ids.length || new Set(v.order).size !== ids.length || v.order.some((id) => !ids.includes(id)))
@@ -44672,9 +44903,9 @@ function apply(c, input, who) {
       break;
     }
     case "create-broadcast": {
-      const work = text3(v.work, "work", { max: 200 });
+      const work = text4(v.work, "work", { max: 200 });
       c.entity(work, "work");
-      const title = text3(v.title, "recording title", { max: 2e3, field: "title" }).trim(), date = text3(v.date, "broadcast date", {
+      const title = text4(v.title, "recording title", { max: 2e3, field: "title" }).trim(), date = text4(v.date, "broadcast date", {
         optional: true,
         max: 10,
         field: "date"
@@ -44693,25 +44924,25 @@ function apply(c, input, who) {
       c.relate("recording_performance", selection, p);
       manual(selection, "title", title);
       if (date) manual(selection, "date", date);
-      const description = text3(v.description, "recording notes", {
+      const description = text4(v.description, "recording notes", {
         optional: true
       });
       if (description) manual(selection, "description", description);
       break;
     }
     case "attach-track": {
-      selection = text3(v.recording, "recording", { max: 200 });
+      selection = text4(v.recording, "recording", { max: 200 });
       c.entity(selection, "recording");
       const pw = c.performanceWork(
-        text3(v.performanceWork, "work performance", { max: 200 })
+        text4(v.performanceWork, "work performance", { max: 200 })
       );
       if (!c.db.prepare(
         "SELECT 1 FROM relation WHERE kind='recording_performance' AND source_id=? AND target_id=?"
       ).get(selection, pw.source_id))
         fail2("This recording does not capture that performance");
-      const movement = text3(v.movement, "movement", { optional: true, max: 200 }) || null;
+      const movement = text4(v.movement, "movement", { optional: true, max: 200 }) || null;
       c.checkMovement(pw.target_id, movement);
-      const track = text3(v.track, "owned track", { max: 200 }), link2 = c.db.prepare("SELECT * FROM track_link WHERE id=? AND state='active'").get(track);
+      const track = text4(v.track, "owned track", { max: 200 }), link2 = c.db.prepare("SELECT * FROM track_link WHERE id=? AND state='active'").get(track);
       if (!link2) fail2("This owned track is missing or requires review");
       const state = c.db.prepare("SELECT state FROM classification WHERE target_id=?").get(track)?.state;
       if (state !== "classical" && v.confirmClassical !== true)
@@ -44736,9 +44967,9 @@ function apply(c, input, who) {
       break;
     }
     case "detach-track": {
-      selection = text3(v.recording, "recording", { max: 200 });
+      selection = text4(v.recording, "recording", { max: 200 });
       c.entity(selection, "recording");
-      const item = text3(v.item, "attachment", { max: 200 });
+      const item = text4(v.item, "attachment", { max: 200 });
       const owned = c.db.prepare(
         `SELECT 1 FROM realization_item i JOIN realization r ON r.id=i.realization_id JOIN relation pw ON pw.id=r.performance_work_id
         JOIN relation rp ON rp.target_id=pw.source_id AND rp.kind='recording_performance' WHERE rp.source_id=? AND i.id=?`
@@ -44815,7 +45046,7 @@ async function mutateEditor(input) {
 
 // src/model/presentation.js
 import path8 from "node:path";
-var text4 = (value, fallback) => typeof value === "string" && value.trim() ? value.trim() : fallback;
+var text5 = (value, fallback) => typeof value === "string" && value.trim() ? value.trim() : fallback;
 var DisplayValues = class {
   constructor(c) {
     this.statement = c.db.prepare(
@@ -44828,7 +45059,7 @@ var DisplayValues = class {
     return { value: row ? JSON.parse(row.value) : void 0 };
   }
 };
-var entityValue = (metadata, id, field2, fallback) => text4(metadata.resolve(id, field2).value, fallback);
+var entityValue = (metadata, id, field2, fallback) => text5(metadata.resolve(id, field2).value, fallback);
 var evidenceOf = (row) => JSON.parse(row.evidence);
 var TEXT_LIMIT = 500;
 var MOVEMENT_LIMIT = 200;
@@ -44880,7 +45111,7 @@ var fitGroup = (group) => ({
   items: group.items.map(fitItem),
   missing: fitMovements(group.missing)
 });
-var trackTitle2 = (evidence) => text4(evidence.hints?.title, path8.basename(evidence.path || "Track"));
+var trackTitle2 = (evidence) => text5(evidence.hints?.title, path8.basename(evidence.path || "Track"));
 function actor2(input) {
   const user = input?.user;
   if (!Number.isSafeInteger(user?.id) || user.id <= 0)
@@ -44911,11 +45142,10 @@ function realizationRows(c, realizationId = null, workId = null, albumId = null)
     return rows;
   }, []);
 }
-var words3 = (value) => String(value || "").normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+var words4 = (value) => String(value || "").normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 function performerOf(hints) {
-  const artist = text4(hints?.artist, text4(hints?.albumArtist, ""));
-  const composers = new Set(composersOf(hints || {}).map(words3));
-  const performers = artist.split(/\s+[—–]\s+|\s*;\s*/).filter((name) => name && !composers.has(words3(name)));
+  const artist = text5(hints?.artist, text5(hints?.albumArtist, ""));
+  const performers = performerNames(hints || {}, composersOf(hints || {}), words4);
   return performers.length ? performers.join(", ") : artist;
 }
 function queueItem(metadata, row, workTitle = null) {
@@ -44926,9 +45156,9 @@ function queueItem(metadata, row, workTitle = null) {
     fileId: String(row.file_id),
     albumId: String(evidence.albumId ?? ""),
     title: workTitle ? movementTitle({ title: withoutComposer(trackTitle2(evidence), composersOf(evidence.hints || {})), work: evidence.hints?.work }, workTitle) : row.movement_ids?.length > 1 ? row.movement_ids.map((id) => entityValue(metadata, id, "title", "")).filter(Boolean).join(" / ") : row.movement_id ? entityValue(metadata, row.movement_id, "title", trackTitle2(evidence)) : trackTitle2(evidence),
-    artist: text4(evidence.hints?.artist, text4(evidence.hints?.albumArtist, "")),
+    artist: text5(evidence.hints?.artist, text5(evidence.hints?.albumArtist, "")),
     performer: performerOf(evidence.hints),
-    album: text4(evidence.hints?.album, ""),
+    album: text5(evidence.hints?.album, ""),
     durationMs: Number(evidence.durationMs) || null,
     startMs: row.start_ms,
     endMs: row.end_ms
@@ -44947,7 +45177,7 @@ function workMovements2(c, metadata, workId) {
 function credits2(c, metadata, targetId) {
   return c.db.prepare(
     `SELECT role,instrument,contributor_id FROM credit
-       WHERE target_id=? ORDER BY position,id`
+       WHERE target_id=? AND state='active' ORDER BY position,id`
   ).all(targetId).map((row) => ({
     role: row.role,
     instrument: row.instrument,
@@ -44965,7 +45195,7 @@ var albumPosition = (row) => {
   return (Number(hints.discNumber) || 1) * 1e4 + (Number(hints.trackNumber) || 9999);
 };
 var ACT = /,\s*(?:act|akt|atto|acte|part|pt\.?|teil|scene|szene)\s*[ivxlc\d]+\b.*$/i;
-var nameBeforeComma = (title) => words3(String(title).split(",")[0]);
+var nameBeforeComma = (title) => words4(String(title).split(",")[0]);
 function sameNamedWork(a, b) {
   if (a === b) return true;
   const catalogueA = catalogueNumber(a).toLowerCase();
@@ -44973,15 +45203,15 @@ function sameNamedWork(a, b) {
   if (catalogueA && catalogueB) return catalogueA === catalogueB;
   const [short, long] = a.length <= b.length ? [a, b] : [b, a];
   const name = nameBeforeComma(long);
-  return name.length >= 4 && words3(short) === name && long.includes(",");
+  return name.length >= 4 && words4(short) === name && long.includes(",");
 }
 function sameCredits(last, heading, names) {
-  const these = new Set(names.map(words3));
+  const these = new Set(names.map(words4));
   if (last.names.length === these.size && last.names.every((name) => these.has(name))) return true;
   const shared = last.names.filter((name) => these.has(name));
   const same2 = shared.length > 0 && Boolean(catalogueNumber(last.title)) && catalogueNumber(last.title) === catalogueNumber(heading);
   if (same2) {
-    last.composer = last.credited.filter((name) => shared.includes(words3(name))).join(", ");
+    last.composer = last.credited.filter((name) => shared.includes(words4(name))).join(", ");
     last.names = shared;
   }
   return same2;
@@ -44996,14 +45226,14 @@ function pieceGroups(c, album, following) {
   const pieces = [];
   for (const row of rows) {
     const evidence = evidenceOf(row);
-    const workTag = text4(evidence.hints?.work, "");
+    const workTag = text5(evidence.hints?.work, "");
     const work = workTag.split(/\s*:\s*/)[0];
     const title = withoutComposer(trackTitle2(evidence), composersOf(evidence.hints || {}));
     const split = splitTitle(title);
     const fullHead = work || split.head;
     const ownTail = work ? movementTitle({ title }, work) : split.tail;
     const taggedTail = work ? movementTitle({ title, work: workTag }, work) : ownTail;
-    const fullTail = words3(ownTail).endsWith(` ${words3(taggedTail)}`) ? taggedTail : ownTail;
+    const fullTail = words4(ownTail).endsWith(` ${words4(taggedTail)}`) ? taggedTail : ownTail;
     const numbered = fullHead ? null : numberedPiece(fullTail);
     const tail = numbered?.part ?? fullTail;
     const names = composersOf(evidence.hints || {});
@@ -45017,9 +45247,9 @@ function pieceGroups(c, album, following) {
       fileId: String(row.file_id),
       albumId: String(evidence.albumId ?? ""),
       title: tail,
-      artist: text4(evidence.hints?.artist, text4(evidence.hints?.albumArtist, "")),
+      artist: text5(evidence.hints?.artist, text5(evidence.hints?.albumArtist, "")),
       performer: performerOf(evidence.hints),
-      album: text4(evidence.hints?.album, ""),
+      album: text5(evidence.hints?.album, ""),
       durationMs: Number(evidence.durationMs) || null,
       startMs: 0,
       endMs: null,
@@ -45029,7 +45259,7 @@ function pieceGroups(c, album, following) {
     if (head && sameWork && sameCredits(last, heading, names) && following.get(last.next) === item.position)
       last.items.push(item);
     else
-      pieces.push({ id: item.id, workId: null, title: heading, composer, names: names.map(words3), credited: names, items: [item], missing: [] });
+      pieces.push({ id: item.id, workId: null, title: heading, composer, names: names.map(words4), credited: names, items: [item], missing: [] });
     pieces.at(-1).next = item.position;
   }
   return pieces.map(({ next, names, credited, items, ...piece }) => ({
@@ -45074,7 +45304,7 @@ function renderAlbumPresentation(c, albumId) {
     const name = entityValue(metadata, workId, "title", "Untitled work");
     const collections = c.db.prepare("SELECT source_id FROM relation WHERE kind='collection_member' AND target_id=?").all(workId);
     const book = collections.length === 1 ? entityValue(metadata, collections[0].source_id, "title", "") : "";
-    const title = book && !` ${words3(name)} `.includes(` ${words3(book)} `) ? `${name} \xB7 \u201C${book}\u201D` : name;
+    const title = book && !` ${words4(name)} `.includes(` ${words4(book)} `) ? `${name} \xB7 \u201C${book}\u201D` : name;
     const excerpts = NUMBERED_SET.test(name) && present.size * 2 < movements.length || Boolean(
       c.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work' AND json_extract(evidence,'$.albumId')=? AND json_extract(evidence,'$.excerpt')=1").get(workId, album)
     );
@@ -45173,8 +45403,8 @@ function recordingEntry(c, metadata, workId, movements, id, entries2, fact, rele
   const recordingIds = c.db.prepare("SELECT source_id FROM relation WHERE kind='recording_performance' AND target_id=? ORDER BY source_id").all(performanceId).map((row) => row.source_id);
   const performers = credits2(c, metadata, performanceId).filter((credit) => credit.role !== "composer");
   const first = evidenceOf(entries2[0]);
-  const album = text4(entries2[0].realization_label, text4(first.hints?.album, ""));
-  const artist = performers.length ? performers.map((credit) => credit.name).join(", ") : text4(first.hints?.artist, text4(first.hints?.albumArtist, ""));
+  const album = text5(entries2[0].realization_label, text5(first.hints?.album, ""));
+  const artist = performers.length ? performers.map((credit) => credit.name).join(", ") : text5(first.hints?.artist, text5(first.hints?.albumArtist, ""));
   const items = entries2.map(
     (entry) => queueItem(
       metadata,
@@ -45464,6 +45694,8 @@ var emptyTags = () => ({
   releaseGroupMbid: "",
   albumArtistMbids: [],
   artistMbids: [],
+  conductor: "",
+  performers: [],
   genres: [],
   composer: [],
   work: "",
@@ -45688,6 +45920,9 @@ async function scanFile(file, root, prior) {
       ...tags.grouping && { grouping: tags.grouping },
       ...tags.year && { year: tags.year },
       ...tags.label && { label: tags.label },
+      ...tags.conductor && { conductor: tags.conductor },
+      ...tags.performers.length && { performers: tags.performers },
+      ...tags.artistMbids.length && { artistMbids: tags.artistMbids },
       workId: tags.workId,
       recordingMbid: tags.recordingMbid || file.recordingMbid || "",
       composerDistinct: tags.composer.length > 0 && !tags.composer.includes(tags.artist)
