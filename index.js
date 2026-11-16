@@ -39531,7 +39531,7 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
         // Op. 11") is a whole piece; one movement of a symphony is not.
         !group.standalone && group.tracks.length < 2 && !catalogueSet(group.work) && !group.excerpt ? "only one track of a work with movements on this album" : new Set(positions).size !== positions.length ? "two tracks share a disc and track number" : (
           // MusicBrainz telling four "Promenade"s apart tells them apart.
-          new Set(group.tracks.map(pieceName)).size !== group.tracks.length ? "two tracks share a title" : null
+          new Set(group.tracks.map(pieceName)).size !== group.tracks.length && !returnsAtEnd(group.tracks) ? "two tracks share a title" : null
         )
       )
     );
@@ -39608,6 +39608,11 @@ function numberedElsewhere(title, workTitle) {
   const numbers = clean3(workTitle).split(/\s*[,·;]\s*|\s+\/\s+/).map(catalogueSubject).concat(catalogueSubject(workTitle)).filter(Boolean);
   return !numbers.some((number) => own === number || own.startsWith(`${number}:`) || number.startsWith(`${own}:`));
 }
+var returnsAtEnd = (tracks) => {
+  const ordered = [...tracks].sort(albumOrder);
+  const names = ordered.map(pieceName);
+  return ordered.length > 2 && names[0] === names.at(-1) && new Set(names.slice(0, -1)).size === names.length - 1;
+};
 var pieceName = (track) => `${normalized(track.title)}|${normalized(track.providerMovement || "")}`;
 function splitScattered(groups) {
   return groups.flatMap((group) => {
@@ -39924,18 +39929,53 @@ function namedMovement(movements, title, used, setSubject) {
   let found = free.filter((m) => m.text && m.text === text5);
   if (found.length !== 1) found = free.filter((m) => m.title && sameNameAbbreviated(m.title, title));
   if (found.length !== 1) {
+    const wanted = asVariation(title);
+    if (wanted.variation && wanted.number) {
+      found = free.filter((m) => {
+        const own = asVariation(m.title || "");
+        return own.variation && own.number === wanted.number;
+      });
+      if (found.length === 1) return found[0];
+    }
+  }
+  if (found.length !== 1) {
     const piece = pieceNumber(title, setSubject);
     found = piece == null ? [] : free.filter((m) => movementPiece(m, setSubject) === piece);
   }
   return found.length === 1 ? found[0] : null;
 }
-var SECTION_START = /^(?:(?:[ivxlc]+|\d+)[a-d]?[.)]\s|(?:var(?:iation|iazione)?\.?|theme|thema|tema|coda|intermezzo|introduction|introduzione)(?![\p{L}]))/iu;
+var SECTION_START = /^(?:(?:[ivxlc]+|\d+)[a-d]?[.)]\s|(?:var(?:iation|iatio|iazione)?\.?|theme|thema|tema|coda|intermezzo|introduction|introduzione)(?![\p{L}]))/iu;
+var VAR_WORD = "var(?:iations|iationen|iation|iatio|iazioni|iazione|s)?\\.?";
+var VAR_NUM = "(?:\\d+|[ivxlc]+)";
+var VAR_RANGE = new RegExp(`^${VAR_WORD}\\s*(?:(?:nos?|nr)\\.?\\s*)?(${VAR_NUM})\\s*[-\u2013\u2014]\\s*(${VAR_NUM})$`, "iu");
+var VAR_ONE = new RegExp(`^${VAR_WORD}\\s*(?:(?:nos?|nr)\\.?\\s*)?(${VAR_NUM})$`, "iu");
+var numberOf = (text5) => /^\d+$/.test(text5) ? Number(text5) : romanValue(text5.toLowerCase());
+function expandSection(part) {
+  const range2 = part.match(VAR_RANGE);
+  if (range2) {
+    const [from, to] = [numberOf(range2[1]), numberOf(range2[2])];
+    if (from && to && to > from && to - from < 40) return Array.from({ length: to - from + 1 }, (_, i) => `Variation ${from + i}`);
+  }
+  const pieces = part.split(/\s*,\s*|\s+(?:&|and|und|et)\s+/i).map(clean3).filter(Boolean);
+  if (pieces.length < 2) return [part];
+  const out = [];
+  let afterVariation = false;
+  for (const piece of pieces) {
+    const one = piece.match(VAR_ONE);
+    if (one && numberOf(one[1])) out.push(`Variation ${numberOf(one[1])}`), afterVariation = true;
+    else if (afterVariation && /^(?:\d+|[ivxlc]+)$/i.test(piece) && numberOf(piece)) out.push(`Variation ${numberOf(piece)}`);
+    else if (SECTION_START.test(piece)) out.push(piece), afterVariation = false;
+    else return [part];
+  }
+  return out;
+}
+var rawSections = (title) => clean3(title).split(/\s+\/\s+|\s+[–—-]\s+(?=var(?:iation|iatio|iazione)?\.?\s|(?:theme|thema|tema|coda)(?![\p{L}]))/iu).flatMap(expandSection);
 function sectionTitles(title) {
-  const parts = clean3(title).split(/\s+\/\s+|\s+[–—-]\s+(?=var(?:iation|iazione)?\.?\s)/i);
+  const parts = rawSections(title);
   return parts.length > 1 && parts.every((part) => SECTION_START.test(part)) ? parts : [clean3(title)];
 }
 var combined = (movement) => sectionTitles(movement.title || "").length > 1;
-var VARIATION = /^(?:var(?:iation|iazione)?s?|variazioni)\s+(?:(?:no|nr|n)\s+)?(?=\d|[ivxlc]+\b)/;
+var VARIATION = /^(?:var(?:iation|iatio|iazione)?s?|variazioni|variationen)\s+(?:(?:no|nr|n)\s+)?(?=\d|[ivxlc]+\b)/;
 function sectionParts(section) {
   let value = words2(section).replace(/\b(?:tema|thema)\b/g, "theme");
   const variation = VARIATION.test(value);
@@ -39945,10 +39985,10 @@ function sectionParts(section) {
   return number ? { number, variation, text: (numbered[2] || "").trim() } : { number: null, variation, text: value.trim() };
 }
 var sameSection = (a, b) => a.number != null || b.number != null ? a.number === b.number && (a.variation || b.variation || a.text === b.text) : a.text === b.text;
-var trackSections = (text5) => clean3(text5).split(/\s+\/\s+|\s+[–—-]\s+(?=var(?:iation|iazione)?\.?\s)/i).map(sectionParts);
+var trackSections = (text5) => sectionTitles(text5).map(sectionParts);
 function mapBySections(movements, tracks) {
-  if (!movements.some((m) => / \/ /.test(m.title || ""))) return null;
-  const sections = movements.map((m) => clean3(m.title).split(/\s+\/\s+/).map(sectionParts));
+  if (!movements.some(combined)) return null;
+  const sections = movements.map((m) => sectionTitles(m.title || "").map(sectionParts));
   const result = [];
   let at = 0, offset = 0;
   for (const track of tracks) {
@@ -39978,26 +40018,27 @@ function mapToMovements(movements, tracks, { setSubject = "", sections = false }
   mapped.forEach((id, i) => result[owners[i]].push(id));
   return result.map((ids) => ids.length === 1 ? ids[0] : [...new Set(ids)].length === 1 ? ids[0] : ids);
 }
-var VARIATION_TITLE = /^var(?:iation|iazione)?\.?\s*(?:(?:no|nr|n)\.?\s*)?(\d+|[ivxlc]+)(?![\p{L}\d])[\s:.,]*(.*)$/iu;
+var VARIATION_TITLE = /^var(?:iation|iatio|iazione)?\.?\s*(?:(?:no|nr|n)\.?\s*)?(\d+|[ivxlc]+)(?![\p{L}\d])[\s:.,]*(.*)$/iu;
 function asVariation(title) {
   const text5 = clean3(title).replace(/^(?:tema|thema)(?![\p{L}])/iu, "Theme");
   const variation = text5.match(VARIATION_TITLE);
-  return variation ? { title: `${variation[1]}. ${variation[2]}`, variation: true } : { title: text5, variation: false };
+  return variation ? { title: `${variation[1]}. ${variation[2]}`, variation: true, number: numberOf(variation[1]) } : { title: text5, variation: false };
 }
 function mapEach(rawMovements, rawTracks, setSubject) {
   const movements = rawMovements.map((m) => {
-    const { title, variation } = asVariation(m.title || "");
-    return variation || title !== clean3(m.title) ? { ...m, ...movementParts(title), variation } : m;
+    const { title, variation, number } = asVariation(m.title || "");
+    return variation || title !== clean3(m.title) ? { ...m, ...movementParts(title), ...variation && number && { index: number }, variation } : m;
   });
   const tracks = rawTracks.map((track) => {
-    const { title, variation } = asVariation(track.movementTitle || "");
-    return { ...track, movementTitle: title, variation };
+    const { title, variation, number } = asVariation(track.movementTitle || "");
+    return { ...track, movementTitle: title, variation, variationNumber: variation ? number : null };
   });
   const used = /* @__PURE__ */ new Set(), result = [];
   const firstWord = (text5) => text5.split(" ")[0];
   let previous = null;
   for (const track of tracks) {
     const parts = movementParts(track.movementTitle);
+    if (track.variationNumber) parts.index = track.variationNumber;
     let found = movements.filter(
       (m) => !used.has(m.id) && m.text && m.text === parts.text
     );
@@ -40008,6 +40049,15 @@ function mapEach(rawMovements, rawTracks, setSubject) {
     if (found.length !== 1) {
       const named = namedMovement(movements, track.movementTitle, used, setSubject);
       if (named) found = [named];
+    }
+    if (found.length !== 1 && !parts.index && parts.text) {
+      const key = (text5) => firstWord(text5).replace(/^fug(?:a|e)$/, "fugue");
+      if (/^(?:theme|introduction|introduzione|coda|finale|aria|fugue|intermezzo)$/.test(key(parts.text))) {
+        const near = movements.filter(
+          (m) => !used.has(m.id) && m.text && !m.index && key(m.text) === key(parts.text) && (m.text === parts.text || firstWord(m.text) !== firstWord(parts.text) || m.text.startsWith(`${parts.text} `) || parts.text.startsWith(`${m.text} `))
+        );
+        if (near.length) found = [near[0]];
+      }
     }
     const variation = track.variation || movements.some((m) => m.variation);
     if (found.length !== 1 && parts.index)
@@ -41409,12 +41459,14 @@ function autoMatchTaggedWorks(catalogue, {
     fileCollectionsFromTags(catalogue, { actor: actor3 });
     repairWorkTitles(catalogue);
     repairMovementTitles(catalogue);
-    for (const { work } of catalogue.db.prepare(
-      `SELECT DISTINCT r.source_id AS work FROM relation r JOIN metadata_target m ON m.entity_id=r.target_id
+    const combinedWorks = /* @__PURE__ */ new Set();
+    for (const { work, value } of catalogue.db.prepare(
+      `SELECT r.source_id AS work,a.value FROM relation r JOIN metadata_target m ON m.entity_id=r.target_id
          JOIN field_resolution f ON f.target_id=m.id AND f.field='title' JOIN assertion a ON a.id=f.assertion_id
-         WHERE r.kind='movement' AND a.value LIKE '% / %'`
+         WHERE r.kind='movement'`
     ).all())
-      splitCombinedMovements(catalogue, work, actor3);
+      if (!combinedWorks.has(work) && sectionTitles(String(JSON.parse(value) ?? "")).length > 1) combinedWorks.add(work);
+    for (const work of combinedWorks) splitCombinedMovements(catalogue, work, actor3);
     const metadata = new Metadata(catalogue);
     for (const { id } of catalogue.db.prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL").all())
       deriveWorkFields(catalogue, id, metadata);

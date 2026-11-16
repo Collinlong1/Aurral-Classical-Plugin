@@ -1,3 +1,11 @@
+# v0.3 Phase 0.11 — variation ranges, Variatio, dash-joined sections and returning arias (L6/L7/L8/L13, issue #20)
+
+Branch `claude/pensive-bardeen-5dat3q` starts at `aurral-classical` `c61dcea`, including merged L1 PR #103. Current #20 has no later scope comments. This implements L6, L7, L8 and L13 together, as #20 asks, from `variations-prototype.patch` (applied cleanly; prototype comments replaced). It is the first of five commits in one PR with Phase 1.1–1.4.
+
+One splitter (`rawSections`) serves `sectionTitles`, `trackSections` and `mapBySections`: it splits on " / " and on a spaced dash before a variation, theme or coda, and expands a range ("Variations 1-3", "Vars. IV–VI") or a list of sections ("Theme and Var. 1") into one section each. "Variatio" is a variation; a variation maps by its number; a named section (theme, introduction, aria, fugue…) takes the earliest free movement of that name; a theme that returns at the end ("Aria … Aria") no longer leaves the work unmatched. The library pass now repairs works older versions made with range or list movements, not only " / " ones (unedited automatic works only). The Apple corpus scorer gains `matched` (share of tracks in a work), so an unmatched album can no longer score as perfect; the baseline is re-saved. No schema or core change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
 # v0.3 Phase 0.10 — excerpts never line up with another album's movements by order (L1, issue #19)
 
 Branch `claude/pensive-bardeen-5dat3q` starts at `aurral-classical` `f055abe`, including merged C1 PR #102 (core C1 merged as core PR #58). Current #19 has no additional dependencies or later scope comments. This implements L1 only.

@@ -60,10 +60,12 @@ export function score(album, presentation) {
   const ordered = [...album.tracks].sort((a, b) => a.disc - b.disc || a.number - b.number);
   const blockOf = new Map();
   const rowTitle = new Map();
+  const inWork = new Set();
   for (const group of presentation?.groups || [])
     for (const item of group.items) {
       blockOf.set(item.trackId, group.id);
       rowTitle.set(item.trackId, item.title);
+      if (group.workId) inWork.add(item.trackId);
     }
   const ours = [];
   const apple = [];
@@ -75,9 +77,13 @@ export function score(album, presentation) {
     apple.push(!previous || track.apple.block !== previous.apple.block);
     if (words(rowTitle.get(id) ?? track.title) === words(track.apple.part)) parts++;
   });
+  const share = (n) => (ordered.length ? Math.round((n / ordered.length) * 1000) / 1000 : 1);
   return {
     grouping: ours.every((start, index) => start === apple[index]),
-    parts: ordered.length ? Math.round((parts / ordered.length) * 1000) / 1000 : 1,
+    parts: share(parts),
+    // Tracks in a work. An unmatched album still shows blocks built from its
+    // own titles, which can read exactly like Apple's; this tells them apart.
+    matched: share(ordered.filter((track) => inWork.has(trackId(album, track))).length),
   };
 }
 
@@ -120,7 +126,7 @@ export function auditAlbum(album, presentation) {
   return { exact: !falseJoins && !missedJoins, falseJoins, missedJoins, appleJoins, parts, rows };
 }
 
-// Every style's results: { style: { appleId: { grouping, parts, falseJoins } } }.
+// Every style's results: { style: { appleId: { grouping, parts, matched, falseJoins } } }.
 export async function scoreApple(fixtures = appleFixtures()) {
   const results = {};
   for (const style of Object.keys(styles)) {

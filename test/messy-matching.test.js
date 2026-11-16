@@ -9,7 +9,7 @@ import { createHash } from "node:crypto";
 import { tempFolders } from "./helpers.js";
 import { artistCredits, composersOf } from "../src/model/credits.js";
 import { classificationEvidence } from "../src/model/classify-evidence.js";
-import { fileCollectionsFromTags, releaseRangeWorks, recordTaggedLeaves, splitTitle, stripWorkPrefix, autoMatchTaggedWorks, withoutComposer, mapToMovements, movementParts, catalogueSubject, workKey, mergeWork, provablyDifferent } from "../src/model/auto-match.js";
+import { fileCollectionsFromTags, releaseRangeWorks, recordTaggedLeaves, splitTitle, stripWorkPrefix, autoMatchTaggedWorks, withoutComposer, mapToMovements, movementParts, sectionTitles, catalogueSubject, workKey, mergeWork, provablyDifferent } from "../src/model/auto-match.js";
 import { openCatalogue } from "../src/model/catalogue.js";
 import { Metadata } from "../src/model/metadata.js";
 import { reconcile, classify } from "../src/model/reconcile.js";
@@ -1256,6 +1256,41 @@ test("matching: one recording listing a piece twice splits into two, folds, and 
 // with a track per variation shared those. The library pass now gives the
 // work one movement per section and places every recording again; the
 // album page still plays each track once.
+// The shape earlier versions stored: each track holding several sections
+// is one movement, titled by `titleOf` its sections' movements, and the
+// other albums' tracks on those sections share it.
+function combineMovements(c, work, items, titleOf) {
+  const metadata = new Metadata(c);
+  const groups = [];
+  for (const item of items) {
+    if (groups.at(-1)?.segment === item.segment_id) groups.at(-1).movements.push(item.movement_id);
+    else groups.push({ segment: item.segment_id, movements: [item.movement_id] });
+  }
+  for (const { segment, movements } of groups) {
+    const [keep, ...drop] = movements;
+    if (!drop.length) continue;
+    metadata.derived(keep, "title", titleOf(movements));
+    for (const id of drop) {
+      for (const extra of c.db.prepare("SELECT id FROM realization_item WHERE segment_id=? AND movement_id=?").all(segment, id)) c.db.prepare("DELETE FROM realization_item WHERE id=?").run(extra.id);
+      for (const { content_id } of c.db.prepare("SELECT x.content_id FROM segment_content x JOIN recording_content r ON r.id=x.content_id WHERE x.segment_id=? AND r.movement_id=?").all(segment, id)) {
+        c.db.prepare("DELETE FROM segment_content WHERE content_id=?").run(content_id);
+        c.db.prepare("DELETE FROM recording_content WHERE id=?").run(content_id);
+      }
+      c.db.prepare("UPDATE realization_item SET movement_id=? WHERE movement_id=?").run(keep, id);
+      c.db.prepare("UPDATE recording_content SET movement_id=? WHERE movement_id=?").run(keep, id);
+      c.db.prepare("DELETE FROM relation WHERE kind='movement' AND target_id=?").run(id);
+      c.db.prepare("UPDATE entity SET deleted_at=1 WHERE id=?").run(id);
+    }
+  }
+  for (const { id } of c.db.prepare("SELECT id FROM realization WHERE work_id=?").all(work)) {
+    const seen = new Map();
+    for (const item of c.db.prepare("SELECT id,movement_id FROM realization_item WHERE realization_id=? ORDER BY sequence").all(id)) {
+      seen.set(item.movement_id, (seen.get(item.movement_id) || 0) + 1);
+      c.db.prepare("UPDATE realization_item SET occurrence=? WHERE id=?").run(seen.get(item.movement_id), item.id);
+    }
+  }
+}
+
 test("matching: a work made with several variations a movement gets a movement per variation", async (t) => {
   const rach = (title) => ({ title, composer: ["Sergei Rachmaninoff"], genres: ["Classical"] });
   const rhapsody = (m) => `Rhapsody on a Theme of Paganini, op. 43: ${m}`;
@@ -1279,36 +1314,8 @@ test("matching: a work made with several variations a movement gets a movement p
       .all(albumId);
   // The 1.0.37 shape: album 831's tracks are the work's movements, each
   // titled with its sections; the other album's tracks share them.
-  const metadata = new Metadata(c);
   const ids = workMovementTitles(c, work, true);
-  const groups = [];
-  for (const item of itemsOf("combined")) {
-    if (groups.at(-1)?.segment === item.segment_id) groups.at(-1).movements.push(item.movement_id);
-    else groups.push({ segment: item.segment_id, movements: [item.movement_id] });
-  }
-  for (const { segment, movements } of groups) {
-    const [keep, ...drop] = movements;
-    if (!drop.length) continue;
-    metadata.derived(keep, "title", movements.map((id) => fine[ids.indexOf(id)]).join(" / "));
-    for (const id of drop) {
-      for (const extra of c.db.prepare("SELECT id FROM realization_item WHERE segment_id=? AND movement_id=?").all(segment, id)) c.db.prepare("DELETE FROM realization_item WHERE id=?").run(extra.id);
-      for (const { content_id } of c.db.prepare("SELECT x.content_id FROM segment_content x JOIN recording_content r ON r.id=x.content_id WHERE x.segment_id=? AND r.movement_id=?").all(segment, id)) {
-        c.db.prepare("DELETE FROM segment_content WHERE content_id=?").run(content_id);
-        c.db.prepare("DELETE FROM recording_content WHERE id=?").run(content_id);
-      }
-      c.db.prepare("UPDATE realization_item SET movement_id=? WHERE movement_id=?").run(keep, id);
-      c.db.prepare("UPDATE recording_content SET movement_id=? WHERE movement_id=?").run(keep, id);
-      c.db.prepare("DELETE FROM relation WHERE kind='movement' AND target_id=?").run(id);
-      c.db.prepare("UPDATE entity SET deleted_at=1 WHERE id=?").run(id);
-    }
-  }
-  for (const { id } of c.db.prepare("SELECT id FROM realization WHERE work_id=?").all(work)) {
-    const seen = new Map();
-    for (const item of c.db.prepare("SELECT id,movement_id FROM realization_item WHERE realization_id=? ORDER BY sequence").all(id)) {
-      seen.set(item.movement_id, (seen.get(item.movement_id) || 0) + 1);
-      c.db.prepare("UPDATE realization_item SET occurrence=? WHERE id=?").run(seen.get(item.movement_id), item.id);
-    }
-  }
+  combineMovements(c, work, itemsOf("combined"), (movements) => movements.map((id) => fine[ids.indexOf(id)]).join(" / "));
   assert.equal(workMovementTitles(c, work).length, 3);
 
   // The library pass splits it; the next album joins variation by variation.
@@ -1329,6 +1336,135 @@ test("matching: a work made with several variations a movement gets a movement p
   assert.equal(page.work.movements.length, 6);
   assert.deepEqual(page.recordings.map((recording) => [recording.items.length, recording.complete]).sort(), [[3, true], [5, true], [6, true]]);
   assert.equal(c.db.prepare("SELECT COUNT(*) AS n FROM review_item WHERE status='open' AND json_extract(evidence,'$.reason')='movement-mismatch'").get().n, 0);
+});
+
+// Variations two albums divide differently, in either scan order: a range
+// track ("Variations 2-3") plays each variation it holds, "Variatio" is a
+// variation, and a theme that returns at the end is its own movement.
+test("matching: variation ranges, Variatio and a returning Aria join one work in either order", async (t) => {
+  const bach = (title) => ({ title, composer: ["Johann Sebastian Bach"], genres: ["Classical"] });
+  const rach = (title) => ({ title, composer: ["Sergei Rachmaninoff"], genres: ["Classical"] });
+  const goldberg = (m) => `Goldberg Variations, BWV 988: ${m}`;
+  const rhapsody = (m) => `Rhapsody on a Theme of Paganini, op. 43: ${m}`;
+  const album = (id, titles, tag) => ({ id, album: id, albumArtist: "Pianist", artist: "Pianist", titles: titles.map(tag) });
+  const cases = {
+    paganini: [
+      album("each", ["Introduction: Allegro vivace", "Variation 1: (Precedente)", "Tema: L'istesso tempo", "Variation 2: L'istesso tempo", "Variation 3: L'istesso tempo", "Variation 4: Più vivo"].map(rhapsody), rach),
+      album("ranges", ["Introduction. Allegro vivace", "Variation 1", "Theme", "Variations 2-3", "Variation 4"].map(rhapsody), rach),
+    ],
+    goldberg: [
+      album("range", ["Aria", "Variations 1-3"].map(goldberg), bach),
+      album("variatio", ["Aria", "Variatio 1 a 1 Clav.", "Variatio 2 a 1 Clav.", "Variatio 3 a 1 Clav. Canone all'Unisono"].map(goldberg), bach),
+    ],
+    aria: [
+      album("returns", ["Aria", "Variatio 1 a 1 Clav.", "Variatio 2 a 1 Clav.", "Variatio 3 a 1 Clav.", "Aria"].map(goldberg), bach),
+      album("da-capo", ["Aria", "Variation 1", "Variation 2", "Variation 3", "Aria da capo"].map(goldberg), bach),
+    ],
+  };
+  const outcome = {};
+  for (const [name, [first, second]] of Object.entries(cases))
+    for (const order of [[first, second], [second, first]]) {
+      const c = await catalogueWith(t, order);
+      for (const { id } of order) autoMatchTaggedWorks(c, { albumId: id, actor: "admin", allowStructuredTitles: true });
+      const works = c.db.prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL").all().map((row) => row.id);
+      const movements = Object.fromEntries(works.map((work) => [work, workMovementTitles(c, work, true)]));
+      const rows = (albumId) =>
+        c.db
+          .prepare(
+            `SELECT r.work_id,i.movement_id,i.segment_id FROM realization_item i JOIN realization r ON r.id=i.realization_id JOIN segment s ON s.id=i.segment_id
+             JOIN track_link t ON t.id=s.track_link_id WHERE CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=? ORDER BY i.sequence`,
+          )
+          .all(albumId)
+          .map((row) => [row.segment_id, movements[row.work_id].indexOf(row.movement_id) + 1]);
+      outcome[`${name} ${order.map((a) => a.id).join(" then ")}`] = {
+        works: works.length,
+        movements: works.map((work) => workMovementTitles(c, work)),
+        tracks: Object.fromEntries(order.map(({ id }) => {
+          const bySegment = new Map();
+          for (const [segment, at] of rows(id)) bySegment.set(segment, [...(bySegment.get(segment) || []), at]);
+          return [id, [...bySegment.values()]];
+        })),
+        reviews: c.db.prepare("SELECT json_extract(evidence,'$.reason') AS r FROM review_item WHERE status='open'").all().map((row) => row.r),
+      };
+    }
+  // One work in either order, the range track on each variation it holds,
+  // the closing Aria its own movement, and nothing left for review.
+  const paganini = ["Introduction", "Variation 1", "Theme", "Variation 2", "Variation 3", "Variation 4"];
+  for (const order of ["each then ranges", "ranges then each"]) {
+    const { works, movements, tracks, reviews } = outcome[`paganini ${order}`];
+    assert.deepEqual([works, reviews], [1, []], order);
+    assert.equal(movements[0].length, paganini.length, order);
+    assert.deepEqual(tracks.each, [[1], [2], [3], [4], [5], [6]], order);
+    assert.deepEqual(tracks.ranges, [[1], [2], [3], [4, 5], [6]], order);
+  }
+  assert.deepEqual(outcome["paganini ranges then each"].movements[0], ["Introduction. Allegro vivace", ...paganini.slice(1, 2), "Theme", ...paganini.slice(3)]);
+  for (const order of ["range then variatio", "variatio then range"]) {
+    const { works, movements, tracks, reviews } = outcome[`goldberg ${order}`];
+    assert.deepEqual([works, reviews, movements[0].length], [1, [], 4], order);
+    assert.deepEqual(tracks.range, [[1], [2, 3, 4]], order);
+    assert.deepEqual(tracks.variatio, [[1], [2], [3], [4]], order);
+  }
+  // Never a movement named for the range.
+  assert.deepEqual(outcome["goldberg range then variatio"].movements[0], ["Aria", "Variation 1", "Variation 2", "Variation 3"]);
+  for (const order of ["returns then da-capo", "da-capo then returns"]) {
+    const { works, movements, tracks, reviews } = outcome[`aria ${order}`];
+    assert.deepEqual([works, reviews, movements[0].length], [1, [], 5], order);
+    assert.deepEqual(tracks.returns, [[1], [2], [3], [4], [5]], order);
+    assert.deepEqual(tracks["da-capo"], [[1], [2], [3], [4], [5]], order);
+  }
+  assert.deepEqual(outcome["aria returns then da-capo"].movements[0].map((title) => title.split(" ")[0]), ["Aria", "Variatio", "Variatio", "Variatio", "Aria"]);
+});
+
+test("matching: sections split on a range, a list or a dash before a section; others stay whole", () => {
+  assert.deepEqual(sectionTitles("Variations 1-3"), ["Variation 1", "Variation 2", "Variation 3"]);
+  assert.deepEqual(sectionTitles("Vars. IV–VI"), ["Variation 4", "Variation 5", "Variation 6"]);
+  assert.deepEqual(sectionTitles("Variations 1 and 2"), ["Variation 1", "Variation 2"]);
+  assert.deepEqual(sectionTitles("Theme and Var. 1"), ["Theme", "Variation 1"]);
+  assert.deepEqual(sectionTitles("Introduction, Variation 1 & Theme"), ["Introduction", "Variation 1", "Theme"]);
+  assert.deepEqual(sectionTitles("Introduction - Variation 1 - Tema"), ["Introduction", "Variation 1", "Tema"]);
+  // A tempo after a dash, a fugue closing a movement and words joined by
+  // "and" are one section.
+  for (const whole of ["Theme - Andante", "III. Adagio ma non troppo - Fuga", "Allegro, ma non troppo", "Return Home / Heimkehr", "Variations 3-3"])
+    assert.deepEqual(sectionTitles(whole), [whole]);
+  // "Variatio" is a variation: Goldberg's movement names line up by number.
+  const goldberg = ["Aria", "Variatio 1 a 1 Clav.", "Variatio 2 a 1 Clav.", "Variatio 3 a 1 Clav. Canone all'Unisono"].map((title, i) => ({ id: `g${i}`, position: i + 1, title, ...movementParts(title) }));
+  const tracks = (...titles) => titles.map((movementTitle) => ({ movementTitle }));
+  assert.deepEqual(mapToMovements(goldberg, tracks("Variation 3", "Variation 1")), ["g3", "g1"]);
+});
+
+test("matching: the library pass splits a movement an older version named for a range of variations", async (t) => {
+  const bach = (title) => ({ title, composer: ["Johann Sebastian Bach"], genres: ["Classical"] });
+  const goldberg = (m) => `Goldberg Variations, BWV 988: ${m}`;
+  const c = await catalogueWith(t, [
+    { id: "range", album: "range", albumArtist: "Pianist", artist: "Pianist", titles: ["Aria", "Variations 1-3"].map(goldberg).map(bach) },
+    { id: "variatio", album: "variatio", albumArtist: "Pianist", artist: "Pianist", titles: ["Aria", "Variatio 1 a 1 Clav.", "Variatio 2 a 1 Clav.", "Variatio 3 a 1 Clav."].map(goldberg).map(bach) },
+  ]);
+  autoMatchTaggedWorks(c, { albumId: "range", actor: "admin", allowStructuredTitles: true });
+  const work = renderAlbumPresentation(c, "range").groups[0].workId;
+  const items = c.db
+    .prepare(
+      `SELECT i.movement_id,i.segment_id FROM realization_item i JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id
+       WHERE CAST(json_extract(t.evidence,'$.albumId') AS TEXT)='range' ORDER BY i.sequence`,
+    )
+    .all();
+  combineMovements(c, work, items, () => "Variations 1-3");
+  assert.deepEqual(workMovementTitles(c, work), ["Aria", "Variations 1-3"]);
+
+  // The library pass splits it, before any other album asks (the second
+  // album is held out of the pass).
+  const hold = (state) =>
+    c.db
+      .prepare("UPDATE classification SET state=? WHERE target_id IN (SELECT id FROM track_link WHERE CAST(json_extract(evidence,'$.albumId') AS TEXT)='variatio')")
+      .run(state);
+  hold("not_classical");
+  autoMatchTaggedWorks(c, { actor: "admin", allowStructuredTitles: true });
+  assert.deepEqual(workMovementTitles(c, work), ["Aria", "Variation 1", "Variation 2", "Variation 3"]);
+  hold("classical");
+  autoMatchTaggedWorks(c, { albumId: "variatio", actor: "admin", allowStructuredTitles: true });
+  assert.deepEqual(workMovementTitles(c, work), ["Aria", "Variation 1", "Variation 2", "Variation 3"]);
+  assert.deepEqual(renderAlbumPresentation(c, "variatio").groups.map((group) => [group.workId, group.items.length, group.missing.length]), [[work, 4, 0]]);
+  assert.deepEqual(renderAlbumPresentation(c, "range").groups.map((group) => [group.workId, group.missing.length]), [[work, 0]]);
+  assert.equal(c.db.prepare("SELECT COUNT(*) AS n FROM review_item WHERE status='open'").get().n, 0);
 });
 
 // From explain-musicbrainz on the user's library: MusicBrainz names the

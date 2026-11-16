@@ -1,3 +1,31 @@
+# v0.3 Phase 0.11 — L6/L7/L8/L13 / issue #20
+
+Base: `aurral-classical` `c61dcea`, including merged L1 PR #103. This follows the handoff sequence (Batch B after L1).
+
+## Result
+
+- **Prototype applied:** `variations-prototype.patch` applies cleanly on top of L1 (offsets only). Its parts, each now with a plain comment: `rawSections` and `expandSection` (ranges, lists, dash before a section; L6, L8), `variatio` in the three variation patterns and `asVariation` returning the number, used as the index in `mapEach` (L7), variation numbers compared first in `namedMovement` (L7, L6), a named section taking the earliest free movement of that name (L6, L13), and `returnsAtEnd` in `candidates` (L13). As #20 warns, fuga and finale are not added to the dash split, so "III. Adagio ma non troppo - Fuga" stays one movement.
+- **Data repair (not in the prototype):** the library pass found works to split only by movement titles containing " / ". It now reads each movement title through `sectionTitles`, so works an older version made with a "Variations 1-3" or "Theme and Var. 1" movement are split too. `splitCombinedMovements` is unchanged and still splits only unedited works that matching made.
+- **Corpus scorer:** `score()` in `test/corpus/apple.js` also returns `matched`, the share of an album's tracks in a group with a work. `test/corpus-apple.test.js` fails when `matched` falls and compares row wording only while `matched` is unchanged. The baseline is re-saved with `node scripts/corpus.mjs --apple --update-baseline`.
+
+## Corpus baseline
+
+Comparing the scorer's results for the code before and after this change (same scorer), 10 of 612 results move, all the same way: `matched` rises (0–0.32 to 0.97–1), `parts` falls, and grouping and false joins are unchanged everywhere. They are the five results #20 traced (store 1640004922, work-tags 1608042390 and 1640004922, messy 1467953807 and 1691120087) plus store and work-tags 1691120087 and the three styles of 476935391 (Gould's 1981 Goldberg, previously unmatched because of its closing "Aria da capo"; L13). Every row in these ten results whose Apple part names a variation was checked against the row's own variation number, in the full shared catalogue: 267 rows, 0 on the wrong variation. `parts` falls only because rows now show the work's movement names, the issue's documented side effect; changing row wording is out of scope. The re-saved file also records eight results (862972382, 1452145443, 1648305509, 269682146, 734587111, 752033492, 884005057 across styles) whose values were already those on the code before this change; earlier phases improved them without re-saving.
+
+## Verification
+
+On Node 22.23:
+
+- Full `npm test`: 404/404.
+- New `variation ranges, Variatio and a returning Aria join one work in either order`: Paganini per-variation album vs "Variations 2-3", Goldberg "Variations 1-3" vs "Variatio 1–3", Goldberg "Aria … Aria" vs "Aria … Aria da capo", each in both scan orders. Each run makes one work, puts a range track on every variation it holds, never names a movement for the range, keeps the closing Aria as its own movement and opens no review.
+- New `sections split on a range, a list or a dash before a section`: ranges (arabic and roman), "and" and comma lists, "Introduction - Variation 1 - Tema"; "Theme - Andante", "III. Adagio ma non troppo - Fuga", "Allegro, ma non troppo", "Return Home / Heimkehr" and "Variations 3-3" stay whole; "Variation 3" maps to "Variatio 3 a 1 Clav.".
+- New `the library pass splits a movement an older version named for a range`: a work stored as "Aria", "Variations 1-3" is split by the library pass alone (the other album held out of it), then the other album joins with no missing movements or review. With the old " / "-only query it fails.
+- The three new tests fail on base `c61dcea`. The existing `several variations a movement` test now uses a `combineMovements` helper extracted from its own setup and passes on both.
+
+Not rerun: the `p6`/`p7`/`f3`/`f5` review probes (the new tests cover their cases). No browser, Compose or restart run locally (no Docker).
+
+---
+
 # v0.3 Phase 0.10 — L1 / issue #19
 
 Base: `aurral-classical` `f055abe`, including merged C1 PR #102. This follows the handoff sequence (L1 after C1). No other issue is implemented here.
