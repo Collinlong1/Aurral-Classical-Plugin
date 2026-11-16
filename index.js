@@ -37181,13 +37181,24 @@ function reconcile(catalogue, snapshot2) {
       );
       return {
         old,
+        exact: changedEpoch ? null : exact,
         items: changedEpoch ? [] : exact ? [exact] : [...pool].filter((item) => match(old, item))
       };
     });
+    const exactDemand = /* @__PURE__ */ new Map();
+    for (const c of candidates2)
+      if (c.exact) exactDemand.set(c.exact, (exactDemand.get(c.exact) || 0) + 1);
+    const claimed = /* @__PURE__ */ new Set();
+    for (const c of candidates2)
+      if (c.exact && exactDemand.get(c.exact) === 1) claimed.add(c.exact);
+    const exactClaims = new Set(claimed);
+    for (const c of candidates2)
+      if (!c.exact || exactDemand.get(c.exact) !== 1)
+        c.items = c.items.filter((item) => !claimed.has(item));
     const demand = /* @__PURE__ */ new Map();
     for (const c of candidates2)
       for (const item of c.items) demand.set(item, (demand.get(item) || 0) + 1);
-    const claimed = /* @__PURE__ */ new Set(), rows = [], now = Date.now();
+    const rows = [], now = Date.now();
     db.prepare("UPDATE track_link SET state='missing' WHERE instance_id=?").run(
       snapshot2.instanceId
     );
@@ -37214,7 +37225,7 @@ function reconcile(catalogue, snapshot2) {
         rows.push({ ...item, id: old.id });
       } else {
         const reused = tracks.filter(
-          (t) => t.coreId === old.core_id || t.path === JSON.parse(old.evidence).path
+          (t) => !exactClaims.has(t) && (t.coreId === old.core_id || t.path === JSON.parse(old.evidence).path)
         );
         if (changedEpoch || items.length || reused.length) {
           db.prepare(

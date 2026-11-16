@@ -13,18 +13,22 @@ import {
   SYNC_INTERVAL_MS,
 } from "../src/model/runtime.js";
 import { openCatalogue } from "../src/model/catalogue.js";
+import { reconcile } from "../src/model/reconcile.js";
+import { Metadata } from "../src/model/metadata.js";
 
-async function library(t, count = 3) {
+async function library(t, count = 3, { identical = false } = {}) {
   const folders = await tempFolders();
   t.after(() => fs.rm(folders.root, { recursive: true, force: true }));
   const files = [];
   for (let i = 0; i < count; i++) {
     const file = await copyFixture("sine.flac", path.join(folders.libraryFolder, `${i}.flac`));
-    // Distinct audio per file (identical copies are legitimately ambiguous).
-    const { size } = await fs.stat(file);
-    const fd = await fs.open(file, "r+");
-    await fd.write(Buffer.from([i + 1]), 0, 1, size - 50);
-    await fd.close();
+    // Most fixtures use distinct audio; duplicate-copy tests retain the same bytes.
+    if (!identical) {
+      const { size } = await fs.stat(file);
+      const fd = await fs.open(file, "r+");
+      await fd.write(Buffer.from([i + 1]), 0, 1, size - 50);
+      await fd.close();
+    }
     await fs.utimes(file, 1_000_000_000, 1_000_000_000);
     files.push(file);
   }
@@ -309,4 +313,106 @@ test("a scan waits for another connection's write instead of failing as locked",
   await runModelJobs(ctx, { budgetMs: 60_000 });
   await done;
   assert.equal((await modelStatus(ctx)).scan.state, "done");
+});
+
+async function duplicateCatalogue(t) {
+  const folders = await tempFolders(), c = await openCatalogue(folders.dataFolder);
+  t.after(async () => { c.close(); await fs.rm(folders.root, { recursive: true, force: true }); });
+  const track = (id) => ({ coreId: id, fileId: id, path: `/library/${id}.flac`, size: 1000, durationMs: 60000, fingerprint: "audio-sha256-v2:identical", hints: { title: id } });
+  let generation = 0;
+  const scan = (tracks, epoch = "e") => reconcile(c, { version: 1, complete: true, instanceId: "i", epoch, generation: ++generation, tracks });
+  return { c, track, scan };
+}
+for (const movedFirst of [true, false]) {
+  test(`#16 exact copies are reserved before a duplicate-audio move (moved first: ${movedFirst})`, async (t) => {
+    const { c, track, scan } = await duplicateCatalogue(t);
+    const original = [track("moved"), track("fixed")];
+    if (!movedFirst) original.reverse();
+    const rows = scan(original), ids = Object.fromEntries(rows.map((r) => [r.coreId, r.id]));
+    const m = new Metadata(c);
+    for (const row of rows) m.manual(row.id, "title", `Pinned ${row.coreId}`, { actor: "1", pin: true });
+    const moved = { ...track("moved"), coreId: "new-core", fileId: "new-file", path: "/library/renamed.flac" };
+    const result = scan([track("fixed"), moved]);
+    assert.equal(result.length, 2);
+    assert.equal(result.find((r) => r.coreId === "new-core").id, ids.moved);
+    assert.equal(result.find((r) => r.coreId === "fixed").id, ids.fixed);
+    assert.equal(m.resolve(ids.moved, "title").value, "Pinned moved");
+    assert.equal(m.resolve(ids.fixed, "title").value, "Pinned fixed");
+    assert.deepEqual(c.db.prepare("SELECT state FROM track_link").all().map((r) => r.state), ["active", "active"]);
+    const evidence = c.db.prepare("SELECT count(*) AS n FROM track_evidence").get().n;
+    scan([moved, track("fixed")]);
+    assert.equal(c.db.prepare("SELECT count(*) AS n FROM track_evidence").get().n, evidence);
+    assert.equal(c.db.prepare("SELECT count(*) AS n FROM review_item WHERE kind='track_link'").get().n, 0);
+  });
+}
+
+test("#16 deleting one of 28 identical copies leaves the exact copies active and only the deleted link missing", async (t) => {
+  const { c, track, scan } = await duplicateCatalogue(t);
+  const original = Array.from({ length: 28 }, (_, i) => track(String(i)));
+  const before = scan(original);
+  const after = scan(original.slice(1));
+  assert.deepEqual(after.map((r) => r.id), before.slice(1).map((r) => r.id));
+  assert.equal(c.db.prepare("SELECT state FROM track_link WHERE id=?").get(before[0].id).state, "missing");
+  assert.equal(c.db.prepare("SELECT count(*) AS n FROM track_link WHERE state='active'").get().n, 27);
+  assert.equal(c.db.prepare("SELECT count(*) AS n FROM review_item WHERE kind='track_link'").get().n, 0);
+  assert.deepEqual(c.db.prepare("PRAGMA foreign_key_check").all(), []);
+});
+
+test("#16 two indistinguishable moved copies stay ambiguous while an exact third copy stays active", async (t) => {
+  const { c, track, scan } = await duplicateCatalogue(t);
+  const rows = scan([track("a"), track("b"), track("fixed")]);
+  scan([{ ...track("x"), path: "/library/moved/x.flac" }, { ...track("y"), path: "/library/moved/y.flac" }, track("fixed")]);
+  for (const row of rows.slice(0, 2)) assert.equal(c.db.prepare("SELECT state FROM track_link WHERE id=?").get(row.id).state, "review");
+  assert.equal(c.db.prepare("SELECT state FROM track_link WHERE id=?").get(rows[2].id).state, "active");
+  const reviews = c.db.prepare("SELECT evidence FROM review_item WHERE kind='track_link'").all();
+  assert.equal(reviews.length, 2);
+  for (const row of reviews) assert.deepEqual(JSON.parse(row.evidence).candidates.map((r) => r.coreId).sort(), ["x", "y"]);
+  assert.equal(c.db.prepare("SELECT count(*) AS n FROM track_link").get().n, 3);
+});
+
+test("#16 an epoch change does not reserve exact-looking duplicate copies", async (t) => {
+  const { c, track, scan } = await duplicateCatalogue(t);
+  const tracks = [track("a"), track("b")], old = scan(tracks);
+  scan(tracks, "new-epoch");
+  for (const row of old) assert.equal(c.db.prepare("SELECT state FROM track_link WHERE id=?").get(row.id).state, "review");
+  assert.equal(c.db.prepare("SELECT count(*) AS n FROM track_link WHERE state='active'").get().n, 2);
+});
+
+test("#16 real identical-audio files keep their links when one moves and another is deleted", async (t) => {
+  const { ctx, files } = await library(t, 28, { identical: true });
+  const scan = async () => { await enqueueModelScan(ctx, { id: 1, role: "admin" }); await runModelJobs(ctx, { budgetMs: 60000 }); };
+  const links = async () => { const c = await openCatalogue(path.join(ctx.dataFolder, "model")); try { return c.db.prepare("SELECT id,core_id,state,evidence FROM track_link ORDER BY CAST(core_id AS INTEGER)").all(); } finally { c.close(); } };
+  await scan(); const before = await links();
+  const renamed = path.join(ctx.libraryFolder, "renamed.flac");
+  await fs.rename(files[0], renamed); files[0] = renamed;
+  await scan();
+  let after = await links();
+  assert.deepEqual(after.map((r) => r.id), before.map((r) => r.id));
+  assert.ok(after.every((r) => r.state === "active"));
+  await fs.rm(files.pop()); await scan(); after = await links();
+  assert.deepEqual(after.map((r) => r.id), before.map((r) => r.id));
+  assert.equal(after.filter((r) => r.state === "active").length, 27);
+  assert.equal(after.at(-1).state, "missing");
+});
+
+test("#16 conflicting historical exact claims remain in review without stealing a fixed copy", async (t) => {
+  const { c, track, scan } = await duplicateCatalogue(t);
+  const original = [track("a"), track("fixed")], rows = scan(original);
+  c.db.prepare(`INSERT INTO track_link SELECT 'historical-review',instance_id,core_id,file_id,'review',evidence,revision,created_at,updated_at
+    FROM track_link WHERE id=?`).run(rows[0].id);
+  c.db.prepare("INSERT INTO metadata_target(id,track_link_id) VALUES ('historical-review','historical-review')").run();
+  const result = scan(original);
+  assert.deepEqual(result.map((r) => r.id), [rows[1].id]);
+  for (const id of [rows[0].id, "historical-review"]) assert.equal(c.db.prepare("SELECT state FROM track_link WHERE id=?").get(id).state, "review");
+  assert.equal(c.db.prepare("SELECT state FROM track_link WHERE id=?").get(rows[1].id).state, "active");
+});
+
+test("#16 deleting an identical file sharing a core track does not review the exact remaining file", async (t) => {
+  const { c, track, scan } = await duplicateCatalogue(t);
+  const a = { ...track("a"), coreId: "shared-track" }, b = { ...track("b"), coreId: "shared-track" };
+  const before = scan([a, b]);
+  const after = scan([a]);
+  assert.deepEqual(after.map((r) => r.id), [before[0].id]);
+  assert.equal(c.db.prepare("SELECT state FROM track_link WHERE id=?").get(before[1].id).state, "missing");
+  assert.equal(c.db.prepare("SELECT count(*) AS n FROM review_item WHERE kind='track_link'").get().n, 0);
 });
