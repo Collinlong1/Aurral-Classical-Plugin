@@ -1,3 +1,16 @@
+# v0.3 Phase 1.5 — contributor identity / issue #55
+
+## Result
+
+- `auto-match.js` `composerPeople` indexes every person (name, `aliases` field, `alias` table); `canonicalComposers`, `composerEntity` and the ambiguous-composer check therefore see performers too. `mergeDuplicateComposers` filters to composers (`isComposer`), so performers of one name are never merged automatically.
+- `contributors.js`: `artistIds` aligns `artistMbids` with the artist tag's names only on equal counts; `deriveCredits` keeps an ID only when every track gives the same one; `contributorFor` follows the identity rule above and opens `contributor_identity` for a new record whose name another record holds. A name two records share without an ID still gets no credit (2.7 adds its review).
+
+## Verification
+
+On Node 22.23: full `npm test` 413/413; Apple corpus identical to the baseline (612/612). New `identity: …` test in `test/contributors.test.js`: Rachmaninoff matched first as the pianist on a Chopin album, then as the composer, is one person with both roles; two "John Williams" albums with different IDs make two records, the second with one open review; "Johnny Williams" with the second ID is credited to that record; one ID for two names is not used. It fails on base `ea1eb8d`.
+
+---
+
 # v0.3 Phase 1.4 — derived performer credits / issue #52
 
 ## Result

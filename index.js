@@ -29607,8 +29607,8 @@ var require_appleTag = __commonJS({
       }
       /** @inheritDoc */
       set musicBrainzArtistId(v) {
-        const artistIds = v.split("/");
-        this.setItunesStrings("com.apple.iTunes", "MusicBrainz Artist Id", ...artistIds);
+        const artistIds2 = v.split("/");
+        this.setItunesStrings("com.apple.iTunes", "MusicBrainz Artist Id", ...artistIds2);
       }
       /** @inheritDoc */
       get musicBrainzReleaseGroupId() {
@@ -39337,12 +39337,7 @@ function catalogueIndex(catalogue) {
 }
 function composerPeople(catalogue) {
   const people = /* @__PURE__ */ new Map();
-  for (const { id } of catalogue.db.prepare(
-    `SELECT id FROM entity WHERE kind='person' AND deleted_at IS NULL
-       AND (json_extract(data,'$.roles') LIKE '%composer%'
-         OR EXISTS(SELECT 1 FROM credit WHERE contributor_id=entity.id AND role='composer' AND state='active'))
-       ORDER BY created_at,id`
-  ).all()) {
+  for (const { id } of catalogue.db.prepare("SELECT id FROM entity WHERE kind='person' AND deleted_at IS NULL ORDER BY created_at,id").all()) {
     const name = resolvedName(catalogue, id, "name");
     if (typeof name !== "string" || !words2(name)) continue;
     const other = resolvedName(catalogue, id, "aliases");
@@ -40463,10 +40458,14 @@ function mergeContributor(catalogue, keep, drop, actor3) {
   catalogue.db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), drop);
   catalogue.audit("person.merge", drop, { into: keep }, actor3);
 }
+var isComposer = (catalogue, id) => catalogue.db.prepare(
+  `SELECT 1 FROM entity WHERE id=? AND deleted_at IS NULL AND (json_extract(data,'$.roles') LIKE '%composer%'
+         OR EXISTS(SELECT 1 FROM credit WHERE contributor_id=entity.id AND role='composer' AND state='active'))`
+).get(id);
 function mergeDuplicateComposers(catalogue, index, actor3) {
   let merged = 0;
   for (const [name, candidates2] of index.people) {
-    const ids = candidates2.filter((id) => words2(resolvedName(catalogue, id, "name") || "") === name && catalogue.db.prepare("SELECT 1 FROM entity WHERE id=? AND deleted_at IS NULL").get(id));
+    const ids = candidates2.filter((id) => words2(resolvedName(catalogue, id, "name") || "") === name && isComposer(catalogue, id));
     if (ids.length < 2) continue;
     const auto = ids.filter(
       (id) => !hasManualEdits(catalogue, [id]) && !catalogue.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND provider!='embedded-tags'").get(id)
@@ -41028,14 +41027,20 @@ function ensembleRole(name) {
   if (/\b(choir\w*|chor\w*|coro|chorus|singers|voices)\b/i.test(name)) return "choir";
   return "ensemble";
 }
+function artistIds(hints) {
+  const ids = list(hints.artistMbids);
+  const names = (text2(hints.artist) || text2(hints.albumArtist)).split(/\s+[—–]\s+|\s*;\s*/).map((name) => name.trim()).filter(Boolean).flatMap(splitList);
+  return ids.length && ids.length === names.length ? new Map(names.map((name, i) => [words3(name), ids[i]])) : /* @__PURE__ */ new Map();
+}
 function trackCredits(hints = {}) {
   const conductor = text2(hints.conductor);
+  const ids = artistIds(hints);
   const credits3 = [];
   const add = (name, instrument = null) => {
     const clean4 = name.trim();
     if (!clean4 || words3(clean4) === words3(conductor) || credits3.some((credit) => words3(credit.name) === words3(clean4))) return;
     const kind = isEnsemble(clean4) ? "ensemble" : "person";
-    credits3.push({ name: clean4, kind, role: kind === "ensemble" ? ensembleRole(clean4) : "performer", instrument });
+    credits3.push({ name: clean4, kind, role: kind === "ensemble" ? ensembleRole(clean4) : "performer", instrument, mbid: ids.get(words3(clean4)) || null });
   };
   const tagged = list(hints.performers);
   if (tagged.length)
@@ -41044,7 +41049,7 @@ function trackCredits(hints = {}) {
       add(name, instrument?.trim() || null);
     }
   else for (const name of performerNames(hints)) for (const piece of splitList(name)) add(piece);
-  if (conductor && !isEnsemble(conductor)) credits3.unshift({ name: conductor, kind: "person", role: "conductor", instrument: null });
+  if (conductor && !isEnsemble(conductor)) credits3.unshift({ name: conductor, kind: "person", role: "conductor", instrument: null, mbid: ids.get(words3(conductor)) || null });
   return credits3;
 }
 function contributorIndex(c) {
@@ -41059,28 +41064,29 @@ function contributorIndex(c) {
   }
   return byName;
 }
+var artistIdOf2 = (c, id) => c.db.prepare("SELECT record_id FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='artist' AND state='active'").get(id)?.record_id || null;
 function contributorFor(c, index, name, { mbid = null, kind = "person", metadata = new Metadata(c) } = {}) {
   const key = words3(name);
   if (!key) return null;
+  const existing = index[kind].get(key) || [];
   if (mbid) {
     const known = c.db.prepare(
       `SELECT x.entity_id FROM external_identity x JOIN entity e ON e.id=x.entity_id
          WHERE x.provider='musicbrainz' AND x.record_kind='artist' AND x.record_id=? AND x.state='active' AND e.deleted_at IS NULL AND e.kind=?`
     ).get(mbid, kind)?.entity_id;
     if (known) return known;
-  }
-  const existing = index[kind].get(key) || [];
-  if (existing.length > 1) return null;
-  if (existing.length === 1) {
-    const other = mbid && c.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='artist' AND state='active'").get(existing[0]);
-    if (!other) {
-      if (mbid) c.externalIdentity(existing[0], "musicbrainz", "artist", mbid, { evidence: { source: "tags" } });
-      return existing[0];
+    const unidentified = existing.filter((id2) => !artistIdOf2(c, id2));
+    if (unidentified.length === 1) {
+      c.externalIdentity(unidentified[0], "musicbrainz", "artist", mbid, { evidence: { source: "tags" } });
+      return unidentified[0];
     }
-  }
+  } else if (existing.length > 1) return null;
+  else if (existing.length === 1) return existing[0];
   const id = c.createEntity(kind, { unreviewed: true });
   metadata.derived(id, "name", name);
   if (mbid) c.externalIdentity(id, "musicbrainz", "artist", mbid, { evidence: { source: "tags" } });
+  if (existing.length)
+    c.review("contributor_identity", id, { reason: "same-name-different-id", name, mbid, others: existing });
   index[kind].set(key, [...existing, id]);
   return id;
 }
@@ -41108,13 +41114,16 @@ function deriveCredits(c, { albumId = null } = {}) {
     const perTrack = tracksOf.all(performance2).map((row) => trackCredits(JSON.parse(row.evidence).hints || {}));
     if (!perTrack.length) continue;
     const signature = (credit) => `${credit.role}|${credit.kind}|${words3(credit.name)}|${credit.instrument || ""}`;
-    const shared = perTrack[0].filter((credit) => perTrack.every((credits3) => credits3.some((other) => signature(other) === signature(credit))));
+    const shared = perTrack[0].filter((credit) => perTrack.every((credits3) => credits3.some((other) => signature(other) === signature(credit)))).map((credit) => {
+      const ids = new Set(perTrack.map((credits3) => credits3.find((other) => signature(other) === signature(credit)).mbid));
+      return { ...credit, mbid: ids.size === 1 ? [...ids][0] : null };
+    });
     if (!shared.length) continue;
     index ??= contributorIndex(c);
     metadata ??= new Metadata(c);
     let position = c.db.prepare("SELECT coalesce(max(position),0) AS n FROM credit WHERE target_id=?").get(performance2).n;
     for (const credit of shared) {
-      const contributor = contributorFor(c, index, credit.name, { kind: credit.kind, metadata });
+      const contributor = contributorFor(c, index, credit.name, { kind: credit.kind, mbid: credit.mbid, metadata });
       if (!contributor) continue;
       c.credit(performance2, contributor, credit.role, { instrument: credit.instrument, position: ++position, source: "derived" });
       added++;
@@ -41449,10 +41458,10 @@ function buildDocuments(c) {
     const v = values.get(id) || {};
     const display2 = name(id);
     if (!display2) continue;
-    const isComposer2 = entry.roles.has("composer");
+    const isComposer3 = entry.roles.has("composer");
     const performerRoles = [...entry.roles].filter((role) => PERFORMER_ROLES.has(role));
     const facets = [];
-    if (isComposer2) facets.push(["composer", id, display2]);
+    if (isComposer3) facets.push(["composer", id, display2]);
     for (const role of performerRoles) {
       facets.push(["performer", id, display2]);
       if (role === "conductor") facets.push(["conductor", id, display2]);
@@ -41460,7 +41469,7 @@ function buildDocuments(c) {
     }
     const common = { ref: id, title: display2, owned: true, primary: [display2, ...list2(v.aliases)], secondary: [], keys: [], facets: dedupeFacets(facets) };
     const label = [...entry.roles].map((role) => ROLE_LABEL[role] || role).join(" \xB7 ");
-    if (isComposer2) docs.push({ ...common, kind: "composer", subtitle: "Composer", detail: `${entry.works} work${entry.works === 1 ? "" : "s"}`, boost: KIND_BOOST.composer, data: { roles: [...entry.roles] } });
+    if (isComposer3) docs.push({ ...common, kind: "composer", subtitle: "Composer", detail: `${entry.works} work${entry.works === 1 ? "" : "s"}`, boost: KIND_BOOST.composer, data: { roles: [...entry.roles] } });
     if (performerRoles.length) docs.push({ ...common, kind: "performer", subtitle: label, detail: "", boost: KIND_BOOST.performer, data: { roles: performerRoles } });
   }
   const albums2 = /* @__PURE__ */ new Map();
@@ -41940,7 +41949,7 @@ function entities(c, kinds2) {
        ORDER BY created_at,id`
   ).all(...kinds2).map((row) => ({ ...row, data: JSON.parse(row.data), label: entityLabel(c, row.id, row.kind) }));
 }
-var isComposer = (c, person) => person.data.roles?.includes("composer") || !!c.db.prepare("SELECT 1 FROM credit WHERE contributor_id=? AND role='composer' AND state='active' LIMIT 1").get(person.id);
+var isComposer2 = (c, person) => person.data.roles?.includes("composer") || !!c.db.prepare("SELECT 1 FROM credit WHERE contributor_id=? AND role='composer' AND state='active' LIMIT 1").get(person.id);
 function credits(c, target) {
   return c.db.prepare(
     `SELECT k.* FROM credit k JOIN entity e ON e.id=k.contributor_id
@@ -42472,7 +42481,7 @@ function workView(c, work, page = 0, section = "details", { orderField = false }
 function contributorView(c, entity, page = 0) {
   const kind = entity.kind;
   const name = entity.label;
-  const composer = kind === "person" && isComposer(c, entity);
+  const composer = kind === "person" && isComposer2(c, entity);
   const works = worksOf(c, entity.id);
   const creditRows = c.db.prepare(
     `SELECT k.*,e.kind AS target_kind FROM credit k JOIN entity e ON e.id=k.target_id
@@ -43351,7 +43360,7 @@ function listFor(c, tab, q, extra = {}) {
   }
   if (tab === "composers" || tab === "performers") {
     const people = entities(c, tab === "composers" ? ["person"] : ["person", "ensemble"]).filter(
-      (entity) => tab === "composers" ? isComposer(c, entity) : entity.kind === "ensemble" || !isComposer(c, entity)
+      (entity) => tab === "composers" ? isComposer2(c, entity) : entity.kind === "ensemble" || !isComposer2(c, entity)
     );
     return people.map((entity) => {
       const works = tab === "composers" ? worksOf(c, entity.id).length : null;
@@ -43423,7 +43432,7 @@ function renderV2(c, query, revision2, { downloads = null, maintenance: maintena
     const kind = selection && !selection.includes(":") ? c.db.prepare("SELECT kind,data FROM entity WHERE id=?").get(parseEntitySelection(selection).id) : null;
     const subject = selection.startsWith("merge:") ? parseMergeSelection(selection) : null;
     const subjectRow = subject ? c.db.prepare("SELECT kind,data FROM entity WHERE id=?").get(subject.a) : null;
-    tab = subject ? subject.review ? "review" : subjectRow?.kind === "work" ? "works" : subjectRow && isComposer(c, { id: subject.a, data: JSON.parse(subjectRow.data) }) ? "composers" : "performers" : selection.startsWith("slskd:") || selection === "maintenance" || selection.startsWith("change:") ? "activity" : selection.startsWith("bulk:") ? "works" : selection.startsWith("album:") || selection.startsWith("track:") ? "albums" : selection.startsWith("review:") ? "review" : selection.startsWith("new:") ? { work: "works", composer: "composers", performer: "performers" }[selection.slice(4)] || "works" : kind?.kind === "person" ? isComposer(c, { id: parseEntitySelection(selection).id, data: JSON.parse(kind.data) }) ? "composers" : "performers" : kind?.kind === "ensemble" ? "performers" : "works";
+    tab = subject ? subject.review ? "review" : subjectRow?.kind === "work" ? "works" : subjectRow && isComposer2(c, { id: subject.a, data: JSON.parse(subjectRow.data) }) ? "composers" : "performers" : selection.startsWith("slskd:") || selection === "maintenance" || selection.startsWith("change:") ? "activity" : selection.startsWith("bulk:") ? "works" : selection.startsWith("album:") || selection.startsWith("track:") ? "albums" : selection.startsWith("review:") ? "review" : selection.startsWith("new:") ? { work: "works", composer: "composers", performer: "performers" }[selection.slice(4)] || "works" : kind?.kind === "person" ? isComposer2(c, { id: parseEntitySelection(selection).id, data: JSON.parse(kind.data) }) ? "composers" : "performers" : kind?.kind === "ensemble" ? "performers" : "works";
   }
   const all = listFor(c, tab, q, { downloads });
   const filtered = q && tab !== "search" ? all.filter((item) => matchesSearch(item.search, q)) : all;
@@ -43513,7 +43522,7 @@ function lookupV2(c, query) {
   if (kind === "works")
     options = entities(c, ["work"]).map((work) => ({ value: work.id, label: work.label, detail: composerNames2(c, work.id).join(", ") || void 0 })).filter((option2) => !q || matchesSearch(`${option2.label} ${option2.detail || ""}`, q));
   else if (kind === "composers" || kind === "contributors")
-    options = entities(c, kind === "composers" ? ["person"] : ["person", "ensemble"]).filter((entity) => kind === "contributors" || isComposer(c, entity)).filter((entity) => !q || matchesSearch(entity.label, q)).map((entity) => ({ value: entity.id, label: entity.label, detail: entity.kind === "ensemble" ? "Ensemble" : isComposer(c, entity) ? "Composer" : "Person" }));
+    options = entities(c, kind === "composers" ? ["person"] : ["person", "ensemble"]).filter((entity) => kind === "contributors" || isComposer2(c, entity)).filter((entity) => !q || matchesSearch(entity.label, q)).map((entity) => ({ value: entity.id, label: entity.label, detail: entity.kind === "ensemble" ? "Ensemble" : isComposer2(c, entity) ? "Composer" : "Person" }));
   else if (kind === "tracks")
     options = q ? ownedTracks(c).filter((track) => matchesSearch(track.search, q)).map((track) => ({ value: track.id, label: track.title, detail: [track.artist, track.album].filter(Boolean).join(" \xB7 ") })) : [];
   else fail("Unknown lookup");
@@ -44006,7 +44015,7 @@ function applyV2(c, request, who) {
       const similar = warnDuplicate(c, title, composer ? [labelOf(c, composer)].filter(Boolean) : composerName ? [composerName] : [], v.createAnyway);
       if (composer) c.entity(composer, "person");
       else if (composerName) {
-        const existing = entities(c, ["person"]).filter((person) => searchText(person.label) === searchText(composerName) && isComposer(c, person));
+        const existing = entities(c, ["person"]).filter((person) => searchText(person.label) === searchText(composerName) && isComposer2(c, person));
         if (existing.length === 1) composer = existing[0].id;
         else {
           composer = c.createEntity("person", { roles: ["composer"] });

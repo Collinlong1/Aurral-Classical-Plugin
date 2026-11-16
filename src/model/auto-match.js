@@ -839,15 +839,13 @@ export function catalogueIndex(catalogue) {
   return { works, aliases, people: composerPeople(catalogue) };
 }
 
+// Every person by name and alias. A composer and a performer of the same
+// name, with no conflicting ID, are one person: Rachmaninoff at the piano is
+// Rachmaninoff the composer.
 function composerPeople(catalogue) {
   const people = new Map();
   for (const { id } of catalogue.db
-    .prepare(
-      `SELECT id FROM entity WHERE kind='person' AND deleted_at IS NULL
-       AND (json_extract(data,'$.roles') LIKE '%composer%'
-         OR EXISTS(SELECT 1 FROM credit WHERE contributor_id=entity.id AND role='composer' AND state='active'))
-       ORDER BY created_at,id`,
-    )
+    .prepare("SELECT id FROM entity WHERE kind='person' AND deleted_at IS NULL ORDER BY created_at,id")
     .all()) {
     const name = resolvedName(catalogue, id, "name");
     if (typeof name !== "string" || !words(name)) continue;
@@ -2379,12 +2377,19 @@ export function mergeContributor(catalogue, keep, drop, actor) {
 }
 
 // Merge composers that earlier auto-match passes created once per album.
+// Composers only: same-named performers are never merged automatically.
+const isComposer = (catalogue, id) =>
+  catalogue.db
+    .prepare(
+      `SELECT 1 FROM entity WHERE id=? AND deleted_at IS NULL AND (json_extract(data,'$.roles') LIKE '%composer%'
+         OR EXISTS(SELECT 1 FROM credit WHERE contributor_id=entity.id AND role='composer' AND state='active'))`,
+    )
+    .get(id);
 function mergeDuplicateComposers(catalogue, index, actor) {
   let merged = 0;
   for (const [name, candidates] of index.people) {
     // Shared aliases are ambiguous, never evidence for an automatic merge.
-    const ids = candidates.filter((id) => words(resolvedName(catalogue, id, "name") || "") === name &&
-      catalogue.db.prepare("SELECT 1 FROM entity WHERE id=? AND deleted_at IS NULL").get(id));
+    const ids = candidates.filter((id) => words(resolvedName(catalogue, id, "name") || "") === name && isComposer(catalogue, id));
     if (ids.length < 2) continue;
     const auto = ids.filter(
       (id) =>

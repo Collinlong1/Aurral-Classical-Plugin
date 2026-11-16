@@ -1,3 +1,11 @@
+# v0.3 Phase 1.5 — contributor identity by aliases and MusicBrainz IDs (issue #55)
+
+First of ten commits in one PR (1.5–1.7, 2.1–2.7) on `claude/pensive-bardeen-5dat3q`, from `aurral-classical` `ea1eb8d` (merged PR #104). Implements #55 only; #55 has no later comments.
+
+Composer matching now finds every person by name and alias, not only known composers, so a composer and a performer of one name with no conflicting ID are one person; the automatic merge of same-named records stays composers-only (plan S18). Derived credits use a track's MusicBrainz artist IDs when the artist tag lists exactly as many names, in order, and every track of the performance agrees. `contributorFor`: an ID's holder wins under any spelling; a lone same-named record without an ID gains it; a same-named record holding another ID is someone else, so a new record is made and a `contributor_identity` review (`same-name-different-id`) opens. Exact folded names and aliases only; no fuzzy matching. No schema or core change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
 # v0.3 Phase 1.4 — derive performer credits (issue #52)
 
 Last of five commits in one PR (0.11, 1.1–1.4). Implements #52 only; #52 has no later comments. 1.5 (identity by aliases and IDs across all contributors) and later items are not started.
