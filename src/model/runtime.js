@@ -32,6 +32,8 @@ const emptyTags = () => ({
   releaseGroupMbid: "",
   albumArtistMbids: [],
   artistMbids: [],
+  conductor: "",
+  performers: [],
   genres: [],
   composer: [],
   work: "",
@@ -343,6 +345,9 @@ async function scanFile(file, root, prior) {
       ...(tags.grouping && { grouping: tags.grouping }),
       ...(tags.year && { year: tags.year }),
       ...(tags.label && { label: tags.label }),
+      ...(tags.conductor && { conductor: tags.conductor }),
+      ...(tags.performers.length && { performers: tags.performers }),
+      ...(tags.artistMbids.length && { artistMbids: tags.artistMbids }),
       workId: tags.workId,
       recordingMbid: tags.recordingMbid || file.recordingMbid || "",
       composerDistinct:

@@ -1,3 +1,11 @@
+# v0.3 Phase 1.3 — conductor, performer and artist ID tag evidence (issue #53)
+
+Fourth of five commits in one PR (0.11, 1.1–1.4). Implements #53 only; #53 has no later comments.
+
+`readTags` (`src/tags.js`) now reads the conductor (taglib's own field, so FLAC, Opus and MP3 alike) and every Vorbis `PERFORMER` value ("Martha Argerich (piano)"); artist IDs were already read. The library scan (`runtime.js` `scanFile`) stores `conductor`, `performers` and `artistMbids` in a track's hints only when set, as it does `grouping`, so a file without them keeps its stored evidence byte for byte and a rescan adds no evidence rows. Nothing reads the new hints yet; 1.4 does. No schema or core change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
 # v0.3 Phase 1.2 — credit provenance (issue #51)
 
 Third of five commits in one PR (0.11, 1.1–1.4). Implements #51 only; #51 has no later comments.

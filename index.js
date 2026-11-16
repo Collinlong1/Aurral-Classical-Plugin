@@ -37861,6 +37861,10 @@ function readTags(filePath) {
       // Every album artist ID: taglib's own property has only the first.
       albumArtistMbids: [...new Set([...albumArtistIdsField.read(file), text(tag.musicBrainzReleaseArtistId)].flatMap((v) => texts(v.split(/[;/]/))))],
       artistMbids: artistIdsField.read(file).flatMap((value) => texts(value.split(/[;/]/))),
+      conductor: text(tag.conductor),
+      // Vorbis PERFORMER, one value a performer, often with the instrument
+      // in brackets: "Martha Argerich (piano)".
+      performers: texts(xiphOf(file)?.getField("PERFORMER") ?? []),
       genres: texts(tag.genres ?? []).flatMap((genre) => texts(genre.split(";"))),
       composer: texts(tag.composers ?? []),
       work: workField.read(file)[0] ?? "",
@@ -45575,6 +45579,8 @@ var emptyTags = () => ({
   releaseGroupMbid: "",
   albumArtistMbids: [],
   artistMbids: [],
+  conductor: "",
+  performers: [],
   genres: [],
   composer: [],
   work: "",
@@ -45799,6 +45805,9 @@ async function scanFile(file, root, prior) {
       ...tags.grouping && { grouping: tags.grouping },
       ...tags.year && { year: tags.year },
       ...tags.label && { label: tags.label },
+      ...tags.conductor && { conductor: tags.conductor },
+      ...tags.performers.length && { performers: tags.performers },
+      ...tags.artistMbids.length && { artistMbids: tags.artistMbids },
       workId: tags.workId,
       recordingMbid: tags.recordingMbid || file.recordingMbid || "",
       composerDistinct: tags.composer.length > 0 && !tags.composer.includes(tags.artist)

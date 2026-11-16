@@ -1,3 +1,20 @@
+# v0.3 Phase 1.3 — tag evidence / issue #53
+
+## Result
+
+`readTags` returns `conductor` (`tag.conductor`: Vorbis `CONDUCTOR`, ID3 `TPE3`) and `performers` (Vorbis `PERFORMER` values, unparsed; the instrument stays in the text for 1.4). The model's fallback for unreadable files has both, empty. `scanFile` adds `conductor`, `performers` and `artistMbids` to hints only when non-empty. ID3 musician credits (`TMCL`) and MP4 have no `PERFORMER` equivalent read here, as #53 scopes it.
+
+## Verification
+
+On Node 22.23:
+
+- Full `npm test`: 407/407.
+- New tagger test: FLAC and MP3 each read their conductor; FLAC reads two `PERFORMER` values and two artist IDs from one `;`-joined value; MP3 has none of those; an untagged FLAC reads empty values.
+- Extended `rescans reuse unchanged fingerprints and add no evidence rows` (`test/sync.test.js`): one file tagged with a conductor, two performers and an artist ID, one untagged. The tagged file's hints carry all three; the untagged file's hints have none of the new keys; a rescan adds no evidence rows and leaves both files' hints identical.
+- Both fail on the 1.2 code.
+
+---
+
 # v0.3 Phase 1.2 — credit provenance / issue #51
 
 ## Result

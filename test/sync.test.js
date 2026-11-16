@@ -1,3 +1,4 @@
+import { File, TagTypes } from "node-taglib-sharp";
 import assert from "node:assert/strict";
 import test from "node:test";
 import fs from "node:fs/promises";
@@ -110,6 +111,19 @@ test("one unreadable or deleted file never fails the library scan", async (t) =>
 
 test("rescans reuse unchanged fingerprints and add no evidence rows", async (t) => {
   const { ctx, files } = await library(t, 2);
+  // One file names its conductor, performers and artist ID; the other names
+  // none, and its evidence keeps exactly the fields it had before they were read.
+  const tagged = File.createFromPath(files[1]);
+  try {
+    tagged.tag.conductor = "Herbert von Karajan";
+    const xiph = tagged.getTag(TagTypes.Xiph, true);
+    xiph.setFieldAsStrings("PERFORMER", "Anne-Sophie Mutter (violin)", "Berliner Philharmoniker");
+    xiph.setFieldAsStrings("MUSICBRAINZ_ARTISTID", "artist-mbid-1");
+    tagged.save();
+  } finally {
+    tagged.dispose();
+  }
+  await fs.utimes(files[1], 1_000_000_000, 1_000_000_000);
   const scan = async () => {
     await enqueueModelScan(ctx, { id: 1, role: "admin" });
     await runModelJobs(ctx, { budgetMs: 60_000 });
@@ -125,9 +139,24 @@ test("rescans reuse unchanged fingerprints and add no evidence rows", async (t) 
   await scan();
   const rows = await evidenceRows(ctx);
   const first = await fingerprints();
+  const hints = async () => {
+    const c = await openCatalogue(path.join(ctx.dataFolder, "model"));
+    try {
+      return c.db.prepare("SELECT json_extract(evidence,'$.hints') AS h FROM track_link WHERE state='active' ORDER BY core_id").all().map((row) => JSON.parse(row.h));
+    } finally {
+      c.close();
+    }
+  };
+  const [plain, credited] = await hints();
+  for (const key of ["conductor", "performers", "artistMbids"]) assert.equal(key in plain, false, key);
+  assert.deepEqual(
+    [credited.conductor, credited.performers, credited.artistMbids],
+    ["Herbert von Karajan", ["Anne-Sophie Mutter (violin)", "Berliner Philharmoniker"], ["artist-mbid-1"]],
+  );
   await scan();
   assert.equal(await evidenceRows(ctx), rows);
   assert.deepEqual(await fingerprints(), first);
+  assert.deepEqual(await hints(), [plain, credited]);
   // Written in place, keeping size, modified time and inode: before 1.0.33
   // this file was taken as unchanged; the ctime now shows the write.
   const stat = await fs.stat(files[0]);
