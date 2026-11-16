@@ -2055,6 +2055,7 @@ export function applyV2(c, request, who) {
         if ((key === "title" || key === "name") && !next) fail(`${key === "name" ? "Name" : "Title"} can't be empty. Use Mark blank to clear it on purpose.`);
         if (key === "date" && next && !validDate(next)) fail("Use a valid year, year-month or full ISO date", key);
         // Classical edits are authoritative: pin them so provider refreshes never overwrite them.
+        if (key === "name" && entity.kind === "person" && current.trim()) c.alias(target, current);
         m.manual(target, key, next, { actor: who, pin: true });
         changed++;
       }

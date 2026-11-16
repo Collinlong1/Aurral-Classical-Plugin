@@ -251,6 +251,7 @@ function candidates(
         (albumId == null || String(row.evidence.albumId) === String(albumId)),
     );
   const groups = new Map();
+  const composerIndex = { people: composerPeople(catalogue) };
   // Composers the library already credits corroborate a name read from an
   // artist field.
   const knownComposers = rows.length ? knownComposerNames(catalogue) : new Set();
@@ -301,13 +302,14 @@ function candidates(
       hints.composer?.length || provider?.composers?.length
         ? null
         : artistCredits(hints, { knownComposers });
-    const composers = [
+    const rawComposers = [
       ...new Set(
         (hints.composer?.length ? hints.composer : provider?.composers?.length ? provider.composers : credit?.composers || [])
           .map(clean)
           .filter(Boolean),
       ),
     ];
+    const composers = canonicalComposers(catalogue, composerIndex, rawComposers, provider?.composerIds);
     const trackNumber = Number(hints.trackNumber);
     const discNumber = Number(hints.discNumber) || 1;
     if (
@@ -328,12 +330,12 @@ function candidates(
       });
       continue;
     }
-    const keyWith = (subjectOf) =>
+    const keyWith = (subjectOf, names = composers) =>
       JSON.stringify([
         row.instance_id,
         String(row.evidence.albumId),
-        proposal.identity || subjectOf(proposal.title, composers),
-        composers.map(normalized).sort(),
+        proposal.identity || subjectOf(proposal.title, names),
+        names.map(normalized).sort(),
         proposal.evidence,
         // Appended only for whole pieces, so earlier groups keep their keys.
         ...(proposal.standalone ? ["standalone"] : []),
@@ -350,6 +352,7 @@ function candidates(
       groups.set(key, {
         key,
         legacyKey: legacy !== key ? legacy : null,
+        spellingKeys: [],
         work: proposal.title,
         titles: new Map(),
         evidence: proposal.evidence,
@@ -361,13 +364,17 @@ function candidates(
         providerAliases: provider?.aliases || [],
         collection: provider?.collection || (proposal.collection ? { id: null, title: proposal.collection } : null),
         composers,
-        composerIds: provider?.composerIds || {},
+        composerIds: Object.fromEntries(rawComposers.map((name, i) => [composers[i], provider?.composerIds?.[name]])),
         composerSource: credit ? { field: "artist", confidence: credit.confidence, evidence: credit.evidence } : null,
         albumId: String(row.evidence.albumId),
         album: clean(hints.album),
         tracks: [],
       });
     const group = groups.get(key);
+    for (const spellingKey of [keyWith(workKey, rawComposers), keyWith(legacyWorkKey, rawComposers)]) {
+      if (spellingKey !== key && spellingKey !== legacy && !group.spellingKeys.includes(spellingKey))
+        group.spellingKeys.push(spellingKey);
+    }
     group.titles.set(proposal.title, (group.titles.get(proposal.title) || 0) + 1);
     group.tracks.push({
       ...row,
@@ -550,6 +557,7 @@ function splitScattered(groups) {
       ...group,
       key: i ? JSON.stringify([...JSON.parse(group.key), `run:${i + 1}`]) : group.key,
       legacyKey: group.legacyKey && i ? JSON.stringify([...JSON.parse(group.legacyKey), `run:${i + 1}`]) : group.legacyKey,
+      spellingKeys: group.spellingKeys?.map((key) => i ? JSON.stringify([...JSON.parse(key), `run:${i + 1}`]) : key),
       tracks,
     }));
   });
@@ -575,6 +583,7 @@ function separateRecordings(groups) {
       ...group,
       key: i ? JSON.stringify([...JSON.parse(group.key), `recording:${i + 1}`]) : group.key,
       legacyKey: group.legacyKey && i ? JSON.stringify([...JSON.parse(group.legacyKey), `recording:${i + 1}`]) : group.legacyKey,
+      spellingKeys: group.spellingKeys?.map((key) => i ? JSON.stringify([...JSON.parse(key), `recording:${i + 1}`]) : key),
       tracks,
     }));
   });
@@ -803,8 +812,7 @@ export function similarWorks(catalogue, title, composers = []) {
 // created also absorb matching albums.
 export function catalogueIndex(catalogue) {
   const works = new Map(),
-    aliases = new Map(),
-    people = new Map();
+    aliases = new Map();
   for (const { id } of catalogue.db
     .prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL")
     .all()) {
@@ -820,6 +828,11 @@ export function catalogueIndex(catalogue) {
       if (aliasKey !== key) aliases.set(aliasKey, [...new Set([...(aliases.get(aliasKey) || []), id])]);
     }
   }
+  return { works, aliases, people: composerPeople(catalogue) };
+}
+
+function composerPeople(catalogue) {
+  const people = new Map();
   for (const { id } of catalogue.db
     .prepare(
       `SELECT id FROM entity WHERE kind='person' AND deleted_at IS NULL
@@ -830,15 +843,36 @@ export function catalogueIndex(catalogue) {
     .all()) {
     const name = resolvedName(catalogue, id, "name");
     if (typeof name !== "string" || !words(name)) continue;
-    people.set(words(name), [...(people.get(words(name)) || []), id]);
+    const other = resolvedName(catalogue, id, "aliases");
+    const names = [name, ...(Array.isArray(other) ? other : []),
+      ...catalogue.db.prepare("SELECT text FROM alias WHERE entity_id=?").all(id).map((a) => a.text)];
+    for (const spelling of names) {
+      const key = words(String(spelling));
+      if (key) people.set(key, [...new Set([...(people.get(key) || []), id])]);
+    }
   }
-  return { works, aliases, people };
+  return people;
 }
 
 const artistIdOf = (catalogue, person) =>
   catalogue.db
     .prepare("SELECT record_id FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='artist' AND state='active'")
     .get(person)?.record_id;
+// Only an unambiguous spelling may redirect a composer. Provider IDs take priority.
+function canonicalComposers(catalogue, index, names, ids = {}) {
+  return names.map((name) => {
+    const mbid = ids?.[name];
+    const known = mbid && catalogue.db.prepare(`SELECT x.entity_id FROM external_identity x
+      JOIN entity e ON e.id=x.entity_id WHERE x.provider='musicbrainz' AND x.record_kind='artist'
+      AND x.record_id=? AND x.state='active' AND e.deleted_at IS NULL`).get(mbid)?.entity_id;
+    const matches = index.people.get(words(name)) || [];
+    const named = matches.length === 1 ? matches[0] : null;
+    const held = named && artistIdOf(catalogue, named);
+    const person = known || (named && (!mbid || !held || held === mbid) ? named : null);
+    return person ? resolvedName(catalogue, person, "name") || name : name;
+  });
+}
+
 function composerEntity(catalogue, metadata, index, name, mbid = null) {
   const key = words(name);
   if (mbid) {
@@ -1300,6 +1334,10 @@ function createGroup(catalogue, group, actor, index) {
   const wanted = catalogueSubject(group.catalogue ? `${group.work}, ${group.catalogue}` : group.work);
   const falseJoin = (work) => Boolean(wanted) && provablyDifferent(wanted, catalogueSubject(String(resolvedName(catalogue, work, "title") || "")));
   if (madeHere && !falseJoin(madeHere)) return false;
+  if ((group.spellingKeys || []).some((key) => {
+    const made = existingIdentity(catalogue, "album-work", identity("album-work", key));
+    return made && !falseJoin(made);
+  })) return false;
   if (madeBeforeSuffixes(catalogue, group)) return false;
   return transaction(catalogue.db, () => {
     if (madeHere)
@@ -1347,7 +1385,8 @@ function createGroup(catalogue, group, actor, index) {
         .prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer'")
         .all(id)
         .some(({ contributor_id: person }) => {
-          const mbid = group.composerIds?.[resolvedName(catalogue, person, "name")];
+          const mbid = group.composerIds?.[resolvedName(catalogue, person, "name")] ||
+            Object.entries(group.composerIds || {}).find(([name]) => index.people.get(words(name))?.includes(person))?.[1];
           const held = artistIdOf(catalogue, person);
           return mbid && held && held !== mbid;
         });
@@ -2195,6 +2234,11 @@ export function repairMergedIdentities(catalogue) {
 
 // Fold one person or ensemble into another: credits move, duplicates drop.
 export function mergeContributor(catalogue, keep, drop, actor) {
+  const name = resolvedName(catalogue, drop, "name");
+  if (typeof name === "string" && name.trim()) catalogue.alias(keep, name);
+  const aliases = resolvedName(catalogue, drop, "aliases");
+  for (const alias of Array.isArray(aliases) ? aliases : []) catalogue.alias(keep, alias);
+  catalogue.db.prepare("UPDATE alias SET entity_id=? WHERE entity_id=?").run(keep, drop);
   for (const credit of catalogue.db
     .prepare("SELECT * FROM credit WHERE contributor_id=?")
     .all(drop)) {
@@ -2220,7 +2264,10 @@ export function mergeContributor(catalogue, keep, drop, actor) {
 // Merge composers that earlier auto-match passes created once per album.
 function mergeDuplicateComposers(catalogue, index, actor) {
   let merged = 0;
-  for (const [name, ids] of index.people) {
+  for (const [name, candidates] of index.people) {
+    // Shared aliases are ambiguous, never evidence for an automatic merge.
+    const ids = candidates.filter((id) => words(resolvedName(catalogue, id, "name") || "") === name &&
+      catalogue.db.prepare("SELECT 1 FROM entity WHERE id=? AND deleted_at IS NULL").get(id));
     if (ids.length < 2) continue;
     const auto = ids.filter(
       (id) =>

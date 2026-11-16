@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import fs from "node:fs/promises";
+import path from "node:path";
+import { readEditor, mutateEditor } from "../src/model/editor.js";
 import { tempFolders } from "./helpers.js";
 import { openCatalogue } from "../src/model/catalogue.js";
 import { Metadata } from "../src/model/metadata.js";
@@ -14,13 +16,14 @@ import { renderWork } from "../src/model/presentation.js";
 
 async function setup(t) {
   const folders = await tempFolders();
-  const c = await openCatalogue(folders.dataFolder);
+  const c = await openCatalogue(path.join(folders.dataFolder, "model"));
   t.after(async () => {
     try {
       c.close();
     } catch {}
     await fs.rm(folders.root, { recursive: true, force: true });
   });
+  c.editorInput = { ...folders, pageId: "editor", user: { id: 1, role: "admin" }, capabilities: { adminForms: 2 } };
   return c;
 }
 let generation = 0;
@@ -182,4 +185,112 @@ test("duplicates created by the old per-album rule are merged without losing pic
   assert.equal(view.favourite, true);
   assert.equal(view.pickedRealizationId, works[1].realization);
   assert.deepEqual(mergeDuplicateAutoWorks(c), { people: 0, works: 0 });
+});
+
+async function edit(c, command, values, selection = values.target) {
+  const input = c.editorInput;
+  const { revision } = await readEditor({ ...input, query: { selection } });
+  const result = await mutateEditor({ ...input, mutation: { revision, command, values } });
+  assert.equal(result.ok, true, JSON.stringify(result));
+}
+const people = (c) => c.db.prepare("SELECT id FROM entity WHERE kind='person' AND deleted_at IS NULL ORDER BY rowid").all().map((p) => p.id);
+
+for (const action of ["merge", "rename"]) {
+  test(`composer ${action} survives new albums with the old spelling and rescans`, async (t) => {
+    generation = 0;
+    const c = await setup(t);
+    const old = "J.S. Bach", canonical = "Johann Sebastian Bach", work = "Brandenburg Concerto No. 3, BWV 1048";
+    const tracks = album("A", 0, work, { composer: old });
+    if (action === "merge") tracks.push(...album("B", 0, work, { composer: canonical }));
+    scan(c, tracks);
+    autoMatchTaggedWorks(c);
+    const [drop, keep] = people(c);
+    if (action === "merge") {
+      new Metadata(c).manual(drop, "aliases", ["Bach, Johann Sebastian"], { actor: "1", pin: true });
+      c.alias(drop, "Joh. Seb. Bach");
+      await edit(c, "merge-entity", { target: drop, into: keep, confirm: true }, `merge:${drop}:${keep}`);
+    } else await edit(c, "save-entity", { target: drop, name: canonical });
+    assert.ok(c.db.prepare("SELECT 1 FROM alias WHERE entity_id=? AND text=?").get(keep || drop, old));
+    tracks.push(...album("C", 0, work, { composer: old }));
+    if (action === "merge") tracks.push(...album("D", 0, work, { composer: "Bach, Johann Sebastian" }), ...album("E", 0, work, { composer: "Joh. Seb. Bach" }));
+    scan(c, tracks);
+    autoMatchTaggedWorks(c);
+    mergeDuplicateAutoWorks(c);
+    assert.equal(count(c, "person"), 1);
+    assert.equal(count(c, "work"), 1);
+    const recordings = count(c, "performance");
+    autoMatchTaggedWorks(c);
+    assert.equal(count(c, "performance"), recordings);
+    assert.equal(c.db.prepare("SELECT count(*) AS n FROM realization_item").get().n, tracks.length);
+  });
+}
+
+test("Other spellings match without guessing initials or resolving shared aliases", async (t) => {
+  generation = 0;
+  const c = await setup(t), m = new Metadata(c);
+  const one = c.createEntity("person", { roles: ["composer"] });
+  m.manual(one, "name", "Johann Sebastian Bach", { actor: "1" });
+  m.manual(one, "aliases", ["Bach, Johann Sebastian"], { actor: "1" });
+  scan(c, album("A", 0, "Concerto BWV 1048", { composer: "Bach, Johann Sebastian" }));
+  autoMatchTaggedWorks(c);
+  assert.equal(count(c, "person"), 1);
+  scan(c, [...album("A", 0, "Concerto BWV 1048", { composer: "Bach, Johann Sebastian" }), ...album("B", 0, "Concerto BWV 1048", { composer: "J.S. Bach" })]);
+  autoMatchTaggedWorks(c);
+  assert.equal(count(c, "person"), 2);
+  const two = people(c).find((id) => id !== one);
+  c.alias(one, "Shared spelling"); c.alias(two, "Shared spelling");
+  mergeDuplicateAutoWorks(c);
+  assert.equal(count(c, "person"), 2);
+});
+
+test("old album-work keys keep removed tracks out after a composer rename", async (t) => {
+  generation = 0;
+  const c = await setup(t);
+  const tracks = album("A", 0, "Concerto BWV 1048", { composer: "J.S. Bach" });
+  scan(c, tracks); autoMatchTaggedWorks(c);
+  // Remove attachments without an unassign-album audit: the album-work identity alone must hold.
+  for (const { id } of c.db.prepare("SELECT id FROM realization_item").all()) c.detachItem(id, { dropRecording: true });
+  await edit(c, "save-entity", { target: people(c)[0], name: "Johann Sebastian Bach" });
+  scan(c, tracks); autoMatchTaggedWorks(c);
+  assert.equal(c.db.prepare("SELECT count(*) AS n FROM realization_item").get().n, 0);
+});
+
+test("MusicBrainz IDs override an alias and conflicting IDs stay separate", async (t) => {
+  generation = 0;
+  const c = await setup(t), m = new Metadata(c);
+  const person = c.createEntity("person", { roles: ["composer"] });
+  m.manual(person, "name", "Canonical Composer", { actor: "1" });
+  c.alias(person, "Old spelling");
+  c.externalIdentity(person, "musicbrainz", "artist", "artist-one");
+  const tracks = album("A", 0, "Concerto BWV 1048", { composer: "Old spelling" });
+  scan(c, tracks); autoMatchTaggedWorks(c);
+  tracks.push(...album("B", 0, "Concerto BWV 1048", { composer: "Old spelling" }));
+  scan(c, tracks);
+  const providerMatches = new Map(c.db.prepare("SELECT id FROM track_link WHERE json_extract(evidence,'$.albumId')='B'").all()
+    .map(({ id }) => [id, { work: "Concerto BWV 1048", composers: ["Old spelling"], composerIds: { "Old spelling": "artist-two" } }]));
+  autoMatchTaggedWorks(c, { albumId: "B", providerMatches });
+  assert.equal(count(c, "person"), 2);
+  assert.equal(count(c, "work"), 2);
+  const other = people(c).find((id) => id !== person);
+  tracks.push(...album("C", 0, "Concerto BWV 1048", { composer: "Another spelling" }));
+  scan(c, tracks);
+  const identified = new Map(c.db.prepare("SELECT id FROM track_link WHERE json_extract(evidence,'$.albumId')='C'").all()
+    .map(({ id }) => [id, { work: "Concerto BWV 1048", composers: ["Another spelling"], composerIds: { "Another spelling": "artist-two" } }]));
+  autoMatchTaggedWorks(c, { albumId: "C", providerMatches: identified });
+  assert.equal(count(c, "person"), 2);
+  assert.equal(count(c, "work"), 2);
+  assert.equal(c.db.prepare("SELECT entity_id FROM external_identity WHERE record_id='artist-two'").get().entity_id, other);
+});
+
+test("legacy editor renames also retain the old composer spelling", async (t) => {
+  generation = 0;
+  const c = await setup(t);
+  const tracks = album("A", 0, "Concerto BWV 1048", { composer: "J.S. Bach" });
+  scan(c, tracks); autoMatchTaggedWorks(c);
+  c.editorInput.capabilities.adminForms = 1;
+  await edit(c, "edit-field", { target: people(c)[0], field: "name", value: "Johann Sebastian Bach", blank: false, pin: true });
+  tracks.push(...album("B", 0, "Concerto BWV 1048", { composer: "J.S. Bach" }));
+  scan(c, tracks); autoMatchTaggedWorks(c);
+  assert.equal(count(c, "person"), 1);
+  assert.equal(count(c, "work"), 1);
 });

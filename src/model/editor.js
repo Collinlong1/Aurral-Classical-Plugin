@@ -776,8 +776,13 @@ function apply(c, input, who) {
   }
   const v = request.values,
     m = new Metadata(c),
-    manual = (target, key, value, pin = false) =>
-      m.manual(target, key, value, { actor: who, pin });
+    manual = (target, key, value, pin = false) => {
+      if (key === "name" && typeof value === "string" && value.trim() && c.entity(target).kind === "person") {
+        const current = m.resolve(target, key).value;
+        if (typeof current === "string" && current.trim() && current !== value) c.alias(target, current);
+      }
+      return m.manual(target, key, value, { actor: who, pin });
+    };
   const allowed = {
     "create-composer": ["name"],
     "create-contributor": ["name", "kind"],

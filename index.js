@@ -39303,6 +39303,7 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
     (row) => row.evidence.albumId != null && (albumId == null || String(row.evidence.albumId) === String(albumId))
   );
   const groups = /* @__PURE__ */ new Map();
+  const composerIndex = { people: composerPeople(catalogue) };
   const knownComposers = rows.length ? knownComposerNames(catalogue) : /* @__PURE__ */ new Set();
   const numbered = allowStructuredTitles ? numberedRuns(rows) : /* @__PURE__ */ new Set();
   for (const row of rows) {
@@ -39328,11 +39329,12 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
     if (proposal && !provider && (proposal.evidence === "work-tag" && standalonePiece(hints, proposal.title) || proposal.evidence === "grouping-tag" && standalonePiece(hints, proposal.title, hints.grouping)))
       proposal.standalone = true;
     const credit = hints.composer?.length || provider?.composers?.length ? null : artistCredits(hints, { knownComposers });
-    const composers = [
+    const rawComposers = [
       ...new Set(
         (hints.composer?.length ? hints.composer : provider?.composers?.length ? provider.composers : credit?.composers || []).map(clean3).filter(Boolean)
       )
     ];
+    const composers = canonicalComposers(catalogue, composerIndex, rawComposers, provider?.composerIds);
     const trackNumber = Number(hints.trackNumber);
     const discNumber = Number(hints.discNumber) || 1;
     if (!proposal || !composers.length || !Number.isSafeInteger(trackNumber) || trackNumber < 1) {
@@ -39342,11 +39344,11 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
       });
       continue;
     }
-    const keyWith = (subjectOf) => JSON.stringify([
+    const keyWith = (subjectOf, names = composers) => JSON.stringify([
       row.instance_id,
       String(row.evidence.albumId),
-      proposal.identity || subjectOf(proposal.title, composers),
-      composers.map(normalized).sort(),
+      proposal.identity || subjectOf(proposal.title, names),
+      names.map(normalized).sort(),
       proposal.evidence,
       // Appended only for whole pieces, so earlier groups keep their keys.
       ...proposal.standalone ? ["standalone"] : [],
@@ -39361,6 +39363,7 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
       groups.set(key, {
         key,
         legacyKey: legacy !== key ? legacy : null,
+        spellingKeys: [],
         work: proposal.title,
         titles: /* @__PURE__ */ new Map(),
         evidence: proposal.evidence,
@@ -39372,13 +39375,17 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
         providerAliases: provider?.aliases || [],
         collection: provider?.collection || (proposal.collection ? { id: null, title: proposal.collection } : null),
         composers,
-        composerIds: provider?.composerIds || {},
+        composerIds: Object.fromEntries(rawComposers.map((name, i) => [composers[i], provider?.composerIds?.[name]])),
         composerSource: credit ? { field: "artist", confidence: credit.confidence, evidence: credit.evidence } : null,
         albumId: String(row.evidence.albumId),
         album: clean3(hints.album),
         tracks: []
       });
     const group = groups.get(key);
+    for (const spellingKey of [keyWith(workKey, rawComposers), keyWith(legacyWorkKey, rawComposers)]) {
+      if (spellingKey !== key && spellingKey !== legacy && !group.spellingKeys.includes(spellingKey))
+        group.spellingKeys.push(spellingKey);
+    }
     group.titles.set(proposal.title, (group.titles.get(proposal.title) || 0) + 1);
     group.tracks.push({
       ...row,
@@ -39499,6 +39506,7 @@ function splitScattered(groups) {
       ...group,
       key: i ? JSON.stringify([...JSON.parse(group.key), `run:${i + 1}`]) : group.key,
       legacyKey: group.legacyKey && i ? JSON.stringify([...JSON.parse(group.legacyKey), `run:${i + 1}`]) : group.legacyKey,
+      spellingKeys: group.spellingKeys?.map((key) => i ? JSON.stringify([...JSON.parse(key), `run:${i + 1}`]) : key),
       tracks
     }));
   });
@@ -39521,6 +39529,7 @@ function separateRecordings(groups) {
       ...group,
       key: i ? JSON.stringify([...JSON.parse(group.key), `recording:${i + 1}`]) : group.key,
       legacyKey: group.legacyKey && i ? JSON.stringify([...JSON.parse(group.legacyKey), `recording:${i + 1}`]) : group.legacyKey,
+      spellingKeys: group.spellingKeys?.map((key) => i ? JSON.stringify([...JSON.parse(key), `recording:${i + 1}`]) : key),
       tracks
     }));
   });
@@ -39669,7 +39678,7 @@ function similarWorks(catalogue, title, composers = []) {
   });
 }
 function catalogueIndex(catalogue) {
-  const works = /* @__PURE__ */ new Map(), aliases = /* @__PURE__ */ new Map(), people = /* @__PURE__ */ new Map();
+  const works = /* @__PURE__ */ new Map(), aliases = /* @__PURE__ */ new Map();
   for (const { id } of catalogue.db.prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL").all()) {
     const title = resolvedName(catalogue, id, "title");
     const composers = composerNames(catalogue, id);
@@ -39682,6 +39691,10 @@ function catalogueIndex(catalogue) {
       if (aliasKey !== key) aliases.set(aliasKey, [.../* @__PURE__ */ new Set([...aliases.get(aliasKey) || [], id])]);
     }
   }
+  return { works, aliases, people: composerPeople(catalogue) };
+}
+function composerPeople(catalogue) {
+  const people = /* @__PURE__ */ new Map();
   for (const { id } of catalogue.db.prepare(
     `SELECT id FROM entity WHERE kind='person' AND deleted_at IS NULL
        AND (json_extract(data,'$.roles') LIKE '%composer%'
@@ -39690,11 +39703,33 @@ function catalogueIndex(catalogue) {
   ).all()) {
     const name = resolvedName(catalogue, id, "name");
     if (typeof name !== "string" || !words2(name)) continue;
-    people.set(words2(name), [...people.get(words2(name)) || [], id]);
+    const other = resolvedName(catalogue, id, "aliases");
+    const names = [
+      name,
+      ...Array.isArray(other) ? other : [],
+      ...catalogue.db.prepare("SELECT text FROM alias WHERE entity_id=?").all(id).map((a) => a.text)
+    ];
+    for (const spelling of names) {
+      const key = words2(String(spelling));
+      if (key) people.set(key, [.../* @__PURE__ */ new Set([...people.get(key) || [], id])]);
+    }
   }
-  return { works, aliases, people };
+  return people;
 }
 var artistIdOf = (catalogue, person) => catalogue.db.prepare("SELECT record_id FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='artist' AND state='active'").get(person)?.record_id;
+function canonicalComposers(catalogue, index, names, ids = {}) {
+  return names.map((name) => {
+    const mbid = ids?.[name];
+    const known = mbid && catalogue.db.prepare(`SELECT x.entity_id FROM external_identity x
+      JOIN entity e ON e.id=x.entity_id WHERE x.provider='musicbrainz' AND x.record_kind='artist'
+      AND x.record_id=? AND x.state='active' AND e.deleted_at IS NULL`).get(mbid)?.entity_id;
+    const matches = index.people.get(words2(name)) || [];
+    const named = matches.length === 1 ? matches[0] : null;
+    const held2 = named && artistIdOf(catalogue, named);
+    const person = known || (named && (!mbid || !held2 || held2 === mbid) ? named : null);
+    return person ? resolvedName(catalogue, person, "name") || name : name;
+  });
+}
 function composerEntity(catalogue, metadata, index, name, mbid = null) {
   const key = words2(name);
   if (mbid) {
@@ -40005,6 +40040,10 @@ function createGroup(catalogue, group, actor3, index) {
   const wanted = catalogueSubject(group.catalogue ? `${group.work}, ${group.catalogue}` : group.work);
   const falseJoin = (work) => Boolean(wanted) && provablyDifferent(wanted, catalogueSubject(String(resolvedName(catalogue, work, "title") || "")));
   if (madeHere && !falseJoin(madeHere)) return false;
+  if ((group.spellingKeys || []).some((key) => {
+    const made = existingIdentity(catalogue, "album-work", identity("album-work", key));
+    return made && !falseJoin(made);
+  })) return false;
   if (madeBeforeSuffixes(catalogue, group)) return false;
   return transaction(catalogue.db, () => {
     if (madeHere)
@@ -40030,7 +40069,7 @@ function createGroup(catalogue, group, actor3, index) {
     };
     if (providerWork && heldElsewhere(providerWork)) providerWork = null;
     const otherComposer = (id) => catalogue.db.prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer'").all(id).some(({ contributor_id: person }) => {
-      const mbid = group.composerIds?.[resolvedName(catalogue, person, "name")];
+      const mbid = group.composerIds?.[resolvedName(catalogue, person, "name")] || Object.entries(group.composerIds || {}).find(([name]) => index.people.get(words2(name))?.includes(person))?.[1];
       const held2 = artistIdOf(catalogue, person);
       return mbid && held2 && held2 !== mbid;
     });
@@ -40675,6 +40714,11 @@ function repairMergedIdentities(catalogue) {
   return repaired;
 }
 function mergeContributor(catalogue, keep, drop, actor3) {
+  const name = resolvedName(catalogue, drop, "name");
+  if (typeof name === "string" && name.trim()) catalogue.alias(keep, name);
+  const aliases = resolvedName(catalogue, drop, "aliases");
+  for (const alias of Array.isArray(aliases) ? aliases : []) catalogue.alias(keep, alias);
+  catalogue.db.prepare("UPDATE alias SET entity_id=? WHERE entity_id=?").run(keep, drop);
   for (const credit of catalogue.db.prepare("SELECT * FROM credit WHERE contributor_id=?").all(drop)) {
     const duplicate = catalogue.db.prepare(
       "SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?"
@@ -40690,7 +40734,8 @@ function mergeContributor(catalogue, keep, drop, actor3) {
 }
 function mergeDuplicateComposers(catalogue, index, actor3) {
   let merged = 0;
-  for (const [name, ids] of index.people) {
+  for (const [name, candidates2] of index.people) {
+    const ids = candidates2.filter((id) => words2(resolvedName(catalogue, id, "name") || "") === name && catalogue.db.prepare("SELECT 1 FROM entity WHERE id=? AND deleted_at IS NULL").get(id));
     if (ids.length < 2) continue;
     const auto = ids.filter(
       (id) => !hasManualEdits(catalogue, [id]) && !catalogue.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND provider!='embedded-tags'").get(id)
@@ -43138,6 +43183,7 @@ function applyV2(c, request, who) {
         if (JSON.stringify(next) === JSON.stringify(current)) continue;
         if ((key === "title" || key === "name") && !next) fail(`${key === "name" ? "Name" : "Title"} can't be empty. Use Mark blank to clear it on purpose.`);
         if (key === "date" && next && !validDate(next)) fail("Use a valid year, year-month or full ISO date", key);
+        if (key === "name" && entity.kind === "person" && current.trim()) c.alias(target, current);
         m.manual(target, key, next, { actor: who, pin: true });
         changed++;
       }
@@ -44213,7 +44259,13 @@ function apply(c, input, who) {
       ...typeof result.focus === "string" && result.focus && { focus: result.focus }
     };
   }
-  const v = request.values, m = new Metadata(c), manual = (target, key, value, pin = false) => m.manual(target, key, value, { actor: who, pin });
+  const v = request.values, m = new Metadata(c), manual = (target, key, value, pin = false) => {
+    if (key === "name" && typeof value === "string" && value.trim() && c.entity(target).kind === "person") {
+      const current = m.resolve(target, key).value;
+      if (typeof current === "string" && current.trim() && current !== value) c.alias(target, current);
+    }
+    return m.manual(target, key, value, { actor: who, pin });
+  };
   const allowed = {
     "create-composer": ["name"],
     "create-contributor": ["name", "kind"],

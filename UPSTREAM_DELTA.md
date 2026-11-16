@@ -1,3 +1,11 @@
+# v0.3 Phase 0.01 — composer aliases (issue #10, November 15, 2026)
+
+Review branch `fix/v0.3-0.01-composer-aliases` starts at `aurral-classical` `762ee5c`. The current issue has no prerequisite issues or later comments. Reference: `v0.3-handoff` `b6f6a3b`, `docs/v0.3-handoff/`. This change implements L2 only; E2 and later phases remain separate.
+
+Person renames retain the previous name in the existing alias table. Contributor merges retain the dropped name, saved aliases and Other spellings. Matching indexes both alias sources and canonicalizes only unambiguous composer names before generating work and album keys. MusicBrainz IDs retain priority; conflicting IDs and shared aliases do not cause identity merges. Initials are not guessed. Original spelling keys remain available so tracks removed from an album's work stay out after a rename or merge. No schema or core change; media tags are untouched. `index.js` rebuilt.
+
+Verification details and limitations: `V0_3_REPORT.md`.
+
 # Paired integration CI passes (November 15, 2026)
 
 The user asked for the paired integration workflow to be run on `aurral-classical`. **Run 30 (`43682154366`) passed** (plugin `347a4e4`, core pin `a7691ad`). It covers all seven editor browser checks, the comparison smoke, the full-app editor and permissions check, and restart persistence with unchanged media.
