@@ -11170,10 +11170,10 @@ var require_syncData = __commonJS({
        */
       toUint: (data) => {
         utils_1.Guards.notNullOrUndefined(data, "data");
-        const last = data.length > 4 ? 3 : data.length - 1;
+        const last2 = data.length > 4 ? 3 : data.length - 1;
         let sum = 0;
-        for (let i = 0; i <= last; i++) {
-          sum |= (data.get(i) & 127) << (last - i) * 7;
+        for (let i = 0; i <= last2; i++) {
+          sum |= (data.get(i) & 127) << (last2 - i) * 7;
         }
         return sum;
       },
@@ -32432,10 +32432,10 @@ var require_oggBitStream = __commonJS({
        * Constructs and initializes a new instance capable of processing a specified page.
        * @param page Page of the stream to be processed by the new instance
        */
-      constructor(page) {
-        utils_1.Guards.truthy(page, "page");
-        this._codec = codecFactory_1.default.getCodec(page.packets[0]);
-        this._firstAbsoluteGranularPosition = page.header.absoluteGranularPosition;
+      constructor(page2) {
+        utils_1.Guards.truthy(page2, "page");
+        this._codec = codecFactory_1.default.getCodec(page2.packets[0]);
+        this._firstAbsoluteGranularPosition = page2.header.absoluteGranularPosition;
       }
       /**
        * Gets the codec object used to interpret the stream represented by the current instance.
@@ -32450,17 +32450,17 @@ var require_oggBitStream = __commonJS({
        *     `true` if the codec has read all the necessary packets in the stream.
        *     `false` otherwise
        */
-      readPage(page) {
-        utils_1.Guards.truthy(page, "page");
-        const packets = page.packets;
+      readPage(page2) {
+        utils_1.Guards.truthy(page2, "page");
+        const packets = page2.packets;
         for (let i = 0; i < packets.length; i++) {
           let packet = packets[i];
-          if (i === 0 && (page.header.flags & oggPageHeader_1.OggPageFlags.FirstPacketContinued) !== 0 && this._previousPacket) {
+          if (i === 0 && (page2.header.flags & oggPageHeader_1.OggPageFlags.FirstPacketContinued) !== 0 && this._previousPacket) {
             this._previousPacket.addByteVector(packet);
             packet = this._previousPacket;
           }
           this._previousPacket = void 0;
-          if (i === packets.length - 1 && !page.header.lastPacketComplete) {
+          if (i === packets.length - 1 && !page2.header.lastPacketComplete) {
             this._previousPacket = packet;
           } else if (this._codec.readPacket(packet)) {
             return true;
@@ -32504,12 +32504,12 @@ var require_oggPage = __commonJS({
       static fromFile(file, position) {
         utils_1.Guards.truthy(file, "file");
         utils_1.Guards.safeUint(position, "position");
-        const page = new _OggPage(oggPageHeader_1.OggPageHeader.fromFile(file, position));
-        file.seek(position + page._header.size);
-        for (const packetSize of page._header.packetSizes) {
-          page._packets.push(file.readBlock(packetSize));
+        const page2 = new _OggPage(oggPageHeader_1.OggPageHeader.fromFile(file, position));
+        file.seek(position + page2._header.size);
+        for (const packetSize of page2._header.packetSizes) {
+          page2._packets.push(file.readBlock(packetSize));
         }
-        return page;
+        return page2;
       }
       /**
        * Constructs and initializes a new instance with a specified header and list of packets.
@@ -32519,10 +32519,10 @@ var require_oggPage = __commonJS({
       static fromPackets(header, packets) {
         utils_1.Guards.truthy(packets, "packets");
         utils_1.Guards.truthy(header, "header");
-        const page = new _OggPage(header);
-        page._packets.splice(0, page._packets.length, ...packets);
-        page._header.packetSizes = packets.map((p) => p.length);
-        return page;
+        const page2 = new _OggPage(header);
+        page2._packets.splice(0, page2._packets.length, ...packets);
+        page2._header.packetSizes = packets.map((p) => p.length);
+        return page2;
       }
       // #endregion
       // #region Properties
@@ -32623,19 +32623,19 @@ var require_oggPaginator = __commonJS({
        * Adds the next page to the current instance.
        * @param page The next page found in the stream
        */
-      addPage(page) {
+      addPage(page2) {
         this._pagesRead++;
         if (!this._firstPageHeader) {
-          this._firstPageHeader = page.header;
+          this._firstPageHeader = page2.header;
         }
-        if (page.packets.length === 0) {
+        if (page2.packets.length === 0) {
           return;
         }
-        for (let i = 0; i < page.packets.length; i++) {
-          if ((page.header.flags & oggPageHeader_1.OggPageFlags.FirstPacketContinued) !== 0 && i === 0 && page.packets.length > 0) {
-            this._packets[this._packets.length - 1].addByteVector(page.packets[0]);
+        for (let i = 0; i < page2.packets.length; i++) {
+          if ((page2.header.flags & oggPageHeader_1.OggPageFlags.FirstPacketContinued) !== 0 && i === 0 && page2.packets.length > 0) {
+            this._packets[this._packets.length - 1].addByteVector(page2.packets[0]);
           } else {
-            this._packets.push(page.packets[i]);
+            this._packets.push(page2.packets[i]);
           }
         }
       }
@@ -32797,12 +32797,12 @@ var require_oggFile = __commonJS({
           const paginators = /* @__PURE__ */ new Map();
           const newPages = [];
           const shifts = /* @__PURE__ */ new Map();
-          for (const page of pages) {
-            const streamSerialNumber = page.header.streamSerialNumber;
+          for (const page2 of pages) {
+            const streamSerialNumber = page2.header.streamSerialNumber;
             if (!paginators.has(streamSerialNumber)) {
               paginators.set(streamSerialNumber, new oggPaginator_1.default(streamsResult.streams.get(streamSerialNumber).codec));
             }
-            paginators.get(streamSerialNumber).addPage(page);
+            paginators.get(streamSerialNumber).addPage(page2);
           }
           for (const streamSerialNumber of paginators.keys()) {
             paginators.get(streamSerialNumber).writeComment(this._tag.getComment(streamSerialNumber));
@@ -32838,23 +32838,23 @@ var require_oggFile = __commonJS({
         let position = 0;
         do {
           let stream;
-          const page = oggPage_1.default.fromFile(this, position);
-          if ((page.header.flags & oggPageHeader_1.OggPageFlags.FirstPageOfStream) !== 0) {
-            stream = new oggBitStream_1.default(page);
-            streams.set(page.header.streamSerialNumber, stream);
+          const page2 = oggPage_1.default.fromFile(this, position);
+          if ((page2.header.flags & oggPageHeader_1.OggPageFlags.FirstPageOfStream) !== 0) {
+            stream = new oggBitStream_1.default(page2);
+            streams.set(page2.header.streamSerialNumber, stream);
             activeStreams.push(stream);
           }
           if (!stream) {
-            stream = streams.get(page.header.streamSerialNumber);
+            stream = streams.get(page2.header.streamSerialNumber);
           }
           const streamIndex = activeStreams.indexOf(stream);
-          if (streamIndex >= 0 && stream.readPage(page)) {
+          if (streamIndex >= 0 && stream.readPage(page2)) {
             activeStreams.splice(streamIndex, 1);
           }
           if (pages) {
-            pages.push(page);
+            pages.push(page2);
           }
-          position += page.size;
+          position += page2.size;
         } while (activeStreams.length > 0);
         return {
           end: position,
@@ -36261,11 +36261,11 @@ async function flacAudioStart(handle, start, size) {
   for (; ; ) {
     const header = await readAt(handle, position, 4);
     if (header.length < 4) return null;
-    const last = (header[0] & 128) !== 0;
+    const last2 = (header[0] & 128) !== 0;
     const length = header.readUIntBE(1, 3);
     position += 4 + length;
     if (position > size) return null;
-    if (last) return position;
+    if (last2) return position;
   }
 }
 async function wavRanges(handle, size) {
@@ -37607,8 +37607,8 @@ var FileCache = class {
 };
 async function pruneCache(folder, maxAgeMs) {
   const stamp = path3.join(folder, ".pruned");
-  const last = (await fs3.stat(stamp).catch(() => null))?.mtimeMs ?? 0;
-  if (Date.now() - last < 24 * 60 * 6e4) return 0;
+  const last2 = (await fs3.stat(stamp).catch(() => null))?.mtimeMs ?? 0;
+  if (Date.now() - last2 < 24 * 60 * 6e4) return 0;
   await fs3.mkdir(folder, { recursive: true });
   await fs3.writeFile(stamp, "");
   let removed = 0;
@@ -39146,8 +39146,8 @@ function numberedRuns(rows) {
     run = [];
   };
   for (const row of ordered) {
-    const last = run.at(-1);
-    if (last && (last.head !== row.head || last.disc !== row.disc || row.track !== last.track + 1)) close();
+    const last2 = run.at(-1);
+    if (last2 && (last2.head !== row.head || last2.disc !== row.disc || row.track !== last2.track + 1)) close();
     run.push(row);
   }
   close();
@@ -39176,8 +39176,8 @@ function splitScattered(groups) {
     if (!group.providerWorkId || !catalogueSet(group.work) || new Set(group.tracks.map(name)).size === group.tracks.length) return [group];
     const runs = [];
     for (const track of [...group.tracks].sort(albumOrder)) {
-      const last = runs.at(-1)?.at(-1);
-      const next = last && (last.discNumber === track.discNumber ? track.trackNumber - last.trackNumber === 1 : track.discNumber - last.discNumber === 1 && track.trackNumber === 1);
+      const last2 = runs.at(-1)?.at(-1);
+      const next = last2 && (last2.discNumber === track.discNumber ? track.trackNumber - last2.trackNumber === 1 : track.discNumber - last2.discNumber === 1 && track.trackNumber === 1);
       if (next) runs.at(-1).push(track);
       else runs.push([track]);
     }
@@ -41273,7 +41273,7 @@ function catalogueStamp(c) {
         (SELECT count(*)||':'||coalesce(max(rowid),0)||':'||coalesce(sum(state='active'),0) FROM credit) AS h,
         (SELECT count(*)||':'||coalesce(max(rowid),0) FROM relation) AS i`
   ).get();
-  return `v3|${Object.values(row).join("|")}`;
+  return `v4|${Object.values(row).join("|")}`;
 }
 function resolvedValues(c) {
   const values = /* @__PURE__ */ new Map();
@@ -41337,9 +41337,9 @@ function ownedRecordings(c, tracks = classicalTracks(c), values = resolvedValues
     }
     const trackMs = [];
     for (const item of recording.items) {
-      const last = trackMs.at(-1);
+      const last2 = trackMs.at(-1);
       const ms = item.endMs != null ? item.endMs - item.startMs : Math.max(0, item.track.durationMs - (item.startMs || 0));
-      if (last && last.track === item.track.id && last.start === item.startMs) continue;
+      if (last2 && last2.track === item.track.id && last2.start === item.startMs) continue;
       trackMs.push({ track: item.track.id, start: item.startMs, ms });
     }
     recordings.push({
@@ -41587,8 +41587,9 @@ function buildDocuments(c) {
     if (performerRoles.length) facets.push(...creditFacets(entry.credits.filter((k) => PERFORMER_ROLES.has(k.role))));
     const common = { ref: id, title: display2, owned: true, primary: [display2, ...list2(v.aliases)], secondary: [], keys: [], facets: dedupeFacets(facets), sort: { title: sortTitle(v, display2), key: "", date: sortDate(v.date) } };
     const label = [...entry.roles].map((role) => ROLE_LABEL[role] || role).join(" \xB7 ");
-    if (isComposer3) docs.push({ ...common, kind: "composer", subtitle: "Composer", detail: `${entry.works} work${entry.works === 1 ? "" : "s"}`, boost: KIND_BOOST.composer, data: { roles: [...entry.roles] } });
-    if (performerRoles.length) docs.push({ ...common, kind: "performer", subtitle: label, detail: "", boost: KIND_BOOST.performer, data: { roles: performerRoles } });
+    const entity = kindOf.get(id);
+    if (isComposer3) docs.push({ ...common, kind: "composer", subtitle: "Composer", detail: `${entry.works} work${entry.works === 1 ? "" : "s"}`, boost: KIND_BOOST.composer, data: { roles: [...entry.roles], entity } });
+    if (performerRoles.length) docs.push({ ...common, kind: "performer", subtitle: label, detail: "", boost: KIND_BOOST.performer, data: { roles: performerRoles, entity } });
   }
   const albums2 = /* @__PURE__ */ new Map();
   for (const track of tracks.values()) {
@@ -41683,7 +41684,7 @@ function normalizeFilters(raw) {
   }
   return filters;
 }
-function searchCatalogue(c, { q = "", filters = {}, kinds: kinds2 = null, limit = 8, offset = 0, ensure = true } = {}) {
+function searchCatalogue(c, { q = "", filters = {}, kinds: kinds2 = null, limit = 8, offset = 0, ensure = true, browse = false, accept = null, sort = "relevance" } = {}) {
   const started = performance.now();
   const index = ensure ? ensureSearchIndex(c) : { rebuilt: false, docs: c.db.prepare("SELECT docs FROM search_state WHERE id=1").get()?.docs ?? 0, ms: 0 };
   const query = parseQuery(String(q).slice(0, 200));
@@ -41699,8 +41700,11 @@ function searchCatalogue(c, { q = "", filters = {}, kinds: kinds2 = null, limit 
     for (const word of query.optional) for (const [doc2, weight] of wordMatches(c, word)) if (scores.has(doc2)) scores.set(doc2, scores.get(doc2) + weight * 0.1);
   }
   if (!scores) {
-    if (!Object.keys(wanted).length) return emptyResult(q, index, started);
-    scores = new Map(c.db.prepare("SELECT id FROM search_doc").all().map((row) => [row.id, 0]));
+    const listing = browse && kinds2?.length;
+    if (!Object.keys(wanted).length && !listing) return emptyResult(q, index, started);
+    scores = new Map(
+      (listing ? c.db.prepare(`SELECT id FROM search_doc WHERE kind IN (${kinds2.map(() => "?").join(",")})`).all(...kinds2) : c.db.prepare("SELECT id FROM search_doc").all()).map((row) => [row.id, 0])
+    );
   }
   for (const [facet, values] of Object.entries(wanted)) {
     const allowed = new Set(
@@ -41720,6 +41724,7 @@ function searchCatalogue(c, { q = "", filters = {}, kinds: kinds2 = null, limit 
     const doc2 = docs.get(id);
     if (!doc2 || kinds2 && !kinds2.includes(doc2.kind)) continue;
     const data = parse3(doc2.data, {});
+    if (accept && !accept(doc2, data)) continue;
     const exact = folded && (fold(doc2.title) === folded || fold(data.nickname) === folded) ? 25 : 0;
     ranked.push({ doc: doc2, data, score: weight + doc2.boost + exact + (doc2.owned ? 2 : 0) });
   }
@@ -41739,6 +41744,7 @@ function searchCatalogue(c, { q = "", filters = {}, kinds: kinds2 = null, limit 
     }
   }
   ranked.sort((a, b) => b.score - a.score || a.doc.title.localeCompare(b.doc.title) || a.doc.id - b.doc.id);
+  if (SORTS[sort]) ranked.sort(SORTS[sort]);
   const sections = [];
   for (const [kind, title] of SECTIONS) {
     const all = ranked.filter((r) => r.doc.kind === kind);
@@ -41760,6 +41766,15 @@ function searchCatalogue(c, { q = "", filters = {}, kinds: kinds2 = null, limit 
     ms: Math.round(performance.now() - started)
   };
 }
+var last = (a, b) => a && b ? a.localeCompare(b) : a ? -1 : b ? 1 : 0;
+var byTitle = (a, b) => a.doc.sort_title.localeCompare(b.doc.sort_title) || a.doc.title.localeCompare(b.doc.title) || a.doc.id - b.doc.id;
+var SORTS = {
+  title: byTitle,
+  catalogue: (a, b) => last(a.doc.sort_key, b.doc.sort_key) || byTitle(a, b),
+  date: (a, b) => last(a.doc.sort_date, b.doc.sort_date) || byTitle(a, b),
+  "date-desc": (a, b) => (a.doc.sort_date && b.doc.sort_date ? b.doc.sort_date.localeCompare(a.doc.sort_date) : last(a.doc.sort_date, b.doc.sort_date)) || byTitle(a, b)
+};
+var SORT_ORDERS = Object.keys(SORTS);
 function emptyResult(q, index, started) {
   return { version: 1, query: String(q), filters: {}, keys: [], total: 0, best: null, sections: [], facets: [], index: { docs: index.docs, rebuilt: index.rebuilt, buildMs: Math.round(index.ms) }, ms: Math.round(performance.now() - started) };
 }
@@ -42004,11 +42019,11 @@ function parseEntitySelection(selection) {
   const match2 = /^(.*)~(\d{1,6})$/.exec(entry);
   return { id: match2 ? match2[1] : entry, page: match2 ? Number(match2[2]) : 0, section };
 }
-var entitySelection = (id, page, section = "") => `${id}${page > 0 ? `~${page}` : ""}${section ? `!${section}` : ""}`;
-function paged(rows, page, id, noun = "", section = "") {
+var entitySelection = (id, page2, section = "") => `${id}${page2 > 0 ? `~${page2}` : ""}${section ? `!${section}` : ""}`;
+function paged(rows, page2, id, noun = "", section = "") {
   if (rows.length <= SECTION_PAGE) return { rows };
   const pages = Math.ceil(rows.length / SECTION_PAGE);
-  const at = Math.min(Math.max(0, page), pages - 1);
+  const at = Math.min(Math.max(0, page2), pages - 1);
   return {
     rows: rows.slice(at * SECTION_PAGE, (at + 1) * SECTION_PAGE),
     pager: {
@@ -42024,14 +42039,14 @@ function finishWorkMutation(c, request, result) {
   const current = parseEntitySelection(scope);
   if (c.db.prepare("SELECT kind FROM entity WHERE id=? AND deleted_at IS NULL").get(current.id)?.kind !== "work" || result.selection !== current.id) return result;
   let section = current.section || (current.page > 0 ? "movements" : "details");
-  let page = current.page;
+  let page2 = current.page;
   if (request.command === "add-movement") {
     section = "movements";
-    page = Math.floor(Math.max(0, workMovements(c, current.id).length - 1) / SECTION_PAGE);
+    page2 = Math.floor(Math.max(0, workMovements(c, current.id).length - 1) / SECTION_PAGE);
   } else if (["add-credit", "remove-credit"].includes(request.command)) section = "credits";
   else if (["move-movement", "delete-movement", "reorder-movements", "set-movement-order"].includes(request.command)) section = "movements";
   else section = WORK_FORMS[section] || section;
-  return { ...result, selection: entitySelection(current.id, page, section === "details" ? "" : section), focus: section };
+  return { ...result, selection: entitySelection(current.id, page2, section === "details" ? "" : section), focus: section };
 }
 var ROLES2 = CREDIT_ROLES;
 var roleLabel = (role) => role[0].toUpperCase() + role.slice(1);
@@ -42506,7 +42521,7 @@ var mergeForm = (target, lookup, noun, note) => ({
     { key: "into", label: `Other ${noun}`, type: "lookup", lookup, value: "", placeholder: `Search ${noun}s`, required: true }
   ]
 });
-function workView(c, work, page = 0, section = "details", { orderField = false } = {}) {
+function workView(c, work, page2 = 0, section = "details", { orderField = false } = {}) {
   const current = WORK_FORMS[section] || section;
   const title = entityLabel(c, work, "work");
   const composers = credits(c, work).filter((credit) => credit.role === "composer");
@@ -42544,7 +42559,7 @@ function workView(c, work, page = 0, section = "details", { orderField = false }
       { label: `${performances.length} recording${performances.length === 1 ? "" : "s"}`, tone: "default" },
       ...movements.length ? [{ label: `${movements.length} movements`, tone: "muted" }] : []
     ],
-    actions: Object.entries(WORK_SECTIONS).map(([key, label]) => open(label, entitySelection(work, key === current ? page : 0, key === "details" ? "" : key))),
+    actions: Object.entries(WORK_SECTIONS).map(([key, label]) => open(label, entitySelection(work, key === current ? page2 : 0, key === "details" ? "" : key))),
     sections: [
       detailsForm(c, work, "work"),
       {
@@ -42564,7 +42579,7 @@ function workView(c, work, page = 0, section = "details", { orderField = false }
             ...movements.length > REORDER_LIMIT && index < movements.length - 1 ? [action("Move down", "move-movement", { work, movement: movement.id, direction: "down" })] : [],
             ...coverage2.get(movement.id) ? [] : [action("Delete", "delete-movement", { work, movement: movement.id }, { tone: "danger", confirm: "Delete this movement?" })]
           ]
-        })), page, work, "Movements", "movements")
+        })), page2, work, "Movements", "movements")
       },
       {
         type: "form",
@@ -42607,7 +42622,7 @@ function workView(c, work, page = 0, section = "details", { orderField = false }
         title: "Recordings",
         note: "Open an album to change which of its tracks belong to this work.",
         empty: "No owned recordings yet. Open an album and assign it to this work.",
-        ...paged([...recordingRows, ...broadcasts], page, work, "Recordings", "recordings")
+        ...paged([...recordingRows, ...broadcasts], page2, work, "Recordings", "recordings")
       },
       {
         type: "form",
@@ -42635,18 +42650,18 @@ function workView(c, work, page = 0, section = "details", { orderField = false }
   } else if (section === "reorder" && (movements.length < 2 || movements.length > REORDER_LIMIT)) {
     fail(movements.length < 2 ? "This work has nothing to reorder." : `Reorder works up to ${REORDER_LIMIT} movements; use Move up and Move down.`);
   } else if (Object.hasOwn(WORK_FORMS, section)) {
-    view.sections = [{ ...selected, actions: [open("Cancel", entitySelection(work, page, current))] }];
+    view.sections = [{ ...selected, actions: [open("Cancel", entitySelection(work, page2, current))] }];
   } else {
     const add = {
       movements: [["Add movements", "add-movement"], ...movements.length > 1 && movements.length <= REORDER_LIMIT ? [["Reorder movements", "reorder"]] : []],
       credits: [["Add a credit", "add-credit"]],
       recordings: [["Add a broadcast recording", "broadcast"]]
     }[section];
-    view.sections = [{ ...selected, ...add && { actions: add.map(([label, form2]) => open(label, entitySelection(work, page, form2))) } }];
+    view.sections = [{ ...selected, ...add && { actions: add.map(([label, form2]) => open(label, entitySelection(work, page2, form2))) } }];
   }
   return view;
 }
-function contributorView(c, entity, page = 0) {
+function contributorView(c, entity, page2 = 0) {
   const kind = entity.kind;
   const name = entity.label;
   const composer = kind === "person" && isComposer2(c, entity);
@@ -42665,7 +42680,7 @@ function contributorView(c, entity, page = 0) {
         empty: "No works yet.",
         ...paged(
           works.map((work) => ({ id: work, label: entityLabel(c, work, "work"), detail: `${realizations(c, work).length} recordings`, selection: work })).sort((a, b) => a.label.localeCompare(b.label)),
-          page,
+          page2,
           entity.id,
           "Works"
         )
@@ -42697,7 +42712,7 @@ function contributorView(c, entity, page = 0) {
           detail: `${roleLabel(credit.role)}${credit.instrument ? ` \xB7 ${credit.instrument}` : ""}`,
           selection: creditTargetPage(c, credit.target_id)
         })),
-        page,
+        page2,
         entity.id,
         "Credits"
       )
@@ -42755,7 +42770,7 @@ function contributorView(c, entity, page = 0) {
     sections
   };
 }
-function movementView(c, movement, page = 0) {
+function movementView(c, movement, page2 = 0) {
   const work = c.db.prepare("SELECT source_id FROM relation WHERE kind='movement' AND target_id=?").get(movement)?.source_id;
   const items = c.db.prepare(
     `SELECT i.id,t.evidence,r.label FROM realization_item i JOIN realization r ON r.id=i.realization_id
@@ -42781,7 +42796,7 @@ function movementView(c, movement, page = 0) {
             detail: [item.evidence.hints?.artist, item.label || item.evidence.hints?.album].filter(Boolean).join(" \xB7 "),
             ...item.evidence.albumId != null && { selection: `album:${item.evidence.albumId}` }
           })),
-          page,
+          page2,
           movement,
           "Tracks"
         )
@@ -42881,12 +42896,12 @@ function guessWork(tracks) {
 var ALBUM_PAGE = 100;
 function parseAlbumSelection(selection) {
   const [body, move = ""] = selection.slice(6).split("!");
-  const [rest, page = "0"] = body.split("~");
+  const [rest, page2 = "0"] = body.split("~");
   const [albumId, work = ""] = rest.split("@");
-  const index = Number(page);
+  const index = Number(page2);
   return { albumId, work, move, page: Number.isSafeInteger(index) && index >= 0 ? index : 0 };
 }
-var albumSelection = (albumId, work, page, move = "") => `album:${albumId}${work ? `@${work}` : ""}${page ? `~${page}` : ""}${move ? `!${move}` : ""}`;
+var albumSelection = (albumId, work, page2, move = "") => `album:${albumId}${work ? `@${work}` : ""}${page2 ? `~${page2}` : ""}${move ? `!${move}` : ""}`;
 var pageOf = (v) => Number.isSafeInteger(Number(v.page)) && Number(v.page) > 0 ? Number(v.page) : 0;
 function movingTracks(c, token) {
   const row = c.db.prepare("SELECT data FROM change_set WHERE id=? AND kind='selection'").get(token);
@@ -42913,13 +42928,13 @@ function checkAssignmentSelection(c, request) {
     fail("The selected tracks changed. Cancel grouping and select the tracks again.");
   return true;
 }
-function albumView(c, albumId, chosenWork, page = 0, move = "") {
+function albumView(c, albumId, chosenWork, page2 = 0, move = "") {
   const album = albums(c, albumId).get(albumId);
   if (!album) fail("This album isn't in the classical index. Run a scan first.");
   const tracks = album.tracks;
   const pages = Math.max(1, Math.ceil(tracks.length / ALBUM_PAGE));
-  page = Math.min(page, pages - 1);
-  const onPage = tracks.slice(page * ALBUM_PAGE, (page + 1) * ALBUM_PAGE);
+  page2 = Math.min(page2, pages - 1);
+  const onPage = tracks.slice(page2 * ALBUM_PAGE, (page2 + 1) * ALBUM_PAGE);
   const assigned = new Map(tracks.map((track) => [track.id, []]));
   for (const row of c.db.prepare(
     `SELECT s.track_link_id AS track,i.id AS item,i.movement_id,r.id AS realization,r.work_id FROM segment s
@@ -42957,8 +42972,8 @@ function albumView(c, albumId, chosenWork, page = 0, move = "") {
         { label: "Selection", value: `${label} from this album, in album order` }
       ]
     });
-    actions = mappingStep ? [open("Choose a different work", albumSelection(albumId, "", page, move))] : [];
-    const footer = [open("Cancel grouping", albumSelection(albumId, "", page))];
+    actions = mappingStep ? [open("Choose a different work", albumSelection(albumId, "", page2, move))] : [];
+    const footer = [open("Cancel grouping", albumSelection(albumId, "", page2))];
     if (!chosenWork) {
       const kept = candidates2.filter((track) => stateOf(track.id).state !== "not_classical");
       const guess = guessWork(kept);
@@ -42972,7 +42987,7 @@ function albumView(c, albumId, chosenWork, page = 0, move = "") {
           id: work,
           label: entityLabel(c, work, "work"),
           detail: composerNames2(c, work).join(", ") || void 0,
-          actions: [action("Use this work", "choose-album-work", { albumId, work, page: String(page), move })]
+          actions: [action("Use this work", "choose-album-work", { albumId, work, page: String(page2), move })]
         }))
       });
       sections.push({
@@ -42981,12 +42996,12 @@ function albumView(c, albumId, chosenWork, page = 0, move = "") {
         title: `Choose a work for ${label}`,
         note: "Use an existing work, or choose Create a new work. Your selected tracks stay together through both steps.",
         command: "choose-album-work",
-        arguments: { albumId, page: String(page), move },
+        arguments: { albumId, page: String(page2), move },
         submitLabel: "Continue to movements",
         actions: footer,
         fields: [{ key: "work", label: "Work", type: "lookup", lookup: "works", value: "", placeholder: guess ? `Search, for example \u201C${guess}\u201D` : "Search works", required: true }]
       });
-      actions.unshift(action("Create a new work", "new-album-work", { albumId, page: String(page), move }));
+      actions.unshift(action("Create a new work", "new-album-work", { albumId, page: String(page2), move }));
     } else if (isNew) {
       const excluded = (track) => stateOf(track.id).state === "not_classical";
       const kept = candidates2.filter((track) => !excluded(track));
@@ -42997,7 +43012,7 @@ function albumView(c, albumId, chosenWork, page = 0, move = "") {
         title: "Create a work from selected tracks",
         note: "Check the work details and each selected track. Skip leaves a track where it is. Included tracks become Classical; any already in another work move here. Nothing changes until Create and assign.",
         command: "create-work-from-album",
-        arguments: { albumId, tracks: candidates2.map((track) => track.id), page: String(page), move },
+        arguments: { albumId, tracks: candidates2.map((track) => track.id), page: String(page2), move },
         submitLabel: "Create and assign",
         actions: footer,
         fields: [
@@ -43025,7 +43040,7 @@ function albumView(c, albumId, chosenWork, page = 0, move = "") {
         title: `Assign selected tracks to ${entityLabel(c, chosenWork, "work")}`,
         note: "Check each movement, or choose New movement to add one named after the track. Skip leaves a track where it is. Assigned tracks become Classical; tracks already in a work move here. Nothing changes until you apply.",
         command: "assign-album",
-        arguments: { albumId, work: chosenWork, tracks: candidates2.map((track) => track.id), page: String(page), move },
+        arguments: { albumId, work: chosenWork, tracks: candidates2.map((track) => track.id), page: String(page2), move },
         submitLabel: moving ? "Move tracks" : "Assign tracks",
         actions: footer,
         fields: [{
@@ -43059,7 +43074,7 @@ function albumView(c, albumId, chosenWork, page = 0, move = "") {
           detail: [composerNames2(c, work).join(", "), `${new Set(links.map((link3) => link3.track)).size} tracks`].filter(Boolean).join(" \xB7 "),
           ...missing ? { badge: { label: `${missing} movement${missing === 1 ? "" : "s"} missing`, tone: "warning" } } : {},
           selection: work,
-          actions: [open("Add tracks", albumSelection(albumId, work, page)), action("Unassign", "unassign-album", { albumId, work, page: String(page) }, { tone: "danger", confirm: "Remove this album's tracks from the work? The work and the audio stay." })]
+          actions: [open("Add tracks", albumSelection(albumId, work, page2)), action("Unassign", "unassign-album", { albumId, work, page: String(page2) }, { tone: "danger", confirm: "Remove this album's tracks from the work? The work and the audio stay." })]
         };
       })
     });
@@ -43079,23 +43094,23 @@ function albumView(c, albumId, chosenWork, page = 0, move = "") {
         };
       }),
       select: { key: "tracks", actions: [
-        action("Group selected tracks", "move-tracks-open", { albumId, page: String(page), ...chosenWork && { work: chosenWork } }),
-        action("Set performers\u2026", "performers-open", { albumId, page: String(page) }),
+        action("Group selected tracks", "move-tracks-open", { albumId, page: String(page2), ...chosenWork && { work: chosenWork } }),
+        action("Set performers\u2026", "performers-open", { albumId, page: String(page2) }),
         action("Send to Classical", "set-classification", { state: "classical" }),
         action("Remove from Classical", "set-classification", { state: "not_classical" }, { tone: "danger", confirm: "Remove these tracks from Aurral Classical? They stay in your Aurral library." }),
-        action("Remove from work", "unassign-tracks", { albumId, page: String(page) }, { tone: "danger", confirm: "Take these tracks out of their works? The works and the audio stay." })
+        action("Remove from work", "unassign-tracks", { albumId, page: String(page2) }, { tone: "danger", confirm: "Take these tracks out of their works? The works and the audio stay." })
       ] },
       ...pages > 1 && { pager: {
-        label: `Tracks ${page * ALBUM_PAGE + 1}\u2013${Math.min((page + 1) * ALBUM_PAGE, tracks.length)} of ${tracks.length}`,
-        ...page > 0 && { previous: albumSelection(albumId, chosenWork, page - 1) },
-        ...page < pages - 1 && { next: albumSelection(albumId, chosenWork, page + 1) }
+        label: `Tracks ${page2 * ALBUM_PAGE + 1}\u2013${Math.min((page2 + 1) * ALBUM_PAGE, tracks.length)} of ${tracks.length}`,
+        ...page2 > 0 && { previous: albumSelection(albumId, chosenWork, page2 - 1) },
+        ...page2 < pages - 1 && { next: albumSelection(albumId, chosenWork, page2 + 1) }
       } }
     });
     actions = [
-      ...chosenWork ? [open("Cancel grouping", albumSelection(albumId, "", page))] : [],
-      action("Send all to Classical", "set-album-classification", { albumId, state: "classical", page: String(page) }),
-      action("Preview tag removal", "preview-tag-removal", { albumId, page: String(page) }),
-      action("Remove all from Classical", "set-album-classification", { albumId, state: "not_classical", page: String(page) }, { tone: "danger", confirm: `Remove all ${tracks.length} tracks on this album from Aurral Classical? They stay in your Aurral library.` })
+      ...chosenWork ? [open("Cancel grouping", albumSelection(albumId, "", page2))] : [],
+      action("Send all to Classical", "set-album-classification", { albumId, state: "classical", page: String(page2) }),
+      action("Preview tag removal", "preview-tag-removal", { albumId, page: String(page2) }),
+      action("Remove all from Classical", "set-album-classification", { albumId, state: "not_classical", page: String(page2) }, { tone: "danger", confirm: `Remove all ${tracks.length} tracks on this album from Aurral Classical? They stay in your Aurral library.` })
     ];
   }
   return {
@@ -43824,9 +43839,9 @@ function renderV2(c, query, revision2, { downloads = null, maintenance: maintena
   }
   let view = null;
   if (selection.startsWith("album:")) {
-    const { albumId, work, page, move } = parseAlbumSelection(selection);
+    const { albumId, work, page: page2, move } = parseAlbumSelection(selection);
     if (work && work !== "new") c.entity(work, "work");
-    view = albumView(c, albumId, work || null, page, move);
+    view = albumView(c, albumId, work || null, page2, move);
   } else if (selection.startsWith("track:")) view = trackView(c, selection.slice(6));
   else if (selection.startsWith("slskd:")) view = downloadView(downloads, Number(selection.slice(6)));
   else if (selection.startsWith("change:")) view = changeView(c, selection.slice(7));
@@ -43840,12 +43855,12 @@ function renderV2(c, query, revision2, { downloads = null, maintenance: maintena
   } else if (selection.startsWith("review:")) view = reviewView(c, selection.slice(7));
   else if (selection.startsWith("new:")) view = newView(selection.slice(4));
   else if (selection) {
-    const { id: entityId, page, section } = parseEntitySelection(selection);
+    const { id: entityId, page: page2, section } = parseEntitySelection(selection);
     const entity = c.db.prepare("SELECT * FROM entity WHERE id=? AND deleted_at IS NULL").get(entityId);
     if (!entity) fail("This catalogue entry no longer exists");
     if (section && entity.kind !== "work") fail("Sections are only available for works");
     const parsed = { ...entity, data: JSON.parse(entity.data), label: entityLabel(c, entity.id, entity.kind) };
-    view = entity.kind === "work" ? workView(c, entity.id, page, section || (page > 0 ? "movements" : "details"), { orderField }) : entity.kind === "person" || entity.kind === "ensemble" ? contributorView(c, parsed, page) : entity.kind === "movement" ? movementView(c, entity.id, page) : recordingView(c, entity.id);
+    view = entity.kind === "work" ? workView(c, entity.id, page2, section || (page2 > 0 ? "movements" : "details"), { orderField }) : entity.kind === "person" || entity.kind === "ensemble" ? contributorView(c, parsed, page2) : entity.kind === "movement" ? movementView(c, entity.id, page2) : recordingView(c, entity.id);
   }
   if (!selection && tab === "activity" && maintenance2) view = maintenanceView(maintenance2);
   if (view && !formActions) hoistFormActions(view);
@@ -44415,10 +44430,10 @@ function applyV2(c, request, who) {
       }
       if (added.length) {
         const order = workMovements(c, into).map((movement) => movement.id);
-        const page = Math.floor(Math.max(0, order.indexOf(added[0])) / SECTION_PAGE);
+        const page2 = Math.floor(Math.max(0, order.indexOf(added[0])) / SECTION_PAGE);
         const names = added.slice(0, 3).map((id) => `\u201C${entityLabel(c, id, "movement")}\u201D`).join(", ");
         return {
-          selection: entitySelection(into, page, "movements"),
+          selection: entitySelection(into, page2, "movements"),
           focus: "movements",
           changeId,
           message: `Merged. Added ${added.length} movement${added.length === 1 ? "" : "s"} the work didn't have (${names}${added.length > 3 ? ` and ${added.length - 3} more` : ""}) at the end of Movements; use Reorder movements to put ${added.length === 1 ? "it" : "them"} in order. Undo it from Activity.`.slice(0, 500)
@@ -45629,6 +45644,7 @@ async function mutateEditor(input) {
 import path8 from "node:path";
 var PAGE_ID = "classical";
 var ENTITY_KINDS = /* @__PURE__ */ new Set(["composer", "person", "ensemble", "work", "recording"]);
+var page = (resourceId) => ({ type: "resource", pageId: PAGE_ID, resourceId });
 var workPage = (workId) => ({ type: "resource", pageId: "work", resourceId: workId });
 var NotFound = class extends Error {
 };
@@ -45654,8 +45670,84 @@ var required = (row, what) => {
 function homeView() {
   return { version: 2, title: "Classical", sections: [{ type: "header", title: "Classical" }] };
 }
-function listView(c, kind) {
-  return { version: 2, title: kind, sections: [{ type: "header", title: kind }, { type: "empty", message: "Nothing here yet." }] };
+var PAGE_SIZE = 100;
+var ENSEMBLE2 = (doc2, data) => data.entity === "ensemble";
+var byRef = (prefix) => (item) => item.ref.length <= 180 ? page(`${prefix}:${item.ref}`) : null;
+var LISTS = {
+  composer: { title: "Composers", noun: ["composer", "composers"], kinds: ["composer"], sorts: [["title", "Name"]], link: byRef("composer") },
+  work: {
+    title: "Works",
+    noun: ["work", "works"],
+    kinds: ["work"],
+    sorts: [["title", "Title"], ["catalogue", "Catalogue number"], ["date", "Date written"]],
+    link: (item) => workPage(item.ref)
+  },
+  performer: { title: "Performers", noun: ["performer", "performers"], kinds: ["performer"], accept: (doc2, data) => !ENSEMBLE2(doc2, data), sorts: [["title", "Name"]], link: byRef("person") },
+  conductor: {
+    title: "Conductors",
+    noun: ["conductor", "conductors"],
+    kinds: ["performer"],
+    accept: (doc2, data) => !ENSEMBLE2(doc2, data) && (data.roles || []).includes("conductor"),
+    sorts: [["title", "Name"]],
+    link: byRef("person")
+  },
+  ensemble: { title: "Ensembles", noun: ["ensemble", "ensembles"], kinds: ["performer"], accept: ENSEMBLE2, sorts: [["title", "Name"]], link: byRef("ensemble") },
+  recording: {
+    title: "Recordings",
+    noun: ["recording", "recordings"],
+    kinds: ["recording"],
+    sorts: [["title", "Work"], ["catalogue", "Catalogue number"], ["date-desc", "Newest first"], ["date", "Oldest first"]],
+    link: (item) => item.workId ? workPage(item.workId) : null
+  }
+};
+var LIST_FACETS = /* @__PURE__ */ new Set(["composer", "performer", "conductor", "ensemble", "role", "period", "form", "instrument", "type", "year"]);
+var counted = (n, [one, many]) => `${n.toLocaleString("en-US")} ${n === 1 ? one : many}`;
+function listView(c, kind, query = {}) {
+  const list4 = LISTS[kind];
+  if (!list4) throw new NotFound(`No Classical list ${kind}`);
+  const q = typeof query.q === "string" ? query.q.trim() : "";
+  const sorts = q ? [["relevance", "Best match"], ...list4.sorts] : list4.sorts;
+  const sort = sorts.some(([value]) => value === query.sort) ? query.sort : sorts[0][0];
+  const pageIndex = Math.min(9999, Math.max(0, Math.trunc(Number(query.page) || 0)));
+  const offset = pageIndex * PAGE_SIZE;
+  const result = searchCatalogue(c, {
+    q,
+    filters: query.filters || {},
+    kinds: list4.kinds,
+    browse: true,
+    accept: list4.accept || null,
+    sort,
+    limit: PAGE_SIZE,
+    offset,
+    ensure: false
+  });
+  const section = result.sections.find((part) => list4.kinds.includes(part.id));
+  const total = section?.total || 0;
+  const items = section?.items || [];
+  const filtered = Boolean(q || Object.keys(result.filters).length);
+  const filters = result.facets.filter((facet) => LIST_FACETS.has(facet.key)).slice(0, 10).map((facet) => ({ key: facet.key, label: facet.label, options: facet.options, selected: facet.selected }));
+  return {
+    version: 2,
+    title: list4.title,
+    sections: [
+      { type: "header", title: list4.title, subtitle: counted(total, list4.noun) },
+      { type: "sort", active: sort, options: sorts.map(([value, label]) => ({ value, label })) },
+      ...filters.length ? [{ type: "filters", filters }] : [],
+      ...items.length ? [
+        {
+          type: "rows",
+          id: kind,
+          rows: items.map((item, index) => ({
+            id: item.ref.length <= 200 ? item.ref : `row-${offset + index}`,
+            label: item.title,
+            detail: [kind === "composer" ? "" : item.subtitle, item.detail].filter(Boolean).join(" \xB7 "),
+            link: list4.link(item)
+          }))
+        }
+      ] : [{ type: "empty", message: total ? `No more ${list4.noun[1]}.` : filtered ? `No ${list4.noun[1]} match.` : `No ${list4.noun[1]} in your Library yet.` }],
+      ...total > PAGE_SIZE ? [{ type: "pager", total, offset, limit: PAGE_SIZE }] : []
+    ]
+  };
 }
 var ENTITY_DOCS = {
   composer: [["composer"], "Composer"],
@@ -45795,8 +45887,8 @@ function realizationRows(c, realizationId = null, workId = null, albumId = null)
       ${filters.length ? `WHERE ${filters.map(([, sql]) => sql).join(" AND ")}` : ""}
       ORDER BY r.id,i.sequence,i.occurrence,i.id`
   ).all(...filters.map(([value]) => value)).reduce((rows, row) => {
-    const last = rows.at(-1);
-    if (last && last.realization_id === row.realization_id && last.segment_id === row.segment_id) last.movement_ids.push(row.movement_id);
+    const last2 = rows.at(-1);
+    if (last2 && last2.realization_id === row.realization_id && last2.segment_id === row.segment_id) last2.movement_ids.push(row.movement_id);
     else rows.push({ ...row, movement_ids: [row.movement_id] });
     return rows;
   }, []);
@@ -45864,14 +45956,14 @@ function sameNamedWork(a, b) {
   const name = nameBeforeComma(long);
   return name.length >= 4 && words4(short) === name && long.includes(",");
 }
-function sameCredits(last, heading, names) {
+function sameCredits(last2, heading, names) {
   const these = new Set(names.map(words4));
-  if (last.names.length === these.size && last.names.every((name) => these.has(name))) return true;
-  const shared = last.names.filter((name) => these.has(name));
-  const same2 = shared.length > 0 && Boolean(catalogueNumber(last.title)) && catalogueNumber(last.title) === catalogueNumber(heading);
+  if (last2.names.length === these.size && last2.names.every((name) => these.has(name))) return true;
+  const shared = last2.names.filter((name) => these.has(name));
+  const same2 = shared.length > 0 && Boolean(catalogueNumber(last2.title)) && catalogueNumber(last2.title) === catalogueNumber(heading);
   if (same2) {
-    last.composer = last.credited.filter((name) => shared.includes(words4(name))).join(", ");
-    last.names = shared;
+    last2.composer = last2.credited.filter((name) => shared.includes(words4(name))).join(", ");
+    last2.names = shared;
   }
   return same2;
 }
@@ -45899,7 +45991,7 @@ function pieceGroups(c, album, following) {
     const head = numbered?.set ?? fullHead.replace(ACT, "");
     const heading = head || tail;
     const composer = names.join(", ");
-    const last = pieces.at(-1);
+    const last2 = pieces.at(-1);
     const item = {
       id: `piece:${row.track_link_id}`,
       trackId: String(row.core_id),
@@ -45914,9 +46006,9 @@ function pieceGroups(c, album, following) {
       endMs: null,
       position: albumPosition(row)
     };
-    const sameWork = last && sameNamedWork(last.title, heading);
-    if (head && sameWork && sameCredits(last, heading, names) && following.get(last.next) === item.position)
-      last.items.push(item);
+    const sameWork = last2 && sameNamedWork(last2.title, heading);
+    if (head && sameWork && sameCredits(last2, heading, names) && following.get(last2.next) === item.position)
+      last2.items.push(item);
     else
       pieces.push({ id: item.id, workId: null, title: heading, composer, names: names.map(words4), credited: names, items: [item], missing: [] });
     pieces.at(-1).next = item.position;
@@ -45956,8 +46048,8 @@ function renderAlbumPresentation(c, albumId) {
     const runs = [];
     for (const row of [...rows].sort((a, b) => albumPosition(a) - albumPosition(b))) {
       const run = runs.at(-1);
-      const last = run && albumPosition(run.at(-1));
-      if (run && (last === albumPosition(row) || following.get(last) === albumPosition(row))) run.push(row);
+      const last2 = run && albumPosition(run.at(-1));
+      if (run && (last2 === albumPosition(row) || following.get(last2) === albumPosition(row))) run.push(row);
       else runs.push([row]);
     }
     const name = entityValue(metadata, workId, "title", "Untitled work");
@@ -46438,10 +46530,10 @@ async function modelSyncDue(ctx, { now = Date.now() } = {}) {
       "SELECT 1 FROM model_job WHERE key='library_scan' AND state IN ('queued','running','retry')"
     ).get())
       return false;
-    const last = catalogue.db.prepare(
+    const last2 = catalogue.db.prepare(
       "SELECT max(created_at) AS at FROM model_job WHERE key='library_scan' AND state='done'"
     ).get().at;
-    return requested || !last || now - last >= SYNC_INTERVAL_MS;
+    return requested || !last2 || now - last2 >= SYNC_INTERVAL_MS;
   } finally {
     catalogue.close();
   }

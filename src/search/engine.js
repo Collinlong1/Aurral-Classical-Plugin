@@ -62,8 +62,9 @@ export function catalogueStamp(c) {
         (SELECT count(*)||':'||coalesce(max(rowid),0) FROM relation) AS i`,
     )
     .get();
-  // v3: contributor roles, credit instruments and sort keys.
-  return `v3|${Object.values(row).join("|")}`;
+  // v3: contributor roles, credit instruments and sort keys; v4: whether a
+  // contributor is a person or an ensemble.
+  return `v4|${Object.values(row).join("|")}`;
 }
 
 // Every resolved display value, read once.
@@ -422,8 +423,9 @@ export function buildDocuments(c) {
     if (performerRoles.length) facets.push(...creditFacets(entry.credits.filter((k) => PERFORMER_ROLES.has(k.role))));
     const common = { ref: id, title: display, owned: true, primary: [display, ...list(v.aliases)], secondary: [], keys: [], facets: dedupeFacets(facets), sort: { title: sortTitle(v, display), key: "", date: sortDate(v.date) } };
     const label = [...entry.roles].map((role) => ROLE_LABEL[role] || role).join(" · ");
-    if (isComposer) docs.push({ ...common, kind: "composer", subtitle: "Composer", detail: `${entry.works} work${entry.works === 1 ? "" : "s"}`, boost: KIND_BOOST.composer, data: { roles: [...entry.roles] } });
-    if (performerRoles.length) docs.push({ ...common, kind: "performer", subtitle: label, detail: "", boost: KIND_BOOST.performer, data: { roles: performerRoles } });
+    const entity = kindOf.get(id);
+    if (isComposer) docs.push({ ...common, kind: "composer", subtitle: "Composer", detail: `${entry.works} work${entry.works === 1 ? "" : "s"}`, boost: KIND_BOOST.composer, data: { roles: [...entry.roles], entity } });
+    if (performerRoles.length) docs.push({ ...common, kind: "performer", subtitle: label, detail: "", boost: KIND_BOOST.performer, data: { roles: performerRoles, entity } });
   }
 
   // Albums holding classical tracks.
@@ -542,9 +544,14 @@ export function normalizeFilters(raw) {
   return filters;
 }
 
-// Searches the index. `q` may be empty when filters are set. Results come in
+// Searches the index. `q` may be empty when filters are set, or with
+// `browse` and `kinds` to list every document of those kinds. Results come in
 // typed sections, works first; facets count what the current results hold.
-export function searchCatalogue(c, { q = "", filters = {}, kinds = null, limit = 8, offset = 0, ensure = true } = {}) {
+// `accept(doc, data)` keeps only some documents (a list of conductors);
+// `sort` orders each section by relevance (the default), "title",
+// "catalogue", "date" or "date-desc", from the sort keys stored beside each
+// document.
+export function searchCatalogue(c, { q = "", filters = {}, kinds = null, limit = 8, offset = 0, ensure = true, browse = false, accept = null, sort = "relevance" } = {}) {
   const started = performance.now();
   // `ensure: false` inside a read-only snapshot: the caller brought the index
   // up to date first.
@@ -560,9 +567,15 @@ export function searchCatalogue(c, { q = "", filters = {}, kinds = null, limit =
   }
   if (scores) for (const word of query.optional) for (const [doc, weight] of wordMatches(c, word)) if (scores.has(doc)) scores.set(doc, scores.get(doc) + weight * 0.1);
   if (!scores) {
-    // Filters alone browse everything they allow.
-    if (!Object.keys(wanted).length) return emptyResult(q, index, started);
-    scores = new Map(c.db.prepare("SELECT id FROM search_doc").all().map((row) => [row.id, 0]));
+    // Filters alone browse everything they allow; a list browses its kinds.
+    const listing = browse && kinds?.length;
+    if (!Object.keys(wanted).length && !listing) return emptyResult(q, index, started);
+    scores = new Map(
+      (listing
+        ? c.db.prepare(`SELECT id FROM search_doc WHERE kind IN (${kinds.map(() => "?").join(",")})`).all(...kinds)
+        : c.db.prepare("SELECT id FROM search_doc").all()
+      ).map((row) => [row.id, 0]),
+    );
   }
   // Filters: a document must carry every chosen facet (any of its values).
   for (const [facet, values] of Object.entries(wanted)) {
@@ -586,6 +599,7 @@ export function searchCatalogue(c, { q = "", filters = {}, kinds = null, limit =
     const doc = docs.get(id);
     if (!doc || (kinds && !kinds.includes(doc.kind))) continue;
     const data = parse(doc.data, {});
+    if (accept && !accept(doc, data)) continue;
     const exact = folded && (fold(doc.title) === folded || fold(data.nickname) === folded) ? 25 : 0;
     ranked.push({ doc, data, score: weight + doc.boost + exact + (doc.owned ? 2 : 0) });
   }
@@ -607,6 +621,7 @@ export function searchCatalogue(c, { q = "", filters = {}, kinds = null, limit =
     }
   }
   ranked.sort((a, b) => b.score - a.score || a.doc.title.localeCompare(b.doc.title) || a.doc.id - b.doc.id);
+  if (SORTS[sort]) ranked.sort(SORTS[sort]);
   const sections = [];
   for (const [kind, title] of SECTIONS) {
     const all = ranked.filter((r) => r.doc.kind === kind);
@@ -628,6 +643,18 @@ export function searchCatalogue(c, { q = "", filters = {}, kinds = null, limit =
     ms: Math.round(performance.now() - started),
   };
 }
+
+// Sort orders for lists. Documents without the key (a work with no catalogue
+// number or date) follow those with it; ties keep the title order.
+const last = (a, b) => (a && b ? a.localeCompare(b) : a ? -1 : b ? 1 : 0);
+const byTitle = (a, b) => a.doc.sort_title.localeCompare(b.doc.sort_title) || a.doc.title.localeCompare(b.doc.title) || a.doc.id - b.doc.id;
+const SORTS = {
+  title: byTitle,
+  catalogue: (a, b) => last(a.doc.sort_key, b.doc.sort_key) || byTitle(a, b),
+  date: (a, b) => last(a.doc.sort_date, b.doc.sort_date) || byTitle(a, b),
+  "date-desc": (a, b) => (a.doc.sort_date && b.doc.sort_date ? b.doc.sort_date.localeCompare(a.doc.sort_date) : last(a.doc.sort_date, b.doc.sort_date)) || byTitle(a, b),
+};
+export const SORT_ORDERS = Object.keys(SORTS);
 
 function emptyResult(q, index, started) {
   return { version: 1, query: String(q), filters: {}, keys: [], total: 0, best: null, sections: [], facets: [], index: { docs: index.docs, rebuilt: index.rebuilt, buildMs: Math.round(index.ms) }, ms: Math.round(performance.now() - started) };

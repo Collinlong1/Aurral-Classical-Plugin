@@ -1,3 +1,16 @@
+# v0.3 Phase 4.2 — Classical Library lists / issue #66
+
+## Result
+
+- `src/search/engine.js`: `searchCatalogue({ browse, accept, sort })`; `SORT_ORDERS`; performer and composer documents carry `data.entity`; stamp `v4`.
+- `src/model/pages.js`: `LISTS`, `PAGE_SIZE` (100), `listView`: header with the count, `sort`, `filters` (up to ten facets), `rows`, `empty` ("No works match.", "No more works." past the end, or none yet), and `pager` when there are more than 100.
+
+## Verification
+
+On Node 22.23: full `npm test` 425/425. New `test/search.test.js` tests: the fixture's three composers in name order; works by title and by catalogue number; conductors are exactly Barenboim and Karajan; no orchestra in the performer list; a composer filter and a query narrow lists, and a query adds "Best match"; an unknown list is refused. A 230-work library lists 100, 100 and 30 rows with pagers at offsets 0 and 200, catalogue order puts Op. 1009 tenth, and a page past the end says "No more works."
+
+---
+
 # v0.3 Phase 4.1 — Classical page routing / issue #65
 
 ## Result

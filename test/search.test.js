@@ -6,6 +6,7 @@ import { autoMatchTaggedWorks } from "../src/model/auto-match.js";
 import { searchCatalogue, ensureSearchIndex } from "../src/search/engine.js";
 import { relinkReissue, unlinkReissue } from "../src/model/reissues.js";
 import { catalogueKeys, parseQuery } from "../src/search/normalize.js";
+import { listView } from "../src/model/pages.js";
 
 test("catalogue numbers are one key however they are written", () => {
   for (const text of ["Op 27 no 2", "Op.27/2", "op. 27, No. 2", "Opus 27 No. 2"]) assert.deepEqual(catalogueKeys(text).map((k) => k.key), ["op:27:2"], text);
@@ -85,7 +86,7 @@ test("combined searches, role-aware filters and one recording across releases", 
     sort_title: "piano sonata no 14 in c sharp minor op 27 no 2",
     sort_key: "op:000027:000002",
   });
-  assert.match(c.db.prepare("SELECT stamp FROM search_state").get().stamp, /^v3\|/);
+  assert.match(c.db.prepare("SELECT stamp FROM search_state").get().stamp, /^v4\|/);
   // Period filter from a pinned field.
   assert.deepEqual(searchCatalogue(c, { q: "sonata", filters: { period: ["classical"] }, kinds: ["work"] }).sections[0].items.map((i) => i.ref), [moonlight]);
   // Two different recordings of the sonata stay two.
@@ -182,4 +183,60 @@ test("the work page lists one entry per recording, with its releases, parts and 
   assert.equal(searchCatalogue(c, { q: "moonlight levit", kinds: ["recording"] }).sections[0].total, 2);
   relinkReissue(c, first, second, "admin");
   assert.deepEqual([links(), entries()], [1, 2]);
+});
+
+test("Classical Library lists browse one kind each, sorted and filtered", async (t) => {
+  const { c, moonlight, barenboim, karajan } = await library(t);
+  ensureSearchIndex(c);
+  const rows = (view) => view.sections.find((s) => s.type === "rows")?.rows || [];
+  const labels = (view) => rows(view).map((row) => row.label);
+  const composers = listView(c, "composer");
+  assert.equal(composers.title, "Composers");
+  assert.equal(composers.sections[0].subtitle, "3 composers");
+  assert.deepEqual(labels(composers), ["Antonín Dvořák", "Johann Sebastian Bach", "Ludwig van Beethoven"]);
+  assert.equal(rows(composers)[0].link.pageId, "classical");
+  assert.match(rows(composers)[0].link.resourceId, /^composer:/);
+  // Works: by title, or by catalogue number.
+  const works = listView(c, "work");
+  assert.deepEqual(labels(works), ["Cello Suite No. 1 in G major, BWV 1007", "Piano Sonata No. 14 in C-sharp minor, Op. 27 No. 2", "Symphony No. 9 in E minor, Op. 95"]);
+  assert.deepEqual(rows(works).find((row) => row.id === moonlight).link, { type: "resource", pageId: "work", resourceId: moonlight });
+  assert.deepEqual(labels(listView(c, "work", { sort: "catalogue" })), ["Cello Suite No. 1 in G major, BWV 1007", "Piano Sonata No. 14 in C-sharp minor, Op. 27 No. 2", "Symphony No. 9 in E minor, Op. 95"]);
+  assert.deepEqual(works.sections.find((s) => s.type === "sort").options.map((o) => o.value), ["title", "catalogue", "date"]);
+  // Conductors are people credited as conductors; ensembles are not performers.
+  const conductors = listView(c, "conductor");
+  assert.deepEqual(rows(conductors).map((row) => row.link.resourceId).sort(), [`person:${barenboim}`, `person:${karajan}`].sort());
+  assert.ok(labels(listView(c, "performer")).includes("Igor Levit"));
+  for (const label of labels(listView(c, "performer"))) assert.ok(!/Philharmoniker|Orchestra/.test(label), label);
+  // Filters and a query narrow a list; a query adds "Best match".
+  const beethoven = rows(composers).find((row) => row.label === "Ludwig van Beethoven").link.resourceId.slice("composer:".length);
+  assert.deepEqual(labels(listView(c, "work", { filters: { composer: [beethoven] } })), ["Piano Sonata No. 14 in C-sharp minor, Op. 27 No. 2"]);
+  const recordings = listView(c, "recording", { q: "Barenboim" });
+  assert.equal(recordings.sections.find((s) => s.type === "sort").active, "relevance");
+  assert.equal(rows(recordings).length, 2);
+  assert.ok(listView(c, "recording").sections.find((s) => s.type === "filters").filters.some((f) => f.key === "conductor"));
+  assert.equal(listView(c, "work", { q: "no such work" }).sections.at(-1).message, "No works match.");
+  assert.throws(() => listView(c, "nothing"), /No Classical list/);
+});
+
+test("Classical Library lists show 100 rows a page", async (t) => {
+  resetGeneration();
+  const c = await setup(t);
+  const tracks = [];
+  for (let a = 0; a < 230; a++) tracks.push(...album(`p${a}`, `Prelude No. ${a + 1} in C major, Op. ${1000 + a}`, ["I. Prelude", "II. Fugue"], { composer: "Paging Composer", artist: "Pianist" }));
+  scan(c, tracks);
+  ensureSearchIndex(c);
+  const at = (page) => listView(c, "work", { page, sort: "catalogue" });
+  const first = at(0);
+  assert.equal(first.sections[0].subtitle, "230 works");
+  assert.equal(first.sections.find((s) => s.type === "rows").rows.length, 100);
+  assert.deepEqual(first.sections.at(-1), { type: "pager", total: 230, offset: 0, limit: 100 });
+  const last = at(2);
+  const lastRows = last.sections.find((s) => s.type === "rows").rows;
+  assert.equal(lastRows.length, 30);
+  assert.equal(lastRows.at(-1).label, "Prelude No. 230 in C major, Op. 1229");
+  assert.equal(at(1).sections.find((s) => s.type === "rows").rows[0].label, "Prelude No. 101 in C major, Op. 1100");
+  assert.deepEqual(at(2).sections.at(-1), { type: "pager", total: 230, offset: 200, limit: 100 });
+  // By title, "Prelude No. 10" sorts as words, not numbers; by catalogue, Op. 1009 follows Op. 1008.
+  assert.equal(listView(c, "work", { sort: "catalogue" }).sections.find((s) => s.type === "rows").rows[9].label, "Prelude No. 10 in C major, Op. 1009");
+  assert.equal(at(9).sections.find((s) => s.type === "empty").message, "No more works.");
 });
