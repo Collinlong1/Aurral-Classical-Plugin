@@ -236,7 +236,8 @@ test("Classical Library lists show 100 rows a page", async (t) => {
   assert.equal(lastRows.at(-1).label, "Prelude No. 230 in C major, Op. 1229");
   assert.equal(at(1).sections.find((s) => s.type === "rows").rows[0].label, "Prelude No. 101 in C major, Op. 1100");
   assert.deepEqual(at(2).sections.at(-1), { type: "pager", total: 230, offset: 200, limit: 100 });
-  // By title, "Prelude No. 10" sorts as words, not numbers; by catalogue, Op. 1009 follows Op. 1008.
+  // Numbers sort as numbers, by title as by catalogue number.
   assert.equal(listView(c, "work", { sort: "catalogue" }).sections.find((s) => s.type === "rows").rows[9].label, "Prelude No. 10 in C major, Op. 1009");
+  assert.equal(listView(c, "work").sections.find((s) => s.type === "rows").rows[9].label, "Prelude No. 10 in C major, Op. 1009");
   assert.equal(at(9).sections.find((s) => s.type === "empty").message, "No more works.");
 });

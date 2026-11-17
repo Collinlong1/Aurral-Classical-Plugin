@@ -58,7 +58,8 @@ export const realizationsOf = (c, work) => c.db.prepare("SELECT id,performance_w
 
 export const MOONLIGHT = "Piano Sonata No. 14 in C-sharp minor, Op. 27 No. 2";
 export const SONATA = ["I. Adagio sostenuto", "II. Allegretto", "III. Presto agitato"];
-export async function library(t, folder = null) {
+// `extra` tracks join the one scan (a scan is the whole Library).
+export async function library(t, folder = null, extra = []) {
   generation = 0;
   const c = await setup(t, folder);
   const m = new Metadata(c);
@@ -80,6 +81,7 @@ export async function library(t, folder = null) {
     ...album("ma", "Cello Suite No. 1 in G major, BWV 1007", ["I. Prélude", "II. Allemande"], { composer: "Johann Sebastian Bach", artist: "Yo-Yo Ma" }),
     ...album("dvorak", "Symphony No. 9 in E minor, Op. 95", ["I. Adagio – Allegro molto", "II. Largo"], { composer: "Antonín Dvořák", artist: "Berliner Philharmoniker; Herbert von Karajan" }),
     ...album("dvorak-db", "Symphony No. 9 in E minor, Op. 95", ["I. Adagio – Allegro molto", "II. Largo"], { composer: "Antonín Dvořák", artist: "Chicago Symphony Orchestra; Daniel Barenboim" }),
+    ...extra,
   ]);
   const moonlight = workId(c, "Piano Sonata No. 14");
   m.manual(moonlight, "nickname", "Moonlight", { actor: "test", pin: true });

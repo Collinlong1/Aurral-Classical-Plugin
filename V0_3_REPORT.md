@@ -1,3 +1,17 @@
+# v0.3 Phase 4.3 — Classical Library home / issue #67
+
+## Result
+
+- `src/model/pages.js`: `listCounts` (one SQL count a list, the same documents `listView` lists), `recentWorks` (realization → item → segment → active track link, newest first, ten), `homeView`.
+- `src/search/engine.js`: title sorts compare numbers numerically.
+- `dev/classical-pages-browser.mjs`; `.github/workflows/phase3-integration.yml` runs it; both integration workflows pin core 263901077859edad33eabfa2d468fb7a2d0f84b4.
+
+## Verification
+
+On Node 22.23: full `npm test` 428/428. New `test/pages.test.js`: the home's Browse rows link to all six lists and each count equals that list's own total (3 composers, 3 works, 2 conductors, 5 recordings); recently added orders works by their newest track (a second release of the Levit sonata added last puts the sonata first, "Added Nov 10, 2026"), and a work whose tracks are all missing drops off; an empty Library's home says how it fills. `test/search.test.js` adds title order by number. `dev/classical-pages-browser.mjs` passes locally on Node 26.12 against core 2639010 in Chromium at both widths, with screenshots checked by eye.
+
+---
+
 # v0.3 Phase 4.2 — Classical Library lists / issue #66
 
 ## Result

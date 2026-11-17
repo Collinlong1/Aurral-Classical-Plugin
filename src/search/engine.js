@@ -647,7 +647,9 @@ export function searchCatalogue(c, { q = "", filters = {}, kinds = null, limit =
 // Sort orders for lists. Documents without the key (a work with no catalogue
 // number or date) follow those with it; ties keep the title order.
 const last = (a, b) => (a && b ? a.localeCompare(b) : a ? -1 : b ? 1 : 0);
-const byTitle = (a, b) => a.doc.sort_title.localeCompare(b.doc.sort_title) || a.doc.title.localeCompare(b.doc.title) || a.doc.id - b.doc.id;
+// Numbers in titles sort as numbers: No. 2 before No. 10.
+const natural = new Intl.Collator("en", { numeric: true });
+const byTitle = (a, b) => natural.compare(a.doc.sort_title, b.doc.sort_title) || natural.compare(a.doc.title, b.doc.title) || a.doc.id - b.doc.id;
 const SORTS = {
   title: byTitle,
   catalogue: (a, b) => last(a.doc.sort_key, b.doc.sort_key) || byTitle(a, b),

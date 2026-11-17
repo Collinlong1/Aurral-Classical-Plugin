@@ -47,9 +47,6 @@ const required = (row, what) => {
   return row;
 };
 
-export function homeView() {
-  return { version: 2, title: "Classical", sections: [{ type: "header", title: "Classical" }] };
-}
 
 // The six lists. Each reads the search index for one kind of document,
 // 100 rows a page, with the search page's filters and its own sort orders.
@@ -138,6 +135,76 @@ export function listView(c, kind, query = {}) {
           ]
         : [{ type: "empty", message: total ? `No more ${list.noun[1]}.` : filtered ? `No ${list.noun[1]} match.` : `No ${list.noun[1]} in your Library yet.` }]),
       ...(total > PAGE_SIZE ? [{ type: "pager", total, offset, limit: PAGE_SIZE }] : []),
+    ],
+  };
+}
+
+// How many rows each list has, the way listView counts them.
+const LIST_COUNTS = {
+  composer: "kind='composer'",
+  work: "kind='work'",
+  performer: "kind='performer' AND json_extract(data,'$.entity') IS NOT 'ensemble'",
+  conductor: "kind='performer' AND json_extract(data,'$.entity') IS NOT 'ensemble' AND EXISTS (SELECT 1 FROM json_each(data,'$.roles') WHERE value='conductor')",
+  ensemble: "kind='performer' AND json_extract(data,'$.entity')='ensemble'",
+  recording: "kind='recording'",
+};
+export function listCounts(c) {
+  return Object.fromEntries(Object.entries(LIST_COUNTS).map(([kind, where]) => [kind, c.db.prepare(`SELECT count(*) AS n FROM search_doc WHERE ${where}`).get().n]));
+}
+
+// Works whose tracks came into the Library most recently: the newest active
+// track link that plays part of each.
+export const RECENT_WORKS = 10;
+export function recentWorks(c, limit = RECENT_WORKS) {
+  return c.db
+    .prepare(
+      `SELECT d.ref,d.title,d.subtitle,w.added FROM (
+         SELECT r.work_id,max(t.created_at) AS added FROM realization r
+         JOIN realization_item i ON i.realization_id=r.id
+         JOIN segment s ON s.id=i.segment_id
+         JOIN track_link t ON t.id=s.track_link_id AND t.state='active'
+         GROUP BY r.work_id
+       ) w JOIN search_doc d ON d.kind='work' AND d.ref=w.work_id
+       ORDER BY w.added DESC,d.sort_title,d.id LIMIT ?`,
+    )
+    .all(limit);
+}
+
+const day = (ms) => new Date(ms).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
+
+export function homeView(c) {
+  const counts = listCounts(c);
+  if (!counts.work && !counts.recording)
+    return {
+      version: 2,
+      title: "Classical",
+      sections: [
+        { type: "header", title: "Classical" },
+        { type: "empty", message: "No classical music in your Library yet. Matched works appear here." },
+      ],
+    };
+  const recent = recentWorks(c);
+  return {
+    version: 2,
+    title: "Classical",
+    sections: [
+      { type: "header", title: "Classical", subtitle: [counted(counts.work, LISTS.work.noun), counted(counts.recording, LISTS.recording.noun)].join(" · ") },
+      {
+        type: "rows",
+        id: "browse",
+        title: "Browse",
+        rows: Object.entries(LISTS).map(([kind, list]) => ({ id: kind, label: list.title, detail: counted(counts[kind], list.noun), link: page(`list:${kind}`) })),
+      },
+      ...(recent.length
+        ? [
+            {
+              type: "rows",
+              id: "recent",
+              title: "Recently added",
+              rows: recent.map((work) => ({ id: work.ref, label: work.title, detail: [work.subtitle, `Added ${day(work.added)}`].filter(Boolean).join(" · "), link: workPage(work.ref) })),
+            },
+          ]
+        : []),
     ],
   };
 }

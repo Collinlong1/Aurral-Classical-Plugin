@@ -3993,11 +3993,11 @@ var require_utils = __commonJS({
         }
         const year = date.getFullYear();
         const month = this.padNumber(date.getMonth() + 1);
-        const day = this.padNumber(date.getDate());
+        const day2 = this.padNumber(date.getDate());
         const hours = this.padNumber(date.getHours());
         const minutes = this.padNumber(date.getMinutes());
         const seconds = this.padNumber(date.getSeconds());
-        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+        return `${year}-${month}-${day2}T${hours}:${minutes}:${seconds}`;
       }
       static padNumber(value) {
         return String(value).padStart(2, "0");
@@ -41767,7 +41767,8 @@ function searchCatalogue(c, { q = "", filters = {}, kinds: kinds2 = null, limit 
   };
 }
 var last = (a, b) => a && b ? a.localeCompare(b) : a ? -1 : b ? 1 : 0;
-var byTitle = (a, b) => a.doc.sort_title.localeCompare(b.doc.sort_title) || a.doc.title.localeCompare(b.doc.title) || a.doc.id - b.doc.id;
+var natural = new Intl.Collator("en", { numeric: true });
+var byTitle = (a, b) => natural.compare(a.doc.sort_title, b.doc.sort_title) || natural.compare(a.doc.title, b.doc.title) || a.doc.id - b.doc.id;
 var SORTS = {
   title: byTitle,
   catalogue: (a, b) => last(a.doc.sort_key, b.doc.sort_key) || byTitle(a, b),
@@ -45667,9 +45668,6 @@ var required = (row, what) => {
   if (!row) throw new NotFound(`${what} not found`);
   return row;
 };
-function homeView() {
-  return { version: 2, title: "Classical", sections: [{ type: "header", title: "Classical" }] };
-}
 var PAGE_SIZE = 100;
 var ENSEMBLE2 = (doc2, data) => data.entity === "ensemble";
 var byRef = (prefix) => (item) => item.ref.length <= 180 ? page(`${prefix}:${item.ref}`) : null;
@@ -45746,6 +45744,65 @@ function listView(c, kind, query = {}) {
         }
       ] : [{ type: "empty", message: total ? `No more ${list4.noun[1]}.` : filtered ? `No ${list4.noun[1]} match.` : `No ${list4.noun[1]} in your Library yet.` }],
       ...total > PAGE_SIZE ? [{ type: "pager", total, offset, limit: PAGE_SIZE }] : []
+    ]
+  };
+}
+var LIST_COUNTS = {
+  composer: "kind='composer'",
+  work: "kind='work'",
+  performer: "kind='performer' AND json_extract(data,'$.entity') IS NOT 'ensemble'",
+  conductor: "kind='performer' AND json_extract(data,'$.entity') IS NOT 'ensemble' AND EXISTS (SELECT 1 FROM json_each(data,'$.roles') WHERE value='conductor')",
+  ensemble: "kind='performer' AND json_extract(data,'$.entity')='ensemble'",
+  recording: "kind='recording'"
+};
+function listCounts(c) {
+  return Object.fromEntries(Object.entries(LIST_COUNTS).map(([kind, where]) => [kind, c.db.prepare(`SELECT count(*) AS n FROM search_doc WHERE ${where}`).get().n]));
+}
+var RECENT_WORKS = 10;
+function recentWorks(c, limit = RECENT_WORKS) {
+  return c.db.prepare(
+    `SELECT d.ref,d.title,d.subtitle,w.added FROM (
+         SELECT r.work_id,max(t.created_at) AS added FROM realization r
+         JOIN realization_item i ON i.realization_id=r.id
+         JOIN segment s ON s.id=i.segment_id
+         JOIN track_link t ON t.id=s.track_link_id AND t.state='active'
+         GROUP BY r.work_id
+       ) w JOIN search_doc d ON d.kind='work' AND d.ref=w.work_id
+       ORDER BY w.added DESC,d.sort_title,d.id LIMIT ?`
+  ).all(limit);
+}
+var day = (ms) => new Date(ms).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
+function homeView(c) {
+  const counts = listCounts(c);
+  if (!counts.work && !counts.recording)
+    return {
+      version: 2,
+      title: "Classical",
+      sections: [
+        { type: "header", title: "Classical" },
+        { type: "empty", message: "No classical music in your Library yet. Matched works appear here." }
+      ]
+    };
+  const recent = recentWorks(c);
+  return {
+    version: 2,
+    title: "Classical",
+    sections: [
+      { type: "header", title: "Classical", subtitle: [counted(counts.work, LISTS.work.noun), counted(counts.recording, LISTS.recording.noun)].join(" \xB7 ") },
+      {
+        type: "rows",
+        id: "browse",
+        title: "Browse",
+        rows: Object.entries(LISTS).map(([kind, list4]) => ({ id: kind, label: list4.title, detail: counted(counts[kind], list4.noun), link: page(`list:${kind}`) }))
+      },
+      ...recent.length ? [
+        {
+          type: "rows",
+          id: "recent",
+          title: "Recently added",
+          rows: recent.map((work) => ({ id: work.ref, label: work.title, detail: [work.subtitle, `Added ${day(work.added)}`].filter(Boolean).join(" \xB7 "), link: workPage(work.ref) }))
+        }
+      ] : []
     ]
   };
 }

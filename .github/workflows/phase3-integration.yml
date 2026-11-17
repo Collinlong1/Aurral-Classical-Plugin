@@ -22,8 +22,10 @@ jobs:
           repository: Collinlong1/aurral
           # Core aurral-classical with the v0.2 hooks (search, manual
           # search, comparisons, admin page selection and pages), synced
-          # with upstream through #1891, plus the v0.3 0.09 C1 fix.
-          ref: bd4115454467f6e73cb3c616f88e9268b6984936
+          # with upstream through #1891, plus the v0.3 0.09 C1 fix and
+          # the v0.3 3.1-3.6 hooks (view 2 pages, Library entry, item and
+          # track links), on the paired core review branch.
+          ref: 263901077859edad33eabfa2d468fb7a2d0f84b4
           path: core
       - uses: actions/setup-node@v4
         with:
@@ -75,6 +77,11 @@ jobs:
         env:
           AURRAL_CORE_PATH: ${{ github.workspace }}/core
         run: node dev/editor-credits-browser.mjs
+      - name: Browse the Classical Library home and lists at desktop and phone width
+        working-directory: plugin
+        env:
+          AURRAL_CORE_PATH: ${{ github.workspace }}/core
+        run: node dev/classical-pages-browser.mjs
       - name: Start synthetic instance and verify comparisons
         working-directory: plugin
         env:

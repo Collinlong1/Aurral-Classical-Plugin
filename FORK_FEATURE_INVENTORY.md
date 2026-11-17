@@ -1,3 +1,11 @@
+# v0.3 Phase 4.3 — the Classical Library home and recently added works (issue #67)
+
+Last of four plugin commits in this PR (3.6, 4.1–4.3). The `classical` page's `home` shows the number of works and recordings, a Browse row per list with its count (counted as the lists count, from the search index), and up to ten Recently added works: those whose newest active `track_link.created_at` among the tracks that play part of them is latest, with their composers and the day. An empty Library says how the page fills. List titles now sort numbers as numbers (No. 2 before No. 10).
+
+New `dev/classical-pages-browser.mjs` (asked for by core #53) renders the real home and lists through core's own `pluginLinks.ts` and `PluginResourceView` in Chromium at 1280 and 390 px: home counts, Works with 100 rows and the pager, a composer filter, and a conductor opening a contributor page, with no sideways scroll on a phone. It found core's filters squeezed to "A…" at phone width; core commit 2639010 wraps them two a row. Both integration workflows now pin that core commit, and the work-view workflow runs the new check. No schema change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
 # v0.3 Phase 4.2 — six Classical Library lists (issue #66)
 
 Third of four plugin commits in this PR (3.6, 4.1–4.3). `list:composer`, `list:work`, `list:performer`, `list:conductor`, `list:ensemble` and `list:recording` are view 2 pages built by `listView(c, kind, query)` in `src/model/pages.js` on `searchCatalogue`: 100 rows a page with core's pager, the search page's facets as filters (all but "Library"), and sort orders per list (works by title, catalogue number or date written; recordings by work, catalogue number, newest or oldest; contributors by sort name), plus "Best match" when the URL has a query. `searchCatalogue` gains `browse` (list every document of the given kinds with no query), `accept` (keep some documents) and `sort` (from the stored `sort_*` keys; documents without a key follow). Performer documents now record whether the contributor is a person or an ensemble (index stamp v4, rebuilt on first read): performers and conductors are people, ensembles are ensembles. Composer and contributor rows open their Classical pages; work and recording rows open the v1 work page until 6.1. No schema change; bundle rebuilt.
