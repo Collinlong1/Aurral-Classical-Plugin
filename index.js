@@ -35502,13 +35502,26 @@ var alive = (pid) => {
 async function staleLock(lockFile) {
   try {
     const [text6, stat] = await Promise.all([fs.readFile(lockFile, "utf8"), fs.stat(lockFile)]);
-    if (Date.now() - stat.mtimeMs > LOCK_STALE_MS) return true;
-    const owner = JSON.parse(text6 || "{}");
-    return !alive(Number(owner.pid));
+    if (Date.now() - stat.mtimeMs > LOCK_STALE_MS) return text6;
+    return alive(Number(JSON.parse(text6).pid)) ? null : text6;
   } catch (error) {
-    if (error.code === "ENOENT") return false;
-    if (error instanceof SyntaxError) return false;
+    if (error.code === "ENOENT" || error instanceof SyntaxError) return null;
     throw error;
+  }
+}
+async function clearStaleLock(lockFile, stale, token) {
+  const aside = `${lockFile}.stale.${token}`;
+  try {
+    await fs.rename(lockFile, aside);
+  } catch (error) {
+    if (error.code === "ENOENT") return;
+    throw error;
+  }
+  try {
+    if (await fs.readFile(aside, "utf8") !== stale) await fs.link(aside, lockFile).catch(() => {
+    });
+  } finally {
+    await fs.rm(aside, { force: true });
   }
 }
 async function acquireUpgradeLock(folder, timeoutMs) {
@@ -35516,13 +35529,11 @@ async function acquireUpgradeLock(folder, timeoutMs) {
   const token = randomUUID();
   const deadline = Date.now() + timeoutMs;
   for (; ; ) {
+    const staged = `${lockFile}.${token}`;
+    await fs.writeFile(staged, JSON.stringify({ pid: process.pid, token, at: Date.now() }));
     try {
-      const handle = await fs.open(lockFile, "wx");
-      try {
-        await handle.writeFile(JSON.stringify({ pid: process.pid, token, at: Date.now() }));
-      } finally {
-        await handle.close();
-      }
+      await fs.link(staged, lockFile);
+      await fs.rm(staged, { force: true });
       return async () => {
         try {
           if (JSON.parse(await fs.readFile(lockFile, "utf8")).token === token) await fs.rm(lockFile, { force: true });
@@ -35530,10 +35541,12 @@ async function acquireUpgradeLock(folder, timeoutMs) {
         }
       };
     } catch (error) {
+      await fs.rm(staged, { force: true });
       if (error.code !== "EEXIST") throw error;
     }
-    if (await staleLock(lockFile)) {
-      await fs.rm(lockFile, { force: true });
+    const stale = await staleLock(lockFile);
+    if (stale !== null) {
+      await clearStaleLock(lockFile, stale, token);
       continue;
     }
     if (Date.now() > deadline)

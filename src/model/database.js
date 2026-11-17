@@ -122,17 +122,35 @@ const alive = (pid) => {
   }
 };
 
+// The lock's contents when it is abandoned, else null.
 async function staleLock(lockFile) {
   try {
     const [text, stat] = await Promise.all([fs.readFile(lockFile, "utf8"), fs.stat(lockFile)]);
-    if (Date.now() - stat.mtimeMs > LOCK_STALE_MS) return true;
-    const owner = JSON.parse(text || "{}");
-    return !alive(Number(owner.pid));
+    if (Date.now() - stat.mtimeMs > LOCK_STALE_MS) return text;
+    return alive(Number(JSON.parse(text).pid)) ? null : text;
   } catch (error) {
-    // Gone already, or still being written by its owner: try again.
-    if (error.code === "ENOENT") return false;
-    if (error instanceof SyntaxError) return false;
+    // Gone already: try again. A lock that can't be read is never taken
+    // over before it is old (above).
+    if (error.code === "ENOENT" || error instanceof SyntaxError) return null;
     throw error;
+  }
+}
+
+// Takes an abandoned lock away. Renaming lets only one waiter take it; if
+// what it moved is no longer the abandoned lock (another waiter replaced it
+// meanwhile), it goes back.
+async function clearStaleLock(lockFile, stale, token) {
+  const aside = `${lockFile}.stale.${token}`;
+  try {
+    await fs.rename(lockFile, aside);
+  } catch (error) {
+    if (error.code === "ENOENT") return;
+    throw error;
+  }
+  try {
+    if ((await fs.readFile(aside, "utf8")) !== stale) await fs.link(aside, lockFile).catch(() => {});
+  } finally {
+    await fs.rm(aside, { force: true });
   }
 }
 
@@ -141,13 +159,13 @@ async function acquireUpgradeLock(folder, timeoutMs) {
   const token = randomUUID();
   const deadline = Date.now() + timeoutMs;
   for (;;) {
+    // The lock appears with its owner already written: a waiter never reads
+    // an empty lock and mistakes it for an abandoned one.
+    const staged = `${lockFile}.${token}`;
+    await fs.writeFile(staged, JSON.stringify({ pid: process.pid, token, at: Date.now() }));
     try {
-      const handle = await fs.open(lockFile, "wx");
-      try {
-        await handle.writeFile(JSON.stringify({ pid: process.pid, token, at: Date.now() }));
-      } finally {
-        await handle.close();
-      }
+      await fs.link(staged, lockFile);
+      await fs.rm(staged, { force: true });
       return async () => {
         // Only remove our own lock, never one a waiter took over as stale.
         try {
@@ -155,10 +173,12 @@ async function acquireUpgradeLock(folder, timeoutMs) {
         } catch {}
       };
     } catch (error) {
+      await fs.rm(staged, { force: true });
       if (error.code !== "EEXIST") throw error;
     }
-    if (await staleLock(lockFile)) {
-      await fs.rm(lockFile, { force: true });
+    const stale = await staleLock(lockFile);
+    if (stale !== null) {
+      await clearStaleLock(lockFile, stale, token);
       continue;
     }
     if (Date.now() > deadline)
