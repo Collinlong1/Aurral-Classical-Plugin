@@ -1,3 +1,15 @@
+# Bug fix — one backup and one upgrade however many processes open the catalogue
+
+## Result
+
+- `src/model/database.js`: `acquireUpgradeLock` (`upgrade.lock`, stale when its PID is gone or after six hours; a release only removes its own lock), `ensureBackupSpace`, and `openDatabase` taking the lock only when a migration is pending, re-reading the version under it, checking space, then making one backup before all steps. `backupDatabase` removes the temporary copy's sidecars. New options `lockTimeoutMs` and `statfs` (tests).
+
+## Verification
+
+On Node 22.23: full `npm test` 431/431. New `test/upgrade-lock.test.js`: four separate processes, released together, open a 40 MB schema 4 catalogue: all reach schema 5 and exactly one `before-v5-*.sqlite` is written (the previous code wrote four backups, twelve files with sidecars); a backup that can't fit is refused before copying, leaves schema 4 and no lock, and the same catalogue upgrades once there is room; a dead process's lock is taken over, a current catalogue opens while a lock is held, and an old one waiting on a live lock times out with a clear message and no copy. Both new behaviour tests fail on the previous code. Five repeated runs pass. `test/model.test.js` now expects one backup for a schema 1 → 5 upgrade.
+
+---
+
 # v0.3 Phase 4.3 — Classical Library home / issue #67
 
 ## Result

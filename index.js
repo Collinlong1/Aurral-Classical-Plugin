@@ -35477,7 +35477,7 @@ async function backupDatabase(db, destination) {
     }
     await fs.rename(temporary, destination);
   } finally {
-    await fs.rm(temporary, { force: true });
+    for (const file of [temporary, `${temporary}-wal`, `${temporary}-shm`]) await fs.rm(file, { force: true });
   }
   return destination;
 }
@@ -35487,54 +35487,132 @@ function verifyOnce(db, filename) {
   validateDatabase(db);
   verified.add(filename);
 }
-async function openDatabase(folder, { migrations: migrations2 = migrations, maxVersion = SCHEMA_VERSION } = {}) {
+var LOCK_POLL_MS = 200;
+var LOCK_STALE_MS = 6 * 3600 * 1e3;
+var BACKUP_HEADROOM = 64 * 1024 * 1024;
+var alive = (pid) => {
+  if (!Number.isSafeInteger(pid) || pid <= 0) return false;
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (error) {
+    return error.code === "EPERM";
+  }
+};
+async function staleLock(lockFile) {
+  try {
+    const [text6, stat] = await Promise.all([fs.readFile(lockFile, "utf8"), fs.stat(lockFile)]);
+    if (Date.now() - stat.mtimeMs > LOCK_STALE_MS) return true;
+    const owner = JSON.parse(text6 || "{}");
+    return !alive(Number(owner.pid));
+  } catch (error) {
+    if (error.code === "ENOENT") return false;
+    if (error instanceof SyntaxError) return false;
+    throw error;
+  }
+}
+async function acquireUpgradeLock(folder, timeoutMs) {
+  const lockFile = path.join(folder, "upgrade.lock");
+  const token = randomUUID();
+  const deadline = Date.now() + timeoutMs;
+  for (; ; ) {
+    try {
+      const handle = await fs.open(lockFile, "wx");
+      try {
+        await handle.writeFile(JSON.stringify({ pid: process.pid, token, at: Date.now() }));
+      } finally {
+        await handle.close();
+      }
+      return async () => {
+        try {
+          if (JSON.parse(await fs.readFile(lockFile, "utf8")).token === token) await fs.rm(lockFile, { force: true });
+        } catch {
+        }
+      };
+    } catch (error) {
+      if (error.code !== "EEXIST") throw error;
+    }
+    if (await staleLock(lockFile)) {
+      await fs.rm(lockFile, { force: true });
+      continue;
+    }
+    if (Date.now() > deadline)
+      throw new Error("The classical database is being upgraded by another process; try again when it finishes");
+    await new Promise((resolve) => setTimeout(resolve, LOCK_POLL_MS));
+  }
+}
+var mib = (bytes) => `${Math.ceil(bytes / 1024 / 1024).toLocaleString("en-US")} MB`;
+async function ensureBackupSpace(db, directory, statfs = fs.statfs) {
+  const { page_count: pages } = db.prepare("PRAGMA page_count").get();
+  const { page_size: pageSize } = db.prepare("PRAGMA page_size").get();
+  const needed = pages * pageSize + BACKUP_HEADROOM;
+  await fs.mkdir(directory, { recursive: true });
+  const disk = await statfs(directory);
+  const free = Number(disk.bavail) * Number(disk.bsize);
+  if (free < needed)
+    throw new Error(
+      `Not enough disk space to back up the classical database before upgrading: ${mib(needed)} needed, ${mib(free)} free in ${directory}`
+    );
+}
+async function openDatabase(folder, { migrations: migrations2 = migrations, maxVersion = SCHEMA_VERSION, lockTimeoutMs = 30 * 60 * 1e3, statfs } = {}) {
   const { DatabaseSync } = await import("node:sqlite");
   await fs.mkdir(folder, { recursive: true });
   const filename = path.join(folder, "classical.sqlite");
   const db = new DatabaseSync(filename);
+  const versionOf = () => db.prepare("PRAGMA user_version").get().user_version;
+  const pending = (version2) => migrations2.filter((migration) => migration.version > version2 && migration.version <= maxVersion);
   try {
     db.exec("PRAGMA busy_timeout=5000; PRAGMA foreign_keys=ON");
-    let version2 = db.prepare("PRAGMA user_version").get().user_version;
+    let version2 = versionOf();
     if (version2 > maxVersion)
       throw new Error(
         `Classical schema ${version2} is newer than supported ${maxVersion}; restore a compatible backup`
       );
-    db.exec("PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL");
-    for (const migration of migrations2) {
-      if (migration.version <= version2 || migration.version > maxVersion)
-        continue;
-      await backupDatabase(
-        db,
-        path.join(
-          folder,
-          "backups",
-          `before-v${migration.version}-${randomUUID()}.sqlite`
-        )
-      );
-      db.exec("BEGIN IMMEDIATE");
+    if (pending(version2).length) {
+      const release = await acquireUpgradeLock(folder, lockTimeoutMs);
       try {
-        version2 = db.prepare("PRAGMA user_version").get().user_version;
-        if (version2 < migration.version) {
-          if (migration.version !== version2 + 1)
-            throw new Error("Non-contiguous classical migration");
-          db.exec(migration.sql);
-          db.exec(
-            "CREATE TABLE IF NOT EXISTS migration_journal(version INTEGER PRIMARY KEY, applied_at INTEGER NOT NULL)"
+        version2 = versionOf();
+        if (version2 > maxVersion)
+          throw new Error(
+            `Classical schema ${version2} is newer than supported ${maxVersion}; restore a compatible backup`
           );
-          db.prepare("INSERT INTO migration_journal VALUES (?,?)").run(
-            migration.version,
-            Date.now()
-          );
-          db.exec(`PRAGMA user_version=${migration.version}`);
-          validateDatabase(db);
+        const steps = pending(version2);
+        if (steps.length) {
+          db.exec("PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL");
+          const backups = path.join(folder, "backups");
+          await ensureBackupSpace(db, backups, statfs);
+          await backupDatabase(db, path.join(backups, `before-v${steps[0].version}-${randomUUID()}.sqlite`));
+          for (const migration of steps) {
+            db.exec("BEGIN IMMEDIATE");
+            try {
+              version2 = versionOf();
+              if (version2 < migration.version) {
+                if (migration.version !== version2 + 1)
+                  throw new Error("Non-contiguous classical migration");
+                db.exec(migration.sql);
+                db.exec(
+                  "CREATE TABLE IF NOT EXISTS migration_journal(version INTEGER PRIMARY KEY, applied_at INTEGER NOT NULL)"
+                );
+                db.prepare("INSERT INTO migration_journal VALUES (?,?)").run(
+                  migration.version,
+                  Date.now()
+                );
+                db.exec(`PRAGMA user_version=${migration.version}`);
+                validateDatabase(db);
+              }
+              db.exec("COMMIT");
+              version2 = versionOf();
+            } catch (error) {
+              db.exec("ROLLBACK");
+              throw error;
+            }
+          }
         }
-        db.exec("COMMIT");
-        version2 = db.prepare("PRAGMA user_version").get().user_version;
-      } catch (error) {
-        db.exec("ROLLBACK");
-        throw error;
+      } finally {
+        await release();
       }
     }
+    db.exec("PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL");
     if (version2 !== maxVersion)
       throw new Error(`Missing migration to classical schema ${maxVersion}`);
     return { db, filename };
@@ -47599,7 +47677,7 @@ var Aurral = class {
 };
 
 // src/tagger.js
-var LOCK_STALE_MS = 2 * 6e4;
+var LOCK_STALE_MS2 = 2 * 6e4;
 var SAVE_EVERY_MS = 3e4;
 var queueDir = (ctx) => path15.join(ctx.dataFolder, "queue");
 var processedFile = (ctx) => path15.join(ctx.dataFolder, "processed.json");
@@ -47979,14 +48057,14 @@ var Session = class {
 };
 var held = /* @__PURE__ */ new Map();
 async function openState(ctx, priority) {
-  let lock = await tryLock(lockDir(ctx), LOCK_STALE_MS);
+  let lock = await tryLock(lockDir(ctx), LOCK_STALE_MS2);
   if (!lock && priority) {
     ctx.log("Waiting for background tagging in another process to pause");
     const until = Date.now() + PRIORITY_WAIT_MS;
     while (!lock && Date.now() < until) {
       await writeJson(yieldFile(ctx), { at: Date.now() });
       await sleep(500);
-      lock = await tryLock(lockDir(ctx), LOCK_STALE_MS);
+      lock = await tryLock(lockDir(ctx), LOCK_STALE_MS2);
     }
     await fs8.rm(yieldFile(ctx), { force: true });
     if (!lock) ctx.log("Tagging in another process didn't pause within 5 minutes");
