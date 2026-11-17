@@ -46550,7 +46550,8 @@ function workView2(c, id, query = {}, user) {
       sections.push({ type: "filters", filters: [{ key: "movement", label: "Movement", options: movements.map((movement) => ({ value: movement.id, label: clip2(movement.title) })), selected: chosen ? [chosen.id] : [] }] });
     if (!recordings.length) sections.push({ type: "empty", message: chosen ? "No recording in your Library has this movement." : "No recordings in your Library." });
     else {
-      const featured = recordings.find((recording) => recording.id === data.pickedRealizationId) || recordings[0];
+      const fullest = [...recordings].sort((a, b) => have(data, b) - have(data, a) || natural2.compare(a.performer || a.label, b.performer || b.label) || (a.id < b.id ? -1 : 1))[0];
+      const featured = recordings.find((recording) => recording.id === data.pickedRealizationId) || fullest;
       sections.push(
         chosen ? { type: "tracks", id: "play", title: clip2(`Compare: ${chosen.title}`, 200), context: clip2(work.title), items: recordings.flatMap(playable).slice(0, TRACKS_LIMIT) } : { type: "tracks", id: "play", title: clip2(`${pickLabel(featured) || "Listen"}: ${featured.performer || featured.label}`, 200), context: clip2(work.title), items: playable(featured).slice(0, TRACKS_LIMIT) }
       );

@@ -364,8 +364,10 @@ export function workView(c, id, query = {}, user) {
     if (!recordings.length) sections.push({ type: "empty", message: chosen ? "No recording in your Library has this movement." : "No recordings in your Library." });
     else {
       // A movement plays from every recording in turn; otherwise the pick
-      // (or the first recording) plays whole.
-      const featured = recordings.find((recording) => recording.id === data.pickedRealizationId) || recordings[0];
+      // plays whole, or without one the fullest recording (by performer,
+      // then id: recordings come in the order of their random ids).
+      const fullest = [...recordings].sort((a, b) => have(data, b) - have(data, a) || natural.compare(a.performer || a.label, b.performer || b.label) || (a.id < b.id ? -1 : 1))[0];
+      const featured = recordings.find((recording) => recording.id === data.pickedRealizationId) || fullest;
       sections.push(
         chosen
           ? { type: "tracks", id: "play", title: clip(`Compare: ${chosen.title}`, 200), context: clip(work.title), items: recordings.flatMap(playable).slice(0, TRACKS_LIMIT) }

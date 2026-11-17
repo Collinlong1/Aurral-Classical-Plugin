@@ -309,6 +309,9 @@ test("a work page has facts, movements, recordings by performance with completen
   const play = section(view, "play");
   assert.equal(play.type, "tracks");
   assert.equal(play.context, MOONLIGHT);
+  // With no pick, the fullest recording plays (Barenboim before Levit by
+  // name), never the excerpt, whatever order the random ids give.
+  assert.equal(play.title, "Listen: Daniel Barenboim");
   assert.equal(play.items.length, 3);
   // Movements tab, with how many recordings hold each.
   const movements = section(read(c, `work:${moonlight}`, { tab: "movements" }), "movements").rows;
