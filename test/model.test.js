@@ -1924,3 +1924,28 @@ test("a page read takes no write lock, and falls back to one when its snapshot g
   assert.equal(runs, 2);
   assert.equal(c.entity(made).kind, "work");
 });
+
+// v0.3 7.2: enrichment refreshes keep an admin's values, pinned or not.
+test("a manual value and a manual blank survive a keepManual refresh; without it a provider still wins an unpinned field", async (t) => {
+  const { c, m } = await setup(t);
+  const person = c.createEntity("person");
+  m.manual(person, "sortName", "Bach, J. S.", { actor: "admin" });
+  m.manual(person, "date", null, { actor: "admin" });
+  m.derived(person, "aliases", ["From tags"]);
+  m.refresh(person, "musicbrainz", "mb-bach", { sortName: "Bach, Johann Sebastian", date: "1685-03-31", aliases: ["J. S. Bach"] }, { complete: false, keepManual: true });
+  assert.deepEqual([m.resolve(person, "sortName").value, m.resolve(person, "sortName").pinned], ["Bach, J. S.", true]);
+  assert.equal(m.resolve(person, "sortName").providerValue, "Bach, Johann Sebastian");
+  assert.deepEqual([m.resolve(person, "date").value, m.resolve(person, "date").pinned], [null, true]);
+  // A derived value is no admin's: the provider's replaces it.
+  assert.deepEqual(m.resolve(person, "aliases").value, ["J. S. Bach"]);
+  assert.equal(c.db.prepare("SELECT state FROM provider_record WHERE provider='musicbrainz' AND target_id=?").get(person).state, "active");
+  // A later refresh keeps them too, and the pin's actor is the admin's.
+  m.refresh(person, "musicbrainz", "mb-bach", { sortName: "Bach, Johann S." }, { complete: false, keepManual: true });
+  assert.equal(m.resolve(person, "sortName").value, "Bach, J. S.");
+  assert.equal(c.db.prepare("SELECT actor FROM pinned_override WHERE target_id=? AND field='sortName'").get(person).actor, "admin");
+  // Without keepManual (the v0.1 behaviour), an unpinned manual value yields.
+  const other = c.createEntity("person");
+  m.manual(other, "sortName", "Mine", { actor: "admin" });
+  m.refresh(other, "musicbrainz", "mb-other", { sortName: "Theirs" });
+  assert.equal(m.resolve(other, "sortName").value, "Theirs");
+});

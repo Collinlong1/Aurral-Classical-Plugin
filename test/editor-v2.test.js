@@ -1410,3 +1410,151 @@ test("#17 group selection does not block deletion undo while tracks remain free"
   await s.ok("undo-change", { id: change }, `change:${change}`);
   assert.deepEqual(s.c.db.prepare("SELECT * FROM realization_item ORDER BY id").all(), before);
 });
+
+// v0.3 6.6: a track holding three movements, as matching makes it (one
+// whole segment, one recording, a content per movement), divided by time.
+test("movement boundaries divide a shared track into ranges; the album view and the queue agree", async (t) => {
+  const s = await setup(t);
+  const { c } = s;
+  const m = new Metadata(c);
+  const work = c.createEntity("work");
+  m.manual(work, "title", "Three Pieces", { actor: "test" });
+  const movements = ["I. Lento", "II. Vivace", "III. Adagio"].map((title, i) => {
+    const id = c.createEntity("movement");
+    m.manual(id, "title", title, { actor: "test" });
+    c.relate("movement", work, id, { position: i + 1 });
+    return id;
+  });
+  const performance = c.createEntity("performance");
+  const pw = c.relate("performance_work", performance, work);
+  const realization = c.realization(work, pw, "Album A");
+  const [track] = s.trackIds("A");
+  const recording = c.createEntity("recording", { durationMs: 60000 });
+  c.relate("recording_performance", recording, performance);
+  const whole = c.segment(track, { kind: "whole" });
+  movements.forEach((movement, j) => {
+    const content = c.recordingContent(recording, pw, { movement, position: j + 1 });
+    c.segmentContent(whole, content);
+    c.realizationItem(realization, whole, { movement, sequence: j + 1, intentionalOverlap: j > 0 });
+  });
+  const items = c.db.prepare("SELECT id FROM realization_item WHERE realization_id=? ORDER BY sequence").all(realization).map((r) => r.id);
+
+  // The track page asks where II and III start.
+  const form = (await s.read({ selection: `track:${track}` })).view.sections.find((section) => section.id === "boundaries-0");
+  assert.equal(form.command, "set-boundaries");
+  assert.deepEqual(form.arguments, { track, realization, items });
+  assert.deepEqual(form.fields.map((f) => [f.key, f.label, f.value]), [["start-1", "II. Vivace starts at", ""], ["start-2", "III. Adagio starts at", ""]]);
+  assert.match(form.note, /I\. Lento starts at 0:00.*\(1:00\)/);
+
+  // Refused: out of order, past the end of the file, not a time, stale items.
+  const save = (values) => s.mutate("set-boundaries", { ...form.arguments, ...values }, `track:${track}`);
+  for (const [values, field, message] of [
+    [{ "start-1": "0:30", "start-2": "0:20" }, "start-2", /after the previous movement \(0:30\)/],
+    [{ "start-1": "0:30", "start-2": "1:00" }, "start-2", /before the end of the file \(1:00\)/],
+    [{ "start-1": "half", "start-2": "0:40" }, "start-1", /m:ss/],
+    [{ "start-1": "0:00", "start-2": "0:40" }, "start-1", /after the previous movement \(0:00\)/],
+  ]) {
+    const result = await save(values);
+    assert.deepEqual([result.ok, result.field], [false, field], JSON.stringify(values));
+    assert.match(result.message, message);
+  }
+  const stale = await s.mutate("set-boundaries", { ...form.arguments, items: items.slice(0, 2), "start-1": "0:20" }, `track:${track}`);
+  assert.match(stale.message, /changed since the page was read/);
+  assert.equal(c.db.prepare("SELECT count(*) AS n FROM segment WHERE track_link_id=?").get(track).n, 1, "a refused save changes nothing");
+
+  // Saved: three ranges, each with its own content, and the old segment gone.
+  const ok = await s.ok("set-boundaries", { ...form.arguments, "start-1": "0:12.5", "start-2": "41" }, `track:${track}`);
+  assert.equal(ok.selection, `track:${track}`);
+  const ranges = c.db
+    .prepare("SELECT i.id,s.start_ms,s.end_ms,s.kind,(SELECT count(*) FROM segment_content x WHERE x.segment_id=s.id) AS contents FROM realization_item i JOIN segment s ON s.id=i.segment_id WHERE i.realization_id=? ORDER BY i.sequence")
+    .all(realization)
+    .map((r) => ({ ...r }));
+  assert.deepEqual(ranges.map((r) => [r.id, r.start_ms, r.end_ms, r.kind, r.contents]), [
+    [items[0], 0, 12500, "range", 1],
+    [items[1], 12500, 41000, "range", 1],
+    [items[2], 41000, 60000, "range", 1],
+  ]);
+  assert.equal(c.db.prepare("SELECT 1 FROM segment WHERE id=?").get(whole), undefined);
+  assert.deepEqual(c.db.prepare("SELECT start_ms,end_ms FROM recording_content WHERE recording_id=? ORDER BY position").all(recording).map((r) => [r.start_ms, r.end_ms]), [[0, 12500], [12500, 41000], [41000, 60000]]);
+
+  // The album page and the work page's queue play the same three ranges.
+  const album = renderAlbumPresentation(c, "A").groups.find((group) => group.workId === work);
+  assert.deepEqual(album.items.map((i) => [i.title, i.startMs, i.endMs]), [["I. Lento", 0, 12500], ["II. Vivace", 12500, 41000], ["III. Adagio", 41000, 60000]]);
+  const { workData } = await import("../src/model/presentation.js");
+  const queued = workData(c, work, { id: 1 }).recordings[0].items;
+  assert.deepEqual(queued.map((i) => [i.title, i.startMs, i.endMs]), album.items.map((i) => [i.title, i.startMs, i.endMs]));
+
+  // The form shows the saved times, and moving one boundary keeps the rest.
+  const again = (await s.read({ selection: `track:${track}` })).view.sections.find((section) => section.id === "boundaries-0");
+  assert.deepEqual(again.fields.map((f) => f.value), ["0:12.500", "0:41"]);
+  await s.ok("set-boundaries", { ...again.arguments, "start-1": "0:15", "start-2": "0:41" }, `track:${track}`);
+  assert.deepEqual(renderAlbumPresentation(c, "A").groups.find((group) => group.workId === work).items.map((i) => [i.startMs, i.endMs]), [[0, 15000], [15000, 41000], [41000, 60000]]);
+  assert.equal(c.db.prepare("SELECT count(*) AS n FROM segment WHERE track_link_id=?").get(track).n, 3, "replaced segments are removed");
+  // An audit entry records it, as every editor change.
+  assert.equal(c.db.prepare("SELECT count(*) AS n FROM audit_event WHERE action='editor.set-boundaries'").get().n, 2);
+});
+
+test("times parse as m:ss, h:mm:ss or seconds, and print back the same", async () => {
+  const { parseTime, formatTime } = await import("../src/model/editor-v2.js");
+  assert.deepEqual(["4:07", "1:02:03", "4:07.25", "247", "0:00", "9:60", "1:60:00", "", "4.07.1", "-1"].map(parseTime), [247000, 3723000, 247250, 247000, 0, null, null, null, null, null]);
+  assert.deepEqual([247000, 3723000, 247250, 0].map(formatTime), ["4:07", "1:02:03", "4:07.250", "0:00"]);
+});
+
+// v0.3 8.3: a preview of classical tags, per file, before anything is written.
+test("tag preview: current and proposed values per file, and files that can't or needn't be written", async (t) => {
+  const { tagLibrary, WORK } = await import("./tag-library.js");
+  const lib = await tagLibrary(t);
+  const c = await lib.catalogue();
+  t.after(() => c.close());
+  const m = new Metadata(c);
+  const work = renderAlbumPresentation(c, "fifth").groups[0].workId;
+  m.manual(work, "catalogue", ["Op. 67"], { actor: "admin", pin: true });
+  // The Opus file is a work of its own (matching made it one), to show an
+  // unsupported format.
+  const opus = await lib.linkOf(4);
+  assert.ok(c.db.prepare("SELECT 1 FROM segment s JOIN realization_item i ON i.segment_id=s.id WHERE s.track_link_id=?").get(opus), "the overture is a work");
+  const before = await Promise.all(lib.files.map((file) => fs.readFile(file.file)));
+
+  // The album: four files would change; the view lists what changes.
+  const opened = await lib.mutate("tag-preview-open", { albumId: "fifth" }, "album:fifth");
+  assert.equal(opened.ok, true, opened.message);
+  assert.match(opened.selection, /^tags:/);
+  const preview = await lib.read(opened.selection);
+  assert.equal(preview.subtitle.split(" · ")[0], "4 of 4 files would change");
+  assert.deepEqual(preview.actions.map((a) => [a.label, a.command, a.arguments.confirm]), [["Write 4 files", "tag-write", true]]);
+  const changing = preview.sections.find((s) => s.id === "status-change");
+  assert.match(changing.rows[0].detail, new RegExp(`Work: — → ${WORK.replace(/[.()]/g, "\\$&")}`));
+  assert.match(changing.rows[0].detail, /Catalogue number: — → Op\. 67/);
+  // The MP3 gets no movement or performer tags.
+  assert.doesNotMatch(changing.rows[3].detail, /Movement|Performers/);
+  // One file: every field, current → proposed, and what this format can't take.
+  const mp3 = await lib.read(changing.rows[3].selection);
+  const fields = Object.fromEntries(mp3.sections[0].items.map((item) => [item.label, item.value]));
+  assert.equal(fields.Composer, "Ludwig van Beethoven → Ludwig van Beethoven (same)");
+  assert.equal(fields.Movement, "Not written to this format → IV. Allegro");
+  assert.equal(fields["Catalogue number"], "— → Op. 67");
+
+  // Ticked tracks, a work and one track open the same kind of preview.
+  const ticked = await lib.mutate("tag-preview-open", { albumId: "fifth", tracks: [await lib.linkOf(0)] }, "album:fifth");
+  assert.equal((await lib.read(ticked.selection)).subtitle.split(" · ")[0], "1 of 1 file would change");
+  const forged = await lib.mutate("tag-preview-open", { albumId: "fifth", tracks: [opus] }, "album:fifth");
+  // A track from elsewhere is refused (by the page's revision check first).
+  assert.equal(forged.ok, false);
+  assert.match(forged.message, /no longer on this album|out of date/);
+  assert.equal((await lib.read((await lib.mutate("tag-preview-open", { work }, work)).selection)).subtitle.split(" · ")[0], "4 of 4 files would change");
+  const opusView = await lib.read((await lib.mutate("tag-preview-open", { track: opus }, `track:${opus}`)).selection);
+  assert.deepEqual(opusView.actions, []);
+  assert.equal(opusView.sections[0].title, "Format not supported yet (1)");
+  assert.match(opusView.sections[0].rows[0].detail, /can't be written to OPUS files yet/);
+  // A file that can't be read, and one not classical.
+  await fs.writeFile(lib.files[2].file, "not audio");
+  c.db.prepare("UPDATE classification SET state='not_classical' WHERE target_id=?").run(await lib.linkOf(1));
+  const mixed = await lib.read((await lib.mutate("tag-preview-open", { albumId: "fifth", tracks: await Promise.all([0, 1, 2].map(lib.linkOf)) }, "album:fifth")).selection);
+  assert.deepEqual(mixed.sections.map((s) => s.title), ["Will change (1)", "Nothing to write (1)", "Couldn't be read (1)"]);
+  assert.match(mixed.sections[1].rows[0].detail, /Not classical/);
+  // Previews never write: the other files are byte for byte as they were.
+  for (const i of [0, 1, 3, 4]) assert.deepEqual(await fs.readFile(lib.files[i].file), before[i], `file ${i}`);
+  // Track pages offer the preview; a stale or unknown preview says so.
+  assert.ok((await lib.read(`track:${opus}`)).actions.some((a) => a.command === "tag-preview-open"));
+  await assert.rejects(lib.read("tags:nothing"), /preview is gone/);
+});

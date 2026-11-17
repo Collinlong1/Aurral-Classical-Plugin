@@ -16,6 +16,7 @@ import {
 import { openCatalogue } from "../src/model/catalogue.js";
 import { reconcile } from "../src/model/reconcile.js";
 import { Metadata } from "../src/model/metadata.js";
+import { readValues } from "../src/tags.js";
 
 async function library(t, count = 3, { identical = false } = {}) {
   const folders = await tempFolders();
@@ -444,4 +445,54 @@ test("#16 deleting an identical file sharing a core track does not review the ex
   assert.deepEqual(after.map((r) => r.id), [before[0].id]);
   assert.equal(c.db.prepare("SELECT state FROM track_link WHERE id=?").get(before[1].id).state, "missing");
   assert.equal(c.db.prepare("SELECT count(*) AS n FROM review_item WHERE kind='track_link'").get().n, 0);
+});
+
+// v0.3 8.6: a rescan after classical tags were written keeps every link and
+// placement, reads the new tags, and an admin's values still win.
+test("after tags are written, a rescan keeps links, placements and manual values, and makes no second work", async (t) => {
+  const { tagLibrary } = await import("./tag-library.js");
+  const { runTagJobs } = await import("../src/model/tag-write.js");
+  const { renderAlbumPresentation } = await import("../src/model/presentation.js");
+  const lib = await tagLibrary(t);
+  const state = async () => {
+    const c = await lib.catalogue();
+    try {
+      const work = renderAlbumPresentation(c, "fifth").groups[0].workId;
+      return {
+        work,
+        links: c.db.prepare("SELECT id,core_id,state FROM track_link ORDER BY core_id").all().map((row) => ({ ...row })),
+        placements: c.db.prepare("SELECT i.id,i.movement_id,i.segment_id,s.track_link_id FROM realization_item i JOIN segment s ON s.id=i.segment_id JOIN realization r ON r.id=i.realization_id WHERE r.work_id=? ORDER BY i.id").all(work).map((row) => ({ ...row })),
+        works: c.db.prepare("SELECT count(*) AS n FROM entity WHERE kind='work' AND deleted_at IS NULL").get().n,
+        hints: Object.fromEntries(c.db.prepare("SELECT core_id,evidence FROM track_link WHERE state='active'").all().map((row) => [row.core_id, JSON.parse(row.evidence).hints])),
+        values: Object.fromEntries(["title", "catalogue"].map((field) => [field, new Metadata(c).resolve(work, field)])),
+      };
+    } finally {
+      c.close();
+    }
+  };
+  const first = await state();
+  // An admin's title and catalogue number, then the tags they propose.
+  const c = await lib.catalogue();
+  new Metadata(c).manual(first.work, "title", "Symphony No. 5 “Fate”", { actor: "admin", pin: true });
+  new Metadata(c).manual(first.work, "catalogue", ["Op. 67"], { actor: "admin", pin: true });
+  c.close();
+  const preview = (await lib.mutate("tag-preview-open", { albumId: "fifth" }, "album:fifth")).selection;
+  assert.equal((await lib.mutate("tag-write", { token: preview.slice(5), confirm: true }, preview)).ok, true);
+  await runTagJobs(lib.ctx, { budgetMs: 30_000 });
+  assert.deepEqual(readValues(lib.files[0].file, ["work", "catalogue"]), { work: ["Symphony No. 5 “Fate”"], catalogue: ["Op. 67"] });
+
+  await lib.scan();
+  const after = await state();
+  assert.deepEqual(after.links, first.links, "every track keeps its link");
+  assert.deepEqual(after.placements, first.placements, "every movement keeps its tracks");
+  assert.equal(after.works, first.works, "the new WORK tags make no second work");
+  // The scan read the new tags…
+  assert.equal(after.hints["0"].work, "Symphony No. 5 “Fate”");
+  assert.deepEqual(after.hints["0"].performers, ["Berliner Philharmoniker (orchestra)", "Herbert von Karajan (performer)"]);
+  // …and the admin's values still win over anything the tags now say.
+  assert.deepEqual([after.values.title.value, after.values.title.source], ["Symphony No. 5 “Fate”", "manual"]);
+  assert.deepEqual([after.values.catalogue.value, after.values.catalogue.source], [["Op. 67"], "manual"]);
+  // Nothing more to write.
+  const again = await lib.read((await lib.mutate("tag-preview-open", { albumId: "fifth" }, "album:fifth")).selection);
+  assert.deepEqual(again.sections.map((s) => s.title), ["Already up to date (4)"]);
 });

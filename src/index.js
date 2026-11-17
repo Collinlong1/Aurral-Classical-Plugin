@@ -16,6 +16,8 @@ import {
   albumMatchResult,
   queueEnglishNames,
   englishNamesStatus,
+  queueEnrichment,
+  enrichmentStatus,
   autoMatchLibrary,
   identifyBacklog,
   runModelJobs,
@@ -26,6 +28,7 @@ import {
 import { readValues } from "./tags.js";
 import { albumClassificationSummary } from "./model/classification-report.js";
 import { search } from "./search/provider.js";
+import { runTagJobs } from "./model/tag-write.js";
 import { MusicBrainz, mbBaseUrl, TTL } from "./mb.js";
 import { ClassicalResolver } from "./resolver.js";
 import { parseOrder, parseSeparator, slskdSettings } from "./settings.js";
@@ -169,6 +172,11 @@ function maintenance(input) {
   const start = () =>
     modelJobs(ctx, { budgetMs: ACTION_BUDGET_MS }).catch((error) => log(`Classical model work stopped: ${error.message}`));
   return {
+    // Tag writes and restores an admin confirmed (v0.3 8.4, 8.5): in this
+    // process, holding the tagger's lock. Never from a scan or the schedule.
+    startTagWrites() {
+      runTagJobs(ctx, { budgetMs: ACTION_BUDGET_MS }).catch((error) => log(`Classical tag writing stopped: ${error.message}`));
+    },
     async status() {
       const status = await modelStatus(ctx);
       return {
@@ -179,6 +187,7 @@ function maintenance(input) {
           state: status.scan.state === "running" && status.scan.leaseUntil <= status.now ? "interrupted (scan again to resume)" : status.scan.state,
         },
         english: await englishNamesStatus(ctx).catch(() => null),
+        enrich: await enrichmentStatus(ctx).catch(() => null),
       };
     },
     async run(command, user) {
@@ -204,6 +213,13 @@ function maintenance(input) {
           return `Work names and books were looked up already: ${queued.renamed} of ${queued.total} works renamed, ${queued.filed || 0} filed under their book.`;
         start();
         return "Looking up work names and books on MusicBrainz in the background, one request a second.";
+      }
+      if (command === "maintenance-enrich") {
+        const queued = await queueEnrichment(ctx, user);
+        if (!queued.queued)
+          return queued.state === "done" ? "Every person, ensemble and work with a MusicBrainz ID has its MusicBrainz details already." : "MusicBrainz details are being looked up already; reload to see progress.";
+        start();
+        return `Looking up dates, sort names and other names for ${queued.waiting} entr${queued.waiting === 1 ? "y" : "ies"} on MusicBrainz in the background, one request a second. Values you set yourself stay.`;
       }
       throw new Error("Unknown maintenance command");
     },

@@ -27,6 +27,8 @@ export class ModelJobs {
     });
   }
   // A scan goes before background identification; `type` claims only that kind.
+  // Tag writes (v0.3 8.4) are claimed only by name: a scan, the schedule or
+  // any other run of model jobs never picks one up.
   claim(owner, { now = Date.now(), leaseMs = 30_000, type = null } = {}) {
     if (!owner || !Number.isFinite(leaseMs) || leaseMs <= 0)
       throw new Error("Invalid job lease");
@@ -45,7 +47,7 @@ export class ModelJobs {
         .prepare(
           `SELECT * FROM model_job WHERE cancel_requested=0 AND attempt<max_attempts AND
         ((state IN ('queued','retry') AND next_run_at<=?) OR (state='running' AND lease_until<=?))
-        ${type ? "AND type=?" : ""} ORDER BY type='library_scan' DESC,created_at LIMIT 1`,
+        ${type ? "AND type=?" : "AND type!='tag_write'"} ORDER BY type='library_scan' DESC,created_at LIMIT 1`,
         )
         .get(now, now, ...(type ? [type] : []));
       if (!row) return null;

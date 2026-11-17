@@ -531,3 +531,183 @@ test("Tag as classical on an artist works on a fresh install, before any scan", 
   const result = await plugin.actions["tag-artist"](input({ user: { id: 1, role: "admin" }, artist: { id: 1, name: "Ludwig van Beethoven", mbid: null, albums: [] } }));
   assert.match(result.message, /1 tagged/);
 });
+
+// v0.3 8.2: classical fields round-trip, one at a time and with several
+// values, on every format enabled for release; others are listed as
+// unsupported, and the audio never changes.
+test("classical tag fields round-trip per field and keep several values on FLAC and MP3", async (t) => {
+  const { writeTags, readValues, FORMAT_FIELDS, CLASSICAL_FIELDS, writableFields, readTags } = await import("../src/tags.js");
+  const { fingerprint } = await import("../src/model/fingerprint.js");
+  const folders = await tempFolders();
+  t.after(() => fs.rm(folders.root, { recursive: true, force: true }));
+  const values = {
+    composer: ["Ludwig van Beethoven", "Franz Liszt"],
+    composerSort: ["Beethoven, Ludwig van", "Liszt, Franz"],
+    work: ["Symphony No. 5 in C minor, Op. 67"],
+    movementName: ["Allegro con brio"],
+    movementNumber: ["1"],
+    movementTotal: ["4"],
+    performers: ["Martha Argerich (piano)", "Berliner Philharmoniker (orchestra)"],
+    conductor: ["Herbert von Karajan"],
+    catalogue: ["Op. 67", "LvW 5"],
+    workId: ["00000000-0000-4000-8000-0000000000aa"],
+  };
+  assert.deepEqual(Object.keys(values), CLASSICAL_FIELDS);
+  assert.deepEqual(Object.keys(FORMAT_FIELDS), [".flac", ".mp3"]);
+  assert.deepEqual(FORMAT_FIELDS[".flac"], CLASSICAL_FIELDS);
+  // MP3: no Picard ID3 frame node-taglib-sharp writes for movements or performers.
+  assert.deepEqual(FORMAT_FIELDS[".mp3"], ["composer", "composerSort", "work", "conductor", "catalogue", "workId"]);
+  assert.deepEqual([writableFields("a.m4a"), writableFields("a.opus"), writableFields("A.FLAC").length], [[], [], 10]);
+  for (const ext of ["flac", "mp3"]) {
+    const fields = FORMAT_FIELDS[`.${ext}`];
+    // One field at a time: only it changes, every other tag stays.
+    for (const field of fields) {
+      const file = await copyFixture(`sine.${ext}`, path.join(folders.libraryFolder, `${ext}-${field}.${ext}`));
+      const before = readTags(file);
+      const audio = await fingerprint(file);
+      assert.deepEqual(await writeTags(file, { [field]: values[field] }), [field], `${ext} ${field}`);
+      assert.deepEqual(readValues(file, [field])[field], values[field], `${ext} ${field}`);
+      const after = readTags(file);
+      for (const kept of ["title", "artist", "albumArtist", "album", "recordingMbid", "genres", "trackNumber", "durationMs"]) assert.deepEqual(after[kept], before[kept], `${ext} ${field} kept ${kept}`);
+      assert.equal(await fingerprint(file), audio, `${ext} ${field} audio`);
+    }
+    // All together, then a second identical write changes nothing.
+    const file = await copyFixture(`sine.${ext}`, path.join(folders.libraryFolder, `${ext}-all.${ext}`));
+    const all = Object.fromEntries(fields.map((field) => [field, values[field]]));
+    assert.deepEqual((await writeTags(file, all)).sort(), [...fields].sort());
+    assert.deepEqual(readValues(file, fields), all);
+    assert.deepEqual(await writeTags(file, all), []);
+    // Clearing a field removes it; the others keep their values.
+    await writeTags(file, { catalogue: [] });
+    assert.deepEqual(readValues(file, ["catalogue", "composer"]), { catalogue: [], composer: values.composer });
+  }
+  // The scan reads what was written as performers and conductor (FLAC).
+  const flac = path.join(folders.libraryFolder, "flac-all.flac");
+  assert.deepEqual([readTags(flac).performers, readTags(flac).conductor], [values.performers, "Herbert von Karajan"]);
+});
+
+// v0.3 8.4, 8.5: confirmed writes with per-file backups, and restore.
+test("tag writing: only confirmed, with the setting on and never from a scan; changed files are left alone; restore puts the first tags back", async (t) => {
+  const { tagLibrary } = await import("./tag-library.js");
+  const { runTagJobs } = await import("../src/model/tag-write.js");
+  const { runModelJobs } = await import("../src/model/runtime.js");
+  const { fingerprint } = await import("../src/model/fingerprint.js");
+  const lib = await tagLibrary(t, { settings: {} });
+  const fifth = lib.files.slice(0, 4).map((file) => file.file);
+  const original = fifth.map((file) => readTags(file));
+  const audio = await Promise.all(fifth.map((file) => fingerprint(file)));
+  const firstEvidence = async () => {
+    const c = await lib.catalogue();
+    try {
+      return Object.fromEntries(c.db.prepare("SELECT core_id,json_extract(evidence,'$.hints') AS hints FROM track_link WHERE state='active' ORDER BY core_id").all().map((row) => [row.core_id, JSON.parse(row.hints)]));
+    } finally {
+      c.close();
+    }
+  };
+  const evidence = await firstEvidence();
+  const preview = (await lib.mutate("tag-preview-open", { albumId: "fifth" }, "album:fifth")).selection;
+  const token = preview.slice(5);
+
+  // Off by default: refused, nothing queued.
+  const off = await lib.mutate("tag-write", { token, confirm: true }, preview);
+  assert.equal(off.ok, false);
+  assert.match(off.message, /Writing tags is off/);
+  lib.ctx.settings.enableTagWriting = true;
+  assert.match((await lib.mutate("tag-write", { token, confirm: false }, preview)).message, /Confirm/);
+  // Someone edits one file after the preview.
+  await writeTags(fifth[1], { composer: ["L. v. Beethoven"] });
+  const queued = await lib.mutate("tag-write", { token, confirm: true }, preview);
+  assert.equal(queued.ok, true, queued.message);
+  assert.match(queued.selection, /^tag-run:/);
+  assert.equal(lib.started.length, 1, "the run is started once its job is committed");
+  // Scans and the schedule run model jobs: never a tag write.
+  await runModelJobs(lib.ctx, { budgetMs: 5_000 });
+  assert.equal((await lib.read(queued.selection)).badges[0].label, "Running");
+  assert.deepEqual(fifth.map((file) => readTags(file).work), ["", "", "", ""]);
+
+  assert.equal(await runTagJobs(lib.ctx, { budgetMs: 30_000 }), true);
+  const report = await lib.read(queued.selection);
+  assert.match(report.subtitle, /^Done · 4 of 4 files · 3 written · 1 skipped$/);
+  const rows = report.sections[0].rows;
+  assert.deepEqual(rows.map((row) => [row.label, row.badge.label]), [["01.flac", "Written"], ["02.flac", "Skipped"], ["03.flac", "Written"], ["04.mp3", "Written"]]);
+  assert.equal(rows[1].detail, "Its tags changed since the preview");
+  // Written as previewed; the audio and every other tag are unchanged.
+  const flac = readValues(fifth[0], ["work", "movementName", "movementNumber", "movementTotal", "performers"]);
+  assert.deepEqual(flac, { work: ["Symphony No. 5 in C minor, Op. 67"], movementName: ["I. Allegro con brio"], movementNumber: ["1"], movementTotal: ["4"], performers: ["Berliner Philharmoniker (orchestra)", "Herbert von Karajan (performer)"] });
+  assert.deepEqual(readValues(fifth[3], ["work", "movementName"]), { work: ["Symphony No. 5 in C minor, Op. 67"], movementName: [] });
+  assert.deepEqual(readValues(fifth[1], ["composer", "work"]), { composer: ["L. v. Beethoven"], work: [] }, "the edited file is left alone");
+  for (const i of [0, 2, 3]) {
+    assert.equal(await fingerprint(fifth[i]), audio[i], `audio ${i}`);
+    for (const kept of ["title", "artist", "albumArtist", "album", "trackNumber", "durationMs"]) assert.deepEqual(readTags(fifth[i])[kept], original[i][kept], `${i} ${kept}`);
+  }
+  // One backup a written file, with the old values of exactly what was written.
+  const c = await lib.catalogue();
+  const backups = c.db.prepare("SELECT * FROM tag_backup ORDER BY path").all();
+  c.close();
+  assert.deepEqual(backups.map((row) => path.basename(row.path)), ["01.flac", "03.flac", "04.mp3"]);
+  assert.deepEqual(JSON.parse(backups[0].tags).work, []);
+  assert.equal(backups[0].fingerprint, audio[0]);
+  assert.equal(backups[0].actor, "1");
+  // Confirming the same preview again writes nothing more.
+  const again = await lib.mutate("tag-write", { token, confirm: true }, preview);
+  assert.deepEqual([again.ok, again.selection], [true, queued.selection]);
+  assert.match(again.message, /written already/);
+
+  // 8.5: restore one file, then the rest of the run.
+  const one = await lib.mutate("tag-restore", { backup: rows[0].actions[0].arguments.backup }, queued.selection);
+  assert.equal(one.ok, true, one.message);
+  await runTagJobs(lib.ctx, { budgetMs: 30_000 });
+  assert.deepEqual(readValues(fifth[0], ["work", "performers"]), { work: [], performers: [] });
+  assert.deepEqual((await lib.read(`track:${await lib.linkOf(0)}`)).sections.find((s) => s.id === "tag-history").rows[0].badge.label, "Restored");
+  assert.match((await lib.mutate("tag-restore", { backup: rows[0].actions[0].arguments.backup }, queued.selection)).message, /restored already/);
+  // A file edited after the write is not put back over that edit.
+  await writeTags(fifth[2], { composer: ["Someone else"] });
+  const rest = (await lib.read(queued.selection)).actions.find((a) => a.command === "tag-restore");
+  assert.equal(rest.label, "Restore all 2");
+  const restoring = await lib.mutate("tag-restore", rest.arguments, queued.selection);
+  await runTagJobs(lib.ctx, { budgetMs: 30_000 });
+  const restored = await lib.read(restoring.selection);
+  assert.deepEqual(restored.sections[0].rows.map((row) => [row.label, row.badge.label]), [["03.flac", "Skipped"], ["04.mp3", "Restored"]]);
+  assert.match(restored.sections[0].rows[0].detail, /changed since they were written/);
+  assert.deepEqual(readValues(fifth[2], ["composer", "work"]), { composer: ["Someone else"], work: ["Symphony No. 5 in C minor, Op. 67"] });
+  for (const i of [0, 3]) assert.equal(await fingerprint(fifth[i]), audio[i]);
+  // Restore, then rescan: the first evidence comes back for restored files.
+  await lib.scan();
+  const after = await firstEvidence();
+  for (const id of ["0", "3"]) assert.deepEqual(after[id], evidence[id], `evidence of file ${id}`);
+
+  // Turned off again: a queued run stops before writing.
+  lib.ctx.settings.enableTagWriting = true;
+  const second = (await lib.mutate("tag-preview-open", { albumId: "fifth" }, "album:fifth")).selection;
+  const run = await lib.mutate("tag-write", { token: second.slice(5), confirm: true }, second);
+  lib.ctx.settings.enableTagWriting = false;
+  await runTagJobs(lib.ctx, { budgetMs: 30_000 });
+  assert.match((await lib.read(run.selection)).subtitle, /^Stopped: Tag writing is off/);
+  assert.deepEqual(readValues(fifth[0], ["work"]), { work: [] });
+});
+
+test("a tag write killed at any moment leaves the old file or the new one, never a mix, and the same audio", async (t) => {
+  const { spawn } = await import("node:child_process");
+  const { fingerprint } = await import("../src/model/fingerprint.js");
+  const folders = await tempFolders();
+  t.after(() => fs.rm(folders.root, { recursive: true, force: true }));
+  const file = await copyFixture("sine.flac", path.join(folders.libraryFolder, "kill.flac"));
+  // A larger file makes each write take longer, so kills land mid-write.
+  await writeTags(file, { work: ["x".repeat(200_000)] });
+  const audio = await fingerprint(file);
+  const states = [JSON.stringify({ composer: ["A"], work: ["Work A"] }), JSON.stringify({ composer: ["B"], work: ["Work B"] })];
+  await writeTags(file, JSON.parse(states[0]));
+  const tags = new URL("../src/tags.js", import.meta.url).href;
+  const script = `const { writeTags } = await import(${JSON.stringify(tags)}); const s = ${JSON.stringify(states.map((x) => JSON.parse(x)))}; process.send?.("go"); for (let i = 0; ; i++) await writeTags(${JSON.stringify(file)}, s[i % 2]);`;
+  for (let round = 0; round < 12; round++) {
+    const child = spawn(process.execPath, ["--input-type=module", "-e", script], { stdio: "ignore" });
+    await new Promise((resolve) => setTimeout(resolve, 150 + Math.floor(Math.random() * 250)));
+    child.kill("SIGKILL");
+    await new Promise((resolve) => child.once("exit", resolve));
+    const now = JSON.stringify(readValues(file, ["composer", "work"]));
+    assert.ok(states.includes(now), `round ${round}: ${now}`);
+    assert.equal(await fingerprint(file), audio, `round ${round}: audio`);
+  }
+  // What a kill can leave is a copy with no audio extension, never indexed.
+  for (const name of await fs.readdir(path.dirname(file))) if (name !== "kill.flac") assert.match(name, /^\.kill\..*\.tagging$/);
+});

@@ -113,7 +113,7 @@ export class Metadata {
     provider,
     recordId,
     fields,
-    { state = "active", confidence = 1, complete = true } = {},
+    { state = "active", confidence = 1, complete = true, keepManual = false } = {},
   ) {
     if (
       !Object.hasOwn(providerOrder, provider) ||
@@ -158,6 +158,18 @@ export class Metadata {
           state,
         });
       } else {
+        // An admin's value, or a blank they set, holds over what a provider
+        // says: a manual value not pinned yet is pinned before the provider's
+        // arrives (enrichment uses this; v0.1 refreshes did not).
+        if (keepManual)
+          for (const field of Object.keys(fields)) {
+            if (this.db.prepare("SELECT 1 FROM pinned_override WHERE target_id=? AND field=?").get(target, field)) continue;
+            const own = this.db
+              .prepare("SELECT id,actor FROM assertion WHERE target_id=? AND field=? AND source='manual' AND state='active' ORDER BY rowid DESC LIMIT 1")
+              .get(target, field);
+            if (own)
+              this.db.prepare("INSERT INTO pinned_override VALUES (?,?,?,?,?)").run(target, field, own.id, own.actor || "manual", Date.now());
+          }
         for (const [field, value] of Object.entries(fields))
           this.append(target, field, value, {
             source: "provider",

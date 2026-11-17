@@ -54,7 +54,7 @@ async function queuedEntries(ctx) {
 export const queueLength = async (ctx) => (await queuedEntries(ctx)).length;
 
 // Only files in the Library or the plugin's own folder are ever written.
-async function allowedPath(ctx, filePath) {
+export async function allowedPath(ctx, filePath) {
   const real = await fs.realpath(filePath).catch(() => null);
   if (!real) return null;
   for (const root of [ctx.libraryFolder, ctx.dataFolder]) {

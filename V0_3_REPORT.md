@@ -1,3 +1,33 @@
+# v0.3 Phases 6.6–8.6 — movement boundaries, MusicBrainz details, classical tag writing / issues #78–#87
+
+## Result
+
+- `src/model/editor-v2.js`: `formatTime`, `parseTime`, `sharedOnTrack`, boundary forms and `set-boundaries`; Maintenance "Details from MusicBrainz"; `tag-preview-open`, `tag-write`, `tag-restore`, the preview, file and run views, track tag history; preview buttons on the album (header and ticked rows), a work's Recordings section and the track page.
+- `src/model/runtime.js`: `queueEnrichment`, `enrichmentStatus`, `enrichmentCandidates`, `enrichmentFields`, `runEnrichment` (`mb_enrich`).
+- `src/model/metadata.js`: `refresh(..., { keepManual })`.
+- `src/model/tag-plan.js` (new): `proposedTags`.
+- `src/model/tag-write.js` (new): `previewTrack`, `createPreview`, `loadPreview`, `queueWrite`, `queueRestore`, `runTagJobs`, `tagRun`.
+- `src/tags.js`: seven new writers, `CLASSICAL_FIELDS`, `FORMAT_FIELDS`, `writableFields`.
+- `src/model/jobs.js`: `claim` without a type skips `tag_write`.
+- `src/tagger.js`: `allowedPath` exported. `src/model/editor.js`: setting check, start after commit. `src/index.js`: `maintenance-enrich`, `startTagWrites`. `manifest.json`: `enableTagWriting`.
+
+## Verification
+
+On Node 22.23: full `npm test` 461/461. New tests, one or more per issue's own verification line:
+
+- `test/editor-v2.test.js`: a three-movement track divided at 0:12.5 and 41; refusals (order, end of file, not a time, a stale item list) change nothing; album view and work queue play the same three ranges; moving one boundary keeps the rest and leaves three segments; time parsing (6.6). The tag preview on a real scanned Library: four FLAC/MP3 files would change, the MP3 without movement fields, one file's every field, ticked tracks, a work, one Opus track (unsupported), an unreadable file and a non-classical one; the other files stay byte for byte (8.3).
+- `test/background-matching.test.js`: enrichment with `fakeFetch` behind the real client: one lookup each, a 503 retried by the next run only, nothing looked up once done; MusicBrainz sort name, aliases and dates stored, an admin's sort name and blank date kept, no period; composer and work pages show them (7.1, 7.3).
+- `test/model.test.js`: a manual value and a blank survive `keepManual` refreshes; without it a provider still wins an unpinned field (7.2).
+- `test/tag-plan.test.js` (new): full plan for a Dvořák movement, the movement's own MusicBrainz work over the work's, an admin's credit and instrument, nothing for not classical, no work, or two works (8.1).
+- `test/tagger.test.js`: each field alone round-trips on FLAC and MP3 with other tags and audio unchanged, several values keep their order, an identical write changes nothing, clearing works (8.2). Writing: refused with the setting off or without confirmation; a normal model-jobs run leaves the job queued; a file edited after the preview is skipped; three written with backups, unchanged audio and other tags; confirming again writes once; restore one file then the run, a file edited after the write left alone; after restore and rescan the first evidence returns; a run whose setting was turned off stops for good (8.4, 8.5). A child process writing in a loop, killed 12 times at random moments, always leaves the old or the new tags and the same audio (8.4).
+- `test/sync.test.js`: after a write and a rescan, the same track links and placements, the new tags read, no second work, the admin's title and catalogue still manual, and a new preview "Already up to date (4)" (8.6).
+
+The new tests passed three repeated runs. On Node 26.12 in Chromium at 1280 and 390 px, `dev/editor-tag-preview-browser.mjs` opens the album's preview, one file's fields, writes after core's confirmation, follows the run and restores a file; all nine earlier browser checks still pass. Screenshots checked by eye.
+
+Not run: `pnpm eden test`, the Compose workflow, remote CI. The read-only file case is not exercised here: the container runs as root, which can write any file.
+
+---
+
 # v0.3 Phases 4.4–6.5 — entity pages, links and saved comparisons / issues #68–#77
 
 ## Result
