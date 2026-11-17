@@ -1,3 +1,17 @@
+# v0.3 Phase 3.6 — plugin-facing core hooks in the fork delta (issue #64, core #51–#56)
+
+First of four plugin commits in this PR (3.6, 4.1–4.3), paired with core 3.1–3.6 (core branch `claude/pensive-bardeen-5dat3q`). All six core hooks are generic, additive and off unless a plugin declares them and the admin's capability switch is on; stock plugins and older hosts are unchanged. Documented in core `plugin-api.md` and typed in `aurral-plugin.d.ts`.
+
+- **Resource view 2 and query pass-through (#51, #53).** A non-admin page answers `pages.read` with `{version: 2, title, sections}`: typed header, rows, groups, tracks, details, pager, tabs, filters, sort and empty sections, rendered by core (`PluginResourceView.tsx`). Hosts send `capabilities.resourceView: 2` and `query: {q, sort, tab, page, filters}` from the page's URL. Version 1 work pages still work. Core builds every path; stale tracks are dropped.
+- **Resource mutations (#51).** `favourite-item` and `delete-queue` (with `target`) and `save-queue` (with `name`, `itemIds`) beside `favourite`, `pick` and `admin-pick`; a view 2 page's tracks can be saved as a playlist.
+- **Library entry (#52).** Manifest `library: {pageId, resourceId, label}` adds one entry to the Library's navigation for a non-admin page, behind the "Library navigation" switch; listed lazily by `GET /api/plugins/library` (kept off bootstrap for the perf budget).
+- **Item links (#54).** Up to six `{label, link}` on playable items, album groups and search results; they ride into the queue and the player's track menu. A filter link away from its page opens the plugin's search. `capabilities.itemLinks: 1`.
+- **Track links (#56).** Manifest `trackLinks: true` and a `trackLinks({trackIds})` export answer `GET /api/plugins/track-links`, merged across plugins and cached per track on the client, for tracks queued from ordinary pages. `/api/plugins/actions` reports whether any plugin answers.
+
+The plugin uses these from 4.1 (the `classical` Library page and entry). No schema change.
+
+Verification: `V0_3_REPORT.md`.
+
 # v0.3 Phase 2.7 — identity and credit conflict review actions (issue #63)
 
 Last of ten commits in one PR (1.5–1.7, 2.1–2.7). Implements #63 only; #63 has no later comments. E3 (#27) itself, for auto-match reviews, stays open; this applies its durable-dismissal rule to the two contributor review kinds, as #63 asks.

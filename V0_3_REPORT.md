@@ -1,3 +1,15 @@
+# v0.3 Phase 3.6 — fork delta for the core hooks / issue #64
+
+## Result
+
+- `UPSTREAM_DELTA.md`, `FORK_FEATURE_INVENTORY.md` and `HANDOFF.md`: the six plugin-facing core changes of core 3.1–3.5 (resource view 2 with query pass-through, resource mutations, the Library entry, item links, track links), each generic, capability-gated and additive. Core 3.6 (#55) documents them in `plugin-api.md` and `aurral-plugin.d.ts`.
+
+## Verification
+
+Docs only. Core on Node 26.12 (the version `.nvmrc` pins): `pnpm run check` passes with the unsafe-any baseline at 1089; `pnpm test` 389 files, 2671 tests pass, the perf budget included; `pnpm run build` passes. Each hook has a core unit test in `.tests/plugins/plugins.test.ts` (view 2, the Library entry, item links on albums, pages and search, track links) and `.tests/frontend/audio-queue.test.ts` (links on queued tracks). Under Node 22 the container's core run fails 14 network-mocked tests in unrelated files because undici 8's dispatcher doesn't fit Node 22's built-in fetch; it is not a regression.
+
+---
+
 # v0.3 Phase 2.7 — contributor reviews / issue #63
 
 ## Result
