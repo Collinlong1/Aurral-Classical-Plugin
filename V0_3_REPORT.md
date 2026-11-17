@@ -1,3 +1,27 @@
+# v0.3 Phases 4.4–6.5 — entity pages, links and saved comparisons / issues #68–#77
+
+## Result
+
+- `src/model/pages-entities.js` (new): `composerView`, `contributorView` (people and ensembles), `workView`, `recordingView`, `queueView`, `mutateEntity` (`favourite`, `pick`, `admin-pick`, `favourite-item`, `save-queue`, `delete-queue`), `completeness`.
+- `src/model/pages.js`: entity and `queue:` routes; work and recording list rows open the Classical pages; reads and actions take the reader.
+- `src/model/presentation.js`: `itemLinks`, `renderTrackLinks`/`trackLinks`, album presentation links when `capabilities.itemLinks`, `workData` (uncut), recordings carry `performanceId`.
+- `src/search/engine.js`: stamp v5; work documents carry form, catalogue, date and recording count; recording documents their performance, composers, people and movements held; `sortName` read into sort keys; fixed role order in labels.
+- `src/search/provider.js`: `linkFor(item, capabilities)`.
+- `src/index.js`, `manifest.json`: `trackLinks`.
+- Core `9fec213` (branch `claude/wizardly-mendel-w49um5`): `isPartOfTrack`; whole-track playlist labels.
+
+## Verification
+
+On Node 22.23: full `npm test` 448/448. New `test/entity-pages.test.js` (17 tests), one or more per issue's own verification line: a composer without a MusicBrainz ID grouped by form, sorted four ways, 131 works paged 100 + 31 (4.4); search links on view 2 hosts and filters elsewhere (4.5); a pianist who also conducts has two sections and one identity, and 121 recordings page 100 + 21 grouped by sort name (5.1); collaborators from shared credits (5.2); members from `member_of` both ways (5.3); a work with an excerpt, picks and favourites, a 600-movement work paged with every section inside core's limits, and a collection's siblings (6.1); broadcast, excerpt and two releases (6.2); album group, item and track links, including a track holding two works (6.3); a saved two-part comparison with a range keeps its ranges and order, is its owner's alone, drops missing tracks, deletes, and caps at 50 (6.5). `test/manifest.test.js` drives the built bundle's `pages.mutate` and `trackLinks`. The previously order-tolerant role assertion in `test/search.test.js` is exact again. Album links were flaky on tied credit positions before the fix (3 of 6 runs failed); 6 of 6 pass after. CI then caught one more: with no pick, a work page played its first recording, in random-id order, so the 6.1 test sometimes got Brendel's one-movement excerpt (1 track, not 3). It now plays the fullest recording, by performer then id; the stricter assertion fails 11 of 12 runs on the previous code and passes 12 of 12.
+
+`dev/classical-pages-browser.mjs` passes on Node 26.12 against core `9fec213` in Chromium at 1280 and 390 px: person, ensemble, composer, work, recording and saved-comparison pages through core's `PluginResourceView`; Play all queues "Piano Sonata No. 14 …: I. Adagio sostenuto" and so on through core's `pluginQueueTrack`, each with its resolved links (6.4, 6.3); a track's menu opens Go to Recording and Go to Work (6.3); the Movements tab's filter compares one movement; the saved comparison queues exactly its two parts, one of them 120000–300000 ms (6.5). Screenshots checked by eye. The harness now passes the URL's `tab` as core does (it sent "" before).
+
+Core on Node 26.12: `pnpm check` clean at the 1089 unsafe-any baseline; `pnpm test` 2707/2707 across 393 files.
+
+Not run: the album page and the player bar themselves in a browser (links are checked as the queue carries them, and core's own tests cover their menus), `pnpm eden test`, the Compose workflow, remote CI.
+
+---
+
 # Bug fix — one backup and one upgrade however many processes open the catalogue
 
 ## Result

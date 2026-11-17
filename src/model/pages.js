@@ -6,20 +6,18 @@
 //   list:<kind>               a list: composer, work, performer, conductor,
 //                             ensemble or recording
 //   composer:<id>, person:<id>, ensemble:<id>, work:<id>, recording:<key>
+//   queue:<id>                one of the reader's saved comparisons
 //
 // Reads go through the search index, so every page sees the same names.
+// Entity pages are in pages-entities.js.
 import path from "node:path";
 import { openCatalogue } from "./catalogue.js";
 import { ensureSearchIndex, searchCatalogue } from "../search/engine.js";
+import { NotFound, PAGE_ID, composerView, contributorView, counted, day, mutateEntity, page, queueView, recordingView, workView } from "./pages-entities.js";
 
-export const PAGE_ID = "classical";
-const ENTITY_KINDS = new Set(["composer", "person", "ensemble", "work", "recording"]);
-
-const page = (resourceId) => ({ type: "resource", pageId: PAGE_ID, resourceId });
-// The work page that plays recordings, until the v2 work page replaces it.
-const workPage = (workId) => ({ type: "resource", pageId: "work", resourceId: workId });
-
-class NotFound extends Error {}
+export { PAGE_ID };
+const ENTITY_KINDS = new Set(["composer", "person", "ensemble", "work", "recording", "queue"]);
+const workPage = (workId) => page(`work:${workId}`);
 
 // "list:work" -> { kind: "list", id: "work" }; "home" -> { kind: "home" }.
 export function parseResource(resourceId) {
@@ -38,19 +36,9 @@ function actor(input) {
   return user;
 }
 
-const doc = (c, kinds, ref) =>
-  c.db
-    .prepare(`SELECT * FROM search_doc WHERE ref=? AND kind IN (${kinds.map(() => "?").join(",")}) ORDER BY kind`)
-    .get(ref, ...kinds);
-const required = (row, what) => {
-  if (!row) throw new NotFound(`${what} not found`);
-  return row;
-};
-
 
 // The six lists. Each reads the search index for one kind of document,
 // 100 rows a page, with the search page's filters and its own sort orders.
-// Works and recordings open the v1 work page until the v2 work page (6.1).
 export const PAGE_SIZE = 100;
 const ENSEMBLE = (doc, data) => data.entity === "ensemble";
 const byRef = (prefix) => (item) => (item.ref.length <= 180 ? page(`${prefix}:${item.ref}`) : null);
@@ -61,7 +49,7 @@ export const LISTS = {
     noun: ["work", "works"],
     kinds: ["work"],
     sorts: [["title", "Title"], ["catalogue", "Catalogue number"], ["date", "Date written"]],
-    link: (item) => workPage(item.ref),
+    link: (item) => (item.ref.length <= 180 ? workPage(item.ref) : null),
   },
   performer: { title: "Performers", noun: ["performer", "performers"], kinds: ["performer"], accept: (doc, data) => !ENSEMBLE(doc, data), sorts: [["title", "Name"]], link: byRef("person") },
   conductor: {
@@ -78,13 +66,12 @@ export const LISTS = {
     noun: ["recording", "recordings"],
     kinds: ["recording"],
     sorts: [["title", "Work"], ["catalogue", "Catalogue number"], ["date-desc", "Newest first"], ["date", "Oldest first"]],
-    link: (item) => (item.workId ? workPage(item.workId) : null),
+    link: byRef("recording"),
   },
 };
 // Facets that narrow a list; "Library" holds everything here.
 const LIST_FACETS = new Set(["composer", "performer", "conductor", "ensemble", "role", "period", "form", "instrument", "type", "year"]);
 
-const counted = (n, [one, many]) => `${n.toLocaleString("en-US")} ${n === 1 ? one : many}`;
 
 export function listView(c, kind, query = {}) {
   const list = LISTS[kind];
@@ -170,7 +157,6 @@ export function recentWorks(c, limit = RECENT_WORKS) {
     .all(limit);
 }
 
-const day = (ms) => new Date(ms).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
 
 export function homeView(c) {
   const counts = listCounts(c);
@@ -209,54 +195,40 @@ export function homeView(c) {
   };
 }
 
-// An entity's page. Until its own phase fills it (composer 4.4, people 5.1,
-// ensembles 5.3, works 6.1, recordings 6.2), it names the entity and, for a
-// work or recording, opens the work page that plays it.
-const ENTITY_DOCS = {
-  composer: [["composer"], "Composer"],
-  person: [["performer", "composer"], "Person"],
-  ensemble: [["performer"], "Ensemble"],
-  work: [["work"], "Work"],
-  recording: [["recording"], "Recording"],
-};
-function entityView(c, kind, id) {
-  const [kinds, what] = ENTITY_DOCS[kind];
-  const row = required(doc(c, kinds, id), what);
-  const workId = kind === "work" ? id : row.work_id;
-  return {
-    version: 2,
-    title: row.title,
-    sections: [
-      {
-        type: "header",
-        title: row.title,
-        subtitle: row.subtitle,
-        facts: kind === "recording" && row.detail ? [{ label: "Released on", value: row.detail }] : [],
-        actions: workId && (kind === "work" || kind === "recording") ? [{ label: kind === "work" ? "Recordings" : "Open the work", link: workPage(workId) }] : [],
-      },
-    ],
-  };
-}
+const ENTITY_VIEWS = { composer: composerView, person: contributorView, ensemble: contributorView, work: workView, recording: recordingView, queue: queueView };
 
-export function renderClassical(c, resourceId, query = {}) {
+// `user` is the reader: picks, favourites and saved comparisons are theirs.
+export function renderClassical(c, resourceId, query = {}, user = { id: 1, role: "user" }) {
   const resource = parseResource(resourceId);
   ensureSearchIndex(c);
   if (resource.kind === "home") return homeView(c, query);
   if (resource.kind === "list") return listView(c, resource.id, query);
-  return entityView(c, resource.kind, resource.id);
+  return ENTITY_VIEWS[resource.kind](c, resource.id, query, user);
 }
 
 export async function readClassical(input) {
-  actor(input);
+  const user = actor(input);
   const c = await openCatalogue(path.join(input.dataFolder, "model"));
   try {
-    return renderClassical(c, input.resourceId, input.query || {});
+    return renderClassical(c, input.resourceId, input.query || {}, user);
   } finally {
     c.close();
   }
 }
 
+export function applyClassicalMutation(c, resourceId, mutation, user) {
+  const resource = parseResource(resourceId);
+  if (resource.kind === "home" || resource.kind === "list") throw new Error("This page has no actions");
+  ensureSearchIndex(c);
+  return mutateEntity(c, resource, mutation, user);
+}
+
 export async function mutateClassical(input) {
-  actor(input);
-  throw new Error("This page has no actions yet");
+  const user = actor(input);
+  const c = await openCatalogue(path.join(input.dataFolder, "model"));
+  try {
+    return applyClassicalMutation(c, input.resourceId, input.mutation, user);
+  } finally {
+    c.close();
+  }
 }

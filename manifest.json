@@ -135,6 +135,7 @@
     }
   ],
   "albumPresentation": true,
+  "trackLinks": true,
   "search": true,
   "library": {
     "pageId": "classical",

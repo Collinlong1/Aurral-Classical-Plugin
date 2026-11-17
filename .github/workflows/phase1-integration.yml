@@ -19,7 +19,7 @@ jobs:
           repository: Collinlong1/aurral
           # Same core as the work-view workflow: the smoke test reads the
           # work page and saves comparisons through the v0.2 hooks.
-          ref: e96e63fc864e140d6d4af041b678d32fce00fcd8
+          ref: 9fec2135ccc5bb0d5395fff78c905bd17b50b622
           path: core
       - uses: actions/setup-node@v4
         with:

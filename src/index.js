@@ -4,6 +4,7 @@ import { readEditor, mutateEditor } from "./model/editor.js";
 import { readClassical, mutateClassical, PAGE_ID } from "./model/pages.js";
 import {
   albumPresentation,
+  trackLinks,
   readWork,
   mutateWork,
 } from "./model/presentation.js";
@@ -225,6 +226,7 @@ export default {
           : mutateEditor({ ...input, maintenance: maintenance(input) }),
   },
   albumPresentation,
+  trackLinks,
   search,
   async test(input) {
     const ctx = makeContext(input);

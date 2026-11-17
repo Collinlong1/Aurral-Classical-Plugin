@@ -24,8 +24,8 @@ jobs:
           # search, comparisons, admin page selection and pages), synced
           # with upstream through #1930, plus the v0.3 0.09 C1 fix and
           # the v0.3 3.1-3.6 hooks (view 2 pages, Library entry, item and
-          # track links).
-          ref: e96e63fc864e140d6d4af041b678d32fce00fcd8
+          # track links) and 6.5's whole-track playlist labels.
+          ref: 9fec2135ccc5bb0d5395fff78c905bd17b50b622
           path: core
       - uses: actions/setup-node@v4
         with:
