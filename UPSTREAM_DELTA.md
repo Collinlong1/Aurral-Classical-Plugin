@@ -1,3 +1,9 @@
+# v0.3 Phase 4.1 — the Classical Library page (issue #65)
+
+Second of four plugin commits in this PR (3.6, 4.1–4.3). `manifest.json` adds page `classical` (`"admin": false`) and a `library` entry for its `home`, so with core 3.3 the Library's navigation shows "Classical" when an admin leaves the "Library navigation" switch on. New `src/model/pages.js` answers `pages.read` for it with view 2 pages: `home`, `list:<kind>`, `composer:<id>`, `person:<id>`, `ensemble:<id>`, `work:<id>` and `recording:<key>`, read through the search index; an unknown resource is "not found". Home and lists are filled by 4.3 and 4.2; entity pages name the entity, and a work or recording opens the v1 `work` page that plays it, until their own phases (4.4, 5.1, 5.3, 6.1, 6.2). The v1 `work` page answers as before; the page has no mutations yet. The search test's Library fixture moves to `test/library-fixture.js`. No schema change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
 # v0.3 Phase 3.6 — plugin-facing core hooks in the fork delta (issue #64, core #51–#56)
 
 First of four plugin commits in this PR (3.6, 4.1–4.3), paired with core 3.1–3.6 (core branch `claude/pensive-bardeen-5dat3q`). All six core hooks are generic, additive and off unless a plugin declares them and the admin's capability switch is on; stock plugins and older hosts are unchanged. Documented in core `plugin-api.md` and typed in `aurral-plugin.d.ts`.

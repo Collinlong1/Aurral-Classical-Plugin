@@ -1,3 +1,18 @@
+# v0.3 Phase 4.1 — Classical page routing / issue #65
+
+## Result
+
+- `manifest.json`: page `classical` (non-admin); `library: {pageId: "classical", resourceId: "home", label: "Classical"}`.
+- `src/model/pages.js`: `parseResource`, `renderClassical(c, resourceId, query)`, `readClassical`, `mutateClassical` (refuses: no actions yet). A real user is required.
+- `src/index.js`: `pages.read`/`mutate` route `classical`, then `work`, then the editor.
+- `test/library-fixture.js`: the search test's Library, shared.
+
+## Verification
+
+On Node 22.23: full `npm test` 423/423. `test/manifest.test.js` now checks the `library` entry against the host's rules (a non-admin page, label up to 40) and, through the built bundle, that every resource kind answers a view 2 page, entity pages name Beethoven, Barenboim, the Moonlight sonata and one of its recordings, a work opens the `work` page, unknown resources and missing entities are refused, an API key (user 0) is refused, and the v1 `work` page still answers.
+
+---
+
 # v0.3 Phase 3.6 — fork delta for the core hooks / issue #64
 
 ## Result

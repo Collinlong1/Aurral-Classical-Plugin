@@ -4235,9 +4235,9 @@ var require_byteVector = __commonJS({
        * Creates a {@link ByteVector} using the contents of a file as the data
        * @param path Path to the file to store in the ByteVector
        */
-      static fromPath(path16) {
-        utils_1.Guards.truthy(path16, "path");
-        const fileBuffer = fs9.readFileSync(path16);
+      static fromPath(path17) {
+        utils_1.Guards.truthy(path17, "path");
+        const fileBuffer = fs9.readFileSync(path17);
         return _ByteVector.fromByteArray(fileBuffer);
       }
       /**
@@ -5269,12 +5269,12 @@ var require_stream = __commonJS({
         this._position = 0;
         this._length = fs9.fstatSync(fd).size;
       }
-      static createAsRead(path16) {
-        const fd = fs9.openSync(path16, "r");
+      static createAsRead(path17) {
+        const fd = fs9.openSync(path17, "r");
         return new _Stream(fd, false);
       }
-      static createAsReadWrite(path16) {
-        const fd = fs9.openSync(path16, "r+");
+      static createAsReadWrite(path17) {
+        const fd = fs9.openSync(path17, "r+");
         return new _Stream(fd, true);
       }
       // #endregion
@@ -5373,9 +5373,9 @@ var require_fileAbstraction = __commonJS({
        * @param path Path of the file to use in the new instance
        * @throws Error Thrown if `path` is falsy
        */
-      constructor(path16) {
-        utils_1.Guards.truthy(path16, "path");
-        this._name = path16;
+      constructor(path17) {
+        utils_1.Guards.truthy(path17, "path");
+        this._name = path17;
       }
       /** @inheritDoc */
       get name() {
@@ -8655,7 +8655,7 @@ var require_picture = __commonJS({
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PictureLazy = exports.Picture = exports.PictureType = void 0;
-    var path16 = __require("path");
+    var path17 = __require("path");
     var byteVector_1 = require_byteVector();
     var fileAbstraction_1 = require_fileAbstraction();
     var utils_1 = require_utils();
@@ -8700,7 +8700,7 @@ var require_picture = __commonJS({
         utils_1.Guards.truthy(filePath, "filePath");
         const picture = new _Picture();
         picture.data = byteVector_1.ByteVector.fromPath(filePath);
-        picture.filename = path16.basename(filePath);
+        picture.filename = path17.basename(filePath);
         picture.description = picture.filename;
         picture.mimeType = _Picture.getMimeTypeFromFilename(picture.filename);
         picture.type = picture.mimeType.startsWith("image/") ? PictureType.FrontCover : PictureType.NotAPicture;
@@ -9049,7 +9049,7 @@ var require_picture = __commonJS({
         utils_1.Guards.truthy(filePath, "path");
         const picture = new _PictureLazy();
         picture._file = new fileAbstraction_1.LocalFileAbstraction(filePath);
-        picture._filename = path16.basename(filePath);
+        picture._filename = path17.basename(filePath);
         picture._description = picture._filename;
         picture._mimeType = Picture.getMimeTypeFromFilename(picture._filename);
         picture._type = picture._mimeType.startsWith("image/") ? PictureType.FrontCover : PictureType.NotAPicture;
@@ -35206,7 +35206,7 @@ var require_dist = __commonJS({
 });
 
 // src/index.js
-import path15 from "node:path";
+import path16 from "node:path";
 import { Worker, isMainThread, parentPort, workerData } from "node:worker_threads";
 
 // src/model/editor.js
@@ -35638,10 +35638,10 @@ var Catalogue = class {
   backup(destination) {
     return backupDatabase(this.db, destination);
   }
-  audit(action2, target, data = {}, actor3 = null) {
+  audit(action2, target, data = {}, actor4 = null) {
     this.db.prepare(
       "INSERT INTO audit_event(actor,action,target_id,data,created_at) VALUES (?,?,?,?,?)"
-    ).run(actor3, action2, target, json(data), Date.now());
+    ).run(actor4, action2, target, json(data), Date.now());
   }
   review(kind, target, evidence) {
     this.db.prepare(
@@ -36002,7 +36002,7 @@ var Metadata = class {
     provider = null,
     recordId = null,
     confidence = null,
-    actor: actor3 = null,
+    actor: actor4 = null,
     state = "active"
   }) {
     this.validate(target, field2, value);
@@ -36023,32 +36023,32 @@ var Metadata = class {
       recordId,
       state,
       confidence,
-      actor3,
+      actor4,
       Date.now(),
       prior?.id ?? null
     );
     return id;
   }
   // Editing a provider-filled field pins automatically. Explicit pin=false cannot undo this.
-  manual(target, field2, value, { actor: actor3, pin = false } = {}) {
-    if (typeof actor3 !== "string" || !actor3)
+  manual(target, field2, value, { actor: actor4, pin = false } = {}) {
+    if (typeof actor4 !== "string" || !actor4)
       throw new Error("Manual edits require host actor attribution");
     return transaction(this.db, () => {
       const provider = this.db.prepare(
         "SELECT 1 FROM assertion WHERE target_id=? AND field=? AND source='provider'"
       ).get(target, field2);
       const existingPin = this.db.prepare("SELECT 1 FROM pinned_override WHERE target_id=? AND field=?").get(target, field2);
-      const id = this.append(target, field2, value, { source: "manual", actor: actor3 });
+      const id = this.append(target, field2, value, { source: "manual", actor: actor4 });
       if (pin || provider || existingPin)
         this.db.prepare(
           `INSERT INTO pinned_override VALUES (?,?,?,?,?)
         ON CONFLICT(target_id,field) DO UPDATE SET assertion_id=excluded.assertion_id,actor=excluded.actor,updated_at=excluded.updated_at`
-        ).run(target, field2, id, actor3, Date.now());
+        ).run(target, field2, id, actor4, Date.now());
       this.catalogue.audit(
         "metadata.manual",
         target,
         { field: field2, assertionId: id },
-        actor3
+        actor4
       );
       return this.resolve(target, field2);
     });
@@ -36123,24 +36123,24 @@ var Metadata = class {
   }
   // Settle a provider conflict by pinning one provider's own value, keeping
   // its provenance rather than copying it into a manual edit.
-  pinAssertion(target, field2, assertionId, { actor: actor3 } = {}) {
-    if (!actor3) throw new Error("Pinning requires host actor attribution");
+  pinAssertion(target, field2, assertionId, { actor: actor4 } = {}) {
+    if (!actor4) throw new Error("Pinning requires host actor attribution");
     return transaction(this.db, () => {
       const row = this.db.prepare("SELECT 1 FROM assertion WHERE id=? AND target_id=? AND field=? AND state='active'").get(assertionId, target, field2);
       if (!row) throw new Error("That value is no longer current; reload the review");
       this.db.prepare(
         `INSERT INTO pinned_override VALUES (?,?,?,?,?)
         ON CONFLICT(target_id,field) DO UPDATE SET assertion_id=excluded.assertion_id,actor=excluded.actor,updated_at=excluded.updated_at`
-      ).run(target, field2, assertionId, actor3, Date.now());
-      this.catalogue.audit("metadata.pin", target, { field: field2, assertionId }, actor3);
+      ).run(target, field2, assertionId, actor4, Date.now());
+      this.catalogue.audit("metadata.pin", target, { field: field2, assertionId }, actor4);
       return this.resolve(target, field2);
     });
   }
-  useProvider(target, field2, { actor: actor3 } = {}) {
-    if (!actor3) throw new Error("Unpin requires host actor attribution");
+  useProvider(target, field2, { actor: actor4 } = {}) {
+    if (!actor4) throw new Error("Unpin requires host actor attribution");
     return transaction(this.db, () => {
       this.db.prepare("DELETE FROM pinned_override WHERE target_id=? AND field=?").run(target, field2);
-      this.catalogue.audit("metadata.unpin", target, { field: field2 }, actor3);
+      this.catalogue.audit("metadata.unpin", target, { field: field2 }, actor4);
       return this.resolve(target, field2, { acceptProviderChange: true });
     });
   }
@@ -37433,13 +37433,13 @@ function withoutCtime(evidence) {
   const { ctimeMs, ino, ...rest } = JSON.parse(evidence);
   return JSON.stringify(rest);
 }
-function classify(catalogue, target, hints, { manual = null, actor: actor3 = null, inherited = null } = {}) {
+function classify(catalogue, target, hints, { manual = null, actor: actor4 = null, inherited = null } = {}) {
   return transaction(catalogue.db, () => {
     const prior = catalogue.db.prepare("SELECT * FROM classification WHERE target_id=?").get(target);
     if (!manual && prior?.pinned) return prior.state;
     if (inherited && !["classical", "not_classical", "unsure"].includes(inherited))
       throw new Error("Invalid inherited classification");
-    if (manual && (!actor3 || !["classical", "not_classical", "unsure"].includes(manual)))
+    if (manual && (!actor4 || !["classical", "not_classical", "unsure"].includes(manual)))
       throw new Error("Invalid classification override");
     const { score, decision } = classificationEvidence(hints);
     const state = manual || inherited || decision;
@@ -37453,7 +37453,7 @@ function classify(catalogue, target, hints, { manual = null, actor: actor3 = nul
       catalogue.db.prepare(
         "UPDATE review_item SET status='resolved' WHERE kind='classification' AND target_id=? AND status='open'"
       ).run(target);
-    if (manual) catalogue.audit("classification.pin", target, { state }, actor3);
+    if (manual) catalogue.audit("classification.pin", target, { state }, actor4);
     return state;
   });
 }
@@ -39667,7 +39667,7 @@ function creditMovementComposers(catalogue, metadata, index, recording, track, g
       catalogue.credit(recording, person, "composer", { position: i + 1 });
   });
 }
-function extendRealization(catalogue, group, actor3, people) {
+function extendRealization(catalogue, group, actor4, people) {
   const attached = group.tracks.filter((track) => track.attached);
   const found = catalogue.db.prepare(
     `SELECT DISTINCT i.realization_id AS id,r.work_id,r.performance_work_id FROM realization_item i
@@ -39755,7 +39755,7 @@ function extendRealization(catalogue, group, actor3, people) {
       "work.auto_match_extend",
       realization.work_id,
       { albumId: group.albumId, added, tracks: ordered.map((track) => track.id) },
-      actor3
+      actor4
     );
     return added > 0;
   });
@@ -39782,7 +39782,7 @@ function madeBeforeSuffixes(catalogue, group) {
   const wanted = group.catalogue ? `${group.work}, ${group.catalogue}` : group.work;
   return typeof title === "string" && catalogueSubject(title) === catalogueSubject(wanted);
 }
-function createGroup(catalogue, group, actor3, index) {
+function createGroup(catalogue, group, actor4, index) {
   if (group.composerSource?.confidence === "medium") {
     const tracks = [...group.tracks].sort(albumOrder);
     catalogue.review("auto_match", tracks[0].id, {
@@ -39796,7 +39796,7 @@ function createGroup(catalogue, group, actor3, index) {
     return false;
   }
   if (group.tracks.some((track) => track.attached))
-    return extendRealization(catalogue, group, actor3, index);
+    return extendRealization(catalogue, group, actor4, index);
   const metadata = new Metadata(catalogue);
   const recordId = identity("album-work", group.key);
   const madeHere = existingIdentity(catalogue, "album-work", recordId);
@@ -39866,7 +39866,7 @@ function createGroup(catalogue, group, actor3, index) {
     if (work && unassignedByAdmin(catalogue, work, group.albumId)) return false;
     if (work) {
       let existing = workMovements(catalogue, work);
-      if (existing.some(combined) && splitCombinedMovements(catalogue, work, actor3)) existing = workMovements(catalogue, work);
+      if (existing.some(combined) && splitCombinedMovements(catalogue, work, actor4)) existing = workMovements(catalogue, work);
       const setSubject = catalogueSubject(String(resolvedName(catalogue, work, "title") || "")) || catalogueSubject(catalogued2 || group.work);
       const place = () => {
         try {
@@ -39886,11 +39886,11 @@ function createGroup(catalogue, group, actor3, index) {
       };
       const excerpts = group.excerpt && existing.length && ordered.length <= existing.length;
       movements = excerpts ? place() : existing.length ? mapToMovements(existing, ordered, { setSubject, sections: true }) : null;
-      if (!movements && !excerpts && existing.length > 1 && foldRepeatedMovements(catalogue, work, existing, setSubject, actor3)) {
+      if (!movements && !excerpts && existing.length > 1 && foldRepeatedMovements(catalogue, work, existing, setSubject, actor4)) {
         existing = workMovements(catalogue, work);
         movements = mapToMovements(existing, ordered, { setSubject, sections: true });
       }
-      if (!movements && existing.length) movements = expandIncompleteWork(catalogue, metadata, work, existing, ordered, setSubject, group, actor3);
+      if (!movements && existing.length) movements = expandIncompleteWork(catalogue, metadata, work, existing, ordered, setSubject, group, actor4);
       if (!movements && existing.length && group.excerpt && !excerpts) movements = place();
       if (!movements && existing.length) {
         catalogue.review("auto_match", ordered[0].id, {
@@ -40007,7 +40007,7 @@ function createGroup(catalogue, group, actor3, index) {
       const segment = catalogue.segment(track.id, { kind: "whole" });
       placeTrack(catalogue, realization, performanceWork, recording, segment, movements[i]);
     });
-    if (group.collection) joinCollection(catalogue, metadata, work, group.collection, actor3);
+    if (group.collection) joinCollection(catalogue, metadata, work, group.collection, actor4);
     catalogue.audit(
       "work.auto_match",
       work,
@@ -40018,7 +40018,7 @@ function createGroup(catalogue, group, actor3, index) {
         reused: known.length === 1,
         tracks: ordered.map((track) => track.id)
       },
-      actor3
+      actor4
     );
     return true;
   });
@@ -40040,7 +40040,7 @@ var namesCatalogueRange = (title) => CATALOGUE_RANGE.test(String(title || ""));
 var collectionTitle = (title) => clean3(
   String(title || "").replace(new RegExp(",?\\s*(?<!\\p{L})(?:BWV|HWV|SV|K|KV|D|Op\\.?|RV|S|Hob\\.?)\\s*\\d+[a-z]?\\s*[-\u2013\u2014]\\s*\\d+[a-z]?", "giu"), "").replace(/[,\s]+$/, "")
 );
-function releaseRangeWorks(catalogue, { actor: actor3 = null } = {}) {
+function releaseRangeWorks(catalogue, { actor: actor4 = null } = {}) {
   const db = catalogue.db;
   let released = 0;
   for (const { id } of db.prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL").all()) {
@@ -40079,14 +40079,14 @@ function releaseRangeWorks(catalogue, { actor: actor3 = null } = {}) {
       for (const item of items) catalogue.detachItem(item.id, { dropRecording: true });
       db.prepare("UPDATE external_identity SET state='stale' WHERE entity_id IN (" + ids.map(() => "?").join(",") + ") AND state='active'").run(...ids);
       db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id IN (" + ids.map(() => "?").join(",") + ")").run(Date.now(), Date.now(), ...ids);
-      catalogue.audit("work.release_range", id, { title, tracks: items.length }, actor3);
+      catalogue.audit("work.release_range", id, { title, tracks: items.length }, actor4);
     });
     released++;
   }
   return released;
 }
 var bookName = (title) => words2(String(title || "")).replace(/^(?:the|das|der|die|le|la|les|il)\s+/, "");
-function joinCollection(catalogue, metadata, work, { id: mbid, title }, actor3) {
+function joinCollection(catalogue, metadata, work, { id: mbid, title }, actor4) {
   const db = catalogue.db;
   if (!title || db.prepare("SELECT 1 FROM relation WHERE kind='collection_member' AND target_id=?").get(work)) return;
   let collection = mbid ? db.prepare("SELECT entity_id AS id FROM external_identity WHERE provider='musicbrainz' AND record_kind='collection' AND record_id=? AND state='active'").get(mbid)?.id : null;
@@ -40100,9 +40100,9 @@ function joinCollection(catalogue, metadata, work, { id: mbid, title }, actor3) 
     catalogue.externalIdentity(collection, "musicbrainz", "collection", mbid, { evidence: { source: "parent-work" } });
   const position = (db.prepare("SELECT max(position) AS n FROM relation WHERE kind='collection_member' AND source_id=?").get(collection).n || 0) + 1;
   catalogue.relate("collection_member", collection, work, { position });
-  catalogue.audit("work.join_collection", work, { collection, title }, actor3);
+  catalogue.audit("work.join_collection", work, { collection, title }, actor4);
 }
-function fileCollectionsFromTags(catalogue, { actor: actor3 = null } = {}) {
+function fileCollectionsFromTags(catalogue, { actor: actor4 = null } = {}) {
   const metadata = new Metadata(catalogue);
   let filed = 0;
   const rows = catalogue.db.prepare(
@@ -40116,7 +40116,7 @@ function fileCollectionsFromTags(catalogue, { actor: actor3 = null } = {}) {
     const proposal = proposedWork({ work: tag, title: "" }, false);
     const title = resolvedName(catalogue, work, "title");
     if (!proposal?.collection || typeof title !== "string" || !catalogueSubject(title) || catalogueSubject(proposal.title) !== catalogueSubject(title)) continue;
-    joinCollection(catalogue, metadata, work, { id: null, title: proposal.collection }, actor3);
+    joinCollection(catalogue, metadata, work, { id: null, title: proposal.collection }, actor4);
     filed++;
   }
   return filed;
@@ -40191,7 +40191,7 @@ function placeExcerpt(catalogue, metadata, work, existing, track, setSubject, us
   recordLeaf(catalogue, movement, track.providerLeaf);
   return movement;
 }
-function expandIncompleteWork(catalogue, metadata, work, existing, ordered, setSubject, group, actor3) {
+function expandIncompleteWork(catalogue, metadata, work, existing, ordered, setSubject, group, actor4) {
   if (ordered.length <= existing.length || ordered.some((track) => sectionTitles(track.movementTitle).length > 1)) return null;
   const ids = [work, ...existing.map((m) => m.id)];
   const madeByMatching = catalogue.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work'").get(work);
@@ -40250,10 +40250,10 @@ function expandIncompleteWork(catalogue, metadata, work, existing, ordered, setS
     recordLeaf(catalogue, movement, track.providerLeaf);
     return movement;
   });
-  catalogue.audit("work.auto_match_expand", work, { albumId: group.albumId, from: existing.length, to: result.length, tracks: ordered.map((t) => t.id) }, actor3);
+  catalogue.audit("work.auto_match_expand", work, { albumId: group.albumId, from: existing.length, to: result.length, tracks: ordered.map((t) => t.id) }, actor4);
   return result;
 }
-function splitCombinedMovements(catalogue, work, actor3 = null) {
+function splitCombinedMovements(catalogue, work, actor4 = null) {
   const db = catalogue.db;
   const existing = workMovements(catalogue, work);
   if (!existing.some(combined)) return false;
@@ -40315,7 +40315,7 @@ function splitCombinedMovements(catalogue, work, actor3 = null) {
         }
         tracks.forEach((track, i) => placeTrack(catalogue, realization.id, realization.performance_work_id, track.recording, track.segment, mapped[i]));
       }
-      catalogue.audit("work.split_sections", work, { from: existing.length, to: fine.length }, actor3);
+      catalogue.audit("work.split_sections", work, { from: existing.length, to: fine.length }, actor4);
     });
   } catch (error) {
     if (error.message === "unplaced") return false;
@@ -40323,7 +40323,7 @@ function splitCombinedMovements(catalogue, work, actor3 = null) {
   }
   return true;
 }
-function foldRepeatedMovements(catalogue, work, existing, setSubject, actor3) {
+function foldRepeatedMovements(catalogue, work, existing, setSubject, actor4) {
   const ids = [work, ...existing.map((m) => m.id)];
   const madeByMatching = catalogue.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work'").get(work);
   if (!madeByMatching || editedInEditor(catalogue, ids) || hasManualEdits(catalogue, ids)) return false;
@@ -40427,7 +40427,7 @@ function foldRepeatedMovements(catalogue, work, existing, setSubject, actor3) {
       transferIdentities(db, keep, drop);
       db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), drop);
     }
-    catalogue.audit("work.fold_movements", work, { from: existing.length, to: existing.length - pairs.length, split: Boolean(split) }, actor3);
+    catalogue.audit("work.fold_movements", work, { from: existing.length, to: existing.length - pairs.length, split: Boolean(split) }, actor4);
   });
   return true;
 }
@@ -40476,7 +40476,7 @@ function repairMergedIdentities(catalogue) {
   }
   return repaired;
 }
-function mergeContributor(catalogue, keep, drop, actor3) {
+function mergeContributor(catalogue, keep, drop, actor4) {
   const name = resolvedName(catalogue, drop, "name");
   if (typeof name === "string" && name.trim()) catalogue.alias(keep, name);
   const aliases = resolvedName(catalogue, drop, "aliases");
@@ -40503,13 +40503,13 @@ function mergeContributor(catalogue, keep, drop, actor3) {
     }
   }
   catalogue.db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), drop);
-  catalogue.audit("person.merge", drop, { into: keep }, actor3);
+  catalogue.audit("person.merge", drop, { into: keep }, actor4);
 }
 var isComposer = (catalogue, id) => catalogue.db.prepare(
   `SELECT 1 FROM entity WHERE id=? AND deleted_at IS NULL AND (json_extract(data,'$.roles') LIKE '%composer%'
          OR EXISTS(SELECT 1 FROM credit WHERE contributor_id=entity.id AND role='composer' AND state='active'))`
 ).get(id);
-function mergeDuplicateComposers(catalogue, index, actor3) {
+function mergeDuplicateComposers(catalogue, index, actor4) {
   let merged = 0;
   for (const [name, candidates2] of index.people) {
     const ids = candidates2.filter((id) => words2(resolvedName(catalogue, id, "name") || "") === name && isComposer(catalogue, id));
@@ -40521,7 +40521,7 @@ function mergeDuplicateComposers(catalogue, index, actor3) {
     const drop = auto.filter((id) => id !== keep);
     if (ids.filter((id) => !auto.includes(id)).length > 1) continue;
     for (const id of drop) {
-      mergeContributor(catalogue, keep, id, actor3);
+      mergeContributor(catalogue, keep, id, actor4);
       merged++;
     }
     index.people.set(name, [keep]);
@@ -40550,7 +40550,7 @@ function mergeMapping(catalogue, keep, drop, addMissing) {
   });
   return { dropMovements, mapped };
 }
-function mergeWork(catalogue, keep, drop, actor3, { addMissing = false } = {}) {
+function mergeWork(catalogue, keep, drop, actor4, { addMissing = false } = {}) {
   const mapping = mergeMapping(catalogue, keep, drop, addMissing);
   if (!mapping) return false;
   const map = new Map(mapping.dropMovements.map((m, i) => [m.id, mapping.mapped[i]]));
@@ -40603,7 +40603,7 @@ function mergeWork(catalogue, keep, drop, actor3, { addMissing = false } = {}) {
   db.prepare("DELETE FROM admin_work_pick WHERE work_id=?").run(drop);
   transferIdentities(db, keep, drop);
   db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), drop);
-  catalogue.audit("work.merge", drop, { into: keep, ...added.length && { addedMovements: added } }, actor3);
+  catalogue.audit("work.merge", drop, { into: keep, ...added.length && { addedMovements: added } }, actor4);
   return addMissing ? { added } : true;
 }
 function mergePreview(catalogue, keep, drop, { addMissing = false } = {}) {
@@ -40631,10 +40631,10 @@ function compatibleAutoWorks(catalogue, a, b) {
   const other = composers(b);
   return ![...composers(a)].some(([name, ids]) => distinctIdentities(ids, other.get(name) || /* @__PURE__ */ new Set()));
 }
-function mergeDuplicateAutoWorks(catalogue, { actor: actor3 = null } = {}) {
+function mergeDuplicateAutoWorks(catalogue, { actor: actor4 = null } = {}) {
   return transaction(catalogue.db, () => {
     let index = catalogueIndex(catalogue);
-    const people = mergeDuplicateComposers(catalogue, index, actor3);
+    const people = mergeDuplicateComposers(catalogue, index, actor4);
     if (people) index = catalogueIndex(catalogue);
     let works = 0;
     for (const [key, ids] of index.works) {
@@ -40654,7 +40654,7 @@ function mergeDuplicateAutoWorks(catalogue, { actor: actor3 = null } = {}) {
           catalogue.review("identity", id, { reason: "duplicate-work", keep, evidence: "work not created by automatic matching" });
         else if (severalEdited) continue;
         else if (!compatibleAutoWorks(catalogue, keep, id)) catalogue.review("identity", id, { reason: "duplicate-work", keep, evidence: "different MusicBrainz identities" });
-        else if (mergeWork(catalogue, keep, id, actor3)) works++;
+        else if (mergeWork(catalogue, keep, id, actor4)) works++;
         else catalogue.review("identity", id, { reason: "duplicate-work", keep });
     }
     return { people, works };
@@ -40686,7 +40686,7 @@ function trackSubject(hints) {
   if (proposal) return catalogueSubject(proposal.catalogue ? `${proposal.title}, ${proposal.catalogue}` : proposal.title);
   return splitTitle(title).head || MOVEMENT_PREFIX.test(title) ? "" : catalogueSubject(title);
 }
-function repairSiblingJoins(catalogue, albumId, actor3) {
+function repairSiblingJoins(catalogue, albumId, actor4) {
   const db = catalogue.db;
   const works = db.prepare(
     `SELECT DISTINCT r.work_id AS id FROM realization r
@@ -40723,13 +40723,13 @@ function repairSiblingJoins(catalogue, albumId, actor3) {
           if (catalogueSubject(String(JSON.parse(record.evidence).work || "")) === item.own)
             db.prepare("UPDATE external_identity SET state='stale' WHERE entity_id=? AND record_kind='album-work' AND record_id=?").run(work, record.record_id);
       for (const own of new Set(items.map((item) => item.own)))
-        catalogue.audit("work.split_sibling", work, { albumId: String(items.find((item) => item.own === own).evidence.albumId), subject, tracks: own }, actor3);
+        catalogue.audit("work.split_sibling", work, { albumId: String(items.find((item) => item.own === own).evidence.albumId), subject, tracks: own }, actor4);
     });
     repaired += items.length;
   }
   return repaired;
 }
-function repairCompletionSplits(catalogue, albumId, actor3) {
+function repairCompletionSplits(catalogue, albumId, actor4) {
   const db = catalogue.db;
   const families = /* @__PURE__ */ new Map();
   for (const { entity_id: work, album } of db.prepare(
@@ -40797,7 +40797,7 @@ function repairCompletionSplits(catalogue, albumId, actor3) {
         db.prepare("DELETE FROM credit WHERE target_id=?").run(drop.work);
         transferIdentities(db, keep.work, drop.work);
         db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(now, now, drop.work);
-        catalogue.audit("work.merge", drop.work, { into: keep.work, reason: "completion-split" }, actor3);
+        catalogue.audit("work.merge", drop.work, { into: keep.work, reason: "completion-split" }, actor4);
       }
       const metadata = new Metadata(catalogue);
       const index = catalogueIndex(catalogue);
@@ -40961,7 +40961,7 @@ function repairWorkTitles(catalogue) {
   }
   return repaired;
 }
-function resolveSettledReviews(catalogue, albumId, actor3) {
+function resolveSettledReviews(catalogue, albumId, actor4) {
   const db = catalogue.db;
   const attached = db.prepare("SELECT 1 FROM segment s JOIN realization_item i ON i.segment_id=s.id WHERE s.track_link_id=? LIMIT 1");
   let resolved = 0;
@@ -40973,12 +40973,12 @@ function resolveSettledReviews(catalogue, albumId, actor3) {
     const tracks = Array.isArray(evidence.tracks) && evidence.tracks.length ? evidence.tracks : [review.target_id];
     if (!tracks.every((track) => attached.get(track))) continue;
     db.prepare("UPDATE review_item SET status='resolved' WHERE id=?").run(review.id);
-    catalogue.audit("review.auto_resolve", review.target_id, { review: review.id, reason: evidence.reason || null }, actor3);
+    catalogue.audit("review.auto_resolve", review.target_id, { review: review.id, reason: evidence.reason || null }, actor4);
     resolved++;
   }
   return resolved;
 }
-function repairDuplicateRealizations(catalogue, { actor: actor3 = null } = {}) {
+function repairDuplicateRealizations(catalogue, { actor: actor4 = null } = {}) {
   return transaction(catalogue.db, () => {
     const db = catalogue.db, seen = /* @__PURE__ */ new Map();
     let repaired = 0;
@@ -41001,7 +41001,7 @@ function repairDuplicateRealizations(catalogue, { actor: actor3 = null } = {}) {
       db.prepare("UPDATE user_work_state SET picked_realization_id=? WHERE picked_realization_id=?").run(keep, realization.id);
       db.prepare("UPDATE admin_work_pick SET realization_id=? WHERE realization_id=?").run(keep, realization.id);
       for (const row of rows) catalogue.detachItem(row.id, { dropRecording: true });
-      catalogue.audit("work.repair_duplicate_realization", realization.work_id, { keep, removed: realization.id }, actor3);
+      catalogue.audit("work.repair_duplicate_realization", realization.work_id, { keep, removed: realization.id }, actor4);
       repaired++;
     }
     return repaired;
@@ -41009,12 +41009,12 @@ function repairDuplicateRealizations(catalogue, { actor: actor3 = null } = {}) {
 }
 function autoMatchTaggedWorks(catalogue, {
   albumId = null,
-  actor: actor3 = null,
+  actor: actor4 = null,
   allowStructuredTitles = false,
   providerMatches = /* @__PURE__ */ new Map()
 } = {}) {
-  repairCompletionSplits(catalogue, albumId, actor3);
-  repairSiblingJoins(catalogue, albumId, actor3);
+  repairCompletionSplits(catalogue, albumId, actor4);
+  repairSiblingJoins(catalogue, albumId, actor4);
   const groups = candidates(
     catalogue,
     albumId,
@@ -41022,12 +41022,12 @@ function autoMatchTaggedWorks(catalogue, {
     providerMatches
   );
   repairMergedIdentities(catalogue);
-  mergeDuplicateAutoWorks(catalogue, { actor: actor3 });
-  if (albumId == null) repairDuplicateRealizations(catalogue, { actor: actor3 });
+  mergeDuplicateAutoWorks(catalogue, { actor: actor4 });
+  if (albumId == null) repairDuplicateRealizations(catalogue, { actor: actor4 });
   if (albumId != null) repairMovementTitles(catalogue, { albumId });
   if (albumId == null) {
-    releaseRangeWorks(catalogue, { actor: actor3 });
-    fileCollectionsFromTags(catalogue, { actor: actor3 });
+    releaseRangeWorks(catalogue, { actor: actor4 });
+    fileCollectionsFromTags(catalogue, { actor: actor4 });
     repairWorkTitles(catalogue);
     repairMovementTitles(catalogue);
     const combinedWorks = /* @__PURE__ */ new Set();
@@ -41037,7 +41037,7 @@ function autoMatchTaggedWorks(catalogue, {
          WHERE r.kind='movement'`
     ).all())
       if (!combinedWorks.has(work) && sectionTitles(String(JSON.parse(value) ?? "")).length > 1) combinedWorks.add(work);
-    for (const work of combinedWorks) splitCombinedMovements(catalogue, work, actor3);
+    for (const work of combinedWorks) splitCombinedMovements(catalogue, work, actor4);
     const metadata = new Metadata(catalogue);
     for (const { id } of catalogue.db.prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL").all())
       deriveWorkFields(catalogue, id, metadata);
@@ -41046,12 +41046,12 @@ function autoMatchTaggedWorks(catalogue, {
   const index = catalogueIndex(catalogue);
   let created = 0;
   for (const group of groups)
-    if (createGroup(catalogue, group, actor3, index)) created++;
+    if (createGroup(catalogue, group, actor4, index)) created++;
   keyMovementTitles(catalogue, { albumId });
   deriveCredits(catalogue, { albumId });
   conductorConflicts(catalogue, { albumId });
   linkReissues(catalogue, { albumId });
-  resolveSettledReviews(catalogue, albumId, actor3);
+  resolveSettledReviews(catalogue, albumId, actor4);
   return { created, candidates: groups.length };
 }
 
@@ -41401,11 +41401,11 @@ function groupRecordings(recordings, state = null) {
   }
   return groups;
 }
-function addTerms(terms, doc, value, field2) {
+function addTerms(terms, doc2, value, field2) {
   for (const word of words(value)) {
-    terms.add(`${word}\0${doc}\0${field2}`);
+    terms.add(`${word}\0${doc2}\0${field2}`);
     const skel = field2 === FIELD.primary ? skeleton(word) : "";
-    if (skel) terms.add(`${skel}\0${doc}\0${FIELD.skeleton}`);
+    if (skel) terms.add(`${skel}\0${doc2}\0${FIELD.skeleton}`);
   }
 }
 function ensureSearchIndex(c, { force = false } = {}) {
@@ -41420,19 +41420,19 @@ function ensureSearchIndex(c, { force = false } = {}) {
     const insertTerm = c.db.prepare("INSERT OR IGNORE INTO search_term VALUES (?,?,?)");
     const insertKey = c.db.prepare("INSERT OR IGNORE INTO search_key VALUES (?,?)");
     const insertFacet = c.db.prepare("INSERT OR IGNORE INTO search_facet VALUES (?,?,?,?)");
-    docs.forEach((doc, index) => {
+    docs.forEach((doc2, index) => {
       const id = index + 1;
-      const sort = doc.sort || {};
-      insertDoc.run(id, doc.kind, doc.ref, doc.workId ?? null, doc.title.slice(0, 500), doc.subtitle.slice(0, 500), doc.detail.slice(0, 500), doc.owned ? 1 : 0, doc.boost || 0, JSON.stringify(doc.data || {}), String(sort.title || "").slice(0, 200), String(sort.key || "").slice(0, 200), String(sort.date || "").slice(0, 20));
+      const sort = doc2.sort || {};
+      insertDoc.run(id, doc2.kind, doc2.ref, doc2.workId ?? null, doc2.title.slice(0, 500), doc2.subtitle.slice(0, 500), doc2.detail.slice(0, 500), doc2.owned ? 1 : 0, doc2.boost || 0, JSON.stringify(doc2.data || {}), String(sort.title || "").slice(0, 200), String(sort.key || "").slice(0, 200), String(sort.date || "").slice(0, 20));
       const terms = /* @__PURE__ */ new Set();
-      for (const value of doc.primary) addTerms(terms, id, value, FIELD.primary);
-      for (const value of doc.secondary) addTerms(terms, id, value, FIELD.secondary);
+      for (const value of doc2.primary) addTerms(terms, id, value, FIELD.primary);
+      for (const value of doc2.secondary) addTerms(terms, id, value, FIELD.secondary);
       for (const entry of terms) {
         const [term, , field2] = entry.split("\0");
         insertTerm.run(term, id, Number(field2));
       }
-      for (const key of doc.keys) insertKey.run(key, id);
-      for (const [facet, value, label] of doc.facets) insertFacet.run(facet, String(value).slice(0, 200), id, String(label).slice(0, 200));
+      for (const key of doc2.keys) insertKey.run(key, id);
+      for (const [facet, value, label] of doc2.facets) insertFacet.run(facet, String(value).slice(0, 200), id, String(label).slice(0, 200));
     });
     c.db.prepare("INSERT INTO search_state VALUES (1,?,?,?) ON CONFLICT(id) DO UPDATE SET stamp=excluded.stamp,built_at=excluded.built_at,docs=excluded.docs").run(stamp, Date.now(), docs.length);
   });
@@ -41651,7 +41651,7 @@ function dedupeFacets(facets) {
 var PREFIX_END = "\u{10FFFF}";
 function wordMatches(c, word) {
   const out = /* @__PURE__ */ new Map();
-  const better = (doc, weight) => out.set(doc, Math.max(out.get(doc) || 0, weight));
+  const better = (doc2, weight) => out.set(doc2, Math.max(out.get(doc2) || 0, weight));
   const rows = word.length >= 2 ? c.db.prepare("SELECT term,doc,field FROM search_term WHERE term>=? AND term<? AND field<2").all(word, word + PREFIX_END) : c.db.prepare("SELECT term,doc,field FROM search_term WHERE term=? AND field<2").all(word);
   for (const row of rows) {
     const exact = row.term === word;
@@ -41671,7 +41671,7 @@ function keyMatchesDocs(c, key) {
 }
 var intersect = (a, b) => {
   const out = /* @__PURE__ */ new Map();
-  for (const [doc, weight] of a) if (b.has(doc)) out.set(doc, weight + b.get(doc));
+  for (const [doc2, weight] of a) if (b.has(doc2)) out.set(doc2, weight + b.get(doc2));
   return out;
 };
 function normalizeFilters(raw) {
@@ -41696,7 +41696,7 @@ function searchCatalogue(c, { q = "", filters = {}, kinds: kinds2 = null, limit 
     scores = scores ? intersect(scores, found) : found;
   }
   if (scores) {
-    for (const word of query.optional) for (const [doc, weight] of wordMatches(c, word)) if (scores.has(doc)) scores.set(doc, scores.get(doc) + weight * 0.1);
+    for (const word of query.optional) for (const [doc2, weight] of wordMatches(c, word)) if (scores.has(doc2)) scores.set(doc2, scores.get(doc2) + weight * 0.1);
   }
   if (!scores) {
     if (!Object.keys(wanted).length) return emptyResult(q, index, started);
@@ -41706,7 +41706,7 @@ function searchCatalogue(c, { q = "", filters = {}, kinds: kinds2 = null, limit 
     const allowed = new Set(
       c.db.prepare(`SELECT doc FROM search_facet WHERE facet=? AND value IN (${values.map(() => "?").join(",")})`).all(facet, ...values).map((row) => row.doc)
     );
-    for (const doc of [...scores.keys()]) if (!allowed.has(doc)) scores.delete(doc);
+    for (const doc2 of [...scores.keys()]) if (!allowed.has(doc2)) scores.delete(doc2);
   }
   const ids = [...scores.keys()];
   const docs = /* @__PURE__ */ new Map();
@@ -41717,11 +41717,11 @@ function searchCatalogue(c, { q = "", filters = {}, kinds: kinds2 = null, limit 
   const folded = fold(q);
   const ranked = [];
   for (const [id, weight] of scores) {
-    const doc = docs.get(id);
-    if (!doc || kinds2 && !kinds2.includes(doc.kind)) continue;
-    const data = parse3(doc.data, {});
-    const exact = folded && (fold(doc.title) === folded || fold(data.nickname) === folded) ? 25 : 0;
-    ranked.push({ doc, data, score: weight + doc.boost + exact + (doc.owned ? 2 : 0) });
+    const doc2 = docs.get(id);
+    if (!doc2 || kinds2 && !kinds2.includes(doc2.kind)) continue;
+    const data = parse3(doc2.data, {});
+    const exact = folded && (fold(doc2.title) === folded || fold(data.nickname) === folded) ? 25 : 0;
+    ranked.push({ doc: doc2, data, score: weight + doc2.boost + exact + (doc2.owned ? 2 : 0) });
   }
   const workDocs = new Map(ranked.filter((r) => r.doc.kind === "work").map((r) => [r.doc.ref, r]));
   const viaRecording = /* @__PURE__ */ new Map();
@@ -41734,8 +41734,8 @@ function searchCatalogue(c, { q = "", filters = {}, kinds: kinds2 = null, limit 
     const ids2 = [...viaRecording.keys()];
     for (let i = 0; i < ids2.length; i += 500) {
       const chunk = ids2.slice(i, i + 500);
-      for (const doc of c.db.prepare(`SELECT * FROM search_doc WHERE kind='work' AND ref IN (${chunk.map(() => "?").join(",")})`).all(...chunk))
-        ranked.push({ doc, data: parse3(doc.data, {}), score: viaRecording.get(doc.ref).score - KIND_BOOST.recording + KIND_BOOST.work - 4, via: "recording" });
+      for (const doc2 of c.db.prepare(`SELECT * FROM search_doc WHERE kind='work' AND ref IN (${chunk.map(() => "?").join(",")})`).all(...chunk))
+        ranked.push({ doc: doc2, data: parse3(doc2.data, {}), score: viaRecording.get(doc2.ref).score - KIND_BOOST.recording + KIND_BOOST.work - 4, via: "recording" });
     }
   }
   ranked.sort((a, b) => b.score - a.score || a.doc.title.localeCompare(b.doc.title) || a.doc.id - b.doc.id);
@@ -41763,18 +41763,18 @@ function searchCatalogue(c, { q = "", filters = {}, kinds: kinds2 = null, limit 
 function emptyResult(q, index, started) {
   return { version: 1, query: String(q), filters: {}, keys: [], total: 0, best: null, sections: [], facets: [], index: { docs: index.docs, rebuilt: index.rebuilt, buildMs: Math.round(index.ms) }, ms: Math.round(performance.now() - started) };
 }
-function resultItem({ doc, data, via }) {
+function resultItem({ doc: doc2, data, via }) {
   return {
-    id: `${doc.kind}:${doc.ref}`,
-    kind: doc.kind,
-    ref: doc.ref,
-    workId: doc.work_id || null,
-    title: doc.title,
-    subtitle: doc.subtitle,
-    detail: via === "recording" ? [doc.detail, "Matched through a recording"].filter(Boolean).join(" \xB7 ") : doc.detail,
-    owned: doc.owned === 1,
-    ...doc.kind === "recording" && { realizations: data.realizations || [], albums: data.albums || [] },
-    ...doc.kind === "release" && { albumId: doc.ref }
+    id: `${doc2.kind}:${doc2.ref}`,
+    kind: doc2.kind,
+    ref: doc2.ref,
+    workId: doc2.work_id || null,
+    title: doc2.title,
+    subtitle: doc2.subtitle,
+    detail: via === "recording" ? [doc2.detail, "Matched through a recording"].filter(Boolean).join(" \xB7 ") : doc2.detail,
+    owned: doc2.owned === 1,
+    ...doc2.kind === "recording" && { realizations: data.realizations || [], albums: data.albums || [] },
+    ...doc2.kind === "release" && { albumId: doc2.ref }
   };
 }
 function facetCounts(c, docIds, wanted) {
@@ -41860,18 +41860,18 @@ function snapshot(c, set) {
 }
 var serialSet = (set) => Object.fromEntries(Object.entries(set).map(([key, ids]) => [key, list3(ids)]));
 var parseSet = (data) => Object.fromEntries(Object.entries(data).map(([key, ids]) => [key, new Set(ids)]));
-function recordChange(c, { kind, summary, works = [], contributors = [], actor: actor3, extra = {} }, change) {
+function recordChange(c, { kind, summary, works = [], contributors = [], actor: actor4, extra = {} }, change) {
   return transaction(c.db, () => {
     const set = contributors.length ? contributorClosure(c, contributors) : workClosure(c, works);
     const rows = snapshot(c, set);
     const result = change();
     const after = c.db.prepare("SELECT coalesce(max(id),0) AS n FROM audit_event").get().n;
     const id = randomUUID9();
-    c.db.prepare("INSERT INTO change_set(id,kind,actor,summary,data,created_at) VALUES (?,?,?,?,?,?)").run(id, kind, actor3, summary.slice(0, 500), JSON.stringify({ set: serialSet(set), rows, after, ...contributors.length && { contributors, credits: creditState(c, contributors) }, ...extra }), Date.now());
+    c.db.prepare("INSERT INTO change_set(id,kind,actor,summary,data,created_at) VALUES (?,?,?,?,?,?)").run(id, kind, actor4, summary.slice(0, 500), JSON.stringify({ set: serialSet(set), rows, after, ...contributors.length && { contributors, credits: creditState(c, contributors) }, ...extra }), Date.now());
     return { result, changeId: id };
   });
 }
-function undoChange(c, id, actor3) {
+function undoChange(c, id, actor4) {
   return transaction(c.db, () => {
     const row = c.db.prepare("SELECT * FROM change_set WHERE id=?").get(id);
     if (!row) throw new Error("That change isn't in the history");
@@ -41909,7 +41909,7 @@ function undoChange(c, id, actor3) {
     if (c.db.prepare("PRAGMA foreign_key_check").all().length) throw new Error("Undo would break the catalogue's links; nothing was changed");
     for (const key of data.suppressions || []) c.db.prepare("DELETE FROM match_suppression WHERE key=?").run(key);
     c.db.prepare("UPDATE change_set SET undone_at=? WHERE id=?").run(Date.now(), id);
-    c.audit("change.undo", data.set.entities[0] || id, { change: id, kind: row.kind }, actor3);
+    c.audit("change.undo", data.set.entities[0] || id, { change: id, kind: row.kind }, actor4);
     return { kind: row.kind, summary: row.summary, works: data.works || [] };
   });
 }
@@ -41926,12 +41926,12 @@ function deletionImpact(c, workIds) {
     tracks: count("SELECT count(DISTINCT s.track_link_id) AS n FROM segment s WHERE s.id IN ($)", list3(set.segments))
   };
 }
-function deleteWorks(c, workIds, actor3, { names }) {
+function deleteWorks(c, workIds, actor4, { names }) {
   const impact = deletionImpact(c, workIds);
   const keys = [];
   return recordChange(
     c,
-    { kind: "delete", summary: `Deleted ${workIds.length === 1 ? `\u201C${names[0]}\u201D` : `${workIds.length} works`}`, works: workIds, actor: actor3, extra: { works: workIds, impact, get suppressions() {
+    { kind: "delete", summary: `Deleted ${workIds.length === 1 ? `\u201C${names[0]}\u201D` : `${workIds.length} works`}`, works: workIds, actor: actor4, extra: { works: workIds, impact, get suppressions() {
       return keys;
     } } },
     () => {
@@ -41957,11 +41957,11 @@ function deleteWorks(c, workIds, actor3, { names }) {
           ...mb.map((row) => `musicbrainz:${row.record_id}`)
         ]) {
           keys.push(key);
-          c.db.prepare("INSERT INTO match_suppression VALUES (?,?,?,?,?) ON CONFLICT(key) DO NOTHING").run(key, names[workIds.indexOf(work)], "deleted", actor3, now);
+          c.db.prepare("INSERT INTO match_suppression VALUES (?,?,?,?,?) ON CONFLICT(key) DO NOTHING").run(key, names[workIds.indexOf(work)], "deleted", actor4, now);
         }
         c.db.prepare("DELETE FROM credit WHERE target_id=?").run(work);
         c.db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(now, now, work);
-        c.audit("work.delete", work, { impact }, actor3);
+        c.audit("work.delete", work, { impact }, actor4);
       }
       return impact;
     }
@@ -45625,8 +45625,86 @@ async function mutateEditor(input) {
   }
 }
 
-// src/model/presentation.js
+// src/model/pages.js
 import path8 from "node:path";
+var PAGE_ID = "classical";
+var ENTITY_KINDS = /* @__PURE__ */ new Set(["composer", "person", "ensemble", "work", "recording"]);
+var workPage = (workId) => ({ type: "resource", pageId: "work", resourceId: workId });
+var NotFound = class extends Error {
+};
+function parseResource(resourceId) {
+  const raw = String(resourceId || "home");
+  if (raw === "home") return { kind: "home", id: "" };
+  const at = raw.indexOf(":");
+  const kind = at > 0 ? raw.slice(0, at) : "";
+  const id = at > 0 ? raw.slice(at + 1) : "";
+  if (!id || kind !== "list" && !ENTITY_KINDS.has(kind)) throw new NotFound(`No Classical page ${raw}`);
+  return { kind, id };
+}
+function actor2(input) {
+  const user = input?.user;
+  if (!Number.isSafeInteger(user?.id) || user.id <= 0) throw new Error("A real user account is required");
+  return user;
+}
+var doc = (c, kinds2, ref) => c.db.prepare(`SELECT * FROM search_doc WHERE ref=? AND kind IN (${kinds2.map(() => "?").join(",")}) ORDER BY kind`).get(ref, ...kinds2);
+var required = (row, what) => {
+  if (!row) throw new NotFound(`${what} not found`);
+  return row;
+};
+function homeView() {
+  return { version: 2, title: "Classical", sections: [{ type: "header", title: "Classical" }] };
+}
+function listView(c, kind) {
+  return { version: 2, title: kind, sections: [{ type: "header", title: kind }, { type: "empty", message: "Nothing here yet." }] };
+}
+var ENTITY_DOCS = {
+  composer: [["composer"], "Composer"],
+  person: [["performer", "composer"], "Person"],
+  ensemble: [["performer"], "Ensemble"],
+  work: [["work"], "Work"],
+  recording: [["recording"], "Recording"]
+};
+function entityView(c, kind, id) {
+  const [kinds2, what] = ENTITY_DOCS[kind];
+  const row = required(doc(c, kinds2, id), what);
+  const workId = kind === "work" ? id : row.work_id;
+  return {
+    version: 2,
+    title: row.title,
+    sections: [
+      {
+        type: "header",
+        title: row.title,
+        subtitle: row.subtitle,
+        facts: kind === "recording" && row.detail ? [{ label: "Released on", value: row.detail }] : [],
+        actions: workId && (kind === "work" || kind === "recording") ? [{ label: kind === "work" ? "Recordings" : "Open the work", link: workPage(workId) }] : []
+      }
+    ]
+  };
+}
+function renderClassical(c, resourceId, query = {}) {
+  const resource = parseResource(resourceId);
+  ensureSearchIndex(c);
+  if (resource.kind === "home") return homeView(c, query);
+  if (resource.kind === "list") return listView(c, resource.id, query);
+  return entityView(c, resource.kind, resource.id);
+}
+async function readClassical(input) {
+  actor2(input);
+  const c = await openCatalogue(path8.join(input.dataFolder, "model"));
+  try {
+    return renderClassical(c, input.resourceId, input.query || {});
+  } finally {
+    c.close();
+  }
+}
+async function mutateClassical(input) {
+  actor2(input);
+  throw new Error("This page has no actions yet");
+}
+
+// src/model/presentation.js
+import path9 from "node:path";
 var text5 = (value, fallback) => typeof value === "string" && value.trim() ? value.trim() : fallback;
 var DisplayValues = class {
   constructor(c) {
@@ -45692,8 +45770,8 @@ var fitGroup = (group) => ({
   items: group.items.map(fitItem),
   missing: fitMovements(group.missing)
 });
-var trackTitle2 = (evidence) => text5(evidence.hints?.title, path8.basename(evidence.path || "Track"));
-function actor2(input) {
+var trackTitle2 = (evidence) => text5(evidence.hints?.title, path9.basename(evidence.path || "Track"));
+function actor3(input) {
   const user = input?.user;
   if (!Number.isSafeInteger(user?.id) || user.id <= 0)
     throw new Error("A real user account is required");
@@ -45913,9 +45991,9 @@ function renderAlbumPresentation(c, albumId) {
   return { version: 1, albumId: album, supportsToggle: true, groups: groups.map(fitGroup) };
 }
 function renderWork(c, workId, user) {
-  return fitWork(workPage(c, workId, user));
+  return fitWork(workPage2(c, workId, user));
 }
-function workPage(c, workId, user) {
+function workPage2(c, workId, user) {
   c.entity(workId, "work");
   const metadata = new DisplayValues(c);
   const movements = workMovements2(c, metadata, workId);
@@ -46012,8 +46090,8 @@ function recordingEntry(c, metadata, workId, movements, id, entries2, fact, rele
   };
 }
 async function readWork(input) {
-  const user = actor2(input);
-  const c = await openCatalogue(path8.join(input.dataFolder, "model"));
+  const user = actor3(input);
+  const c = await openCatalogue(path9.join(input.dataFolder, "model"));
   try {
     return renderWork(c, input.resourceId, user);
   } finally {
@@ -46021,8 +46099,8 @@ async function readWork(input) {
   }
 }
 async function mutateWork(input) {
-  const user = actor2(input);
-  const c = await openCatalogue(path8.join(input.dataFolder, "model"));
+  const user = actor3(input);
+  const c = await openCatalogue(path9.join(input.dataFolder, "model"));
   try {
     return applyWorkMutation(c, input, user);
   } finally {
@@ -46066,8 +46144,8 @@ function applyWorkMutation(c, input, user) {
   });
 }
 async function albumPresentation(input) {
-  actor2(input);
-  const c = await openCatalogue(path8.join(input.dataFolder, "model"));
+  actor3(input);
+  const c = await openCatalogue(path9.join(input.dataFolder, "model"));
   try {
     return renderAlbumPresentation(c, input.album.id);
   } finally {
@@ -46078,7 +46156,7 @@ async function albumPresentation(input) {
 // src/model/runtime.js
 import { createHash as createHash5, randomUUID as randomUUID12 } from "node:crypto";
 import fs6 from "node:fs/promises";
-import path9 from "node:path";
+import path10 from "node:path";
 
 // src/model/jobs.js
 import { randomUUID as randomUUID11 } from "node:crypto";
@@ -46264,7 +46342,7 @@ var UserOperations = class {
 function englishTitle(work, fallback = work.title) {
   return ClassicalResolver.bestEnglishAlias(work.aliases)?.name ?? fallback;
 }
-var modelFolder = (ctx) => path9.join(ctx.dataFolder, "model");
+var modelFolder = (ctx) => path10.join(ctx.dataFolder, "model");
 var emptyTags = () => ({
   title: "",
   artist: "",
@@ -46320,7 +46398,7 @@ async function modelStatus(ctx) {
 }
 var PLUGIN_ID = "aurral-classical";
 var SYNC_INTERVAL_MS = 6 * 60 * 6e4;
-var syncFlag = (ctx) => path9.join(modelFolder(ctx), "sync-requested");
+var syncFlag = (ctx) => path10.join(modelFolder(ctx), "sync-requested");
 async function hostLibrary(ctx) {
   if (ctx.userOperations)
     return new UserOperations(ctx.userOperations, ctx.fetch).library();
@@ -46368,8 +46446,8 @@ async function modelSyncDue(ctx, { now = Date.now() } = {}) {
     catalogue.close();
   }
 }
-async function enqueueModelScan(ctx, actor3, { system = false } = {}) {
-  if (!system && actor3?.role !== "admin")
+async function enqueueModelScan(ctx, actor4, { system = false } = {}) {
+  if (!system && actor4?.role !== "admin")
     throw new Error("Classical model scans require a current host admin");
   if (!canReadHostLibrary(ctx))
     throw new Error(
@@ -46428,7 +46506,7 @@ async function enqueueModelScan(ctx, actor3, { system = false } = {}) {
     );
     const jobs = new ModelJobs(catalogue);
     const id = jobs.enqueue("library_scan", "library_scan", {
-      actor: system ? "system" : String(actor3.id),
+      actor: system ? "system" : String(actor4.id),
       instanceId: instance.id,
       epoch: ctx.settings.libraryEpoch || "initial",
       generation: instance.generation + 1,
@@ -46443,8 +46521,8 @@ async function enqueueModelScan(ctx, actor3, { system = false } = {}) {
 var REUSED = Symbol("reused");
 async function scanFile(file, root, prior) {
   const real = await fs6.realpath(file.readPath);
-  const relative = path9.relative(root, real);
-  if (!relative || relative === ".." || relative.startsWith(`..${path9.sep}`) || path9.isAbsolute(relative))
+  const relative = path10.relative(root, real);
+  if (!relative || relative === ".." || relative.startsWith(`..${path10.sep}`) || path10.isAbsolute(relative))
     throw new Error("Indexed model file is outside the configured library");
   const before = await fs6.stat(real);
   const unchanged = prior?.fingerprint && prior.observedRealPath === real && prior.size === before.size && prior.mtimeMs === before.mtimeMs && (prior.ctimeMs != null ? prior.ctimeMs === before.ctimeMs : prior.ino === before.ino);
@@ -46558,8 +46636,8 @@ function queueAlbumIdentification(catalogue, { now = Date.now() } = {}) {
     return queued;
   });
 }
-async function identifyBacklog(ctx, actor3) {
-  if (actor3?.role !== "admin")
+async function identifyBacklog(ctx, actor4) {
+  if (actor4?.role !== "admin")
     throw new Error("MusicBrainz identification requires a current host admin");
   const catalogue = await openCatalogue(modelFolder(ctx));
   try {
@@ -46571,7 +46649,7 @@ async function identifyBacklog(ctx, actor3) {
         if (prior && !prior.baseline) continue;
         catalogue.db.prepare("DELETE FROM model_job WHERE key=? AND state='done' AND json_extract(progress,'$.baseline')=1").run(album.key);
         jobs.enqueue(IDENTIFY, album.key, { albumId: album.albumId, backfill: true }, { maxAttempts: 5 });
-        catalogue.audit("work.identify_backlog", album.albumId, { tracks: album.tracks }, String(actor3.id));
+        catalogue.audit("work.identify_backlog", album.albumId, { tracks: album.tracks }, String(actor4.id));
         queued++;
         tracks += album.tracks;
       }
@@ -46581,8 +46659,8 @@ async function identifyBacklog(ctx, actor3) {
     catalogue.close();
   }
 }
-async function queueAlbumMatch(ctx, actor3, albumId) {
-  if (actor3?.role !== "admin")
+async function queueAlbumMatch(ctx, actor4, albumId) {
+  if (actor4?.role !== "admin")
     throw new Error("Automatic work matching requires a current host admin");
   const catalogue = await openCatalogue(modelFolder(ctx));
   try {
@@ -46654,8 +46732,8 @@ function headingFor(catalogue, work, albumId, title) {
 }
 var ENGLISH = "work_english";
 var ENGLISH_KEY = `${ENGLISH}:v3`;
-async function queueEnglishNames(ctx, actor3) {
-  if (actor3?.role !== "admin") throw new Error("English work names require a current host admin");
+async function queueEnglishNames(ctx, actor4) {
+  if (actor4?.role !== "admin") throw new Error("English work names require a current host admin");
   const catalogue = await openCatalogue(modelFolder(ctx));
   try {
     const prior = catalogue.db.prepare("SELECT state,progress FROM model_job WHERE key=?").get(ENGLISH_KEY);
@@ -47021,8 +47099,8 @@ async function identifyTrack(ctx, hints) {
     )
   };
 }
-async function autoMatchLibrary(ctx, actor3) {
-  if (actor3?.role !== "admin")
+async function autoMatchLibrary(ctx, actor4) {
+  if (actor4?.role !== "admin")
     throw new Error("Automatic work matching requires a current host admin");
   const catalogue = await openCatalogue(modelFolder(ctx));
   try {
@@ -47034,14 +47112,14 @@ async function autoMatchLibrary(ctx, actor3) {
     ).all().map((row) => row.id);
     let created = 0;
     for (const albumId of albums2)
-      created += autoMatchTaggedWorks(catalogue, { albumId, actor: String(actor3.id), allowStructuredTitles: true }).created;
+      created += autoMatchTaggedWorks(catalogue, { albumId, actor: String(actor4.id), allowStructuredTitles: true }).created;
     return { albums: albums2.length, created };
   } finally {
     catalogue.close();
   }
 }
-async function cancelModelScan(ctx, actor3) {
-  if (actor3?.role !== "admin")
+async function cancelModelScan(ctx, actor4) {
+  if (actor4?.role !== "admin")
     throw new Error("Cancelling model scans requires a current host admin");
   const catalogue = await openCatalogue(modelFolder(ctx));
   try {
@@ -47056,10 +47134,10 @@ async function cancelModelScan(ctx, actor3) {
 }
 
 // src/model/classification-report.js
-import path10 from "node:path";
+import path11 from "node:path";
 async function openModelReadOnly(folder) {
   const { DatabaseSync } = await import("node:sqlite");
-  return new DatabaseSync(path10.join(folder, "classical.sqlite"), { readOnly: true });
+  return new DatabaseSync(path11.join(folder, "classical.sqlite"), { readOnly: true });
 }
 var describe2 = (signal) => `${signal.signal}${signal.value ? ` "${signal.value}"` : ""} +${signal.points}`;
 function classificationReport(db, { albumId = null, all = false } = {}) {
@@ -47090,7 +47168,7 @@ function classificationReport(db, { albumId = null, all = false } = {}) {
       trackId: String(row.core_id),
       albumId: album,
       album: hints.album || "",
-      title: hints.title || path10.basename(evidence.path || ""),
+      title: hints.title || path11.basename(evidence.path || ""),
       artist: hints.artist || "",
       genres: hints.genres || [],
       composer: hints.composer || [],
@@ -47116,7 +47194,7 @@ function classificationReport(db, { albumId = null, all = false } = {}) {
   return { tracks, summary };
 }
 async function albumClassificationSummary(ctx, albumId) {
-  const folder = path10.join(ctx.dataFolder, "model");
+  const folder = path11.join(ctx.dataFolder, "model");
   let db;
   try {
     db = await openModelReadOnly(folder);
@@ -47136,7 +47214,7 @@ async function albumClassificationSummary(ctx, albumId) {
 }
 
 // src/search/provider.js
-import path11 from "node:path";
+import path12 from "node:path";
 var SECTION_IDS = new Set(SECTIONS.map(([id]) => id));
 function linkFor(item) {
   if (item.kind === "work") return { type: "resource", pageId: "work", resourceId: item.ref };
@@ -47174,7 +47252,7 @@ function searchResult(c, query) {
 }
 async function search(input) {
   if (!Number.isSafeInteger(input?.user?.id) || input.user.id <= 0) throw new Error("A real user account is required");
-  const c = await openCatalogue(path11.join(input.dataFolder, "model"));
+  const c = await openCatalogue(path12.join(input.dataFolder, "model"));
   try {
     return searchResult(c, input.query);
   } finally {
@@ -47183,7 +47261,7 @@ async function search(input) {
 }
 
 // src/mb.js
-import path12 from "node:path";
+import path13 from "node:path";
 
 // src/version.js
 var VERSION = true ? "1.0.59" : "dev";
@@ -47206,7 +47284,7 @@ var MusicBrainz = class {
     this.userAgent = `AurralClassical/${VERSION} ( ${REPOSITORY} )`;
     this.fetch = fetchImpl;
     this.log = log2;
-    this.cache = new FileCache(path12.join(dataFolder, "mb-cache"));
+    this.cache = new FileCache(path13.join(dataFolder, "mb-cache"));
     const isPublic = this.base === PUBLIC_MB;
     this.throttle = new Throttle(dataFolder, intervalMs ?? (isPublic ? 1e3 : 0));
     this.maxRetries = maxRetries;
@@ -47297,9 +47375,9 @@ import { randomUUID as randomUUID13 } from "node:crypto";
 
 // src/model/write-guard.js
 import fs7 from "node:fs/promises";
-import path13 from "node:path";
+import path14 from "node:path";
 async function modelAllowsTagging(ctx, realPath) {
-  const filename = path13.join(ctx.dataFolder, "model", "classical.sqlite");
+  const filename = path14.join(ctx.dataFolder, "model", "classical.sqlite");
   try {
     await fs7.access(filename);
   } catch (error) {
@@ -47328,7 +47406,7 @@ async function modelAllowsTagging(ctx, realPath) {
 
 // src/tagger.js
 import fs8 from "node:fs/promises";
-import path14 from "node:path";
+import path15 from "node:path";
 
 // src/aurral.js
 var Aurral = class {
@@ -47374,16 +47452,16 @@ var Aurral = class {
 // src/tagger.js
 var LOCK_STALE_MS = 2 * 6e4;
 var SAVE_EVERY_MS = 3e4;
-var queueDir = (ctx) => path14.join(ctx.dataFolder, "queue");
-var processedFile = (ctx) => path14.join(ctx.dataFolder, "processed.json");
-var indexFile = (ctx) => path14.join(ctx.dataFolder, "library-index.json");
-var originalsFile = (ctx) => path14.join(ctx.dataFolder, "originals.json");
-var excludedFile = (ctx) => path14.join(ctx.dataFolder, "excluded.json");
+var queueDir = (ctx) => path15.join(ctx.dataFolder, "queue");
+var processedFile = (ctx) => path15.join(ctx.dataFolder, "processed.json");
+var indexFile = (ctx) => path15.join(ctx.dataFolder, "library-index.json");
+var originalsFile = (ctx) => path15.join(ctx.dataFolder, "originals.json");
+var excludedFile = (ctx) => path15.join(ctx.dataFolder, "excluded.json");
 var TAG_FIELDS = ["artist", "albumArtist", "composer", "work", "workId"];
 var TAGGING_VERSION = 2;
 var outdated = (record) => record && (record.status === "tagged" || record.status === "unchanged") && (record.v ?? 1) < TAGGING_VERSION;
-var lockDir = (ctx) => path14.join(ctx.dataFolder, "tagging.lock");
-var yieldFile = (ctx) => path14.join(ctx.dataFolder, "tagging.yield");
+var lockDir = (ctx) => path15.join(ctx.dataFolder, "tagging.lock");
+var yieldFile = (ctx) => path15.join(ctx.dataFolder, "tagging.yield");
 var YIELD_FRESH_MS = 10 * 6e4;
 var PRIORITY_WAIT_MS = 5 * 6e4;
 var ACTION_CLAIM_MS = 2 * 6e4;
@@ -47393,14 +47471,14 @@ async function enqueue(ctx, filePaths, { force = false, source = null } = {}) {
   for (const filePath of filePaths) {
     if (!filePath) continue;
     const id = `${Date.now().toString().padStart(15, "0")}-${randomUUID13()}`;
-    await writeJson(path14.join(queueDir(ctx), `${id}.json`), { path: filePath, force, source, at: Date.now() });
+    await writeJson(path15.join(queueDir(ctx), `${id}.json`), { path: filePath, force, source, at: Date.now() });
     ids.push(id);
   }
   return ids;
 }
 async function queuedEntries(ctx) {
   const names = (await fs8.readdir(queueDir(ctx)).catch(() => [])).filter((n) => n.endsWith(".json")).sort();
-  return names.map((name) => ({ name, file: path14.join(queueDir(ctx), name) }));
+  return names.map((name) => ({ name, file: path15.join(queueDir(ctx), name) }));
 }
 var queueLength = async (ctx) => (await queuedEntries(ctx)).length;
 async function allowedPath(ctx, filePath) {
@@ -47410,8 +47488,8 @@ async function allowedPath(ctx, filePath) {
     if (!root) continue;
     const base = await fs8.realpath(root).catch(() => null);
     if (!base) continue;
-    const relative = path14.relative(base, real);
-    if (relative && !relative.startsWith("..") && !path14.isAbsolute(relative)) return real;
+    const relative = path15.relative(base, real);
+    if (relative && !relative.startsWith("..") && !path15.isAbsolute(relative)) return real;
   }
   return null;
 }
@@ -47612,7 +47690,7 @@ var Session = class {
     });
     if (changed.length) {
       this.changedFiles++;
-      ctx.log(`Tagged ${path14.basename(real)}: ${fields.artist}`);
+      ctx.log(`Tagged ${path15.basename(real)}: ${fields.artist}`);
     }
     return true;
   }
@@ -47654,7 +47732,7 @@ var Session = class {
     this.stats.skipped["classical tags removed"]--;
     if (changed.length) {
       this.changedFiles++;
-      ctx.log(`Removed classical tags from ${path14.basename(real)}`);
+      ctx.log(`Removed classical tags from ${path15.basename(real)}`);
     }
     return changed.length ? original && mode !== "clear" ? "restored" : "cleared" : "unchanged";
   }
@@ -47722,7 +47800,7 @@ var Session = class {
           return;
         }
         if (entry.name.startsWith(".")) continue;
-        const full = path14.join(dir, entry.name);
+        const full = path15.join(dir, entry.name);
         if (entry.isDirectory()) await walk(full);
         else if (entry.isFile() && isAudioPath(full)) {
           seen.add(full);
@@ -47776,7 +47854,7 @@ async function openState(ctx, priority) {
   return state;
 }
 async function withTagging(ctx, work, { priority = false } = {}) {
-  const key = path14.resolve(ctx.dataFolder);
+  const key = path15.resolve(ctx.dataFolder);
   let entry;
   for (; ; ) {
     entry = held.get(key);
@@ -48044,8 +48122,8 @@ function maintenance(input) {
 }
 var index_default = {
   pages: {
-    read: (input) => input.pageId === "work" ? readWork(input) : readEditor({ ...input, maintenance: maintenance(input) }),
-    mutate: (input) => input.pageId === "work" ? mutateWork(input) : mutateEditor({ ...input, maintenance: maintenance(input) })
+    read: (input) => input.pageId === PAGE_ID ? readClassical(input) : input.pageId === "work" ? readWork(input) : readEditor({ ...input, maintenance: maintenance(input) }),
+    mutate: (input) => input.pageId === PAGE_ID ? mutateClassical(input) : input.pageId === "work" ? mutateWork(input) : mutateEditor({ ...input, maintenance: maintenance(input) })
   },
   albumPresentation,
   search,
@@ -48232,7 +48310,7 @@ var index_default = {
     if (remainingMs <= 0) return;
     const stats = await runScheduled(ctx, remainingMs);
     if (stats) log(`Scheduled tagging: ${describeStats(stats)}`);
-    await pruneCache(path15.join(ctx.dataFolder, "mb-cache"), TTL.default).catch(
+    await pruneCache(path16.join(ctx.dataFolder, "mb-cache"), TTL.default).catch(
       () => {
       }
     );
