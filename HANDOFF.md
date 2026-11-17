@@ -1,3 +1,22 @@
+# v0.3 Phases 4.4–6.5 — composer, contributor, ensemble, work, recording and saved-comparison pages (issues #68–#77)
+
+The next ten v0.3 issues in plan order: 4.4 (#68), 4.5 (#69), 5.1 (#71), 5.2 (#72), 5.3 (#73), 6.1 (#70), 6.2 (#74), 6.3 (#75), 6.4 (#77), 6.5 (#76). New `src/model/pages-entities.js` answers the `classical` page's entity resources with view 2 pages; `pages.js` routes them and adds `queue:<id>`.
+
+- **4.4** `composer:<id>`: name, other names, dates, period and notes when set; works grouped by form (or one list by title, catalogue number or date written), each with its catalogue number and recording count, 100 a page; the performers who recorded them, most recordings first.
+- **4.5** search links composers, performers, ensembles, works, movements and recordings to these pages when `capabilities.resourceView >= 2`; older hosts get filters and the v1 work page as before.
+- **5.1** `person:<id>` and `ensemble:<id>`: one page an identity, a section a kind of credit (as soloist or performer, as conductor), recordings grouped by composer (by sort name, as the Composers list) then work, 100 a page; "Works as composer" when they also compose.
+- **5.2** "Often with": conductors, ensembles and soloists sharing their recordings, counted from credits, with the role each holds most often.
+- **5.3** an ensemble page lists its members from `member_of`; a member's page names the ensemble.
+- **6.1** `work:<id>`: composer, catalogue, key and an About block; tabs Recordings, Movements (100 a page, with how many recordings hold each) and Related (other works in its collections); recordings one per performance, every release badged Complete, "N of M movements" or Excerpt, 50 a page; a movement filter compares that movement across recordings. Favourite and pick are the same rows the v1 work page uses.
+- **6.2** `recording:<key>` (any realization of it, or a performance for a broadcast): work, credits by role and instrument, recorded date, location, label, year, length, completeness and Broadcast badges, the movements as a playable section, every release (`same_recording` reissues are one recording), favourite (`user_recording_state`), and picks.
+- **6.3** album groups and their items, and the new `trackLinks` hook (manifest `"trackLinks": true`), carry up to six links: Go to Work, Go to Recording, the composers, then performers by role. A track holding parts of two works names both works.
+- **6.4** queued titles read "Work: movement" from every new page (each playable section sends the work as `context`); checked in Chromium.
+- **6.5** `save-queue` stores the parts on screen in `saved_queue` with each part's track link and range; the work page lists "Saved comparisons" (the reader's own, 50 a work); `queue:<id>` plays exactly those parts and ranges, leaves out parts whose tracks left the Library, and `delete-queue` removes it. Core commit `9fec213` labels playlists "Add whole track to playlist" / "Save whole tracks as playlist" for cuts, since playlists hold whole files.
+
+Fixed on the way: the stored sort keys never read `sortName` (lists sorted people by display name); a contributor's role label ("Soloist · Conductor") and album links followed credit ids when positions tied. Search index stamp v5. Both integration workflows pin core `9fec213`. No schema change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
 # Bug fix — concurrent openers each copied the catalogue before upgrading (November 17, 2026)
 
 Reported from a deployment: a health check opened the catalogue from four processes at once while it needed an upgrade. `openDatabase` backed up the whole database before taking any lock, so all four copied it (about 760 MB each), the disk filled and every copy failed. Upgrades are now serialised by `upgrade.lock` in the model folder (exclusive create, with the owner's PID): one opener backs up and migrates; the others wait (up to 30 minutes), then re-read the schema version and find nothing to do. A lock whose process is gone, or older than six hours, is taken over. Before copying, the opener checks free space (`fs.statfs`) for the database's size plus 64 MB and refuses with "Not enough disk space to back up the classical database before upgrading: N MB needed, M MB free", leaving the catalogue unchanged. A multi-step upgrade makes one backup of the database as it was (named for the first step), not one per step. The backup's integrity check no longer leaves `-wal`/`-shm` files behind. A current catalogue opens without the lock. No schema or core change; bundle rebuilt.

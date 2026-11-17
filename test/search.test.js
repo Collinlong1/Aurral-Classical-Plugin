@@ -60,7 +60,7 @@ test("combined searches, role-aware filters and one recording across releases", 
   // Facets offer the roles found, and the performer list is role-labelled.
   const facets = searchCatalogue(c, { q: "barenboim" });
   assert.ok(facets.facets.find((f) => f.key === "conductor").options.some((o) => o.value === barenboim));
-  assert.match(facets.sections.find((s) => s.id === "performer").items[0].subtitle, /Soloist · Conductor|Conductor · Soloist/);
+  assert.match(facets.sections.find((s) => s.id === "performer").items[0].subtitle, /^Soloist · Conductor$/);
   // A derived credit counts until an admin removes it; removing it rebuilds
   // the index even though no credit row is added or deleted.
   const conductedBy = () => searchCatalogue(c, { q: "", filters: { conductor: [barenboim] }, kinds: ["recording"] }).sections[0]?.total ?? 0;
@@ -86,7 +86,7 @@ test("combined searches, role-aware filters and one recording across releases", 
     sort_title: "piano sonata no 14 in c sharp minor op 27 no 2",
     sort_key: "op:000027:000002",
   });
-  assert.match(c.db.prepare("SELECT stamp FROM search_state").get().stamp, /^v4\|/);
+  assert.match(c.db.prepare("SELECT stamp FROM search_state").get().stamp, /^v5\|/);
   // Period filter from a pinned field.
   assert.deepEqual(searchCatalogue(c, { q: "sonata", filters: { period: ["classical"] }, kinds: ["work"] }).sections[0].items.map((i) => i.ref), [moonlight]);
   // Two different recordings of the sonata stay two.
@@ -199,7 +199,7 @@ test("Classical Library lists browse one kind each, sorted and filtered", async 
   // Works: by title, or by catalogue number.
   const works = listView(c, "work");
   assert.deepEqual(labels(works), ["Cello Suite No. 1 in G major, BWV 1007", "Piano Sonata No. 14 in C-sharp minor, Op. 27 No. 2", "Symphony No. 9 in E minor, Op. 95"]);
-  assert.deepEqual(rows(works).find((row) => row.id === moonlight).link, { type: "resource", pageId: "work", resourceId: moonlight });
+  assert.deepEqual(rows(works).find((row) => row.id === moonlight).link, { type: "resource", pageId: "classical", resourceId: `work:${moonlight}` });
   assert.deepEqual(labels(listView(c, "work", { sort: "catalogue" })), ["Cello Suite No. 1 in G major, BWV 1007", "Piano Sonata No. 14 in C-sharp minor, Op. 27 No. 2", "Symphony No. 9 in E minor, Op. 95"]);
   assert.deepEqual(works.sections.find((s) => s.type === "sort").options.map((o) => o.value), ["title", "catalogue", "date"]);
   // Conductors are people credited as conductors; ensembles are not performers.

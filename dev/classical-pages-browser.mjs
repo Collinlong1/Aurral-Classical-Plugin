@@ -1,8 +1,12 @@
-// The Classical Library pages (v0.3 4.1-4.3, core #53) with the real plugin
-// catalogue, links resolved by core's own pluginLinks.ts and rendered by the
-// real core PluginResourceView: the home, a list's sort, filter and pager,
-// and a contributor page, at desktop and phone width. All data is
-// synthetic; no Aurral server, media, or provider is accessed.
+// The Classical Library pages (v0.3 4.1-4.5, 5.1-5.3, 6.1-6.5, core #53)
+// with the real plugin catalogue, links resolved by core's own
+// pluginLinks.ts and rendered by the real core PluginResourceView: the home,
+// a list's sort, filter and pager, composer, contributor, ensemble, work,
+// recording and saved-comparison pages, at desktop and phone width. What a
+// page queues is recorded through core's own pluginQueueTrack, so the
+// player's titles ("Work: movement"), ranges and links are checked as the
+// player receives them. All data is synthetic; no Aurral server, media, or
+// provider is accessed.
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import http from "node:http";
@@ -10,14 +14,14 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { build } from "esbuild";
 import { chromium } from "playwright";
-import { renderClassical } from "../src/model/pages.js";
+import { applyClassicalMutation, renderClassical } from "../src/model/pages.js";
 import { ensureSearchIndex } from "../src/search/engine.js";
-import { album, library } from "../test/library-fixture.js";
+import { MOONLIGHT, album, library } from "../test/library-fixture.js";
 
 const core = path.resolve(process.env.AURRAL_CORE_PATH || "../aurral");
 const output = path.resolve(".scratch/classical-pages");
 await fs.mkdir(output, { recursive: true });
-const { resolvedLink } = await import(pathToFileURL(path.join(core, "backend/services/plugins/pluginLinks.ts")).href);
+const { resolvedLink, resolvedItemLinks } = await import(pathToFileURL(path.join(core, "backend/services/plugins/pluginLinks.ts")).href);
 const PLUGIN = "aurral-classical";
 
 await build({
@@ -31,7 +35,10 @@ await build({
       import { AudioQueueContext } from './frontend/src/contexts/audioQueueContext.ts';
       import { ToastProvider } from './frontend/src/contexts/ToastContext.tsx';
       import './frontend/src/index.css';
-      const queue = { playQueue: () => true, queueNext: () => true, addToQueue: () => true };
+      // What the page queues, as the player receives it.
+      window.__queued = [];
+      const record = (tracks) => { window.__queued.push(tracks.map((t) => ({ title: t.title, start: t.segmentStartMs, end: t.segmentEndMs, links: (t.links || []).map((l) => l.label + '=' + l.href) }))); return true; };
+      const queue = { playQueue: record, queueNext: record, addToQueue: record };
       function Page() {
         const { resourceId } = useParams();
         const [search, setSearch] = useSearchParams();
@@ -60,10 +67,14 @@ const parseFilters = (raw) => Object.fromEntries(String(raw || "").split(";").fl
   const at = part.indexOf("=");
   return at > 0 ? [[part.slice(0, at), part.slice(at + 1).split(",").map(decodeURIComponent).filter(Boolean)]] : [];
 }));
+// Playable items as hydrateView sends them: item links resolved to paths
+// and a stream path (nothing is streamed here).
+const hydrateItem = (item) => ({ movementIds: [], performer: "", ...item, links: resolvedItemLinks(PLUGIN, item.links || []), streamPath: `/library/stream/${item.albumId}/${item.trackId}` });
 const hydrate = (value) =>
   Array.isArray(value) ? value.map(hydrate)
   : value && typeof value === "object"
-    ? Object.fromEntries(Object.entries(value).map(([key, entry]) => [key, key === "link" ? resolvedLink(PLUGIN, entry) : hydrate(entry)]))
+    ? value.type === "tracks" ? { title: "", context: "", ...value, items: value.items.map(hydrateItem) }
+    : Object.fromEntries(Object.entries(value).map(([key, entry]) => [key, key === "link" ? resolvedLink(PLUGIN, entry) : hydrate(entry)]))
     : value;
 const withDefaults = (view) => ({
   ...view,
@@ -71,6 +82,8 @@ const withDefaults = (view) => ({
     ...section,
     ...(section.type === "header" && { subtitle: section.subtitle || "", facts: section.facts || [], badges: section.badges || [], actions: section.actions || [] }),
     ...(section.type === "rows" && { title: section.title || "", empty: section.empty || "", rows: section.rows.map((row) => ({ detail: "", badge: "", link: null, ...row })) }),
+    ...(section.type === "groups" && { title: section.title || "", groups: section.groups.map((group) => ({ detail: "", link: null, ...group, rows: group.rows.map((row) => ({ detail: "", badge: "", link: null, ...row })) })) }),
+    ...(section.type === "details" && { title: section.title || "", items: section.items.map((item) => ({ link: null, ...item })) }),
     ...(section.type === "filters" && { filters: section.filters.map((filter) => ({ selected: [], ...filter })) }),
   })),
 });
@@ -78,17 +91,41 @@ const withDefaults = (view) => ({
 // The test Library plus enough Beethoven works for a second page.
 const cleanups = [];
 const bagatelles = Array.from({ length: 110 }, (_, a) => album(`b${a}`, `Bagatelle No. ${a + 1} in C major, Op. ${200 + a}`, ["I. Andante", "II. Allegro"], { composer: "Ludwig van Beethoven", artist: "Igor Levit" })).flat();
-const { c } = await library({ after: (cleanup) => cleanups.push(cleanup) }, null, bagatelles);
+const { c, moonlight, barenboim } = await library({ after: (cleanup) => cleanups.push(cleanup) }, null, bagatelles);
 ensureSearchIndex(c);
+// The reader, and one saved comparison: movement II of two recordings, one
+// of them a range of a track that also holds movement I (6.5).
+const READER = { id: 7, role: "user" };
+const movements = c.db.prepare("SELECT target_id FROM relation WHERE kind='movement' AND source_id=? ORDER BY position").all(moonlight).map((r) => r.target_id);
+{
+  const performance = c.createEntity("performance");
+  const pw = c.relate("performance_work", performance, moonlight);
+  const recording = c.createEntity("recording");
+  c.relate("recording_performance", recording, performance);
+  c.credit(performance, barenboim, "soloist");
+  const realization = c.realization(moonlight, pw, "Ranges");
+  const track = c.db.prepare("SELECT id FROM track_link WHERE core_id='barenboim-0'").get().id;
+  [[0, 120000], [120000, 300000]].forEach(([startMs, endMs], i) => {
+    const content = c.recordingContent(recording, pw, { movement: movements[i], position: i + 1, startMs, endMs });
+    const segment = c.segment(track, { startMs, endMs });
+    c.segmentContent(segment, content);
+    c.realizationItem(realization, segment, { movement: movements[i], sequence: i + 1 });
+  });
+}
+ensureSearchIndex(c);
+const compare = renderClassical(c, `work:${moonlight}`, { filters: { movement: [movements[1]] } }, READER);
+const ranged = compare.sections.find((s) => s.id === "play").items.filter((item) => item.endMs === 300000 || item.trackId.startsWith("levit-"));
+applyClassicalMutation(c, `work:${moonlight}`, { command: "save-queue", name: "Allegretto, two ways", itemIds: ranged.map((i) => i.id) }, READER);
+const savedQueue = renderClassical(c, `work:${moonlight}`, {}, READER).sections.find((s) => s.id === "saved").rows[0].link.resourceId;
 
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, "http://fixture.test");
   try {
     if (url.pathname.startsWith("/document/")) {
       const resourceId = decodeURIComponent(url.pathname.slice("/document/".length));
-      const query = { q: url.searchParams.get("q") || "", sort: url.searchParams.get("sort") || "", tab: "", page: Number(url.searchParams.get("page") || 0), filters: parseFilters(url.searchParams.get("filters")) };
+      const query = { q: url.searchParams.get("q") || "", sort: url.searchParams.get("sort") || "", tab: url.searchParams.get("tab") || "", page: Number(url.searchParams.get("page") || 0), filters: parseFilters(url.searchParams.get("filters")) };
       res.setHeader("Content-Type", "application/json");
-      res.end(JSON.stringify(hydrate(withDefaults(renderClassical(c, resourceId, query)))));
+      res.end(JSON.stringify(hydrate(withDefaults(renderClassical(c, resourceId, query, READER)))));
     } else if (/\.(js|css|woff2?)$/.test(url.pathname)) {
       const file = path.join(output, path.basename(url.pathname));
       res.setHeader("Content-Type", file.endsWith(".js") ? "text/javascript" : file.endsWith(".css") ? "text/css" : "font/woff2");
@@ -112,7 +149,7 @@ try {
     page.on("pageerror", (error) => errors.push(`${name}: ${error.message}`));
     await page.goto(`${base}/home`);
     await page.getByRole("heading", { name: "Classical", level: 1 }).waitFor();
-    await page.getByText("113 works · 115 recordings").waitFor();
+    await page.getByText("113 works · 116 recordings").waitFor();
     await page.getByRole("heading", { name: "Recently added" }).waitFor();
     await page.screenshot({ path: path.join(output, `home-${name}.png`), fullPage: true });
     // Home -> Works: 100 rows, sort and pager.
@@ -128,10 +165,67 @@ try {
     await page.goto(`${base}/list:work?filters=${encodeURIComponent(`composer=${c.db.prepare("SELECT ref FROM search_doc WHERE kind='composer' AND title LIKE 'Johann%'").get().ref}`)}`);
     await page.getByText("1 work", { exact: true }).waitFor();
     assert.equal(await page.locator(".plugin-view__row").count(), 1);
-    // Conductors open a contributor page.
+    // Conductors open a contributor page (5.1), with a section per role.
     await page.goto(`${base}/list:conductor`);
-    await page.getByRole("link", { name: "Herbert von Karajan" }).click();
-    await page.getByRole("heading", { name: "Herbert von Karajan", level: 1 }).waitFor();
+    await page.getByRole("link", { name: "Daniel Barenboim" }).click();
+    await page.getByRole("heading", { name: "Daniel Barenboim", level: 1 }).waitFor();
+    await page.getByRole("heading", { name: "As soloist or performer" }).waitFor();
+    await page.getByRole("heading", { name: "As conductor" }).waitFor();
+    await page.getByRole("heading", { name: "Often with" }).waitFor();
+    await page.screenshot({ path: path.join(output, `person-${name}.png`), fullPage: true });
+    // A collaborator opens an ensemble page (5.2, 5.3).
+    await page.getByRole("link", { name: "Chicago Symphony Orchestra" }).click();
+    await page.getByRole("heading", { name: "Chicago Symphony Orchestra", level: 1 }).waitFor();
+    // A recording's composer heading opens the composer page (4.4).
+    await page.getByRole("link", { name: "Antonín Dvořák" }).click();
+    await page.getByRole("heading", { name: "Antonín Dvořák", level: 1 }).waitFor();
+    await page.getByText("Composer · 1 work").waitFor();
+    await page.getByRole("heading", { name: "Performers" }).waitFor();
+    // Beethoven's 111 works: by form, then paged.
+    await page.goto(`${base}/composer:${c.db.prepare("SELECT ref FROM search_doc WHERE kind='composer' AND title LIKE 'Ludwig%'").get().ref}`);
+    await page.getByText("Composer · 111 works").waitFor();
+    assert.equal(await page.locator("section[aria-label=Works] .plugin-view__row").count(), 100, name);
+    await page.screenshot({ path: path.join(output, `composer-${name}.png`), fullPage: false });
+    // The work page (6.1): recordings with completeness, then a movement.
+    // The Moonlight is on the second page (110 Bagatelles come first).
+    await page.getByRole("button", { name: "Next" }).first().click();
+    await page.getByRole("link", { name: /Piano Sonata No\. 14/ }).click();
+    await page.getByRole("heading", { name: /Piano Sonata No\. 14/, level: 1 }).waitFor();
+    await page.getByRole("heading", { name: "Recordings", level: 2 }).waitFor();
+    assert.ok((await page.locator(".plugin-view__badge", { hasText: "Complete" }).count()) >= 2, name);
+    await page.screenshot({ path: path.join(output, `work-${name}.png`), fullPage: true });
+    // Play: the player gets "Work: movement" titles (6.4) and each item's links (6.3).
+    await page.evaluate(() => (window.__queued = []));
+    await page.getByRole("button", { name: "Play all" }).click();
+    const played = (await page.evaluate(() => window.__queued))[0];
+    assert.ok(played.length === 3 && played.every((t) => /^Piano Sonata No\. 14 in C-sharp minor, Op\. 27 No\. 2: (I|II|III)\. /.test(t.title)), JSON.stringify(played));
+    assert.ok(played.every((t) => t.links.some((l) => l.startsWith("Go to Work=/plugins/aurral-classical/classical/work%3A"))), JSON.stringify(played[0]));
+    // From a track's menu, Go to Work opens the work page (6.3).
+    await page.getByRole("button", { name: /^More for I\. Adagio sostenuto/ }).first().click();
+    await page.getByRole("menuitem", { name: "Go to Recording" }).click();
+    await page.getByRole("heading", { name: "Credits" }).waitFor();
+    await page.getByRole("heading", { name: "Movements" }).waitFor();
+    await page.screenshot({ path: path.join(output, `recording-${name}.png`), fullPage: true });
+    await page.getByRole("button", { name: /^More for II\. Allegretto/ }).first().click();
+    await page.getByRole("menuitem", { name: "Go to Work" }).click();
+    await page.getByRole("heading", { name: /Piano Sonata No\. 14/, level: 1 }).waitFor();
+    // Movements tab, then compare one movement across recordings.
+    await page.getByRole("button", { name: /^Movements/ }).click();
+    await page.waitForURL(/tab=movements/);
+    await page.locator("section[aria-label=Movements] .plugin-view__row button", { hasText: "II. Allegretto" }).click();
+    await page.waitForURL(/filters=movement/);
+    await page.getByRole("heading", { name: "Compare: II. Allegretto" }).waitFor();
+    // The saved comparison plays only its two ranges, in order (6.5).
+    await page.getByRole("link", { name: "Allegretto, two ways" }).click();
+    await page.getByRole("heading", { name: "Allegretto, two ways", level: 1 }).waitFor();
+    await page.evaluate(() => (window.__queued = []));
+    await page.getByRole("button", { name: "Play all" }).click();
+    const parts = (await page.evaluate(() => window.__queued))[0];
+    // In the order saved; one is a range of a two-movement track.
+    assert.deepEqual(parts.map((t) => [t.title, t.start, t.end]), ranged.map((item) => [`${MOONLIGHT}: II. Allegretto`, item.startMs, item.endMs]), name);
+    assert.deepEqual(ranged.map((item) => item.endMs).sort(), [300000, null]);
+    await page.screenshot({ path: path.join(output, `saved-${name}.png`), fullPage: true });
+    assert.equal(new URL(page.url()).pathname, `/plugins/${PLUGIN}/classical/${encodeURIComponent(savedQueue)}`);
     if (name === "phone") {
       await page.goto(`${base}/list:work`);
       const width = await page.evaluate(() => document.documentElement.scrollWidth);

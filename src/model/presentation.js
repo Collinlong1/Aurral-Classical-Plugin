@@ -11,7 +11,7 @@ const text = (value, fallback) =>
   typeof value === "string" && value.trim() ? value.trim() : fallback;
 // Pages only read. Every write path stores its resolution in
 // field_resolution, so reading it avoids a write transaction per name.
-class DisplayValues {
+export class DisplayValues {
   constructor(c) {
     this.statement = c.db.prepare(
       `SELECT a.value FROM field_resolution f JOIN assertion a ON a.id=f.assertion_id
@@ -134,7 +134,7 @@ function performerOf(hints) {
 
 // `workTitle` is given when this track is one of several parts of one
 // movement ("Ia. Maestoso", "Ib. Allegro…"): the row names its own part.
-function queueItem(metadata, row, workTitle = null) {
+function queueItem(metadata, row, workTitle = null, links = null) {
   const evidence = evidenceOf(row);
   return {
     id: row.item_id,
@@ -154,8 +154,41 @@ function queueItem(metadata, row, workTitle = null) {
     durationMs: Number(evidence.durationMs) || null,
     startMs: row.start_ms,
     endMs: row.end_ms,
+    ...(links?.length && { links }),
   };
 }
+
+// Where a playing movement leads: its work, this recording of it, its
+// composers and who plays, six places at most. They travel with the track
+// into the queue, so the player's menu offers them too (core "Links on
+// items"). `workLabel` tells two works on one track apart.
+const CLASSICAL_PAGE = "classical";
+const LINK_ROLES = ["soloist", "performer", "accompanist", "conductor", "orchestra", "ensemble", "choir"];
+const place = (resourceId) => ({ type: "resource", pageId: CLASSICAL_PAGE, resourceId });
+const goTo = (name) => clip(`Go to ${name}`, 80);
+export function itemLinks(c, metadata, { workId, realizationId, performanceId }, workLabel = "Go to Work") {
+  const links = [
+    { label: workLabel, link: place(`work:${workId}`) },
+    { label: "Go to Recording", link: place(`recording:${realizationId}`) },
+  ];
+  const kindOf = c.db.prepare("SELECT kind FROM entity WHERE id=? AND deleted_at IS NULL");
+  for (const credit of credits(c, metadata, workId).filter((entry) => entry.role === "composer").slice(0, 2))
+    links.push({ label: goTo(credit.name), link: place(`composer:${credit.id}`) });
+  const seen = new Set();
+  // By role, then name: credits can share a position, and the menu must not
+  // follow their random ids.
+  const rank = (role) => (LINK_ROLES.indexOf(role) + 1 || LINK_ROLES.length + 1);
+  const performers = (performanceId ? credits(c, metadata, performanceId) : []).sort((a, b) => rank(a.role) - rank(b.role) || a.name.localeCompare(b.name) || (a.id < b.id ? -1 : 1));
+  for (const credit of performers) {
+    if (links.length >= 6) break;
+    const kind = credit.role === "composer" || seen.has(credit.id) ? null : kindOf.get(credit.id)?.kind;
+    if (kind !== "person" && kind !== "ensemble") continue;
+    seen.add(credit.id);
+    links.push({ label: goTo(credit.name), link: place(`${kind}:${credit.id}`) });
+  }
+  return links.filter((entry) => entry.link.resourceId.length <= 200);
+}
+const performanceOf = (c, performanceWorkId) => c.db.prepare("SELECT source_id FROM relation WHERE id=?").get(performanceWorkId)?.source_id ?? null;
 
 function workMovements(c, metadata, workId) {
   return c.db
@@ -171,7 +204,7 @@ function workMovements(c, metadata, workId) {
     }));
 }
 
-function credits(c, metadata, targetId) {
+export function credits(c, metadata, targetId) {
   return c.db
     .prepare(
       `SELECT role,instrument,contributor_id FROM credit
@@ -311,7 +344,7 @@ export function compareAlbumGroups(a, b) {
   );
 }
 
-export function renderAlbumPresentation(c, albumId) {
+export function renderAlbumPresentation(c, albumId, capabilities = {}) {
   const metadata = new DisplayValues(c);
   const album = String(albumId);
   // Filter in SQL: this runs on every album page view.
@@ -357,6 +390,9 @@ export function renderAlbumPresentation(c, albumId) {
     // Not when the title says it already ("Préludes, Livre I" in "Préludes").
     const title = book && !` ${words(name)} `.includes(` ${words(book)} `) ? `${name} · “${book}”` : name;
     // Nor is one excerpt (an overture, an aria) a recording of the rest.
+    // Hosts that show item links get each work's places on its heading and
+    // on every row.
+    const links = capabilities?.itemLinks >= 1 ? itemLinks(c, metadata, { workId, realizationId, performanceId: performanceOf(c, rows[0].performance_work_id) }) : null;
     const excerpts =
       (NUMBERED_SET.test(name) && present.size * 2 < movements.length) ||
       Boolean(
@@ -379,8 +415,10 @@ export function renderAlbumPresentation(c, albumId) {
           row.movement_id && rows.filter((other) => other.movement_id === row.movement_id).length > 1
             ? entityValue(metadata, workId, "title", "")
             : null,
+          links,
         ),
       ),
+      ...(links && { links }),
       missing: index || excerpts ? [] : movements.filter((movement) => !present.has(movement.id)),
       movementCount: Math.max(1, movements.length),
       first: albumPosition(run[0]),
@@ -396,6 +434,13 @@ export function renderAlbumPresentation(c, albumId) {
 
 export function renderWork(c, workId, user) {
   return fitWork(workPage(c, workId, user));
+}
+
+// Everything the work pages show, uncut: the v1 page clips it to core's
+// limits (`renderWork`), and the Classical Library's work and recording
+// pages lay it out in sections (pages-entities.js).
+export function workData(c, workId, user) {
+  return workPage(c, workId, user);
 }
 
 function workPage(c, workId, user) {
@@ -506,6 +551,7 @@ function recordingEntry(c, metadata, workId, movements, id, entries, fact, relea
   entries.forEach((entry, i) => (items[i].movementIds = entry.movement_ids.filter(Boolean)));
   return {
     id,
+    performanceId,
     label: [artist, album].filter(Boolean).join(" · ") || `Recording ${index + 1}`,
     albumId: first.albumId == null ? null : String(first.albumId),
     recordingIds,
@@ -591,7 +637,49 @@ export async function albumPresentation(input) {
   actor(input);
   const c = await openCatalogue(path.join(input.dataFolder, "model"));
   try {
-    return renderAlbumPresentation(c, input.album.id);
+    return renderAlbumPresentation(c, input.album.id, input.capabilities);
+  } finally {
+    c.close();
+  }
+}
+
+// Core's `trackLinks` hook: the same places for Library tracks queued from
+// ordinary pages. A track that plays parts of two works names both.
+export function renderTrackLinks(c, trackIds) {
+  const ids = [...new Set((Array.isArray(trackIds) ? trackIds : []).map(String))].filter((id) => id && id.length <= 200).slice(0, 100);
+  if (!ids.length) return { version: 1, tracks: {} };
+  const metadata = new DisplayValues(c);
+  const rows = c.db
+    .prepare(
+      `SELECT DISTINCT t.core_id,r.id AS realization_id,r.work_id,r.performance_work_id,min(i.sequence) AS first
+       FROM track_link t JOIN classification k ON k.target_id=t.id AND k.state='classical'
+       JOIN segment s ON s.track_link_id=t.id JOIN realization_item i ON i.segment_id=s.id
+       JOIN realization r ON r.id=i.realization_id JOIN entity w ON w.id=r.work_id AND w.deleted_at IS NULL
+       WHERE t.state='active' AND CAST(t.core_id AS TEXT) IN (${ids.map(() => "?").join(",")})
+       GROUP BY t.core_id,r.id ORDER BY t.core_id,min(s.start_ms),first,r.id`,
+    )
+    .all(...ids);
+  const byTrack = new Map();
+  for (const row of rows) byTrack.set(String(row.core_id), [...(byTrack.get(String(row.core_id)) || []), row]);
+  const tracks = {};
+  for (const [trackId, found] of byTrack) {
+    // One recording of each work the track plays.
+    const works = found.filter((row, at) => found.findIndex((other) => other.work_id === row.work_id) === at);
+    const target = (row) => ({ workId: row.work_id, realizationId: row.realization_id, performanceId: performanceOf(c, row.performance_work_id) });
+    const links =
+      works.length === 1
+        ? itemLinks(c, metadata, target(works[0]))
+        : works.slice(0, 6).map((row) => itemLinks(c, metadata, target(row), goTo(`Work: ${entityValue(metadata, row.work_id, "title", "Untitled work")}`))[0]);
+    if (links.length) tracks[trackId] = links;
+  }
+  return { version: 1, tracks };
+}
+
+export async function trackLinks(input) {
+  actor(input);
+  const c = await openCatalogue(path.join(input.dataFolder, "model"));
+  try {
+    return renderTrackLinks(c, input.trackIds);
   } finally {
     c.close();
   }

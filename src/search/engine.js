@@ -35,6 +35,8 @@ const FACET_KEYS = new Set(FACETS.map(([key]) => key));
 const PERFORMER_ROLES = PERFORMING_ROLES;
 const ENSEMBLE_ROLES = new Set(["orchestra", "ensemble", "choir"]);
 const ROLE_LABEL = { soloist: "Soloist", performer: "Performer", accompanist: "Accompanist", conductor: "Conductor", orchestra: "Orchestra", ensemble: "Ensemble", choir: "Choir", composer: "Composer", arranger: "Arranger", lyricist: "Lyricist" };
+const ROLE_RANK = Object.keys(ROLE_LABEL);
+const roleRank = (role) => ROLE_RANK.indexOf(role) + 1 || ROLE_RANK.length + 1;
 const LIVE = /\b(live|concert|recital|broadcast|in concert|konzert)\b/i;
 
 const text = (value) => (typeof value === "string" ? value.trim() : Array.isArray(value) ? value.filter((v) => typeof v === "string").join("; ") : "");
@@ -63,8 +65,10 @@ export function catalogueStamp(c) {
     )
     .get();
   // v3: contributor roles, credit instruments and sort keys; v4: whether a
-  // contributor is a person or an ensemble.
-  return `v4|${Object.values(row).join("|")}`;
+  // contributor is a person or an ensemble; v5: what entity pages read
+  // (a work's form, catalogue number and recordings; a recording's
+  // performance, composers, people and movements held).
+  return `v5|${Object.values(row).join("|")}`;
 }
 
 // Every resolved display value, read once.
@@ -73,7 +77,7 @@ export function resolvedValues(c) {
   for (const row of c.db
     .prepare(
       `SELECT f.target_id,f.field,a.value FROM field_resolution f JOIN assertion a ON a.id=f.assertion_id
-       WHERE f.field IN ('title','name','nickname','aliases','catalogue','key','form','period','instrumentation','date')`,
+       WHERE f.field IN ('title','name','sortName','nickname','aliases','catalogue','key','form','period','instrumentation','date')`,
     )
     .iterate()) {
     if (!values.has(row.target_id)) values.set(row.target_id, {});
@@ -333,7 +337,7 @@ export function buildDocuments(c) {
       secondary: [...composers.map((k) => name(k.id)), ...composers.flatMap((k) => list(values.get(k.id)?.aliases)), text(v.key), text(v.form), ...(collectionsOf.get(id) || []).map(name)],
       keys: workKeys.set(id, keysOf(title, list(v.catalogue), list(v.aliases), text(v.nickname))).get(id),
       facets: [...facets, ...dedupeFacets(recordingFacets.filter(([facet]) => facet !== "year" && facet !== "type")), ["owned", owned ? "owned" : "missing", owned ? "In your library" : "Not in your library"]],
-      data: { nickname: text(v.nickname) },
+      data: { nickname: text(v.nickname), form: text(v.form), catalogue: list(v.catalogue)[0] || "", date: text(v.date), recordings: groupsHere.length },
       sort: { title: sortTitle(v, title), key: sortKey(workKeys.get(id)), date: sortDate(v.date) },
     });
   }
@@ -373,7 +377,15 @@ export function buildDocuments(c) {
     const composers = composersOf(lead.workId).map((k) => name(k.id));
     const albums = [...new Set(group.realizations.map((r) => r.album).filter(Boolean))];
     const years = group.realizations.map((r) => r.year).filter(Boolean);
-    const complete = (movementsOf.get(lead.workId) || []).every((m) => group.realizations.some((r) => r.parts.has(m)));
+    const movements = movementsOf.get(lead.workId) || [];
+    const have = movements.filter((m) => group.realizations.some((r) => r.parts.has(m))).length;
+    const complete = have === movements.length;
+    // Everyone credited on any release of it, once each.
+    const people = group.realizations
+      .flatMap((r) => r.people)
+      .filter((p, at, all) => all.findIndex((other) => other.id === p.id) === at)
+      .slice(0, 40)
+      .map((p) => ({ id: p.id, role: p.role, instrument: p.instrument || null }));
     docs.push({
       kind: "recording",
       ref: group.key,
@@ -392,6 +404,13 @@ export function buildDocuments(c) {
         realizations: group.realizations.map((r) => r.id),
         albums: [...new Set(group.realizations.flatMap((r) => r.albums))],
         roles: Object.fromEntries(lead.people.map((p) => [p.id, p.role])),
+        performance: lead.performanceId,
+        work: title,
+        composers: composersOf(lead.workId).map((k) => [k.id, name(k.id)]),
+        people,
+        have,
+        of: movements.length,
+        year: years.length ? Math.min(...years) : null,
       },
     });
   }
@@ -422,7 +441,8 @@ export function buildDocuments(c) {
     }
     if (performerRoles.length) facets.push(...creditFacets(entry.credits.filter((k) => PERFORMER_ROLES.has(k.role))));
     const common = { ref: id, title: display, owned: true, primary: [display, ...list(v.aliases)], secondary: [], keys: [], facets: dedupeFacets(facets), sort: { title: sortTitle(v, display), key: "", date: sortDate(v.date) } };
-    const label = [...entry.roles].map((role) => ROLE_LABEL[role] || role).join(" · ");
+    // A fixed order: credits can share a position, and their ids are random.
+    const label = [...entry.roles].sort((a, b) => roleRank(a) - roleRank(b) || (a < b ? -1 : 1)).map((role) => ROLE_LABEL[role] || role).join(" · ");
     const entity = kindOf.get(id);
     if (isComposer) docs.push({ ...common, kind: "composer", subtitle: "Composer", detail: `${entry.works} work${entry.works === 1 ? "" : "s"}`, boost: KIND_BOOST.composer, data: { roles: [...entry.roles], entity } });
     if (performerRoles.length) docs.push({ ...common, kind: "performer", subtitle: label, detail: "", boost: KIND_BOOST.performer, data: { roles: performerRoles, entity } });
@@ -674,6 +694,8 @@ function resultItem({ doc, data, via }) {
     owned: doc.owned === 1,
     ...(doc.kind === "recording" && { realizations: data.realizations || [], albums: data.albums || [] }),
     ...(doc.kind === "release" && { albumId: doc.ref }),
+    // Whether a contributor's page is a person's or an ensemble's.
+    ...((doc.kind === "performer" || doc.kind === "composer") && { entity: data.entity === "ensemble" ? "ensemble" : "person" }),
   };
 }
 

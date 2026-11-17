@@ -37,7 +37,7 @@ test("recently added works follow the newest track that plays part of each", asy
   const recent = section(renderClassical(c, "home"), "recent").rows;
   assert.deepEqual(recent.map((row) => row.id), [moonlight, bach, dvorak]);
   assert.equal(recent[0].detail, "Ludwig van Beethoven · Added Nov 10, 2026");
-  assert.deepEqual(recent[1].link, { type: "resource", pageId: "work", resourceId: bach });
+  assert.deepEqual(recent[1].link, { type: "resource", pageId: "classical", resourceId: `work:${bach}` });
   // A work whose tracks are all gone leaves the list.
   c.db.prepare("UPDATE track_link SET state='missing' WHERE json_extract(evidence,'$.albumId')='ma'").run();
   assert.deepEqual(section(renderClassical(c, "home"), "recent").rows.map((row) => row.id), [moonlight, dvorak]);

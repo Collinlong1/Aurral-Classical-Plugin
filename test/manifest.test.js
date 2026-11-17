@@ -97,9 +97,19 @@ test("the Classical Library page routes its resources, and the work page still a
   assert.equal((await read("classical", `person:${barenboim}`)).title, "Daniel Barenboim");
   const work = await read("classical", `work:${moonlight}`);
   assert.match(work.title, /Piano Sonata No\. 14/);
-  assert.deepEqual(work.sections[0].actions[0].link, { type: "resource", pageId: "work", resourceId: moonlight });
+  assert.deepEqual(work.sections[0].actions[0].mutation, { command: "favourite", value: true });
   const recording = c.db.prepare("SELECT ref FROM search_doc WHERE kind='recording' AND work_id=?").get(moonlight).ref;
-  assert.equal((await read("classical", `recording:${recording}`)).sections[0].actions[0].link.resourceId, moonlight);
+  assert.deepEqual((await read("classical", `recording:${recording}`)).sections[0].facts[0].link, { type: "resource", pageId: "classical", resourceId: `work:${moonlight}` });
+  // Actions go through the bundle's pages.mutate, as the reader.
+  const mutate = (resourceId, mutation) => plugin.pages.mutate({ dataFolder, user, pageId: "classical", resourceId, mutation });
+  assert.deepEqual(await mutate(`work:${moonlight}`, { command: "favourite", value: true }), { ok: true });
+  assert.equal((await read("classical", `work:${moonlight}`)).sections[0].actions[0].label, "Remove favourite");
+  assert.equal((await read("work", moonlight)).favourite, true, "one favourite for both work pages");
+  await assert.rejects(mutate("home", { command: "favourite" }), /no actions/);
+  // Track links for the player, through the bundle.
+  const links = await plugin.trackLinks({ dataFolder, user, trackIds: ["levit-0"], capabilities: { trackLinks: 1 } });
+  assert.equal(links.tracks["levit-0"][0].label, "Go to Work");
+  assert.equal(manifest.trackLinks, true);
   for (const bad of ["nowhere", "list:", "composer:missing", "work:missing"]) await assert.rejects(read("classical", bad), /not found|No Classical page/, bad);
   await assert.rejects(plugin.pages.read({ dataFolder, user: { id: 0, username: "key", role: "user" }, pageId: "classical", resourceId: "home", query: {} }), /real user/);
   // The v1 work page is unchanged.
