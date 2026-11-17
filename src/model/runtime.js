@@ -609,6 +609,97 @@ async function englishEntryFor(ctx, catalogue, work) {
   }
   return { entry: null, verified: false };
 }
+// MusicBrainz enrichment (v0.3 7.1, 7.2): for each person, ensemble or work
+// with a MusicBrainz ID and no MusicBrainz record stored yet, one lookup
+// through the paced, cached client; its sort name, dates and other names are
+// stored as provider values. An admin's own values and blanks hold
+// (`keepManual`), and a period is never taken from MusicBrainz. Admin-started
+// from Maintenance; resumable: what was stored drops out of the next run.
+const ENRICH = "mb_enrich";
+export async function queueEnrichment(ctx, actor) {
+  if (actor?.role !== "admin") throw new Error("MusicBrainz enrichment requires a current host admin");
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  try {
+    const active = catalogue.db.prepare("SELECT state,progress FROM model_job WHERE key=? AND state IN ('queued','running','retry')").get(ENRICH);
+    if (active) return { queued: false, state: active.state, ...JSON.parse(active.progress || "{}") };
+    const waiting = enrichmentCandidates(catalogue).length;
+    if (!waiting) return { queued: false, state: "done", waiting: 0 };
+    new ModelJobs(catalogue).enqueue(ENRICH, ENRICH, {}, { maxAttempts: 5 });
+    return { queued: true, waiting };
+  } finally {
+    catalogue.close();
+  }
+}
+export async function enrichmentStatus(ctx) {
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  try {
+    const row = catalogue.db.prepare("SELECT state,progress FROM model_job WHERE key=? ORDER BY created_at DESC,rowid DESC LIMIT 1").get(ENRICH);
+    return { ...(row ? { state: row.state, ...JSON.parse(row.progress || "{}") } : { state: "not run" }), waiting: enrichmentCandidates(catalogue).length };
+  } finally {
+    catalogue.close();
+  }
+}
+export function enrichmentCandidates(catalogue, after = "") {
+  return catalogue.db
+    .prepare(
+      `SELECT e.id,e.kind,min(x.record_id) AS mbid FROM entity e
+       JOIN external_identity x ON x.entity_id=e.id AND x.provider='musicbrainz' AND x.state='active'
+         AND x.record_kind=(CASE e.kind WHEN 'work' THEN 'work' ELSE 'artist' END)
+       WHERE e.deleted_at IS NULL AND e.kind IN ('person','ensemble','work') AND e.id>?
+       AND NOT EXISTS(SELECT 1 FROM provider_record p WHERE p.provider='musicbrainz' AND p.target_id=e.id)
+       GROUP BY e.id ORDER BY e.id`,
+    )
+    .all(after);
+}
+// What a MusicBrainz artist or work says, as catalogue fields.
+const ISO_DATE = /^\d{4}(?:-\d{2}(?:-\d{2})?)?$/;
+export function enrichmentFields(kind, entry) {
+  const name = (kind === "work" ? entry.title : entry.name) || "";
+  const fold = (value) => String(value || "").normalize("NFKC").toLowerCase().trim();
+  const aliases = [...new Set((entry.aliases || []).map((alias) => (typeof alias?.name === "string" ? alias.name.trim() : "")).filter((alias) => alias && fold(alias) !== fold(name)))].slice(0, 50);
+  const fields = {};
+  if (aliases.length) fields.aliases = aliases;
+  if (kind !== "work") {
+    const sortName = typeof entry["sort-name"] === "string" ? entry["sort-name"].trim() : "";
+    if (sortName) fields.sortName = sortName;
+    const begin = typeof entry["life-span"]?.begin === "string" ? entry["life-span"].begin.trim() : "";
+    if (ISO_DATE.test(begin)) fields.date = begin;
+  }
+  return fields;
+}
+async function runEnrichment(ctx, catalogue, jobs, job, deadline) {
+  try {
+    const progress = { after: "", stored: 0, missing: 0, failed: 0, ...job.progress };
+    const metadata = new Metadata(catalogue);
+    for (;;) {
+      if (Date.now() >= deadline) {
+        jobs.checkpoint(job, progress, { leaseMs: 60_000 });
+        jobs.yield(job);
+        return;
+      }
+      const next = enrichmentCandidates(catalogue, progress.after)[0];
+      if (!next) break;
+      try {
+        const entry = await ctx.mb.get(next.kind === "work" ? "work" : "artist", next.mbid, "aliases");
+        if (entry) {
+          metadata.refresh(next.id, "musicbrainz", next.mbid, enrichmentFields(next.kind, entry), { complete: false, keepManual: true });
+          progress.stored++;
+        } else if (ctx.mb.lastResult === "missing") progress.missing++;
+        else progress.failed++;
+      } catch (error) {
+        progress.failed++;
+        ctx.log(`MusicBrainz enrichment skipped ${next.id}: ${error.message}`);
+      }
+      progress.after = next.id;
+      jobs.checkpoint(job, progress, { leaseMs: 60_000 });
+    }
+    jobs.checkpoint(job, progress, { done: true, leaseMs: 60_000 });
+  } catch (error) {
+    jobs.fail(job, error.message);
+    ctx.log(`MusicBrainz enrichment failed: ${error.message}`);
+  }
+}
+
 async function runEnglishNames(ctx, catalogue, jobs, job, deadline) {
   try {
     const works = catalogue.db
@@ -762,6 +853,7 @@ export async function runModelJobs(
     if (!job) return;
     if (job.type === IDENTIFY) return await runIdentification(ctx, catalogue, jobs, job, owner, deadline);
     if (job.type === ENGLISH) return await runEnglishNames(ctx, catalogue, jobs, job, deadline);
+    if (job.type === ENRICH) return await runEnrichment(ctx, catalogue, jobs, job, deadline);
     try {
       if (job.type !== "library_scan")
         throw new Error("Unknown model job type");

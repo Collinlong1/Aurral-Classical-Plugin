@@ -11,6 +11,7 @@ import { searchCatalogue } from "../search/engine.js";
 import { readValues } from "../tags.js";
 import { contributorFor, contributorIndex } from "./contributors.js";
 import { CHANGE_KINDS, deleteWorks, deletionImpact, recentChanges, recordChange, undoChange } from "./history.js";
+import { FIELD_LABELS, STATUS, createPreview, loadPreview, queueRestore, queueWrite, tagRun } from "./tag-write.js";
 import {
   mapToMovements,
   distinctKey,
@@ -826,7 +827,18 @@ function workView(c, work, page = 0, section = "details", { orderField = false }
       credits: [["Add a credit", "add-credit"]],
       recordings: [["Add a broadcast recording", "broadcast"]],
     }[section];
-    view.sections = [{ ...selected, ...(add && { actions: add.map(([label, form]) => open(label, entitySelection(work, page, form))) }) }];
+    view.sections = [
+      {
+        ...selected,
+        ...(add && {
+          actions: [
+            ...add.map(([label, form]) => open(label, entitySelection(work, page, form))),
+            // The header keeps only section navigation; the files are here.
+            ...(section === "recordings" ? [action("Preview classical tags", "tag-preview-open", { work })] : []),
+          ],
+        }),
+      },
+    ];
   }
   return view;
 }
@@ -1275,6 +1287,7 @@ function albumView(c, albumId, chosenWork, page = 0, move = "") {
       select: { key: "tracks", actions: [
         action("Group selected tracks", "move-tracks-open", { albumId, page: String(page), ...(chosenWork && { work: chosenWork }) }),
         action("Set performers…", "performers-open", { albumId, page: String(page) }),
+        action("Preview classical tags", "tag-preview-open", { albumId }),
         action("Send to Classical", "set-classification", { state: "classical" }),
         action("Remove from Classical", "set-classification", { state: "not_classical" }, { tone: "danger", confirm: "Remove these tracks from Aurral Classical? They stay in your Aurral library." }),
         action("Remove from work", "unassign-tracks", { albumId, page: String(page) }, { tone: "danger", confirm: "Take these tracks out of their works? The works and the audio stay." }),
@@ -1286,6 +1299,7 @@ function albumView(c, albumId, chosenWork, page = 0, move = "") {
       ...(chosenWork ? [open("Cancel grouping", albumSelection(albumId, "", page))] : []),
       action("Send all to Classical", "set-album-classification", { albumId, state: "classical", page: String(page) }),
       action("Preview tag removal", "preview-tag-removal", { albumId, page: String(page) }),
+      action("Preview classical tags", "tag-preview-open", { albumId }),
       action("Remove all from Classical", "set-album-classification", { albumId, state: "not_classical", page: String(page) }, { tone: "danger", confirm: `Remove all ${tracks.length} tracks on this album from Aurral Classical? They stay in your Aurral library.` }),
     ];
   }
@@ -1298,6 +1312,110 @@ function albumView(c, albumId, chosenWork, page = 0, move = "") {
     ],
     actions, sections,
   };
+}
+
+// Movement boundaries (v0.3 6.6). A track can hold several movements of one
+// recording (an attacca, or an album that gave them one track); each then
+// plays the whole file until an admin says where each starts. Times are
+// from the start of the file.
+export function formatTime(ms) {
+  const total = Math.max(0, Math.round(Number(ms) || 0));
+  const [h, m, s, rest] = [Math.floor(total / 3600000), Math.floor((total % 3600000) / 60000), Math.floor((total % 60000) / 1000), total % 1000];
+  const clock = h ? `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}` : `${m}:${String(s).padStart(2, "0")}`;
+  return rest ? `${clock}.${String(rest).padStart(3, "0")}` : clock;
+}
+// "4:07", "1:02:03", "4:07.250" or "247" (seconds) -> milliseconds; null if
+// it is none of those.
+export function parseTime(value) {
+  const text = typeof value === "string" ? value.trim() : "";
+  const match = text.match(/^(?:(\d+):)?(?:(\d+):)?(\d+)(?:\.(\d{1,3}))?$/);
+  if (!match) return null;
+  const parts = [match[1], match[2], match[3]].filter((part) => part !== undefined).map(Number);
+  const [h, m, s] = parts.length === 3 ? parts : parts.length === 2 ? [0, ...parts] : [0, 0, parts[0]];
+  if (parts.length > 1 && s >= 60) return null;
+  if (parts.length === 3 && m >= 60) return null;
+  return ((h * 60 + m) * 60 + s) * 1000 + (match[4] ? Number(match[4].padEnd(3, "0")) : 0);
+}
+// Each recording that holds two or more movements of this track: its items
+// in order, with the segment each plays now.
+function sharedOnTrack(c, track) {
+  const rows = c.db
+    .prepare(
+      `SELECT i.id,i.movement_id,i.sequence,i.occurrence,r.id AS realization,r.work_id,r.performance_work_id,s.id AS segment,s.start_ms,s.end_ms
+       FROM segment s JOIN realization_item i ON i.segment_id=s.id JOIN realization r ON r.id=i.realization_id
+       WHERE s.track_link_id=? ORDER BY r.id,i.sequence`,
+    )
+    .all(track);
+  const byRealization = new Map();
+  for (const row of rows) byRealization.set(row.realization, [...(byRealization.get(row.realization) || []), row]);
+  return [...byRealization.values()].filter((items) => items.length >= 2);
+}
+function boundaryForms(c, track, evidence) {
+  return sharedOnTrack(c, track).map((items, n) => ({
+    type: "form",
+    id: `boundaries-${n}`,
+    title: `Where each movement starts · ${entityLabel(c, items[0].work_id, "work")}`,
+    note: `This track holds ${items.length} movements. ${items[0].movement_id ? entityLabel(c, items[0].movement_id, "movement") : "The first"} starts at 0:00; each movement ends where the next starts, and the last at the end of the file${evidence.durationMs ? ` (${formatTime(evidence.durationMs)})` : ""}. Use m:ss or h:mm:ss. The audio file is never changed.`,
+    command: "set-boundaries",
+    arguments: { track, realization: items[0].realization, items: items.map((item) => item.id) },
+    submitLabel: "Save where movements start",
+    fields: items.slice(1).map((item, j) => ({
+      key: `start-${j + 1}`,
+      label: `${item.movement_id ? entityLabel(c, item.movement_id, "movement") : `Part ${j + 2}`} starts at`,
+      type: "text",
+      // A track not divided yet has every movement at 0:00: leave it blank.
+      value: item.start_ms ? formatTime(item.start_ms) : "",
+      placeholder: "m:ss",
+      required: true,
+    })),
+  }));
+}
+function setBoundaries(c, v) {
+  const track = str(v.track, "track", { max: 200 });
+  const realization = str(v.realization, "recording", { max: 200 });
+  const ids = Array.isArray(v.items) ? v.items.map(String) : [];
+  const allowed = new Set(["track", "realization", "items", ...ids.slice(1).map((_, j) => `start-${j + 1}`)]);
+  if (Object.keys(v).some((key) => !allowed.has(key))) fail("Unknown fields");
+  const items = sharedOnTrack(c, track).find((group) => group[0].realization === realization);
+  if (!items || items.map((item) => item.id).join() !== ids.join()) fail("This track's movements changed since the page was read. Reload it and try again.");
+  const row = c.db.prepare("SELECT evidence FROM track_link WHERE id=? AND state='active'").get(track);
+  const duration = Number(JSON.parse(row?.evidence || "{}").durationMs) || 0;
+  if (!duration) fail("This file's length is unknown, so its movements can't be divided.");
+  const starts = [0];
+  for (let j = 1; j < items.length; j++) {
+    const key = `start-${j}`;
+    const ms = parseTime(v[key]);
+    if (ms === null) fail("Use m:ss or h:mm:ss, for example 4:07", key);
+    if (ms <= starts[j - 1]) fail(`Start after the previous movement (${formatTime(starts[j - 1])})`, key);
+    if (ms >= duration) fail(`Start before the end of the file (${formatTime(duration)})`, key);
+    starts.push(ms);
+  }
+  const contentFor = c.db.prepare(
+    `SELECT c.id FROM segment_content s JOIN recording_content c ON c.id=s.content_id
+     WHERE s.segment_id=? AND c.performance_work_id=? AND c.movement_id IS ? ORDER BY c.position,c.id`,
+  );
+  const taken = new Set();
+  items.forEach((item, j) => {
+    const startMs = starts[j];
+    const endMs = j + 1 < items.length ? starts[j + 1] : duration;
+    const segment = c.segment(track, { startMs, endMs });
+    // The movement's own content moves with it, with the same times: its
+    // recording is this track.
+    const content = contentFor.all(item.segment, item.performance_work_id, item.movement_id).find((row) => !taken.has(row.id));
+    if (content) {
+      taken.add(content.id);
+      c.segmentContent(segment, content.id);
+      c.db.prepare("UPDATE recording_content SET start_ms=?,end_ms=? WHERE id=?").run(startMs, endMs, content.id);
+    }
+    c.db.prepare("UPDATE realization_item SET segment_id=? WHERE id=?").run(segment, item.id);
+  });
+  // The segments they played before, once nothing plays them.
+  for (const old of new Set(items.map((item) => item.segment)))
+    if (!c.db.prepare("SELECT 1 FROM realization_item WHERE segment_id=?").get(old)) {
+      c.db.prepare("DELETE FROM segment_content WHERE segment_id=?").run(old);
+      c.db.prepare("DELETE FROM segment WHERE id=?").run(old);
+    }
+  return { selection: `track:${track}`, message: `Saved where ${items.length} movements start.` };
 }
 
 function trackView(c, track) {
@@ -1320,6 +1438,7 @@ function trackView(c, track) {
         ? action("Remove from Classical", "set-classification", { tracks: [track], state: "not_classical" })
         : action("Send to Classical", "set-classification", { tracks: [track], state: "classical" }),
       ...(state.pinned ? [action("Use automatic detection", "set-classification", { tracks: [track], state: "automatic" })] : []),
+      action("Preview classical tags", "tag-preview-open", { track }),
     ],
     sections: [
       {
@@ -1347,8 +1466,171 @@ function trackView(c, track) {
           selection: link.work_id,
         })),
       },
+      ...boundaryForms(c, track, evidence),
+      ...tagHistory(c, track),
     ],
   };
+}
+
+// v0.3 8.3-8.5: classical tags written to files.
+const fieldValue = (values) => (values == null ? "not written to this format" : values.length ? values.join("; ") : "—");
+function fieldChanges(track) {
+  return track.fields
+    .filter((field) => field.writable && JSON.stringify(field.current) !== JSON.stringify(field.proposed))
+    .map((field) => `${FIELD_LABELS[field.field]}: ${fieldValue(field.current)} → ${fieldValue(field.proposed)}`)
+    .join(" · ");
+}
+const SHOWN = 100;
+function tagPreviewView(c, token, index = null) {
+  const preview = loadPreview(c, token);
+  if (!preview) fail("This preview is gone. Open it again from the album, work or track.");
+  if (index !== null) {
+    const track = preview.tracks[index];
+    if (!track) fail("This file isn't in the preview");
+    return {
+      crumbs: [{ label: "Tag preview", selection: `tags:${token}` }],
+      title: track.title || track.name || "File",
+      subtitle: [track.name, STATUS[track.status]].filter(Boolean).join(" · "),
+      badges: [{ label: STATUS[track.status], tone: track.status === "change" ? "warning" : "muted" }],
+      actions: [open("Back to the preview", `tags:${token}`), ...(track.link ? [open("Open the track", `track:${track.link}`)] : [])],
+      sections: [
+        {
+          type: "details",
+          id: "fields",
+          title: "Current and proposed",
+          items: track.fields.length
+            ? track.fields.map((field) => ({
+                label: FIELD_LABELS[field.field],
+                value: `${field.writable ? fieldValue(field.current) : "Not written to this format"} → ${fieldValue(field.proposed)}${field.writable && JSON.stringify(field.current) === JSON.stringify(field.proposed) ? " (same)" : ""}`.slice(0, 2000),
+              }))
+            : [{ label: "Nothing to write", value: track.reason || STATUS[track.status] }],
+        },
+      ],
+    };
+  }
+  const groups = Object.keys(STATUS).map((status) => [status, preview.tracks.map((track, i) => ({ track, i })).filter(({ track }) => track.status === status)]);
+  const changing = groups[0][1].length;
+  const rows = (list) =>
+    list.slice(0, SHOWN).map(({ track, i }) => ({
+      id: `file-${i}`,
+      label: (track.title || track.name || "File").slice(0, 500),
+      detail: (track.status === "change" ? fieldChanges(track) : [track.name, track.reason].filter(Boolean).join(" · ")).slice(0, 500) || undefined,
+      selection: `tags:${token}:${i}`,
+    }));
+  return {
+    crumbs: [],
+    title: "Classical tags preview",
+    subtitle: `${changing} of ${preview.tracks.length} file${preview.tracks.length === 1 ? "" : "s"} would change · Read ${new Date(preview.createdAt).toISOString().slice(0, 16).replace("T", " ")} UTC`,
+    badges: [{ label: "Nothing written yet", tone: "muted" }],
+    actions: changing
+      ? [
+          action(`Write ${changing} file${changing === 1 ? "" : "s"}`, "tag-write", { token, confirm: true }, {
+            tone: "danger",
+            confirm: `Write classical tags to ${changing} file${changing === 1 ? "" : "s"}? Each file's old values are kept so you can restore them. A file changed since this preview is left alone.`,
+          }),
+        ]
+      : [],
+    sections: groups
+      .filter(([, list]) => list.length)
+      .map(([status, list]) => ({
+        type: "rows",
+        id: `status-${status}`,
+        title: `${STATUS[status]} (${list.length})`,
+        note:
+          status === "change"
+            ? `Composer, work, movement, performer, conductor, catalogue and MusicBrainz work tags only; titles, albums and album artists stay as they are. MP3 files get no movement or performer tags. Writing needs “Write classical tags to files” on in the plugin's settings.${list.length > SHOWN ? ` The first ${SHOWN} are listed.` : ""}`
+            : list.length > SHOWN
+              ? `The first ${SHOWN} are listed.`
+              : undefined,
+        rows: rows(list),
+      })),
+  };
+}
+const RESULT_TONE = { written: "success", restored: "success", unchanged: "muted", skipped: "warning", failed: "danger" };
+const RESULT_LABEL = { written: "Written", restored: "Restored", unchanged: "Unchanged", skipped: "Skipped", failed: "Failed" };
+function tagRunView(c, id) {
+  const run = tagRun(c, id);
+  if (!run) fail("This tag run is gone");
+  const restore = run.input.mode === "restore";
+  const results = run.progress.results || [];
+  const count = (status) => results.filter((result) => result.status === status).length;
+  const open_ = c.db.prepare("SELECT count(*) AS n FROM tag_backup WHERE run_id=? AND restored_at IS NULL").get(run.id).n;
+  const restoredNow = new Set(c.db.prepare("SELECT id FROM tag_backup WHERE run_id=? AND restored_at IS NOT NULL").all(run.id).map((row) => row.id));
+  const state = run.state === "done" ? "Done" : run.state === "failed" ? `Stopped: ${run.error || "failed"}` : `${run.state}; reload to see progress`;
+  return {
+    crumbs: run.input.preview ? [{ label: "Tag preview", selection: `tags:${run.input.preview}` }] : [],
+    title: restore ? "Restoring classical tags" : "Writing classical tags",
+    subtitle: [state, `${results.length} of ${run.progress.total ?? "?"} files`, ...Object.keys(RESULT_LABEL).filter(count).map((status) => `${count(status)} ${RESULT_LABEL[status].toLowerCase()}`)].join(" · "),
+    badges: [{ label: run.state === "done" ? "Done" : run.state === "failed" ? "Stopped" : "Running", tone: run.state === "done" ? "success" : run.state === "failed" ? "danger" : "warning" }],
+    actions: [
+      ...(!restore && open_ ? [action(`Restore all ${open_}`, "tag-restore", { run: run.id }, { tone: "danger", confirm: `Put back the old tags of ${open_} file${open_ === 1 ? "" : "s"} from this run? A file whose tags changed since is left alone.` })] : []),
+      open("Refresh", `tag-run:${run.id}`),
+    ],
+    sections: [
+      {
+        type: "rows",
+        id: "results",
+        title: "Files",
+        empty: "No file done yet.",
+        rows: results.slice(0, 500).map((result, i) => ({
+          id: `result-${i}`,
+          label: (result.name || "File").slice(0, 500),
+          detail: result.reason ? result.reason.slice(0, 500) : undefined,
+          badge: { label: restoredNow.has(result.backup) && !restore ? "Restored" : RESULT_LABEL[result.status] || result.status, tone: RESULT_TONE[result.status] || "muted" },
+          ...(result.link && { selection: `track:${result.link}` }),
+          ...(!restore && result.status === "written" && result.backup && !restoredNow.has(result.backup) && { actions: [action("Restore this file", "tag-restore", { backup: result.backup })] }),
+        })),
+      },
+    ],
+  };
+}
+// A track's tag writes, newest first, each restorable while its tags are
+// still the ones written.
+function tagHistory(c, track) {
+  const rows = c.db.prepare("SELECT id,run_id,written,created_at,restored_at FROM tag_backup WHERE track_link_id=? ORDER BY created_at DESC LIMIT 20").all(track);
+  if (!rows.length) return [];
+  return [
+    {
+      type: "rows",
+      id: "tag-history",
+      title: "Classical tags written",
+      rows: rows.map((row) => ({
+        id: row.id,
+        label: `Written ${new Date(row.created_at).toISOString().slice(0, 16).replace("T", " ")} UTC`,
+        detail: Object.keys(JSON.parse(row.written)).map((field) => FIELD_LABELS[field] || field).join(", ").slice(0, 500),
+        badge: row.restored_at ? { label: "Restored", tone: "muted" } : { label: "Current", tone: "success" },
+        selection: `tag-run:${row.run_id}`,
+        ...(!row.restored_at && { actions: [action("Restore", "tag-restore", { backup: row.id })] }),
+      })),
+    },
+  ];
+}
+function tagPreviewTracks(c, v) {
+  const classical = (ids) => ids.filter((id) => c.db.prepare("SELECT 1 FROM classification WHERE target_id=? AND state='classical'").get(id));
+  if (v.albumId != null && v.albumId !== "") {
+    const albumId = str(v.albumId, "album", { max: 200 });
+    const tracks = albums(c, albumId).get(albumId)?.tracks.map((track) => track.id) || [];
+    if (!tracks.length) fail("This album has no indexed tracks");
+    if (Array.isArray(v.tracks)) {
+      const ticked = new Set(v.tracks.map(String));
+      const chosen = tracks.filter((id) => ticked.has(id));
+      if (!chosen.length || chosen.length !== ticked.size) fail("A ticked track is no longer on this album");
+      return { links: chosen, scope: `album:${albumId}` };
+    }
+    return { links: classical(tracks), scope: `album:${albumId}` };
+  }
+  if (v.work) {
+    const work = str(v.work, "work", { max: 200 });
+    c.entity(work, "work");
+    const links = c.db
+      .prepare("SELECT DISTINCT s.track_link_id AS id FROM realization r JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id AND t.state='active' WHERE r.work_id=? ORDER BY t.id")
+      .all(work)
+      .map((row) => row.id);
+    if (!links.length) fail("No track in your Library plays this work");
+    return { links, scope: work };
+  }
+  if (v.track) return { links: [str(v.track, "track", { max: 200 })], scope: `track:${v.track}` };
+  fail("Choose an album, a work, a track or ticked tracks");
 }
 
 function reviewView(c, id) {
@@ -1585,6 +1867,7 @@ function maintenanceView(status) {
   const scan = status.scan;
   const id = status.identification;
   const names = status.english;
+  const enrich = status.enrich;
   const scanRunning = scan && ["queued", "running", "retry"].includes(scan.state);
   return {
     crumbs: [],
@@ -1613,6 +1896,12 @@ function maintenanceView(status) {
         items: [
           { label: "Identification", value: id ? `${id.queued} queued, ${id.done} done, ${id.matched} work groups made${id.backlog ? `; ${id.backlog} earlier albums wait for the one-time lookup` : ""}` : "Nothing yet" },
           { label: "Work names and books", value: names ? `${names.state}: ${names.renamed ?? 0} of ${names.total ?? "?"} renamed, ${names.filed || 0} filed` : "Not run" },
+          {
+            label: "Dates, sort names and other names",
+            value: enrich
+              ? `${enrich.state}${enrich.stored != null ? `: ${enrich.stored} stored, ${enrich.missing || 0} no longer on MusicBrainz, ${enrich.failed || 0} to retry` : ""}; ${enrich.waiting} waiting`
+              : "Not run",
+          },
         ],
       },
       {
@@ -1625,6 +1914,7 @@ function maintenanceView(status) {
         actions: [
           action("Identify earlier albums", "maintenance-backlog", {}, { confirm: "Look up, once, the albums scanned before automatic identification? It runs in the background, one request a second." }),
           action("Work names from MusicBrainz", "maintenance-english", {}, { confirm: "Look up English work names and books on MusicBrainz, once per work? Titles you set yourself are left alone." }),
+          action("Details from MusicBrainz", "maintenance-enrich", {}, { confirm: "Look up dates, sort names and other names on MusicBrainz for every person, ensemble and work with a MusicBrainz ID that has none yet? Values you set yourself stay." }),
         ],
       },
     ],
@@ -2136,6 +2426,10 @@ export function renderV2(c, query, revision, { downloads = null, maintenance = n
     if (work && work !== "new") c.entity(work, "work");
     view = albumView(c, albumId, work || null, page, move);
   } else if (selection.startsWith("track:")) view = trackView(c, selection.slice(6));
+  else if (selection.startsWith("tags:")) {
+    const [token, index] = selection.slice(5).split(":");
+    view = tagPreviewView(c, token, index === undefined ? null : Number(index));
+  } else if (selection.startsWith("tag-run:")) view = tagRunView(c, selection.slice(8));
   else if (selection.startsWith("slskd:")) view = downloadView(downloads, Number(selection.slice(6)));
   else if (selection.startsWith("change:")) view = changeView(c, selection.slice(7));
   else if (selection === "maintenance") view = maintenanceView(maintenance);
@@ -2181,7 +2475,7 @@ export function renderV2(c, query, revision, { downloads = null, maintenance = n
   return {
     version: 2,
     title: "Classical metadata",
-    description: "Works, composers, performers and albums in Aurral Classical. Edits stay in the classical catalogue; audio files are never changed.",
+    description: "Works, composers, performers and albums in Aurral Classical. Edits stay in the classical catalogue; audio files change only when you write classical tags from a preview.",
     revision,
     tabs: [
       { id: "works", label: "Works", count: c.db.prepare("SELECT count(*) AS n FROM entity WHERE kind='work' AND deleted_at IS NULL").get().n },
@@ -2291,6 +2585,11 @@ export const V2_COMMANDS = {
   "resolve-reviews": ["ids", "as"],
   "choose-provider-value": ["id", "field", "assertion"],
   "relink-track": ["id", "candidate"],
+  // One field per movement after the first: setBoundaries checks them.
+  "set-boundaries": null,
+  "tag-preview-open": ["albumId", "tracks", "work", "track", "page"],
+  "tag-write": ["token", "confirm"],
+  "tag-restore": ["run", "backup"],
 };
 
 // Merge two people or ensembles as one undoable change.
@@ -2990,6 +3289,40 @@ export function applyV2(c, request, who) {
         .run(candidate.coreId, candidate.fileId, JSON.stringify(candidate), Date.now(), link.id);
       c.db.prepare("UPDATE review_item SET status='resolved' WHERE id=?").run(id);
       return { selection: `track:${link.id}`, message: "Linked to the moved file; its works and picks are kept." };
+    }
+    case "set-boundaries":
+      return transaction(c.db, () => setBoundaries(c, v));
+    case "tag-preview-open": {
+      const { links, scope } = tagPreviewTracks(c, v);
+      let token;
+      try {
+        token = createPreview(c, links, who, { scope });
+      } catch (error) {
+        fail(error.message);
+      }
+      return { selection: `tags:${token}`, message: "Nothing was written. Check the preview, then write." };
+    }
+    case "tag-write": {
+      if (v.confirm !== true) fail("Confirm writing the tags first");
+      let queued;
+      try {
+        queued = transaction(c.db, () => queueWrite(c, str(v.token, "preview", { max: 200 }), who));
+      } catch (error) {
+        fail(error.message);
+      }
+      return {
+        selection: `tag-run:${queued.id}`,
+        message: queued.again ? "This preview was written already; here is how it went." : `Writing classical tags to ${queued.files} file${queued.files === 1 ? "" : "s"} in the background. This page shows each file's result.`,
+      };
+    }
+    case "tag-restore": {
+      let queued;
+      try {
+        queued = transaction(c.db, () => queueRestore(c, { run: v.run ? str(v.run, "run", { max: 200 }) : null, backup: v.backup ? str(v.backup, "file", { max: 200 }) : null }, who));
+      } catch (error) {
+        fail(error.message);
+      }
+      return { selection: `tag-run:${queued.id}`, message: `Putting back the old tags of ${queued.files} file${queued.files === 1 ? "" : "s"} in the background.` };
     }
     case "resolve-reviews": {
       const ids = Array.isArray(v.ids) ? v.ids.filter((x) => typeof x === "string") : [];

@@ -82,6 +82,11 @@ jobs:
         env:
           AURRAL_CORE_PATH: ${{ github.workspace }}/core
         run: node dev/classical-pages-browser.mjs
+      - name: Preview, write and restore classical tags at desktop and phone width
+        working-directory: plugin
+        env:
+          AURRAL_CORE_PATH: ${{ github.workspace }}/core
+        run: node dev/editor-tag-preview-browser.mjs
       - name: Start synthetic instance and verify comparisons
         working-directory: plugin
         env:

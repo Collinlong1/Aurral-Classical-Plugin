@@ -342,3 +342,93 @@ test("background matching: English work names from MusicBrainz, once, for works 
   // Once: a second run looks nothing up.
   assert.match((await plugin.actions["classical-english-names"](input)).message, /already/);
 });
+
+// v0.3 7.1-7.3: details from MusicBrainz for people, ensembles and works
+// with a MusicBrainz ID, through the paced, cached client.
+test("MusicBrainz details: one lookup each, resumable, never over an admin's own values, and pages read them", async (t) => {
+  const { fakeFetch, MB } = await import("./helpers.js");
+  const { MusicBrainz } = await import("../src/mb.js");
+  const { queueEnrichment, enrichmentStatus } = await import("../src/model/runtime.js");
+  const { ensureSearchIndex } = await import("../src/search/engine.js");
+  const { renderClassical } = await import("../src/model/pages.js");
+  const folders = await tempFolders();
+  t.after(() => fs.rm(folders.root, { recursive: true, force: true }));
+  const c = await openCatalogue(path.join(folders.dataFolder, "model"));
+  t.after(() => {
+    try {
+      c.close();
+    } catch {}
+  });
+  const m = new Metadata(c);
+  const entity = (kind, name, mbid) => {
+    const id = c.createEntity(kind);
+    m.manual(id, kind === "work" ? "title" : "name", name, { actor: "test" });
+    if (mbid) c.externalIdentity(id, "musicbrainz", kind === "work" ? "work" : "artist", mbid, { evidence: { source: "tags" } });
+    return id;
+  };
+  const beethoven = entity("person", "Ludwig van Beethoven", "mb-beethoven");
+  const orchestra = entity("ensemble", "Berliner Philharmoniker", "mb-bpo");
+  const sonata = entity("work", "Piano Sonata No. 14, Op. 27 No. 2", "mb-op27");
+  const nobody = entity("person", "Local Pianist", null);
+  // An admin's own sort name (not pinned yet) and a blank they set.
+  m.manual(orchestra, "sortName", "Berlin Philharmonic", { actor: "admin" });
+  m.manual(beethoven, "date", null, { actor: "admin", pin: true });
+  const entities = {
+    "artist:mb-beethoven": { id: "mb-beethoven", name: "Ludwig van Beethoven", "sort-name": "Beethoven, Ludwig van", "life-span": { begin: "1770-12-16", end: "1827-03-26" }, aliases: [{ name: "Louis van Beethoven" }, { name: "Ludwig van Beethoven" }, { name: "Бетховен" }] },
+    "artist:mb-bpo": { id: "mb-bpo", name: "Berliner Philharmoniker", "sort-name": "Berliner Philharmoniker", "life-span": { begin: "1882" }, aliases: [{ name: "Berlin Philharmonic" }] },
+    "work:mb-op27": { id: "mb-op27", title: "Piano Sonata no. 14 in C-sharp minor, op. 27 no. 2", aliases: [{ name: "Moonlight Sonata" }, { name: "Sonata quasi una fantasia" }] },
+  };
+  // The orchestra's first lookup fails (MusicBrainz down), the next succeeds.
+  let down = 1;
+  const base = fakeFetch({ entities });
+  const fetchImpl = async (url, init) => (String(url).includes("/artist/mb-bpo") && down-- > 0 ? response({ error: "busy" }, 503) : base(url, init));
+  fetchImpl.calls = base.calls;
+  const ctx = { ...folders, settings: { mbMirror: MB }, log: () => {}, mb: new MusicBrainz({ settings: { mbMirror: MB }, dataFolder: folders.dataFolder, fetchImpl, maxRetries: 1, retryWaitMs: 1 }) };
+  const requested = () => base.calls.filter((call) => call.url.startsWith(MB)).map((call) => new URL(call.url).pathname.split("/").slice(-2).join(":"));
+
+  assert.deepEqual(await queueEnrichment(ctx, admin), { queued: true, waiting: 3 });
+  await assert.rejects(queueEnrichment(ctx, { id: 2, role: "user" }), /admin/);
+  await runModelJobs(ctx, { budgetMs: 30_000 });
+  // One lookup each, with aliases; the person without an ID is not asked about.
+  assert.deepEqual(requested().sort(), ["artist:mb-beethoven", "work:mb-op27"]);
+  assert.match(base.calls[0].url, /inc=aliases/);
+  let status = await enrichmentStatus(ctx);
+  assert.deepEqual([status.state, status.stored, status.failed, status.waiting], ["done", 2, 1, 1]);
+  // Run again: only what failed is looked up.
+  assert.deepEqual(await queueEnrichment(ctx, admin), { queued: true, waiting: 1 });
+  await runModelJobs(ctx, { budgetMs: 30_000 });
+  assert.deepEqual(requested().filter((call) => call === "artist:mb-bpo").length, 1);
+  status = await enrichmentStatus(ctx);
+  assert.deepEqual([status.state, status.stored, status.waiting], ["done", 1, 0]);
+  // Nothing left: no job, no lookup.
+  const before = base.calls.length;
+  assert.deepEqual(await queueEnrichment(ctx, admin), { queued: false, state: "done", waiting: 0 });
+  assert.equal(base.calls.length, before);
+
+  // Stored as MusicBrainz values; the admin's sort name and blank date hold.
+  const value = (id, field) => m.resolve(id, field);
+  assert.deepEqual([value(beethoven, "sortName").value, value(beethoven, "sortName").source, value(beethoven, "sortName").provider], ["Beethoven, Ludwig van", "provider", "musicbrainz"]);
+  assert.deepEqual(value(beethoven, "aliases").value, ["Louis van Beethoven", "Бетховен"]);
+  assert.deepEqual([value(beethoven, "date").value, value(beethoven, "date").pinned, value(beethoven, "date").providerValue], [null, true, "1770-12-16"]);
+  assert.deepEqual([value(orchestra, "sortName").value, value(orchestra, "sortName").source, value(orchestra, "sortName").pinned], ["Berlin Philharmonic", "manual", true]);
+  assert.equal(value(orchestra, "date").value, "1882");
+  assert.deepEqual(value(sonata, "aliases").value, ["Moonlight Sonata", "Sonata quasi una fantasia"]);
+  assert.equal(value(sonata, "period").value, undefined, "a period is never taken from MusicBrainz");
+  assert.equal(value(nobody, "sortName").value, undefined);
+
+  // 7.3: pages read the resolved values. A composer credit makes Beethoven a page.
+  c.credit(sonata, beethoven, "composer");
+  ensureSearchIndex(c);
+  const composer = renderClassical(c, `composer:${beethoven}`, {}, { id: 1, role: "user" });
+  assert.equal(composer.sections[0].facts.find((fact) => fact.label === "Other names").value, "Louis van Beethoven, Бетховен");
+  assert.equal(composer.sections[0].facts.find((fact) => fact.label === "Dates"), undefined, "the admin's blank date stays blank");
+  assert.equal(c.db.prepare("SELECT sort_title FROM search_doc WHERE kind='composer' AND ref=?").get(beethoven).sort_title, "beethoven ludwig van");
+  const work = renderClassical(c, `work:${sonata}`, {}, { id: 1, role: "user" });
+  assert.equal(work.sections.find((s) => s.id === "about").items.find((item) => item.label === "Other names").value, "Moonlight Sonata, Sonata quasi una fantasia");
+});
+
+test("MusicBrainz details: what an artist or work entry gives, and what it doesn't", async () => {
+  const { enrichmentFields } = await import("../src/model/runtime.js");
+  assert.deepEqual(enrichmentFields("person", { name: "A", "sort-name": "A, B", "life-span": { begin: "about 1600" }, aliases: [{ name: "a " }, { name: "C" }, { name: "C" }, {}] }), { aliases: ["C"], sortName: "A, B" });
+  assert.deepEqual(enrichmentFields("work", { title: "W", "sort-name": "ignored", "life-span": { begin: "1800" }, aliases: [] }), {});
+});

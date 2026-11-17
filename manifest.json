@@ -19,6 +19,12 @@
       "help": "Off by default. Enable only after reviewing a synthetic or local dry run. Explicit admin tag/remove actions still write selected files."
     },
     {
+      "key": "enableTagWriting",
+      "label": "Write classical tags to files",
+      "type": "boolean",
+      "help": "Off by default. When on, an admin can write the classical tags a preview shows, after confirming, with each file's old values kept to restore. Scans and schedules never write them."
+    },
+    {
       "key": "mbMirror",
       "label": "MusicBrainz mirror",
       "type": "text",

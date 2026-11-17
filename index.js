@@ -4014,7 +4014,7 @@ var require_byteVector = __commonJS({
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ByteVector = exports.Encoding = exports.StringType = void 0;
     var IConv = require_lib();
-    var fs9 = __require("fs");
+    var fs10 = __require("fs");
     var utils_1 = require_utils();
     var StringType2;
     (function(StringType3) {
@@ -4056,8 +4056,8 @@ var require_byteVector = __commonJS({
         }
         return IConv.decode(data, this._encoding);
       }
-      encode(text6) {
-        return IConv.encode(text6, this._encoding);
+      encode(text7) {
+        return IConv.encode(text7, this._encoding);
       }
     };
     exports.Encoding = Encoding;
@@ -4235,9 +4235,9 @@ var require_byteVector = __commonJS({
        * Creates a {@link ByteVector} using the contents of a file as the data
        * @param path Path to the file to store in the ByteVector
        */
-      static fromPath(path17) {
-        utils_1.Guards.truthy(path17, "path");
-        const fileBuffer = fs9.readFileSync(path17);
+      static fromPath(path18) {
+        utils_1.Guards.truthy(path18, "path");
+        const fileBuffer = fs10.readFileSync(path18);
         return _ByteVector.fromByteArray(fileBuffer);
       }
       /**
@@ -4298,19 +4298,19 @@ var require_byteVector = __commonJS({
        * @param length Number of characters from the string to store in the ByteVector. Must be a
        *        positive 32-bit integer.
        */
-      static fromString(text6, type, length = Number.MAX_SAFE_INTEGER) {
-        utils_1.Guards.notNullOrUndefined(text6, "text");
+      static fromString(text7, type, length = Number.MAX_SAFE_INTEGER) {
+        utils_1.Guards.notNullOrUndefined(text7, "text");
         if (!Number.isInteger(length) || !Number.isSafeInteger(length) || length < 0) {
           throw new Error("Argument out of range exception: length is invalid");
         }
         const vector = type === StringType2.UTF16 ? new _ByteVector(new Uint8Array([255, 254])) : _ByteVector.empty();
-        if (!text6) {
+        if (!text7) {
           return vector;
         }
-        if (text6.length > length) {
-          text6 = text6.substring(0, length);
+        if (text7.length > length) {
+          text7 = text7.substring(0, length);
         }
-        const textBytes = Encoding.getEncoding(type, vector).encode(text6);
+        const textBytes = Encoding.getEncoding(type, vector).encode(text7);
         vector.addByteArray(textBytes);
         return vector;
       }
@@ -5252,7 +5252,7 @@ var require_stream = __commonJS({
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Stream = exports.SeekOrigin = void 0;
-    var fs9 = __require("fs");
+    var fs10 = __require("fs");
     var utils_1 = require_utils();
     var byteVector_1 = require_byteVector();
     var SeekOrigin;
@@ -5267,14 +5267,14 @@ var require_stream = __commonJS({
         this._canWrite = canWrite;
         this._fd = fd;
         this._position = 0;
-        this._length = fs9.fstatSync(fd).size;
+        this._length = fs10.fstatSync(fd).size;
       }
-      static createAsRead(path17) {
-        const fd = fs9.openSync(path17, "r");
+      static createAsRead(path18) {
+        const fd = fs10.openSync(path18, "r");
         return new _Stream(fd, false);
       }
-      static createAsReadWrite(path17) {
-        const fd = fs9.openSync(path17, "r+");
+      static createAsReadWrite(path18) {
+        const fd = fs10.openSync(path18, "r+");
         return new _Stream(fd, true);
       }
       // #endregion
@@ -5300,11 +5300,11 @@ var require_stream = __commonJS({
       // #region Public Methods
       /** @inheritDoc */
       close() {
-        fs9.closeSync(this._fd);
+        fs10.closeSync(this._fd);
       }
       /** @inheritDoc */
       read(buffer, bufferOffset, length) {
-        const bytes = fs9.readSync(this._fd, buffer, bufferOffset, length, this._position);
+        const bytes = fs10.readSync(this._fd, buffer, bufferOffset, length, this._position);
         this._position += bytes;
         return bytes;
       }
@@ -5332,7 +5332,7 @@ var require_stream = __commonJS({
         if (length === this._length) {
           return;
         }
-        fs9.ftruncateSync(this._fd, length);
+        fs10.ftruncateSync(this._fd, length);
         this._length = length;
         if (this._position > this._length) {
           this._position = this._length;
@@ -5347,7 +5347,7 @@ var require_stream = __commonJS({
           throw new Error("Invalid operation: this stream is a read-only stream");
         }
         const origLength = this._length;
-        const bytes = fs9.writeSync(this._fd, buffer, bufferOffset, length, this._position);
+        const bytes = fs10.writeSync(this._fd, buffer, bufferOffset, length, this._position);
         this._position += bytes;
         if (this._position > origLength) {
           this._length = this._position;
@@ -5373,9 +5373,9 @@ var require_fileAbstraction = __commonJS({
        * @param path Path of the file to use in the new instance
        * @throws Error Thrown if `path` is falsy
        */
-      constructor(path17) {
-        utils_1.Guards.truthy(path17, "path");
-        this._name = path17;
+      constructor(path18) {
+        utils_1.Guards.truthy(path18, "path");
+        this._name = path18;
       }
       /** @inheritDoc */
       get name() {
@@ -8440,12 +8440,12 @@ var require_genres = __commonJS({
         const index = _Genres.VIDEO_GENRES.indexOf(name);
         return index < 0 ? 255 : index;
       }
-      static stringToByte(text6, allowParenthesis) {
+      static stringToByte(text7, allowParenthesis) {
         if (allowParenthesis) {
           const trimRegex = /^\(+|\)+$/g;
-          text6 = text6.replace(trimRegex, "");
+          text7 = text7.replace(trimRegex, "");
         }
-        const normalized3 = text6.trim();
+        const normalized3 = text7.trim();
         if (!/^\d+$/.test(normalized3)) {
           return 255;
         }
@@ -8655,7 +8655,7 @@ var require_picture = __commonJS({
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PictureLazy = exports.Picture = exports.PictureType = void 0;
-    var path17 = __require("path");
+    var path18 = __require("path");
     var byteVector_1 = require_byteVector();
     var fileAbstraction_1 = require_fileAbstraction();
     var utils_1 = require_utils();
@@ -8700,7 +8700,7 @@ var require_picture = __commonJS({
         utils_1.Guards.truthy(filePath, "filePath");
         const picture = new _Picture();
         picture.data = byteVector_1.ByteVector.fromPath(filePath);
-        picture.filename = path17.basename(filePath);
+        picture.filename = path18.basename(filePath);
         picture.description = picture.filename;
         picture.mimeType = _Picture.getMimeTypeFromFilename(picture.filename);
         picture.type = picture.mimeType.startsWith("image/") ? PictureType.FrontCover : PictureType.NotAPicture;
@@ -9049,7 +9049,7 @@ var require_picture = __commonJS({
         utils_1.Guards.truthy(filePath, "path");
         const picture = new _PictureLazy();
         picture._file = new fileAbstraction_1.LocalFileAbstraction(filePath);
-        picture._filename = path17.basename(filePath);
+        picture._filename = path18.basename(filePath);
         picture._description = picture._filename;
         picture._mimeType = Picture.getMimeTypeFromFilename(picture._filename);
         picture._type = picture._mimeType.startsWith("image/") ? PictureType.FrontCover : PictureType.NotAPicture;
@@ -9990,14 +9990,14 @@ var require_apeTag = __commonJS({
        * @remarks Stored in the `Year` item
        */
       get year() {
-        let text6 = this.getStringValue("Year");
-        if (!text6) {
+        let text7 = this.getStringValue("Year");
+        if (!text7) {
           return 0;
         }
-        let asInt = Number.parseInt(text6, 10);
+        let asInt = Number.parseInt(text7, 10);
         if (Number.isNaN(asInt)) {
-          text6 = text6.substring(0, 4);
-          asInt = Number.parseInt(text6, 10);
+          text7 = text7.substring(0, 4);
+          asInt = Number.parseInt(text7, 10);
           if (Number.isNaN(asInt)) {
             return 0;
           }
@@ -10315,14 +10315,14 @@ var require_apeTag = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_TRACK_GAIN` item
        */
       get replayGainTrackGain() {
-        let text6 = this.getStringValue("REPLAYGAIN_TRACK_GAIN");
-        if (!text6) {
+        let text7 = this.getStringValue("REPLAYGAIN_TRACK_GAIN");
+        if (!text7) {
           return NaN;
         }
-        if (text6.toLowerCase().endsWith("db")) {
-          text6 = text6.substring(0, text6.length - 2).trim();
+        if (text7.toLowerCase().endsWith("db")) {
+          text7 = text7.substring(0, text7.length - 2).trim();
         }
-        return Number.parseFloat(text6);
+        return Number.parseFloat(text7);
       }
       /**
        * @inheritDoc
@@ -10332,8 +10332,8 @@ var require_apeTag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.removeItem("REPLAYGAIN_TRACK_GAIN");
         } else {
-          const text6 = `${value.toFixed(2)} dB`;
-          this.setStringValue("REPLAYGAIN_TRACK_GAIN", text6);
+          const text7 = `${value.toFixed(2)} dB`;
+          this.setStringValue("REPLAYGAIN_TRACK_GAIN", text7);
         }
       }
       /**
@@ -10341,8 +10341,8 @@ var require_apeTag = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_TRACK_PEAK` item
        */
       get replayGainTrackPeak() {
-        const text6 = this.getStringValue("REPLAYGAIN_TRACK_PEAK");
-        return text6 ? Number.parseFloat(text6) : NaN;
+        const text7 = this.getStringValue("REPLAYGAIN_TRACK_PEAK");
+        return text7 ? Number.parseFloat(text7) : NaN;
       }
       /**
        * @inheritDoc
@@ -10352,8 +10352,8 @@ var require_apeTag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.removeItem("REPLAYGAIN_TRACK_PEAK");
         } else {
-          const text6 = value.toFixed(6).toString();
-          this.setStringValue("REPLAYGAIN_TRACK_PEAK", text6);
+          const text7 = value.toFixed(6).toString();
+          this.setStringValue("REPLAYGAIN_TRACK_PEAK", text7);
         }
       }
       /**
@@ -10361,14 +10361,14 @@ var require_apeTag = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_ALBUM_GAIN` item
        */
       get replayGainAlbumGain() {
-        let text6 = this.getStringValue("REPLAYGAIN_ALBUM_GAIN");
-        if (!text6) {
+        let text7 = this.getStringValue("REPLAYGAIN_ALBUM_GAIN");
+        if (!text7) {
           return NaN;
         }
-        if (text6.toLowerCase().endsWith("db")) {
-          text6 = text6.substring(0, text6.length - 2).trim();
+        if (text7.toLowerCase().endsWith("db")) {
+          text7 = text7.substring(0, text7.length - 2).trim();
         }
-        return Number.parseFloat(text6);
+        return Number.parseFloat(text7);
       }
       /**
        * @inheritDoc
@@ -10378,8 +10378,8 @@ var require_apeTag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.removeItem("REPLAYGAIN_ALBUM_GAIN");
         } else {
-          const text6 = `${value.toFixed(2).toString()} dB`;
-          this.setStringValue("REPLAYGAIN_ALBUM_GAIN", text6);
+          const text7 = `${value.toFixed(2).toString()} dB`;
+          this.setStringValue("REPLAYGAIN_ALBUM_GAIN", text7);
         }
       }
       /**
@@ -10387,8 +10387,8 @@ var require_apeTag = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_ALBUM_PEAK` item
        */
       get replayGainAlbumPeak() {
-        const text6 = this.getStringValue("REPLAYGAIN_ALBUM_PEAK");
-        return text6 ? Number.parseFloat(text6) : NaN;
+        const text7 = this.getStringValue("REPLAYGAIN_ALBUM_PEAK");
+        return text7 ? Number.parseFloat(text7) : NaN;
       }
       /**
        * @inheritDoc
@@ -10398,8 +10398,8 @@ var require_apeTag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.removeItem("REPLAYGAIN_ALBUM_PEAK");
         } else {
-          const text6 = value.toFixed(6).toString();
-          this.setStringValue("REPLAYGAIN_ALBUM_PEAK", text6);
+          const text7 = value.toFixed(6).toString();
+          this.setStringValue("REPLAYGAIN_ALBUM_PEAK", text7);
         }
       }
       /**
@@ -10631,11 +10631,11 @@ var require_apeTag = __commonJS({
         return item ? item.text : [];
       }
       getUint32Value(key, index) {
-        const text6 = this.getStringValue(key);
-        if (!text6) {
+        const text7 = this.getStringValue(key);
+        if (!text7) {
           return 0;
         }
-        const values = text6.split("/", index + 2);
+        const values = text7.split("/", index + 2);
         if (values.length < index + 1) {
           return 0;
         }
@@ -14597,9 +14597,9 @@ var require_synchronizedLyricsFrame = __commonJS({
        *     displayed. See {@link TimestampFormat} for possible values.
        * @param text Text for the point in time
        */
-      constructor(time, text6) {
+      constructor(time, text7) {
         utils_1.Guards.uint(time, "time");
-        this.text = text6;
+        this.text = text7;
         this._time = time;
       }
       /**
@@ -14879,13 +14879,13 @@ var require_synchronizedLyricsFrame = __commonJS({
           if (lyricsLength < 0) {
             throw new errors_1.CorruptFileError("Text delimiter for synchronized lyric not found");
           }
-          const text6 = data.subarray(offset, lyricsLength).toString(this.textEncoding);
+          const text7 = data.subarray(offset, lyricsLength).toString(this.textEncoding);
           offset += lyricsLength + delim.length;
           if (offset + 4 > data.length) {
             break;
           }
           const time = data.subarray(offset, 4).toUint();
-          l.push(new SynchronizedText(time, text6));
+          l.push(new SynchronizedText(time, text7));
           offset += 4;
         }
         this._text = l;
@@ -15034,22 +15034,22 @@ var require_textInformationFrame = __commonJS({
         if (version2 !== 3 || this.frameId !== frameIdentifiers_1.FrameIdentifiers.TDRC) {
           return super.render(version2);
         }
-        const text6 = this.toString();
-        if (text6.length < 10 || text6[4] !== "-" || text6[7] !== "-") {
+        const text7 = this.toString();
+        if (text7.length < 10 || text7[4] !== "-" || text7[7] !== "-") {
           return super.render(version2);
         }
         const output = byteVector_1.ByteVector.empty();
         let frame = new _TextInformationFrame(new frameHeader_1.Id3v2FrameHeader(frameIdentifiers_1.FrameIdentifiers.TYER));
-        frame.text = [text6.substring(0, 4)];
+        frame.text = [text7.substring(0, 4)];
         output.addByteVector(frame.render(version2));
         frame = new _TextInformationFrame(new frameHeader_1.Id3v2FrameHeader(frameIdentifiers_1.FrameIdentifiers.TDAT));
-        frame.text = [text6.substring(5, 7) + text6.substring(8, 10)];
+        frame.text = [text7.substring(5, 7) + text7.substring(8, 10)];
         output.addByteVector(frame.render(version2));
-        if (text6.length < 16 || text6[10] !== "T" || text6[13] !== ":") {
+        if (text7.length < 16 || text7[10] !== "T" || text7[13] !== ":") {
           return output;
         }
         frame = new _TextInformationFrame(new frameHeader_1.Id3v2FrameHeader(frameIdentifiers_1.FrameIdentifiers.TIME));
-        frame.text = [text6.substring(11, 13) + text6.substring(14, 16)];
+        frame.text = [text7.substring(11, 13) + text7.substring(14, 16)];
         output.addByteVector(frame.render(version2));
         return output;
       }
@@ -15140,10 +15140,10 @@ var require_textInformationFrame = __commonJS({
         }
         const encoding = _TextInformationFrame.correctEncoding(this.textEncoding, version2);
         const v = byteVector_1.ByteVector.empty();
-        let text6 = this._textFields;
+        let text7 = this._textFields;
         v.addByte(encoding);
         if (version2 > 3 && this.frameId === frameIdentifiers_1.FrameIdentifiers.TCON) {
-          text6 = text6.map((g) => {
+          text7 = text7.map((g) => {
             switch (g) {
               case _TextInformationFrame.COVER_STRING:
                 return _TextInformationFrame.COVER_ABBREV;
@@ -15161,24 +15161,24 @@ var require_textInformationFrame = __commonJS({
         const isTxxx = this.frameId === frameIdentifiers_1.FrameIdentifiers.TXXX;
         if (version2 > 3 || isTxxx) {
           if (isTxxx) {
-            if (text6.length === 0) {
-              text6 = [null, null];
-            } else if (text6.length === 1) {
-              text6 = [text6[0], null];
+            if (text7.length === 0) {
+              text7 = [null, null];
+            } else if (text7.length === 1) {
+              text7 = [text7[0], null];
             }
           }
-          for (let i = 0; i < text6.length; i++) {
+          for (let i = 0; i < text7.length; i++) {
             if (i !== 0) {
               v.addByteVector(byteVector_1.ByteVector.getTextDelimiter(encoding));
             }
-            if (text6[i]) {
-              v.addByteVector(byteVector_1.ByteVector.fromString(text6[i], encoding));
+            if (text7[i]) {
+              v.addByteVector(byteVector_1.ByteVector.fromString(text7[i], encoding));
             }
           }
         } else if (this.frameId === frameIdentifiers_1.FrameIdentifiers.TCON) {
           const numericGenres = [];
           const textGenres = [];
-          for (const s of text6) {
+          for (const s of text7) {
             if (id3v2Settings_1.default.useNumericGenres) {
               switch (s) {
                 case _TextInformationFrame.COVER_STRING:
@@ -15202,7 +15202,7 @@ var require_textInformationFrame = __commonJS({
           const genreString = `${numericGenres.join("")}${textGenres.join(";")}`;
           v.addByteVector(byteVector_1.ByteVector.fromString(genreString, encoding));
         } else {
-          v.addByteVector(byteVector_1.ByteVector.fromString(text6.join("/"), encoding));
+          v.addByteVector(byteVector_1.ByteVector.fromString(text7.join("/"), encoding));
         }
         return v;
       }
@@ -15341,8 +15341,8 @@ var require_textInformationFrame = __commonJS({
        * Gets the description stored in the current instance.
        */
       get description() {
-        const text6 = super.text;
-        return text6.length > 0 ? text6[0] : void 0;
+        const text7 = super.text;
+        return text7.length > 0 ? text7[0] : void 0;
       }
       /**
        * Sets the description stored in the current instance.
@@ -15350,13 +15350,13 @@ var require_textInformationFrame = __commonJS({
        * @param value Description to store in the current instance.
        */
       set description(value) {
-        let text6 = super.text;
-        if (text6.length > 0) {
-          text6[0] = value;
+        let text7 = super.text;
+        if (text7.length > 0) {
+          text7[0] = value;
         } else {
-          text6 = [value];
+          text7 = [value];
         }
-        super.text = text6;
+        super.text = text7;
       }
       /**
        * Gets the text contained in the current instance.
@@ -15364,11 +15364,11 @@ var require_textInformationFrame = __commonJS({
        * current instance. The value must be reassigned for the value to change.
        */
       get text() {
-        const text6 = super.text;
-        if (text6.length < 2) {
+        const text7 = super.text;
+        if (text7.length < 2) {
           return [];
         }
-        return text6.slice(1);
+        return text7.slice(1);
       }
       /**
        * Sets the text contained in the current instance.
@@ -15593,8 +15593,8 @@ var require_urlLinkFrame = __commonJS({
             }
           }
         }
-        const text6 = textFields.join("/");
-        return byteVector_1.ByteVector.concatenate(isWxxx ? encoding : void 0, byteVector_1.ByteVector.fromString(text6, byteVector_1.StringType.Latin1));
+        const text7 = textFields.join("/");
+        return byteVector_1.ByteVector.concatenate(isWxxx ? encoding : void 0, byteVector_1.ByteVector.fromString(text7, byteVector_1.StringType.Latin1));
       }
     };
     exports.UrlLinkFrame = UrlLinkFrame;
@@ -15653,8 +15653,8 @@ var require_urlLinkFrame = __commonJS({
        * Gets the description stored in the current instance.
        */
       get description() {
-        const text6 = super.text;
-        return text6.length > 0 ? text6[0] : void 0;
+        const text7 = super.text;
+        return text7.length > 0 ? text7[0] : void 0;
       }
       /**
        * Sets the description stored in the current instance.
@@ -15662,13 +15662,13 @@ var require_urlLinkFrame = __commonJS({
        */
       set description(value) {
         const normalizedValue = value || void 0;
-        let text6 = super.text;
-        if (text6.length > 0) {
-          text6[0] = normalizedValue;
+        let text7 = super.text;
+        if (text7.length > 0) {
+          text7[0] = normalizedValue;
         } else {
-          text6 = [normalizedValue];
+          text7 = [normalizedValue];
         }
-        super.text = text6;
+        super.text = text7;
       }
       /**
        * Gets the text contained in the current instance.
@@ -15676,13 +15676,13 @@ var require_urlLinkFrame = __commonJS({
        * current instance. The value must be reassigned for the value to change.
        */
       get text() {
-        const text6 = super.text;
-        if (text6.length < 2) {
+        const text7 = super.text;
+        if (text7.length < 2) {
           return [];
         }
-        const newText = new Array(text6.length - 1);
+        const newText = new Array(text7.length - 1);
         for (let i = 0; i < newText.length; i++) {
-          newText[i] = text6[i + 1];
+          newText[i] = text7[i + 1];
         }
         return newText;
       }
@@ -16522,11 +16522,11 @@ var require_id3v2Tag = __commonJS({
        * @remarks Stored in the `TBPM` frame
        */
       get beatsPerMinute() {
-        const text6 = this.getTextAsString(frameIdentifiers_1.FrameIdentifiers.TBPM);
-        if (!text6) {
+        const text7 = this.getTextAsString(frameIdentifiers_1.FrameIdentifiers.TBPM);
+        if (!text7) {
           return 0;
         }
-        const num = Number.parseFloat(text6);
+        const num = Number.parseFloat(text7);
         return Number.isNaN(num) || num < 0 ? 0 : Math.round(num);
       }
       /**
@@ -16742,14 +16742,14 @@ var require_id3v2Tag = __commonJS({
        * @remarks via a TXXX `REPLAY_GAIN_TRACK_GAIN` frame
        */
       get replayGainTrackGain() {
-        let text6 = this.getUserTextAsString("REPLAYGAIN_TRACK_GAIN", false);
-        if (!text6) {
+        let text7 = this.getUserTextAsString("REPLAYGAIN_TRACK_GAIN", false);
+        if (!text7) {
           return NaN;
         }
-        if (text6.toLowerCase().endsWith("db")) {
-          text6 = text6.substring(0, text6.length - 2).trim();
+        if (text7.toLowerCase().endsWith("db")) {
+          text7 = text7.substring(0, text7.length - 2).trim();
         }
-        return Number.parseFloat(text6);
+        return Number.parseFloat(text7);
       }
       /**
        * @inheritDoc
@@ -16759,8 +16759,8 @@ var require_id3v2Tag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.setUserTextAsString("REPLAYGAIN_TRACK_GAIN", void 0, false);
         } else {
-          const text6 = `${value.toFixed(2).toString()} dB`;
-          this.setUserTextAsString("REPLAYGAIN_TRACK_GAIN", text6, false);
+          const text7 = `${value.toFixed(2).toString()} dB`;
+          this.setUserTextAsString("REPLAYGAIN_TRACK_GAIN", text7, false);
         }
       }
       /**
@@ -16768,8 +16768,8 @@ var require_id3v2Tag = __commonJS({
        * @remarks via a TXXX `REPLAYGAIN_TRACK_PEAK` frame
        */
       get replayGainTrackPeak() {
-        const text6 = this.getUserTextAsString("REPLAYGAIN_TRACK_PEAK", false);
-        return text6 ? Number.parseFloat(text6) : NaN;
+        const text7 = this.getUserTextAsString("REPLAYGAIN_TRACK_PEAK", false);
+        return text7 ? Number.parseFloat(text7) : NaN;
       }
       /**
        * @inheritDoc
@@ -16779,8 +16779,8 @@ var require_id3v2Tag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.setUserTextAsString("REPLAYGAIN_TRACK_PEAK", void 0, false);
         } else {
-          const text6 = value.toFixed(6).toString();
-          this.setUserTextAsString("REPLAYGAIN_TRACK_PEAK", text6, false);
+          const text7 = value.toFixed(6).toString();
+          this.setUserTextAsString("REPLAYGAIN_TRACK_PEAK", text7, false);
         }
       }
       /**
@@ -16788,14 +16788,14 @@ var require_id3v2Tag = __commonJS({
        * @remarks via a TXXX `REPLAYGAIN_ALBUM_GAIN` frame
        */
       get replayGainAlbumGain() {
-        let text6 = this.getUserTextAsString("REPLAYGAIN_ALBUM_GAIN", false);
-        if (!text6) {
+        let text7 = this.getUserTextAsString("REPLAYGAIN_ALBUM_GAIN", false);
+        if (!text7) {
           return NaN;
         }
-        if (text6.toLowerCase().endsWith("db")) {
-          text6 = text6.substring(0, text6.length - 2).trim();
+        if (text7.toLowerCase().endsWith("db")) {
+          text7 = text7.substring(0, text7.length - 2).trim();
         }
-        return Number.parseFloat(text6);
+        return Number.parseFloat(text7);
       }
       /**
        * @inheritDoc
@@ -16805,8 +16805,8 @@ var require_id3v2Tag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.setUserTextAsString("REPLAYGAIN_ALBUM_GAIN", void 0, false);
         } else {
-          const text6 = `${value.toFixed(2).toString()} dB`;
-          this.setUserTextAsString("REPLAYGAIN_ALBUM_GAIN", text6, false);
+          const text7 = `${value.toFixed(2).toString()} dB`;
+          this.setUserTextAsString("REPLAYGAIN_ALBUM_GAIN", text7, false);
         }
       }
       /**
@@ -16814,8 +16814,8 @@ var require_id3v2Tag = __commonJS({
        * @remarks via a TXXX `REPLAYGAIN_ALBUM_PEAK` frame
        */
       get replayGainAlbumPeak() {
-        const text6 = this.getUserTextAsString("REPLAYGAIN_ALBUM_PEAK", false);
-        return text6 ? Number.parseFloat(text6) : NaN;
+        const text7 = this.getUserTextAsString("REPLAYGAIN_ALBUM_PEAK", false);
+        return text7 ? Number.parseFloat(text7) : NaN;
       }
       /**
        * @inheritDoc
@@ -16825,8 +16825,8 @@ var require_id3v2Tag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.setUserTextAsString("REPLAYGAIN_ALBUM_PEAK", void 0, false);
         } else {
-          const text6 = value.toFixed(6).toString();
-          this.setUserTextAsString("REPLAYGAIN_ALBUM_PEAK", text6, false);
+          const text7 = value.toFixed(6).toString();
+          this.setUserTextAsString("REPLAYGAIN_ALBUM_PEAK", text7, false);
         }
       }
       /**
@@ -17161,12 +17161,12 @@ var require_id3v2Tag = __commonJS({
        * @param text Text to set for the specified frame or `undefined`/`null`/`""` to remove all
        *     frames with that identifier.
        */
-      setTextFrame(ident, ...text6) {
+      setTextFrame(ident, ...text7) {
         utils_1.Guards.truthy(ident, "ident");
         let empty = true;
-        if (text6) {
-          for (let i = 0; empty && i < text6.length; i++) {
-            if (text6[i]) {
+        if (text7) {
+          for (let i = 0; empty && i < text7.length; i++) {
+            if (text7[i]) {
               empty = false;
             }
           }
@@ -17182,7 +17182,7 @@ var require_id3v2Tag = __commonJS({
             urlFrame = urlLinkFrame_1.UrlLinkFrame.fromIdentity(ident);
             this.addFrame(urlFrame);
           }
-          urlFrame.text = text6;
+          urlFrame.text = text7;
           urlFrame.textEncoding = id3v2Settings_1.default.defaultEncoding;
         } else {
           const frames = this.getFramesByClassType(frame_1.FrameClassType.TextInformationFrame);
@@ -17191,7 +17191,7 @@ var require_id3v2Tag = __commonJS({
             frame = textInformationFrame_1.TextInformationFrame.fromIdentifier(ident);
             this.addFrame(frame);
           }
-          frame.text = text6;
+          frame.text = text7;
           frame.textEncoding = id3v2Settings_1.default.defaultEncoding;
         }
       }
@@ -17256,11 +17256,11 @@ var require_id3v2Tag = __commonJS({
         return frame ? frame.text : [];
       }
       getTextAsUint32(ident, index) {
-        const text6 = this.getTextAsString(ident);
-        if (text6 === null || text6 === void 0) {
+        const text7 = this.getTextAsString(ident);
+        if (text7 === null || text7 === void 0) {
           return 0;
         }
-        const values = text6.split("/", index + 2);
+        const values = text7.split("/", index + 2);
         if (values.length < index + 1) {
           return 0;
         }
@@ -17282,21 +17282,21 @@ var require_id3v2Tag = __commonJS({
         const result = frame ? frame.text.join(";") : void 0;
         return result || void 0;
       }
-      setUfidText(owner, text6) {
+      setUfidText(owner, text7) {
         const frames = this.getFramesByClassType(frame_1.FrameClassType.UniqueFileIdentifierFrame);
         let frame = uniqueFileIdentifierFrame_1.default.find(frames, owner);
-        if (!text6 && frame) {
+        if (!text7 && frame) {
           this.removeFrame(frame);
         } else {
-          const identifier = byteVector_1.ByteVector.fromString(text6, byteVector_1.StringType.UTF8);
+          const identifier = byteVector_1.ByteVector.fromString(text7, byteVector_1.StringType.UTF8);
           frame = uniqueFileIdentifierFrame_1.default.fromData(owner, identifier);
           this.addFrame(frame);
         }
       }
-      setUserTextAsString(description, text6, caseSensitive = true) {
+      setUserTextAsString(description, text7, caseSensitive = true) {
         const frames = this.getFramesByClassType(frame_1.FrameClassType.UserTextInformationFrame);
         let frame = textInformationFrame_1.UserTextInformationFrame.findUserTextInformationFrame(frames, description, caseSensitive);
-        if (!text6) {
+        if (!text7) {
           if (frame) {
             this.removeFrame(frame);
           }
@@ -17305,7 +17305,7 @@ var require_id3v2Tag = __commonJS({
             frame = textInformationFrame_1.UserTextInformationFrame.fromDescription(description, id3v2Settings_1.default.defaultEncoding);
             this.addFrame(frame);
           }
-          frame.text = text6.split(";");
+          frame.text = text7.split(";");
         }
       }
     };
@@ -19969,11 +19969,11 @@ var require_asfTag = __commonJS({
        *     https://docs.microsoft.com/en-us/windows/win32/wmformat/wm-year
        */
       get year() {
-        const text6 = this.getDescriptorString("WM/Year");
-        if (!text6 || text6.length < 4) {
+        const text7 = this.getDescriptorString("WM/Year");
+        if (!text7 || text7.length < 4) {
           return 0;
         }
-        const parsed = Number.parseInt(text6.substring(0, 4), 10);
+        const parsed = Number.parseInt(text7.substring(0, 4), 10);
         return Number.isNaN(parsed) ? 0 : parsed;
       }
       /**
@@ -20349,8 +20349,8 @@ var require_asfTag = __commonJS({
         if (Number.isNaN(value)) {
           this.removeDescriptors("ReplayGain/Track");
         } else {
-          const text6 = value.toFixed(2);
-          this.setDescriptorString(`${text6} dB`, "ReplayGain/Track");
+          const text7 = value.toFixed(2);
+          this.setDescriptorString(`${text7} dB`, "ReplayGain/Track");
         }
       }
       /**
@@ -20369,8 +20369,8 @@ var require_asfTag = __commonJS({
         if (Number.isNaN(value)) {
           this.removeDescriptors("ReplayGain/Track Peak");
         } else {
-          const text6 = value.toFixed(6);
-          this.setDescriptorString(text6, "ReplayGain/Track Peak");
+          const text7 = value.toFixed(6);
+          this.setDescriptorString(text7, "ReplayGain/Track Peak");
         }
       }
       /**
@@ -20396,8 +20396,8 @@ var require_asfTag = __commonJS({
         if (Number.isNaN(value)) {
           this.removeDescriptors("ReplayGain/Album");
         } else {
-          const text6 = value.toFixed(2);
-          this.setDescriptorString(`${text6} dB`, "ReplayGain/Album");
+          const text7 = value.toFixed(2);
+          this.setDescriptorString(`${text7} dB`, "ReplayGain/Album");
         }
       }
       /**
@@ -20416,8 +20416,8 @@ var require_asfTag = __commonJS({
         if (Number.isNaN(value)) {
           this.removeDescriptors("ReplayGain/Album Peak");
         } else {
-          const text6 = value.toFixed(6);
-          this.setDescriptorString(text6, "ReplayGain/Album Peak");
+          const text7 = value.toFixed(6);
+          this.setDescriptorString(text7, "ReplayGain/Album Peak");
         }
       }
       /**
@@ -24175,11 +24175,11 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `DATE` field
        */
       get year() {
-        const text6 = this.getFieldFirstValue("DATE");
-        if (!text6) {
+        const text7 = this.getFieldFirstValue("DATE");
+        if (!text7) {
           return 0;
         }
-        const parsedText = Number.parseInt(text6.substring(0, 4), 10);
+        const parsedText = Number.parseInt(text7.substring(0, 4), 10);
         return Number.isNaN(parsedText) ? 0 : parsedText;
       }
       /**
@@ -24199,11 +24199,11 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `TRACKNUMBER` field
        */
       get track() {
-        const text6 = this.getFieldFirstValue("TRACKNUMBER");
-        if (!text6) {
+        const text7 = this.getFieldFirstValue("TRACKNUMBER");
+        if (!text7) {
           return 0;
         }
-        const splitText = text6.split("/");
+        const splitText = text7.split("/");
         const parsedText = Number.parseInt(splitText[0], 10);
         return Number.isNaN(parsedText) ? 0 : parsedText;
       }
@@ -24222,16 +24222,16 @@ var require_xiphComment = __commonJS({
        *     used if `TRACKTOTAL` is not available.
        */
       get trackCount() {
-        let text6 = this.getFieldFirstValue("TRACKTOTAL");
-        if (text6) {
-          const parsedValue = Number.parseInt(text6, 10);
+        let text7 = this.getFieldFirstValue("TRACKTOTAL");
+        if (text7) {
+          const parsedValue = Number.parseInt(text7, 10);
           if (!Number.isNaN(parsedValue)) {
             return parsedValue;
           }
         }
-        text6 = this.getFieldFirstValue("TRACKNUMBER");
-        if (text6) {
-          const textSplit = text6.split("/");
+        text7 = this.getFieldFirstValue("TRACKNUMBER");
+        if (text7) {
+          const textSplit = text7.split("/");
           if (textSplit.length > 1) {
             const parsedValue = Number.parseInt(textSplit[1], 10);
             if (!Number.isNaN(parsedValue)) {
@@ -24254,11 +24254,11 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `DISCNUMBER` field
        */
       get disc() {
-        const text6 = this.getFieldFirstValue("DISCNUMBER");
-        if (!text6) {
+        const text7 = this.getFieldFirstValue("DISCNUMBER");
+        if (!text7) {
           return 0;
         }
-        const splitText = text6.split("/");
+        const splitText = text7.split("/");
         const parsedText = Number.parseInt(splitText[0], 10);
         return Number.isNaN(parsedText) ? 0 : parsedText;
       }
@@ -24277,16 +24277,16 @@ var require_xiphComment = __commonJS({
        *     used if `DISCTOTAL` is not available.
        */
       get discCount() {
-        let text6 = this.getFieldFirstValue("DISCTOTAL");
-        if (text6) {
-          const parsedValue = Number.parseInt(text6, 10);
+        let text7 = this.getFieldFirstValue("DISCTOTAL");
+        if (text7) {
+          const parsedValue = Number.parseInt(text7, 10);
           if (!Number.isNaN(parsedValue)) {
             return parsedValue;
           }
         }
-        text6 = this.getFieldFirstValue("DISCNUMBER");
-        if (text6) {
-          const textSplit = text6.split("/");
+        text7 = this.getFieldFirstValue("DISCNUMBER");
+        if (text7) {
+          const textSplit = text7.split("/");
           if (textSplit.length > 1) {
             const parsedValue = Number.parseInt(textSplit[1], 10);
             if (!Number.isNaN(parsedValue)) {
@@ -24340,11 +24340,11 @@ var require_xiphComment = __commonJS({
        *     behavior can be controlled Stored in the {@link XiphSettings.useTempoToStoreBpm}.
        */
       get beatsPerMinute() {
-        let text6 = this.getFieldFirstValue("TEMPO");
-        if (!text6) {
-          text6 = this.getFieldFirstValue("BPM");
+        let text7 = this.getFieldFirstValue("TEMPO");
+        if (!text7) {
+          text7 = this.getFieldFirstValue("BPM");
         }
-        const parsedNumber = Number.parseInt(text6, 10);
+        const parsedNumber = Number.parseInt(text7, 10);
         return Number.isNaN(parsedNumber) ? 0 : parsedNumber;
       }
       /**
@@ -24396,8 +24396,8 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `DATETAGGED` field
        */
       get dateTagged() {
-        const text6 = this.getFieldFirstValue("DATETAGGED");
-        const date = new Date(text6);
+        const text7 = this.getFieldFirstValue("DATETAGGED");
+        const date = new Date(text7);
         return Number.isNaN(date.getTime()) ? void 0 : date;
       }
       /**
@@ -24601,8 +24601,8 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_TRACK_GAIN` field
        */
       get replayGainTrackGain() {
-        const text6 = this.getFieldFirstValue("REPLAYGAIN_TRACK_GAIN");
-        return Number.parseFloat(text6);
+        const text7 = this.getFieldFirstValue("REPLAYGAIN_TRACK_GAIN");
+        return Number.parseFloat(text7);
       }
       /**
        * @inheritDoc
@@ -24620,8 +24620,8 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_TRACK_PEAK` field
        */
       get replayGainTrackPeak() {
-        const text6 = this.getFieldFirstValue("REPLAYGAIN_TRACK_PEAK");
-        return Number.parseFloat(text6);
+        const text7 = this.getFieldFirstValue("REPLAYGAIN_TRACK_PEAK");
+        return Number.parseFloat(text7);
       }
       /**
        * @inheritDoc
@@ -24639,8 +24639,8 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_ALBUM_GAIN` field
        */
       get replayGainAlbumGain() {
-        const text6 = this.getFieldFirstValue("REPLAYGAIN_ALBUM_GAIN");
-        return Number.parseFloat(text6);
+        const text7 = this.getFieldFirstValue("REPLAYGAIN_ALBUM_GAIN");
+        return Number.parseFloat(text7);
       }
       /**
        * @inheritDoc
@@ -24658,8 +24658,8 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_ALBUM_PEAK` field
        */
       get replayGainAlbumPeak() {
-        const text6 = this.getFieldFirstValue("REPLAYGAIN_ALBUM_PEAK");
-        return Number.parseFloat(text6);
+        const text7 = this.getFieldFirstValue("REPLAYGAIN_ALBUM_PEAK");
+        return Number.parseFloat(text7);
       }
       /**
        * @inheritDoc
@@ -29424,8 +29424,8 @@ var require_appleTag = __commonJS({
       }
       /** @inheritDoc */
       get genres() {
-        let text6 = this.getQuickTimeStrings(mpeg4BoxType_1.default.GEN);
-        if (text6.length === 0) {
+        let text7 = this.getQuickTimeStrings(mpeg4BoxType_1.default.GEN);
+        if (text7.length === 0) {
           for (const data of this.getQuickTimeData(mpeg4BoxType_1.default.GNRE)) {
             const index = data.toUshort(true);
             if (index === 0) {
@@ -29435,11 +29435,11 @@ var require_appleTag = __commonJS({
             if (!str2) {
               continue;
             }
-            text6 = [str2];
+            text7 = [str2];
             break;
           }
         }
-        return text6;
+        return text7;
       }
       /** @inheritDoc */
       set genres(v) {
@@ -29548,8 +29548,8 @@ var require_appleTag = __commonJS({
       }
       /** @inheritDoc */
       get dateTagged() {
-        for (const text6 of this.getQuickTimeStrings(mpeg4BoxType_1.default.DTAG)) {
-          const date = new Date(text6);
+        for (const text7 of this.getQuickTimeStrings(mpeg4BoxType_1.default.DTAG)) {
+          const date = new Date(text7);
           if (!isNaN(date.getTime())) {
             return date;
           }
@@ -29694,14 +29694,14 @@ var require_appleTag = __commonJS({
       }
       /** @inheritDoc */
       get replayGainTrackGain() {
-        let text6 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_TRACK_GAIN");
-        if (!text6) {
+        let text7 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_TRACK_GAIN");
+        if (!text7) {
           return NaN;
         }
-        if (text6.toLowerCase().endsWith("db")) {
-          text6 = text6.substring(0, text6.length - 2).trim();
+        if (text7.toLowerCase().endsWith("db")) {
+          text7 = text7.substring(0, text7.length - 2).trim();
         }
-        return Number.parseFloat(text6);
+        return Number.parseFloat(text7);
       }
       /** @inheritDoc */
       set replayGainTrackGain(v) {
@@ -29710,24 +29710,24 @@ var require_appleTag = __commonJS({
       }
       /** @inheritDoc */
       get replayGainTrackPeak() {
-        const text6 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_TRACK_PEAK");
-        return text6 ? Number.parseFloat(text6) : NaN;
+        const text7 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_TRACK_PEAK");
+        return text7 ? Number.parseFloat(text7) : NaN;
       }
       /** @inheritDoc */
       set replayGainTrackPeak(v) {
-        const text6 = Number.isNaN(v) ? void 0 : v.toFixed(6);
-        this.setItunesStrings("com.apple.iTunes", "REPLAYGAIN_TRACK_PEAK", text6);
+        const text7 = Number.isNaN(v) ? void 0 : v.toFixed(6);
+        this.setItunesStrings("com.apple.iTunes", "REPLAYGAIN_TRACK_PEAK", text7);
       }
       /** @inheritDoc */
       get replayGainAlbumGain() {
-        let text6 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_ALBUM_GAIN");
-        if (!text6) {
+        let text7 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_ALBUM_GAIN");
+        if (!text7) {
           return NaN;
         }
-        if (text6.toLowerCase().endsWith("db")) {
-          text6 = text6.substring(0, text6.length - 2).trim();
+        if (text7.toLowerCase().endsWith("db")) {
+          text7 = text7.substring(0, text7.length - 2).trim();
         }
-        return Number.parseFloat(text6);
+        return Number.parseFloat(text7);
       }
       set replayGainAlbumGain(v) {
         const value = Number.isNaN(v) ? void 0 : `${v.toFixed(2)} dB`;
@@ -29735,13 +29735,13 @@ var require_appleTag = __commonJS({
       }
       /** @inheritDoc */
       get replayGainAlbumPeak() {
-        const text6 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_ALBUM_PEAK");
-        return text6 ? Number.parseFloat(text6) : NaN;
+        const text7 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_ALBUM_PEAK");
+        return text7 ? Number.parseFloat(text7) : NaN;
       }
       /** @inheritDoc */
       set replayGainAlbumPeak(v) {
-        const text6 = Number.isNaN(v) ? void 0 : v.toFixed(6);
-        this.setItunesStrings("com.apple.iTunes", "REPLAYGAIN_ALBUM_PEAK", text6);
+        const text7 = Number.isNaN(v) ? void 0 : v.toFixed(6);
+        this.setItunesStrings("com.apple.iTunes", "REPLAYGAIN_ALBUM_PEAK", text7);
       }
       /** @inheritDoc */
       get initialKey() {
@@ -29855,8 +29855,8 @@ var require_appleTag = __commonJS({
       getQuickTimeStrings(boxType) {
         return this._ilstBox.getQuickTimeDataBoxes(boxType).filter((b) => utils_1.NumberUtils.hasFlag(b.flags, appleDataBox_1.AppleDataBoxFlagType.ContainsText, true)).reduce((accum, b) => {
           if (b.text) {
-            for (const text6 of b.text.split(";")) {
-              utils_1.ArrayUtils.safePush(accum, text6.trim());
+            for (const text7 of b.text.split(";")) {
+              utils_1.ArrayUtils.safePush(accum, text7.trim());
             }
           }
           return accum;
@@ -32942,12 +32942,12 @@ var require_aviStream = __commonJS({
        * Constructs and initializes a new instance with a specified stream header.
        * @param list RiffList containing the stream headers
        */
-      constructor(list4) {
-        utils_1.Guards.truthy(list4, "list");
-        if (list4.type !== _AviStream.LIST_TYPE) {
+      constructor(list5) {
+        utils_1.Guards.truthy(list5, "list");
+        if (list5.type !== _AviStream.LIST_TYPE) {
           throw new errors_1.CorruptFileError("Stream header list does not have correct type");
         }
-        const streamHeaderData = list4.getValues(_AviStream.HEADER_CHUNK_ID);
+        const streamHeaderData = list5.getValues(_AviStream.HEADER_CHUNK_ID);
         if (streamHeaderData.length !== 1) {
           throw new errors_1.CorruptFileError("Stream header list does not contain valid stream header chunks");
         }
@@ -32972,7 +32972,7 @@ var require_aviStream = __commonJS({
         this._top = streamHeaderDatum.subarray(50, 2).toUshort(false);
         this._right = streamHeaderDatum.subarray(52, 2).toUshort(false);
         this._bottom = streamHeaderDatum.subarray(54, 2).toUshort(false);
-        const streamFormatData = list4.getValues(_AviStream.FORMAT_CHUNK_ID);
+        const streamFormatData = list5.getValues(_AviStream.FORMAT_CHUNK_ID);
         if (streamFormatData.length !== 1) {
           throw new errors_1.CorruptFileError("Stream header list is missing stream format chunk");
         }
@@ -33147,12 +33147,12 @@ var require_aviHeader = __commonJS({
        * Constructs and initializes a new instance by reading information from a RIFF list.
        * @param list List containing the data for the AVI headers
        */
-      constructor(list4) {
-        utils_1.Guards.truthy(list4, "list");
-        if (list4.type !== _AviHeader.HEADER_LIST_TYPE) {
-          throw new errors_1.CorruptFileError(`Expected ${_AviHeader.HEADER_LIST_TYPE} list but got ${list4.type}`);
+      constructor(list5) {
+        utils_1.Guards.truthy(list5, "list");
+        if (list5.type !== _AviHeader.HEADER_LIST_TYPE) {
+          throw new errors_1.CorruptFileError(`Expected ${_AviHeader.HEADER_LIST_TYPE} list but got ${list5.type}`);
         }
-        const mainHeaderValues = list4.getValues(_AviHeader.HEADER_CHUNK_ID);
+        const mainHeaderValues = list5.getValues(_AviHeader.HEADER_CHUNK_ID);
         if (mainHeaderValues.length === 0) {
           throw new errors_1.CorruptFileError("Could not find AVI main header data");
         }
@@ -33170,7 +33170,7 @@ var require_aviHeader = __commonJS({
         this._width = mainHeaderData.subarray(32, 4).toUint(false);
         this._height = mainHeaderData.subarray(36, 4).toUint(false);
         this._durationMilliseconds = this._totalFrames * this._microsecondsPerFrame / 1e3;
-        const streamHeaderLists = list4.getLists(aviStream_1.AviStream.LIST_TYPE);
+        const streamHeaderLists = list5.getLists(aviStream_1.AviStream.LIST_TYPE);
         this._streams = streamHeaderLists.map((l) => new aviStream_1.AviStream(l));
         this._codecs = this._streams.map((s) => s.codec).filter((c) => !!c);
       }
@@ -33410,11 +33410,11 @@ var require_riffList = __commonJS({
        * @param type Type ID of the list
        */
       static fromEmpty(type) {
-        const list4 = new _RiffList();
-        list4._isLoaded = true;
-        list4._type = type;
-        list4._originalDataSize = 4;
-        return list4;
+        const list5 = new _RiffList();
+        list5._isLoaded = true;
+        list5._type = type;
+        list5._originalDataSize = 4;
+        return list5;
       }
       /**
        * Constructs and initializes a new instance, lazily, from a position in a file.
@@ -33432,13 +33432,13 @@ var require_riffList = __commonJS({
         if (listHeader.subarray(0, 4).toString(byteVector_1.StringType.Latin1) !== _RiffList.IDENTIFIER_FOURCC) {
           throw new Error("Cannot read RIFF list from non-list chunk");
         }
-        const list4 = new _RiffList();
-        list4._chunkStart = position;
-        list4._originalDataSize = listHeader.subarray(4, 4).toUint(false);
-        list4._file = file;
-        list4._isLoaded = false;
-        list4._type = listHeader.subarray(8, 4).toString(byteVector_1.StringType.Latin1);
-        return list4;
+        const list5 = new _RiffList();
+        list5._chunkStart = position;
+        list5._originalDataSize = listHeader.subarray(4, 4).toUint(false);
+        list5._file = file;
+        list5._isLoaded = false;
+        list5._type = listHeader.subarray(8, 4).toString(byteVector_1.StringType.Latin1);
+        return list5;
       }
       // #endregion
       // #region Properties
@@ -33630,10 +33630,10 @@ var require_riffListTag = __commonJS({
     var utils_1 = require_utils();
     var RiffListTag = class extends tag_1.Tag {
       // #region Constructors
-      constructor(list4) {
+      constructor(list5) {
         super();
         this._stringType = byteVector_1.StringType.UTF8;
-        this._list = list4;
+        this._list = list5;
       }
       // #endregion
       // #region Properties
@@ -33769,8 +33769,8 @@ var require_infoTag = __commonJS({
     var utils_1 = require_utils();
     var InfoTag = class _InfoTag extends riffListTag_1.default {
       // #region Constructors
-      constructor(list4) {
-        super(list4);
+      constructor(list5) {
+        super(list5);
       }
       /**
        * Constructs and initializes a new, empty instance.
@@ -33783,9 +33783,9 @@ var require_infoTag = __commonJS({
        * a file.
        * @param list List that contains the contents of the tag
        */
-      static fromList(list4) {
-        utils_1.Guards.truthy(list4, "list");
-        return new _InfoTag(list4);
+      static fromList(list5) {
+        utils_1.Guards.truthy(list5, "list");
+        return new _InfoTag(list5);
       }
       // #endregion
       // #region Properties
@@ -34000,17 +34000,17 @@ var require_movieIdTag = __commonJS({
     var utils_1 = require_utils();
     var MovieIdTag = class _MovieIdTag extends riffListTag_1.default {
       // #region Constructors
-      constructor(list4) {
-        super(list4);
+      constructor(list5) {
+        super(list5);
       }
       /**
        * Constructs and initializes a new instance by reading the contents of a raw RIFF list stored
        * a file.
        * @param list List that contains the contents of the tag
        */
-      static fromList(list4) {
-        utils_1.Guards.truthy(list4, "list");
-        return new _MovieIdTag(list4);
+      static fromList(list5) {
+        utils_1.Guards.truthy(list5, "list");
+        return new _MovieIdTag(list5);
       }
       /**
        * Constructs and initializes a new, empty instance.
@@ -35206,11 +35206,11 @@ var require_dist = __commonJS({
 });
 
 // src/index.js
-import path16 from "node:path";
+import path17 from "node:path";
 import { Worker, isMainThread, parentPort, workerData } from "node:worker_threads";
 
 // src/model/editor.js
-import path7 from "node:path";
+import path11 from "node:path";
 import { createHash as createHash4 } from "node:crypto";
 
 // src/model/catalogue.js
@@ -35501,9 +35501,9 @@ var alive = (pid) => {
 };
 async function staleLock(lockFile) {
   try {
-    const [text6, stat] = await Promise.all([fs.readFile(lockFile, "utf8"), fs.stat(lockFile)]);
-    if (Date.now() - stat.mtimeMs > LOCK_STALE_MS) return text6;
-    return alive(Number(JSON.parse(text6).pid)) ? null : text6;
+    const [text7, stat] = await Promise.all([fs.readFile(lockFile, "utf8"), fs.stat(lockFile)]);
+    if (Date.now() - stat.mtimeMs > LOCK_STALE_MS) return text7;
+    return alive(Number(JSON.parse(text7).pid)) ? null : text7;
   } catch (error) {
     if (error.code === "ENOENT" || error instanceof SyntaxError) return null;
     throw error;
@@ -36018,16 +36018,16 @@ var Catalogue = class {
       return true;
     });
   }
-  alias(entity, text6, { language = null, kind = "alternate", assertionId = null } = {}) {
+  alias(entity, text7, { language = null, kind = "alternate", assertionId = null } = {}) {
     this.entity(entity);
-    if (typeof text6 !== "string" || !text6.trim())
+    if (typeof text7 !== "string" || !text7.trim())
       throw new Error("Invalid alias");
     const id = randomUUID2();
     this.db.prepare("INSERT INTO alias VALUES (?,?,?,?,?,?,?)").run(
       id,
       entity,
-      text6,
-      text6.normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase(),
+      text7,
+      text7.normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase(),
       language,
       kind,
       assertionId
@@ -36150,7 +36150,7 @@ var Metadata = class {
       return this.resolve(target, field2);
     });
   }
-  refresh(target, provider, recordId, fields, { state = "active", confidence = 1, complete = true } = {}) {
+  refresh(target, provider, recordId, fields, { state = "active", confidence = 1, complete = true, keepManual = false } = {}) {
     if (!Object.hasOwn(providerOrder, provider) || !recordId || !fields || Array.isArray(fields) || typeof fields !== "object" || !["active", "stale", "deleted", "conflict"].includes(state) || !Number.isFinite(confidence) || confidence < 0 || confidence > 1)
       throw new Error("Invalid provider refresh");
     return transaction(this.db, () => {
@@ -36178,6 +36178,13 @@ var Metadata = class {
           state
         });
       } else {
+        if (keepManual)
+          for (const field2 of Object.keys(fields)) {
+            if (this.db.prepare("SELECT 1 FROM pinned_override WHERE target_id=? AND field=?").get(target, field2)) continue;
+            const own = this.db.prepare("SELECT id,actor FROM assertion WHERE target_id=? AND field=? AND source='manual' AND state='active' ORDER BY rowid DESC LIMIT 1").get(target, field2);
+            if (own)
+              this.db.prepare("INSERT INTO pinned_override VALUES (?,?,?,?,?)").run(target, field2, own.id, own.actor || "manual", Date.now());
+          }
         for (const [field2, value] of Object.entries(fields))
           this.append(target, field2, value, {
             source: "provider",
@@ -36707,11 +36714,11 @@ function isSoloistRelation(rel) {
 }
 var unique = (values) => [...new Set(values.filter(Boolean))];
 function isPlaceholder(name) {
-  const text6 = String(name || "").trim();
-  return text6.startsWith("[") && text6.endsWith("]");
+  const text7 = String(name || "").trim();
+  return text7.startsWith("[") && text7.endsWith("]");
 }
-function isLatin(text6) {
-  for (const ch of String(text6 || "")) {
+function isLatin(text7) {
+  for (const ch of String(text7 || "")) {
     if (new RegExp("\\p{L}", "u").test(ch) && !new RegExp("\\p{Script=Latin}", "u").test(ch)) return false;
   }
   return true;
@@ -36725,7 +36732,7 @@ function genreNames(entity) {
   names.delete("");
   return names;
 }
-var escapeRegex = (text6) => text6.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+var escapeRegex = (text7) => text7.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 function addPerson(people, person) {
   if (person && people.every((p) => p.id !== person.id)) people.push(person);
 }
@@ -36814,10 +36821,10 @@ var ClassicalResolver = class _ClassicalResolver {
   // classical genre wins over "pop" or "rock" on the same entity, but not
   // over Christmas, soundtrack or crossover genres.
   classifyGenres(genres) {
-    const list4 = [...genres];
-    if (list4.some((g) => this.isHardNonClassicalGenre(g))) return false;
-    if (list4.some((g) => this.isClassicalGenre(g))) return true;
-    if (list4.some((g) => this.isNonClassicalGenre(g))) return false;
+    const list5 = [...genres];
+    if (list5.some((g) => this.isHardNonClassicalGenre(g))) return false;
+    if (list5.some((g) => this.isClassicalGenre(g))) return true;
+    if (list5.some((g) => this.isNonClassicalGenre(g))) return false;
     return null;
   }
   async isNonClassicalArtist(artist) {
@@ -37196,7 +37203,7 @@ var CATALOGUE_OWNERS = [
   [/,\s*Z\.?\s*\d/, "purcell"]
 ];
 var surnameOf = (name) => plain(name).split(" ").filter(Boolean).at(-1) || "";
-var hasWord = (text6, word) => word.length >= 3 && ` ${plain(text6)} `.includes(` ${word} `);
+var hasWord = (text7, word) => word.length >= 3 && ` ${plain(text7)} `.includes(` ${word} `);
 function performerLike(part, albumArtists) {
   const words5 = plain(part);
   if (!words5) return true;
@@ -37239,7 +37246,7 @@ function composersOf(hints = {}, options) {
 }
 
 // src/model/classify-evidence.js
-var escape = (text6) => text6.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+var escape = (text7) => text7.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 var wordList = (terms) => new RegExp(
   `(?<![\\p{L}\\p{N}_])(?:${[...new Set(terms.map(normGenre))].sort((a, b) => b.length - a.length).map(escape).join("|")})(?![\\p{L}\\p{N}_])`,
   "u"
@@ -37871,6 +37878,16 @@ var workField = textField("WORK", "WORK", { box: "\xA9wrk" });
 var workIdField = textField("MUSICBRAINZ_WORKID", "MusicBrainz Work Id", { name: "MusicBrainz Work Id" });
 var artistIdsField = textField("MUSICBRAINZ_ARTISTID", "MusicBrainz Artist Id", { name: "MusicBrainz Artist Id" });
 var albumArtistIdsField = textField("MUSICBRAINZ_ALBUMARTISTID", "MusicBrainz Album Artist Id", { name: "MusicBrainz Album Artist Id" });
+var movementNameField = textField("MOVEMENTNAME", "MOVEMENTNAME", { name: "MOVEMENTNAME" });
+var movementNumberField = textField("MOVEMENT", "MOVEMENT", { name: "MOVEMENT" });
+var movementTotalField = textField("MOVEMENTTOTAL", "MOVEMENTTOTAL", { name: "MOVEMENTTOTAL" });
+var catalogueField = textField("CLASSICAL_CATALOGUE", "CLASSICAL_CATALOGUE", { name: "CLASSICAL_CATALOGUE" });
+var performersField = {
+  read: (file) => texts(xiphOf(file)?.getField("PERFORMER") ?? []),
+  write(file, values) {
+    xiphOf(file)?.setFieldAsStrings("PERFORMER", ...values);
+  }
+};
 var WRITERS = {
   title: {
     read: (file) => texts(file.tag.title),
@@ -37888,6 +37905,19 @@ var WRITERS = {
     read: (file) => texts(file.tag.composers),
     write: (file, values) => file.tag.composers = values
   },
+  composerSort: {
+    read: (file) => texts(file.tag.composersSort),
+    write: (file, values) => file.tag.composersSort = values
+  },
+  conductor: {
+    read: (file) => texts(file.tag.conductor),
+    write: (file, values) => file.tag.conductor = values[0] ?? void 0
+  },
+  performers: performersField,
+  movementName: movementNameField,
+  movementNumber: movementNumberField,
+  movementTotal: movementTotalField,
+  catalogue: catalogueField,
   work: { read: (file) => workField.read(file), write: (file, values) => workField.write(file, values) },
   workId: { read: (file) => workIdField.read(file), write: (file, values) => workIdField.write(file, values) },
   recordingMbid: {
@@ -37901,6 +37931,13 @@ var WRITERS = {
     }
   }
 };
+var CLASSICAL_FIELDS = ["composer", "composerSort", "work", "movementName", "movementNumber", "movementTotal", "performers", "conductor", "catalogue", "workId"];
+var NOT_ID3 = /* @__PURE__ */ new Set(["movementName", "movementNumber", "movementTotal", "performers"]);
+var FORMAT_FIELDS = {
+  ".flac": CLASSICAL_FIELDS,
+  ".mp3": CLASSICAL_FIELDS.filter((field2) => !NOT_ID3.has(field2))
+};
+var writableFields = (filePath) => FORMAT_FIELDS[path4.extname(String(filePath || "")).toLowerCase()] || [];
 function isFragmentedMp4(filePath) {
   const fd = openSync(filePath, "r");
   try {
@@ -38045,10 +38082,10 @@ var CATALOGUES = [
 var OPUS = /\bop(?:us|\.)?\s*(\d+[a-z]?)(?:\s*,?\s*(?:no\.?|nr\.?|n°)\s*(\d+))?/i;
 var PIECE = /^\s*,?\s*(?:no\.?|nr\.?|n°)\s*(\d+[a-z]{0,3})(?![a-z\d])/i;
 function catalogueMatch(title) {
-  const text6 = String(title || "");
+  const text7 = String(title || "");
   for (const [pattern, prefix] of CATALOGUES) {
-    const match2 = text6.match(pattern);
-    if (match2) return { prefix, number: match2[1].replace(/\s+/g, ""), end: match2.index + match2[0].length, text: text6 };
+    const match2 = text7.match(pattern);
+    if (match2) return { prefix, number: match2[1].replace(/\s+/g, ""), end: match2.index + match2[0].length, text: text7 };
   }
   return null;
 }
@@ -38064,14 +38101,14 @@ function cataloguePiece(title) {
   return match2 ? match2.text.slice(match2.end).match(PIECE)?.[1]?.toLowerCase() || "" : "";
 }
 function shortWorkTitle(title) {
-  let text6 = String(title || "").split(":")[0];
-  text6 = text6.replace(OPUS, " ");
-  for (const [pattern] of CATALOGUES) text6 = text6.replace(pattern, " ");
-  text6 = text6.replace(/\bin\s+[A-G](?:[- ]?(?:flat|sharp|♭|♯|b|#))?\s*(?:major|minor|maj|min|dur|moll)\b/gi, " ").replace(/\b(?:no|nr|n°)\.?\s*(?=\d)/gi, " ").replace(/[“”"'’,;()[\]]/g, " ");
-  return searchWords(text6);
+  let text7 = String(title || "").split(":")[0];
+  text7 = text7.replace(OPUS, " ");
+  for (const [pattern] of CATALOGUES) text7 = text7.replace(pattern, " ");
+  text7 = text7.replace(/\bin\s+[A-G](?:[- ]?(?:flat|sharp|♭|♯|b|#))?\s*(?:major|minor|maj|min|dur|moll)\b/gi, " ").replace(/\b(?:no|nr|n°)\.?\s*(?=\d)/gi, " ").replace(/[“”"'’,;()[\]]/g, " ");
+  return searchWords(text7);
 }
-function searchWords(text6) {
-  return String(text6 || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim().split(/\s+/).filter(Boolean).join(" ");
+function searchWords(text7) {
+  return String(text7 || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim().split(/\s+/).filter(Boolean).join(" ");
 }
 function surname(person) {
   if (!person) return "";
@@ -38082,12 +38119,12 @@ function surname(person) {
 function creditString(credit) {
   return (credit || []).map((entry) => `${entry.name ?? entry.artist?.name ?? ""}${entry.joinphrase ?? ""}`).join("").trim();
 }
-async function topWork(mb, work, depth = 0, inc = "artist-rels+work-rels", { stop = () => false } = {}) {
+async function topWork(mb, work, depth = 0, inc = "artist-rels+work-rels", { stop: stop2 = () => false } = {}) {
   if (!work || depth >= 3) return work;
   const parent = (work.relations || []).find((rel) => rel.type === "parts" && rel.direction === "backward" && rel.work?.id);
   if (!parent) return work;
   const data = await mb.get("work", parent.work.id, inc);
-  return data && !stop(data, work) ? topWork(mb, data, depth + 1, inc, { stop }) : work;
+  return data && !stop2(data, work) ? topWork(mb, data, depth + 1, inc, { stop: stop2 }) : work;
 }
 var RELEASE_INC = "recordings+artist-credits+release-groups+media";
 function releaseYear(date) {
@@ -38226,8 +38263,8 @@ var NUMBERED = new RegExp(
 var SYSTEM = new Map(SYSTEMS);
 var SUBNUMBERED = /* @__PURE__ */ new Set(["op", "hob", "woo", "s", "d", "k"]);
 var NO_BEFORE = /(?:no|nr|n°|num|number|#)\.?\s*$|\/\s*$/i;
-function catalogueKeys(text6) {
-  const source = String(text6 ?? "").normalize("NFC");
+function catalogueKeys(text7) {
+  const source = String(text7 ?? "").normalize("NFC");
   const found = [];
   for (const match2 of source.matchAll(HOBOKEN)) {
     if (!match2[1]) continue;
@@ -38251,8 +38288,8 @@ function catalogueKeys(text6) {
 }
 var keyMatches = (query, key) => key === query || key.startsWith(`${query}:`);
 var STOP = /* @__PURE__ */ new Set(["no", "nr", "num", "number", "in", "the", "a", "an", "of", "and", "de", "la", "le", "der", "die", "das", "von", "van", "op", "opus"]);
-function parseQuery(text6) {
-  let rest = String(text6 ?? "");
+function parseQuery(text7) {
+  let rest = String(text7 ?? "");
   const keys = catalogueKeys(rest);
   for (const item of [...keys].reverse()) rest = `${rest.slice(0, item.start)} ${rest.slice(item.end)}`;
   const all = words(rest);
@@ -38298,8 +38335,8 @@ var has = (haystack, name) => {
   const wanted = words(name);
   return wanted.length > 0 && wanted.every((word) => haystack.includes(` ${word} `));
 };
-var coverage = (haystack, text6) => {
-  const wanted = words(text6).filter((word) => word.length > 1);
+var coverage = (haystack, text7) => {
+  const wanted = words(text7).filter((word) => word.length > 1);
   return wanted.length ? wanted.filter((word) => haystack.includes(` ${word} `)).length / wanted.length : 0;
 };
 function scoreFolder(folder, info, { albumTitle = "", movements = [] } = {}) {
@@ -38933,10 +38970,10 @@ function linkReissues(c, { albumId = null } = {}) {
   let added = 0;
   const byWork = /* @__PURE__ */ new Map();
   for (const recording of recordings) byWork.set(recording.workId, [...byWork.get(recording.workId) || [], recording]);
-  for (const list4 of byWork.values())
-    for (let i = 0; i < list4.length; i++)
-      for (let j = i + 1; j < list4.length; j++) {
-        const [a, b] = [list4[i], list4[j]];
+  for (const list5 of byWork.values())
+    for (let i = 0; i < list5.length; i++)
+      for (let j = i + 1; j < list5.length; j++) {
+        const [a, b] = [list5[i], list5[j]];
         const key = pair(a.performanceId, b.performanceId);
         if (a.performanceId === b.performanceId || linked.has(key) || unlinked.has(key) || !sameRecording(a, b)) continue;
         link2(c, a.performanceId, b.performanceId);
@@ -38960,15 +38997,15 @@ var sameCatalogue = (a, b) => {
 var identity = (...values) => createHash3("sha256").update(JSON.stringify(values)).digest("hex");
 var NUMBERED_SET = new RegExp("(?<!\\p{L})(pr[e\xE9]ludes|[e\xE9]tudes|nocturnes|mazurkas|waltzes|valses|impromptus|ballades|polonaises|bagatelles|intermezzi|consolations|po[e\xE8]mes|morceaux|songs without words|lieder ohne worte)(?!\\p{L})", "iu");
 function withoutComposer(title, composers = []) {
-  const text6 = clean3(title);
-  const match2 = text6.match(/^([^:]{2,60}):\s+(\S.*)$/);
-  if (!match2) return text6;
+  const text7 = clean3(title);
+  const match2 = text7.match(/^([^:]{2,60}):\s+(\S.*)$/);
+  if (!match2) return text7;
   const prefix = nameKey(match2[1]);
   const named = (Array.isArray(composers) ? composers : [composers]).some((name) => {
     const full = nameKey(name);
     return Boolean(full) && (prefix === full || prefix === full.split(" ").at(-1));
   });
-  return named ? clean3(match2[2]) : text6;
+  return named ? clean3(match2[2]) : text7;
 }
 function nameKey(name) {
   return normalized(name).replace(/[^\p{L}\p{N}]+/gu, " ").trim().replace(/ts?ch/g, "ch").replace(/ff\b/g, "v").replace(/w/g, "v").replace(/[yj]/g, "i").replace(/kh/g, "h");
@@ -38977,27 +39014,27 @@ var WORK_HEAD = /^(.+?)(?:\s*[:;]\s+|\s+[–—-]\s+|:(?=["“„'‘]))(.+)$/;
 var titleHead = (title) => splitTitle(title).head;
 var COMMA_MOVEMENT = /^(.{4,}?),\s+((?:[IVXLC]+|\d{1,2})\.\s+(?!\d)\S.*)$/;
 function splitTitle(title) {
-  const text6 = clean3(title);
-  const match2 = text6.match(WORK_HEAD);
-  const comma = text6.match(COMMA_MOVEMENT);
+  const text7 = clean3(title);
+  const match2 = text7.match(WORK_HEAD);
+  const comma = text7.match(COMMA_MOVEMENT);
   if (comma && (!match2 || comma[1].length < match2[1].length) && (catalogueNumber(comma[1]) || MULTI_MOVEMENT.test(comma[1])))
     return { head: clean3(comma[1]), tail: clean3(comma[2]) };
-  return match2 ? { head: clean3(match2[1]), tail: clean3(match2[2]) } : { head: "", tail: text6 };
+  return match2 ? { head: clean3(match2[1]), tail: clean3(match2[2]) } : { head: "", tail: text7 };
 }
 function standalonePiece(hints, workTitle, tag = hints.work) {
   const tagged = clean3(tag);
   const title = clean3(hints.title);
   if (!tagged || tagged.includes(":") || isCollectionLike(tagged) || title.includes(":")) return false;
   const head = words2(workTitle);
-  const text6 = words2(title);
-  return text6 === head || text6.startsWith(`${head} `) && splitTitle(title).head === "" && !MOVEMENT_PREFIX.test(stripWorkPrefix(title, workTitle));
+  const text7 = words2(title);
+  return text7 === head || text7.startsWith(`${head} `) && splitTitle(title).head === "" && !MOVEMENT_PREFIX.test(stripWorkPrefix(title, workTitle));
 }
-var isCatalogueRange = (text6) => /\d+[a-z]?\s*[-–—]\s*\d+/i.test(text6) || [...String(text6).matchAll(/\b(\d+)\s*\/\s*(\d+)\b(?![a-z])/gi)].some(([, a, b]) => Number(b) > Number(a));
-var catalogued = (text6) => Boolean(catalogueNumber(text6)) && !isCatalogueRange(text6);
-var catalogueSet = (text6) => NUMBERED_SET.test(text6) && catalogued(text6);
+var isCatalogueRange = (text7) => /\d+[a-z]?\s*[-–—]\s*\d+/i.test(text7) || [...String(text7).matchAll(/\b(\d+)\s*\/\s*(\d+)\b(?![a-z])/gi)].some(([, a, b]) => Number(b) > Number(a));
+var catalogued = (text7) => Boolean(catalogueNumber(text7)) && !isCatalogueRange(text7);
+var catalogueSet = (text7) => NUMBERED_SET.test(text7) && catalogued(text7);
 var COUNTED_COLLECTION = new RegExp("(?<!\\p{L})(?:\\d+|zwei|drei|vier|f\xFCnf|sechs|sieben|acht|neun|zehn|elf|zw\xF6lf|dreizehn|vierzehn|deux|trois|quatre|cinq|six|sept|huit|neuf|dix|douze|two|three|four|five|six|seven|eight|nine|ten|twelve)\\s+(?:\\p{L}+\\s+)?(?:lieder|songs?|m\xE9lodies|melodies|chants|ges\xE4nge)(?!\\p{L})", "iu");
 var WITH_FUGUE = new RegExp("(?<!\\p{L})(?:fugue|fuga|fuge|fughetta)(?!\\p{L})", "iu");
-var readsAsWork = (text6) => Boolean(text6) && (!isCollectionLike(text6) && (MULTI_MOVEMENT.test(text6) || catalogued(text6)) || catalogueSet(text6) || (COUNTED_COLLECTION.test(text6) || WITH_FUGUE.test(text6)) && catalogued(text6));
+var readsAsWork = (text7) => Boolean(text7) && (!isCollectionLike(text7) && (MULTI_MOVEMENT.test(text7) || catalogued(text7)) || catalogueSet(text7) || (COUNTED_COLLECTION.test(text7) || WITH_FUGUE.test(text7)) && catalogued(text7));
 var BOOK_IN_BRACKETS = /\s*\(([^()]*?(?:book|livre|teil|heft|vol\.?|volume)\s+(?:[ivx]+|\d+))(?:[^()]*)\)/iu;
 function withBook(title) {
   const book = title.match(BOOK_IN_BRACKETS);
@@ -39364,13 +39401,13 @@ function romanValue(value) {
   return total || null;
 }
 function movementParts(title) {
-  const text6 = words2(title);
+  const text7 = words2(title);
   const part = clean3(title).match(/^([ivxlc]+|\d+)[a-d][.)]\s+(.*)$/i);
-  const match2 = part ? [part[0], part[1].toLowerCase(), words2(part[2])] : text6.match(/^(no\s+)?((?:[ivxlc]+)|\d+)\s+(.*)$/)?.filter((_, i) => i !== 1);
-  if (!match2) return { index: null, text: text6 };
+  const match2 = part ? [part[0], part[1].toLowerCase(), words2(part[2])] : text7.match(/^(no\s+)?((?:[ivxlc]+)|\d+)\s+(.*)$/)?.filter((_, i) => i !== 1);
+  if (!match2) return { index: null, text: text7 };
   const index = /^\d+$/.test(match2[1]) ? Number(match2[1]) : romanValue(match2[1]);
-  const piece = !part && /^no\s/.test(text6);
-  return index ? { index, text: match2[2], ...piece && { piece: true } } : { index: null, text: text6 };
+  const piece = !part && /^no\s/.test(text7);
+  return index ? { index, text: match2[2], ...piece && { piece: true } } : { index: null, text: text7 };
 }
 function movementTitle(track, workTitle) {
   const fromTitle = stripWorkPrefix(clean3(track.title), workTitle);
@@ -39389,26 +39426,26 @@ function stripWorkPrefix(title, workTitle, depth = 0) {
   const again2 = stripWorkPrefixOnce(withoutRepeatedComposer(stripped, workTitle), workTitle);
   return depth < 2 && again2 !== stripped && words2(stripped).includes(words2(workTitle)) ? stripWorkPrefix(again2, workTitle, depth + 1) : stripped;
 }
-var withoutRepeatedComposer = (text6, workTitle) => {
-  const match2 = clean3(text6).match(/^([^:]{2,60}):\s+(\S.*)$/);
-  return match2 && words2(match2[2]).startsWith(words2(workTitle)) && words2(match2[1]).split(" ").length <= 3 ? match2[2] : text6;
+var withoutRepeatedComposer = (text7, workTitle) => {
+  const match2 = clean3(text7).match(/^([^:]{2,60}):\s+(\S.*)$/);
+  return match2 && words2(match2[2]).startsWith(words2(workTitle)) && words2(match2[1]).split(" ").length <= 3 ? match2[2] : text7;
 };
 function stripWorkPrefixOnce(title, workTitle) {
-  const text6 = clean3(title);
-  const separators = [...text6.matchAll(SEPARATOR)];
-  const tailAt = (match2) => clean3(text6.slice(match2.index + match2[0].length));
+  const text7 = clean3(title);
+  const separators = [...text7.matchAll(SEPARATOR)];
+  const tailAt = (match2) => clean3(text7.slice(match2.index + match2[0].length));
   for (const match2 of separators) {
     const tail = tailAt(match2);
     if (tail && MOVEMENT_PREFIX.test(tail)) return tail;
   }
   const workWords = words2(workTitle);
   const workCatalogue = catalogueNumber(workTitle).toLowerCase();
-  const comma = splitTitle(text6);
-  if (comma.head && text6.startsWith(`${comma.head},`) && (workWords && words2(comma.head) === workWords || workCatalogue && catalogueNumber(comma.head).toLowerCase() === workCatalogue))
+  const comma = splitTitle(text7);
+  if (comma.head && text7.startsWith(`${comma.head},`) && (workWords && words2(comma.head) === workWords || workCatalogue && catalogueNumber(comma.head).toLowerCase() === workCatalogue))
     return comma.tail;
   const workName = words2(String(workTitle).split(",")[0]);
   for (const match2 of separators) {
-    const head = text6.slice(0, match2.index);
+    const head = text7.slice(0, match2.index);
     const tail = tailAt(match2);
     const headWords = words2(head);
     const namesWork = workWords && (headWords === workWords || headWords.startsWith(`${workWords} `) || workWords.startsWith(`${headWords} `)) || workCatalogue && catalogueNumber(head).toLowerCase() === workCatalogue || workName.length >= 4 && words2(head.split(",")[0]) === workName;
@@ -39416,9 +39453,9 @@ function stripWorkPrefixOnce(title, workTitle) {
     return clean3(tail.match(NICKNAME)?.[1] ?? tail);
   }
   const set = clean3(workTitle);
-  const rest = set && NUMBERED_SET.test(set) && normalized(text6).startsWith(normalized(set)) ? text6.slice(set.length).match(/^[,\s]+(no\.?\s*\d+\b.*)$/i) : null;
+  const rest = set && NUMBERED_SET.test(set) && normalized(text7).startsWith(normalized(set)) ? text7.slice(set.length).match(/^[,\s]+(no\.?\s*\d+\b.*)$/i) : null;
   if (rest) return rest[1].charAt(0).toUpperCase() + rest[1].slice(1);
-  return text6;
+  return text7;
 }
 function resolvedName(catalogue, id, field2) {
   const row = catalogue.db.prepare(
@@ -39438,7 +39475,7 @@ function similarWorks(catalogue, title, composers = []) {
   const wanted = workKey(title, composers);
   const named = composers.map(words2).filter(Boolean).length > 0;
   const people = (key) => JSON.parse(key)[0].join("|");
-  const bare = (text6) => words2(text6).replace(KEY_PHRASE, " ").replace(new RegExp(CATALOGUE.source, "g"), " ").replace(/\s+/g, " ").trim();
+  const bare = (text7) => words2(text7).replace(KEY_PHRASE, " ").replace(new RegExp(CATALOGUE.source, "g"), " ").replace(/\s+/g, " ").trim();
   return catalogue.db.prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL ORDER BY created_at,id").all().map((row) => row.id).filter((id) => {
     const existing = resolvedName(catalogue, id, "title");
     if (typeof existing !== "string" || !existing.trim()) return false;
@@ -39552,7 +39589,7 @@ function abbreviates(short, long) {
   return at === short.length;
 }
 function sameNameAbbreviated(a, b) {
-  const tokens = (text6) => normalized(text6).replace(/^(?:[ivxlc]+|\d+)[.)]\s+/, "").replace(/[^\p{L}\p{N}.]+/gu, " ").trim().split(" ").filter(Boolean);
+  const tokens = (text7) => normalized(text7).replace(/^(?:[ivxlc]+|\d+)[.)]\s+/, "").replace(/[^\p{L}\p{N}.]+/gu, " ").trim().split(" ").filter(Boolean);
   const [x, y] = [tokens(a), tokens(b)];
   if (!x.length || x.length !== y.length) return false;
   let abbreviated = 0;
@@ -39566,9 +39603,9 @@ function sameNameAbbreviated(a, b) {
   return abbreviated > 0;
 }
 function namedMovement(movements, title, used, setSubject) {
-  const text6 = movementParts(title).text;
+  const text7 = movementParts(title).text;
   const free = movements.filter((m) => !used.has(m.id));
-  let found = free.filter((m) => m.text && m.text === text6);
+  let found = free.filter((m) => m.text && m.text === text7);
   if (found.length !== 1) found = free.filter((m) => m.title && sameNameAbbreviated(m.title, title));
   if (found.length !== 1) {
     const wanted = asVariation(title);
@@ -39591,7 +39628,7 @@ var VAR_WORD = "var(?:iations|iationen|iation|iatio|iazioni|iazione|s)?\\.?";
 var VAR_NUM = "(?:\\d+|[ivxlc]+)";
 var VAR_RANGE = new RegExp(`^${VAR_WORD}\\s*(?:(?:nos?|nr)\\.?\\s*)?(${VAR_NUM})\\s*[-\u2013\u2014]\\s*(${VAR_NUM})$`, "iu");
 var VAR_ONE = new RegExp(`^${VAR_WORD}\\s*(?:(?:nos?|nr)\\.?\\s*)?(${VAR_NUM})$`, "iu");
-var numberOf = (text6) => /^\d+$/.test(text6) ? Number(text6) : romanValue(text6.toLowerCase());
+var numberOf = (text7) => /^\d+$/.test(text7) ? Number(text7) : romanValue(text7.toLowerCase());
 function expandSection(part) {
   const range2 = part.match(VAR_RANGE);
   if (range2) {
@@ -39627,7 +39664,7 @@ function sectionParts(section) {
   return number ? { number, variation, text: (numbered[2] || "").trim() } : { number: null, variation, text: value.trim() };
 }
 var sameSection = (a, b) => a.number != null || b.number != null ? a.number === b.number && (a.variation || b.variation || a.text === b.text) : a.text === b.text;
-var trackSections = (text6) => sectionTitles(text6).map(sectionParts);
+var trackSections = (text7) => sectionTitles(text7).map(sectionParts);
 function mapBySections(movements, tracks) {
   if (!movements.some(combined)) return null;
   const sections = movements.map((m) => sectionTitles(m.title || "").map(sectionParts));
@@ -39662,9 +39699,9 @@ function mapToMovements(movements, tracks, { setSubject = "", sections = false }
 }
 var VARIATION_TITLE = /^var(?:iation|iatio|iazione)?\.?\s*(?:(?:no|nr|n)\.?\s*)?(\d+|[ivxlc]+)(?![\p{L}\d])[\s:.,]*(.*)$/iu;
 function asVariation(title) {
-  const text6 = clean3(title).replace(/^(?:tema|thema)(?![\p{L}])/iu, "Theme");
-  const variation = text6.match(VARIATION_TITLE);
-  return variation ? { title: `${variation[1]}. ${variation[2]}`, variation: true, number: numberOf(variation[1]) } : { title: text6, variation: false };
+  const text7 = clean3(title).replace(/^(?:tema|thema)(?![\p{L}])/iu, "Theme");
+  const variation = text7.match(VARIATION_TITLE);
+  return variation ? { title: `${variation[1]}. ${variation[2]}`, variation: true, number: numberOf(variation[1]) } : { title: text7, variation: false };
 }
 function mapEach(rawMovements, rawTracks, setSubject) {
   const movements = rawMovements.map((m) => {
@@ -39676,7 +39713,7 @@ function mapEach(rawMovements, rawTracks, setSubject) {
     return { ...track, movementTitle: title, variation, variationNumber: variation ? number : null };
   });
   const used = /* @__PURE__ */ new Set(), result = [];
-  const firstWord = (text6) => text6.split(" ")[0];
+  const firstWord = (text7) => text7.split(" ")[0];
   let previous = null;
   for (const track of tracks) {
     const parts = movementParts(track.movementTitle);
@@ -39693,7 +39730,7 @@ function mapEach(rawMovements, rawTracks, setSubject) {
       if (named) found = [named];
     }
     if (found.length !== 1 && !parts.index && parts.text) {
-      const key = (text6) => firstWord(text6).replace(/^fug(?:a|e)$/, "fugue");
+      const key = (text7) => firstWord(text7).replace(/^fug(?:a|e)$/, "fugue");
       if (/^(?:theme|introduction|introduzione|coda|finale|aria|fugue|intermezzo)$/.test(key(parts.text))) {
         const near = movements.filter(
           (m) => !used.has(m.id) && m.text && !m.index && key(m.text) === key(parts.text) && (m.text === parts.text || firstWord(m.text) !== firstWord(parts.text) || m.text.startsWith(`${parts.text} `) || parts.text.startsWith(`${m.text} `))
@@ -40116,10 +40153,10 @@ function createGroup(catalogue, group, actor4, index) {
 }
 function placeTrack(catalogue, realization, performanceWork, recording, segment, movement) {
   const db = catalogue.db;
-  const list4 = Array.isArray(movement) ? movement : [movement];
+  const list5 = Array.isArray(movement) ? movement : [movement];
   let sequence = db.prepare("SELECT coalesce(max(sequence),0) AS n FROM realization_item WHERE realization_id=?").get(realization).n;
   let position = db.prepare("SELECT coalesce(max(position),0) AS n FROM recording_content WHERE recording_id=?").get(recording).n;
-  list4.forEach((id, j) => {
+  list5.forEach((id, j) => {
     const content = catalogue.recordingContent(recording, performanceWork, { movement: id, position: ++position });
     catalogue.segmentContent(segment, content);
     const occurrence = id ? db.prepare("SELECT count(*) AS n FROM realization_item WHERE realization_id=? AND movement_id=?").get(realization, id).n + 1 : 1;
@@ -40253,10 +40290,10 @@ function excerptsOnly(catalogue, work) {
 }
 var ACT_WORD = /^(?:act|atto|akt|acte|aufzug|scene|scena|szene|prologue|prolog|prologo)$/;
 function namesWithin(a, b, workTitle) {
-  const strip = (text6) => {
-    const list4 = words2(text6).split(" ").filter(Boolean).filter((word, i, all) => !ACT_WORD.test(word) && !(i > 0 && ACT_WORD.test(all[i - 1]) && romanValue(word)));
-    for (const word of words2(workTitle).split(" ")) if (list4.includes(word) && list4.length > 1) list4.splice(list4.indexOf(word), 1);
-    return list4;
+  const strip = (text7) => {
+    const list5 = words2(text7).split(" ").filter(Boolean).filter((word, i, all) => !ACT_WORD.test(word) && !(i > 0 && ACT_WORD.test(all[i - 1]) && romanValue(word)));
+    for (const word of words2(workTitle).split(" ")) if (list5.includes(word) && list5.length > 1) list5.splice(list5.indexOf(word), 1);
+    return list5;
   };
   const [x, y] = [strip(a), strip(b)];
   const [short, long] = x.length <= y.length ? [x, y] : [y, x];
@@ -40311,7 +40348,7 @@ function expandIncompleteWork(catalogue, metadata, work, existing, ordered, setS
     const rest = words2(movement.title).split(" ").filter(Boolean);
     for (const word of workWords) if (rest.includes(word)) rest.splice(rest.indexOf(word), 1);
     if (rest.length < 2) continue;
-    const named = ordered.map((track, i) => [i, words2(movementParts(track.movementTitle).text).split(" ")]).filter(([i, text6]) => !mapped[i] && rest.every((word) => text6.includes(word)));
+    const named = ordered.map((track, i) => [i, words2(movementParts(track.movementTitle).text).split(" ")]).filter(([i, text7]) => !mapped[i] && rest.every((word) => text7.includes(word)));
     if (named.length !== 1) continue;
     mapped[named[0][0]] = movement;
     used.add(movement.id);
@@ -40418,7 +40455,7 @@ function foldRepeatedMovements(catalogue, work, existing, setSubject, actor4) {
   const ids = [work, ...existing.map((m) => m.id)];
   const madeByMatching = catalogue.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work'").get(work);
   if (!madeByMatching || editedInEditor(catalogue, ids) || hasManualEdits(catalogue, ids)) return false;
-  const tokens = (text6) => words2(text6).split(" ").filter(Boolean);
+  const tokens = (text7) => words2(text7).split(" ").filter(Boolean);
   const within = (short, long) => {
     const rest = [...long];
     return short.length > 1 && short.every((token) => {
@@ -40439,7 +40476,7 @@ function foldRepeatedMovements(catalogue, work, existing, setSubject, actor4) {
       })[0] || ""
     ])
   );
-  const same2 = (a, b) => {
+  const same3 = (a, b) => {
     if (trackNumber.get(a.id) && trackNumber.get(b.id) && trackNumber.get(a.id) !== trackNumber.get(b.id)) return false;
     const [pa, pb] = [pieceNumber(a.title, setSubject), pieceNumber(b.title, setSubject)];
     if (pa != null && pb != null && pa !== pb) return false;
@@ -40462,7 +40499,7 @@ function foldRepeatedMovements(catalogue, work, existing, setSubject, actor4) {
   }
   let split = null;
   if (runs.length === 1 && runs[0].by.length === 1) {
-    const restart = existing.findIndex((m, i) => i > 0 && same2(existing[0], m));
+    const restart = existing.findIndex((m, i) => i > 0 && same3(existing[0], m));
     if (restart < 1 || existing.length % restart) return false;
     split = runs[0].by[0];
     runs = [];
@@ -40484,7 +40521,7 @@ function foldRepeatedMovements(catalogue, work, existing, setSubject, actor4) {
     if (split && run.movements.length !== first.movements.length) return false;
     let from = 0;
     for (const movement of run.movements) {
-      const match2 = first.movements.findIndex((m, i) => i >= from && same2(m, movement));
+      const match2 = first.movements.findIndex((m, i) => i >= from && same3(m, movement));
       if (match2 < 0) return false;
       pairs.push([movement.id, first.movements[match2].id]);
       from = match2 + 1;
@@ -40538,9 +40575,9 @@ var hasManualEdits = (catalogue, ids) => ids.some(
 );
 function transferIdentities(db, keep, drop) {
   for (const row of db.prepare("SELECT * FROM external_identity WHERE entity_id=?").all(drop)) {
-    const same2 = db.prepare("SELECT state FROM external_identity WHERE entity_id=? AND provider=? AND record_kind=? AND record_id=?").get(keep, row.provider, row.record_kind, row.record_id);
-    if (same2) {
-      if (row.state === "active" && same2.state !== "active")
+    const same3 = db.prepare("SELECT state FROM external_identity WHERE entity_id=? AND provider=? AND record_kind=? AND record_id=?").get(keep, row.provider, row.record_kind, row.record_id);
+    if (same3) {
+      if (row.state === "active" && same3.state !== "active")
         db.prepare("UPDATE external_identity SET state='active' WHERE entity_id=? AND provider=? AND record_kind=? AND record_id=?").run(keep, row.provider, row.record_kind, row.record_id);
       db.prepare("DELETE FROM external_identity WHERE entity_id=? AND provider=? AND record_kind=? AND record_id=?").run(drop, row.provider, row.record_kind, row.record_id);
     } else
@@ -40848,7 +40885,7 @@ function repairCompletionSplits(catalogue, albumId, actor4) {
     );
     const names = (work) => composerNames(catalogue, work).map(words2);
     const shared = names(works[0]).filter((name) => works.every((work) => names(work).includes(name)));
-    if (!shared.length || realizations2.some((list4) => list4.length !== 1 || list4[0].elsewhere > 0) || works.some((work) => hasManualEdits(catalogue, [work, ...workMovements(catalogue, work).map((m) => m.id)])))
+    if (!shared.length || realizations2.some((list5) => list5.length !== 1 || list5[0].elsewhere > 0) || works.some((work) => hasManualEdits(catalogue, [work, ...workMovements(catalogue, work).map((m) => m.id)])))
       continue;
     const order = works.map((work, i) => ({ work, realization: realizations2[i][0] })).sort((a, b) => a.realization.first - b.realization.first);
     const [keep, ...drops] = order;
@@ -40914,18 +40951,18 @@ var KEY = /\bin\s+([a-h])(?:[\s-]?(flat|sharp|♭|♯))?\s+(major|minor)\b/i;
 var CATALOGUE_TEXT = /\b(?:op(?:us|\.)?\s*\d+[a-z]?(?:\s*,?\s*no\.?\s*\d+)?|(?:BWV|HWV|RV|WoO|TWV|K(?:V|\.)?|D\.?|Hob\.?\s*[IVXL]+[a-z]?:?)\s*\d+[a-z]?)/gi;
 var tidyCatalogue = (value) => clean3(value).replace(/^op(?:us|\.)?\s*/i, "Op. ").replace(/\s*,?\s*no\.?\s*(\d)/i, " No. $1");
 function workFieldsFromTitle(title) {
-  const text6 = clean3(title);
+  const text7 = clean3(title);
   const fields = {};
-  const key = text6.match(KEY);
+  const key = text7.match(KEY);
   if (key)
     fields.key = `${key[1].toUpperCase()}${key[2] ? `-${key[2].toLowerCase().replace("\u266D", "flat").replace("\u266F", "sharp")}` : ""} ${key[3].toLowerCase()}`;
-  const catalogue = [...new Set((text6.match(CATALOGUE_TEXT) || []).map(tidyCatalogue))];
+  const catalogue = [...new Set((text7.match(CATALOGUE_TEXT) || []).map(tidyCatalogue))];
   if (catalogue.length) fields.catalogue = catalogue;
-  const form2 = text6.match(MULTI_MOVEMENT);
+  const form2 = text7.match(MULTI_MOVEMENT);
   if (form2) fields.form = form2[1].toLowerCase();
-  const nickname = text6.match(/["“„«]([^"”»]+)["”»]/);
+  const nickname = text7.match(/["“„«]([^"”»]+)["”»]/);
   if (nickname) fields.nickname = clean3(nickname[1]);
-  const instrument = text6.match(INSTRUMENT);
+  const instrument = text7.match(INSTRUMENT);
   if (instrument)
     fields.instrumentation = instrument[1].toLowerCase().split(/\s+and\s+/).map((name) => name[0].toUpperCase() + name.slice(1));
   return fields;
@@ -41478,7 +41515,7 @@ function reissueState(c) {
   return { linked, unlinked };
 }
 function groupRecordings(recordings, state = null) {
-  const same2 = (a, b) => {
+  const same3 = (a, b) => {
     if (state && a.performanceId && b.performanceId && a.performanceId !== b.performanceId) {
       const key = performancePair(a.performanceId, b.performanceId);
       if (state.linked.has(key)) return true;
@@ -41488,7 +41525,7 @@ function groupRecordings(recordings, state = null) {
   };
   const groups = [];
   for (const recording of recordings) {
-    const group = groups.find((g) => g.realizations.some((other) => same2(recording, other)));
+    const group = groups.find((g) => g.realizations.some((other) => same3(recording, other)));
     if (group) group.realizations.push(recording);
     else groups.push({ key: recording.id, realizations: [recording] });
   }
@@ -41918,8 +41955,8 @@ function facetCounts(c, docIds, wanted) {
 }
 
 // src/model/editor-v2.js
-import path6 from "node:path";
-import { randomUUID as randomUUID10 } from "node:crypto";
+import path10 from "node:path";
+import { randomUUID as randomUUID13 } from "node:crypto";
 
 // src/model/history.js
 import { randomUUID as randomUUID9 } from "node:crypto";
@@ -42089,6 +42126,1537 @@ function deleteWorks(c, workIds, actor4, { names }) {
   );
 }
 
+// src/model/tag-write.js
+import { randomUUID as randomUUID12 } from "node:crypto";
+import fs8 from "node:fs";
+import path9 from "node:path";
+
+// src/tagger.js
+import { randomUUID as randomUUID10 } from "node:crypto";
+
+// src/model/write-guard.js
+import fs6 from "node:fs/promises";
+import path6 from "node:path";
+async function modelAllowsTagging(ctx, realPath) {
+  const filename = path6.join(ctx.dataFolder, "model", "classical.sqlite");
+  try {
+    await fs6.access(filename);
+  } catch (error) {
+    if (error.code === "ENOENT") return true;
+    throw error;
+  }
+  let db;
+  try {
+    const { DatabaseSync } = await import("node:sqlite");
+    db = new DatabaseSync(filename, { readOnly: true });
+    const rows = db.prepare(
+      `SELECT t.state AS link_state,c.state FROM track_link t
+      LEFT JOIN classification c ON c.target_id=t.id
+      WHERE json_extract(t.evidence,'$.observedRealPath')=? OR json_extract(t.evidence,'$.path')=? OR json_extract(t.evidence,'$.readPath')=?`
+    ).all(realPath, realPath, realPath);
+    return !rows.length || rows.every(
+      (row) => row.link_state === "active" && row.state === "classical"
+    );
+  } catch (error) {
+    ctx.log?.(`Classical model cannot authorize tagging: ${error.message}`);
+    return false;
+  } finally {
+    db?.close();
+  }
+}
+
+// src/tagger.js
+import fs7 from "node:fs/promises";
+import path7 from "node:path";
+
+// src/aurral.js
+var Aurral = class {
+  constructor(api, fetchImpl = fetch) {
+    if (!api?.url || !api?.key) throw new Error("Aurral API access is off. Turn it on on the plugin's page.");
+    this.url = api.url.replace(/\/+$/, "");
+    this.key = api.key;
+    this.fetch = fetchImpl;
+  }
+  async request(method, route, body) {
+    const response = await this.fetch(`${this.url}${route}`, {
+      method,
+      headers: { "X-Api-Key": this.key, ...body !== void 0 && { "Content-Type": "application/json" } },
+      body: body === void 0 ? void 0 : JSON.stringify(body),
+      signal: AbortSignal.timeout(3e4)
+    });
+    const data = await response.json().catch(() => null);
+    if (!response.ok) {
+      const detail = data?.message || data?.error || response.statusText;
+      throw new Error(`Aurral answered ${response.status} for ${route}: ${detail}`);
+    }
+    return data;
+  }
+  // Re-reads files whose tags changed, so the Library shows the new ones.
+  refreshLibrary() {
+    return this.request("POST", "/library/refresh", { mode: "quick" });
+  }
+  users() {
+    return this.request("GET", "/users");
+  }
+  async staticPlaylists() {
+    const status = await this.request("GET", "/playlists/status");
+    return status?.staticPlaylists ?? [];
+  }
+  createPlaylist(name, tracks) {
+    return this.request("POST", "/playlists/static-playlists", { name, tracks, downloadMissing: true });
+  }
+  updatePlaylist(id, name, tracks) {
+    return this.request("PUT", `/playlists/static-playlists/${encodeURIComponent(id)}`, { name, tracks });
+  }
+};
+
+// src/tagger.js
+var LOCK_STALE_MS2 = 2 * 6e4;
+var SAVE_EVERY_MS = 3e4;
+var queueDir = (ctx) => path7.join(ctx.dataFolder, "queue");
+var processedFile = (ctx) => path7.join(ctx.dataFolder, "processed.json");
+var indexFile = (ctx) => path7.join(ctx.dataFolder, "library-index.json");
+var originalsFile = (ctx) => path7.join(ctx.dataFolder, "originals.json");
+var excludedFile = (ctx) => path7.join(ctx.dataFolder, "excluded.json");
+var TAG_FIELDS = ["artist", "albumArtist", "composer", "work", "workId"];
+var TAGGING_VERSION = 2;
+var outdated = (record) => record && (record.status === "tagged" || record.status === "unchanged") && (record.v ?? 1) < TAGGING_VERSION;
+var lockDir = (ctx) => path7.join(ctx.dataFolder, "tagging.lock");
+var yieldFile = (ctx) => path7.join(ctx.dataFolder, "tagging.yield");
+var YIELD_FRESH_MS = 10 * 6e4;
+var PRIORITY_WAIT_MS = 5 * 6e4;
+var ACTION_CLAIM_MS = 2 * 6e4;
+async function enqueue(ctx, filePaths, { force = false, source = null } = {}) {
+  await fs7.mkdir(queueDir(ctx), { recursive: true });
+  const ids = [];
+  for (const filePath of filePaths) {
+    if (!filePath) continue;
+    const id = `${Date.now().toString().padStart(15, "0")}-${randomUUID10()}`;
+    await writeJson(path7.join(queueDir(ctx), `${id}.json`), { path: filePath, force, source, at: Date.now() });
+    ids.push(id);
+  }
+  return ids;
+}
+async function queuedEntries(ctx) {
+  const names = (await fs7.readdir(queueDir(ctx)).catch(() => [])).filter((n) => n.endsWith(".json")).sort();
+  return names.map((name) => ({ name, file: path7.join(queueDir(ctx), name) }));
+}
+var queueLength = async (ctx) => (await queuedEntries(ctx)).length;
+async function allowedPath(ctx, filePath) {
+  const real = await fs7.realpath(filePath).catch(() => null);
+  if (!real) return null;
+  for (const root of [ctx.libraryFolder, ctx.dataFolder]) {
+    if (!root) continue;
+    const base = await fs7.realpath(root).catch(() => null);
+    if (!base) continue;
+    const relative = path7.relative(base, real);
+    if (relative && !relative.startsWith("..") && !path7.isAbsolute(relative)) return real;
+  }
+  return null;
+}
+var statKey = (stat) => ({ mtimeMs: Math.round(stat.mtimeMs), size: stat.size });
+var sameStat = (record, stat) => record && record.mtimeMs === Math.round(stat.mtimeMs) && record.size === stat.size;
+function indexEntry(tags, stat) {
+  return {
+    ...statKey(stat),
+    title: tags.title,
+    artist: tags.artist,
+    album: tags.album,
+    albumArtist: tags.albumArtist,
+    recordingMbid: tags.recordingMbid,
+    releaseMbid: tags.releaseMbid,
+    releaseGroupMbid: tags.releaseGroupMbid,
+    albumArtistMbids: tags.albumArtistMbids,
+    trackNumber: tags.trackNumber,
+    discNumber: tags.discNumber,
+    durationMs: tags.durationMs,
+    workId: tags.workId
+  };
+}
+var State = class {
+  constructor(ctx, lock) {
+    this.ctx = ctx;
+    this.lock = lock;
+    this.dirty = 0;
+    this.savedAt = Date.now();
+    this.refs = 0;
+    this.admins = 0;
+    this.background = 0;
+    this.claimed = /* @__PURE__ */ new Set();
+    this.busyPaths = /* @__PURE__ */ new Map();
+  }
+  async load() {
+    this.processed = await readJson(processedFile(this.ctx), {});
+    this.index = await readJson(indexFile(this.ctx), {});
+    this.originals = await readJson(originalsFile(this.ctx), {});
+    this.excluded = await readJson(excludedFile(this.ctx), {});
+  }
+  // Saved every 30 seconds while working, and at the end: the index of a
+  // large Library is several megabytes.
+  async save(force = false) {
+    if (!this.dirty || !force && Date.now() - this.savedAt < SAVE_EVERY_MS) return;
+    this.savedAt = Date.now();
+    this.dirty = 0;
+    await writeJson(processedFile(this.ctx), this.processed);
+    await writeJson(indexFile(this.ctx), this.index);
+    await writeJson(originalsFile(this.ctx), this.originals);
+    await writeJson(excludedFile(this.ctx), this.excluded);
+    await this.lock.touch();
+  }
+  // One call at a time works on a file.
+  async exclusive(file, work) {
+    while (this.busyPaths.has(file)) await this.busyPaths.get(file).catch(() => {
+    });
+    const running = work();
+    this.busyPaths.set(file, running);
+    try {
+      return await running;
+    } finally {
+      this.busyPaths.delete(file);
+    }
+  }
+};
+var Session = class {
+  constructor(ctx, state, priority) {
+    this.ctx = ctx;
+    this.state = state;
+    this.priority = priority;
+    this.changedFiles = 0;
+    this.stats = { tagged: 0, unchanged: 0, skipped: {}, failed: 0, left: 0 };
+  }
+  get processed() {
+    return this.state.processed;
+  }
+  get index() {
+    return this.state.index;
+  }
+  get originals() {
+    return this.state.originals;
+  }
+  get excluded() {
+    return this.state.excluded;
+  }
+  get dirty() {
+    return this.state.dirty;
+  }
+  set dirty(value) {
+    this.state.dirty = value;
+  }
+  save(force = false) {
+    return this.state.save(force);
+  }
+  // True when an admin action wants the lock and this is background work:
+  // one in this process, or one waiting in another.
+  async shouldYield() {
+    if (this.priority) return false;
+    if (this.state.admins > 0) this.yielding = true;
+    else if (!this.yieldCheckedAt || Date.now() - this.yieldCheckedAt >= 500) {
+      this.yieldCheckedAt = Date.now();
+      const stat = await fs7.stat(yieldFile(this.ctx)).catch(() => null);
+      this.yielding = Boolean(stat && Date.now() - stat.mtimeMs < YIELD_FRESH_MS);
+    }
+    if (this.yielding && !this.yieldLogged) {
+      this.yieldLogged = true;
+      this.ctx.log("Pausing background tagging for an admin action");
+    }
+    return this.yielding;
+  }
+  record(filePath, stat, result) {
+    this.processed[filePath] = { ...statKey(stat), ...result, at: Date.now() };
+    this.dirty++;
+    if (result.status === "skipped") this.stats.skipped[result.reason] = (this.stats.skipped[result.reason] || 0) + 1;
+    else this.stats[result.status]++;
+  }
+  // Returns false when MusicBrainz can't be reached, so the caller stops.
+  async processFile(filePath, options = {}) {
+    const real = await allowedPath(this.ctx, filePath);
+    if (!real) {
+      this.ctx.log(`Not tagging ${filePath}: it isn't in the Library folder`);
+      this.stats.skipped["outside the Library"] = (this.stats.skipped["outside the Library"] || 0) + 1;
+      return true;
+    }
+    if (!isAudioPath(real)) return true;
+    return this.state.exclusive(real, () => this.processReal(real, options));
+  }
+  // `queuedAt`: when the request to tag was made. Classical tags an admin
+  // removed after that stay removed.
+  async processReal(real, { force = false, prefilter = false, upgrade = false, queuedAt = null } = {}) {
+    const { ctx } = this;
+    const stat = await fs7.stat(real);
+    if (!await modelAllowsTagging(ctx, real)) {
+      this.record(real, stat, { status: "skipped", reason: "model classification or link requires review" });
+      return true;
+    }
+    if (!force && sameStat(this.processed[real], stat) && !(upgrade && outdated(this.processed[real]))) return true;
+    let tags;
+    try {
+      tags = readTags(real);
+    } catch (error) {
+      this.record(real, stat, { status: "skipped", reason: error instanceof UnsupportedFormat ? "unsupported format" : "unreadable" });
+      return true;
+    }
+    this.index[real] = indexEntry(tags, stat);
+    if (!tags.recordingMbid) {
+      this.record(real, stat, { status: "skipped", reason: "no recording ID" });
+      return true;
+    }
+    if (this.excluded[tags.recordingMbid]) {
+      if (!force || queuedAt && (this.excluded[tags.recordingMbid].at ?? 0) > queuedAt) {
+        this.record(real, stat, { status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
+        return true;
+      }
+      delete this.excluded[tags.recordingMbid];
+    }
+    if (prefilter && ctx.resolver.classifyGenres(new Set(tags.genres.map((g) => g.toLowerCase()))) === false) {
+      this.record(real, stat, { status: "skipped", reason: "non-classical", recording: tags.recordingMbid });
+      return true;
+    }
+    const fields = await ctx.resolver.resolve(tags.recordingMbid, {
+      trackArtistIds: tags.artistMbids,
+      albumArtistIds: tags.albumArtistMbids,
+      releaseGroupId: tags.releaseGroupMbid || null,
+      confirmed: force
+    });
+    if (!fields) {
+      const reason = ctx.resolver.skipReason;
+      if (reason === "unreachable") return false;
+      this.record(real, stat, { status: "skipped", reason, recording: tags.recordingMbid });
+      return true;
+    }
+    const values = { artist: [fields.artist], composer: fields.composers };
+    if (fields.workId) Object.assign(values, { work: [fields.work], workId: [fields.workId] });
+    const albumArtist = await this.englishAlbumArtist(tags);
+    if (albumArtist) values.albumArtist = [albumArtist];
+    let changed;
+    try {
+      if (!this.originals[real]) {
+        this.originals[real] = { ...readValues(real, TAG_FIELDS), recording: tags.recordingMbid };
+        this.dirty++;
+        await writeJson(originalsFile(ctx), this.originals);
+      }
+      changed = await writeTags(real, values);
+    } catch (error) {
+      ctx.log(`Couldn't tag ${real}: ${error.message}`);
+      this.record(real, stat, { status: "skipped", reason: "couldn't write tags", recording: tags.recordingMbid });
+      return true;
+    }
+    const after = await fs7.stat(real);
+    this.index[real] = { ...this.index[real], ...statKey(after), artist: fields.artist, workId: fields.workId || "" };
+    this.record(real, after, {
+      v: TAGGING_VERSION,
+      status: changed.length ? "tagged" : "unchanged",
+      recording: tags.recordingMbid,
+      artist: fields.artist,
+      workId: fields.workId
+    });
+    if (changed.length) {
+      this.changedFiles++;
+      ctx.log(`Tagged ${path7.basename(real)}: ${fields.artist}`);
+    }
+    return true;
+  }
+  // Puts back the tags a file had before the plugin changed them. Files
+  // tagged before the plugin kept backups get the artist MusicBrainz credits
+  // for that track on its release, which is what Aurral writes.
+  async untagFile(filePath, mode = "restore") {
+    const real = await allowedPath(this.ctx, filePath);
+    if (!real || !isAudioPath(real)) return "skipped";
+    return this.state.exclusive(real, () => this.untagReal(real, mode));
+  }
+  async untagReal(real, mode = "restore") {
+    const { ctx } = this;
+    if (!await modelAllowsTagging(ctx, real)) return "skipped";
+    let tags;
+    try {
+      tags = readTags(real);
+    } catch {
+      return "skipped";
+    }
+    if (tags.recordingMbid) this.excluded[tags.recordingMbid] = { at: Date.now() };
+    const original = this.originals[real];
+    let values;
+    if (mode === "clear") values = { composer: [], work: [], workId: [] };
+    else if (original) values = Object.fromEntries(TAG_FIELDS.map((field2) => [field2, original[field2] ?? []]));
+    else {
+      const credit = await this.trackCredit(tags);
+      values = { composer: [], work: [], workId: [], ...credit && { artist: [credit] } };
+      if (tags.albumArtistMbids.length === 1) {
+        const name = (await ctx.mb.get("artist", tags.albumArtistMbids[0], "aliases+genres"))?.name;
+        if (name) values.albumArtist = [name];
+      }
+    }
+    const changed = await writeTags(real, values);
+    if (mode !== "clear") delete this.originals[real];
+    const after = await fs7.stat(real);
+    this.index[real] = { ...this.index[real] ?? {}, ...indexEntry(readTags(real), after) };
+    this.record(real, after, { status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
+    this.stats.skipped["classical tags removed"]--;
+    if (changed.length) {
+      this.changedFiles++;
+      ctx.log(`Removed classical tags from ${path7.basename(real)}`);
+    }
+    return changed.length ? original && mode !== "clear" ? "restored" : "cleared" : "unchanged";
+  }
+  async englishAlbumArtist(tags) {
+    if (tags.albumArtistMbids.length !== 1) return null;
+    const artist = await this.ctx.resolver.getArtist(tags.albumArtistMbids[0]);
+    if (!artist?.name) return null;
+    const [name] = await this.ctx.resolver.englishNames(artist);
+    return name || null;
+  }
+  // MusicBrainz's artist credit for this recording on the file's release,
+  // else on the recording itself.
+  async trackCredit(tags) {
+    const { mb } = this.ctx;
+    if (tags.releaseMbid) {
+      const release = await mb.get("release", tags.releaseMbid, RELEASE_INC);
+      for (const medium of release?.media || [])
+        for (const track of medium.tracks || [])
+          if (track.recording?.id === tags.recordingMbid) {
+            const credit = creditString(track["artist-credit"] || track.recording["artist-credit"]);
+            if (credit) return credit;
+          }
+    }
+    const recording = await mb.get("recording", tags.recordingMbid, "artist-credits");
+    return creditString(recording?.["artist-credit"]) || null;
+  }
+  async drainQueue(until, onlyIds = null) {
+    for (const entry of await queuedEntries(this.ctx)) {
+      if (Date.now() > until || await this.shouldYield()) return false;
+      if (onlyIds && !onlyIds.has(entry.name.replace(/\.json$/, ""))) continue;
+      if (this.state.claimed.has(entry.name)) continue;
+      this.state.claimed.add(entry.name);
+      try {
+        const job = await readJson(entry.file, null);
+        if (!this.priority && job?.source === "action" && Date.now() - (job.at || 0) < ACTION_CLAIM_MS) continue;
+        if (job?.path) {
+          const reachable = await this.processFile(job.path, { force: job.force, queuedAt: job.at });
+          if (!reachable) return false;
+        }
+        await fs7.rm(entry.file, { force: true });
+      } finally {
+        this.state.claimed.delete(entry.name);
+      }
+      await this.save();
+    }
+    return true;
+  }
+  // Walks the Library, refreshing the index, and returns files that have a
+  // recording ID and were never processed (or changed since). Stops at
+  // `until`; unchanged files cost only a stat, so the next run gets further.
+  async scan(until) {
+    const root = this.ctx.libraryFolder;
+    const pending = [];
+    const seen = /* @__PURE__ */ new Set();
+    let complete = true;
+    const walk = async (dir) => {
+      if (Date.now() > until || await this.shouldYield()) {
+        complete = false;
+        return;
+      }
+      const entries2 = await fs7.readdir(dir, { withFileTypes: true }).catch(() => []);
+      for (const entry of entries2) {
+        if (Date.now() > until || await this.shouldYield()) {
+          complete = false;
+          return;
+        }
+        if (entry.name.startsWith(".")) continue;
+        const full = path7.join(dir, entry.name);
+        if (entry.isDirectory()) await walk(full);
+        else if (entry.isFile() && isAudioPath(full)) {
+          seen.add(full);
+          const stat = await fs7.stat(full).catch(() => null);
+          if (!stat) continue;
+          if (!sameStat(this.index[full], stat)) {
+            try {
+              this.index[full] = indexEntry(readTags(full), stat);
+            } catch {
+              delete this.index[full];
+              continue;
+            }
+            this.dirty++;
+            await this.save();
+          }
+          if (this.index[full].recordingMbid && (!sameStat(this.processed[full], stat) || outdated(this.processed[full]))) pending.push(full);
+        }
+      }
+    };
+    if (root) await walk(root);
+    if (complete) {
+      for (const file of Object.keys(this.index)) if (file.startsWith(root) && !seen.has(file)) delete this.index[file];
+    }
+    this.scanComplete = complete;
+    return pending;
+  }
+};
+var held = /* @__PURE__ */ new Map();
+async function openState(ctx, priority) {
+  let lock = await tryLock(lockDir(ctx), LOCK_STALE_MS2);
+  if (!lock && priority) {
+    ctx.log("Waiting for background tagging in another process to pause");
+    const until = Date.now() + PRIORITY_WAIT_MS;
+    while (!lock && Date.now() < until) {
+      await writeJson(yieldFile(ctx), { at: Date.now() });
+      await sleep(500);
+      lock = await tryLock(lockDir(ctx), LOCK_STALE_MS2);
+    }
+    await fs7.rm(yieldFile(ctx), { force: true });
+    if (!lock) ctx.log("Tagging in another process didn't pause within 5 minutes");
+  }
+  if (!lock) return null;
+  const state = new State(ctx, lock);
+  try {
+    await state.load();
+  } catch (error) {
+    await lock.release();
+    throw error;
+  }
+  state.heartbeat = setInterval(() => lock.touch(), 3e4);
+  return state;
+}
+async function withTagging(ctx, work, { priority = false } = {}) {
+  const key = path7.resolve(ctx.dataFolder);
+  let entry;
+  for (; ; ) {
+    entry = held.get(key);
+    if (!entry) {
+      entry = { opening: openState(ctx, priority), state: null };
+      held.set(key, entry);
+      try {
+        entry.state = await entry.opening;
+      } catch (error) {
+        held.delete(key);
+        throw error;
+      }
+      if (!entry.state) {
+        held.delete(key);
+        return null;
+      }
+      break;
+    }
+    if (!entry.state) {
+      if (!priority) return null;
+      await entry.opening.catch(() => {
+      });
+      if (held.get(key) === entry && entry.state) break;
+      continue;
+    }
+    if (!priority && entry.state.background > 0) return null;
+    break;
+  }
+  const { state } = entry;
+  const session = new Session(ctx, state, priority);
+  state.refs++;
+  if (priority) state.admins++;
+  else state.background++;
+  try {
+    await work(session);
+    return session.stats;
+  } finally {
+    if (priority) state.admins--;
+    else state.background--;
+    if (--state.refs === 0) {
+      held.delete(key);
+      clearInterval(state.heartbeat);
+      await state.save(true).catch((error) => ctx.log(`Couldn't save progress: ${error.message}`));
+      await state.lock.release();
+    } else {
+      await state.save().catch(() => {
+      });
+    }
+    if (session.changedFiles) await refreshLibrary(ctx);
+  }
+}
+async function refreshLibrary(ctx) {
+  if (!ctx.api?.url || !ctx.api?.key) return;
+  try {
+    await new Aurral(ctx.api, ctx.fetch).refreshLibrary();
+  } catch (error) {
+    ctx.log(`Couldn't ask Aurral to rescan the Library: ${error.message}`);
+  }
+}
+async function runQueue(ctx, budgetMs, onlyIds = null, { priority = false } = {}) {
+  const until = Date.now() + budgetMs;
+  return withTagging(
+    ctx,
+    async (session) => {
+      await session.drainQueue(until, onlyIds);
+      session.stats.left = onlyIds ? (await queuedEntries(ctx)).filter((e) => onlyIds.has(e.name.replace(/\.json$/, ""))).length : await queueLength(ctx);
+    },
+    { priority }
+  );
+}
+async function runScheduled(ctx, budgetMs) {
+  const until = Date.now() + budgetMs;
+  return withTagging(ctx, async (session) => {
+    if (!await session.drainQueue(until)) return;
+    const pending = await session.scan(until);
+    session.stats.found = pending.length;
+    for (const file of pending) {
+      if (Date.now() > until || await session.shouldYield()) break;
+      if (!await session.processFile(file, { prefilter: true, upgrade: true })) break;
+      await session.save();
+    }
+    session.stats.left = await queueLength(ctx) + pending.filter((f) => !session.processed[f]).length;
+  });
+}
+async function libraryIndex(ctx, budgetMs, { priority = false } = {}) {
+  let index = null;
+  await withTagging(
+    ctx,
+    async (session) => {
+      await session.scan(Date.now() + budgetMs);
+      index = session.index;
+    },
+    { priority }
+  );
+  return index ?? await readJson(indexFile(ctx), {});
+}
+async function untagFiles(ctx, paths, budgetMs, { priority = false, mode = "restore" } = {}) {
+  const until = Date.now() + budgetMs;
+  const counts = { restored: 0, cleared: 0, unchanged: 0, "no backup": 0, skipped: 0, left: 0 };
+  const stats = await withTagging(ctx, async (session) => {
+    for (const file of paths) {
+      if (Date.now() > until) {
+        counts.left++;
+        continue;
+      }
+      try {
+        counts[await session.untagFile(file, mode)]++;
+      } catch (error) {
+        ctx.log(`Couldn't remove classical tags from ${file}: ${error.message}`);
+        counts.skipped++;
+      }
+    }
+  }, { priority });
+  return stats ? counts : null;
+}
+function describeStats(stats) {
+  if (!stats) return "Another tagging run is in progress";
+  const parts = [`${stats.tagged} tagged`];
+  if (stats.unchanged) parts.push(`${stats.unchanged} already right`);
+  for (const [reason, count] of Object.entries(stats.skipped)) parts.push(`${count} skipped (${reason})`);
+  if (stats.failed) parts.push(`${stats.failed} failed`);
+  if (stats.left) parts.push(`${stats.left} left for the next run`);
+  return parts.join(", ");
+}
+
+// src/model/presentation.js
+import path8 from "node:path";
+var text4 = (value, fallback) => typeof value === "string" && value.trim() ? value.trim() : fallback;
+var DisplayValues = class {
+  constructor(c) {
+    this.statement = c.db.prepare(
+      `SELECT a.value FROM field_resolution f JOIN assertion a ON a.id=f.assertion_id
+       WHERE f.target_id=? AND f.field=?`
+    );
+  }
+  resolve(id, field2) {
+    const row = this.statement.get(id, field2);
+    return { value: row ? JSON.parse(row.value) : void 0 };
+  }
+};
+var entityValue = (metadata, id, field2, fallback) => text4(metadata.resolve(id, field2).value, fallback);
+var evidenceOf = (row) => JSON.parse(row.evidence);
+var TEXT_LIMIT = 500;
+var MOVEMENT_LIMIT = 200;
+function clip(value, max = TEXT_LIMIT) {
+  if (typeof value !== "string" || value.length <= max) return value;
+  const cut = value.slice(0, max - 1).replace(/[\uD800-\uDBFF]$/, "");
+  return `${cut.trimEnd()}\u2026`;
+}
+var fitMovement = (movement) => ({ ...movement, title: clip(movement.title) });
+var fitMovements = (movements) => movements.slice(0, MOVEMENT_LIMIT).map(fitMovement);
+var fitCredit = (credit) => ({ ...credit, name: clip(credit.name), instrument: clip(credit.instrument, 200) });
+var fitItem = (item) => ({
+  ...item,
+  title: clip(item.title),
+  artist: clip(item.artist),
+  performer: clip(item.performer),
+  album: clip(item.album)
+});
+function fitWork(view) {
+  const { work } = view;
+  return {
+    ...view,
+    work: {
+      ...work,
+      title: clip(work.title),
+      nickname: clip(work.nickname),
+      description: clip(work.description, 1e4),
+      credits: work.credits.map(fitCredit),
+      movements: fitMovements(work.movements),
+      collections: work.collections.map((collection) => ({ ...collection, title: clip(collection.title) }))
+    },
+    recordings: view.recordings.map((recording) => ({
+      ...recording,
+      label: clip(recording.label),
+      performer: clip(recording.performer),
+      recordLabel: clip(recording.recordLabel, 200),
+      credits: recording.credits.map(fitCredit),
+      parts: recording.parts.slice(0, MOVEMENT_LIMIT),
+      releases: recording.releases.map((release) => ({ ...release, album: clip(release.album) })),
+      items: recording.items.map(fitItem),
+      missing: fitMovements(recording.missing)
+    }))
+  };
+}
+var fitGroup = (group) => ({
+  ...group,
+  title: clip(group.title),
+  composer: clip(group.composer),
+  items: group.items.map(fitItem),
+  missing: fitMovements(group.missing)
+});
+var trackTitle = (evidence) => text4(evidence.hints?.title, path8.basename(evidence.path || "Track"));
+function actor(input) {
+  const user = input?.user;
+  if (!Number.isSafeInteger(user?.id) || user.id <= 0)
+    throw new Error("A real user account is required");
+  return user;
+}
+function realizationRows(c, realizationId = null, workId = null, albumId = null) {
+  const filters = [
+    [realizationId, "r.id=?"],
+    [workId, "r.work_id=?"],
+    [albumId, "CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?"]
+  ].filter(([value]) => value !== null);
+  return c.db.prepare(
+    `SELECT r.id AS realization_id,r.work_id,r.performance_work_id,r.label AS realization_label,
+        i.id AS item_id,i.movement_id,i.sequence,i.occurrence,i.segment_id,s.start_ms,s.end_ms,s.kind AS segment_kind,
+        t.id AS track_link_id,t.core_id,t.file_id,t.evidence
+      FROM realization r
+      JOIN realization_item i ON i.realization_id=r.id
+      JOIN segment s ON s.id=i.segment_id
+      JOIN track_link t ON t.id=s.track_link_id AND t.state='active'
+      JOIN classification c ON c.target_id=t.id AND c.state='classical'
+      ${filters.length ? `WHERE ${filters.map(([, sql]) => sql).join(" AND ")}` : ""}
+      ORDER BY r.id,i.sequence,i.occurrence,i.id`
+  ).all(...filters.map(([value]) => value)).reduce((rows, row) => {
+    const last3 = rows.at(-1);
+    if (last3 && last3.realization_id === row.realization_id && last3.segment_id === row.segment_id) last3.movement_ids.push(row.movement_id);
+    else rows.push({ ...row, movement_ids: [row.movement_id] });
+    return rows;
+  }, []);
+}
+var words4 = (value) => String(value || "").normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+function performerOf(hints) {
+  const artist = text4(hints?.artist, text4(hints?.albumArtist, ""));
+  const performers = performerNames(hints || {}, composersOf(hints || {}), words4);
+  return performers.length ? performers.join(", ") : artist;
+}
+function queueItem(metadata, row, workTitle = null, links = null) {
+  const evidence = evidenceOf(row);
+  return {
+    id: row.item_id,
+    trackId: String(row.core_id),
+    fileId: String(row.file_id),
+    albumId: String(evidence.albumId ?? ""),
+    title: workTitle ? movementTitle({ title: withoutComposer(trackTitle(evidence), composersOf(evidence.hints || {})), work: evidence.hints?.work }, workTitle) : row.movement_ids?.length > 1 ? row.movement_ids.map((id) => entityValue(metadata, id, "title", "")).filter(Boolean).join(" / ") : row.movement_id ? entityValue(metadata, row.movement_id, "title", trackTitle(evidence)) : trackTitle(evidence),
+    artist: text4(evidence.hints?.artist, text4(evidence.hints?.albumArtist, "")),
+    performer: performerOf(evidence.hints),
+    album: text4(evidence.hints?.album, ""),
+    durationMs: Number(evidence.durationMs) || null,
+    startMs: row.start_ms,
+    endMs: row.end_ms,
+    ...links?.length && { links }
+  };
+}
+var CLASSICAL_PAGE = "classical";
+var LINK_ROLES = ["soloist", "performer", "accompanist", "conductor", "orchestra", "ensemble", "choir"];
+var place = (resourceId) => ({ type: "resource", pageId: CLASSICAL_PAGE, resourceId });
+var goTo = (name) => clip(`Go to ${name}`, 80);
+function itemLinks(c, metadata, { workId, realizationId, performanceId }, workLabel = "Go to Work") {
+  const links = [
+    { label: workLabel, link: place(`work:${workId}`) },
+    { label: "Go to Recording", link: place(`recording:${realizationId}`) }
+  ];
+  const kindOf = c.db.prepare("SELECT kind FROM entity WHERE id=? AND deleted_at IS NULL");
+  for (const credit of credits(c, metadata, workId).filter((entry) => entry.role === "composer").slice(0, 2))
+    links.push({ label: goTo(credit.name), link: place(`composer:${credit.id}`) });
+  const seen = /* @__PURE__ */ new Set();
+  const rank = (role) => LINK_ROLES.indexOf(role) + 1 || LINK_ROLES.length + 1;
+  const performers = (performanceId ? credits(c, metadata, performanceId) : []).sort((a, b) => rank(a.role) - rank(b.role) || a.name.localeCompare(b.name) || (a.id < b.id ? -1 : 1));
+  for (const credit of performers) {
+    if (links.length >= 6) break;
+    const kind = credit.role === "composer" || seen.has(credit.id) ? null : kindOf.get(credit.id)?.kind;
+    if (kind !== "person" && kind !== "ensemble") continue;
+    seen.add(credit.id);
+    links.push({ label: goTo(credit.name), link: place(`${kind}:${credit.id}`) });
+  }
+  return links.filter((entry) => entry.link.resourceId.length <= 200);
+}
+var performanceOf = (c, performanceWorkId) => c.db.prepare("SELECT source_id FROM relation WHERE id=?").get(performanceWorkId)?.source_id ?? null;
+function workMovements2(c, metadata, workId) {
+  return c.db.prepare(
+    `SELECT target_id,position FROM relation
+       WHERE kind='movement' AND source_id=? ORDER BY position,occurrence,id`
+  ).all(workId).map((row) => ({
+    id: row.target_id,
+    title: entityValue(metadata, row.target_id, "title", "Untitled movement"),
+    position: row.position
+  }));
+}
+function credits(c, metadata, targetId) {
+  return c.db.prepare(
+    `SELECT role,instrument,contributor_id FROM credit
+       WHERE target_id=? AND state='active' ORDER BY position,id`
+  ).all(targetId).map((row) => ({
+    role: row.role,
+    instrument: row.instrument,
+    id: row.contributor_id,
+    name: entityValue(
+      metadata,
+      row.contributor_id,
+      "name",
+      "Unknown contributor"
+    )
+  }));
+}
+var albumPosition = (row) => {
+  const hints = evidenceOf(row).hints || {};
+  return (Number(hints.discNumber) || 1) * 1e4 + (Number(hints.trackNumber) || 9999);
+};
+var ACT = /,\s*(?:act|akt|atto|acte|part|pt\.?|teil|scene|szene)\s*[ivxlc\d]+\b.*$/i;
+var nameBeforeComma = (title) => words4(String(title).split(",")[0]);
+function sameNamedWork(a, b) {
+  if (a === b) return true;
+  const catalogueA = catalogueNumber(a).toLowerCase();
+  const catalogueB = catalogueNumber(b).toLowerCase();
+  if (catalogueA && catalogueB) return catalogueA === catalogueB;
+  const [short, long] = a.length <= b.length ? [a, b] : [b, a];
+  const name = nameBeforeComma(long);
+  return name.length >= 4 && words4(short) === name && long.includes(",");
+}
+function sameCredits(last3, heading, names) {
+  const these = new Set(names.map(words4));
+  if (last3.names.length === these.size && last3.names.every((name) => these.has(name))) return true;
+  const shared = last3.names.filter((name) => these.has(name));
+  const same3 = shared.length > 0 && Boolean(catalogueNumber(last3.title)) && catalogueNumber(last3.title) === catalogueNumber(heading);
+  if (same3) {
+    last3.composer = last3.credited.filter((name) => shared.includes(words4(name))).join(", ");
+    last3.names = shared;
+  }
+  return same3;
+}
+function pieceGroups(c, album, following) {
+  const rows = c.db.prepare(
+    `SELECT t.id AS track_link_id,t.core_id,t.file_id,t.evidence FROM track_link t
+       JOIN classification c ON c.target_id=t.id AND c.state='classical'
+       WHERE t.state='active' AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?
+       AND NOT EXISTS(SELECT 1 FROM segment s WHERE s.track_link_id=t.id)`
+  ).all(album).sort((a, b) => albumPosition(a) - albumPosition(b));
+  const pieces = [];
+  for (const row of rows) {
+    const evidence = evidenceOf(row);
+    const workTag = text4(evidence.hints?.work, "");
+    const work = workTag.split(/\s*:\s*/)[0];
+    const title = withoutComposer(trackTitle(evidence), composersOf(evidence.hints || {}));
+    const split = splitTitle(title);
+    const fullHead = work || split.head;
+    const ownTail = work ? movementTitle({ title }, work) : split.tail;
+    const taggedTail = work ? movementTitle({ title, work: workTag }, work) : ownTail;
+    const fullTail = words4(ownTail).endsWith(` ${words4(taggedTail)}`) ? taggedTail : ownTail;
+    const numbered = fullHead ? null : numberedPiece(fullTail);
+    const tail = numbered?.part ?? fullTail;
+    const names = composersOf(evidence.hints || {});
+    const head = numbered?.set ?? fullHead.replace(ACT, "");
+    const heading = head || tail;
+    const composer = names.join(", ");
+    const last3 = pieces.at(-1);
+    const item = {
+      id: `piece:${row.track_link_id}`,
+      trackId: String(row.core_id),
+      fileId: String(row.file_id),
+      albumId: String(evidence.albumId ?? ""),
+      title: tail,
+      artist: text4(evidence.hints?.artist, text4(evidence.hints?.albumArtist, "")),
+      performer: performerOf(evidence.hints),
+      album: text4(evidence.hints?.album, ""),
+      durationMs: Number(evidence.durationMs) || null,
+      startMs: 0,
+      endMs: null,
+      position: albumPosition(row)
+    };
+    const sameWork = last3 && sameNamedWork(last3.title, heading);
+    if (head && sameWork && sameCredits(last3, heading, names) && following.get(last3.next) === item.position)
+      last3.items.push(item);
+    else
+      pieces.push({ id: item.id, workId: null, title: heading, composer, names: names.map(words4), credited: names, items: [item], missing: [] });
+    pieces.at(-1).next = item.position;
+  }
+  return pieces.map(({ next, names, credited, items, ...piece }) => ({
+    ...piece,
+    first: items[0].position,
+    items: items.map(({ position, ...item }) => item),
+    movementCount: items.length,
+    // Several tracks under one heading look like a work; say when they are
+    // not one yet. Sets such as "Études" are never made into works.
+    ...items.length > 1 && !isCollectionLike(piece.title) && !NUMBERED_SET.test(piece.title) && { detail: "Not matched to a work" }
+  }));
+}
+function compareAlbumGroups(a, b) {
+  return a.first - b.first || b.items.length - a.items.length || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
+}
+function renderAlbumPresentation(c, albumId, capabilities = {}) {
+  const metadata = new DisplayValues(c);
+  const album = String(albumId);
+  const allRows = realizationRows(c, null, null, album);
+  const grouped = /* @__PURE__ */ new Map();
+  for (const row of allRows) {
+    const group = grouped.get(row.realization_id) || [];
+    group.push(row);
+    grouped.set(row.realization_id, group);
+  }
+  const positions = c.db.prepare(
+    `SELECT evidence FROM track_link WHERE state='active'
+       AND CAST(json_extract(evidence,'$.albumId') AS TEXT)=?`
+  ).all(album).map(albumPosition).sort((a, b) => a - b).filter((position, index, all) => position !== all[index - 1]);
+  const following = new Map(positions.map((position, index) => [position, positions[index + 1]]));
+  const works = [...grouped.entries()].flatMap(([realizationId, rows]) => {
+    const workId = rows[0].work_id;
+    const movements = workMovements2(c, metadata, workId);
+    const present = new Set(rows.flatMap((row) => row.movement_ids).filter(Boolean));
+    const runs = [];
+    for (const row of [...rows].sort((a, b) => albumPosition(a) - albumPosition(b))) {
+      const run = runs.at(-1);
+      const last3 = run && albumPosition(run.at(-1));
+      if (run && (last3 === albumPosition(row) || following.get(last3) === albumPosition(row))) run.push(row);
+      else runs.push([row]);
+    }
+    const name = entityValue(metadata, workId, "title", "Untitled work");
+    const collections = c.db.prepare("SELECT source_id FROM relation WHERE kind='collection_member' AND target_id=?").all(workId);
+    const book = collections.length === 1 ? entityValue(metadata, collections[0].source_id, "title", "") : "";
+    const title = book && !` ${words4(name)} `.includes(` ${words4(book)} `) ? `${name} \xB7 \u201C${book}\u201D` : name;
+    const links = capabilities?.itemLinks >= 1 ? itemLinks(c, metadata, { workId, realizationId, performanceId: performanceOf(c, rows[0].performance_work_id) }) : null;
+    const excerpts = NUMBERED_SET.test(name) && present.size * 2 < movements.length || Boolean(
+      c.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work' AND json_extract(evidence,'$.albumId')=? AND json_extract(evidence,'$.excerpt')=1").get(workId, album)
+    );
+    return runs.map((run, index) => ({
+      id: index ? `${realizationId}:${index}` : realizationId,
+      workId,
+      title,
+      composer: credits(c, metadata, workId).find(
+        (credit) => credit.role === "composer"
+      )?.name || "",
+      items: run.map(
+        (row) => queueItem(
+          metadata,
+          row,
+          row.movement_id && rows.filter((other) => other.movement_id === row.movement_id).length > 1 ? entityValue(metadata, workId, "title", "") : null,
+          links
+        )
+      ),
+      ...links && { links },
+      missing: index || excerpts ? [] : movements.filter((movement) => !present.has(movement.id)),
+      movementCount: Math.max(1, movements.length),
+      first: albumPosition(run[0])
+    }));
+  });
+  const groups = [...works, ...pieceGroups(c, album, following)].sort(compareAlbumGroups).map(({ first, ...group }) => group);
+  if (!groups.some((group) => group.workId || group.items.length > 1)) return null;
+  return { version: 1, albumId: album, supportsToggle: true, groups: groups.map(fitGroup) };
+}
+function renderWork(c, workId, user) {
+  return fitWork(workPage(c, workId, user));
+}
+function workData(c, workId, user) {
+  return workPage(c, workId, user);
+}
+function workPage(c, workId, user) {
+  c.entity(workId, "work");
+  const metadata = new DisplayValues(c);
+  const movements = workMovements2(c, metadata, workId);
+  const rows = realizationRows(c, null, workId);
+  const byRealization = /* @__PURE__ */ new Map();
+  for (const row of rows) {
+    const current = byRealization.get(row.realization_id) || [];
+    current.push(row);
+    byRealization.set(row.realization_id, current);
+  }
+  const state = c.db.prepare("SELECT * FROM user_work_state WHERE user_id=? AND work_id=?").get(user.id, workId);
+  const recordings = recordingsOf(c, metadata, workId, movements, byRealization);
+  const shown = (realization) => recordings.find((r) => r.id === realization || r.releases.some((release) => release.realizationId === realization))?.id ?? realization;
+  const userPick = state?.picked_realization_id ? shown(state.picked_realization_id) : null;
+  const rawAdminPick = c.db.prepare("SELECT realization_id FROM admin_work_pick WHERE work_id=?").get(workId)?.realization_id;
+  const adminPick = rawAdminPick ? shown(rawAdminPick) : null;
+  return {
+    version: 1,
+    work: {
+      id: workId,
+      title: entityValue(metadata, workId, "title", "Untitled work"),
+      nickname: entityValue(metadata, workId, "nickname", ""),
+      description: entityValue(metadata, workId, "description", ""),
+      credits: credits(c, metadata, workId),
+      movements,
+      collections: c.db.prepare(
+        `SELECT source_id FROM relation
+           WHERE kind='collection_member' AND target_id=? ORDER BY position,id`
+      ).all(workId).map((row) => ({
+        id: row.source_id,
+        title: entityValue(
+          metadata,
+          row.source_id,
+          "title",
+          "Untitled collection"
+        )
+      }))
+    },
+    favourite: state?.favourite === 1,
+    pickedRealizationId: userPick || adminPick || null,
+    adminPickId: adminPick || null,
+    pickScope: userPick ? "user" : adminPick ? "admin" : null,
+    recordings
+  };
+}
+function recordingsOf(c, metadata, workId, movements, byRealization) {
+  const facts = new Map(ownedRecordings(c, void 0, void 0, { workId }).map((r) => [r.id, r]));
+  const groups = groupRecordings([...byRealization.keys()].map((id) => facts.get(id)).filter(Boolean), reissueState(c));
+  const grouped = new Map(groups.flatMap((group) => group.realizations.map((r) => [r.id, group])));
+  const seen = /* @__PURE__ */ new Set();
+  const out = [];
+  for (const [id, entries2] of byRealization) {
+    const group = grouped.get(id);
+    if (group && seen.has(group.key)) continue;
+    if (group) seen.add(group.key);
+    const releases = (group?.realizations ?? [facts.get(id)].filter(Boolean)).flatMap(
+      (r) => r.albums.map((albumId) => ({ albumId: String(albumId), album: r.album || "", realizationId: r.id }))
+    );
+    out.push(recordingEntry(c, metadata, workId, movements, id, entries2, facts.get(id), releases, out.length));
+  }
+  return out;
+}
+function recordingEntry(c, metadata, workId, movements, id, entries2, fact, releases, index) {
+  const present = new Set(entries2.flatMap((entry) => entry.movement_ids).filter(Boolean));
+  const performanceId = c.db.prepare("SELECT source_id FROM relation WHERE id=?").get(entries2[0].performance_work_id)?.source_id;
+  const recordingIds = c.db.prepare("SELECT source_id FROM relation WHERE kind='recording_performance' AND target_id=? ORDER BY source_id").all(performanceId).map((row) => row.source_id);
+  const performers = credits(c, metadata, performanceId).filter((credit) => credit.role !== "composer");
+  const first = evidenceOf(entries2[0]);
+  const album = text4(entries2[0].realization_label, text4(first.hints?.album, ""));
+  const artist = performers.length ? performers.map((credit) => credit.name).join(", ") : text4(first.hints?.artist, text4(first.hints?.albumArtist, ""));
+  const items = entries2.map(
+    (entry) => queueItem(
+      metadata,
+      entry,
+      entry.movement_id && entries2.filter((other) => other.movement_id === entry.movement_id).length > 1 ? entityValue(metadata, workId, "title", "") : null
+    )
+  );
+  entries2.forEach((entry, i) => items[i].movementIds = entry.movement_ids.filter(Boolean));
+  return {
+    id,
+    performanceId,
+    label: [artist, album].filter(Boolean).join(" \xB7 ") || `Recording ${index + 1}`,
+    albumId: first.albumId == null ? null : String(first.albumId),
+    recordingIds,
+    credits: credits(c, metadata, performanceId),
+    performer: fact?.performerNames?.join(", ") || artist,
+    year: fact?.year ?? null,
+    recordLabel: fact?.label || "",
+    durationMs: fact?.durationMs || null,
+    parts: movements.map((movement) => ({ movementId: movement.id, durationMs: fact?.parts.get(movement.id) ?? null })),
+    releases,
+    items,
+    missing: movements.filter((movement) => !present.has(movement.id)),
+    complete: movements.length === 0 || movements.every((movement) => present.has(movement.id))
+  };
+}
+async function readWork(input) {
+  const user = actor(input);
+  const c = await openCatalogue(path8.join(input.dataFolder, "model"));
+  try {
+    return renderWork(c, input.resourceId, user);
+  } finally {
+    c.close();
+  }
+}
+async function mutateWork(input) {
+  const user = actor(input);
+  const c = await openCatalogue(path8.join(input.dataFolder, "model"));
+  try {
+    return applyWorkMutation(c, input, user);
+  } finally {
+    c.close();
+  }
+}
+function applyWorkMutation(c, input, user) {
+  return transaction(c.db, () => {
+    const workId = String(input.resourceId || "");
+    c.entity(workId, "work");
+    const command = input.mutation?.command;
+    const realizationId = input.mutation?.realizationId || null;
+    if (realizationId) {
+      const row = c.db.prepare("SELECT 1 FROM realization WHERE id=? AND work_id=?").get(realizationId, workId);
+      if (!row) throw new Error("Recording does not belong to this work");
+    }
+    if (command === "favourite") {
+      const favourite = input.mutation?.value === true ? 1 : 0;
+      c.db.prepare(
+        `INSERT INTO user_work_state(user_id,work_id,favourite,updated_at) VALUES (?,?,?,?)
+           ON CONFLICT(user_id,work_id) DO UPDATE SET favourite=excluded.favourite,updated_at=excluded.updated_at`
+      ).run(user.id, workId, favourite, Date.now());
+    } else if (command === "pick") {
+      c.db.prepare(
+        `INSERT INTO user_work_state(user_id,work_id,favourite,picked_realization_id,updated_at)
+           VALUES (?,?,0,?,?) ON CONFLICT(user_id,work_id) DO UPDATE SET
+           picked_realization_id=excluded.picked_realization_id,updated_at=excluded.updated_at`
+      ).run(user.id, workId, realizationId, Date.now());
+    } else if (command === "admin-pick" && user.role === "admin") {
+      if (realizationId)
+        c.db.prepare(
+          `INSERT INTO admin_work_pick VALUES (?,?,?,?) ON CONFLICT(work_id) DO UPDATE SET
+             realization_id=excluded.realization_id,actor_id=excluded.actor_id,updated_at=excluded.updated_at`
+        ).run(workId, realizationId, user.id, Date.now());
+      else
+        c.db.prepare("DELETE FROM admin_work_pick WHERE work_id=?").run(workId);
+    } else if (command === "admin-pick")
+      throw new Error("Only admins can set the admin pick");
+    else throw new Error("Unknown work action");
+    return { ok: true };
+  });
+}
+async function albumPresentation(input) {
+  actor(input);
+  const c = await openCatalogue(path8.join(input.dataFolder, "model"));
+  try {
+    return renderAlbumPresentation(c, input.album.id, input.capabilities);
+  } finally {
+    c.close();
+  }
+}
+function renderTrackLinks(c, trackIds) {
+  const ids = [...new Set((Array.isArray(trackIds) ? trackIds : []).map(String))].filter((id) => id && id.length <= 200).slice(0, 100);
+  if (!ids.length) return { version: 1, tracks: {} };
+  const metadata = new DisplayValues(c);
+  const rows = c.db.prepare(
+    `SELECT DISTINCT t.core_id,r.id AS realization_id,r.work_id,r.performance_work_id,min(i.sequence) AS first
+       FROM track_link t JOIN classification k ON k.target_id=t.id AND k.state='classical'
+       JOIN segment s ON s.track_link_id=t.id JOIN realization_item i ON i.segment_id=s.id
+       JOIN realization r ON r.id=i.realization_id JOIN entity w ON w.id=r.work_id AND w.deleted_at IS NULL
+       WHERE t.state='active' AND CAST(t.core_id AS TEXT) IN (${ids.map(() => "?").join(",")})
+       GROUP BY t.core_id,r.id ORDER BY t.core_id,min(s.start_ms),first,r.id`
+  ).all(...ids);
+  const byTrack = /* @__PURE__ */ new Map();
+  for (const row of rows) byTrack.set(String(row.core_id), [...byTrack.get(String(row.core_id)) || [], row]);
+  const tracks = {};
+  for (const [trackId, found] of byTrack) {
+    const works = found.filter((row, at) => found.findIndex((other) => other.work_id === row.work_id) === at);
+    const target = (row) => ({ workId: row.work_id, realizationId: row.realization_id, performanceId: performanceOf(c, row.performance_work_id) });
+    const links = works.length === 1 ? itemLinks(c, metadata, target(works[0])) : works.slice(0, 6).map((row) => itemLinks(c, metadata, target(row), goTo(`Work: ${entityValue(metadata, row.work_id, "title", "Untitled work")}`))[0]);
+    if (links.length) tracks[trackId] = links;
+  }
+  return { version: 1, tracks };
+}
+async function trackLinks(input) {
+  actor(input);
+  const c = await openCatalogue(path8.join(input.dataFolder, "model"));
+  try {
+    return renderTrackLinks(c, input.trackIds);
+  } finally {
+    c.close();
+  }
+}
+
+// src/model/tag-plan.js
+var PERFORMING = ["soloist", "performer", "accompanist", "orchestra", "ensemble", "choir"];
+var text5 = (value) => typeof value === "string" ? value.trim() : "";
+var list4 = (value) => (Array.isArray(value) ? value : value == null ? [] : [value]).map((entry) => text5(String(entry ?? ""))).filter(Boolean);
+function proposedTags(c, trackLinkId) {
+  const none = (reason) => ({ fields: {}, workId: null, reason });
+  const track = c.db.prepare("SELECT t.id FROM track_link t JOIN classification k ON k.target_id=t.id AND k.state='classical' WHERE t.id=? AND t.state='active'").get(trackLinkId);
+  if (!track) return none("Not classical");
+  const items = c.db.prepare(
+    `SELECT i.movement_id,i.sequence,r.id AS realization,r.work_id,r.performance_work_id FROM segment s
+       JOIN realization_item i ON i.segment_id=s.id JOIN realization r ON r.id=i.realization_id
+       JOIN entity w ON w.id=r.work_id AND w.deleted_at IS NULL
+       WHERE s.track_link_id=? ORDER BY r.id,i.sequence`
+  ).all(trackLinkId);
+  if (!items.length) return none("Not in a work");
+  const workId = items[0].work_id;
+  if (items.some((item) => item.work_id !== workId)) return none("Plays parts of two works");
+  const values = new DisplayValues(c);
+  const value = (id, field2) => values.resolve(id, field2).value;
+  const credits3 = (target, roles2) => c.db.prepare(`SELECT contributor_id AS id,role,instrument FROM credit WHERE target_id=? AND state='active' AND role IN (${roles2.map(() => "?").join(",")}) ORDER BY position,id`).all(target, ...roles2).filter((credit) => c.db.prepare("SELECT 1 FROM entity WHERE id=? AND deleted_at IS NULL").get(credit.id)).map((credit) => ({ ...credit, name: text5(value(credit.id, "name")) })).filter((credit) => credit.name);
+  const fields = {};
+  const set = (field2, entries2) => {
+    const clean4 = [...new Set(list4(entries2))];
+    if (clean4.length) fields[field2] = clean4;
+  };
+  const composers = credits3(workId, ["composer"]);
+  set("composer", composers.map((credit) => credit.name));
+  const sorts = composers.map((credit) => text5(value(credit.id, "sortName")));
+  if (composers.length && sorts.every(Boolean)) set("composerSort", sorts);
+  set("work", [value(workId, "title")]);
+  const all = c.db.prepare("SELECT target_id FROM relation WHERE kind='movement' AND source_id=? ORDER BY position,occurrence,id").all(workId).map((row) => row.target_id);
+  const played = [...new Set(items.map((item) => item.movement_id).filter(Boolean))];
+  set("movementName", played.length ? [played.map((id) => text5(value(id, "title"))).filter(Boolean).join(" / ")] : []);
+  if (played.length === 1 && all.length > 1) {
+    set("movementNumber", [String(all.indexOf(played[0]) + 1)]);
+    set("movementTotal", [String(all.length)]);
+  }
+  const performance2 = c.db.prepare("SELECT source_id FROM relation WHERE id=?").get(items[0].performance_work_id)?.source_id;
+  if (performance2) {
+    set(
+      "performers",
+      credits3(performance2, PERFORMING).map((credit) => `${credit.name} (${text5(credit.instrument) || credit.role})`)
+    );
+    set("conductor", credits3(performance2, ["conductor"]).map((credit) => credit.name).slice(0, 1));
+  }
+  set("catalogue", value(workId, "catalogue"));
+  const mbWork = (id) => c.db.prepare("SELECT record_id FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='work' AND state='active' ORDER BY record_id").get(id)?.record_id;
+  set("workId", [played.length === 1 && mbWork(played[0]) || mbWork(workId)]);
+  return { fields, workId, reason: Object.keys(fields).length ? "" : "Nothing to propose" };
+}
+
+// src/model/jobs.js
+import { randomUUID as randomUUID11 } from "node:crypto";
+var ModelJobs = class _ModelJobs {
+  constructor(catalogue) {
+    this.db = catalogue.db;
+  }
+  enqueue(type, key, input, { maxAttempts = 3 } = {}) {
+    if (!type || !key || !Number.isSafeInteger(maxAttempts) || maxAttempts < 1)
+      throw new Error("Invalid job");
+    return transaction(this.db, () => {
+      const existing = this.db.prepare(
+        "SELECT id FROM model_job WHERE key=? AND state IN ('queued','running','retry')"
+      ).get(key);
+      if (existing) return existing.id;
+      const id = randomUUID11();
+      this.db.prepare(
+        `INSERT INTO model_job(id,type,key,input,state,max_attempts,created_at)
+        VALUES (?,?,?,?,'queued',?,?)`
+      ).run(id, type, key, JSON.stringify(input), maxAttempts, Date.now());
+      return id;
+    });
+  }
+  // A scan goes before background identification; `type` claims only that kind.
+  // Tag writes (v0.3 8.4) are claimed only by name: a scan, the schedule or
+  // any other run of model jobs never picks one up.
+  claim(owner, { now = Date.now(), leaseMs = 3e4, type = null } = {}) {
+    if (!owner || !Number.isFinite(leaseMs) || leaseMs <= 0)
+      throw new Error("Invalid job lease");
+    return transaction(this.db, () => {
+      this.db.prepare(
+        "UPDATE model_job SET state='cancelled' WHERE cancel_requested=1 AND (state!='running' OR lease_until<=?)"
+      ).run(now);
+      this.db.prepare(
+        "UPDATE model_job SET state='failed',error='ATTEMPTS_EXHAUSTED' WHERE attempt>=max_attempts AND state='running' AND lease_until<=?"
+      ).run(now);
+      const row = this.db.prepare(
+        `SELECT * FROM model_job WHERE cancel_requested=0 AND attempt<max_attempts AND
+        ((state IN ('queued','retry') AND next_run_at<=?) OR (state='running' AND lease_until<=?))
+        ${type ? "AND type=?" : "AND type!='tag_write'"} ORDER BY type='library_scan' DESC,created_at LIMIT 1`
+      ).get(now, now, ...type ? [type] : []);
+      if (!row) return null;
+      this.db.prepare(
+        "UPDATE model_job SET state='running',owner=?,lease_until=?,generation=generation+1,attempt=attempt+1,error=NULL WHERE id=?"
+      ).run(owner, now + leaseMs, row.id);
+      return this.get(row.id);
+    });
+  }
+  get(id) {
+    const row = this.db.prepare("SELECT * FROM model_job WHERE id=?").get(id);
+    return row && {
+      ...row,
+      input: JSON.parse(row.input),
+      progress: JSON.parse(row.progress)
+    };
+  }
+  // Evidence a scan has read, saved a chunk at a time with each checkpoint
+  // so a checkpoint never rewrites everything read so far. Chunks are
+  // model_job rows of their own (no schema change), never claimed: they are
+  // born 'done'.
+  static chunkKey = (id) => `scan-chunk:${id}`;
+  chunks(id, count) {
+    return this.db.prepare("SELECT input FROM model_job WHERE key=? ORDER BY id LIMIT ?").all(_ModelJobs.chunkKey(id), count).flatMap((row) => JSON.parse(row.input));
+  }
+  // A finished or cancelled scan keeps only its summary: the file list and
+  // the evidence it read are already in the catalogue, and keeping them made
+  // every scan add tens of megabytes that integrity checks then had to read.
+  compactFinished() {
+    for (const row of this.db.prepare(
+      `SELECT id,state FROM model_job WHERE type='library_scan' AND state IN ('done','cancelled')
+         AND (length(input)>4096 OR length(progress)>65536 OR EXISTS(SELECT 1 FROM model_job c WHERE c.key='scan-chunk:'||model_job.id))`
+    ).all())
+      transaction(this.db, () => this.#compact(row.id));
+  }
+  #compact(id) {
+    this.db.prepare("DELETE FROM model_job WHERE key=?").run(_ModelJobs.chunkKey(id));
+    this.db.prepare(
+      `UPDATE model_job SET
+          input=json_object('instanceId',json_extract(input,'$.instanceId'),'epoch',json_extract(input,'$.epoch'),
+            'generation',json_extract(input,'$.generation'),'total',coalesce(json_extract(input,'$.total'),json_array_length(input,'$.files'))),
+          progress=json_object('cursor',coalesce(json_extract(progress,'$.cursor'),0),'errorCount',coalesce(json_extract(progress,'$.errorCount'),0),
+            'reused',coalesce(json_extract(progress,'$.reused'),0),
+            'errors',json(coalesce(json_extract(progress,'$.errors'),'[]')))
+         WHERE id=?`
+    ).run(id);
+  }
+  checkpoint(job, progress, { done = false, now = Date.now(), leaseMs = 3e4, commit, chunk = null } = {}) {
+    return transaction(this.db, () => {
+      const row = this.db.prepare(
+        "SELECT state,owner,generation,lease_until,cancel_requested FROM model_job WHERE id=?"
+      ).get(job.id);
+      if (!row || row.state !== "running" || row.owner !== job.owner || row.generation !== job.generation || row.lease_until <= now)
+        throw new Error("Stale job lease");
+      if (row.cancel_requested) {
+        this.db.prepare("UPDATE model_job SET state='cancelled' WHERE id=?").run(job.id);
+        if (job.type === "library_scan") this.#compact(job.id);
+        return false;
+      }
+      if (commit) commit();
+      if (chunk?.items.length && !done)
+        this.db.prepare(
+          `INSERT INTO model_job(id,type,key,input,state,max_attempts,created_at)
+             VALUES (?,'scan_chunk',?,?,'done',1,?)`
+        ).run(`${job.id}#${String(chunk.seq).padStart(6, "0")}`, _ModelJobs.chunkKey(job.id), JSON.stringify(chunk.items), now);
+      this.db.prepare(
+        "UPDATE model_job SET progress=?,state=?,lease_until=?,error=NULL WHERE id=?"
+      ).run(
+        JSON.stringify(progress),
+        done ? "done" : "running",
+        now + leaseMs,
+        job.id
+      );
+      if (done && job.type === "library_scan") this.#compact(job.id);
+      return true;
+    });
+  }
+  yield(job) {
+    this.db.prepare(
+      `UPDATE model_job SET state='queued',owner=NULL,lease_until=0,attempt=attempt-1
+      WHERE id=? AND owner=? AND generation=? AND state='running'`
+    ).run(job.id, job.owner, job.generation);
+  }
+  fail(job, error, { now = Date.now() } = {}) {
+    this.db.prepare(
+      `UPDATE model_job SET state=CASE WHEN attempt>=max_attempts THEN 'failed' ELSE 'retry' END,
+      error=?,next_run_at=?,lease_until=0 WHERE id=? AND owner=? AND generation=? AND state='running' AND lease_until>?`
+    ).run(
+      String(error).slice(0, 500),
+      now + 1e3 * 2 ** job.attempt,
+      job.id,
+      job.owner,
+      job.generation,
+      now
+    );
+  }
+  cancel(id) {
+    this.db.prepare(
+      "UPDATE model_job SET cancel_requested=1 WHERE id=? AND state IN ('queued','running','retry')"
+    ).run(id);
+  }
+};
+
+// src/model/tag-write.js
+var TAG_JOB = "tag_write";
+var PREVIEW_LIMIT = 500;
+var PREVIEW_TTL_MS = 60 * 6e4;
+var FIELD_LABELS = {
+  composer: "Composer",
+  composerSort: "Composer sort",
+  work: "Work",
+  movementName: "Movement",
+  movementNumber: "Movement number",
+  movementTotal: "Movements in the work",
+  performers: "Performers",
+  conductor: "Conductor",
+  catalogue: "Catalogue number",
+  workId: "MusicBrainz work"
+};
+var STATUS = {
+  change: "Will change",
+  unchanged: "Already up to date",
+  nothing: "Nothing to write",
+  unsupported: "Format not supported yet",
+  unreadable: "Couldn't be read",
+  "read-only": "Read only",
+  missing: "No longer in the Library"
+};
+var same2 = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+var writable = (file) => {
+  try {
+    fs8.accessSync(file, fs8.constants.W_OK);
+    fs8.accessSync(path9.dirname(file), fs8.constants.W_OK);
+    return true;
+  } catch {
+    return false;
+  }
+};
+function previewTrack(c, link3) {
+  const row = c.db.prepare("SELECT id,evidence FROM track_link WHERE id=? AND state='active'").get(link3);
+  if (!row) return { link: link3, file: "", name: "", title: "", status: "missing", reason: STATUS.missing, fields: [] };
+  const evidence = JSON.parse(row.evidence);
+  const file = evidence.readPath || evidence.path || "";
+  const name = path9.basename(evidence.path || file);
+  const base = { link: link3, file, name, title: evidence.hints?.title || name, albumId: evidence.albumId == null ? null : String(evidence.albumId) };
+  const plan = proposedTags(c, link3);
+  const planned = Object.keys(plan.fields);
+  if (!planned.length) return { ...base, workId: plan.workId, status: "nothing", reason: plan.reason, fields: [] };
+  const fields = writableFields(file);
+  const entry = (field2, current2) => ({ field: field2, current: current2, proposed: plan.fields[field2], writable: fields.includes(field2) });
+  if (!fields.length)
+    return { ...base, workId: plan.workId, status: "unsupported", reason: `Classical tags can't be written to ${path9.extname(file).slice(1).toUpperCase() || "these"} files yet`, fields: planned.map((field2) => entry(field2, null)) };
+  let current;
+  try {
+    current = readValues(file, planned.filter((field2) => fields.includes(field2)));
+  } catch (error) {
+    return { ...base, workId: plan.workId, status: "unreadable", reason: String(error.message || error).slice(0, 200), fields: [] };
+  }
+  const entries2 = planned.map((field2) => entry(field2, fields.includes(field2) ? current[field2] : null));
+  const changes = entries2.filter((field2) => field2.writable && !same2(field2.current, field2.proposed));
+  const status = !changes.length ? "unchanged" : writable(file) ? "change" : "read-only";
+  return { ...base, workId: plan.workId, status, reason: status === "read-only" ? "The file or its folder can't be written" : "", fields: entries2 };
+}
+function createPreview(c, links, who, { scope = "" } = {}) {
+  const ids = [...new Set(links)];
+  if (!ids.length) throw new Error("Choose tracks to preview");
+  if (ids.length > PREVIEW_LIMIT) throw new Error(`Preview at most ${PREVIEW_LIMIT} files at a time`);
+  const tracks = ids.map((id) => previewTrack(c, id));
+  c.db.prepare("DELETE FROM change_set WHERE kind='tag_preview' AND created_at<?").run(Date.now() - 7 * 864e5);
+  const token = randomUUID12();
+  const changing = tracks.filter((track) => track.status === "change").length;
+  c.db.prepare("INSERT INTO change_set(id,kind,actor,summary,data,created_at) VALUES (?,?,?,?,?,?)").run(token, "tag_preview", who, `${changing} of ${tracks.length} files would change`, JSON.stringify({ scope, tracks }), Date.now());
+  return token;
+}
+function loadPreview(c, token) {
+  const row = c.db.prepare("SELECT data,created_at,actor FROM change_set WHERE id=? AND kind='tag_preview'").get(String(token || ""));
+  return row ? { ...JSON.parse(row.data), createdAt: row.created_at, actor: row.actor } : null;
+}
+function queueWrite(c, token, who, now = Date.now()) {
+  const preview = loadPreview(c, token);
+  if (!preview) throw new Error("This preview is gone. Open it again.");
+  if (now - preview.createdAt > PREVIEW_TTL_MS) throw new Error("This preview is more than an hour old. Open it again so it shows the files as they are now.");
+  const files = preview.tracks.filter((track) => track.status === "change").length;
+  if (!files) throw new Error("No file in this preview would change.");
+  const key = `${TAG_JOB}:${token}`;
+  const prior = c.db.prepare("SELECT id FROM model_job WHERE key=? ORDER BY created_at DESC LIMIT 1").get(key);
+  if (prior) return { id: prior.id, files, again: true };
+  const id = new ModelJobs(c).enqueue(TAG_JOB, key, { mode: "write", preview: token, actor: who }, { maxAttempts: 3 });
+  return { id, files, again: false };
+}
+function queueRestore(c, { run = null, backup = null }, who) {
+  const rows = backup ? c.db.prepare("SELECT id FROM tag_backup WHERE id=? AND restored_at IS NULL").all(String(backup)) : c.db.prepare("SELECT id FROM tag_backup WHERE run_id=? AND restored_at IS NULL").all(String(run || ""));
+  if (!rows.length) throw new Error(backup ? "This file's tags were restored already." : "Every file of this run was restored already.");
+  const id = new ModelJobs(c).enqueue(TAG_JOB, `${TAG_JOB}:restore:${randomUUID12()}`, { mode: "restore", backups: rows.map((row) => row.id), run, actor: who }, { maxAttempts: 3 });
+  return { id, files: rows.length };
+}
+async function writeOne(ctx, c, job, session, entry, actor4) {
+  const real = await allowedPath(ctx, entry.file);
+  if (!real) return { status: "failed", reason: "Not in the Library folder" };
+  return session.state.exclusive(real, async () => {
+    const fields = entry.fields.filter((field2) => field2.writable);
+    const names = fields.map((field2) => field2.field);
+    let now;
+    try {
+      now = readValues(real, names);
+    } catch (error) {
+      return { status: "failed", reason: `Couldn't be read: ${error.message}` };
+    }
+    if (!same2(now, Object.fromEntries(fields.map((field2) => [field2.field, field2.current])))) return { status: "skipped", reason: "Its tags changed since the preview" };
+    const proposed = Object.fromEntries(fields.map((field2) => [field2.field, field2.proposed]));
+    if (same2(now, proposed)) return { status: "unchanged" };
+    const before = await fingerprint(real);
+    const backup = randomUUID12();
+    c.db.prepare("INSERT INTO tag_backup VALUES (?,?,?,?,?,?,?,?,?,?)").run(backup, entry.link, real, before, JSON.stringify(now), JSON.stringify(proposed), job.id, actor4 || "admin", Date.now(), null);
+    try {
+      await writeTags(real, proposed);
+    } catch (error) {
+      c.db.prepare("DELETE FROM tag_backup WHERE id=?").run(backup);
+      return { status: "failed", reason: String(error.message || error).slice(0, 200) };
+    }
+    session.changedFiles++;
+    const after = await fingerprint(real);
+    const read = readValues(real, names);
+    if (!same2(read, proposed) || before?.startsWith(AUDIO_PREFIX) && after !== before) {
+      await writeTags(real, now);
+      c.db.prepare("UPDATE tag_backup SET restored_at=? WHERE id=?").run(Date.now(), backup);
+      return { status: "failed", reason: !same2(read, proposed) ? "The written tags didn't read back; the old ones were put back" : "The audio changed; the old tags were put back" };
+    }
+    return { status: "written", backup };
+  });
+}
+async function restoreOne(ctx, c, session, backup) {
+  const row = c.db.prepare("SELECT * FROM tag_backup WHERE id=?").get(backup);
+  if (!row) return { status: "failed", reason: "No backup" };
+  const base = { link: row.track_link_id, name: path9.basename(row.path), backup };
+  if (row.restored_at) return { ...base, status: "unchanged", reason: "Restored already" };
+  const real = await allowedPath(ctx, row.path);
+  if (!real) return { ...base, status: "failed", reason: "Not in the Library folder" };
+  return session.state.exclusive(real, async () => {
+    const written = JSON.parse(row.written);
+    const old = JSON.parse(row.tags);
+    let now;
+    try {
+      now = readValues(real, Object.keys(written));
+    } catch (error) {
+      return { ...base, status: "failed", reason: `Couldn't be read: ${error.message}` };
+    }
+    if (!same2(now, written)) return { ...base, status: "skipped", reason: "Its tags changed since they were written; nothing was put back" };
+    await writeTags(real, old);
+    session.changedFiles++;
+    if (!same2(readValues(real, Object.keys(old)), old)) return { ...base, status: "failed", reason: "The old tags didn't read back" };
+    c.db.prepare("UPDATE tag_backup SET restored_at=? WHERE id=?").run(Date.now(), backup);
+    return { ...base, status: "restored" };
+  });
+}
+var stop = (c, job, error) => c.db.prepare("UPDATE model_job SET state='failed',error=?,lease_until=0 WHERE id=? AND owner=? AND generation=? AND state='running'").run(error, job.id, job.owner, job.generation);
+async function runOne(ctx, c, jobs, job, session, deadline) {
+  const input = job.input;
+  const progress = { cursor: 0, results: [], ...job.progress };
+  let items;
+  if (input.mode === "write") {
+    if (ctx.settings?.enableTagWriting !== true) return stop(c, job, "Tag writing is off in the plugin's settings");
+    const preview = loadPreview(c, input.preview);
+    if (!preview) return stop(c, job, "The preview is gone");
+    items = preview.tracks.filter((track) => track.status === "change");
+  } else if (input.mode === "restore") items = input.backups || [];
+  else return stop(c, job, "Unknown tag job");
+  progress.total = items.length;
+  while (progress.cursor < items.length) {
+    if (Date.now() >= deadline) {
+      jobs.checkpoint(job, progress, { leaseMs: 12e4 });
+      jobs.yield(job);
+      return;
+    }
+    const item = items[progress.cursor];
+    let result;
+    try {
+      result = input.mode === "write" ? { link: item.link, name: item.name, ...await writeOne(ctx, c, job, session, item, input.actor) } : await restoreOne(ctx, c, session, item);
+    } catch (error) {
+      result = { link: item.link, name: item.name || "", status: "failed", reason: String(error.message || error).slice(0, 200) };
+    }
+    progress.results.push(result);
+    progress.cursor++;
+    jobs.checkpoint(job, progress, { leaseMs: 12e4 });
+  }
+  jobs.checkpoint(job, progress, { done: true, leaseMs: 12e4 });
+}
+async function runTagJobs(ctx, { budgetMs = 25 * 6e4 } = {}) {
+  const deadline = Date.now() + budgetMs;
+  const stats = await withTagging(
+    ctx,
+    async (session) => {
+      const c = await openCatalogue(path9.join(ctx.dataFolder, "model"));
+      c.db.exec("PRAGMA busy_timeout=60000");
+      try {
+        const jobs = new ModelJobs(c);
+        const owner = randomUUID12();
+        for (let job; Date.now() < deadline && (job = jobs.claim(owner, { leaseMs: 12e4, type: TAG_JOB })); ) await runOne(ctx, c, jobs, job, session, deadline);
+      } finally {
+        c.close();
+      }
+    },
+    { priority: true }
+  );
+  return stats !== null;
+}
+function tagRun(c, id) {
+  const row = c.db.prepare("SELECT * FROM model_job WHERE id=? AND type=?").get(String(id || ""), TAG_JOB);
+  if (!row) return null;
+  return { id: row.id, state: row.state, error: row.error, input: JSON.parse(row.input), progress: JSON.parse(row.progress || "{}"), createdAt: row.created_at };
+}
+
 // src/model/editor-v2.js
 var EditorV2Error = class extends Error {
   // `field`: the form field the message is about; the host shows it there.
@@ -42216,13 +43784,13 @@ function entities(c, kinds2) {
   ).all(...kinds2).map((row) => ({ ...row, data: JSON.parse(row.data), label: entityLabel(c, row.id, row.kind) }));
 }
 var isComposer2 = (c, person) => person.data.roles?.includes("composer") || !!c.db.prepare("SELECT 1 FROM credit WHERE contributor_id=? AND role='composer' AND state='active' LIMIT 1").get(person.id);
-function credits(c, target) {
+function credits2(c, target) {
   return c.db.prepare(
     `SELECT k.* FROM credit k JOIN entity e ON e.id=k.contributor_id
        WHERE k.target_id=? AND k.state='active' AND e.deleted_at IS NULL ORDER BY k.position,k.id`
   ).all(target).map((row) => ({ ...row, name: entityLabel(c, row.contributor_id) }));
 }
-var composerNames2 = (c, work) => credits(c, work).filter((credit) => credit.role === "composer").map((credit) => credit.name);
+var composerNames2 = (c, work) => credits2(c, work).filter((credit) => credit.role === "composer").map((credit) => credit.name);
 function worksOf(c, contributor) {
   return c.db.prepare(
     `SELECT DISTINCT k.target_id AS id FROM credit k JOIN entity e ON e.id=k.target_id
@@ -42246,7 +43814,7 @@ function realizationTracks(c, realization) {
        WHERE i.realization_id=? ORDER BY i.sequence,i.id`
   ).all(realization).map((row) => ({ ...row, evidence: JSON.parse(row.evidence) }));
 }
-var trackTitle = (evidence) => evidence.hints?.title || evidence.title || path6.basename(evidence.path || "Track");
+var trackTitle2 = (evidence) => evidence.hints?.title || evidence.title || path10.basename(evidence.path || "Track");
 function albums(c, albumId = null) {
   const map = /* @__PURE__ */ new Map();
   for (const track of ownedTracks(c, { albumId })) {
@@ -42320,7 +43888,7 @@ function nextReview(c, id) {
 }
 function reviewLabel(c, review) {
   const track = c.db.prepare("SELECT evidence FROM track_link WHERE id=?").get(review.target_id);
-  const trackName = track ? trackTitle(JSON.parse(track.evidence)) : null;
+  const trackName = track ? trackTitle2(JSON.parse(track.evidence)) : null;
   switch (review.kind) {
     case "classification":
       return { label: trackName || "Track", detail: "Unsure whether this is classical" };
@@ -42405,12 +43973,12 @@ function compareWorks(c, a, b) {
   ];
   const rows = facts.map(([label, of]) => {
     const [left, right] = [of(a), of(b)];
-    const same2 = searchText(left) === searchText(right);
+    const same3 = searchText(left) === searchText(right);
     return {
       id: label,
       label,
       detail: `This: ${left || "\u2014"} | Other: ${right || "\u2014"}`.slice(0, 500),
-      badge: same2 ? { label: "Same", tone: "muted" } : { label: "Differs", tone: "warning" }
+      badge: same3 ? { label: "Same", tone: "muted" } : { label: "Differs", tone: "warning" }
     };
   });
   return {
@@ -42434,8 +44002,8 @@ function mergeOutcome(c, keep, drop) {
       { label: "Undo", value: "Not possible: check before merging" }
     ];
   }
-  const keptComposers = credits(c, keep).filter((credit) => credit.role === "composer");
-  const droppedComposers = credits(c, drop).filter((credit) => credit.role === "composer");
+  const keptComposers = credits2(c, keep).filter((credit) => credit.role === "composer");
+  const droppedComposers = credits2(c, drop).filter((credit) => credit.role === "composer");
   const notAdded = keptComposers.length ? droppedComposers.filter((credit) => !keptComposers.some((kept) => kept.contributor_id === credit.contributor_id)) : [];
   const composerOutcome = keptComposers.length ? `Kept work's composers stay: ${keptComposers.map((credit) => `\u201C${credit.name}\u201D`).join(", ")}.${notAdded.length ? ` ${notAdded.map((credit) => `\u201C${credit.name}\u201D is not added`).join("; ")}.` : ""}` : droppedComposers.length ? `${droppedComposers.map((credit) => `\u201C${credit.name}\u201D`).join(", ")} move to the kept work, which has no composer.` : "Neither work has a composer.";
   const preview = mergePreview(c, keep, drop, { addMissing: true });
@@ -42567,7 +44135,7 @@ function detailsForm(c, entity, kind) {
   };
 }
 function creditSections(c, target, { id = "credits", title = "Credits", noun = "credit", edit = false, back = null } = {}) {
-  const list4 = credits(c, target);
+  const list5 = credits2(c, target);
   const extra = back ? { back } : {};
   const roleOptions = ROLES2.map((role) => ({ value: role, label: roleLabel(role) }));
   return [
@@ -42576,7 +44144,7 @@ function creditSections(c, target, { id = "credits", title = "Credits", noun = "
       id,
       title,
       empty: `No ${noun}s yet.`,
-      rows: list4.map((credit) => ({
+      rows: list5.map((credit) => ({
         id: credit.id,
         label: credit.name,
         detail: [`${roleLabel(credit.role)}${credit.instrument ? ` \xB7 ${credit.instrument}` : ""}`, credit.source === "derived" ? "from tags" : ""].filter(Boolean).join(" \xB7 "),
@@ -42584,7 +44152,7 @@ function creditSections(c, target, { id = "credits", title = "Credits", noun = "
         actions: [action("Remove", "remove-credit", { target, credit: credit.id, ...extra }, { tone: "danger" })]
       }))
     },
-    ...edit && list4.length ? [
+    ...edit && list5.length ? [
       {
         type: "form",
         id: `edit-${noun}`,
@@ -42594,8 +44162,8 @@ function creditSections(c, target, { id = "credits", title = "Credits", noun = "
         arguments: { target, ...extra },
         submitLabel: "Save",
         fields: [
-          { key: "credit", label: noun[0].toUpperCase() + noun.slice(1), type: "select", value: list4[0].id, options: list4.map((credit) => ({ value: credit.id, label: `${credit.name} (${roleLabel(credit.role)})` })) },
-          { key: "role", label: "Role", type: "select", value: list4[0].role, options: roleOptions },
+          { key: "credit", label: noun[0].toUpperCase() + noun.slice(1), type: "select", value: list5[0].id, options: list5.map((credit) => ({ value: credit.id, label: `${credit.name} (${roleLabel(credit.role)})` })) },
+          { key: "role", label: "Role", type: "select", value: list5[0].role, options: roleOptions },
           { key: "instrument", label: "Instrument or voice", type: "text", value: "", placeholder: "Leave empty to keep it" }
         ]
       }
@@ -42630,7 +44198,7 @@ var mergeForm = (target, lookup, noun, note) => ({
 function workView(c, work, page2 = 0, section = "details", { orderField = false } = {}) {
   const current = WORK_FORMS[section] || section;
   const title = entityLabel(c, work, "work");
-  const composers = credits(c, work).filter((credit) => credit.role === "composer");
+  const composers = credits2(c, work).filter((credit) => credit.role === "composer");
   const movements = workMovements(c, work);
   const performances = realizations(c, work);
   const coverage2 = /* @__PURE__ */ new Map();
@@ -42641,7 +44209,7 @@ function workView(c, work, page2 = 0, section = "details", { orderField = false 
     const tracks = realizationTracks(c, performance2.id);
     const album = tracks[0]?.evidence.albumId;
     const performers = c.db.prepare("SELECT source_id FROM relation WHERE id=?").get(performance2.performance_work_id)?.source_id;
-    const names = performers ? credits(c, performers).map((credit) => credit.name) : [];
+    const names = performers ? credits2(c, performers).map((credit) => credit.name) : [];
     const complete = movements.length && performance2.covered >= movements.length;
     return {
       id: performance2.id,
@@ -42763,7 +44331,18 @@ function workView(c, work, page2 = 0, section = "details", { orderField = false 
       credits: [["Add a credit", "add-credit"]],
       recordings: [["Add a broadcast recording", "broadcast"]]
     }[section];
-    view.sections = [{ ...selected, ...add && { actions: add.map(([label, form2]) => open(label, entitySelection(work, page2, form2))) } }];
+    view.sections = [
+      {
+        ...selected,
+        ...add && {
+          actions: [
+            ...add.map(([label, form2]) => open(label, entitySelection(work, page2, form2))),
+            // The header keeps only section navigation; the files are here.
+            ...section === "recordings" ? [action("Preview classical tags", "tag-preview-open", { work })] : []
+          ]
+        }
+      }
+    ];
   }
   return view;
 }
@@ -42898,7 +44477,7 @@ function movementView(c, movement, page2 = 0) {
         ...paged(
           items.map((item) => ({
             id: item.id,
-            label: trackTitle(item.evidence),
+            label: trackTitle2(item.evidence),
             detail: [item.evidence.hints?.artist, item.label || item.evidence.hints?.album].filter(Boolean).join(" \xB7 "),
             ...item.evidence.albumId != null && { selection: `album:${item.evidence.albumId}` }
           })),
@@ -42938,7 +44517,7 @@ function recordingView(c, recording) {
         empty: "No owned tracks attached yet.",
         rows: attached.map((item) => ({
           id: item.id,
-          label: trackTitle(item.evidence),
+          label: trackTitle2(item.evidence),
           detail: item.movement_id ? entityLabel(c, item.movement_id, "movement") : "Whole work",
           actions: [action("Detach", "detach-track", { recording, item: item.id }, { tone: "danger" })]
         }))
@@ -43021,7 +44600,7 @@ function rememberAlbumTracks(c, albumId, selected, who) {
   const tracks = albums(c, albumId).get(albumId)?.tracks.filter((track) => ids.has(track.id)).map((track) => track.id) || [];
   if (tracks.length !== ids.size) fail("A selected track is no longer on this album");
   c.db.prepare("DELETE FROM change_set WHERE kind='selection' AND created_at<?").run(Date.now() - 864e5);
-  const token = randomUUID10();
+  const token = randomUUID13();
   c.db.prepare("INSERT INTO change_set(id,kind,actor,summary,data,created_at) VALUES (?,?,?,?,?,?)").run(token, "selection", who, `${tracks.length} tracks`, JSON.stringify({ albumId, tracks }), Date.now());
   return token;
 }
@@ -43202,6 +44781,7 @@ function albumView(c, albumId, chosenWork, page2 = 0, move = "") {
       select: { key: "tracks", actions: [
         action("Group selected tracks", "move-tracks-open", { albumId, page: String(page2), ...chosenWork && { work: chosenWork } }),
         action("Set performers\u2026", "performers-open", { albumId, page: String(page2) }),
+        action("Preview classical tags", "tag-preview-open", { albumId }),
         action("Send to Classical", "set-classification", { state: "classical" }),
         action("Remove from Classical", "set-classification", { state: "not_classical" }, { tone: "danger", confirm: "Remove these tracks from Aurral Classical? They stay in your Aurral library." }),
         action("Remove from work", "unassign-tracks", { albumId, page: String(page2) }, { tone: "danger", confirm: "Take these tracks out of their works? The works and the audio stay." })
@@ -43216,6 +44796,7 @@ function albumView(c, albumId, chosenWork, page2 = 0, move = "") {
       ...chosenWork ? [open("Cancel grouping", albumSelection(albumId, "", page2))] : [],
       action("Send all to Classical", "set-album-classification", { albumId, state: "classical", page: String(page2) }),
       action("Preview tag removal", "preview-tag-removal", { albumId, page: String(page2) }),
+      action("Preview classical tags", "tag-preview-open", { albumId }),
       action("Remove all from Classical", "set-album-classification", { albumId, state: "not_classical", page: String(page2) }, { tone: "danger", confirm: `Remove all ${tracks.length} tracks on this album from Aurral Classical? They stay in your Aurral library.` })
     ];
   }
@@ -43232,6 +44813,96 @@ function albumView(c, albumId, chosenWork, page2 = 0, move = "") {
     sections
   };
 }
+function formatTime(ms) {
+  const total = Math.max(0, Math.round(Number(ms) || 0));
+  const [h, m, s, rest] = [Math.floor(total / 36e5), Math.floor(total % 36e5 / 6e4), Math.floor(total % 6e4 / 1e3), total % 1e3];
+  const clock = h ? `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}` : `${m}:${String(s).padStart(2, "0")}`;
+  return rest ? `${clock}.${String(rest).padStart(3, "0")}` : clock;
+}
+function parseTime(value) {
+  const text7 = typeof value === "string" ? value.trim() : "";
+  const match2 = text7.match(/^(?:(\d+):)?(?:(\d+):)?(\d+)(?:\.(\d{1,3}))?$/);
+  if (!match2) return null;
+  const parts = [match2[1], match2[2], match2[3]].filter((part) => part !== void 0).map(Number);
+  const [h, m, s] = parts.length === 3 ? parts : parts.length === 2 ? [0, ...parts] : [0, 0, parts[0]];
+  if (parts.length > 1 && s >= 60) return null;
+  if (parts.length === 3 && m >= 60) return null;
+  return ((h * 60 + m) * 60 + s) * 1e3 + (match2[4] ? Number(match2[4].padEnd(3, "0")) : 0);
+}
+function sharedOnTrack(c, track) {
+  const rows = c.db.prepare(
+    `SELECT i.id,i.movement_id,i.sequence,i.occurrence,r.id AS realization,r.work_id,r.performance_work_id,s.id AS segment,s.start_ms,s.end_ms
+       FROM segment s JOIN realization_item i ON i.segment_id=s.id JOIN realization r ON r.id=i.realization_id
+       WHERE s.track_link_id=? ORDER BY r.id,i.sequence`
+  ).all(track);
+  const byRealization = /* @__PURE__ */ new Map();
+  for (const row of rows) byRealization.set(row.realization, [...byRealization.get(row.realization) || [], row]);
+  return [...byRealization.values()].filter((items) => items.length >= 2);
+}
+function boundaryForms(c, track, evidence) {
+  return sharedOnTrack(c, track).map((items, n) => ({
+    type: "form",
+    id: `boundaries-${n}`,
+    title: `Where each movement starts \xB7 ${entityLabel(c, items[0].work_id, "work")}`,
+    note: `This track holds ${items.length} movements. ${items[0].movement_id ? entityLabel(c, items[0].movement_id, "movement") : "The first"} starts at 0:00; each movement ends where the next starts, and the last at the end of the file${evidence.durationMs ? ` (${formatTime(evidence.durationMs)})` : ""}. Use m:ss or h:mm:ss. The audio file is never changed.`,
+    command: "set-boundaries",
+    arguments: { track, realization: items[0].realization, items: items.map((item) => item.id) },
+    submitLabel: "Save where movements start",
+    fields: items.slice(1).map((item, j) => ({
+      key: `start-${j + 1}`,
+      label: `${item.movement_id ? entityLabel(c, item.movement_id, "movement") : `Part ${j + 2}`} starts at`,
+      type: "text",
+      // A track not divided yet has every movement at 0:00: leave it blank.
+      value: item.start_ms ? formatTime(item.start_ms) : "",
+      placeholder: "m:ss",
+      required: true
+    }))
+  }));
+}
+function setBoundaries(c, v) {
+  const track = str(v.track, "track", { max: 200 });
+  const realization = str(v.realization, "recording", { max: 200 });
+  const ids = Array.isArray(v.items) ? v.items.map(String) : [];
+  const allowed = /* @__PURE__ */ new Set(["track", "realization", "items", ...ids.slice(1).map((_, j) => `start-${j + 1}`)]);
+  if (Object.keys(v).some((key) => !allowed.has(key))) fail("Unknown fields");
+  const items = sharedOnTrack(c, track).find((group) => group[0].realization === realization);
+  if (!items || items.map((item) => item.id).join() !== ids.join()) fail("This track's movements changed since the page was read. Reload it and try again.");
+  const row = c.db.prepare("SELECT evidence FROM track_link WHERE id=? AND state='active'").get(track);
+  const duration2 = Number(JSON.parse(row?.evidence || "{}").durationMs) || 0;
+  if (!duration2) fail("This file's length is unknown, so its movements can't be divided.");
+  const starts = [0];
+  for (let j = 1; j < items.length; j++) {
+    const key = `start-${j}`;
+    const ms = parseTime(v[key]);
+    if (ms === null) fail("Use m:ss or h:mm:ss, for example 4:07", key);
+    if (ms <= starts[j - 1]) fail(`Start after the previous movement (${formatTime(starts[j - 1])})`, key);
+    if (ms >= duration2) fail(`Start before the end of the file (${formatTime(duration2)})`, key);
+    starts.push(ms);
+  }
+  const contentFor = c.db.prepare(
+    `SELECT c.id FROM segment_content s JOIN recording_content c ON c.id=s.content_id
+     WHERE s.segment_id=? AND c.performance_work_id=? AND c.movement_id IS ? ORDER BY c.position,c.id`
+  );
+  const taken = /* @__PURE__ */ new Set();
+  items.forEach((item, j) => {
+    const startMs = starts[j];
+    const endMs = j + 1 < items.length ? starts[j + 1] : duration2;
+    const segment = c.segment(track, { startMs, endMs });
+    const content = contentFor.all(item.segment, item.performance_work_id, item.movement_id).find((row2) => !taken.has(row2.id));
+    if (content) {
+      taken.add(content.id);
+      c.segmentContent(segment, content.id);
+      c.db.prepare("UPDATE recording_content SET start_ms=?,end_ms=? WHERE id=?").run(startMs, endMs, content.id);
+    }
+    c.db.prepare("UPDATE realization_item SET segment_id=? WHERE id=?").run(segment, item.id);
+  });
+  for (const old of new Set(items.map((item) => item.segment)))
+    if (!c.db.prepare("SELECT 1 FROM realization_item WHERE segment_id=?").get(old)) {
+      c.db.prepare("DELETE FROM segment_content WHERE segment_id=?").run(old);
+      c.db.prepare("DELETE FROM segment WHERE id=?").run(old);
+    }
+  return { selection: `track:${track}`, message: `Saved where ${items.length} movements start.` };
+}
 function trackView(c, track) {
   const row = c.db.prepare("SELECT * FROM track_link WHERE id=?").get(track);
   if (!row) fail("This track is no longer indexed");
@@ -43242,12 +44913,13 @@ function trackView(c, track) {
   const albumLink = evidence.albumId != null ? albumSelection(String(evidence.albumId), "", albumPage) : "";
   return {
     crumbs: evidence.albumId != null ? [{ label: evidence.hints?.album || "Album", selection: albumLink }] : [],
-    title: trackTitle(evidence),
+    title: trackTitle2(evidence),
     subtitle: [evidence.hints?.artist, evidence.hints?.album].filter(Boolean).join(" \xB7 "),
     badges: [{ ...CLASSIFICATION[state.state], ...state.pinned ? { label: `${CLASSIFICATION[state.state].label} \xB7 Set by you` } : {} }],
     actions: [
       state.state === "classical" ? action("Remove from Classical", "set-classification", { tracks: [track], state: "not_classical" }) : action("Send to Classical", "set-classification", { tracks: [track], state: "classical" }),
-      ...state.pinned ? [action("Use automatic detection", "set-classification", { tracks: [track], state: "automatic" })] : []
+      ...state.pinned ? [action("Use automatic detection", "set-classification", { tracks: [track], state: "automatic" })] : [],
+      action("Preview classical tags", "tag-preview-open", { track })
     ],
     sections: [
       {
@@ -43259,7 +44931,7 @@ function trackView(c, track) {
           { label: "Performer", value: evidence.hints?.artist || "Unknown" },
           { label: "Composer tag", value: (evidence.hints?.composer || []).join(", ") || "None" },
           { label: "WORK tag", value: evidence.hints?.work || "None" },
-          { label: "File", value: path6.basename(evidence.path || "") }
+          { label: "File", value: path10.basename(evidence.path || "") }
         ]
       },
       {
@@ -43274,9 +44946,150 @@ function trackView(c, track) {
           detail: link3.movement_id ? entityLabel(c, link3.movement_id, "movement") : "Whole work",
           selection: link3.work_id
         }))
+      },
+      ...boundaryForms(c, track, evidence),
+      ...tagHistory(c, track)
+    ]
+  };
+}
+var fieldValue = (values) => values == null ? "not written to this format" : values.length ? values.join("; ") : "\u2014";
+function fieldChanges(track) {
+  return track.fields.filter((field2) => field2.writable && JSON.stringify(field2.current) !== JSON.stringify(field2.proposed)).map((field2) => `${FIELD_LABELS[field2.field]}: ${fieldValue(field2.current)} \u2192 ${fieldValue(field2.proposed)}`).join(" \xB7 ");
+}
+var SHOWN = 100;
+function tagPreviewView(c, token, index = null) {
+  const preview = loadPreview(c, token);
+  if (!preview) fail("This preview is gone. Open it again from the album, work or track.");
+  if (index !== null) {
+    const track = preview.tracks[index];
+    if (!track) fail("This file isn't in the preview");
+    return {
+      crumbs: [{ label: "Tag preview", selection: `tags:${token}` }],
+      title: track.title || track.name || "File",
+      subtitle: [track.name, STATUS[track.status]].filter(Boolean).join(" \xB7 "),
+      badges: [{ label: STATUS[track.status], tone: track.status === "change" ? "warning" : "muted" }],
+      actions: [open("Back to the preview", `tags:${token}`), ...track.link ? [open("Open the track", `track:${track.link}`)] : []],
+      sections: [
+        {
+          type: "details",
+          id: "fields",
+          title: "Current and proposed",
+          items: track.fields.length ? track.fields.map((field2) => ({
+            label: FIELD_LABELS[field2.field],
+            value: `${field2.writable ? fieldValue(field2.current) : "Not written to this format"} \u2192 ${fieldValue(field2.proposed)}${field2.writable && JSON.stringify(field2.current) === JSON.stringify(field2.proposed) ? " (same)" : ""}`.slice(0, 2e3)
+          })) : [{ label: "Nothing to write", value: track.reason || STATUS[track.status] }]
+        }
+      ]
+    };
+  }
+  const groups = Object.keys(STATUS).map((status) => [status, preview.tracks.map((track, i) => ({ track, i })).filter(({ track }) => track.status === status)]);
+  const changing = groups[0][1].length;
+  const rows = (list5) => list5.slice(0, SHOWN).map(({ track, i }) => ({
+    id: `file-${i}`,
+    label: (track.title || track.name || "File").slice(0, 500),
+    detail: (track.status === "change" ? fieldChanges(track) : [track.name, track.reason].filter(Boolean).join(" \xB7 ")).slice(0, 500) || void 0,
+    selection: `tags:${token}:${i}`
+  }));
+  return {
+    crumbs: [],
+    title: "Classical tags preview",
+    subtitle: `${changing} of ${preview.tracks.length} file${preview.tracks.length === 1 ? "" : "s"} would change \xB7 Read ${new Date(preview.createdAt).toISOString().slice(0, 16).replace("T", " ")} UTC`,
+    badges: [{ label: "Nothing written yet", tone: "muted" }],
+    actions: changing ? [
+      action(`Write ${changing} file${changing === 1 ? "" : "s"}`, "tag-write", { token, confirm: true }, {
+        tone: "danger",
+        confirm: `Write classical tags to ${changing} file${changing === 1 ? "" : "s"}? Each file's old values are kept so you can restore them. A file changed since this preview is left alone.`
+      })
+    ] : [],
+    sections: groups.filter(([, list5]) => list5.length).map(([status, list5]) => ({
+      type: "rows",
+      id: `status-${status}`,
+      title: `${STATUS[status]} (${list5.length})`,
+      note: status === "change" ? `Composer, work, movement, performer, conductor, catalogue and MusicBrainz work tags only; titles, albums and album artists stay as they are. MP3 files get no movement or performer tags. Writing needs \u201CWrite classical tags to files\u201D on in the plugin's settings.${list5.length > SHOWN ? ` The first ${SHOWN} are listed.` : ""}` : list5.length > SHOWN ? `The first ${SHOWN} are listed.` : void 0,
+      rows: rows(list5)
+    }))
+  };
+}
+var RESULT_TONE = { written: "success", restored: "success", unchanged: "muted", skipped: "warning", failed: "danger" };
+var RESULT_LABEL = { written: "Written", restored: "Restored", unchanged: "Unchanged", skipped: "Skipped", failed: "Failed" };
+function tagRunView(c, id) {
+  const run = tagRun(c, id);
+  if (!run) fail("This tag run is gone");
+  const restore = run.input.mode === "restore";
+  const results = run.progress.results || [];
+  const count = (status) => results.filter((result) => result.status === status).length;
+  const open_ = c.db.prepare("SELECT count(*) AS n FROM tag_backup WHERE run_id=? AND restored_at IS NULL").get(run.id).n;
+  const restoredNow = new Set(c.db.prepare("SELECT id FROM tag_backup WHERE run_id=? AND restored_at IS NOT NULL").all(run.id).map((row) => row.id));
+  const state = run.state === "done" ? "Done" : run.state === "failed" ? `Stopped: ${run.error || "failed"}` : `${run.state}; reload to see progress`;
+  return {
+    crumbs: run.input.preview ? [{ label: "Tag preview", selection: `tags:${run.input.preview}` }] : [],
+    title: restore ? "Restoring classical tags" : "Writing classical tags",
+    subtitle: [state, `${results.length} of ${run.progress.total ?? "?"} files`, ...Object.keys(RESULT_LABEL).filter(count).map((status) => `${count(status)} ${RESULT_LABEL[status].toLowerCase()}`)].join(" \xB7 "),
+    badges: [{ label: run.state === "done" ? "Done" : run.state === "failed" ? "Stopped" : "Running", tone: run.state === "done" ? "success" : run.state === "failed" ? "danger" : "warning" }],
+    actions: [
+      ...!restore && open_ ? [action(`Restore all ${open_}`, "tag-restore", { run: run.id }, { tone: "danger", confirm: `Put back the old tags of ${open_} file${open_ === 1 ? "" : "s"} from this run? A file whose tags changed since is left alone.` })] : [],
+      open("Refresh", `tag-run:${run.id}`)
+    ],
+    sections: [
+      {
+        type: "rows",
+        id: "results",
+        title: "Files",
+        empty: "No file done yet.",
+        rows: results.slice(0, 500).map((result, i) => ({
+          id: `result-${i}`,
+          label: (result.name || "File").slice(0, 500),
+          detail: result.reason ? result.reason.slice(0, 500) : void 0,
+          badge: { label: restoredNow.has(result.backup) && !restore ? "Restored" : RESULT_LABEL[result.status] || result.status, tone: RESULT_TONE[result.status] || "muted" },
+          ...result.link && { selection: `track:${result.link}` },
+          ...!restore && result.status === "written" && result.backup && !restoredNow.has(result.backup) && { actions: [action("Restore this file", "tag-restore", { backup: result.backup })] }
+        }))
       }
     ]
   };
+}
+function tagHistory(c, track) {
+  const rows = c.db.prepare("SELECT id,run_id,written,created_at,restored_at FROM tag_backup WHERE track_link_id=? ORDER BY created_at DESC LIMIT 20").all(track);
+  if (!rows.length) return [];
+  return [
+    {
+      type: "rows",
+      id: "tag-history",
+      title: "Classical tags written",
+      rows: rows.map((row) => ({
+        id: row.id,
+        label: `Written ${new Date(row.created_at).toISOString().slice(0, 16).replace("T", " ")} UTC`,
+        detail: Object.keys(JSON.parse(row.written)).map((field2) => FIELD_LABELS[field2] || field2).join(", ").slice(0, 500),
+        badge: row.restored_at ? { label: "Restored", tone: "muted" } : { label: "Current", tone: "success" },
+        selection: `tag-run:${row.run_id}`,
+        ...!row.restored_at && { actions: [action("Restore", "tag-restore", { backup: row.id })] }
+      }))
+    }
+  ];
+}
+function tagPreviewTracks(c, v) {
+  const classical = (ids) => ids.filter((id) => c.db.prepare("SELECT 1 FROM classification WHERE target_id=? AND state='classical'").get(id));
+  if (v.albumId != null && v.albumId !== "") {
+    const albumId = str(v.albumId, "album", { max: 200 });
+    const tracks = albums(c, albumId).get(albumId)?.tracks.map((track) => track.id) || [];
+    if (!tracks.length) fail("This album has no indexed tracks");
+    if (Array.isArray(v.tracks)) {
+      const ticked = new Set(v.tracks.map(String));
+      const chosen = tracks.filter((id) => ticked.has(id));
+      if (!chosen.length || chosen.length !== ticked.size) fail("A ticked track is no longer on this album");
+      return { links: chosen, scope: `album:${albumId}` };
+    }
+    return { links: classical(tracks), scope: `album:${albumId}` };
+  }
+  if (v.work) {
+    const work = str(v.work, "work", { max: 200 });
+    c.entity(work, "work");
+    const links = c.db.prepare("SELECT DISTINCT s.track_link_id AS id FROM realization r JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id AND t.state='active' WHERE r.work_id=? ORDER BY t.id").all(work).map((row) => row.id);
+    if (!links.length) fail("No track in your Library plays this work");
+    return { links, scope: work };
+  }
+  if (v.track) return { links: [str(v.track, "track", { max: 200 })], scope: `track:${v.track}` };
+  fail("Choose an album, a work, a track or ticked tracks");
 }
 function reviewView(c, id) {
   const review = c.db.prepare("SELECT * FROM review_item WHERE id=?").get(id);
@@ -43326,7 +45139,7 @@ function reviewView(c, id) {
     );
   if (review.kind === "track_link" && track)
     (review.evidence.candidates || []).slice(0, 5).forEach(
-      (candidate, index) => actions.unshift(action(`Link to ${path6.basename(candidate.path || "")}`.slice(0, 100), "relink-track", { id, candidate: String(index) }))
+      (candidate, index) => actions.unshift(action(`Link to ${path10.basename(candidate.path || "")}`.slice(0, 100), "relink-track", { id, candidate: String(index) }))
     );
   for (const candidate of (Array.isArray(review.evidence.candidates) ? review.evidence.candidates : []).slice(0, 5))
     if (typeof candidate === "string" && c.db.prepare("SELECT 1 FROM entity WHERE id=? AND deleted_at IS NULL").get(candidate))
@@ -43345,7 +45158,7 @@ function reviewView(c, id) {
   const items = [];
   if (evidence)
     items.push(
-      { label: "Track", value: trackTitle(evidence) },
+      { label: "Track", value: trackTitle2(evidence) },
       { label: "Album", value: evidence.hints?.album || "Unknown" },
       { label: "Performer", value: evidence.hints?.artist || "Unknown" },
       { label: "Composer tag", value: (evidence.hints?.composer || []).join(", ") || "None" }
@@ -43489,6 +45302,7 @@ function maintenanceView(status) {
   const scan = status.scan;
   const id = status.identification;
   const names = status.english;
+  const enrich = status.enrich;
   const scanRunning = scan && ["queued", "running", "retry"].includes(scan.state);
   return {
     crumbs: [],
@@ -43516,7 +45330,11 @@ function maintenanceView(status) {
         title: "MusicBrainz",
         items: [
           { label: "Identification", value: id ? `${id.queued} queued, ${id.done} done, ${id.matched} work groups made${id.backlog ? `; ${id.backlog} earlier albums wait for the one-time lookup` : ""}` : "Nothing yet" },
-          { label: "Work names and books", value: names ? `${names.state}: ${names.renamed ?? 0} of ${names.total ?? "?"} renamed, ${names.filed || 0} filed` : "Not run" }
+          { label: "Work names and books", value: names ? `${names.state}: ${names.renamed ?? 0} of ${names.total ?? "?"} renamed, ${names.filed || 0} filed` : "Not run" },
+          {
+            label: "Dates, sort names and other names",
+            value: enrich ? `${enrich.state}${enrich.stored != null ? `: ${enrich.stored} stored, ${enrich.missing || 0} no longer on MusicBrainz, ${enrich.failed || 0} to retry` : ""}; ${enrich.waiting} waiting` : "Not run"
+          }
         ]
       },
       {
@@ -43528,7 +45346,8 @@ function maintenanceView(status) {
         empty: "Start one below; progress shows above.",
         actions: [
           action("Identify earlier albums", "maintenance-backlog", {}, { confirm: "Look up, once, the albums scanned before automatic identification? It runs in the background, one request a second." }),
-          action("Work names from MusicBrainz", "maintenance-english", {}, { confirm: "Look up English work names and books on MusicBrainz, once per work? Titles you set yourself are left alone." })
+          action("Work names from MusicBrainz", "maintenance-english", {}, { confirm: "Look up English work names and books on MusicBrainz, once per work? Titles you set yourself are left alone." }),
+          action("Details from MusicBrainz", "maintenance-enrich", {}, { confirm: "Look up dates, sort names and other names on MusicBrainz for every person, ensemble and work with a MusicBrainz ID that has none yet? Values you set yourself stay." })
         ]
       }
     ]
@@ -43652,7 +45471,7 @@ function performersView(c, token) {
         rows: performances.map((performance2) => ({
           id: performance2,
           label: performanceLabel(c, performance2),
-          detail: credits(c, performance2).filter((credit) => PERFORMING_ROLES2.has(credit.role)).map((credit) => `${credit.name} (${roleLabel(credit.role)})`).join(", ") || "No performers yet",
+          detail: credits2(c, performance2).filter((credit) => PERFORMING_ROLES2.has(credit.role)).map((credit) => `${credit.name} (${roleLabel(credit.role)})`).join(", ") || "No performers yet",
           selection: creditTargetPage(c, performance2)
         }))
       }
@@ -43888,20 +45707,20 @@ var LIST_SELECT = {
     ]
   }
 };
-var PERFORMING = /* @__PURE__ */ new Set(["soloist", "performer", "accompanist"]);
+var PERFORMING2 = /* @__PURE__ */ new Set(["soloist", "performer", "accompanist"]);
 function listFilters(tab, q) {
   if (tab !== "performers") return { text: q, keep: () => true };
   const tests = [];
-  const text6 = q.split(/\s+/).filter((word) => {
+  const text7 = q.split(/\s+/).filter((word) => {
     const role = word.match(/^role:([a-z]+)$/i)?.[1]?.toLowerCase();
     if (role === "ensemble") tests.push((facts) => facts.kind === "ensemble");
-    else if (role === "performer") tests.push((facts) => facts.roles.some((r) => PERFORMING.has(r)));
+    else if (role === "performer") tests.push((facts) => facts.roles.some((r) => PERFORMING2.has(r)));
     else if (role && CREDIT_ROLES.includes(role)) tests.push((facts) => facts.roles.includes(role));
     else if (/^unreviewed$/i.test(word)) tests.push((facts) => facts.unreviewed);
     else return true;
     return false;
   }).join(" ");
-  return { text: text6, keep: (item) => !item.facts || tests.every((test) => test(item.facts)) };
+  return { text: text7, keep: (item) => !item.facts || tests.every((test) => test(item.facts)) };
 }
 function listKey(c, selection) {
   if (selection.startsWith("album:")) return `album:${parseAlbumSelection(selection).albumId}`;
@@ -43949,6 +45768,10 @@ function renderV2(c, query, revision2, { downloads = null, maintenance: maintena
     if (work && work !== "new") c.entity(work, "work");
     view = albumView(c, albumId, work || null, page2, move);
   } else if (selection.startsWith("track:")) view = trackView(c, selection.slice(6));
+  else if (selection.startsWith("tags:")) {
+    const [token, index] = selection.slice(5).split(":");
+    view = tagPreviewView(c, token, index === void 0 ? null : Number(index));
+  } else if (selection.startsWith("tag-run:")) view = tagRunView(c, selection.slice(8));
   else if (selection.startsWith("slskd:")) view = downloadView(downloads, Number(selection.slice(6)));
   else if (selection.startsWith("change:")) view = changeView(c, selection.slice(7));
   else if (selection === "maintenance") view = maintenanceView(maintenance2);
@@ -43986,7 +45809,7 @@ function renderV2(c, query, revision2, { downloads = null, maintenance: maintena
   return {
     version: 2,
     title: "Classical metadata",
-    description: "Works, composers, performers and albums in Aurral Classical. Edits stay in the classical catalogue; audio files are never changed.",
+    description: "Works, composers, performers and albums in Aurral Classical. Edits stay in the classical catalogue; audio files change only when you write classical tags from a preview.",
     revision: revision2,
     tabs: [
       { id: "works", label: "Works", count: c.db.prepare("SELECT count(*) AS n FROM entity WHERE kind='work' AND deleted_at IS NULL").get().n },
@@ -44077,7 +45900,12 @@ var V2_COMMANDS = {
   "resolve-review": ["id"],
   "resolve-reviews": ["ids", "as"],
   "choose-provider-value": ["id", "field", "assertion"],
-  "relink-track": ["id", "candidate"]
+  "relink-track": ["id", "candidate"],
+  // One field per movement after the first: setBoundaries checks them.
+  "set-boundaries": null,
+  "tag-preview-open": ["albumId", "tracks", "work", "track", "page"],
+  "tag-write": ["token", "confirm"],
+  "tag-restore": ["run", "backup"]
 };
 function mergePeople(c, keep, drop, who) {
   return recordChange(
@@ -44086,8 +45914,8 @@ function mergePeople(c, keep, drop, who) {
     () => mergeContributor(c, keep, drop, who)
   );
 }
-function addAlias(c, entity, text6) {
-  const spelling = String(text6 ?? "").trim();
+function addAlias(c, entity, text7) {
+  const spelling = String(text7 ?? "").trim();
   if (!spelling) return;
   const fold2 = searchText(spelling);
   if (c.db.prepare("SELECT text FROM alias WHERE entity_id=?").all(entity).some((row) => searchText(row.text) === fold2)) return;
@@ -44127,7 +45955,7 @@ function assignTracks(c, m, who, work, tracks, mapping, { move = false } = {}) {
   for (const entry of chosen) {
     if (entry.movement !== "new") continue;
     const evidence = JSON.parse(c.db.prepare("SELECT evidence FROM track_link WHERE id=?").get(entry.track).evidence);
-    const name = movementTitle({ title: trackTitle(evidence), work: evidence.hints?.work }, workTitle) || trackTitle(evidence);
+    const name = movementTitle({ title: trackTitle2(evidence), work: evidence.hints?.work }, workTitle) || trackTitle2(evidence);
     const movement = c.createEntity("movement");
     m.manual(movement, "title", name.slice(0, 2e3), { actor: who, pin: true });
     const position = c.db.prepare("SELECT coalesce(max(position),0)+1 AS n FROM relation WHERE kind='movement' AND source_id=?").get(work).n;
@@ -44143,7 +45971,7 @@ function assignTracks(c, m, who, work, tracks, mapping, { move = false } = {}) {
   chosen.forEach(({ track, movement }, index) => {
     const evidence = JSON.parse(c.db.prepare("SELECT evidence FROM track_link WHERE id=?").get(track).evidence);
     const recording = c.createEntity("recording", { durationMs: evidence.durationMs });
-    m.manual(recording, "title", trackTitle(evidence), { actor: who });
+    m.manual(recording, "title", trackTitle2(evidence), { actor: who });
     c.relate("recording_performance", recording, performance2);
     const content = c.recordingContent(recording, performanceWork, { movement: movement === "whole" ? null : movement });
     const segment = c.segment(track, { kind: "whole" });
@@ -44297,7 +46125,7 @@ function applyV2(c, request, who) {
       if (!works.length || works.length > 500) fail("Choose at least one work");
       for (const work of works) c.entity(work, "work");
       c.db.prepare("DELETE FROM change_set WHERE kind='selection' AND created_at<?").run(Date.now() - 864e5);
-      const token = randomUUID10();
+      const token = randomUUID13();
       c.db.prepare("INSERT INTO change_set(id,kind,actor,summary,data,created_at) VALUES (?,?,?,?,?,?)").run(token, "selection", who, `${works.length} works`, JSON.stringify({ works }), Date.now());
       return { selection: `bulk:${token}`, message: "" };
     }
@@ -44354,8 +46182,8 @@ function applyV2(c, request, who) {
             if (replace)
               for (const { id } of c.db.prepare(`SELECT id FROM credit WHERE target_id=? AND state='active' AND role IN (${[...PERFORMING_ROLES2].map(() => "?").join(",")})`).all(performance2, ...PERFORMING_ROLES2))
                 c.removeCredit(id);
-            const same2 = c.db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ? AND state='active'").get(performance2, contributor.id, role, instrument);
-            if (!same2) {
+            const same3 = c.db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ? AND state='active'").get(performance2, contributor.id, role, instrument);
+            if (!same3) {
               const position = c.db.prepare("SELECT coalesce(max(position),0)+1 AS n FROM credit WHERE target_id=?").get(performance2).n;
               c.credit(performance2, contributor.id, role, { instrument, position });
             }
@@ -44393,9 +46221,9 @@ function applyV2(c, request, who) {
       for (const credit of credits_) {
         try {
           transaction(c.db, () => {
-            const same2 = c.db.prepare("SELECT id,state FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?").get(credit.target_id, target.id, to, credit.instrument);
-            if (same2?.state === "active") throw new Error(`already credited as ${roleLabel(to).toLowerCase()}`);
-            if (same2) c.db.prepare("DELETE FROM credit WHERE id=?").run(same2.id);
+            const same3 = c.db.prepare("SELECT id,state FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?").get(credit.target_id, target.id, to, credit.instrument);
+            if (same3?.state === "active") throw new Error(`already credited as ${roleLabel(to).toLowerCase()}`);
+            if (same3) c.db.prepare("DELETE FROM credit WHERE id=?").run(same3.id);
             c.db.prepare("UPDATE credit SET role=?,source='manual' WHERE id=?").run(to, credit.id);
             c.audit("editor.change-roles", credit.target_id, { contributor: target.id, from, to }, who);
           });
@@ -44723,6 +46551,40 @@ function applyV2(c, request, who) {
       c.db.prepare("UPDATE review_item SET status='resolved' WHERE id=?").run(id);
       return { selection: `track:${link3.id}`, message: "Linked to the moved file; its works and picks are kept." };
     }
+    case "set-boundaries":
+      return transaction(c.db, () => setBoundaries(c, v));
+    case "tag-preview-open": {
+      const { links, scope } = tagPreviewTracks(c, v);
+      let token;
+      try {
+        token = createPreview(c, links, who, { scope });
+      } catch (error) {
+        fail(error.message);
+      }
+      return { selection: `tags:${token}`, message: "Nothing was written. Check the preview, then write." };
+    }
+    case "tag-write": {
+      if (v.confirm !== true) fail("Confirm writing the tags first");
+      let queued;
+      try {
+        queued = transaction(c.db, () => queueWrite(c, str(v.token, "preview", { max: 200 }), who));
+      } catch (error) {
+        fail(error.message);
+      }
+      return {
+        selection: `tag-run:${queued.id}`,
+        message: queued.again ? "This preview was written already; here is how it went." : `Writing classical tags to ${queued.files} file${queued.files === 1 ? "" : "s"} in the background. This page shows each file's result.`
+      };
+    }
+    case "tag-restore": {
+      let queued;
+      try {
+        queued = transaction(c.db, () => queueRestore(c, { run: v.run ? str(v.run, "run", { max: 200 }) : null, backup: v.backup ? str(v.backup, "file", { max: 200 }) : null }, who));
+      } catch (error) {
+        fail(error.message);
+      }
+      return { selection: `tag-run:${queued.id}`, message: `Putting back the old tags of ${queued.files} file${queued.files === 1 ? "" : "s"} in the background.` };
+    }
     case "resolve-reviews": {
       const ids = Array.isArray(v.ids) ? v.ids.filter((x) => typeof x === "string") : [];
       if (!ids.length || ids.length > 500) fail("Choose at least one review item");
@@ -44769,14 +46631,14 @@ var EditorError = class extends Error {
 var fail2 = (message, field2) => {
   throw new EditorError(message, 400, field2);
 };
-var actor = (input) => {
+var actor2 = (input) => {
   if (input.pageId !== "editor" || ![1, 2].includes(input.capabilities?.adminForms) || input.user?.role !== "admin" || !Number.isSafeInteger(input.user.id) || input.user.id <= 0)
     throw new Error(
       "The classical editor requires the host admin-forms v1 capability and a real admin"
     );
   return String(input.user.id);
 };
-function text4(value, label, { optional = false, max = 1e4, field: field2 } = {}) {
+function text6(value, label, { optional = false, max = 1e4, field: field2 } = {}) {
   if (typeof value !== "string" || value.length > max || !optional && !value.trim())
     fail2(`Enter a valid ${label}`, field2);
   return value;
@@ -44912,7 +46774,7 @@ var movementRows = (c, work) => c.db.prepare(
   "SELECT * FROM relation WHERE kind='movement' AND source_id=? ORDER BY position"
 ).all(work);
 function render(c, input) {
-  const m = new Metadata(c), all = entries(c), query = input.query || {}, q = normalized2(text4(query.q || "", "search", { optional: true, max: 200 }));
+  const m = new Metadata(c), all = entries(c), query = input.query || {}, q = normalized2(text6(query.q || "", "search", { optional: true, max: 200 }));
   const offset = Number(query.offset || 0);
   if (!Number.isSafeInteger(offset) || offset < 0 || offset > 1e7)
     fail2("Invalid page offset");
@@ -45207,7 +47069,7 @@ Provider value: ${providerText}`;
                 options: choices.map(
                   (t) => option(
                     t.id,
-                    `${t.label} \xB7 ${path7.basename(path7.dirname(t.evidence.path))} / ${path7.basename(t.evidence.path)} \xB7 ${t.classification || "unsure"}`
+                    `${t.label} \xB7 ${path11.basename(path11.dirname(t.evidence.path))} / ${path11.basename(t.evidence.path)} \xB7 ${t.classification || "unsure"}`
                   )
                 )
               }),
@@ -45247,7 +47109,7 @@ Provider value: ${providerText}`;
                 options: attached.map(
                   (i) => option(
                     i.id,
-                    `${i.movement_id ? label(i.movement_id) : "Whole work"} \xB7 ${path7.basename(JSON.parse(c.db.prepare("SELECT evidence FROM track_link WHERE id=?").get(i.track_link_id).evidence).path)}`
+                    `${i.movement_id ? label(i.movement_id) : "Whole work"} \xB7 ${path11.basename(JSON.parse(c.db.prepare("SELECT evidence FROM track_link WHERE id=?").get(i.track_link_id).evidence).path)}`
                   )
                 )
               })
@@ -45270,7 +47132,7 @@ Provider value: ${providerText}`;
       `Owned track: ${selectedTrack.title}
 Album: ${selectedTrack.album || "Unknown album"}
 Performer: ${selectedTrack.artist || "Unknown performer"}
-File: ${path7.basename(selectedTrack.evidence.path)}
+File: ${path11.basename(selectedTrack.evidence.path)}
 Classification: ${selectedTrack.classification || "unsure"}`.slice(
         0,
         8e3
@@ -45368,6 +47230,8 @@ function apply(c, input, who) {
   if (!request || typeof request !== "object" || typeof request.command !== "string" || !request.values || Array.isArray(request.values))
     fail2("Invalid editor request");
   if (Object.hasOwn(V2_COMMANDS, request.command)) {
+    if (request.command === "tag-write" && input.settings?.enableTagWriting !== true)
+      fail2("Writing tags is off. Turn on \u201CWrite classical tags to files\u201D in the plugin's settings first.");
     const keys = V2_COMMANDS[request.command];
     if (keys && Object.keys(request.values).some((key) => !keys.includes(key)))
       fail2("Unknown editor command or fields");
@@ -45430,7 +47294,7 @@ function apply(c, input, who) {
   let selection;
   switch (request.command) {
     case "attach-found-track": {
-      const parts = text4(v.choice, "recording and performance", {
+      const parts = text6(v.choice, "recording and performance", {
         max: 200
       }).split("|");
       if (parts.length !== 2)
@@ -45455,7 +47319,7 @@ function apply(c, input, who) {
       );
     }
     case "create-contributor": {
-      const name = text4(v.name, "contributor name", { max: 500, field: "name" }).trim();
+      const name = text6(v.name, "contributor name", { max: 500, field: "name" }).trim();
       if (!["person", "ensemble"].includes(v.kind))
         fail2("Select a valid contributor type");
       selection = c.createEntity(v.kind, {
@@ -45465,9 +47329,9 @@ function apply(c, input, who) {
       break;
     }
     case "add-credit": {
-      selection = text4(v.target, "entry", { max: 200 });
+      selection = text6(v.target, "entry", { max: 200 });
       c.entity(selection, ["work", "recording", "performance", "release"]);
-      const contributor = text4(v.contributor, "contributor", { max: 200, field: "contributor" }), role = text4(v.role, "role", { max: 80 }), instrument = text4(v.instrument, "instrument", {
+      const contributor = text6(v.contributor, "contributor", { max: 200, field: "contributor" }), role = text6(v.role, "role", { max: 80 }), instrument = text6(v.instrument, "instrument", {
         optional: true,
         max: 200
       }).trim() || null;
@@ -45486,45 +47350,45 @@ function apply(c, input, who) {
       break;
     }
     case "update-credit": {
-      selection = text4(v.target, "entry", { max: 200 });
+      selection = text6(v.target, "entry", { max: 200 });
       c.entity(selection);
-      const credit = c.db.prepare("SELECT * FROM credit WHERE id=? AND target_id=? AND state='active'").get(text4(v.credit, "credit", { max: 200 }), selection);
+      const credit = c.db.prepare("SELECT * FROM credit WHERE id=? AND target_id=? AND state='active'").get(text6(v.credit, "credit", { max: 200 }), selection);
       if (!credit) fail2("Credit does not belong to this entry");
-      const role = text4(v.role, "role", { max: 80 });
-      const instrument = text4(v.instrument ?? "", "instrument", { optional: true, max: 200 }).trim() || credit.instrument;
+      const role = text6(v.role, "role", { max: 80 });
+      const instrument = text6(v.instrument ?? "", "instrument", { optional: true, max: 200 }).trim() || credit.instrument;
       const who2 = c.entity(credit.contributor_id, ["person", "ensemble"]);
       if (!CREDIT_ROLES.includes(role)) fail2("Choose a role from the list");
       if (PERSON_ROLES.has(role) && who2.kind !== "person") fail2(`An ensemble can't be credited as ${role}; choose a person or another role`);
       if (ENSEMBLE_ROLES.has(role) && who2.kind !== "ensemble") fail2(`Only an ensemble can be credited as ${role}`);
-      const same2 = c.db.prepare("SELECT id,state FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ? AND id!=?").get(selection, credit.contributor_id, role, instrument, credit.id);
-      if (same2?.state === "active") fail2("That role credit already exists");
-      if (same2) c.db.prepare("DELETE FROM credit WHERE id=?").run(same2.id);
+      const same3 = c.db.prepare("SELECT id,state FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ? AND id!=?").get(selection, credit.contributor_id, role, instrument, credit.id);
+      if (same3?.state === "active") fail2("That role credit already exists");
+      if (same3) c.db.prepare("DELETE FROM credit WHERE id=?").run(same3.id);
       c.db.prepare("UPDATE credit SET role=?,instrument=?,source='manual' WHERE id=?").run(role, instrument, credit.id);
       break;
     }
     case "remove-credit": {
-      selection = text4(v.target, "entry", { max: 200 });
+      selection = text6(v.target, "entry", { max: 200 });
       c.entity(selection);
-      const credit = text4(v.credit, "credit", { max: 200 });
+      const credit = text6(v.credit, "credit", { max: 200 });
       if (!c.db.prepare("SELECT 1 FROM credit WHERE id=? AND target_id=? AND state='active'").get(credit, selection))
         fail2("Credit does not belong to this entry");
       c.removeCredit(credit);
       break;
     }
     case "create-composer": {
-      const name = text4(v.name, "composer name", { max: 500, field: "name" }).trim();
+      const name = text6(v.name, "composer name", { max: 500, field: "name" }).trim();
       selection = c.createEntity("person", { roles: ["composer"] });
       manual(selection, "name", name);
       break;
     }
     case "create-work": {
-      const title = text4(v.title, "work title", { max: 2e3, field: "title" }).trim();
-      const composer = text4(v.composer ?? "", "composer", {
+      const title = text6(v.title, "work title", { max: 2e3, field: "title" }).trim();
+      const composer = text6(v.composer ?? "", "composer", {
         optional: true,
         max: 200
       });
       if (composer) c.entity(composer, "person");
-      const movements = (Array.isArray(v.movements) ? v.movements.join("\n") : text4(v.movements ?? "", "movement titles", { optional: true })).split("\n").map((s) => s.trim()).filter(Boolean);
+      const movements = (Array.isArray(v.movements) ? v.movements.join("\n") : text6(v.movements ?? "", "movement titles", { optional: true })).split("\n").map((s) => s.trim()).filter(Boolean);
       if (movements.length > 100)
         fail2("Create no more than 100 movements at a time");
       const similar = warnDuplicate(c, title, composer ? [m.resolve(composer, "name").value].filter(Boolean) : [], v.createAnyway);
@@ -45540,12 +47404,12 @@ function apply(c, input, who) {
       break;
     }
     case "edit-field": {
-      const target = text4(v.target, "entry", { max: 200 }), key = text4(v.field, "field", { max: 80 });
+      const target = text6(v.target, "entry", { max: 200 }), key = text6(v.field, "field", { max: 80 });
       c.entity(target);
       const definition = c.db.prepare("SELECT type FROM field_definition WHERE key=?").get(key);
       if (!definition || !["string", "array"].includes(definition.type))
         fail2("This field is not editable");
-      const raw = text4(v.value, "value", { optional: true });
+      const raw = text6(v.value, "value", { optional: true });
       if (typeof v.blank !== "boolean" || typeof v.pin !== "boolean")
         fail2("Invalid override options");
       const value = v.blank ? null : definition.type === "array" ? raw.split("\n").map((s) => s.trim()).filter(Boolean) : raw;
@@ -45556,9 +47420,9 @@ function apply(c, input, who) {
       break;
     }
     case "use-provider": {
-      selection = text4(v.target, "entry", { max: 200 });
+      selection = text6(v.target, "entry", { max: 200 });
       c.entity(selection);
-      const field2 = text4(v.field, "field", { max: 80 });
+      const field2 = text6(v.field, "field", { max: 80 });
       if (!c.db.prepare("SELECT 1 FROM field_definition WHERE key=?").get(field2))
         fail2("Unknown metadata field");
       m.useProvider(selection, field2, {
@@ -45567,9 +47431,9 @@ function apply(c, input, who) {
       break;
     }
     case "add-movement": {
-      selection = text4(v.work, "work", { max: 200 });
+      selection = text6(v.work, "work", { max: 200 });
       c.entity(selection, "work");
-      const titles = (Array.isArray(v.title) ? v.title : [text4(v.title, "movement title", { max: 2e3, field: "title" })]).map((title) => String(title).trim()).filter(Boolean);
+      const titles = (Array.isArray(v.title) ? v.title : [text6(v.title, "movement title", { max: 2e3, field: "title" })]).map((title) => String(title).trim()).filter(Boolean);
       if (!titles.length) fail2("Enter a movement title", "title");
       if (titles.length > 100) fail2("Add no more than 100 movements at a time");
       for (const title of titles) {
@@ -45583,7 +47447,7 @@ function apply(c, input, who) {
       break;
     }
     case "reorder-movements": {
-      selection = text4(v.work, "work", { max: 200 });
+      selection = text6(v.work, "work", { max: 200 });
       c.entity(selection, "work");
       const rows = movementRows(c, selection), ids = rows.map((r) => r.target_id);
       if (!Array.isArray(v.order) || v.order.length !== ids.length || new Set(v.order).size !== ids.length || v.order.some((id) => !ids.includes(id)))
@@ -45600,9 +47464,9 @@ function apply(c, input, who) {
       break;
     }
     case "create-broadcast": {
-      const work = text4(v.work, "work", { max: 200 });
+      const work = text6(v.work, "work", { max: 200 });
       c.entity(work, "work");
-      const title = text4(v.title, "recording title", { max: 2e3, field: "title" }).trim(), date = text4(v.date, "broadcast date", {
+      const title = text6(v.title, "recording title", { max: 2e3, field: "title" }).trim(), date = text6(v.date, "broadcast date", {
         optional: true,
         max: 10,
         field: "date"
@@ -45621,25 +47485,25 @@ function apply(c, input, who) {
       c.relate("recording_performance", selection, p);
       manual(selection, "title", title);
       if (date) manual(selection, "date", date);
-      const description = text4(v.description, "recording notes", {
+      const description = text6(v.description, "recording notes", {
         optional: true
       });
       if (description) manual(selection, "description", description);
       break;
     }
     case "attach-track": {
-      selection = text4(v.recording, "recording", { max: 200 });
+      selection = text6(v.recording, "recording", { max: 200 });
       c.entity(selection, "recording");
       const pw = c.performanceWork(
-        text4(v.performanceWork, "work performance", { max: 200 })
+        text6(v.performanceWork, "work performance", { max: 200 })
       );
       if (!c.db.prepare(
         "SELECT 1 FROM relation WHERE kind='recording_performance' AND source_id=? AND target_id=?"
       ).get(selection, pw.source_id))
         fail2("This recording does not capture that performance");
-      const movement = text4(v.movement, "movement", { optional: true, max: 200 }) || null;
+      const movement = text6(v.movement, "movement", { optional: true, max: 200 }) || null;
       c.checkMovement(pw.target_id, movement);
-      const track = text4(v.track, "owned track", { max: 200 }), link3 = c.db.prepare("SELECT * FROM track_link WHERE id=? AND state='active'").get(track);
+      const track = text6(v.track, "owned track", { max: 200 }), link3 = c.db.prepare("SELECT * FROM track_link WHERE id=? AND state='active'").get(track);
       if (!link3) fail2("This owned track is missing or requires review");
       const state = c.db.prepare("SELECT state FROM classification WHERE target_id=?").get(track)?.state;
       if (state !== "classical" && v.confirmClassical !== true)
@@ -45664,9 +47528,9 @@ function apply(c, input, who) {
       break;
     }
     case "detach-track": {
-      selection = text4(v.recording, "recording", { max: 200 });
+      selection = text6(v.recording, "recording", { max: 200 });
       c.entity(selection, "recording");
-      const item = text4(v.item, "attachment", { max: 200 });
+      const item = text6(v.item, "attachment", { max: 200 });
       const owned = c.db.prepare(
         `SELECT 1 FROM realization_item i JOIN realization r ON r.id=i.realization_id JOIN relation pw ON pw.id=r.performance_work_id
         JOIN relation rp ON rp.target_id=pw.source_id AND rp.kind='recording_performance' WHERE rp.source_id=? AND i.id=?`
@@ -45680,7 +47544,7 @@ function apply(c, input, who) {
   }
   c.audit(`editor.${request.command}`, selection || "", { values: v }, who);
   if (["add-credit", "update-credit", "remove-credit"].includes(request.command) && v.back != null) {
-    const back = text4(v.back, "page", { max: 200 });
+    const back = text6(v.back, "page", { max: 200 });
     c.entity(back);
     selection = back;
   }
@@ -45691,8 +47555,8 @@ function apply(c, input, who) {
   };
 }
 async function readEditor(input) {
-  actor(input);
-  const c = await openCatalogue(path7.join(input.dataFolder, "model"));
+  actor2(input);
+  const c = await openCatalogue(path11.join(input.dataFolder, "model"));
   try {
     if (input.capabilities.adminForms >= 2) {
       const query = input.query || {};
@@ -45716,7 +47580,7 @@ async function readEditor(input) {
 }
 async function mutateEditor(input) {
   if (String(input.mutation?.command || "").startsWith("maintenance-")) {
-    actor(input);
+    actor2(input);
     if (!input.maintenance) return { ok: false, status: 400, message: "Maintenance needs the plugin's runtime" };
     try {
       return { ok: true, message: await input.maintenance.run(input.mutation.command, input.user), selection: "maintenance" };
@@ -45724,16 +47588,18 @@ async function mutateEditor(input) {
       return { ok: false, status: 400, message: String(error.message || error).slice(0, 500) };
     }
   }
-  const who = actor(input), c = await openCatalogue(path7.join(input.dataFolder, "model"));
+  const who = actor2(input), c = await openCatalogue(path11.join(input.dataFolder, "model"));
   try {
     try {
-      return transaction(c.db, () => {
+      const result = transaction(c.db, () => {
         const request = input.mutation;
         if (request && typeof request === "object" && request.values && typeof request.values === "object")
           checkRevision(c, request);
-        const result = apply(c, input, who);
-        return input.capabilities.adminForms >= 2 ? finishWorkMutation(c, request, result) : result;
+        const result2 = apply(c, input, who);
+        return input.capabilities.adminForms >= 2 ? finishWorkMutation(c, request, result2) : result2;
       });
+      if (result?.ok && ["tag-write", "tag-restore"].includes(input.mutation?.command)) input.maintenance?.startTagWrites?.();
+      return result;
     } catch (error) {
       if (error instanceof EditorError || error instanceof EditorV2Error)
         return { ok: false, status: error.status, message: error.message.slice(0, 500), ...error.field && { field: error.field } };
@@ -45747,527 +47613,10 @@ async function mutateEditor(input) {
 }
 
 // src/model/pages.js
-import path9 from "node:path";
+import path12 from "node:path";
 
 // src/model/pages-entities.js
-import { randomUUID as randomUUID11 } from "node:crypto";
-
-// src/model/presentation.js
-import path8 from "node:path";
-var text5 = (value, fallback) => typeof value === "string" && value.trim() ? value.trim() : fallback;
-var DisplayValues = class {
-  constructor(c) {
-    this.statement = c.db.prepare(
-      `SELECT a.value FROM field_resolution f JOIN assertion a ON a.id=f.assertion_id
-       WHERE f.target_id=? AND f.field=?`
-    );
-  }
-  resolve(id, field2) {
-    const row = this.statement.get(id, field2);
-    return { value: row ? JSON.parse(row.value) : void 0 };
-  }
-};
-var entityValue = (metadata, id, field2, fallback) => text5(metadata.resolve(id, field2).value, fallback);
-var evidenceOf = (row) => JSON.parse(row.evidence);
-var TEXT_LIMIT = 500;
-var MOVEMENT_LIMIT = 200;
-function clip(value, max = TEXT_LIMIT) {
-  if (typeof value !== "string" || value.length <= max) return value;
-  const cut = value.slice(0, max - 1).replace(/[\uD800-\uDBFF]$/, "");
-  return `${cut.trimEnd()}\u2026`;
-}
-var fitMovement = (movement) => ({ ...movement, title: clip(movement.title) });
-var fitMovements = (movements) => movements.slice(0, MOVEMENT_LIMIT).map(fitMovement);
-var fitCredit = (credit) => ({ ...credit, name: clip(credit.name), instrument: clip(credit.instrument, 200) });
-var fitItem = (item) => ({
-  ...item,
-  title: clip(item.title),
-  artist: clip(item.artist),
-  performer: clip(item.performer),
-  album: clip(item.album)
-});
-function fitWork(view) {
-  const { work } = view;
-  return {
-    ...view,
-    work: {
-      ...work,
-      title: clip(work.title),
-      nickname: clip(work.nickname),
-      description: clip(work.description, 1e4),
-      credits: work.credits.map(fitCredit),
-      movements: fitMovements(work.movements),
-      collections: work.collections.map((collection) => ({ ...collection, title: clip(collection.title) }))
-    },
-    recordings: view.recordings.map((recording) => ({
-      ...recording,
-      label: clip(recording.label),
-      performer: clip(recording.performer),
-      recordLabel: clip(recording.recordLabel, 200),
-      credits: recording.credits.map(fitCredit),
-      parts: recording.parts.slice(0, MOVEMENT_LIMIT),
-      releases: recording.releases.map((release) => ({ ...release, album: clip(release.album) })),
-      items: recording.items.map(fitItem),
-      missing: fitMovements(recording.missing)
-    }))
-  };
-}
-var fitGroup = (group) => ({
-  ...group,
-  title: clip(group.title),
-  composer: clip(group.composer),
-  items: group.items.map(fitItem),
-  missing: fitMovements(group.missing)
-});
-var trackTitle2 = (evidence) => text5(evidence.hints?.title, path8.basename(evidence.path || "Track"));
-function actor2(input) {
-  const user = input?.user;
-  if (!Number.isSafeInteger(user?.id) || user.id <= 0)
-    throw new Error("A real user account is required");
-  return user;
-}
-function realizationRows(c, realizationId = null, workId = null, albumId = null) {
-  const filters = [
-    [realizationId, "r.id=?"],
-    [workId, "r.work_id=?"],
-    [albumId, "CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?"]
-  ].filter(([value]) => value !== null);
-  return c.db.prepare(
-    `SELECT r.id AS realization_id,r.work_id,r.performance_work_id,r.label AS realization_label,
-        i.id AS item_id,i.movement_id,i.sequence,i.occurrence,i.segment_id,s.start_ms,s.end_ms,s.kind AS segment_kind,
-        t.id AS track_link_id,t.core_id,t.file_id,t.evidence
-      FROM realization r
-      JOIN realization_item i ON i.realization_id=r.id
-      JOIN segment s ON s.id=i.segment_id
-      JOIN track_link t ON t.id=s.track_link_id AND t.state='active'
-      JOIN classification c ON c.target_id=t.id AND c.state='classical'
-      ${filters.length ? `WHERE ${filters.map(([, sql]) => sql).join(" AND ")}` : ""}
-      ORDER BY r.id,i.sequence,i.occurrence,i.id`
-  ).all(...filters.map(([value]) => value)).reduce((rows, row) => {
-    const last3 = rows.at(-1);
-    if (last3 && last3.realization_id === row.realization_id && last3.segment_id === row.segment_id) last3.movement_ids.push(row.movement_id);
-    else rows.push({ ...row, movement_ids: [row.movement_id] });
-    return rows;
-  }, []);
-}
-var words4 = (value) => String(value || "").normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
-function performerOf(hints) {
-  const artist = text5(hints?.artist, text5(hints?.albumArtist, ""));
-  const performers = performerNames(hints || {}, composersOf(hints || {}), words4);
-  return performers.length ? performers.join(", ") : artist;
-}
-function queueItem(metadata, row, workTitle = null, links = null) {
-  const evidence = evidenceOf(row);
-  return {
-    id: row.item_id,
-    trackId: String(row.core_id),
-    fileId: String(row.file_id),
-    albumId: String(evidence.albumId ?? ""),
-    title: workTitle ? movementTitle({ title: withoutComposer(trackTitle2(evidence), composersOf(evidence.hints || {})), work: evidence.hints?.work }, workTitle) : row.movement_ids?.length > 1 ? row.movement_ids.map((id) => entityValue(metadata, id, "title", "")).filter(Boolean).join(" / ") : row.movement_id ? entityValue(metadata, row.movement_id, "title", trackTitle2(evidence)) : trackTitle2(evidence),
-    artist: text5(evidence.hints?.artist, text5(evidence.hints?.albumArtist, "")),
-    performer: performerOf(evidence.hints),
-    album: text5(evidence.hints?.album, ""),
-    durationMs: Number(evidence.durationMs) || null,
-    startMs: row.start_ms,
-    endMs: row.end_ms,
-    ...links?.length && { links }
-  };
-}
-var CLASSICAL_PAGE = "classical";
-var LINK_ROLES = ["soloist", "performer", "accompanist", "conductor", "orchestra", "ensemble", "choir"];
-var place = (resourceId) => ({ type: "resource", pageId: CLASSICAL_PAGE, resourceId });
-var goTo = (name) => clip(`Go to ${name}`, 80);
-function itemLinks(c, metadata, { workId, realizationId, performanceId }, workLabel = "Go to Work") {
-  const links = [
-    { label: workLabel, link: place(`work:${workId}`) },
-    { label: "Go to Recording", link: place(`recording:${realizationId}`) }
-  ];
-  const kindOf = c.db.prepare("SELECT kind FROM entity WHERE id=? AND deleted_at IS NULL");
-  for (const credit of credits2(c, metadata, workId).filter((entry) => entry.role === "composer").slice(0, 2))
-    links.push({ label: goTo(credit.name), link: place(`composer:${credit.id}`) });
-  const seen = /* @__PURE__ */ new Set();
-  const rank = (role) => LINK_ROLES.indexOf(role) + 1 || LINK_ROLES.length + 1;
-  const performers = (performanceId ? credits2(c, metadata, performanceId) : []).sort((a, b) => rank(a.role) - rank(b.role) || a.name.localeCompare(b.name) || (a.id < b.id ? -1 : 1));
-  for (const credit of performers) {
-    if (links.length >= 6) break;
-    const kind = credit.role === "composer" || seen.has(credit.id) ? null : kindOf.get(credit.id)?.kind;
-    if (kind !== "person" && kind !== "ensemble") continue;
-    seen.add(credit.id);
-    links.push({ label: goTo(credit.name), link: place(`${kind}:${credit.id}`) });
-  }
-  return links.filter((entry) => entry.link.resourceId.length <= 200);
-}
-var performanceOf = (c, performanceWorkId) => c.db.prepare("SELECT source_id FROM relation WHERE id=?").get(performanceWorkId)?.source_id ?? null;
-function workMovements2(c, metadata, workId) {
-  return c.db.prepare(
-    `SELECT target_id,position FROM relation
-       WHERE kind='movement' AND source_id=? ORDER BY position,occurrence,id`
-  ).all(workId).map((row) => ({
-    id: row.target_id,
-    title: entityValue(metadata, row.target_id, "title", "Untitled movement"),
-    position: row.position
-  }));
-}
-function credits2(c, metadata, targetId) {
-  return c.db.prepare(
-    `SELECT role,instrument,contributor_id FROM credit
-       WHERE target_id=? AND state='active' ORDER BY position,id`
-  ).all(targetId).map((row) => ({
-    role: row.role,
-    instrument: row.instrument,
-    id: row.contributor_id,
-    name: entityValue(
-      metadata,
-      row.contributor_id,
-      "name",
-      "Unknown contributor"
-    )
-  }));
-}
-var albumPosition = (row) => {
-  const hints = evidenceOf(row).hints || {};
-  return (Number(hints.discNumber) || 1) * 1e4 + (Number(hints.trackNumber) || 9999);
-};
-var ACT = /,\s*(?:act|akt|atto|acte|part|pt\.?|teil|scene|szene)\s*[ivxlc\d]+\b.*$/i;
-var nameBeforeComma = (title) => words4(String(title).split(",")[0]);
-function sameNamedWork(a, b) {
-  if (a === b) return true;
-  const catalogueA = catalogueNumber(a).toLowerCase();
-  const catalogueB = catalogueNumber(b).toLowerCase();
-  if (catalogueA && catalogueB) return catalogueA === catalogueB;
-  const [short, long] = a.length <= b.length ? [a, b] : [b, a];
-  const name = nameBeforeComma(long);
-  return name.length >= 4 && words4(short) === name && long.includes(",");
-}
-function sameCredits(last3, heading, names) {
-  const these = new Set(names.map(words4));
-  if (last3.names.length === these.size && last3.names.every((name) => these.has(name))) return true;
-  const shared = last3.names.filter((name) => these.has(name));
-  const same2 = shared.length > 0 && Boolean(catalogueNumber(last3.title)) && catalogueNumber(last3.title) === catalogueNumber(heading);
-  if (same2) {
-    last3.composer = last3.credited.filter((name) => shared.includes(words4(name))).join(", ");
-    last3.names = shared;
-  }
-  return same2;
-}
-function pieceGroups(c, album, following) {
-  const rows = c.db.prepare(
-    `SELECT t.id AS track_link_id,t.core_id,t.file_id,t.evidence FROM track_link t
-       JOIN classification c ON c.target_id=t.id AND c.state='classical'
-       WHERE t.state='active' AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?
-       AND NOT EXISTS(SELECT 1 FROM segment s WHERE s.track_link_id=t.id)`
-  ).all(album).sort((a, b) => albumPosition(a) - albumPosition(b));
-  const pieces = [];
-  for (const row of rows) {
-    const evidence = evidenceOf(row);
-    const workTag = text5(evidence.hints?.work, "");
-    const work = workTag.split(/\s*:\s*/)[0];
-    const title = withoutComposer(trackTitle2(evidence), composersOf(evidence.hints || {}));
-    const split = splitTitle(title);
-    const fullHead = work || split.head;
-    const ownTail = work ? movementTitle({ title }, work) : split.tail;
-    const taggedTail = work ? movementTitle({ title, work: workTag }, work) : ownTail;
-    const fullTail = words4(ownTail).endsWith(` ${words4(taggedTail)}`) ? taggedTail : ownTail;
-    const numbered = fullHead ? null : numberedPiece(fullTail);
-    const tail = numbered?.part ?? fullTail;
-    const names = composersOf(evidence.hints || {});
-    const head = numbered?.set ?? fullHead.replace(ACT, "");
-    const heading = head || tail;
-    const composer = names.join(", ");
-    const last3 = pieces.at(-1);
-    const item = {
-      id: `piece:${row.track_link_id}`,
-      trackId: String(row.core_id),
-      fileId: String(row.file_id),
-      albumId: String(evidence.albumId ?? ""),
-      title: tail,
-      artist: text5(evidence.hints?.artist, text5(evidence.hints?.albumArtist, "")),
-      performer: performerOf(evidence.hints),
-      album: text5(evidence.hints?.album, ""),
-      durationMs: Number(evidence.durationMs) || null,
-      startMs: 0,
-      endMs: null,
-      position: albumPosition(row)
-    };
-    const sameWork = last3 && sameNamedWork(last3.title, heading);
-    if (head && sameWork && sameCredits(last3, heading, names) && following.get(last3.next) === item.position)
-      last3.items.push(item);
-    else
-      pieces.push({ id: item.id, workId: null, title: heading, composer, names: names.map(words4), credited: names, items: [item], missing: [] });
-    pieces.at(-1).next = item.position;
-  }
-  return pieces.map(({ next, names, credited, items, ...piece }) => ({
-    ...piece,
-    first: items[0].position,
-    items: items.map(({ position, ...item }) => item),
-    movementCount: items.length,
-    // Several tracks under one heading look like a work; say when they are
-    // not one yet. Sets such as "Études" are never made into works.
-    ...items.length > 1 && !isCollectionLike(piece.title) && !NUMBERED_SET.test(piece.title) && { detail: "Not matched to a work" }
-  }));
-}
-function compareAlbumGroups(a, b) {
-  return a.first - b.first || b.items.length - a.items.length || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
-}
-function renderAlbumPresentation(c, albumId, capabilities = {}) {
-  const metadata = new DisplayValues(c);
-  const album = String(albumId);
-  const allRows = realizationRows(c, null, null, album);
-  const grouped = /* @__PURE__ */ new Map();
-  for (const row of allRows) {
-    const group = grouped.get(row.realization_id) || [];
-    group.push(row);
-    grouped.set(row.realization_id, group);
-  }
-  const positions = c.db.prepare(
-    `SELECT evidence FROM track_link WHERE state='active'
-       AND CAST(json_extract(evidence,'$.albumId') AS TEXT)=?`
-  ).all(album).map(albumPosition).sort((a, b) => a - b).filter((position, index, all) => position !== all[index - 1]);
-  const following = new Map(positions.map((position, index) => [position, positions[index + 1]]));
-  const works = [...grouped.entries()].flatMap(([realizationId, rows]) => {
-    const workId = rows[0].work_id;
-    const movements = workMovements2(c, metadata, workId);
-    const present = new Set(rows.flatMap((row) => row.movement_ids).filter(Boolean));
-    const runs = [];
-    for (const row of [...rows].sort((a, b) => albumPosition(a) - albumPosition(b))) {
-      const run = runs.at(-1);
-      const last3 = run && albumPosition(run.at(-1));
-      if (run && (last3 === albumPosition(row) || following.get(last3) === albumPosition(row))) run.push(row);
-      else runs.push([row]);
-    }
-    const name = entityValue(metadata, workId, "title", "Untitled work");
-    const collections = c.db.prepare("SELECT source_id FROM relation WHERE kind='collection_member' AND target_id=?").all(workId);
-    const book = collections.length === 1 ? entityValue(metadata, collections[0].source_id, "title", "") : "";
-    const title = book && !` ${words4(name)} `.includes(` ${words4(book)} `) ? `${name} \xB7 \u201C${book}\u201D` : name;
-    const links = capabilities?.itemLinks >= 1 ? itemLinks(c, metadata, { workId, realizationId, performanceId: performanceOf(c, rows[0].performance_work_id) }) : null;
-    const excerpts = NUMBERED_SET.test(name) && present.size * 2 < movements.length || Boolean(
-      c.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work' AND json_extract(evidence,'$.albumId')=? AND json_extract(evidence,'$.excerpt')=1").get(workId, album)
-    );
-    return runs.map((run, index) => ({
-      id: index ? `${realizationId}:${index}` : realizationId,
-      workId,
-      title,
-      composer: credits2(c, metadata, workId).find(
-        (credit) => credit.role === "composer"
-      )?.name || "",
-      items: run.map(
-        (row) => queueItem(
-          metadata,
-          row,
-          row.movement_id && rows.filter((other) => other.movement_id === row.movement_id).length > 1 ? entityValue(metadata, workId, "title", "") : null,
-          links
-        )
-      ),
-      ...links && { links },
-      missing: index || excerpts ? [] : movements.filter((movement) => !present.has(movement.id)),
-      movementCount: Math.max(1, movements.length),
-      first: albumPosition(run[0])
-    }));
-  });
-  const groups = [...works, ...pieceGroups(c, album, following)].sort(compareAlbumGroups).map(({ first, ...group }) => group);
-  if (!groups.some((group) => group.workId || group.items.length > 1)) return null;
-  return { version: 1, albumId: album, supportsToggle: true, groups: groups.map(fitGroup) };
-}
-function renderWork(c, workId, user) {
-  return fitWork(workPage(c, workId, user));
-}
-function workData(c, workId, user) {
-  return workPage(c, workId, user);
-}
-function workPage(c, workId, user) {
-  c.entity(workId, "work");
-  const metadata = new DisplayValues(c);
-  const movements = workMovements2(c, metadata, workId);
-  const rows = realizationRows(c, null, workId);
-  const byRealization = /* @__PURE__ */ new Map();
-  for (const row of rows) {
-    const current = byRealization.get(row.realization_id) || [];
-    current.push(row);
-    byRealization.set(row.realization_id, current);
-  }
-  const state = c.db.prepare("SELECT * FROM user_work_state WHERE user_id=? AND work_id=?").get(user.id, workId);
-  const recordings = recordingsOf(c, metadata, workId, movements, byRealization);
-  const shown = (realization) => recordings.find((r) => r.id === realization || r.releases.some((release) => release.realizationId === realization))?.id ?? realization;
-  const userPick = state?.picked_realization_id ? shown(state.picked_realization_id) : null;
-  const rawAdminPick = c.db.prepare("SELECT realization_id FROM admin_work_pick WHERE work_id=?").get(workId)?.realization_id;
-  const adminPick = rawAdminPick ? shown(rawAdminPick) : null;
-  return {
-    version: 1,
-    work: {
-      id: workId,
-      title: entityValue(metadata, workId, "title", "Untitled work"),
-      nickname: entityValue(metadata, workId, "nickname", ""),
-      description: entityValue(metadata, workId, "description", ""),
-      credits: credits2(c, metadata, workId),
-      movements,
-      collections: c.db.prepare(
-        `SELECT source_id FROM relation
-           WHERE kind='collection_member' AND target_id=? ORDER BY position,id`
-      ).all(workId).map((row) => ({
-        id: row.source_id,
-        title: entityValue(
-          metadata,
-          row.source_id,
-          "title",
-          "Untitled collection"
-        )
-      }))
-    },
-    favourite: state?.favourite === 1,
-    pickedRealizationId: userPick || adminPick || null,
-    adminPickId: adminPick || null,
-    pickScope: userPick ? "user" : adminPick ? "admin" : null,
-    recordings
-  };
-}
-function recordingsOf(c, metadata, workId, movements, byRealization) {
-  const facts = new Map(ownedRecordings(c, void 0, void 0, { workId }).map((r) => [r.id, r]));
-  const groups = groupRecordings([...byRealization.keys()].map((id) => facts.get(id)).filter(Boolean), reissueState(c));
-  const grouped = new Map(groups.flatMap((group) => group.realizations.map((r) => [r.id, group])));
-  const seen = /* @__PURE__ */ new Set();
-  const out = [];
-  for (const [id, entries2] of byRealization) {
-    const group = grouped.get(id);
-    if (group && seen.has(group.key)) continue;
-    if (group) seen.add(group.key);
-    const releases = (group?.realizations ?? [facts.get(id)].filter(Boolean)).flatMap(
-      (r) => r.albums.map((albumId) => ({ albumId: String(albumId), album: r.album || "", realizationId: r.id }))
-    );
-    out.push(recordingEntry(c, metadata, workId, movements, id, entries2, facts.get(id), releases, out.length));
-  }
-  return out;
-}
-function recordingEntry(c, metadata, workId, movements, id, entries2, fact, releases, index) {
-  const present = new Set(entries2.flatMap((entry) => entry.movement_ids).filter(Boolean));
-  const performanceId = c.db.prepare("SELECT source_id FROM relation WHERE id=?").get(entries2[0].performance_work_id)?.source_id;
-  const recordingIds = c.db.prepare("SELECT source_id FROM relation WHERE kind='recording_performance' AND target_id=? ORDER BY source_id").all(performanceId).map((row) => row.source_id);
-  const performers = credits2(c, metadata, performanceId).filter((credit) => credit.role !== "composer");
-  const first = evidenceOf(entries2[0]);
-  const album = text5(entries2[0].realization_label, text5(first.hints?.album, ""));
-  const artist = performers.length ? performers.map((credit) => credit.name).join(", ") : text5(first.hints?.artist, text5(first.hints?.albumArtist, ""));
-  const items = entries2.map(
-    (entry) => queueItem(
-      metadata,
-      entry,
-      entry.movement_id && entries2.filter((other) => other.movement_id === entry.movement_id).length > 1 ? entityValue(metadata, workId, "title", "") : null
-    )
-  );
-  entries2.forEach((entry, i) => items[i].movementIds = entry.movement_ids.filter(Boolean));
-  return {
-    id,
-    performanceId,
-    label: [artist, album].filter(Boolean).join(" \xB7 ") || `Recording ${index + 1}`,
-    albumId: first.albumId == null ? null : String(first.albumId),
-    recordingIds,
-    credits: credits2(c, metadata, performanceId),
-    performer: fact?.performerNames?.join(", ") || artist,
-    year: fact?.year ?? null,
-    recordLabel: fact?.label || "",
-    durationMs: fact?.durationMs || null,
-    parts: movements.map((movement) => ({ movementId: movement.id, durationMs: fact?.parts.get(movement.id) ?? null })),
-    releases,
-    items,
-    missing: movements.filter((movement) => !present.has(movement.id)),
-    complete: movements.length === 0 || movements.every((movement) => present.has(movement.id))
-  };
-}
-async function readWork(input) {
-  const user = actor2(input);
-  const c = await openCatalogue(path8.join(input.dataFolder, "model"));
-  try {
-    return renderWork(c, input.resourceId, user);
-  } finally {
-    c.close();
-  }
-}
-async function mutateWork(input) {
-  const user = actor2(input);
-  const c = await openCatalogue(path8.join(input.dataFolder, "model"));
-  try {
-    return applyWorkMutation(c, input, user);
-  } finally {
-    c.close();
-  }
-}
-function applyWorkMutation(c, input, user) {
-  return transaction(c.db, () => {
-    const workId = String(input.resourceId || "");
-    c.entity(workId, "work");
-    const command = input.mutation?.command;
-    const realizationId = input.mutation?.realizationId || null;
-    if (realizationId) {
-      const row = c.db.prepare("SELECT 1 FROM realization WHERE id=? AND work_id=?").get(realizationId, workId);
-      if (!row) throw new Error("Recording does not belong to this work");
-    }
-    if (command === "favourite") {
-      const favourite = input.mutation?.value === true ? 1 : 0;
-      c.db.prepare(
-        `INSERT INTO user_work_state(user_id,work_id,favourite,updated_at) VALUES (?,?,?,?)
-           ON CONFLICT(user_id,work_id) DO UPDATE SET favourite=excluded.favourite,updated_at=excluded.updated_at`
-      ).run(user.id, workId, favourite, Date.now());
-    } else if (command === "pick") {
-      c.db.prepare(
-        `INSERT INTO user_work_state(user_id,work_id,favourite,picked_realization_id,updated_at)
-           VALUES (?,?,0,?,?) ON CONFLICT(user_id,work_id) DO UPDATE SET
-           picked_realization_id=excluded.picked_realization_id,updated_at=excluded.updated_at`
-      ).run(user.id, workId, realizationId, Date.now());
-    } else if (command === "admin-pick" && user.role === "admin") {
-      if (realizationId)
-        c.db.prepare(
-          `INSERT INTO admin_work_pick VALUES (?,?,?,?) ON CONFLICT(work_id) DO UPDATE SET
-             realization_id=excluded.realization_id,actor_id=excluded.actor_id,updated_at=excluded.updated_at`
-        ).run(workId, realizationId, user.id, Date.now());
-      else
-        c.db.prepare("DELETE FROM admin_work_pick WHERE work_id=?").run(workId);
-    } else if (command === "admin-pick")
-      throw new Error("Only admins can set the admin pick");
-    else throw new Error("Unknown work action");
-    return { ok: true };
-  });
-}
-async function albumPresentation(input) {
-  actor2(input);
-  const c = await openCatalogue(path8.join(input.dataFolder, "model"));
-  try {
-    return renderAlbumPresentation(c, input.album.id, input.capabilities);
-  } finally {
-    c.close();
-  }
-}
-function renderTrackLinks(c, trackIds) {
-  const ids = [...new Set((Array.isArray(trackIds) ? trackIds : []).map(String))].filter((id) => id && id.length <= 200).slice(0, 100);
-  if (!ids.length) return { version: 1, tracks: {} };
-  const metadata = new DisplayValues(c);
-  const rows = c.db.prepare(
-    `SELECT DISTINCT t.core_id,r.id AS realization_id,r.work_id,r.performance_work_id,min(i.sequence) AS first
-       FROM track_link t JOIN classification k ON k.target_id=t.id AND k.state='classical'
-       JOIN segment s ON s.track_link_id=t.id JOIN realization_item i ON i.segment_id=s.id
-       JOIN realization r ON r.id=i.realization_id JOIN entity w ON w.id=r.work_id AND w.deleted_at IS NULL
-       WHERE t.state='active' AND CAST(t.core_id AS TEXT) IN (${ids.map(() => "?").join(",")})
-       GROUP BY t.core_id,r.id ORDER BY t.core_id,min(s.start_ms),first,r.id`
-  ).all(...ids);
-  const byTrack = /* @__PURE__ */ new Map();
-  for (const row of rows) byTrack.set(String(row.core_id), [...byTrack.get(String(row.core_id)) || [], row]);
-  const tracks = {};
-  for (const [trackId, found] of byTrack) {
-    const works = found.filter((row, at) => found.findIndex((other) => other.work_id === row.work_id) === at);
-    const target = (row) => ({ workId: row.work_id, realizationId: row.realization_id, performanceId: performanceOf(c, row.performance_work_id) });
-    const links = works.length === 1 ? itemLinks(c, metadata, target(works[0])) : works.slice(0, 6).map((row) => itemLinks(c, metadata, target(row), goTo(`Work: ${entityValue(metadata, row.work_id, "title", "Untitled work")}`))[0]);
-    if (links.length) tracks[trackId] = links;
-  }
-  return { version: 1, tracks };
-}
-async function trackLinks(input) {
-  actor2(input);
-  const c = await openCatalogue(path8.join(input.dataFolder, "model"));
-  try {
-    return renderTrackLinks(c, input.trackIds);
-  } finally {
-    c.close();
-  }
-}
-
-// src/model/pages-entities.js
+import { randomUUID as randomUUID14 } from "node:crypto";
 var PAGE_ID = "classical";
 var PAGE_SIZE = 100;
 var RECORDINGS_PAGE = 50;
@@ -46301,9 +47650,9 @@ var parse4 = (value, fallback) => {
   }
 };
 function clip2(value, max = 500) {
-  const text6 = typeof value === "string" ? value : "";
-  if (text6.length <= max) return text6;
-  return `${text6.slice(0, max - 1).replace(/[\uD800-\uDBFF]$/, "").trimEnd()}\u2026`;
+  const text7 = typeof value === "string" ? value : "";
+  if (text7.length <= max) return text7;
+  return `${text7.slice(0, max - 1).replace(/[\uD800-\uDBFF]$/, "").trimEnd()}\u2026`;
 }
 var rowId = (id, fallback) => typeof id === "string" && id && id.length <= 200 ? id : fallback;
 function duration(ms) {
@@ -46395,7 +47744,7 @@ function composerView(c, id, query = {}) {
       if (plain3(groups.at(-1)?.heading) !== plain3(heading)) groups.push({ heading: clip2(heading), rows: [] });
       groups.at(-1).rows.push(workRow(work, offset + at));
     });
-  const list4 = !shown.length ? [{ type: "empty", message: works.length ? "No more works." : "No works by this composer yet." }] : sort === "form" && groups.length <= 50 ? [{ type: "groups", id: "works", title: "Works", groups: groups.map((group) => ({ ...group, detail: counted(group.rows.length, WORKS) })) }] : [{ type: "rows", id: "works", title: "Works", rows: shown.map((work, at) => workRow(work, offset + at)) }];
+  const list5 = !shown.length ? [{ type: "empty", message: works.length ? "No more works." : "No works by this composer yet." }] : sort === "form" && groups.length <= 50 ? [{ type: "groups", id: "works", title: "Works", groups: groups.map((group) => ({ ...group, detail: counted(group.rows.length, WORKS) })) }] : [{ type: "rows", id: "works", title: "Works", rows: shown.map((work, at) => workRow(work, offset + at)) }];
   return {
     version: 2,
     title: row.title,
@@ -46409,7 +47758,7 @@ function composerView(c, id, query = {}) {
       },
       ...about,
       ...works.length > 1 ? [{ type: "sort", active: sort, options: COMPOSER_SORTS.map(([value, label]) => ({ value, label })) }] : [],
-      ...list4,
+      ...list5,
       ...works.length > PAGE_SIZE ? [{ type: "pager", total: works.length, offset, limit: PAGE_SIZE }] : [],
       // Who recorded these works, on the first page.
       ...offset ? [] : topPeople(c, values, docsWithFacet(c, "recording", "composer", id), { id: "performers", title: "Performers" })
@@ -46699,7 +48048,7 @@ function recordingView2(c, key, query = {}, user) {
   const records = performanceId ? c.db.prepare("SELECT source_id AS id FROM relation WHERE kind='recording_performance' AND target_id=? ORDER BY source_id").all(performanceId).map((row) => row.id) : [];
   const own = (field2) => [performanceId, ...records].filter(Boolean).map((id) => values.text(id, field2)).find(Boolean) || "";
   const broadcast = performance2.type === "broadcast";
-  const people = entry?.credits || (performanceId ? credits2(c, metadata, performanceId) : []);
+  const people = entry?.credits || (performanceId ? credits(c, metadata, performanceId) : []);
   const performers = people.filter((credit) => credit.role !== "composer").sort((a, b) => ROLE_ORDER.indexOf(a.role) - ROLE_ORDER.indexOf(b.role));
   const title = clip2(entry?.performer || performers.map((credit) => credit.name).join(", ") || own("title") || entry?.label || "Recording");
   const composers = work.credits.filter((credit) => credit.role === "composer").map((credit) => credit.name);
@@ -46771,17 +48120,17 @@ function queueView(c, id, query = {}, user) {
     seen.add(part.id);
     const evidence = parse4(found.evidence, {});
     const hints = evidence.hints || {};
-    const text6 = (value) => typeof value === "string" ? value.trim() : "";
+    const text7 = (value) => typeof value === "string" ? value.trim() : "";
     return [
       fitItem2({
         id: part.id,
         trackId: String(found.core_id),
         fileId: String(found.file_id),
         albumId: String(evidence.albumId ?? ""),
-        title: text6(part.title) || text6(hints.title) || "Track",
-        artist: text6(hints.artist) || text6(hints.albumArtist),
-        performer: text6(part.performer),
-        album: text6(hints.album),
+        title: text7(part.title) || text7(hints.title) || "Track",
+        artist: text7(hints.artist) || text7(hints.albumArtist),
+        performer: text7(part.performer),
+        album: text7(hints.album),
         durationMs: Number(evidence.durationMs) || null,
         startMs: Number(part.startMs) || 0,
         endMs: part.endMs == null ? null : Number(part.endMs)
@@ -46819,7 +48168,7 @@ function saveQueue(c, workId, user, mutation) {
   transaction(c.db, () => {
     if (c.db.prepare("SELECT count(*) AS n FROM saved_queue WHERE user_id=? AND work_id=?").get(user.id, workId).n >= SAVED_LIMIT)
       throw new Error(`A work keeps ${SAVED_LIMIT} saved comparisons. Delete one first.`);
-    c.db.prepare("INSERT INTO saved_queue(id,user_id,name,work_id,items,created_at) VALUES (?,?,?,?,?,?)").run(randomUUID11(), user.id, name, workId, JSON.stringify(items), Date.now());
+    c.db.prepare("INSERT INTO saved_queue(id,user_id,name,work_id,items,created_at) VALUES (?,?,?,?,?,?)").run(randomUUID14(), user.id, name, workId, JSON.stringify(items), Date.now());
   });
 }
 function mutateEntity(c, resource, mutation, user) {
@@ -46899,34 +48248,34 @@ var LISTS = {
 };
 var LIST_FACETS = /* @__PURE__ */ new Set(["composer", "performer", "conductor", "ensemble", "role", "period", "form", "instrument", "type", "year"]);
 function listView(c, kind, query = {}) {
-  const list4 = LISTS[kind];
-  if (!list4) throw new NotFound(`No Classical list ${kind}`);
+  const list5 = LISTS[kind];
+  if (!list5) throw new NotFound(`No Classical list ${kind}`);
   const q = typeof query.q === "string" ? query.q.trim() : "";
-  const sorts = q ? [["relevance", "Best match"], ...list4.sorts] : list4.sorts;
+  const sorts = q ? [["relevance", "Best match"], ...list5.sorts] : list5.sorts;
   const sort = sorts.some(([value]) => value === query.sort) ? query.sort : sorts[0][0];
   const pageIndex2 = Math.min(9999, Math.max(0, Math.trunc(Number(query.page) || 0)));
   const offset = pageIndex2 * PAGE_SIZE2;
   const result = searchCatalogue(c, {
     q,
     filters: query.filters || {},
-    kinds: list4.kinds,
+    kinds: list5.kinds,
     browse: true,
-    accept: list4.accept || null,
+    accept: list5.accept || null,
     sort,
     limit: PAGE_SIZE2,
     offset,
     ensure: false
   });
-  const section = result.sections.find((part) => list4.kinds.includes(part.id));
+  const section = result.sections.find((part) => list5.kinds.includes(part.id));
   const total = section?.total || 0;
   const items = section?.items || [];
   const filtered = Boolean(q || Object.keys(result.filters).length);
   const filters = result.facets.filter((facet) => LIST_FACETS.has(facet.key)).slice(0, 10).map((facet) => ({ key: facet.key, label: facet.label, options: facet.options, selected: facet.selected }));
   return {
     version: 2,
-    title: list4.title,
+    title: list5.title,
     sections: [
-      { type: "header", title: list4.title, subtitle: counted(total, list4.noun) },
+      { type: "header", title: list5.title, subtitle: counted(total, list5.noun) },
       { type: "sort", active: sort, options: sorts.map(([value, label]) => ({ value, label })) },
       ...filters.length ? [{ type: "filters", filters }] : [],
       ...items.length ? [
@@ -46937,10 +48286,10 @@ function listView(c, kind, query = {}) {
             id: item.ref.length <= 200 ? item.ref : `row-${offset + index}`,
             label: item.title,
             detail: [kind === "composer" ? "" : item.subtitle, item.detail].filter(Boolean).join(" \xB7 "),
-            link: list4.link(item)
+            link: list5.link(item)
           }))
         }
-      ] : [{ type: "empty", message: total ? `No more ${list4.noun[1]}.` : filtered ? `No ${list4.noun[1]} match.` : `No ${list4.noun[1]} in your Library yet.` }],
+      ] : [{ type: "empty", message: total ? `No more ${list5.noun[1]}.` : filtered ? `No ${list5.noun[1]} match.` : `No ${list5.noun[1]} in your Library yet.` }],
       ...total > PAGE_SIZE2 ? [{ type: "pager", total, offset, limit: PAGE_SIZE2 }] : []
     ]
   };
@@ -46990,7 +48339,7 @@ function homeView(c) {
         type: "rows",
         id: "browse",
         title: "Browse",
-        rows: Object.entries(LISTS).map(([kind, list4]) => ({ id: kind, label: list4.title, detail: counted(counts[kind], list4.noun), link: page(`list:${kind}`) }))
+        rows: Object.entries(LISTS).map(([kind, list5]) => ({ id: kind, label: list5.title, detail: counted(counts[kind], list5.noun), link: page(`list:${kind}`) }))
       },
       ...recent.length ? [
         {
@@ -47013,7 +48362,7 @@ function renderClassical(c, resourceId, query = {}, user = { id: 1, role: "user"
 }
 async function readClassical(input) {
   const user = actor3(input);
-  const c = await openCatalogue(path9.join(input.dataFolder, "model"));
+  const c = await openCatalogue(path12.join(input.dataFolder, "model"));
   try {
     return renderClassical(c, input.resourceId, input.query || {}, user);
   } finally {
@@ -47028,7 +48377,7 @@ function applyClassicalMutation(c, resourceId, mutation, user) {
 }
 async function mutateClassical(input) {
   const user = actor3(input);
-  const c = await openCatalogue(path9.join(input.dataFolder, "model"));
+  const c = await openCatalogue(path12.join(input.dataFolder, "model"));
   try {
     return applyClassicalMutation(c, input.resourceId, input.mutation, user);
   } finally {
@@ -47037,148 +48386,9 @@ async function mutateClassical(input) {
 }
 
 // src/model/runtime.js
-import { createHash as createHash5, randomUUID as randomUUID13 } from "node:crypto";
-import fs6 from "node:fs/promises";
-import path10 from "node:path";
-
-// src/model/jobs.js
-import { randomUUID as randomUUID12 } from "node:crypto";
-var ModelJobs = class _ModelJobs {
-  constructor(catalogue) {
-    this.db = catalogue.db;
-  }
-  enqueue(type, key, input, { maxAttempts = 3 } = {}) {
-    if (!type || !key || !Number.isSafeInteger(maxAttempts) || maxAttempts < 1)
-      throw new Error("Invalid job");
-    return transaction(this.db, () => {
-      const existing = this.db.prepare(
-        "SELECT id FROM model_job WHERE key=? AND state IN ('queued','running','retry')"
-      ).get(key);
-      if (existing) return existing.id;
-      const id = randomUUID12();
-      this.db.prepare(
-        `INSERT INTO model_job(id,type,key,input,state,max_attempts,created_at)
-        VALUES (?,?,?,?,'queued',?,?)`
-      ).run(id, type, key, JSON.stringify(input), maxAttempts, Date.now());
-      return id;
-    });
-  }
-  // A scan goes before background identification; `type` claims only that kind.
-  claim(owner, { now = Date.now(), leaseMs = 3e4, type = null } = {}) {
-    if (!owner || !Number.isFinite(leaseMs) || leaseMs <= 0)
-      throw new Error("Invalid job lease");
-    return transaction(this.db, () => {
-      this.db.prepare(
-        "UPDATE model_job SET state='cancelled' WHERE cancel_requested=1 AND (state!='running' OR lease_until<=?)"
-      ).run(now);
-      this.db.prepare(
-        "UPDATE model_job SET state='failed',error='ATTEMPTS_EXHAUSTED' WHERE attempt>=max_attempts AND state='running' AND lease_until<=?"
-      ).run(now);
-      const row = this.db.prepare(
-        `SELECT * FROM model_job WHERE cancel_requested=0 AND attempt<max_attempts AND
-        ((state IN ('queued','retry') AND next_run_at<=?) OR (state='running' AND lease_until<=?))
-        ${type ? "AND type=?" : ""} ORDER BY type='library_scan' DESC,created_at LIMIT 1`
-      ).get(now, now, ...type ? [type] : []);
-      if (!row) return null;
-      this.db.prepare(
-        "UPDATE model_job SET state='running',owner=?,lease_until=?,generation=generation+1,attempt=attempt+1,error=NULL WHERE id=?"
-      ).run(owner, now + leaseMs, row.id);
-      return this.get(row.id);
-    });
-  }
-  get(id) {
-    const row = this.db.prepare("SELECT * FROM model_job WHERE id=?").get(id);
-    return row && {
-      ...row,
-      input: JSON.parse(row.input),
-      progress: JSON.parse(row.progress)
-    };
-  }
-  // Evidence a scan has read, saved a chunk at a time with each checkpoint
-  // so a checkpoint never rewrites everything read so far. Chunks are
-  // model_job rows of their own (no schema change), never claimed: they are
-  // born 'done'.
-  static chunkKey = (id) => `scan-chunk:${id}`;
-  chunks(id, count) {
-    return this.db.prepare("SELECT input FROM model_job WHERE key=? ORDER BY id LIMIT ?").all(_ModelJobs.chunkKey(id), count).flatMap((row) => JSON.parse(row.input));
-  }
-  // A finished or cancelled scan keeps only its summary: the file list and
-  // the evidence it read are already in the catalogue, and keeping them made
-  // every scan add tens of megabytes that integrity checks then had to read.
-  compactFinished() {
-    for (const row of this.db.prepare(
-      `SELECT id,state FROM model_job WHERE type='library_scan' AND state IN ('done','cancelled')
-         AND (length(input)>4096 OR length(progress)>65536 OR EXISTS(SELECT 1 FROM model_job c WHERE c.key='scan-chunk:'||model_job.id))`
-    ).all())
-      transaction(this.db, () => this.#compact(row.id));
-  }
-  #compact(id) {
-    this.db.prepare("DELETE FROM model_job WHERE key=?").run(_ModelJobs.chunkKey(id));
-    this.db.prepare(
-      `UPDATE model_job SET
-          input=json_object('instanceId',json_extract(input,'$.instanceId'),'epoch',json_extract(input,'$.epoch'),
-            'generation',json_extract(input,'$.generation'),'total',coalesce(json_extract(input,'$.total'),json_array_length(input,'$.files'))),
-          progress=json_object('cursor',coalesce(json_extract(progress,'$.cursor'),0),'errorCount',coalesce(json_extract(progress,'$.errorCount'),0),
-            'reused',coalesce(json_extract(progress,'$.reused'),0),
-            'errors',json(coalesce(json_extract(progress,'$.errors'),'[]')))
-         WHERE id=?`
-    ).run(id);
-  }
-  checkpoint(job, progress, { done = false, now = Date.now(), leaseMs = 3e4, commit, chunk = null } = {}) {
-    return transaction(this.db, () => {
-      const row = this.db.prepare(
-        "SELECT state,owner,generation,lease_until,cancel_requested FROM model_job WHERE id=?"
-      ).get(job.id);
-      if (!row || row.state !== "running" || row.owner !== job.owner || row.generation !== job.generation || row.lease_until <= now)
-        throw new Error("Stale job lease");
-      if (row.cancel_requested) {
-        this.db.prepare("UPDATE model_job SET state='cancelled' WHERE id=?").run(job.id);
-        if (job.type === "library_scan") this.#compact(job.id);
-        return false;
-      }
-      if (commit) commit();
-      if (chunk?.items.length && !done)
-        this.db.prepare(
-          `INSERT INTO model_job(id,type,key,input,state,max_attempts,created_at)
-             VALUES (?,'scan_chunk',?,?,'done',1,?)`
-        ).run(`${job.id}#${String(chunk.seq).padStart(6, "0")}`, _ModelJobs.chunkKey(job.id), JSON.stringify(chunk.items), now);
-      this.db.prepare(
-        "UPDATE model_job SET progress=?,state=?,lease_until=?,error=NULL WHERE id=?"
-      ).run(
-        JSON.stringify(progress),
-        done ? "done" : "running",
-        now + leaseMs,
-        job.id
-      );
-      if (done && job.type === "library_scan") this.#compact(job.id);
-      return true;
-    });
-  }
-  yield(job) {
-    this.db.prepare(
-      `UPDATE model_job SET state='queued',owner=NULL,lease_until=0,attempt=attempt-1
-      WHERE id=? AND owner=? AND generation=? AND state='running'`
-    ).run(job.id, job.owner, job.generation);
-  }
-  fail(job, error, { now = Date.now() } = {}) {
-    this.db.prepare(
-      `UPDATE model_job SET state=CASE WHEN attempt>=max_attempts THEN 'failed' ELSE 'retry' END,
-      error=?,next_run_at=?,lease_until=0 WHERE id=? AND owner=? AND generation=? AND state='running' AND lease_until>?`
-    ).run(
-      String(error).slice(0, 500),
-      now + 1e3 * 2 ** job.attempt,
-      job.id,
-      job.owner,
-      job.generation,
-      now
-    );
-  }
-  cancel(id) {
-    this.db.prepare(
-      "UPDATE model_job SET cancel_requested=1 WHERE id=? AND state IN ('queued','running','retry')"
-    ).run(id);
-  }
-};
+import { createHash as createHash5, randomUUID as randomUUID15 } from "node:crypto";
+import fs9 from "node:fs/promises";
+import path13 from "node:path";
 
 // src/user-operations.js
 var UserOperations = class {
@@ -47225,7 +48435,7 @@ var UserOperations = class {
 function englishTitle(work, fallback = work.title) {
   return ClassicalResolver.bestEnglishAlias(work.aliases)?.name ?? fallback;
 }
-var modelFolder = (ctx) => path10.join(ctx.dataFolder, "model");
+var modelFolder = (ctx) => path13.join(ctx.dataFolder, "model");
 var emptyTags = () => ({
   title: "",
   artist: "",
@@ -47281,7 +48491,7 @@ async function modelStatus(ctx) {
 }
 var PLUGIN_ID = "aurral-classical";
 var SYNC_INTERVAL_MS = 6 * 60 * 6e4;
-var syncFlag = (ctx) => path10.join(modelFolder(ctx), "sync-requested");
+var syncFlag = (ctx) => path13.join(modelFolder(ctx), "sync-requested");
 async function hostLibrary(ctx) {
   if (ctx.userOperations)
     return new UserOperations(ctx.userOperations, ctx.fetch).library();
@@ -47306,15 +48516,15 @@ async function hostLibrary(ctx) {
 }
 var canReadHostLibrary = (ctx) => !!(ctx.userOperations || ctx.api?.url && ctx.api?.key);
 async function requestModelSync(ctx) {
-  await fs6.mkdir(modelFolder(ctx), { recursive: true });
-  await fs6.writeFile(syncFlag(ctx), `${Date.now()}:${randomUUID13()}`);
+  await fs9.mkdir(modelFolder(ctx), { recursive: true });
+  await fs9.writeFile(syncFlag(ctx), `${Date.now()}:${randomUUID15()}`);
 }
-var readSyncFlag = (ctx) => fs6.readFile(syncFlag(ctx), "utf8").catch(() => null);
+var readSyncFlag = (ctx) => fs9.readFile(syncFlag(ctx), "utf8").catch(() => null);
 async function clearSyncFlag(ctx, seen) {
-  if (seen != null && await readSyncFlag(ctx) === seen) await fs6.rm(syncFlag(ctx), { force: true });
+  if (seen != null && await readSyncFlag(ctx) === seen) await fs9.rm(syncFlag(ctx), { force: true });
 }
 async function modelSyncDue(ctx, { now = Date.now() } = {}) {
-  const requested = await fs6.access(syncFlag(ctx)).then(() => true, () => false);
+  const requested = await fs9.access(syncFlag(ctx)).then(() => true, () => false);
   const catalogue = await openCatalogue(modelFolder(ctx));
   try {
     if (catalogue.db.prepare(
@@ -47358,7 +48568,7 @@ async function enqueueModelScan(ctx, actor4, { system = false } = {}) {
     const library = await hostLibrary(ctx);
     let instance = catalogue.db.prepare("SELECT * FROM core_instance LIMIT 1").get();
     if (!instance) {
-      const id2 = randomUUID13();
+      const id2 = randomUUID15();
       catalogue.db.prepare("INSERT INTO core_instance VALUES (?,?,0)").run(id2, ctx.settings.libraryEpoch || "initial");
       instance = { id: id2, generation: 0 };
     }
@@ -47403,18 +48613,18 @@ async function enqueueModelScan(ctx, actor4, { system = false } = {}) {
 }
 var REUSED = Symbol("reused");
 async function scanFile(file, root, prior) {
-  const real = await fs6.realpath(file.readPath);
-  const relative = path10.relative(root, real);
-  if (!relative || relative === ".." || relative.startsWith(`..${path10.sep}`) || path10.isAbsolute(relative))
+  const real = await fs9.realpath(file.readPath);
+  const relative = path13.relative(root, real);
+  if (!relative || relative === ".." || relative.startsWith(`..${path13.sep}`) || path13.isAbsolute(relative))
     throw new Error("Indexed model file is outside the configured library");
-  const before = await fs6.stat(real);
+  const before = await fs9.stat(real);
   const unchanged = prior?.fingerprint && prior.observedRealPath === real && prior.size === before.size && prior.mtimeMs === before.mtimeMs && (prior.ctimeMs != null ? prior.ctimeMs === before.ctimeMs : prior.ino === before.ino);
   if (unchanged && prior.hints && !prior.hints.tagsUnreadable && prior.ctimeMs != null && ["title", "album", "artist", "albumId", "trackNumber", "discNumber", "recordingMbid"].every((key) => prior[key] === file[key]))
     return { ...prior, ...file, ino: before.ino, durationMs: prior.durationMs, [REUSED]: true };
   const hash = unchanged ? prior.fingerprint : await fingerprint(real);
   const parsed = readModelTags(real);
   const tags = parsed || emptyTags();
-  const after = await fs6.stat(real);
+  const after = await fs9.stat(real);
   if (before.size !== after.size || before.mtimeMs !== after.mtimeMs || before.ino !== after.ino)
     throw new Error("Library file changed during model scan; retry required");
   const kept = !parsed && prior?.hints && sameAudio2(prior, hash) ? prior : null;
@@ -47499,14 +48709,14 @@ function markSeen(catalogue, album, progress) {
   catalogue.db.prepare(
     `INSERT INTO model_job(id,type,key,input,state,progress,max_attempts,created_at)
        VALUES (?,?,?,?,'done',?,1,?)`
-  ).run(randomUUID13(), IDENTIFY, album.key, JSON.stringify({ albumId: album.albumId }), JSON.stringify(progress), Date.now());
+  ).run(randomUUID15(), IDENTIFY, album.key, JSON.stringify({ albumId: album.albumId }), JSON.stringify(progress), Date.now());
 }
 function queueAlbumIdentification(catalogue, { now = Date.now() } = {}) {
   return transaction(catalogue.db, () => {
     const pending = pendingIdentification(catalogue);
     if (!keyRan(catalogue, BASELINE_KEY)) {
       for (const album of pending) if (!keyRan(catalogue, album.key)) markSeen(catalogue, album, { baseline: true, tracks: album.tracks });
-      catalogue.db.prepare(`INSERT INTO model_job(id,type,key,input,state,max_attempts,created_at) VALUES (?,?,?,'{}','done',1,?)`).run(randomUUID13(), `${IDENTIFY}_baseline`, BASELINE_KEY, now);
+      catalogue.db.prepare(`INSERT INTO model_job(id,type,key,input,state,max_attempts,created_at) VALUES (?,?,?,'{}','done',1,?)`).run(randomUUID15(), `${IDENTIFY}_baseline`, BASELINE_KEY, now);
       return 0;
     }
     const jobs = new ModelJobs(catalogue);
@@ -47547,7 +48757,7 @@ async function queueAlbumMatch(ctx, actor4, albumId) {
     throw new Error("Automatic work matching requires a current host admin");
   const catalogue = await openCatalogue(modelFolder(ctx));
   try {
-    const key = `${IDENTIFY}:${RULES}:manual:${albumId}:${randomUUID13()}`;
+    const key = `${IDENTIFY}:${RULES}:manual:${albumId}:${randomUUID15()}`;
     new ModelJobs(catalogue).enqueue(IDENTIFY, key, { albumId: String(albumId) }, { maxAttempts: 5 });
     return key;
   } finally {
@@ -47654,6 +48864,87 @@ async function englishEntryFor(ctx, catalogue, work) {
   }
   return { entry: null, verified: false };
 }
+var ENRICH = "mb_enrich";
+async function queueEnrichment(ctx, actor4) {
+  if (actor4?.role !== "admin") throw new Error("MusicBrainz enrichment requires a current host admin");
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  try {
+    const active = catalogue.db.prepare("SELECT state,progress FROM model_job WHERE key=? AND state IN ('queued','running','retry')").get(ENRICH);
+    if (active) return { queued: false, state: active.state, ...JSON.parse(active.progress || "{}") };
+    const waiting = enrichmentCandidates(catalogue).length;
+    if (!waiting) return { queued: false, state: "done", waiting: 0 };
+    new ModelJobs(catalogue).enqueue(ENRICH, ENRICH, {}, { maxAttempts: 5 });
+    return { queued: true, waiting };
+  } finally {
+    catalogue.close();
+  }
+}
+async function enrichmentStatus(ctx) {
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  try {
+    const row = catalogue.db.prepare("SELECT state,progress FROM model_job WHERE key=? ORDER BY created_at DESC,rowid DESC LIMIT 1").get(ENRICH);
+    return { ...row ? { state: row.state, ...JSON.parse(row.progress || "{}") } : { state: "not run" }, waiting: enrichmentCandidates(catalogue).length };
+  } finally {
+    catalogue.close();
+  }
+}
+function enrichmentCandidates(catalogue, after = "") {
+  return catalogue.db.prepare(
+    `SELECT e.id,e.kind,min(x.record_id) AS mbid FROM entity e
+       JOIN external_identity x ON x.entity_id=e.id AND x.provider='musicbrainz' AND x.state='active'
+         AND x.record_kind=(CASE e.kind WHEN 'work' THEN 'work' ELSE 'artist' END)
+       WHERE e.deleted_at IS NULL AND e.kind IN ('person','ensemble','work') AND e.id>?
+       AND NOT EXISTS(SELECT 1 FROM provider_record p WHERE p.provider='musicbrainz' AND p.target_id=e.id)
+       GROUP BY e.id ORDER BY e.id`
+  ).all(after);
+}
+var ISO_DATE = /^\d{4}(?:-\d{2}(?:-\d{2})?)?$/;
+function enrichmentFields(kind, entry) {
+  const name = (kind === "work" ? entry.title : entry.name) || "";
+  const fold2 = (value) => String(value || "").normalize("NFKC").toLowerCase().trim();
+  const aliases = [...new Set((entry.aliases || []).map((alias) => typeof alias?.name === "string" ? alias.name.trim() : "").filter((alias) => alias && fold2(alias) !== fold2(name)))].slice(0, 50);
+  const fields = {};
+  if (aliases.length) fields.aliases = aliases;
+  if (kind !== "work") {
+    const sortName = typeof entry["sort-name"] === "string" ? entry["sort-name"].trim() : "";
+    if (sortName) fields.sortName = sortName;
+    const begin = typeof entry["life-span"]?.begin === "string" ? entry["life-span"].begin.trim() : "";
+    if (ISO_DATE.test(begin)) fields.date = begin;
+  }
+  return fields;
+}
+async function runEnrichment(ctx, catalogue, jobs, job, deadline) {
+  try {
+    const progress = { after: "", stored: 0, missing: 0, failed: 0, ...job.progress };
+    const metadata = new Metadata(catalogue);
+    for (; ; ) {
+      if (Date.now() >= deadline) {
+        jobs.checkpoint(job, progress, { leaseMs: 6e4 });
+        jobs.yield(job);
+        return;
+      }
+      const next = enrichmentCandidates(catalogue, progress.after)[0];
+      if (!next) break;
+      try {
+        const entry = await ctx.mb.get(next.kind === "work" ? "work" : "artist", next.mbid, "aliases");
+        if (entry) {
+          metadata.refresh(next.id, "musicbrainz", next.mbid, enrichmentFields(next.kind, entry), { complete: false, keepManual: true });
+          progress.stored++;
+        } else if (ctx.mb.lastResult === "missing") progress.missing++;
+        else progress.failed++;
+      } catch (error) {
+        progress.failed++;
+        ctx.log(`MusicBrainz enrichment skipped ${next.id}: ${error.message}`);
+      }
+      progress.after = next.id;
+      jobs.checkpoint(job, progress, { leaseMs: 6e4 });
+    }
+    jobs.checkpoint(job, progress, { done: true, leaseMs: 6e4 });
+  } catch (error) {
+    jobs.fail(job, error.message);
+    ctx.log(`MusicBrainz enrichment failed: ${error.message}`);
+  }
+}
 async function runEnglishNames(ctx, catalogue, jobs, job, deadline) {
   try {
     const works = catalogue.db.prepare(
@@ -47676,12 +48967,12 @@ async function runEnglishNames(ctx, catalogue, jobs, job, deadline) {
         if (typeof title === "string") {
           const { entry, verified: verified2 } = await englishEntryFor(ctx, catalogue, work);
           const english = entry && ClassicalResolver.bestEnglishAlias(entry.aliases)?.name || entry && headingFor(catalogue, work, null, title);
-          const same2 = verified2 || catalogueSubject(title) && [entry?.title, english].some((name) => catalogueSubject(name || "") === catalogueSubject(title));
-          if (english && same2 && english !== title) {
+          const same3 = verified2 || catalogueSubject(title) && [entry?.title, english].some((name) => catalogueSubject(name || "") === catalogueSubject(title));
+          if (english && same3 && english !== title) {
             metadata.derived(work, "title", english);
             progress.renamed++;
           }
-          const above = entry && (verified2 || same2) && (entry.relations || []).find((rel) => rel.type === "parts" && rel.direction === "backward" && rel.work?.id);
+          const above = entry && (verified2 || same3) && (entry.relations || []).find((rel) => rel.type === "parts" && rel.direction === "backward" && rel.work?.id);
           const hasParts = (entry?.relations || []).some((rel) => rel.type === "parts" && rel.direction === "forward");
           if (above && hasParts && (isCollectionLike(above.work.title || "") || namesCatalogueRange(above.work.title || ""))) {
             const filed = catalogue.db.prepare("SELECT 1 FROM relation WHERE kind='collection_member' AND target_id=?").get(work);
@@ -47774,12 +49065,13 @@ async function runIdentification(ctx, catalogue, jobs, first, owner, deadline) {
 async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 200, checkpointMs = 1e4 } = {}) {
   const catalogue = await openCatalogue(modelFolder(ctx));
   catalogue.db.exec("PRAGMA busy_timeout=60000");
-  const jobs = new ModelJobs(catalogue), owner = randomUUID13(), deadline = Date.now() + budgetMs;
+  const jobs = new ModelJobs(catalogue), owner = randomUUID15(), deadline = Date.now() + budgetMs;
   try {
     const job = jobs.claim(owner, { leaseMs: 6e4 });
     if (!job) return;
     if (job.type === IDENTIFY) return await runIdentification(ctx, catalogue, jobs, job, owner, deadline);
     if (job.type === ENGLISH) return await runEnglishNames(ctx, catalogue, jobs, job, deadline);
+    if (job.type === ENRICH) return await runEnrichment(ctx, catalogue, jobs, job, deadline);
     try {
       if (job.type !== "library_scan")
         throw new Error("Unknown model job type");
@@ -47806,7 +49098,7 @@ async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 200, checkpointMs
       const errors = job.progress.errors || [];
       let errorCount = job.progress.errorCount || 0;
       let reused = job.progress.reused || 0;
-      const root = await fs6.realpath(ctx.libraryFolder);
+      const root = await fs9.realpath(ctx.libraryFolder);
       const previous = new Map(
         catalogue.db.prepare(
           "SELECT core_id,file_id,evidence FROM track_link WHERE instance_id=? AND state='active'"
@@ -47831,10 +49123,10 @@ async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 200, checkpointMs
           });
       };
       while (cursor < input.files.length && Date.now() < deadline) {
-        const stop = Math.min(cursor + batchSize, input.files.length);
+        const stop2 = Math.min(cursor + batchSize, input.files.length);
         const checkpointAt = Date.now() + checkpointMs;
         let cancelled = false;
-        for (; cursor < stop && Date.now() < deadline && Date.now() < checkpointAt; cursor++) {
+        for (; cursor < stop2 && Date.now() < deadline && Date.now() < checkpointAt; cursor++) {
           if (catalogue.db.prepare("SELECT cancel_requested FROM model_job WHERE id=?").get(job.id).cancel_requested) {
             cancelled = true;
             break;
@@ -48017,10 +49309,10 @@ async function cancelModelScan(ctx, actor4) {
 }
 
 // src/model/classification-report.js
-import path11 from "node:path";
+import path14 from "node:path";
 async function openModelReadOnly(folder) {
   const { DatabaseSync } = await import("node:sqlite");
-  return new DatabaseSync(path11.join(folder, "classical.sqlite"), { readOnly: true });
+  return new DatabaseSync(path14.join(folder, "classical.sqlite"), { readOnly: true });
 }
 var describe2 = (signal) => `${signal.signal}${signal.value ? ` "${signal.value}"` : ""} +${signal.points}`;
 function classificationReport(db, { albumId = null, all = false } = {}) {
@@ -48051,7 +49343,7 @@ function classificationReport(db, { albumId = null, all = false } = {}) {
       trackId: String(row.core_id),
       albumId: album,
       album: hints.album || "",
-      title: hints.title || path11.basename(evidence.path || ""),
+      title: hints.title || path14.basename(evidence.path || ""),
       artist: hints.artist || "",
       genres: hints.genres || [],
       composer: hints.composer || [],
@@ -48077,7 +49369,7 @@ function classificationReport(db, { albumId = null, all = false } = {}) {
   return { tracks, summary };
 }
 async function albumClassificationSummary(ctx, albumId) {
-  const folder = path11.join(ctx.dataFolder, "model");
+  const folder = path14.join(ctx.dataFolder, "model");
   let db;
   try {
     db = await openModelReadOnly(folder);
@@ -48097,7 +49389,7 @@ async function albumClassificationSummary(ctx, albumId) {
 }
 
 // src/search/provider.js
-import path12 from "node:path";
+import path15 from "node:path";
 var SECTION_IDS = new Set(SECTIONS.map(([id]) => id));
 var PAGE2 = "classical";
 function linkFor(item, capabilities = {}) {
@@ -48143,7 +49435,7 @@ function searchResult(c, query, capabilities = {}) {
 }
 async function search(input) {
   if (!Number.isSafeInteger(input?.user?.id) || input.user.id <= 0) throw new Error("A real user account is required");
-  const c = await openCatalogue(path12.join(input.dataFolder, "model"));
+  const c = await openCatalogue(path15.join(input.dataFolder, "model"));
   try {
     return searchResult(c, input.query, input.capabilities);
   } finally {
@@ -48152,7 +49444,7 @@ async function search(input) {
 }
 
 // src/mb.js
-import path13 from "node:path";
+import path16 from "node:path";
 
 // src/version.js
 var VERSION = true ? "1.0.59" : "dev";
@@ -48175,7 +49467,7 @@ var MusicBrainz = class {
     this.userAgent = `AurralClassical/${VERSION} ( ${REPOSITORY} )`;
     this.fetch = fetchImpl;
     this.log = log2;
-    this.cache = new FileCache(path13.join(dataFolder, "mb-cache"));
+    this.cache = new FileCache(path16.join(dataFolder, "mb-cache"));
     const isPublic = this.base === PUBLIC_MB;
     this.throttle = new Throttle(dataFolder, intervalMs ?? (isPublic ? 1e3 : 0));
     this.maxRetries = maxRetries;
@@ -48260,616 +49552,6 @@ var MusicBrainz = class {
     return null;
   }
 };
-
-// src/tagger.js
-import { randomUUID as randomUUID14 } from "node:crypto";
-
-// src/model/write-guard.js
-import fs7 from "node:fs/promises";
-import path14 from "node:path";
-async function modelAllowsTagging(ctx, realPath) {
-  const filename = path14.join(ctx.dataFolder, "model", "classical.sqlite");
-  try {
-    await fs7.access(filename);
-  } catch (error) {
-    if (error.code === "ENOENT") return true;
-    throw error;
-  }
-  let db;
-  try {
-    const { DatabaseSync } = await import("node:sqlite");
-    db = new DatabaseSync(filename, { readOnly: true });
-    const rows = db.prepare(
-      `SELECT t.state AS link_state,c.state FROM track_link t
-      LEFT JOIN classification c ON c.target_id=t.id
-      WHERE json_extract(t.evidence,'$.observedRealPath')=? OR json_extract(t.evidence,'$.path')=? OR json_extract(t.evidence,'$.readPath')=?`
-    ).all(realPath, realPath, realPath);
-    return !rows.length || rows.every(
-      (row) => row.link_state === "active" && row.state === "classical"
-    );
-  } catch (error) {
-    ctx.log?.(`Classical model cannot authorize tagging: ${error.message}`);
-    return false;
-  } finally {
-    db?.close();
-  }
-}
-
-// src/tagger.js
-import fs8 from "node:fs/promises";
-import path15 from "node:path";
-
-// src/aurral.js
-var Aurral = class {
-  constructor(api, fetchImpl = fetch) {
-    if (!api?.url || !api?.key) throw new Error("Aurral API access is off. Turn it on on the plugin's page.");
-    this.url = api.url.replace(/\/+$/, "");
-    this.key = api.key;
-    this.fetch = fetchImpl;
-  }
-  async request(method, route, body) {
-    const response = await this.fetch(`${this.url}${route}`, {
-      method,
-      headers: { "X-Api-Key": this.key, ...body !== void 0 && { "Content-Type": "application/json" } },
-      body: body === void 0 ? void 0 : JSON.stringify(body),
-      signal: AbortSignal.timeout(3e4)
-    });
-    const data = await response.json().catch(() => null);
-    if (!response.ok) {
-      const detail = data?.message || data?.error || response.statusText;
-      throw new Error(`Aurral answered ${response.status} for ${route}: ${detail}`);
-    }
-    return data;
-  }
-  // Re-reads files whose tags changed, so the Library shows the new ones.
-  refreshLibrary() {
-    return this.request("POST", "/library/refresh", { mode: "quick" });
-  }
-  users() {
-    return this.request("GET", "/users");
-  }
-  async staticPlaylists() {
-    const status = await this.request("GET", "/playlists/status");
-    return status?.staticPlaylists ?? [];
-  }
-  createPlaylist(name, tracks) {
-    return this.request("POST", "/playlists/static-playlists", { name, tracks, downloadMissing: true });
-  }
-  updatePlaylist(id, name, tracks) {
-    return this.request("PUT", `/playlists/static-playlists/${encodeURIComponent(id)}`, { name, tracks });
-  }
-};
-
-// src/tagger.js
-var LOCK_STALE_MS2 = 2 * 6e4;
-var SAVE_EVERY_MS = 3e4;
-var queueDir = (ctx) => path15.join(ctx.dataFolder, "queue");
-var processedFile = (ctx) => path15.join(ctx.dataFolder, "processed.json");
-var indexFile = (ctx) => path15.join(ctx.dataFolder, "library-index.json");
-var originalsFile = (ctx) => path15.join(ctx.dataFolder, "originals.json");
-var excludedFile = (ctx) => path15.join(ctx.dataFolder, "excluded.json");
-var TAG_FIELDS = ["artist", "albumArtist", "composer", "work", "workId"];
-var TAGGING_VERSION = 2;
-var outdated = (record) => record && (record.status === "tagged" || record.status === "unchanged") && (record.v ?? 1) < TAGGING_VERSION;
-var lockDir = (ctx) => path15.join(ctx.dataFolder, "tagging.lock");
-var yieldFile = (ctx) => path15.join(ctx.dataFolder, "tagging.yield");
-var YIELD_FRESH_MS = 10 * 6e4;
-var PRIORITY_WAIT_MS = 5 * 6e4;
-var ACTION_CLAIM_MS = 2 * 6e4;
-async function enqueue(ctx, filePaths, { force = false, source = null } = {}) {
-  await fs8.mkdir(queueDir(ctx), { recursive: true });
-  const ids = [];
-  for (const filePath of filePaths) {
-    if (!filePath) continue;
-    const id = `${Date.now().toString().padStart(15, "0")}-${randomUUID14()}`;
-    await writeJson(path15.join(queueDir(ctx), `${id}.json`), { path: filePath, force, source, at: Date.now() });
-    ids.push(id);
-  }
-  return ids;
-}
-async function queuedEntries(ctx) {
-  const names = (await fs8.readdir(queueDir(ctx)).catch(() => [])).filter((n) => n.endsWith(".json")).sort();
-  return names.map((name) => ({ name, file: path15.join(queueDir(ctx), name) }));
-}
-var queueLength = async (ctx) => (await queuedEntries(ctx)).length;
-async function allowedPath(ctx, filePath) {
-  const real = await fs8.realpath(filePath).catch(() => null);
-  if (!real) return null;
-  for (const root of [ctx.libraryFolder, ctx.dataFolder]) {
-    if (!root) continue;
-    const base = await fs8.realpath(root).catch(() => null);
-    if (!base) continue;
-    const relative = path15.relative(base, real);
-    if (relative && !relative.startsWith("..") && !path15.isAbsolute(relative)) return real;
-  }
-  return null;
-}
-var statKey = (stat) => ({ mtimeMs: Math.round(stat.mtimeMs), size: stat.size });
-var sameStat = (record, stat) => record && record.mtimeMs === Math.round(stat.mtimeMs) && record.size === stat.size;
-function indexEntry(tags, stat) {
-  return {
-    ...statKey(stat),
-    title: tags.title,
-    artist: tags.artist,
-    album: tags.album,
-    albumArtist: tags.albumArtist,
-    recordingMbid: tags.recordingMbid,
-    releaseMbid: tags.releaseMbid,
-    releaseGroupMbid: tags.releaseGroupMbid,
-    albumArtistMbids: tags.albumArtistMbids,
-    trackNumber: tags.trackNumber,
-    discNumber: tags.discNumber,
-    durationMs: tags.durationMs,
-    workId: tags.workId
-  };
-}
-var State = class {
-  constructor(ctx, lock) {
-    this.ctx = ctx;
-    this.lock = lock;
-    this.dirty = 0;
-    this.savedAt = Date.now();
-    this.refs = 0;
-    this.admins = 0;
-    this.background = 0;
-    this.claimed = /* @__PURE__ */ new Set();
-    this.busyPaths = /* @__PURE__ */ new Map();
-  }
-  async load() {
-    this.processed = await readJson(processedFile(this.ctx), {});
-    this.index = await readJson(indexFile(this.ctx), {});
-    this.originals = await readJson(originalsFile(this.ctx), {});
-    this.excluded = await readJson(excludedFile(this.ctx), {});
-  }
-  // Saved every 30 seconds while working, and at the end: the index of a
-  // large Library is several megabytes.
-  async save(force = false) {
-    if (!this.dirty || !force && Date.now() - this.savedAt < SAVE_EVERY_MS) return;
-    this.savedAt = Date.now();
-    this.dirty = 0;
-    await writeJson(processedFile(this.ctx), this.processed);
-    await writeJson(indexFile(this.ctx), this.index);
-    await writeJson(originalsFile(this.ctx), this.originals);
-    await writeJson(excludedFile(this.ctx), this.excluded);
-    await this.lock.touch();
-  }
-  // One call at a time works on a file.
-  async exclusive(file, work) {
-    while (this.busyPaths.has(file)) await this.busyPaths.get(file).catch(() => {
-    });
-    const running = work();
-    this.busyPaths.set(file, running);
-    try {
-      return await running;
-    } finally {
-      this.busyPaths.delete(file);
-    }
-  }
-};
-var Session = class {
-  constructor(ctx, state, priority) {
-    this.ctx = ctx;
-    this.state = state;
-    this.priority = priority;
-    this.changedFiles = 0;
-    this.stats = { tagged: 0, unchanged: 0, skipped: {}, failed: 0, left: 0 };
-  }
-  get processed() {
-    return this.state.processed;
-  }
-  get index() {
-    return this.state.index;
-  }
-  get originals() {
-    return this.state.originals;
-  }
-  get excluded() {
-    return this.state.excluded;
-  }
-  get dirty() {
-    return this.state.dirty;
-  }
-  set dirty(value) {
-    this.state.dirty = value;
-  }
-  save(force = false) {
-    return this.state.save(force);
-  }
-  // True when an admin action wants the lock and this is background work:
-  // one in this process, or one waiting in another.
-  async shouldYield() {
-    if (this.priority) return false;
-    if (this.state.admins > 0) this.yielding = true;
-    else if (!this.yieldCheckedAt || Date.now() - this.yieldCheckedAt >= 500) {
-      this.yieldCheckedAt = Date.now();
-      const stat = await fs8.stat(yieldFile(this.ctx)).catch(() => null);
-      this.yielding = Boolean(stat && Date.now() - stat.mtimeMs < YIELD_FRESH_MS);
-    }
-    if (this.yielding && !this.yieldLogged) {
-      this.yieldLogged = true;
-      this.ctx.log("Pausing background tagging for an admin action");
-    }
-    return this.yielding;
-  }
-  record(filePath, stat, result) {
-    this.processed[filePath] = { ...statKey(stat), ...result, at: Date.now() };
-    this.dirty++;
-    if (result.status === "skipped") this.stats.skipped[result.reason] = (this.stats.skipped[result.reason] || 0) + 1;
-    else this.stats[result.status]++;
-  }
-  // Returns false when MusicBrainz can't be reached, so the caller stops.
-  async processFile(filePath, options = {}) {
-    const real = await allowedPath(this.ctx, filePath);
-    if (!real) {
-      this.ctx.log(`Not tagging ${filePath}: it isn't in the Library folder`);
-      this.stats.skipped["outside the Library"] = (this.stats.skipped["outside the Library"] || 0) + 1;
-      return true;
-    }
-    if (!isAudioPath(real)) return true;
-    return this.state.exclusive(real, () => this.processReal(real, options));
-  }
-  // `queuedAt`: when the request to tag was made. Classical tags an admin
-  // removed after that stay removed.
-  async processReal(real, { force = false, prefilter = false, upgrade = false, queuedAt = null } = {}) {
-    const { ctx } = this;
-    const stat = await fs8.stat(real);
-    if (!await modelAllowsTagging(ctx, real)) {
-      this.record(real, stat, { status: "skipped", reason: "model classification or link requires review" });
-      return true;
-    }
-    if (!force && sameStat(this.processed[real], stat) && !(upgrade && outdated(this.processed[real]))) return true;
-    let tags;
-    try {
-      tags = readTags(real);
-    } catch (error) {
-      this.record(real, stat, { status: "skipped", reason: error instanceof UnsupportedFormat ? "unsupported format" : "unreadable" });
-      return true;
-    }
-    this.index[real] = indexEntry(tags, stat);
-    if (!tags.recordingMbid) {
-      this.record(real, stat, { status: "skipped", reason: "no recording ID" });
-      return true;
-    }
-    if (this.excluded[tags.recordingMbid]) {
-      if (!force || queuedAt && (this.excluded[tags.recordingMbid].at ?? 0) > queuedAt) {
-        this.record(real, stat, { status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
-        return true;
-      }
-      delete this.excluded[tags.recordingMbid];
-    }
-    if (prefilter && ctx.resolver.classifyGenres(new Set(tags.genres.map((g) => g.toLowerCase()))) === false) {
-      this.record(real, stat, { status: "skipped", reason: "non-classical", recording: tags.recordingMbid });
-      return true;
-    }
-    const fields = await ctx.resolver.resolve(tags.recordingMbid, {
-      trackArtistIds: tags.artistMbids,
-      albumArtistIds: tags.albumArtistMbids,
-      releaseGroupId: tags.releaseGroupMbid || null,
-      confirmed: force
-    });
-    if (!fields) {
-      const reason = ctx.resolver.skipReason;
-      if (reason === "unreachable") return false;
-      this.record(real, stat, { status: "skipped", reason, recording: tags.recordingMbid });
-      return true;
-    }
-    const values = { artist: [fields.artist], composer: fields.composers };
-    if (fields.workId) Object.assign(values, { work: [fields.work], workId: [fields.workId] });
-    const albumArtist = await this.englishAlbumArtist(tags);
-    if (albumArtist) values.albumArtist = [albumArtist];
-    let changed;
-    try {
-      if (!this.originals[real]) {
-        this.originals[real] = { ...readValues(real, TAG_FIELDS), recording: tags.recordingMbid };
-        this.dirty++;
-        await writeJson(originalsFile(ctx), this.originals);
-      }
-      changed = await writeTags(real, values);
-    } catch (error) {
-      ctx.log(`Couldn't tag ${real}: ${error.message}`);
-      this.record(real, stat, { status: "skipped", reason: "couldn't write tags", recording: tags.recordingMbid });
-      return true;
-    }
-    const after = await fs8.stat(real);
-    this.index[real] = { ...this.index[real], ...statKey(after), artist: fields.artist, workId: fields.workId || "" };
-    this.record(real, after, {
-      v: TAGGING_VERSION,
-      status: changed.length ? "tagged" : "unchanged",
-      recording: tags.recordingMbid,
-      artist: fields.artist,
-      workId: fields.workId
-    });
-    if (changed.length) {
-      this.changedFiles++;
-      ctx.log(`Tagged ${path15.basename(real)}: ${fields.artist}`);
-    }
-    return true;
-  }
-  // Puts back the tags a file had before the plugin changed them. Files
-  // tagged before the plugin kept backups get the artist MusicBrainz credits
-  // for that track on its release, which is what Aurral writes.
-  async untagFile(filePath, mode = "restore") {
-    const real = await allowedPath(this.ctx, filePath);
-    if (!real || !isAudioPath(real)) return "skipped";
-    return this.state.exclusive(real, () => this.untagReal(real, mode));
-  }
-  async untagReal(real, mode = "restore") {
-    const { ctx } = this;
-    if (!await modelAllowsTagging(ctx, real)) return "skipped";
-    let tags;
-    try {
-      tags = readTags(real);
-    } catch {
-      return "skipped";
-    }
-    if (tags.recordingMbid) this.excluded[tags.recordingMbid] = { at: Date.now() };
-    const original = this.originals[real];
-    let values;
-    if (mode === "clear") values = { composer: [], work: [], workId: [] };
-    else if (original) values = Object.fromEntries(TAG_FIELDS.map((field2) => [field2, original[field2] ?? []]));
-    else {
-      const credit = await this.trackCredit(tags);
-      values = { composer: [], work: [], workId: [], ...credit && { artist: [credit] } };
-      if (tags.albumArtistMbids.length === 1) {
-        const name = (await ctx.mb.get("artist", tags.albumArtistMbids[0], "aliases+genres"))?.name;
-        if (name) values.albumArtist = [name];
-      }
-    }
-    const changed = await writeTags(real, values);
-    if (mode !== "clear") delete this.originals[real];
-    const after = await fs8.stat(real);
-    this.index[real] = { ...this.index[real] ?? {}, ...indexEntry(readTags(real), after) };
-    this.record(real, after, { status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
-    this.stats.skipped["classical tags removed"]--;
-    if (changed.length) {
-      this.changedFiles++;
-      ctx.log(`Removed classical tags from ${path15.basename(real)}`);
-    }
-    return changed.length ? original && mode !== "clear" ? "restored" : "cleared" : "unchanged";
-  }
-  async englishAlbumArtist(tags) {
-    if (tags.albumArtistMbids.length !== 1) return null;
-    const artist = await this.ctx.resolver.getArtist(tags.albumArtistMbids[0]);
-    if (!artist?.name) return null;
-    const [name] = await this.ctx.resolver.englishNames(artist);
-    return name || null;
-  }
-  // MusicBrainz's artist credit for this recording on the file's release,
-  // else on the recording itself.
-  async trackCredit(tags) {
-    const { mb } = this.ctx;
-    if (tags.releaseMbid) {
-      const release = await mb.get("release", tags.releaseMbid, RELEASE_INC);
-      for (const medium of release?.media || [])
-        for (const track of medium.tracks || [])
-          if (track.recording?.id === tags.recordingMbid) {
-            const credit = creditString(track["artist-credit"] || track.recording["artist-credit"]);
-            if (credit) return credit;
-          }
-    }
-    const recording = await mb.get("recording", tags.recordingMbid, "artist-credits");
-    return creditString(recording?.["artist-credit"]) || null;
-  }
-  async drainQueue(until, onlyIds = null) {
-    for (const entry of await queuedEntries(this.ctx)) {
-      if (Date.now() > until || await this.shouldYield()) return false;
-      if (onlyIds && !onlyIds.has(entry.name.replace(/\.json$/, ""))) continue;
-      if (this.state.claimed.has(entry.name)) continue;
-      this.state.claimed.add(entry.name);
-      try {
-        const job = await readJson(entry.file, null);
-        if (!this.priority && job?.source === "action" && Date.now() - (job.at || 0) < ACTION_CLAIM_MS) continue;
-        if (job?.path) {
-          const reachable = await this.processFile(job.path, { force: job.force, queuedAt: job.at });
-          if (!reachable) return false;
-        }
-        await fs8.rm(entry.file, { force: true });
-      } finally {
-        this.state.claimed.delete(entry.name);
-      }
-      await this.save();
-    }
-    return true;
-  }
-  // Walks the Library, refreshing the index, and returns files that have a
-  // recording ID and were never processed (or changed since). Stops at
-  // `until`; unchanged files cost only a stat, so the next run gets further.
-  async scan(until) {
-    const root = this.ctx.libraryFolder;
-    const pending = [];
-    const seen = /* @__PURE__ */ new Set();
-    let complete = true;
-    const walk = async (dir) => {
-      if (Date.now() > until || await this.shouldYield()) {
-        complete = false;
-        return;
-      }
-      const entries2 = await fs8.readdir(dir, { withFileTypes: true }).catch(() => []);
-      for (const entry of entries2) {
-        if (Date.now() > until || await this.shouldYield()) {
-          complete = false;
-          return;
-        }
-        if (entry.name.startsWith(".")) continue;
-        const full = path15.join(dir, entry.name);
-        if (entry.isDirectory()) await walk(full);
-        else if (entry.isFile() && isAudioPath(full)) {
-          seen.add(full);
-          const stat = await fs8.stat(full).catch(() => null);
-          if (!stat) continue;
-          if (!sameStat(this.index[full], stat)) {
-            try {
-              this.index[full] = indexEntry(readTags(full), stat);
-            } catch {
-              delete this.index[full];
-              continue;
-            }
-            this.dirty++;
-            await this.save();
-          }
-          if (this.index[full].recordingMbid && (!sameStat(this.processed[full], stat) || outdated(this.processed[full]))) pending.push(full);
-        }
-      }
-    };
-    if (root) await walk(root);
-    if (complete) {
-      for (const file of Object.keys(this.index)) if (file.startsWith(root) && !seen.has(file)) delete this.index[file];
-    }
-    this.scanComplete = complete;
-    return pending;
-  }
-};
-var held = /* @__PURE__ */ new Map();
-async function openState(ctx, priority) {
-  let lock = await tryLock(lockDir(ctx), LOCK_STALE_MS2);
-  if (!lock && priority) {
-    ctx.log("Waiting for background tagging in another process to pause");
-    const until = Date.now() + PRIORITY_WAIT_MS;
-    while (!lock && Date.now() < until) {
-      await writeJson(yieldFile(ctx), { at: Date.now() });
-      await sleep(500);
-      lock = await tryLock(lockDir(ctx), LOCK_STALE_MS2);
-    }
-    await fs8.rm(yieldFile(ctx), { force: true });
-    if (!lock) ctx.log("Tagging in another process didn't pause within 5 minutes");
-  }
-  if (!lock) return null;
-  const state = new State(ctx, lock);
-  try {
-    await state.load();
-  } catch (error) {
-    await lock.release();
-    throw error;
-  }
-  state.heartbeat = setInterval(() => lock.touch(), 3e4);
-  return state;
-}
-async function withTagging(ctx, work, { priority = false } = {}) {
-  const key = path15.resolve(ctx.dataFolder);
-  let entry;
-  for (; ; ) {
-    entry = held.get(key);
-    if (!entry) {
-      entry = { opening: openState(ctx, priority), state: null };
-      held.set(key, entry);
-      try {
-        entry.state = await entry.opening;
-      } catch (error) {
-        held.delete(key);
-        throw error;
-      }
-      if (!entry.state) {
-        held.delete(key);
-        return null;
-      }
-      break;
-    }
-    if (!entry.state) {
-      if (!priority) return null;
-      await entry.opening.catch(() => {
-      });
-      if (held.get(key) === entry && entry.state) break;
-      continue;
-    }
-    if (!priority && entry.state.background > 0) return null;
-    break;
-  }
-  const { state } = entry;
-  const session = new Session(ctx, state, priority);
-  state.refs++;
-  if (priority) state.admins++;
-  else state.background++;
-  try {
-    await work(session);
-    return session.stats;
-  } finally {
-    if (priority) state.admins--;
-    else state.background--;
-    if (--state.refs === 0) {
-      held.delete(key);
-      clearInterval(state.heartbeat);
-      await state.save(true).catch((error) => ctx.log(`Couldn't save progress: ${error.message}`));
-      await state.lock.release();
-    } else {
-      await state.save().catch(() => {
-      });
-    }
-    if (session.changedFiles) await refreshLibrary(ctx);
-  }
-}
-async function refreshLibrary(ctx) {
-  if (!ctx.api?.url || !ctx.api?.key) return;
-  try {
-    await new Aurral(ctx.api, ctx.fetch).refreshLibrary();
-  } catch (error) {
-    ctx.log(`Couldn't ask Aurral to rescan the Library: ${error.message}`);
-  }
-}
-async function runQueue(ctx, budgetMs, onlyIds = null, { priority = false } = {}) {
-  const until = Date.now() + budgetMs;
-  return withTagging(
-    ctx,
-    async (session) => {
-      await session.drainQueue(until, onlyIds);
-      session.stats.left = onlyIds ? (await queuedEntries(ctx)).filter((e) => onlyIds.has(e.name.replace(/\.json$/, ""))).length : await queueLength(ctx);
-    },
-    { priority }
-  );
-}
-async function runScheduled(ctx, budgetMs) {
-  const until = Date.now() + budgetMs;
-  return withTagging(ctx, async (session) => {
-    if (!await session.drainQueue(until)) return;
-    const pending = await session.scan(until);
-    session.stats.found = pending.length;
-    for (const file of pending) {
-      if (Date.now() > until || await session.shouldYield()) break;
-      if (!await session.processFile(file, { prefilter: true, upgrade: true })) break;
-      await session.save();
-    }
-    session.stats.left = await queueLength(ctx) + pending.filter((f) => !session.processed[f]).length;
-  });
-}
-async function libraryIndex(ctx, budgetMs, { priority = false } = {}) {
-  let index = null;
-  await withTagging(
-    ctx,
-    async (session) => {
-      await session.scan(Date.now() + budgetMs);
-      index = session.index;
-    },
-    { priority }
-  );
-  return index ?? await readJson(indexFile(ctx), {});
-}
-async function untagFiles(ctx, paths, budgetMs, { priority = false, mode = "restore" } = {}) {
-  const until = Date.now() + budgetMs;
-  const counts = { restored: 0, cleared: 0, unchanged: 0, "no backup": 0, skipped: 0, left: 0 };
-  const stats = await withTagging(ctx, async (session) => {
-    for (const file of paths) {
-      if (Date.now() > until) {
-        counts.left++;
-        continue;
-      }
-      try {
-        counts[await session.untagFile(file, mode)]++;
-      } catch (error) {
-        ctx.log(`Couldn't remove classical tags from ${file}: ${error.message}`);
-        counts.skipped++;
-      }
-    }
-  }, { priority });
-  return stats ? counts : null;
-}
-function describeStats(stats) {
-  if (!stats) return "Another tagging run is in progress";
-  const parts = [`${stats.tagged} tagged`];
-  if (stats.unchanged) parts.push(`${stats.unchanged} already right`);
-  for (const [reason, count] of Object.entries(stats.skipped)) parts.push(`${count} skipped (${reason})`);
-  if (stats.failed) parts.push(`${stats.failed} failed`);
-  if (stats.left) parts.push(`${stats.left} left for the next run`);
-  return parts.join(", ");
-}
 
 // src/index.js
 var BACKGROUND_BUDGET_MS = 4 * 6e4;
@@ -48973,6 +49655,11 @@ function maintenance(input) {
   const ctx = makeContext(input);
   const start = () => modelJobs(ctx, { budgetMs: ACTION_BUDGET_MS }).catch((error) => log(`Classical model work stopped: ${error.message}`));
   return {
+    // Tag writes and restores an admin confirmed (v0.3 8.4, 8.5): in this
+    // process, holding the tagger's lock. Never from a scan or the schedule.
+    startTagWrites() {
+      runTagJobs(ctx, { budgetMs: ACTION_BUDGET_MS }).catch((error) => log(`Classical tag writing stopped: ${error.message}`));
+    },
     async status() {
       const status = await modelStatus(ctx);
       return {
@@ -48982,7 +49669,8 @@ function maintenance(input) {
           ...status.scan,
           state: status.scan.state === "running" && status.scan.leaseUntil <= status.now ? "interrupted (scan again to resume)" : status.scan.state
         },
-        english: await englishNamesStatus(ctx).catch(() => null)
+        english: await englishNamesStatus(ctx).catch(() => null),
+        enrich: await enrichmentStatus(ctx).catch(() => null)
       };
     },
     async run(command, user) {
@@ -49006,6 +49694,13 @@ function maintenance(input) {
           return `Work names and books were looked up already: ${queued.renamed} of ${queued.total} works renamed, ${queued.filed || 0} filed under their book.`;
         start();
         return "Looking up work names and books on MusicBrainz in the background, one request a second.";
+      }
+      if (command === "maintenance-enrich") {
+        const queued = await queueEnrichment(ctx, user);
+        if (!queued.queued)
+          return queued.state === "done" ? "Every person, ensemble and work with a MusicBrainz ID has its MusicBrainz details already." : "MusicBrainz details are being looked up already; reload to see progress.";
+        start();
+        return `Looking up dates, sort names and other names for ${queued.waiting} entr${queued.waiting === 1 ? "y" : "ies"} on MusicBrainz in the background, one request a second. Values you set yourself stay.`;
       }
       throw new Error("Unknown maintenance command");
     }
@@ -49202,7 +49897,7 @@ var index_default = {
     if (remainingMs <= 0) return;
     const stats = await runScheduled(ctx, remainingMs);
     if (stats) log(`Scheduled tagging: ${describeStats(stats)}`);
-    await pruneCache(path16.join(ctx.dataFolder, "mb-cache"), TTL.default).catch(
+    await pruneCache(path17.join(ctx.dataFolder, "mb-cache"), TTL.default).catch(
       () => {
       }
     );

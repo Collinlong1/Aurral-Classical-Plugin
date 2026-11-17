@@ -759,6 +759,9 @@ function apply(c, input, who) {
   )
     fail("Invalid editor request");
   if (Object.hasOwn(V2_COMMANDS, request.command)) {
+    // Writing tags to files needs its own setting (v0.3 8.4), off by default.
+    if (request.command === "tag-write" && input.settings?.enableTagWriting !== true)
+      fail("Writing tags is off. Turn on “Write classical tags to files” in the plugin's settings first.");
     const keys = V2_COMMANDS[request.command];
     if (keys && Object.keys(request.values).some((key) => !keys.includes(key)))
       fail("Unknown editor command or fields");
@@ -1207,13 +1210,17 @@ export async function mutateEditor(input) {
     c = await openCatalogue(path.join(input.dataFolder, "model"));
   try {
     try {
-      return transaction(c.db, () => {
+      const result = transaction(c.db, () => {
         const request = input.mutation;
         if (request && typeof request === "object" && request.values && typeof request.values === "object")
           checkRevision(c, request);
         const result = apply(c, input, who);
         return input.capabilities.adminForms >= 2 ? finishWorkMutation(c, request, result) : result;
       });
+      // A confirmed tag write or restore runs once its job is committed, in
+      // the plugin's process under the tagger's lock (v0.3 8.4, 8.5).
+      if (result?.ok && ["tag-write", "tag-restore"].includes(input.mutation?.command)) input.maintenance?.startTagWrites?.();
+      return result;
     } catch (error) {
       if (error instanceof EditorError || error instanceof EditorV2Error)
         return { ok: false, status: error.status, message: error.message.slice(0, 500), ...(error.field && { field: error.field }) };

@@ -38,6 +38,7 @@ and tagging.
 | slskd download folder | slskd's downloads folder, as Aurral's container sees it. Finished files are copied from here. |
 | Name order | The roles in the artist, in order. Default `composers, arrangers, soloists, ensembles, conductors`. People credited on the recording but in none of these roles come last. |
 | Separator | Goes between the names. Default `—`, with a space either side. |
+| Write classical tags to files | Off by default. Lets an admin write the classical tags a preview shows (see *Writing classical tags*). Scans and schedules never write them. |
 
 ## Tagging
 
@@ -283,10 +284,27 @@ which Aurral installs and updates from.
 ## Classical catalogue
 
 The catalogue lives in the plugin's own SQLite database (`model/` in the data
-folder) and needs Node 22.16+. It never writes to your audio files, so the
-Library can be mounted read only. The editor, album **By work** view and work
+folder) and needs Node 22.16+. It never writes to your audio files unless an
+admin writes classical tags (below), so otherwise the Library can be mounted
+read only. The editor, album **By work** view and work
 pages need the matching Aurral Classical fork, which adds generic admin-form
 and album-presentation hooks; a stock Aurral shows none of them.
+
+**Writing classical tags.** From an album, ticked tracks, a work's Recordings
+or a track, **Preview classical tags** reads each file and lists, per field,
+what it holds and what the catalogue proposes: composer and its sort name,
+work, movement name, number and total, performers (`Name (instrument)`),
+conductor, the work's catalogue number (`CLASSICAL_CATALOGUE`, a field of the
+plugin's own: Picard has none) and the MusicBrainz work. Titles, albums and
+album artists are never proposed. FLAC takes every field; MP3 takes all but the
+movement fields and performers, which have no Picard ID3 frame the tag library
+can write; other formats are listed as not supported yet. Nothing is written
+until an admin confirms **Write**, with **Write classical tags to files** on.
+Each file is read again first and left alone if it changed since the preview;
+its old values are kept, the new file replaces it only once it reads back
+correctly, and its audio fingerprint must not change. The run's page lists
+each file's result and restores a whole run or one file, as long as its tags
+are still the ones written. Background tagging pauses meanwhile.
 
 **Scans.** **Scan the library** (the editor's Activity → Maintenance, admin)
 indexes the Library in resumable batches; the plugin schedule also rescans every 6 hours
