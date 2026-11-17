@@ -25,6 +25,18 @@ afterEach(async () => {
 
 const input = (extra = {}) => ({ settings: baseSettings, libraryFolder: folders.libraryFolder, dataFolder: folders.dataFolder, ...extra });
 
+// The album and artist menu actions only plan (v0.3 8.7); `act` chooses one
+// and then confirms its request, as an admin does in the editor. Returns the
+// confirmed run's message, or the plan's when nothing was planned.
+async function act(name, request) {
+  const { listRequests, applyRequest } = await import("../src/tag-requests.js");
+  const before = new Set(listRequests(request).map((entry) => entry.id));
+  const planned = await plugin.actions[name](request);
+  const made = listRequests(request).find((entry) => !before.has(entry.id));
+  if (!made) return planned;
+  return applyRequest(makeContext(request), made.id, request.user);
+}
+
 test("enabling the plugin without file-write opt-in never tags existing media", async () => {
   const file = await copyFixture("sine.flac", path.join(folders.libraryFolder, "readonly-default.flac"));
   const before = await fs.readFile(file);
@@ -42,14 +54,14 @@ test("clear removes duplicate native ID3 work frames, including an empty leading
     const frame = Id3v2UserTextInformationFrame.fromDescription("WORK"); frame.text = [value]; id3.addFrame(frame);
   }
   audio.save(); audio.dispose();
-  await plugin.actions["clear-classical"](input({ user:{id:1,role:"admin"}, album:{title:"Duplicate",tracks:[{path:file}]} }));
+  await act("clear-classical", input({ user:{id:1,role:"admin"}, album:{title:"Duplicate",tracks:[{path:file}]} }));
   assert.deepEqual(readValues(file,["work"]).work,[]);
 });
 
 test("a failed atomic replacement preserves original audio and the persisted backup", async () => {
   const file = await copyFixture("sine.flac", path.join(folders.libraryFolder,"failure.flac"));
   const album = {title:"Failure",tracks:[{path:file}]};
-  await plugin.actions["tag-album"](input({user:{id:1,role:"admin"},album}));
+  await act("tag-album", input({user:{id:1,role:"admin"},album}));
   const before = await fs.readFile(file);
   const backup = await fs.readFile(path.join(folders.dataFolder,"originals.json"));
   const rename = fs.rename;
@@ -58,7 +70,7 @@ test("a failed atomic replacement preserves original audio and the persisted bac
     return rename(source,target);
   };
   try {
-    const result = await plugin.actions["untag-album"](input({user:{id:1,role:"admin"},album}));
+    const result = await act("untag-album", input({user:{id:1,role:"admin"},album}));
     assert.match(result.message,/1 skipped/);
   } finally { fs.rename = rename; }
   assert.deepEqual(await fs.readFile(file),before);
@@ -202,7 +214,7 @@ test("only one process tags at a time", async () => {
 
 test("Tag as classical on an album retags its files", async () => {
   const file = await copyFixture("sine.opus", path.join(folders.libraryFolder, "album", "01.opus"));
-  const result = await plugin.actions["tag-album"](
+  const result = await act("tag-album", 
     input({ user: { id: 1, role: "admin" }, album: { title: "Symphony No. 5", tracks: [{ path: file }, { path: null }] } }),
   );
   assert.match(result.message, /1 tagged/);
@@ -217,7 +229,7 @@ test("Tag as classical on an artist finds the artist's files", async () => {
   f.tag.albumArtists = ["Someone Else"];
   f.save();
   f.dispose();
-  const result = await plugin.actions["tag-artist"](
+  const result = await act("tag-artist", 
     input({ user: { id: 1, role: "admin" }, artist: { id: 3, name: "Ludwig van Beethoven", mbid: null, albums: [] } }),
   );
   assert.match(result.message, /^Ludwig van Beethoven: 1 tagged/);
@@ -254,8 +266,8 @@ for (const ext of ["flac", "mp3", "m4a", "opus"]) {
     const original = { composer: values, work: values, workId: values };
     await writeTags(file, original);
     const album = { title: "Restore", tracks: [{ path: file }] };
-    await plugin.actions["tag-album"](input({ user: { id: 1, role: "admin" }, album }));
-    const result = await plugin.actions["untag-album"](input({ user: { id: 1, role: "admin" }, album }));
+    await act("tag-album", input({ user: { id: 1, role: "admin" }, album }));
+    const result = await act("untag-album", input({ user: { id: 1, role: "admin" }, album }));
     assert.match(result.message, /1 restored/);
     assert.deepEqual(readValues(file, Object.keys(original)), original);
   });
@@ -266,7 +278,7 @@ for (const ext of ["flac", "mp3", "m4a", "opus"]) {
     await writeTags(file, { composer: values, work: values, workId: values });
     const unrelated = otherTags(file);
     const recording = readTags(file).recordingMbid;
-    const result = await plugin.actions["untag-album"](input({ user: { id: 1, role: "admin" }, album: { title: "Seven", tracks: [{ path: file }] } }));
+    const result = await act("untag-album", input({ user: { id: 1, role: "admin" }, album: { title: "Seven", tracks: [{ path: file }] } }));
     assert.match(result.message, /1 cleared/);
     assert.deepEqual(readValues(file, ["composer", "work", "workId"]), { composer: [], work: [], workId: [] });
     assert.deepEqual(otherTags(file), unrelated);
@@ -284,7 +296,7 @@ for (const ext of ["flac", "mp3", "m4a"]) {
     await plugin.scheduled(input());
     assert.equal(readTags(file).artist, EXPECTED_ARTIST);
     const album = { title: "Symphony No. 5", tracks: [{ path: file }] };
-    const result = await plugin.actions["untag-album"](input({ user: { id: 1, role: "admin" }, album }));
+    const result = await act("untag-album", input({ user: { id: 1, role: "admin" }, album }));
     assert.match(result.message, /^"Symphony No. 5": 1 restored/);
     assert.deepEqual(tagsOf(file), before);
     assert.deepEqual(otherTags(file), others);
@@ -292,7 +304,7 @@ for (const ext of ["flac", "mp3", "m4a"]) {
     await plugin.scheduled(input());
     assert.deepEqual(tagsOf(file), before);
     // ...until an admin tags it as classical again.
-    await plugin.actions["tag-album"](input({ user: { id: 1, role: "admin" }, album }));
+    await act("tag-album", input({ user: { id: 1, role: "admin" }, album }));
     assert.equal(readTags(file).artist, EXPECTED_ARTIST);
   });
 }
@@ -312,7 +324,7 @@ test("files tagged before backups get MusicBrainz's credit for the track back", 
   f.tag.musicBrainzReleaseId = "rel1";
   f.save();
   f.dispose();
-  const result = await plugin.actions["untag-album"](input({ user: { id: 1, role: "admin" }, album: { title: "Old", tracks: [{ path: file }] } }));
+  const result = await act("untag-album", input({ user: { id: 1, role: "admin" }, album: { title: "Old", tracks: [{ path: file }] } }));
   assert.match(result.message, /1 cleared/);
   assert.equal(readTags(file).artist, "Berliner Philharmoniker, Herbert von Karajan");
 });
@@ -332,7 +344,7 @@ test("files with no evidence of being classical are left alone, unless an admin 
   const processed = await readProcessed(makeContext(input()));
   assert.equal(processed[await fs.realpath(file)].reason, "not clearly classical");
   assert.equal(readTags(file).artist, "Berliner Philharmoniker, Herbert von Karajan");
-  await plugin.actions["tag-album"](input({ user: { id: 1, role: "admin" }, album: { title: "Unsure", tracks: [{ path: file }] } }));
+  await act("tag-album", input({ user: { id: 1, role: "admin" }, album: { title: "Unsure", tracks: [{ path: file }] } }));
   assert.equal(readTags(file).artist, EXPECTED_ARTIST);
 });
 
@@ -346,7 +358,7 @@ test("soundtracks and Christmas albums are never tagged, even by Tag as classica
     f.tag.musicBrainzReleaseGroupId = "rg-x";
     f.save();
     f.dispose();
-    const result = await plugin.actions["tag-album"](input({ user: { id: 1, role: "admin" }, album: { title: "X", tracks: [{ path: file }] } }));
+    const result = await act("tag-album", input({ user: { id: 1, role: "admin" }, album: { title: "X", tracks: [{ path: file }] } }));
     assert.match(result.message, /skipped \(non-classical\)/);
     assert.equal(readTags(file).artist, "Berliner Philharmoniker, Herbert von Karajan");
   }
@@ -408,7 +420,7 @@ test("an album Aurral files under one artist gets that artist's English name", a
   await plugin.scheduled(input());
   assert.equal(readTags(file).albumArtist, "Pyotr Tchaikovsky");
   // Remove classical tags puts it back.
-  await plugin.actions["untag-album"](input({ user: { id: 1, role: "admin" }, album: { title: "X", tracks: [{ path: file }] } }));
+  await act("untag-album", input({ user: { id: 1, role: "admin" }, album: { title: "X", tracks: [{ path: file }] } }));
   assert.equal(readTags(file).albumArtist, "Пётр Ильич Чайковский");
 });
 
@@ -456,9 +468,9 @@ test("an admin action runs while another is still going, instead of waiting for 
   const long = withTagging(ctx, () => gate, { priority: true });
   await new Promise((r) => setTimeout(r, 50));
   const started = Date.now();
-  const tagged = await plugin.actions["tag-album"](input({ user: { id: 1, role: "admin" }, album: { title: "Busy", tracks: [{ path: file }] } }));
+  const tagged = await act("tag-album", input({ user: { id: 1, role: "admin" }, album: { title: "Busy", tracks: [{ path: file }] } }));
   assert.match(tagged.message, /1 tagged/);
-  const untagged = await plugin.actions["untag-album"](input({ user: { id: 1, role: "admin" }, album: { title: "Busy", tracks: [{ path: file }] } }));
+  const untagged = await act("untag-album", input({ user: { id: 1, role: "admin" }, album: { title: "Busy", tracks: [{ path: file }] } }));
   assert.match(untagged.message, /1 restored/);
   assert.ok(Date.now() - started < 10_000);
   release();
@@ -501,7 +513,7 @@ test("background tagging in another process pauses for an admin action", async (
     await lock.release();
   })();
   const started = Date.now();
-  const result = await plugin.actions["tag-album"](input({ user: { id: 1, role: "admin" }, album: { title: "Busy", tracks: [{ path: file }] } }));
+  const result = await act("tag-album", input({ user: { id: 1, role: "admin" }, album: { title: "Busy", tracks: [{ path: file }] } }));
   await other;
   assert.ok(Date.now() - started < 10_000);
   assert.match(result.message, /1 tagged/);
@@ -511,7 +523,7 @@ test("background tagging in another process pauses for an admin action", async (
 test("a Tag as classical left in the queue doesn't undo a later Remove classical tags", async () => {
   const file = await copyFixture("sine.flac", path.join(folders.libraryFolder, "later", "01.flac"));
   const album = { title: "Later", tracks: [{ path: file }] };
-  await plugin.actions["tag-album"](input({ user: { id: 1, role: "admin" }, album }));
+  await act("tag-album", input({ user: { id: 1, role: "admin" }, album }));
   const ctx = makeContext(input());
   // A Tag as classical that was cut off (the plugin restarted) leaves its
   // request queued; then the admin removes the tags.
@@ -520,7 +532,7 @@ test("a Tag as classical left in the queue doesn't undo a later Remove classical
   const job = JSON.parse(await fs.readFile(path.join(folders.dataFolder, "queue", queued), "utf8"));
   job.at -= 10 * 60_000;
   await fs.writeFile(path.join(folders.dataFolder, "queue", queued), JSON.stringify(job));
-  await plugin.actions["untag-album"](input({ user: { id: 1, role: "admin" }, album }));
+  await act("untag-album", input({ user: { id: 1, role: "admin" }, album }));
   await plugin.scheduled(input());
   assert.notEqual(readTags(file).artist, EXPECTED_ARTIST);
   assert.deepEqual(await fs.readdir(path.join(folders.dataFolder, "queue")), []);
@@ -528,7 +540,7 @@ test("a Tag as classical left in the queue doesn't undo a later Remove classical
 
 test("Tag as classical on an artist works on a fresh install, before any scan", async () => {
   await copyFixture("sine.flac", path.join(folders.libraryFolder, "Ludwig van Beethoven", "Album", "01.flac"));
-  const result = await plugin.actions["tag-artist"](input({ user: { id: 1, role: "admin" }, artist: { id: 1, name: "Ludwig van Beethoven", mbid: null, albums: [] } }));
+  const result = await act("tag-artist", input({ user: { id: 1, role: "admin" }, artist: { id: 1, name: "Ludwig van Beethoven", mbid: null, albums: [] } }));
   assert.match(result.message, /1 tagged/);
 });
 
@@ -710,4 +722,71 @@ test("a tag write killed at any moment leaves the old file or the new one, never
   }
   // What a kill can leave is a copy with no audio extension, never indexed.
   for (const name of await fs.readdir(path.dirname(file))) if (name !== "kill.flac") assert.match(name, /^\.kill\..*\.tagging$/);
+});
+
+// v0.3 8.7 (review E6/B12): the four menu actions plan; an admin confirms.
+test("album and artist menu actions write nothing until an admin confirms their request in the editor", async () => {
+  const { listRequests, readRequest, applyRequest } = await import("../src/tag-requests.js");
+  const { readEditor, mutateEditor } = await import("../src/model/editor.js");
+  const admin = { id: 1, role: "admin" };
+  const one = await copyFixture("sine.flac", path.join(folders.libraryFolder, "req", "01.flac"));
+  const two = await copyFixture("sine.mp3", path.join(folders.libraryFolder, "req", "02.mp3"));
+  const album = { title: "Request", tracks: [{ path: one }, { path: two }] };
+  const bytes = async () => Promise.all([one, two].map((file) => fs.readFile(file)));
+  const before = await bytes();
+
+  // Choosing Tag as classical plans and says where to confirm; nothing is written.
+  const planned = await plugin.actions["tag-album"](input({ user: admin, album }));
+  assert.match(planned.message, /^"Request": nothing written yet\. 2 files would change\. To write them, open Classical metadata → Activity → Tag requests and confirm\.$/);
+  assert.deepEqual(await bytes(), before);
+  const [request] = listRequests(input());
+  assert.deepEqual([request.mode, request.state, request.files.map((file) => file.status)], ["tag", "waiting", ["change", "change"]]);
+  assert.deepEqual(request.files[0].values.artist, [EXPECTED_ARTIST]);
+  assert.equal(request.files[0].current.artist[0], "Berliner Philharmoniker, Herbert von Karajan");
+  // No catalogue database is made by planning.
+  await assert.rejects(fs.access(path.join(folders.dataFolder, "model", "classical.sqlite")));
+
+  // The editor lists it under Activity and shows each file's change.
+  const editor = { ...input(), user: admin, pageId: "editor", capabilities: { adminForms: 2 } };
+  const started = [];
+  const maintenance = { status: async () => null, run: async (command, user, values) => (started.push([command, values]), { message: "started", selection: `tag-request:${values.request}` }) };
+  const activity = await readEditor({ ...editor, maintenance, query: { tab: "activity" } });
+  const row = activity.list.items.find((item) => item.selection === `tag-request:${request.id}`);
+  assert.equal(row.label, 'Tag as classical: "Request"');
+  assert.equal(row.badge.label, "Waiting for you");
+  const view = (await readEditor({ ...editor, maintenance, query: { tab: "activity", selection: row.selection } })).view;
+  assert.match(view.subtitle, /2 files would change\. Nothing is written until you confirm\./);
+  assert.match(view.sections[0].rows[0].detail, new RegExp(`Artist: Berliner Philharmoniker, Herbert von Karajan → ${EXPECTED_ARTIST}`));
+  const write = view.actions.find((a) => a.command === "maintenance-tag-request");
+  assert.deepEqual([write.label, write.arguments, Boolean(write.confirm)], ["Write 2 files", { request: request.id, confirm: true }, true]);
+  // The editor passes the confirmation on, and opens the request.
+  const confirmed = await mutateEditor({ ...editor, maintenance, mutation: { revision: activity.revision, command: write.command, values: write.arguments } });
+  assert.deepEqual([confirmed.ok, confirmed.selection], [true, `tag-request:${request.id}`]);
+  assert.deepEqual(started, [["maintenance-tag-request", { request: request.id, confirm: true }]]);
+  assert.deepEqual(await bytes(), before, "the stub wrote nothing");
+
+  // Someone edits the MP3 after the request; confirming writes the FLAC only.
+  await writeTags(two, { composer: ["Someone"] });
+  const result = await applyRequest(makeContext(input({ user: admin })), request.id, admin);
+  assert.equal(result.message, '"Request": 1 tagged, 1 skipped (changed since the request)');
+  assert.deepEqual([readTags(one).artist, readTags(two).composer], [EXPECTED_ARTIST, ["Someone"]]);
+  const done = readRequest(input(), request.id);
+  assert.deepEqual([done.state, done.files.map((file) => file.result.status)], ["done", ["tagged", "skipped"]]);
+  // Confirming again writes nothing more.
+  assert.equal((await applyRequest(makeContext(input({ user: admin })), request.id, admin)).message, result.message);
+
+  // Restore and Clear plan too; a request can be discarded unwritten.
+  const restore = await plugin.actions["untag-album"](input({ user: admin, album: { title: "Request", tracks: [{ path: one }] } }));
+  assert.match(restore.message, /nothing written yet\. 1 file would change/);
+  assert.equal(readTags(one).artist, EXPECTED_ARTIST);
+  const restoring = listRequests(input()).find((entry) => entry.mode === "restore");
+  assert.deepEqual(restoring.files[0].values.artist, ["Berliner Philharmoniker, Herbert von Karajan"]);
+  await (await import("../src/tag-requests.js")).discardRequest(input(), restoring.id);
+  assert.equal(readRequest(input(), restoring.id), null);
+  const clear = await plugin.actions["clear-classical"](input({ user: admin, album: { title: "Request", tracks: [{ path: one }] } }));
+  assert.match(clear.message, /nothing written yet/);
+  assert.equal(readTags(one).artist, EXPECTED_ARTIST);
+  // An album with nothing to change makes no request.
+  const none = await plugin.actions["tag-album"](input({ user: admin, album: { title: "Done", tracks: [{ path: one }] } }));
+  assert.equal(none.message, '"Done": nothing to write (1 already right).');
 });

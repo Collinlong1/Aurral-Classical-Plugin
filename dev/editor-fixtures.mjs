@@ -215,6 +215,35 @@ if (action === "prepare") {
   } finally {
     c.close();
   }
+} else if (action === "v03") {
+  // v0.3 9.3: contributor edits, a merge and a saved comparison, made through
+  // the live editor and Classical pages, for `check` to find after a restart.
+  const fixture = JSON.parse(await fs.readFile("/config/phase4-fixture.json", "utf8"));
+  const c = await openCatalogue("/config/plugin-data/aurral-classical/model");
+  let composer;
+  try {
+    composer = c.db.prepare("SELECT contributor_id AS id FROM credit WHERE target_id=? AND role='composer' AND state='active'").get(fixture.work)?.id;
+  } finally {
+    c.close();
+  }
+  assert.ok(composer, "the fixture work has a composer");
+  const editor = async (selection, command, values) => {
+    const page = await request(`/plugins/aurral-classical/pages/editor?selection=${encodeURIComponent(selection)}`);
+    const result = await request("/plugins/aurral-classical/pages/editor", { revision: page.revision, command, values });
+    assert.notEqual(result.ok, false, result.message);
+    return result;
+  };
+  await editor(composer, "save-entity", { target: composer, sortName: "Composer, Fixture", aliases: ["F. Composer"], date: "1801" });
+  const duplicate = (await editor("", "create-contributor", { name: "Fixture Komponist", kind: "person" })).selection;
+  await editor(duplicate, "merge-entity", { target: duplicate, into: composer, confirm: true });
+  // The whole-work comparison the work page offers, saved as this user's.
+  const resource = `/plugins/aurral-classical/resources/classical/${encodeURIComponent(`work:${fixture.work}`)}`;
+  const workPage = await request(resource);
+  const save = workPage.sections.find((section) => section.type === "header").actions.find((entry) => entry.mutation?.command === "save-queue");
+  assert.ok(save, "the work page offers a comparison");
+  await request(resource, { ...save.mutation, name: "Fixture comparison" });
+  await fs.writeFile("/config/v03-fixture.json", JSON.stringify({ composer, duplicate, items: save.mutation.itemIds }));
+  console.log("v0.3 fixtures made: contributor edits, a merge and a saved comparison");
 } else if (action === "check") {
   const evidence = JSON.parse(
     await fs.readFile("/config/editor-media-evidence.json", "utf8"),
@@ -296,10 +325,38 @@ if (action === "prepare") {
     "admin state is separate from regular-user state",
   );
   assert.equal(workPage.pickScope, "admin");
+  // v0.3 9.3, when the v03 step ran: contributor edits, the merge and the
+  // saved comparison are all still there.
+  const v03 = await fs.readFile("/config/v03-fixture.json", "utf8").then(JSON.parse, () => null);
+  if (v03) {
+    const c3 = await openCatalogue("/config/plugin-data/aurral-classical/model");
+    try {
+      const m3 = new Metadata(c3);
+      assert.deepEqual([m3.resolve(v03.composer, "sortName").value, m3.resolve(v03.composer, "date").value], ["Composer, Fixture", "1801"]);
+      assert.ok(c3.db.prepare("SELECT deleted_at FROM entity WHERE id=?").get(v03.duplicate).deleted_at, "the merged duplicate is gone");
+      const spellings = c3.db.prepare("SELECT text FROM alias WHERE entity_id=? ORDER BY text").all(v03.composer).map((row) => row.text);
+      assert.ok(spellings.includes("Fixture Komponist") && spellings.includes("F. Composer"), JSON.stringify(spellings));
+      assert.ok(c3.db.prepare("SELECT 1 FROM change_set WHERE kind='merge-person' AND undone_at IS NULL").get(), "the merge stays undoable");
+      assert.equal(c3.db.prepare("SELECT count(*) AS n FROM saved_queue WHERE name='Fixture comparison'").get().n, 1);
+    } finally {
+      c3.close();
+    }
+    const work = await request(`/plugins/aurral-classical/resources/classical/${encodeURIComponent(`work:${phase4Saved.work}`)}`);
+    const saved = work.sections.find((section) => section.id === "saved");
+    assert.equal(saved.rows[0].label, "Fixture comparison");
+    // The row links to /plugins/aurral-classical/classical/queue%3A<id>.
+    const queueId = decodeURIComponent(saved.rows[0].link.href.split("/").pop());
+    assert.match(queueId, /^queue:/);
+    const queue = await request(`/plugins/aurral-classical/resources/classical/${encodeURIComponent(queueId)}`);
+    const parts = queue.sections.find((section) => section.type === "tracks");
+    assert.deepEqual(parts.items.map((item) => item.id), v03.items, "the comparison plays the parts saved");
+    const person = await request(`/plugins/aurral-classical/resources/classical/${encodeURIComponent(`composer:${v03.composer}`)}`);
+    assert.match(person.sections[0].facts.map((fact) => fact.value).join(" "), /F\. Composer/);
+  }
   console.log(
-    "PASS: editor metadata, pinned blanks, movement order, attachments and media hashes survive restart",
+    `PASS: editor metadata, pinned blanks, movement order, attachments${v03 ? ", contributor edits, a merge, a saved comparison" : ""} and media hashes survive restart`,
   );
 } else
   throw new Error(
-    "Expected prepare, refresh, remember, phase4, phase4-bounds, phase4-reset or check",
+    "Expected prepare, refresh, remember, phase4, phase4-bounds, phase4-reset, v03 or check",
   );

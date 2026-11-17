@@ -1,4 +1,5 @@
 import path from "node:path";
+import { listRequests } from "../tag-requests.js";
 import { createHash } from "node:crypto";
 import { openCatalogue, CREDIT_ROLES, PERSON_ROLES, ENSEMBLE_ROLES } from "./catalogue.js";
 import { Metadata } from "./metadata.js";
@@ -1175,6 +1176,9 @@ export async function readEditor(input) {
         query.tab === "activity" || String(query.selection || "").startsWith("slskd:")
           ? await searchDiagnostics({ dataFolder: input.dataFolder })
           : null;
+      // Tag requests the album and artist menus planned (v0.3 8.7), kept in the data folder.
+      const tagRequests =
+        query.tab === "activity" || String(query.selection || "").startsWith("tag-request:") ? listRequests({ dataFolder: input.dataFolder }) : null;
       // The search index is brought up to date before the snapshot: a page
       // read never writes.
       if (query.tab === "search" && query.q) ensureSearchIndex(c);
@@ -1184,6 +1188,7 @@ export async function readEditor(input) {
           : renderV2(c, query, revision(c, query.selection || ""), {
               downloads,
               maintenance,
+              tagRequests,
               formActions: input.capabilities.formActions === true,
               orderField: input.capabilities.orderField === true,
             }),
@@ -1201,7 +1206,9 @@ export async function mutateEditor(input) {
     actor(input);
     if (!input.maintenance) return { ok: false, status: 400, message: "Maintenance needs the plugin's runtime" };
     try {
-      return { ok: true, message: await input.maintenance.run(input.mutation.command, input.user), selection: "maintenance" };
+      const result = await input.maintenance.run(input.mutation.command, input.user, input.mutation.values || {});
+      // A command may name the page to show: a tag request it started.
+      return typeof result === "string" ? { ok: true, message: result, selection: "maintenance" } : { ok: true, ...result };
     } catch (error) {
       return { ok: false, status: 400, message: String(error.message || error).slice(0, 500) };
     }

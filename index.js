@@ -4014,7 +4014,7 @@ var require_byteVector = __commonJS({
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ByteVector = exports.Encoding = exports.StringType = void 0;
     var IConv = require_lib();
-    var fs10 = __require("fs");
+    var fs11 = __require("fs");
     var utils_1 = require_utils();
     var StringType2;
     (function(StringType3) {
@@ -4235,9 +4235,9 @@ var require_byteVector = __commonJS({
        * Creates a {@link ByteVector} using the contents of a file as the data
        * @param path Path to the file to store in the ByteVector
        */
-      static fromPath(path18) {
-        utils_1.Guards.truthy(path18, "path");
-        const fileBuffer = fs10.readFileSync(path18);
+      static fromPath(path19) {
+        utils_1.Guards.truthy(path19, "path");
+        const fileBuffer = fs11.readFileSync(path19);
         return _ByteVector.fromByteArray(fileBuffer);
       }
       /**
@@ -5252,7 +5252,7 @@ var require_stream = __commonJS({
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Stream = exports.SeekOrigin = void 0;
-    var fs10 = __require("fs");
+    var fs11 = __require("fs");
     var utils_1 = require_utils();
     var byteVector_1 = require_byteVector();
     var SeekOrigin;
@@ -5267,14 +5267,14 @@ var require_stream = __commonJS({
         this._canWrite = canWrite;
         this._fd = fd;
         this._position = 0;
-        this._length = fs10.fstatSync(fd).size;
+        this._length = fs11.fstatSync(fd).size;
       }
-      static createAsRead(path18) {
-        const fd = fs10.openSync(path18, "r");
+      static createAsRead(path19) {
+        const fd = fs11.openSync(path19, "r");
         return new _Stream(fd, false);
       }
-      static createAsReadWrite(path18) {
-        const fd = fs10.openSync(path18, "r+");
+      static createAsReadWrite(path19) {
+        const fd = fs11.openSync(path19, "r+");
         return new _Stream(fd, true);
       }
       // #endregion
@@ -5300,11 +5300,11 @@ var require_stream = __commonJS({
       // #region Public Methods
       /** @inheritDoc */
       close() {
-        fs10.closeSync(this._fd);
+        fs11.closeSync(this._fd);
       }
       /** @inheritDoc */
       read(buffer, bufferOffset, length) {
-        const bytes = fs10.readSync(this._fd, buffer, bufferOffset, length, this._position);
+        const bytes = fs11.readSync(this._fd, buffer, bufferOffset, length, this._position);
         this._position += bytes;
         return bytes;
       }
@@ -5332,7 +5332,7 @@ var require_stream = __commonJS({
         if (length === this._length) {
           return;
         }
-        fs10.ftruncateSync(this._fd, length);
+        fs11.ftruncateSync(this._fd, length);
         this._length = length;
         if (this._position > this._length) {
           this._position = this._length;
@@ -5347,7 +5347,7 @@ var require_stream = __commonJS({
           throw new Error("Invalid operation: this stream is a read-only stream");
         }
         const origLength = this._length;
-        const bytes = fs10.writeSync(this._fd, buffer, bufferOffset, length, this._position);
+        const bytes = fs11.writeSync(this._fd, buffer, bufferOffset, length, this._position);
         this._position += bytes;
         if (this._position > origLength) {
           this._length = this._position;
@@ -5373,9 +5373,9 @@ var require_fileAbstraction = __commonJS({
        * @param path Path of the file to use in the new instance
        * @throws Error Thrown if `path` is falsy
        */
-      constructor(path18) {
-        utils_1.Guards.truthy(path18, "path");
-        this._name = path18;
+      constructor(path19) {
+        utils_1.Guards.truthy(path19, "path");
+        this._name = path19;
       }
       /** @inheritDoc */
       get name() {
@@ -7416,7 +7416,7 @@ var init_v1 = __esm({
 });
 
 // node_modules/uuid/dist/esm-node/parse.js
-function parse2(uuid) {
+function parse(uuid) {
   if (!validate_default(uuid)) {
     throw TypeError("Invalid UUID");
   }
@@ -7444,7 +7444,7 @@ var parse_default;
 var init_parse = __esm({
   "node_modules/uuid/dist/esm-node/parse.js"() {
     init_validate();
-    parse_default = parse2;
+    parse_default = parse;
   }
 });
 
@@ -8655,7 +8655,7 @@ var require_picture = __commonJS({
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PictureLazy = exports.Picture = exports.PictureType = void 0;
-    var path18 = __require("path");
+    var path19 = __require("path");
     var byteVector_1 = require_byteVector();
     var fileAbstraction_1 = require_fileAbstraction();
     var utils_1 = require_utils();
@@ -8700,7 +8700,7 @@ var require_picture = __commonJS({
         utils_1.Guards.truthy(filePath, "filePath");
         const picture = new _Picture();
         picture.data = byteVector_1.ByteVector.fromPath(filePath);
-        picture.filename = path18.basename(filePath);
+        picture.filename = path19.basename(filePath);
         picture.description = picture.filename;
         picture.mimeType = _Picture.getMimeTypeFromFilename(picture.filename);
         picture.type = picture.mimeType.startsWith("image/") ? PictureType.FrontCover : PictureType.NotAPicture;
@@ -9049,7 +9049,7 @@ var require_picture = __commonJS({
         utils_1.Guards.truthy(filePath, "path");
         const picture = new _PictureLazy();
         picture._file = new fileAbstraction_1.LocalFileAbstraction(filePath);
-        picture._filename = path18.basename(filePath);
+        picture._filename = path19.basename(filePath);
         picture._description = picture._filename;
         picture._mimeType = Picture.getMimeTypeFromFilename(picture._filename);
         picture._type = picture._mimeType.startsWith("image/") ? PictureType.FrontCover : PictureType.NotAPicture;
@@ -35206,20 +35206,1238 @@ var require_dist = __commonJS({
 });
 
 // src/index.js
-import path17 from "node:path";
+import path18 from "node:path";
 import { Worker, isMainThread, parentPort, workerData } from "node:worker_threads";
 
 // src/model/editor.js
-import path11 from "node:path";
+import path12 from "node:path";
+
+// src/tag-requests.js
+import { randomUUID as randomUUID4 } from "node:crypto";
+import fs5 from "node:fs";
+import fsp from "node:fs/promises";
+import path5 from "node:path";
+
+// src/tags.js
+var import_node_taglib_sharp = __toESM(require_dist(), 1);
+import { randomUUID } from "node:crypto";
+import { closeSync, fstatSync, openSync, readSync } from "node:fs";
+import fs from "node:fs/promises";
+import path from "node:path";
+import_node_taglib_sharp.Id3v2Settings.useNumericGenres = false;
+var READ_STYLE = import_node_taglib_sharp.ReadStyle.None | import_node_taglib_sharp.ReadStyle.PictureLazy;
+var READ_WITH_PROPERTIES = import_node_taglib_sharp.ReadStyle.Average | import_node_taglib_sharp.ReadStyle.PictureLazy;
+var ADDED_TAG_TYPES = import_node_taglib_sharp.TagTypes.Id3v1 | import_node_taglib_sharp.TagTypes.Ape | import_node_taglib_sharp.TagTypes.MovieId | import_node_taglib_sharp.TagTypes.DivX;
+var ITUNES_MEAN = "com.apple.iTunes";
+var MUSICBRAINZ_UFID_OWNER = "http://musicbrainz.org";
+var AUDIO_EXTENSIONS = /* @__PURE__ */ new Set([".flac", ".mp3", ".m4a", ".mp4", ".ogg", ".oga", ".opus"]);
+var isAudioPath = (file) => AUDIO_EXTENSIONS.has(path.extname(file).toLowerCase());
+var text = (value) => value == null ? "" : String(value).trim();
+var texts = (value) => (Array.isArray(value) ? value : [value]).map(text).filter(Boolean);
+var positive = (value) => {
+  const number = Number(value);
+  return Number.isSafeInteger(number) && number > 0 ? number : 0;
+};
+var xiphOf = (file) => file.getTag(import_node_taglib_sharp.TagTypes.Xiph, false);
+var id3Of = (file) => file.getTag(import_node_taglib_sharp.TagTypes.Id3v2, false);
+var appleOf = (file) => file.getTag(import_node_taglib_sharp.TagTypes.Apple, false);
+function userTextFrames(id3, description) {
+  const wanted = description.toLowerCase();
+  return id3.getFramesByClassType(import_node_taglib_sharp.Id3v2FrameClassType.UserTextInformationFrame).filter((frame) => frame.description.toLowerCase() === wanted);
+}
+function textField(xiphName, id3Description, apple) {
+  const box = apple.box ? import_node_taglib_sharp.ByteVector.fromString(apple.box, import_node_taglib_sharp.StringType.Latin1) : null;
+  return {
+    read(file) {
+      const xiph = xiphOf(file);
+      const id3 = id3Of(file);
+      const appleTag = appleOf(file);
+      for (const values of [
+        xiph?.getField(xiphName),
+        id3 && userTextFrames(id3, id3Description).flatMap((frame) => frame.text || []),
+        appleTag && (box ? appleTag.getQuickTimeStrings(box) : appleTag.getItunesStrings(ITUNES_MEAN, apple.name))
+      ]) {
+        const found = texts(values ?? []);
+        if (found.length) return found;
+      }
+      return [];
+    },
+    write(file, values) {
+      const xiph = xiphOf(file);
+      if (xiph) xiph.setFieldAsStrings(xiphName, ...values);
+      const appleTag = appleOf(file);
+      if (appleTag) {
+        if (box) appleTag.setQuickTimeStrings(box, values);
+        else appleTag.setItunesStrings(ITUNES_MEAN, apple.name, ...values);
+      }
+      const id3 = id3Of(file);
+      if (id3) {
+        for (const frame of userTextFrames(id3, id3Description)) id3.removeFrame(frame);
+        if (values.length) {
+          const frame = import_node_taglib_sharp.Id3v2UserTextInformationFrame.fromDescription(id3Description);
+          frame.text = values;
+          id3.addFrame(frame);
+        }
+      }
+    }
+  };
+}
+var workField = textField("WORK", "WORK", { box: "\xA9wrk" });
+var workIdField = textField("MUSICBRAINZ_WORKID", "MusicBrainz Work Id", { name: "MusicBrainz Work Id" });
+var artistIdsField = textField("MUSICBRAINZ_ARTISTID", "MusicBrainz Artist Id", { name: "MusicBrainz Artist Id" });
+var albumArtistIdsField = textField("MUSICBRAINZ_ALBUMARTISTID", "MusicBrainz Album Artist Id", { name: "MusicBrainz Album Artist Id" });
+var movementNameField = textField("MOVEMENTNAME", "MOVEMENTNAME", { name: "MOVEMENTNAME" });
+var movementNumberField = textField("MOVEMENT", "MOVEMENT", { name: "MOVEMENT" });
+var movementTotalField = textField("MOVEMENTTOTAL", "MOVEMENTTOTAL", { name: "MOVEMENTTOTAL" });
+var catalogueField = textField("CLASSICAL_CATALOGUE", "CLASSICAL_CATALOGUE", { name: "CLASSICAL_CATALOGUE" });
+var performersField = {
+  read: (file) => texts(xiphOf(file)?.getField("PERFORMER") ?? []),
+  write(file, values) {
+    xiphOf(file)?.setFieldAsStrings("PERFORMER", ...values);
+  }
+};
+var WRITERS = {
+  title: {
+    read: (file) => texts(file.tag.title),
+    write: (file, values) => file.tag.title = values[0] ?? void 0
+  },
+  artist: {
+    read: (file) => texts(file.tag.performers),
+    write: (file, values) => file.tag.performers = values
+  },
+  albumArtist: {
+    read: (file) => texts(file.tag.albumArtists),
+    write: (file, values) => file.tag.albumArtists = values
+  },
+  composer: {
+    read: (file) => texts(file.tag.composers),
+    write: (file, values) => file.tag.composers = values
+  },
+  composerSort: {
+    read: (file) => texts(file.tag.composersSort),
+    write: (file, values) => file.tag.composersSort = values
+  },
+  conductor: {
+    read: (file) => texts(file.tag.conductor),
+    write: (file, values) => file.tag.conductor = values[0] ?? void 0
+  },
+  performers: performersField,
+  movementName: movementNameField,
+  movementNumber: movementNumberField,
+  movementTotal: movementTotalField,
+  catalogue: catalogueField,
+  work: { read: (file) => workField.read(file), write: (file, values) => workField.write(file, values) },
+  workId: { read: (file) => workIdField.read(file), write: (file, values) => workIdField.write(file, values) },
+  recordingMbid: {
+    read: (file) => texts(file.tag.musicBrainzTrackId),
+    write: (file, values) => {
+      const id3 = id3Of(file);
+      for (const frame of id3?.getFramesByClassType(import_node_taglib_sharp.Id3v2FrameClassType.UniqueFileIdentifierFrame) || []) {
+        if (frame.owner === MUSICBRAINZ_UFID_OWNER) id3.removeFrame(frame);
+      }
+      file.tag.musicBrainzTrackId = values[0] ?? void 0;
+    }
+  }
+};
+var CLASSICAL_FIELDS = ["composer", "composerSort", "work", "movementName", "movementNumber", "movementTotal", "performers", "conductor", "catalogue", "workId"];
+var NOT_ID3 = /* @__PURE__ */ new Set(["movementName", "movementNumber", "movementTotal", "performers"]);
+var FORMAT_FIELDS = {
+  ".flac": CLASSICAL_FIELDS,
+  ".mp3": CLASSICAL_FIELDS.filter((field2) => !NOT_ID3.has(field2))
+};
+var writableFields = (filePath) => FORMAT_FIELDS[path.extname(String(filePath || "")).toLowerCase()] || [];
+function isFragmentedMp4(filePath) {
+  const fd = openSync(filePath, "r");
+  try {
+    const size = fstatSync(fd).size;
+    const header = Buffer.alloc(16);
+    for (let offset = 0; offset + 8 <= size; ) {
+      readSync(fd, header, 0, 16, offset);
+      const type = header.toString("latin1", 4, 8);
+      if (offset === 0 && type !== "ftyp") return false;
+      if (type === "moof") return true;
+      const boxSize = header.readUInt32BE(0);
+      const length = boxSize === 1 ? Number(header.readBigUInt64BE(8)) : boxSize === 0 ? size - offset : boxSize;
+      if (length < 8) return false;
+      offset += length;
+    }
+    return false;
+  } finally {
+    closeSync(fd);
+  }
+}
+var UnsupportedFormat = class extends Error {
+};
+function openFile(filePath, readStyle = READ_STYLE, asPath = filePath) {
+  if (!isAudioPath(asPath)) throw new UnsupportedFormat(`can't tag ${path.extname(asPath) || "this kind of"} files`);
+  if (isFragmentedMp4(filePath)) throw new UnsupportedFormat("can't tag fragmented MP4 files");
+  try {
+    return import_node_taglib_sharp.File.createFromPath(filePath, `taglib/${path.extname(asPath).slice(1).toLowerCase()}`, readStyle);
+  } catch (error) {
+    if (/unsupported format/i.test(String(error?.message))) throw new UnsupportedFormat("can't tag this kind of file");
+    throw error;
+  }
+}
+function readValues(filePath, fields) {
+  const file = openFile(filePath);
+  try {
+    return Object.fromEntries(fields.map((field2) => [field2, WRITERS[field2].read(file)]));
+  } finally {
+    file.dispose();
+  }
+}
+function readTags(filePath) {
+  const file = openFile(filePath, READ_WITH_PROPERTIES);
+  try {
+    const tag = file.tag;
+    return {
+      title: text(tag.title),
+      artist: text(tag.performers?.[0]),
+      albumArtist: text(tag.albumArtists?.[0]),
+      album: text(tag.album),
+      recordingMbid: text(tag.musicBrainzTrackId),
+      releaseMbid: text(tag.musicBrainzReleaseId),
+      releaseGroupMbid: text(tag.musicBrainzReleaseGroupId),
+      // Every album artist ID: taglib's own property has only the first.
+      albumArtistMbids: [...new Set([...albumArtistIdsField.read(file), text(tag.musicBrainzReleaseArtistId)].flatMap((v) => texts(v.split(/[;/]/))))],
+      artistMbids: artistIdsField.read(file).flatMap((value) => texts(value.split(/[;/]/))),
+      conductor: text(tag.conductor),
+      // Vorbis PERFORMER, one value a performer, often with the instrument
+      // in brackets: "Martha Argerich (piano)".
+      performers: texts(xiphOf(file)?.getField("PERFORMER") ?? []),
+      genres: texts(tag.genres ?? []).flatMap((genre) => texts(genre.split(";"))),
+      composer: texts(tag.composers ?? []),
+      work: workField.read(file)[0] ?? "",
+      // Some taggers put the work here and leave WORK empty.
+      grouping: text(tag.grouping),
+      workId: workIdField.read(file)[0] ?? "",
+      trackNumber: positive(tag.track),
+      discNumber: positive(tag.disc),
+      durationMs: Math.round(file.properties?.durationMilliseconds || 0),
+      year: Number.isSafeInteger(tag.year) && tag.year > 0 ? tag.year : null,
+      label: text(tag.publisher)
+    };
+  } finally {
+    file.dispose();
+  }
+}
+var same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+async function writeTags(filePath, values) {
+  const source = path.resolve(filePath);
+  const preview = openFile(source);
+  let changed;
+  try {
+    changed = Object.keys(values).filter((field2) => !same(WRITERS[field2].read(preview), texts(values[field2])));
+  } finally {
+    preview.dispose();
+  }
+  if (!changed.length) return [];
+  const extension = path.extname(source);
+  const working = path.join(path.dirname(source), `.${path.basename(source, extension)}.${randomUUID()}.tagging`);
+  await fs.copyFile(source, working, fs.constants.COPYFILE_FICLONE);
+  try {
+    const file = openFile(working, READ_STYLE, source);
+    try {
+      file.removeTags(ADDED_TAG_TYPES & ~file.tagTypesOnDisk);
+      const id3 = id3Of(file);
+      if (id3 && !(file.tagTypesOnDisk & import_node_taglib_sharp.TagTypes.Id3v2)) id3.version = 4;
+      for (const field2 of changed) WRITERS[field2].write(file, texts(values[field2]));
+      file.save();
+    } finally {
+      file.dispose();
+    }
+    const verified2 = openFile(working, READ_STYLE, source);
+    try {
+      for (const field2 of changed) {
+        if (!same(WRITERS[field2].read(verified2), texts(values[field2])))
+          throw new Error(`Tag verification failed for ${field2}`);
+      }
+    } finally {
+      verified2.dispose();
+    }
+    await fs.rename(working, source);
+  } catch (error) {
+    await fs.rm(working, { force: true }).catch(() => {
+    });
+    throw error;
+  }
+  return changed;
+}
+
+// src/tagger.js
+import { randomUUID as randomUUID3 } from "node:crypto";
+
+// src/model/write-guard.js
+import fs2 from "node:fs/promises";
+import path2 from "node:path";
+async function modelAllowsTagging(ctx, realPath) {
+  const filename = path2.join(ctx.dataFolder, "model", "classical.sqlite");
+  try {
+    await fs2.access(filename);
+  } catch (error) {
+    if (error.code === "ENOENT") return true;
+    throw error;
+  }
+  let db;
+  try {
+    const { DatabaseSync } = await import("node:sqlite");
+    db = new DatabaseSync(filename, { readOnly: true });
+    const rows = db.prepare(
+      `SELECT t.state AS link_state,c.state FROM track_link t
+      LEFT JOIN classification c ON c.target_id=t.id
+      WHERE json_extract(t.evidence,'$.observedRealPath')=? OR json_extract(t.evidence,'$.path')=? OR json_extract(t.evidence,'$.readPath')=?`
+    ).all(realPath, realPath, realPath);
+    return !rows.length || rows.every(
+      (row) => row.link_state === "active" && row.state === "classical"
+    );
+  } catch (error) {
+    ctx.log?.(`Classical model cannot authorize tagging: ${error.message}`);
+    return false;
+  } finally {
+    db?.close();
+  }
+}
+
+// src/tagger.js
+import fs4 from "node:fs/promises";
+import path4 from "node:path";
+
+// src/works.js
+var SUFFIX = "(?:[a-z]{1,3}(?![a-z]))?";
+var CATALOGUES = [
+  [/\bBWV\s*(\d+[a-z]?)/i, "BWV"],
+  [/\bHWV\s*(\d+[a-z]?)/i, "HWV"],
+  [/\bRV\s*(\d+[a-z]?)/i, "RV"],
+  [/\bK(?:V|\.)?\s*(\d+[a-z]?)\b/, "K"],
+  [/\bD\.?\s*(\d+[a-z]?)\b/, "D"],
+  [/\bHob\.?\s*([IVXL]+[a-z]?:\s*\d+[a-z]?)/i, "Hob"],
+  [new RegExp(`\\bWoO\\s*(\\d+${SUFFIX})`, "i"), "WoO"],
+  // "S. 161", and Hyperion's "S161", "S166r" or "S534ii/bis". Searle's own
+  // sub-numbers after a slash name a piece too ("S. 534/2b", "S. 385/3",
+  // "S163d/ii").
+  [new RegExp(`\\bS(?:\\.\\s*|(?=\\d))(\\d+${SUFFIX}(?:\\/(?:bis|[ivx]{1,4}(?![a-z])|\\d+${SUFFIX}))?)`), "S"],
+  [new RegExp(`\\bSz\\.?\\s*(\\d+${SUFFIX})`, "i"), "Sz"],
+  [new RegExp(`\\bBB\\s*(\\d+${SUFFIX})`), "BB"],
+  [new RegExp(`\\bTrV\\s*(\\d+${SUFFIX})`, "i"), "TrV"],
+  [new RegExp(`\\bL\\.\\s*(\\d+${SUFFIX})`), "L"],
+  [new RegExp(`\\bFP\\s*(\\d+${SUFFIX})`), "FP"],
+  // Ravel's (Marnat): "Boléro, M 81", "Pavane…, M.19". Capital M only.
+  // "M. 63/2" is the second of M. 63's pieces.
+  [new RegExp(`(?<![\\p{L}\\d])M(?:\\.\\s*|\\s+)(\\d+${SUFFIX}(?:\\/\\d+)?)(?![\\d])`, "u"), "M"]
+];
+var OPUS = /\bop(?:us|\.)?\s*(\d+[a-z]?)(?:\s*,?\s*(?:no\.?|nr\.?|n°)\s*(\d+))?/i;
+var PIECE = /^\s*,?\s*(?:no\.?|nr\.?|n°)\s*(\d+[a-z]{0,3})(?![a-z\d])/i;
+function catalogueMatch(title) {
+  const text7 = String(title || "");
+  for (const [pattern, prefix] of CATALOGUES) {
+    const match2 = text7.match(pattern);
+    if (match2) return { prefix, number: match2[1].replace(/\s+/g, ""), end: match2.index + match2[0].length, text: text7 };
+  }
+  return null;
+}
+function catalogueNumber(title) {
+  const match2 = catalogueMatch(title);
+  if (match2) return `${match2.prefix} ${match2.number}`;
+  const opus = String(title || "").match(OPUS);
+  if (opus) return `op ${opus[1]}${opus[2] ? ` no ${opus[2]}` : ""}`;
+  return "";
+}
+function cataloguePiece(title) {
+  const match2 = catalogueMatch(title);
+  return match2 ? match2.text.slice(match2.end).match(PIECE)?.[1]?.toLowerCase() || "" : "";
+}
+function shortWorkTitle(title) {
+  let text7 = String(title || "").split(":")[0];
+  text7 = text7.replace(OPUS, " ");
+  for (const [pattern] of CATALOGUES) text7 = text7.replace(pattern, " ");
+  text7 = text7.replace(/\bin\s+[A-G](?:[- ]?(?:flat|sharp|♭|♯|b|#))?\s*(?:major|minor|maj|min|dur|moll)\b/gi, " ").replace(/\b(?:no|nr|n°)\.?\s*(?=\d)/gi, " ").replace(/[“”"'’,;()[\]]/g, " ");
+  return searchWords(text7);
+}
+function searchWords(text7) {
+  return String(text7 || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim().split(/\s+/).filter(Boolean).join(" ");
+}
+function surname(person) {
+  if (!person) return "";
+  const sort = String(person.sortName || "");
+  if (sort.includes(",")) return searchWords(sort.split(",")[0]);
+  return searchWords(person.name);
+}
+function creditString(credit) {
+  return (credit || []).map((entry) => `${entry.name ?? entry.artist?.name ?? ""}${entry.joinphrase ?? ""}`).join("").trim();
+}
+async function topWork(mb, work, depth = 0, inc = "artist-rels+work-rels", { stop: stop2 = () => false } = {}) {
+  if (!work || depth >= 3) return work;
+  const parent = (work.relations || []).find((rel) => rel.type === "parts" && rel.direction === "backward" && rel.work?.id);
+  if (!parent) return work;
+  const data = await mb.get("work", parent.work.id, inc);
+  return data && !stop2(data, work) ? topWork(mb, data, depth + 1, inc, { stop: stop2 }) : work;
+}
+var RELEASE_INC = "recordings+artist-credits+release-groups+media";
+function releaseYear(date) {
+  const year = Number(String(date || "").slice(0, 4));
+  return Number.isInteger(year) && year > 0 ? year : null;
+}
+
+// src/aurral.js
+var Aurral = class {
+  constructor(api, fetchImpl = fetch) {
+    if (!api?.url || !api?.key) throw new Error("Aurral API access is off. Turn it on on the plugin's page.");
+    this.url = api.url.replace(/\/+$/, "");
+    this.key = api.key;
+    this.fetch = fetchImpl;
+  }
+  async request(method, route, body) {
+    const response = await this.fetch(`${this.url}${route}`, {
+      method,
+      headers: { "X-Api-Key": this.key, ...body !== void 0 && { "Content-Type": "application/json" } },
+      body: body === void 0 ? void 0 : JSON.stringify(body),
+      signal: AbortSignal.timeout(3e4)
+    });
+    const data = await response.json().catch(() => null);
+    if (!response.ok) {
+      const detail = data?.message || data?.error || response.statusText;
+      throw new Error(`Aurral answered ${response.status} for ${route}: ${detail}`);
+    }
+    return data;
+  }
+  // Re-reads files whose tags changed, so the Library shows the new ones.
+  refreshLibrary() {
+    return this.request("POST", "/library/refresh", { mode: "quick" });
+  }
+  users() {
+    return this.request("GET", "/users");
+  }
+  async staticPlaylists() {
+    const status = await this.request("GET", "/playlists/status");
+    return status?.staticPlaylists ?? [];
+  }
+  createPlaylist(name, tracks) {
+    return this.request("POST", "/playlists/static-playlists", { name, tracks, downloadMissing: true });
+  }
+  updatePlaylist(id, name, tracks) {
+    return this.request("PUT", `/playlists/static-playlists/${encodeURIComponent(id)}`, { name, tracks });
+  }
+};
+
+// src/store.js
+import { createHash, randomUUID as randomUUID2 } from "node:crypto";
+import fs3 from "node:fs/promises";
+import path3 from "node:path";
+var sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+async function readJson(file, fallback) {
+  try {
+    return JSON.parse(await fs3.readFile(file, "utf8"));
+  } catch {
+    return fallback;
+  }
+}
+async function writeJson(file, value) {
+  await fs3.mkdir(path3.dirname(file), { recursive: true });
+  const temp = `${file}.${process.pid}.${randomUUID2()}.tmp`;
+  await fs3.writeFile(temp, JSON.stringify(value));
+  await fs3.rename(temp, file);
+}
+async function tryLock(dir, staleMs) {
+  try {
+    await fs3.mkdir(dir);
+  } catch (error) {
+    if (error.code !== "EEXIST") throw error;
+    const stat = await fs3.stat(dir).catch(() => null);
+    if (stat && Date.now() - stat.mtimeMs < staleMs) return null;
+    await fs3.rm(dir, { recursive: true, force: true });
+    try {
+      await fs3.mkdir(dir);
+    } catch {
+      return null;
+    }
+  }
+  let released = false;
+  return {
+    async touch() {
+      if (released) return;
+      const now = /* @__PURE__ */ new Date();
+      await fs3.utimes(dir, now, now).catch(() => {
+      });
+    },
+    async release() {
+      released = true;
+      await fs3.rm(dir, { recursive: true, force: true }).catch(() => {
+      });
+    }
+  };
+}
+async function withLock(dir, staleMs, run, { waitMs = 3e4 } = {}) {
+  const until = Date.now() + waitMs;
+  for (; ; ) {
+    const lock = await tryLock(dir, staleMs);
+    if (lock) {
+      try {
+        return await run(lock);
+      } finally {
+        await lock.release();
+      }
+    }
+    if (Date.now() > until) throw new Error(`Timed out waiting for ${path3.basename(dir)}`);
+    await sleep(50 + Math.random() * 100);
+  }
+}
+var Throttle = class {
+  constructor(folder2, intervalMs) {
+    this.lockDir = path3.join(folder2, "mb-throttle.lock");
+    this.stateFile = path3.join(folder2, "mb-throttle.json");
+    this.intervalMs = intervalMs;
+  }
+  async run(dispatch) {
+    if (!this.intervalMs) return dispatch();
+    return withLock(this.lockDir, 12e4, async () => {
+      const state = await readJson(this.stateFile, { next: 0 });
+      const wait = (Number(state.next) || 0) - Date.now();
+      if (wait > 0) await sleep(wait);
+      await writeJson(this.stateFile, { next: Date.now() + this.intervalMs });
+      try {
+        return await dispatch();
+      } finally {
+        await writeJson(this.stateFile, { next: Date.now() + this.intervalMs });
+      }
+    }, { waitMs: 12e4 });
+  }
+};
+var FileCache = class {
+  constructor(folder2) {
+    this.folder = folder2;
+  }
+  file(key) {
+    const hash = createHash("sha1").update(key).digest("hex");
+    return path3.join(this.folder, hash.slice(0, 2), `${hash}.json`);
+  }
+  async get(key, ttlMs) {
+    const entry = await readJson(this.file(key), null);
+    if (!entry || Date.now() - entry.time > ttlMs) return null;
+    return entry.value;
+  }
+  async set(key, value) {
+    await writeJson(this.file(key), { time: Date.now(), key, value }).catch(() => {
+    });
+  }
+};
+async function pruneCache(folder2, maxAgeMs) {
+  const stamp = path3.join(folder2, ".pruned");
+  const last3 = (await fs3.stat(stamp).catch(() => null))?.mtimeMs ?? 0;
+  if (Date.now() - last3 < 24 * 60 * 6e4) return 0;
+  await fs3.mkdir(folder2, { recursive: true });
+  await fs3.writeFile(stamp, "");
+  let removed = 0;
+  for (const dir of await fs3.readdir(folder2).catch(() => [])) {
+    const sub = path3.join(folder2, dir);
+    for (const name of await fs3.readdir(sub).catch(() => [])) {
+      const file = path3.join(sub, name);
+      const stat = await fs3.stat(file).catch(() => null);
+      if (stat && Date.now() - stat.mtimeMs > maxAgeMs) {
+        await fs3.rm(file, { force: true });
+        removed++;
+      }
+    }
+  }
+  return removed;
+}
+
+// src/tagger.js
+var LOCK_STALE_MS = 2 * 6e4;
+var SAVE_EVERY_MS = 3e4;
+var queueDir = (ctx) => path4.join(ctx.dataFolder, "queue");
+var processedFile = (ctx) => path4.join(ctx.dataFolder, "processed.json");
+var indexFile = (ctx) => path4.join(ctx.dataFolder, "library-index.json");
+var originalsFile = (ctx) => path4.join(ctx.dataFolder, "originals.json");
+var excludedFile = (ctx) => path4.join(ctx.dataFolder, "excluded.json");
+var TAG_FIELDS = ["artist", "albumArtist", "composer", "work", "workId"];
+var TAGGING_VERSION = 2;
+var outdated = (record) => record && (record.status === "tagged" || record.status === "unchanged") && (record.v ?? 1) < TAGGING_VERSION;
+var lockDir = (ctx) => path4.join(ctx.dataFolder, "tagging.lock");
+var yieldFile = (ctx) => path4.join(ctx.dataFolder, "tagging.yield");
+var YIELD_FRESH_MS = 10 * 6e4;
+var PRIORITY_WAIT_MS = 5 * 6e4;
+var ACTION_CLAIM_MS = 2 * 6e4;
+async function enqueue(ctx, filePaths, { force = false, source = null } = {}) {
+  await fs4.mkdir(queueDir(ctx), { recursive: true });
+  const ids = [];
+  for (const filePath of filePaths) {
+    if (!filePath) continue;
+    const id = `${Date.now().toString().padStart(15, "0")}-${randomUUID3()}`;
+    await writeJson(path4.join(queueDir(ctx), `${id}.json`), { path: filePath, force, source, at: Date.now() });
+    ids.push(id);
+  }
+  return ids;
+}
+async function queuedEntries(ctx) {
+  const names = (await fs4.readdir(queueDir(ctx)).catch(() => [])).filter((n) => n.endsWith(".json")).sort();
+  return names.map((name) => ({ name, file: path4.join(queueDir(ctx), name) }));
+}
+var queueLength = async (ctx) => (await queuedEntries(ctx)).length;
+async function allowedPath(ctx, filePath) {
+  const real = await fs4.realpath(filePath).catch(() => null);
+  if (!real) return null;
+  for (const root of [ctx.libraryFolder, ctx.dataFolder]) {
+    if (!root) continue;
+    const base = await fs4.realpath(root).catch(() => null);
+    if (!base) continue;
+    const relative = path4.relative(base, real);
+    if (relative && !relative.startsWith("..") && !path4.isAbsolute(relative)) return real;
+  }
+  return null;
+}
+var statKey = (stat) => ({ mtimeMs: Math.round(stat.mtimeMs), size: stat.size });
+var sameStat = (record, stat) => record && record.mtimeMs === Math.round(stat.mtimeMs) && record.size === stat.size;
+function indexEntry(tags, stat) {
+  return {
+    ...statKey(stat),
+    title: tags.title,
+    artist: tags.artist,
+    album: tags.album,
+    albumArtist: tags.albumArtist,
+    recordingMbid: tags.recordingMbid,
+    releaseMbid: tags.releaseMbid,
+    releaseGroupMbid: tags.releaseGroupMbid,
+    albumArtistMbids: tags.albumArtistMbids,
+    trackNumber: tags.trackNumber,
+    discNumber: tags.discNumber,
+    durationMs: tags.durationMs,
+    workId: tags.workId
+  };
+}
+var State = class {
+  constructor(ctx, lock) {
+    this.ctx = ctx;
+    this.lock = lock;
+    this.dirty = 0;
+    this.savedAt = Date.now();
+    this.refs = 0;
+    this.admins = 0;
+    this.background = 0;
+    this.claimed = /* @__PURE__ */ new Set();
+    this.busyPaths = /* @__PURE__ */ new Map();
+  }
+  async load() {
+    this.processed = await readJson(processedFile(this.ctx), {});
+    this.index = await readJson(indexFile(this.ctx), {});
+    this.originals = await readJson(originalsFile(this.ctx), {});
+    this.excluded = await readJson(excludedFile(this.ctx), {});
+  }
+  // Saved every 30 seconds while working, and at the end: the index of a
+  // large Library is several megabytes.
+  async save(force = false) {
+    if (!this.dirty || !force && Date.now() - this.savedAt < SAVE_EVERY_MS) return;
+    this.savedAt = Date.now();
+    this.dirty = 0;
+    await writeJson(processedFile(this.ctx), this.processed);
+    await writeJson(indexFile(this.ctx), this.index);
+    await writeJson(originalsFile(this.ctx), this.originals);
+    await writeJson(excludedFile(this.ctx), this.excluded);
+    await this.lock.touch();
+  }
+  // One call at a time works on a file.
+  async exclusive(file, work) {
+    while (this.busyPaths.has(file)) await this.busyPaths.get(file).catch(() => {
+    });
+    const running = work();
+    this.busyPaths.set(file, running);
+    try {
+      return await running;
+    } finally {
+      this.busyPaths.delete(file);
+    }
+  }
+};
+var Session = class {
+  constructor(ctx, state, priority) {
+    this.ctx = ctx;
+    this.state = state;
+    this.priority = priority;
+    this.changedFiles = 0;
+    this.stats = { tagged: 0, unchanged: 0, skipped: {}, failed: 0, left: 0 };
+  }
+  get processed() {
+    return this.state.processed;
+  }
+  get index() {
+    return this.state.index;
+  }
+  get originals() {
+    return this.state.originals;
+  }
+  get excluded() {
+    return this.state.excluded;
+  }
+  get dirty() {
+    return this.state.dirty;
+  }
+  set dirty(value) {
+    this.state.dirty = value;
+  }
+  save(force = false) {
+    return this.state.save(force);
+  }
+  // True when an admin action wants the lock and this is background work:
+  // one in this process, or one waiting in another.
+  async shouldYield() {
+    if (this.priority) return false;
+    if (this.state.admins > 0) this.yielding = true;
+    else if (!this.yieldCheckedAt || Date.now() - this.yieldCheckedAt >= 500) {
+      this.yieldCheckedAt = Date.now();
+      const stat = await fs4.stat(yieldFile(this.ctx)).catch(() => null);
+      this.yielding = Boolean(stat && Date.now() - stat.mtimeMs < YIELD_FRESH_MS);
+    }
+    if (this.yielding && !this.yieldLogged) {
+      this.yieldLogged = true;
+      this.ctx.log("Pausing background tagging for an admin action");
+    }
+    return this.yielding;
+  }
+  record(filePath, stat, result) {
+    this.processed[filePath] = { ...statKey(stat), ...result, at: Date.now() };
+    this.dirty++;
+    if (result.status === "skipped") this.stats.skipped[result.reason] = (this.stats.skipped[result.reason] || 0) + 1;
+    else this.stats[result.status]++;
+  }
+  // Returns false when MusicBrainz can't be reached, so the caller stops.
+  async processFile(filePath, options = {}) {
+    const real = await allowedPath(this.ctx, filePath);
+    if (!real) {
+      this.ctx.log(`Not tagging ${filePath}: it isn't in the Library folder`);
+      this.stats.skipped["outside the Library"] = (this.stats.skipped["outside the Library"] || 0) + 1;
+      return true;
+    }
+    if (!isAudioPath(real)) return true;
+    return this.state.exclusive(real, () => this.processReal(real, options));
+  }
+  // `queuedAt`: when the request to tag was made. Classical tags an admin
+  // removed after that stay removed.
+  //
+  // `plan` (v0.3 8.7): an array that receives what would be written, with
+  // the file's current values, instead of writing or recording anything.
+  // `values`: write exactly these (a confirmed plan) instead of looking up.
+  async processReal(real, { force = false, prefilter = false, upgrade = false, queuedAt = null, plan = null, values: planned = null } = {}) {
+    const { ctx } = this;
+    const stat = await fs4.stat(real);
+    const skip = (result) => plan ? plan.push({ file: real, status: "skipped", reason: result.reason }) : this.record(real, stat, result);
+    if (!await modelAllowsTagging(ctx, real)) {
+      skip({ status: "skipped", reason: "model classification or link requires review" });
+      return true;
+    }
+    if (!force && sameStat(this.processed[real], stat) && !(upgrade && outdated(this.processed[real]))) return true;
+    let tags;
+    try {
+      tags = readTags(real);
+    } catch (error) {
+      skip({ status: "skipped", reason: error instanceof UnsupportedFormat ? "unsupported format" : "unreadable" });
+      return true;
+    }
+    if (!plan) this.index[real] = indexEntry(tags, stat);
+    if (!tags.recordingMbid) {
+      skip({ status: "skipped", reason: "no recording ID" });
+      return true;
+    }
+    if (this.excluded[tags.recordingMbid]) {
+      if (!force || queuedAt && (this.excluded[tags.recordingMbid].at ?? 0) > queuedAt) {
+        skip({ status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
+        return true;
+      }
+      if (!plan) delete this.excluded[tags.recordingMbid];
+    }
+    if (prefilter && ctx.resolver.classifyGenres(new Set(tags.genres.map((g) => g.toLowerCase()))) === false) {
+      this.record(real, stat, { status: "skipped", reason: "non-classical", recording: tags.recordingMbid });
+      return true;
+    }
+    let values = planned;
+    let fields = planned && { artist: planned.artist?.[0] || "", workId: planned.workId?.[0] || "" };
+    if (!values) {
+      fields = await ctx.resolver.resolve(tags.recordingMbid, {
+        trackArtistIds: tags.artistMbids,
+        albumArtistIds: tags.albumArtistMbids,
+        releaseGroupId: tags.releaseGroupMbid || null,
+        confirmed: force
+      });
+      if (!fields) {
+        const reason = ctx.resolver.skipReason;
+        if (reason === "unreachable") return false;
+        skip({ status: "skipped", reason, recording: tags.recordingMbid });
+        return true;
+      }
+      values = { artist: [fields.artist], composer: fields.composers };
+      if (fields.workId) Object.assign(values, { work: [fields.work], workId: [fields.workId] });
+      const albumArtist = await this.englishAlbumArtist(tags);
+      if (albumArtist) values.albumArtist = [albumArtist];
+    }
+    if (plan) {
+      plan.push({ file: real, status: "planned", recording: tags.recordingMbid, values, current: readValues(real, Object.keys(values)) });
+      return true;
+    }
+    let changed;
+    try {
+      if (!this.originals[real]) {
+        this.originals[real] = { ...readValues(real, TAG_FIELDS), recording: tags.recordingMbid };
+        this.dirty++;
+        await writeJson(originalsFile(ctx), this.originals);
+      }
+      changed = await writeTags(real, values);
+    } catch (error) {
+      ctx.log(`Couldn't tag ${real}: ${error.message}`);
+      this.record(real, stat, { status: "skipped", reason: "couldn't write tags", recording: tags.recordingMbid });
+      return true;
+    }
+    const after = await fs4.stat(real);
+    this.index[real] = { ...this.index[real], ...statKey(after), artist: fields.artist, workId: fields.workId || "" };
+    this.record(real, after, {
+      v: TAGGING_VERSION,
+      status: changed.length ? "tagged" : "unchanged",
+      recording: tags.recordingMbid,
+      artist: fields.artist,
+      workId: fields.workId
+    });
+    if (changed.length) {
+      this.changedFiles++;
+      ctx.log(`Tagged ${path4.basename(real)}: ${fields.artist}`);
+    }
+    return true;
+  }
+  // Puts back the tags a file had before the plugin changed them. Files
+  // tagged before the plugin kept backups get the artist MusicBrainz credits
+  // for that track on its release, which is what Aurral writes.
+  async untagFile(filePath, mode = "restore") {
+    const real = await allowedPath(this.ctx, filePath);
+    if (!real || !isAudioPath(real)) return "skipped";
+    return this.state.exclusive(real, () => this.untagReal(real, mode));
+  }
+  // `plan` and `values` as in processReal.
+  async untagReal(real, mode = "restore", { plan = null, values: planned = null } = {}) {
+    const { ctx } = this;
+    const skip = (reason) => plan ? (plan.push({ file: real, status: "skipped", reason }), "skipped") : "skipped";
+    if (!await modelAllowsTagging(ctx, real)) return skip("model classification or link requires review");
+    let tags;
+    try {
+      tags = readTags(real);
+    } catch {
+      return skip("unreadable");
+    }
+    if (tags.recordingMbid && !plan) this.excluded[tags.recordingMbid] = { at: Date.now() };
+    const original = this.originals[real];
+    let values = planned;
+    if (!values) {
+      if (mode === "clear") values = { composer: [], work: [], workId: [] };
+      else if (original) values = Object.fromEntries(TAG_FIELDS.map((field2) => [field2, original[field2] ?? []]));
+      else {
+        const credit = await this.trackCredit(tags);
+        values = { composer: [], work: [], workId: [], ...credit && { artist: [credit] } };
+        if (tags.albumArtistMbids.length === 1) {
+          const name = (await ctx.mb.get("artist", tags.albumArtistMbids[0], "aliases+genres"))?.name;
+          if (name) values.albumArtist = [name];
+        }
+      }
+    }
+    if (plan) {
+      plan.push({ file: real, status: "planned", recording: tags.recordingMbid, restore: Boolean(original), values, current: readValues(real, Object.keys(values)) });
+      return "planned";
+    }
+    const changed = await writeTags(real, values);
+    if (mode !== "clear") delete this.originals[real];
+    const after = await fs4.stat(real);
+    this.index[real] = { ...this.index[real] ?? {}, ...indexEntry(readTags(real), after) };
+    this.record(real, after, { status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
+    this.stats.skipped["classical tags removed"]--;
+    if (changed.length) {
+      this.changedFiles++;
+      ctx.log(`Removed classical tags from ${path4.basename(real)}`);
+    }
+    return changed.length ? original && mode !== "clear" ? "restored" : "cleared" : "unchanged";
+  }
+  async englishAlbumArtist(tags) {
+    if (tags.albumArtistMbids.length !== 1) return null;
+    const artist = await this.ctx.resolver.getArtist(tags.albumArtistMbids[0]);
+    if (!artist?.name) return null;
+    const [name] = await this.ctx.resolver.englishNames(artist);
+    return name || null;
+  }
+  // MusicBrainz's artist credit for this recording on the file's release,
+  // else on the recording itself.
+  async trackCredit(tags) {
+    const { mb } = this.ctx;
+    if (tags.releaseMbid) {
+      const release = await mb.get("release", tags.releaseMbid, RELEASE_INC);
+      for (const medium of release?.media || [])
+        for (const track of medium.tracks || [])
+          if (track.recording?.id === tags.recordingMbid) {
+            const credit = creditString(track["artist-credit"] || track.recording["artist-credit"]);
+            if (credit) return credit;
+          }
+    }
+    const recording = await mb.get("recording", tags.recordingMbid, "artist-credits");
+    return creditString(recording?.["artist-credit"]) || null;
+  }
+  async drainQueue(until, onlyIds = null) {
+    for (const entry of await queuedEntries(this.ctx)) {
+      if (Date.now() > until || await this.shouldYield()) return false;
+      if (onlyIds && !onlyIds.has(entry.name.replace(/\.json$/, ""))) continue;
+      if (this.state.claimed.has(entry.name)) continue;
+      this.state.claimed.add(entry.name);
+      try {
+        const job = await readJson(entry.file, null);
+        if (!this.priority && job?.source === "action" && Date.now() - (job.at || 0) < ACTION_CLAIM_MS) continue;
+        if (job?.path) {
+          const reachable = await this.processFile(job.path, { force: job.force, queuedAt: job.at });
+          if (!reachable) return false;
+        }
+        await fs4.rm(entry.file, { force: true });
+      } finally {
+        this.state.claimed.delete(entry.name);
+      }
+      await this.save();
+    }
+    return true;
+  }
+  // Walks the Library, refreshing the index, and returns files that have a
+  // recording ID and were never processed (or changed since). Stops at
+  // `until`; unchanged files cost only a stat, so the next run gets further.
+  async scan(until) {
+    const root = this.ctx.libraryFolder;
+    const pending = [];
+    const seen = /* @__PURE__ */ new Set();
+    let complete = true;
+    const walk = async (dir) => {
+      if (Date.now() > until || await this.shouldYield()) {
+        complete = false;
+        return;
+      }
+      const entries2 = await fs4.readdir(dir, { withFileTypes: true }).catch(() => []);
+      for (const entry of entries2) {
+        if (Date.now() > until || await this.shouldYield()) {
+          complete = false;
+          return;
+        }
+        if (entry.name.startsWith(".")) continue;
+        const full = path4.join(dir, entry.name);
+        if (entry.isDirectory()) await walk(full);
+        else if (entry.isFile() && isAudioPath(full)) {
+          seen.add(full);
+          const stat = await fs4.stat(full).catch(() => null);
+          if (!stat) continue;
+          if (!sameStat(this.index[full], stat)) {
+            try {
+              this.index[full] = indexEntry(readTags(full), stat);
+            } catch {
+              delete this.index[full];
+              continue;
+            }
+            this.dirty++;
+            await this.save();
+          }
+          if (this.index[full].recordingMbid && (!sameStat(this.processed[full], stat) || outdated(this.processed[full]))) pending.push(full);
+        }
+      }
+    };
+    if (root) await walk(root);
+    if (complete) {
+      for (const file of Object.keys(this.index)) if (file.startsWith(root) && !seen.has(file)) delete this.index[file];
+    }
+    this.scanComplete = complete;
+    return pending;
+  }
+};
+var held = /* @__PURE__ */ new Map();
+async function openState(ctx, priority) {
+  let lock = await tryLock(lockDir(ctx), LOCK_STALE_MS);
+  if (!lock && priority) {
+    ctx.log("Waiting for background tagging in another process to pause");
+    const until = Date.now() + PRIORITY_WAIT_MS;
+    while (!lock && Date.now() < until) {
+      await writeJson(yieldFile(ctx), { at: Date.now() });
+      await sleep(500);
+      lock = await tryLock(lockDir(ctx), LOCK_STALE_MS);
+    }
+    await fs4.rm(yieldFile(ctx), { force: true });
+    if (!lock) ctx.log("Tagging in another process didn't pause within 5 minutes");
+  }
+  if (!lock) return null;
+  const state = new State(ctx, lock);
+  try {
+    await state.load();
+  } catch (error) {
+    await lock.release();
+    throw error;
+  }
+  state.heartbeat = setInterval(() => lock.touch(), 3e4);
+  return state;
+}
+async function withTagging(ctx, work, { priority = false } = {}) {
+  const key = path4.resolve(ctx.dataFolder);
+  let entry;
+  for (; ; ) {
+    entry = held.get(key);
+    if (!entry) {
+      entry = { opening: openState(ctx, priority), state: null };
+      held.set(key, entry);
+      try {
+        entry.state = await entry.opening;
+      } catch (error) {
+        held.delete(key);
+        throw error;
+      }
+      if (!entry.state) {
+        held.delete(key);
+        return null;
+      }
+      break;
+    }
+    if (!entry.state) {
+      if (!priority) return null;
+      await entry.opening.catch(() => {
+      });
+      if (held.get(key) === entry && entry.state) break;
+      continue;
+    }
+    if (!priority && entry.state.background > 0) return null;
+    break;
+  }
+  const { state } = entry;
+  const session = new Session(ctx, state, priority);
+  state.refs++;
+  if (priority) state.admins++;
+  else state.background++;
+  try {
+    await work(session);
+    return session.stats;
+  } finally {
+    if (priority) state.admins--;
+    else state.background--;
+    if (--state.refs === 0) {
+      held.delete(key);
+      clearInterval(state.heartbeat);
+      await state.save(true).catch((error) => ctx.log(`Couldn't save progress: ${error.message}`));
+      await state.lock.release();
+    } else {
+      await state.save().catch(() => {
+      });
+    }
+    if (session.changedFiles) await refreshLibrary(ctx);
+  }
+}
+async function refreshLibrary(ctx) {
+  if (!ctx.api?.url || !ctx.api?.key) return;
+  try {
+    await new Aurral(ctx.api, ctx.fetch).refreshLibrary();
+  } catch (error) {
+    ctx.log(`Couldn't ask Aurral to rescan the Library: ${error.message}`);
+  }
+}
+async function runQueue(ctx, budgetMs, onlyIds = null, { priority = false } = {}) {
+  const until = Date.now() + budgetMs;
+  return withTagging(
+    ctx,
+    async (session) => {
+      await session.drainQueue(until, onlyIds);
+      session.stats.left = onlyIds ? (await queuedEntries(ctx)).filter((e) => onlyIds.has(e.name.replace(/\.json$/, ""))).length : await queueLength(ctx);
+    },
+    { priority }
+  );
+}
+async function runScheduled(ctx, budgetMs) {
+  const until = Date.now() + budgetMs;
+  return withTagging(ctx, async (session) => {
+    if (!await session.drainQueue(until)) return;
+    const pending = await session.scan(until);
+    session.stats.found = pending.length;
+    for (const file of pending) {
+      if (Date.now() > until || await session.shouldYield()) break;
+      if (!await session.processFile(file, { prefilter: true, upgrade: true })) break;
+      await session.save();
+    }
+    session.stats.left = await queueLength(ctx) + pending.filter((f) => !session.processed[f]).length;
+  });
+}
+async function libraryIndex(ctx, budgetMs, { priority = false } = {}) {
+  let index = null;
+  await withTagging(
+    ctx,
+    async (session) => {
+      await session.scan(Date.now() + budgetMs);
+      index = session.index;
+    },
+    { priority }
+  );
+  return index ?? await readJson(indexFile(ctx), {});
+}
+function describeStats(stats) {
+  if (!stats) return "Another tagging run is in progress";
+  const parts = [`${stats.tagged} tagged`];
+  if (stats.unchanged) parts.push(`${stats.unchanged} already right`);
+  for (const [reason, count] of Object.entries(stats.skipped)) parts.push(`${count} skipped (${reason})`);
+  if (stats.failed) parts.push(`${stats.failed} failed`);
+  if (stats.left) parts.push(`${stats.left} left for the next run`);
+  return parts.join(", ");
+}
+
+// src/tag-requests.js
+var MODES = { tag: "Tag as classical", restore: "Restore original tags", clear: "Clear classical tags" };
+var KEEP_MS = 7 * 864e5;
+var ID = /^[0-9a-f-]{36}$/;
+var folder = (ctx) => path5.join(ctx.dataFolder, "tag-requests");
+var fileOf = (ctx, id) => path5.join(folder(ctx), `${id}.json`);
+var same2 = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+function untagMessage(counts, what, mode) {
+  const parts = [`${counts.restored} restored`];
+  if (counts.cleared) parts.push(`${counts.cleared} cleared${mode === "clear" ? " (existing backups retained)" : " (original tags unavailable)"}`);
+  if (counts.unchanged) parts.push(`${counts.unchanged} already had no classical tags`);
+  if (counts["no backup"]) parts.push(`${counts["no backup"]} couldn't be restored (no backup, and MusicBrainz has no credit)`);
+  if (counts.skipped) parts.push(`${counts.skipped} skipped`);
+  if (counts.changed) parts.push(`${counts.changed} skipped (changed since the request)`);
+  if (counts.left) parts.push(`${counts.left} left: run it again`);
+  return `${what}: ${parts.join(", ")}. The plugin won't tag these recordings again unless you tag them as classical.`.slice(0, 500);
+}
+function save(ctx, request) {
+  fs5.mkdirSync(folder(ctx), { recursive: true });
+  const target = fileOf(ctx, request.id);
+  fs5.writeFileSync(`${target}.tmp`, JSON.stringify(request));
+  fs5.renameSync(`${target}.tmp`, target);
+}
+function readRequest(ctx, id) {
+  if (!ID.test(String(id || ""))) return null;
+  try {
+    return JSON.parse(fs5.readFileSync(fileOf(ctx, id), "utf8"));
+  } catch {
+    return null;
+  }
+}
+function listRequests(ctx) {
+  let names = [];
+  try {
+    names = fs5.readdirSync(folder(ctx)).filter((name) => name.endsWith(".json"));
+  } catch {
+    return [];
+  }
+  const out = [];
+  for (const name of names) {
+    const request = readRequest(ctx, name.slice(0, -5));
+    if (!request) continue;
+    if (Date.now() - request.createdAt > KEEP_MS) fs5.rmSync(fileOf(ctx, request.id), { force: true });
+    else out.push(request);
+  }
+  return out.sort((a, b) => b.createdAt - a.createdAt).slice(0, 50);
+}
+async function requestTags(ctx, paths, { mode, what, actor: actor4 }) {
+  if (!MODES[mode]) throw new Error("Unknown tag request");
+  if (!paths.length) return { message: mode === "tag" ? `No files to tag in ${what}` : `No files in ${what}` };
+  const plan = [];
+  let unreachable = false;
+  const stats = await withTagging(
+    ctx,
+    async (session) => {
+      for (const file of paths) {
+        const real = await allowedPath(ctx, file);
+        if (!real || !isAudioPath(real)) {
+          plan.push({ file, status: "skipped", reason: real ? "not an audio file" : "outside the Library" });
+          continue;
+        }
+        if (mode === "tag") {
+          if (!await session.processReal(real, { force: true, plan })) {
+            unreachable = true;
+            break;
+          }
+        } else await session.untagReal(real, mode, { plan });
+      }
+    },
+    { priority: true }
+  );
+  if (!stats) return { message: "Tagging is busy. Try again in a few minutes." };
+  const files = plan.map((entry) => entry.status === "planned" ? { ...entry, status: same2(entry.current, entry.values) ? "unchanged" : "change" } : entry);
+  const count = (status) => files.filter((entry) => entry.status === status).length;
+  const changing = count("change");
+  const reasons = {};
+  for (const entry of files) if (entry.status === "skipped") reasons[entry.reason] = (reasons[entry.reason] || 0) + 1;
+  const notes = [
+    count("unchanged") && `${count("unchanged")} already right`,
+    ...Object.entries(reasons).map(([reason, n]) => `${n} skipped (${reason})`),
+    unreachable && "MusicBrainz couldn't be reached, so the rest wait"
+  ].filter(Boolean);
+  if (!changing) return { message: `${what}: nothing to write${notes.length ? ` (${notes.join(", ")})` : ""}.`.slice(0, 500) };
+  const request = { id: randomUUID4(), mode, what, actor: String(actor4?.id ?? ""), createdAt: Date.now(), state: "waiting", files };
+  save(ctx, request);
+  return {
+    id: request.id,
+    message: `${what}: nothing written yet. ${changing} file${changing === 1 ? "" : "s"} would change${notes.length ? `; ${notes.join(", ")}` : ""}. To write them, open Classical metadata \u2192 Activity \u2192 Tag requests and confirm.`.slice(0, 500)
+  };
+}
+async function applyRequest(ctx, id, actor4) {
+  const request = readRequest(ctx, id);
+  if (!request) throw new Error("This tag request is gone. Choose the action again.");
+  if (request.state !== "waiting") return { message: request.message || "This tag request was written already." };
+  request.state = "writing";
+  save(ctx, request);
+  const counts = { restored: 0, cleared: 0, unchanged: 0, "no backup": 0, skipped: 0, changed: 0, left: 0 };
+  let session;
+  const stats = await withTagging(
+    ctx,
+    async (current) => {
+      session = current;
+      for (const entry of request.files) {
+        if (entry.status !== "change") continue;
+        const real = await allowedPath(ctx, entry.file);
+        if (!real) {
+          entry.result = { status: "skipped", reason: "outside the Library" };
+          counts.skipped++;
+          continue;
+        }
+        entry.result = await session.state.exclusive(real, async () => {
+          let now;
+          try {
+            now = readValues(real, Object.keys(entry.values));
+          } catch {
+            return { status: "skipped", reason: "unreadable" };
+          }
+          if (!same2(now, entry.current)) return { status: "skipped", reason: "changed since the request", changed: true };
+          if (request.mode === "tag") {
+            await session.processReal(real, { force: true, values: entry.values });
+            const record = session.processed[real];
+            return { status: record?.status || "failed", reason: record?.reason };
+          }
+          return { status: await session.untagReal(real, request.mode, { values: entry.values }) };
+        }).catch((error) => {
+          ctx.log(`Couldn't write tags to ${real}: ${error.message}`);
+          if (request.mode === "tag") session.stats.failed++;
+          return { status: "skipped", reason: String(error.message || error).slice(0, 200) };
+        });
+        if (entry.result.changed) {
+          counts.changed++;
+          session.stats.skipped["changed since the request"] = (session.stats.skipped["changed since the request"] || 0) + 1;
+        } else if (request.mode !== "tag") counts[entry.result.status] = (counts[entry.result.status] || 0) + 1;
+      }
+    },
+    { priority: true }
+  );
+  if (!stats) {
+    request.state = "waiting";
+    save(ctx, request);
+    return { message: "Tagging is busy. Try again in a few minutes." };
+  }
+  request.state = "done";
+  request.writtenAt = Date.now();
+  request.writtenBy = String(actor4?.id ?? "");
+  request.message = request.mode === "tag" ? `${request.what}: ${describeStats(stats)}`.slice(0, 500) : untagMessage(counts, request.what, request.mode);
+  save(ctx, request);
+  return { message: request.message };
+}
+async function discardRequest(ctx, id) {
+  if (!ID.test(String(id || ""))) throw new Error("This tag request is gone.");
+  await fsp.rm(fileOf(ctx, id), { force: true });
+}
+
+// src/model/editor.js
 import { createHash as createHash4 } from "node:crypto";
 
 // src/model/catalogue.js
-import { randomUUID as randomUUID2 } from "node:crypto";
+import { randomUUID as randomUUID6 } from "node:crypto";
 
 // src/model/database.js
-import { randomUUID } from "node:crypto";
-import fs from "node:fs/promises";
-import path from "node:path";
+import { randomUUID as randomUUID5 } from "node:crypto";
+import fs6 from "node:fs/promises";
+import path6 from "node:path";
 
 // src/model/schema.js
 var migrations = [
@@ -35464,8 +36682,8 @@ function validateDatabase(db) {
 }
 async function backupDatabase(db, destination) {
   const { backup } = await import("node:sqlite");
-  await fs.mkdir(path.dirname(destination), { recursive: true });
-  const temporary = `${destination}.${randomUUID()}.tmp`;
+  await fs6.mkdir(path6.dirname(destination), { recursive: true });
+  const temporary = `${destination}.${randomUUID5()}.tmp`;
   try {
     await backup(db, temporary);
     const { DatabaseSync } = await import("node:sqlite");
@@ -35475,9 +36693,9 @@ async function backupDatabase(db, destination) {
     } finally {
       check.close();
     }
-    await fs.rename(temporary, destination);
+    await fs6.rename(temporary, destination);
   } finally {
-    for (const file of [temporary, `${temporary}-wal`, `${temporary}-shm`]) await fs.rm(file, { force: true });
+    for (const file of [temporary, `${temporary}-wal`, `${temporary}-shm`]) await fs6.rm(file, { force: true });
   }
   return destination;
 }
@@ -35488,7 +36706,7 @@ function verifyOnce(db, filename) {
   verified.add(filename);
 }
 var LOCK_POLL_MS = 200;
-var LOCK_STALE_MS = 6 * 3600 * 1e3;
+var LOCK_STALE_MS2 = 6 * 3600 * 1e3;
 var BACKUP_HEADROOM = 64 * 1024 * 1024;
 var alive = (pid) => {
   if (!Number.isSafeInteger(pid) || pid <= 0) return false;
@@ -35501,8 +36719,8 @@ var alive = (pid) => {
 };
 async function staleLock(lockFile) {
   try {
-    const [text7, stat] = await Promise.all([fs.readFile(lockFile, "utf8"), fs.stat(lockFile)]);
-    if (Date.now() - stat.mtimeMs > LOCK_STALE_MS) return text7;
+    const [text7, stat] = await Promise.all([fs6.readFile(lockFile, "utf8"), fs6.stat(lockFile)]);
+    if (Date.now() - stat.mtimeMs > LOCK_STALE_MS2) return text7;
     return alive(Number(JSON.parse(text7).pid)) ? null : text7;
   } catch (error) {
     if (error.code === "ENOENT" || error instanceof SyntaxError) return null;
@@ -35512,36 +36730,36 @@ async function staleLock(lockFile) {
 async function clearStaleLock(lockFile, stale, token) {
   const aside = `${lockFile}.stale.${token}`;
   try {
-    await fs.rename(lockFile, aside);
+    await fs6.rename(lockFile, aside);
   } catch (error) {
     if (error.code === "ENOENT") return;
     throw error;
   }
   try {
-    if (await fs.readFile(aside, "utf8") !== stale) await fs.link(aside, lockFile).catch(() => {
+    if (await fs6.readFile(aside, "utf8") !== stale) await fs6.link(aside, lockFile).catch(() => {
     });
   } finally {
-    await fs.rm(aside, { force: true });
+    await fs6.rm(aside, { force: true });
   }
 }
-async function acquireUpgradeLock(folder, timeoutMs) {
-  const lockFile = path.join(folder, "upgrade.lock");
-  const token = randomUUID();
+async function acquireUpgradeLock(folder2, timeoutMs) {
+  const lockFile = path6.join(folder2, "upgrade.lock");
+  const token = randomUUID5();
   const deadline = Date.now() + timeoutMs;
   for (; ; ) {
     const staged = `${lockFile}.${token}`;
-    await fs.writeFile(staged, JSON.stringify({ pid: process.pid, token, at: Date.now() }));
+    await fs6.writeFile(staged, JSON.stringify({ pid: process.pid, token, at: Date.now() }));
     try {
-      await fs.link(staged, lockFile);
-      await fs.rm(staged, { force: true });
+      await fs6.link(staged, lockFile);
+      await fs6.rm(staged, { force: true });
       return async () => {
         try {
-          if (JSON.parse(await fs.readFile(lockFile, "utf8")).token === token) await fs.rm(lockFile, { force: true });
+          if (JSON.parse(await fs6.readFile(lockFile, "utf8")).token === token) await fs6.rm(lockFile, { force: true });
         } catch {
         }
       };
     } catch (error) {
-      await fs.rm(staged, { force: true });
+      await fs6.rm(staged, { force: true });
       if (error.code !== "EEXIST") throw error;
     }
     const stale = await staleLock(lockFile);
@@ -35555,11 +36773,11 @@ async function acquireUpgradeLock(folder, timeoutMs) {
   }
 }
 var mib = (bytes) => `${Math.ceil(bytes / 1024 / 1024).toLocaleString("en-US")} MB`;
-async function ensureBackupSpace(db, directory, statfs = fs.statfs) {
+async function ensureBackupSpace(db, directory, statfs = fs6.statfs) {
   const { page_count: pages } = db.prepare("PRAGMA page_count").get();
   const { page_size: pageSize } = db.prepare("PRAGMA page_size").get();
   const needed = pages * pageSize + BACKUP_HEADROOM;
-  await fs.mkdir(directory, { recursive: true });
+  await fs6.mkdir(directory, { recursive: true });
   const disk = await statfs(directory);
   const free = Number(disk.bavail) * Number(disk.bsize);
   if (free < needed)
@@ -35567,10 +36785,10 @@ async function ensureBackupSpace(db, directory, statfs = fs.statfs) {
       `Not enough disk space to back up the classical database before upgrading: ${mib(needed)} needed, ${mib(free)} free in ${directory}`
     );
 }
-async function openDatabase(folder, { migrations: migrations2 = migrations, maxVersion = SCHEMA_VERSION, lockTimeoutMs = 30 * 60 * 1e3, statfs } = {}) {
+async function openDatabase(folder2, { migrations: migrations2 = migrations, maxVersion = SCHEMA_VERSION, lockTimeoutMs = 30 * 60 * 1e3, statfs } = {}) {
   const { DatabaseSync } = await import("node:sqlite");
-  await fs.mkdir(folder, { recursive: true });
-  const filename = path.join(folder, "classical.sqlite");
+  await fs6.mkdir(folder2, { recursive: true });
+  const filename = path6.join(folder2, "classical.sqlite");
   const db = new DatabaseSync(filename);
   const versionOf = () => db.prepare("PRAGMA user_version").get().user_version;
   const pending = (version2) => migrations2.filter((migration) => migration.version > version2 && migration.version <= maxVersion);
@@ -35582,7 +36800,7 @@ async function openDatabase(folder, { migrations: migrations2 = migrations, maxV
         `Classical schema ${version2} is newer than supported ${maxVersion}; restore a compatible backup`
       );
     if (pending(version2).length) {
-      const release = await acquireUpgradeLock(folder, lockTimeoutMs);
+      const release = await acquireUpgradeLock(folder2, lockTimeoutMs);
       try {
         version2 = versionOf();
         if (version2 > maxVersion)
@@ -35592,9 +36810,9 @@ async function openDatabase(folder, { migrations: migrations2 = migrations, maxV
         const steps = pending(version2);
         if (steps.length) {
           db.exec("PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL");
-          const backups = path.join(folder, "backups");
+          const backups = path6.join(folder2, "backups");
           await ensureBackupSpace(db, backups, statfs);
-          await backupDatabase(db, path.join(backups, `before-v${steps[0].version}-${randomUUID()}.sqlite`));
+          await backupDatabase(db, path6.join(backups, `before-v${steps[0].version}-${randomUUID5()}.sqlite`));
           for (const migration of steps) {
             db.exec("BEGIN IMMEDIATE");
             try {
@@ -35637,7 +36855,7 @@ async function openDatabase(folder, { migrations: migrations2 = migrations, maxV
 var activeTransactions = /* @__PURE__ */ new WeakSet();
 function transaction(db, run) {
   const nested = activeTransactions.has(db);
-  const savepoint = `nested_${randomUUID().replaceAll("-", "")}`;
+  const savepoint = `nested_${randomUUID5().replaceAll("-", "")}`;
   db.exec(nested ? `SAVEPOINT ${savepoint}` : "BEGIN IMMEDIATE");
   if (!nested) activeTransactions.add(db);
   try {
@@ -35715,8 +36933,8 @@ var relations = {
   recording_relation: [["recording"], ["recording"]]
 };
 var json = (value) => JSON.stringify(value);
-var parse = (row) => row && { ...row, data: JSON.parse(row.data) };
-var positive = (value) => Number.isSafeInteger(value) && value > 0;
+var parse2 = (row) => row && { ...row, data: JSON.parse(row.data) };
+var positive2 = (value) => Number.isSafeInteger(value) && value > 0;
 var range = (start, end) => Number.isSafeInteger(start) && start >= 0 && (end === null || Number.isSafeInteger(end) && end > start);
 var Catalogue = class {
   constructor(db, filename) {
@@ -35735,10 +36953,18 @@ var Catalogue = class {
     ).run(actor4, action2, target, json(data), Date.now());
   }
   review(kind, target, evidence) {
+    if (kind === "auto_match" && Array.isArray(evidence?.tracks)) {
+      const tracks = JSON.stringify([...evidence.tracks].sort());
+      const settled = this.db.prepare("SELECT evidence FROM review_item WHERE kind=? AND target_id=? AND status='resolved'").all(kind, target).some((row) => {
+        const prior = JSON.parse(row.evidence);
+        return prior.reason === evidence.reason && Array.isArray(prior.tracks) && JSON.stringify([...prior.tracks].sort()) === tracks;
+      });
+      if (settled) return false;
+    }
     this.db.prepare(
       `INSERT INTO review_item VALUES (?,?,?,?, 'open',?)
       ON CONFLICT(kind,target_id) WHERE status='open' DO UPDATE SET evidence=excluded.evidence`
-    ).run(randomUUID2(), kind, target, json(evidence), Date.now());
+    ).run(randomUUID6(), kind, target, json(evidence), Date.now());
   }
   // One open review per entry can carry several findings (each conflicting
   // field, each omitted field): add this one under its key instead of
@@ -35750,7 +36976,7 @@ var Catalogue = class {
     this.review(kind, target, { ...entry, entries: entries2 });
   }
   entity(id, expected) {
-    const row = parse(
+    const row = parse2(
       this.db.prepare("SELECT * FROM entity WHERE id=? AND deleted_at IS NULL").get(id)
     );
     if (!row || expected && ![].concat(expected).includes(row.kind))
@@ -35760,14 +36986,14 @@ var Catalogue = class {
   createEntity(kind, data = {}) {
     if (!kinds.has(kind) || !data || Array.isArray(data) || typeof data !== "object")
       throw new Error("Invalid entity");
-    if (data.durationMs != null && !positive(data.durationMs))
+    if (data.durationMs != null && !positive2(data.durationMs))
       throw new Error("Invalid entity duration");
     if (data.date != null && (typeof data.date !== "string" || !/^\d{4}(-(?:0[1-9]|1[0-2])(-(?:0[1-9]|[12]\d|3[01]))?)?$/.test(
       data.date
     )))
       throw new Error("Use a partial ISO date, without invented precision");
     return transaction(this.db, () => {
-      const id = randomUUID2(), now = Date.now();
+      const id = randomUUID6(), now = Date.now();
       this.db.prepare(
         "INSERT INTO entity(id,kind,data,created_at,updated_at) VALUES (?,?,?,?,?)"
       ).run(id, kind, json(data), now, now);
@@ -35779,7 +37005,7 @@ var Catalogue = class {
   relate(kind, source, target, { position = 1, occurrence = 1, ...data } = {}) {
     return transaction(this.db, () => {
       const rule = relations[kind];
-      if (!rule || !positive(position) || !positive(occurrence) || source === target)
+      if (!rule || !positive2(position) || !positive2(occurrence) || source === target)
         throw new Error("Invalid relation");
       this.entity(source, rule[0]);
       this.entity(target, rule[1]);
@@ -35793,7 +37019,7 @@ var Catalogue = class {
          WHERE r.kind='collection_member') SELECT 1 FROM descendants WHERE id=?`
       ).get(target, source))
         throw new Error("Collection cycle");
-      const id = randomUUID2();
+      const id = randomUUID6();
       this.db.prepare("INSERT INTO relation VALUES (?,?,?,?,?,?,?)").run(id, kind, source, target, position, occurrence, json(data));
       this.audit("relation.create", id, { kind, source, target });
       return id;
@@ -35806,7 +37032,7 @@ var Catalogue = class {
     return transaction(this.db, () => {
       this.entity(target);
       const person = this.entity(contributor, ["person", "ensemble"]);
-      if (!roles.has(role) || !positive(position) || PERSON_ROLES.has(role) && person.kind !== "person" || ENSEMBLE_ROLES.has(role) && person.kind !== "ensemble")
+      if (!roles.has(role) || !positive2(position) || PERSON_ROLES.has(role) && person.kind !== "person" || ENSEMBLE_ROLES.has(role) && person.kind !== "ensemble")
         throw new Error("Invalid role/contributor");
       if (!CREDIT_SOURCES.has(source)) throw new Error("Invalid credit source");
       if (assertionId) {
@@ -35819,7 +37045,7 @@ var Catalogue = class {
         this.db.prepare("UPDATE credit SET state='active',source=?,position=?,assertion_id=? WHERE id=?").run(source, position, assertionId, removed.id);
         return removed.id;
       }
-      const id = randomUUID2();
+      const id = randomUUID6();
       this.db.prepare("INSERT INTO credit(id,target_id,contributor_id,role,instrument,position,assertion_id,source) VALUES (?,?,?,?,?,?,?,?)").run(id, target, contributor, role, instrument, position, assertionId, source);
       return id;
     });
@@ -35861,15 +37087,15 @@ var Catalogue = class {
   }
   releaseItem(release, { disc = 1, position }) {
     this.entity(release, "release");
-    if (!positive(disc) || !positive(position))
+    if (!positive2(disc) || !positive2(position))
       throw new Error("Invalid release placement");
-    const id = randomUUID2();
+    const id = randomUUID6();
     this.db.prepare("INSERT INTO release_item VALUES (?,?,?,?)").run(id, release, disc, position);
     return id;
   }
   attachRecording(item, recording, { occurrence = 1, startMs = 0, endMs = null } = {}) {
     this.entity(recording, "recording");
-    if (!positive(occurrence) || !range(startMs, endMs))
+    if (!positive2(occurrence) || !range(startMs, endMs))
       throw new Error("Invalid recording range");
     this.db.prepare("INSERT INTO release_item_recording VALUES (?,?,?,?,?)").run(item, recording, occurrence, startMs, endMs);
   }
@@ -35897,9 +37123,9 @@ var Catalogue = class {
       ).get(recording, pw.source_id))
         throw new Error("Recording does not capture this performance");
       const duration2 = this.entity(recording).data.durationMs;
-      if (!positive(position) || !range(startMs, endMs) || duration2 != null && (startMs >= duration2 || endMs > duration2))
+      if (!positive2(position) || !range(startMs, endMs) || duration2 != null && (startMs >= duration2 || endMs > duration2))
         throw new Error("Invalid content range");
-      const id = randomUUID2();
+      const id = randomUUID6();
       this.db.prepare("INSERT INTO recording_content VALUES (?,?,?,?,?,?,?)").run(
         id,
         recording,
@@ -35919,20 +37145,20 @@ var Catalogue = class {
       const duration2 = JSON.parse(row.evidence).durationMs;
       if (!range(startMs, endMs) || !["range", "whole"].includes(kind) || kind === "range" && endMs === null || kind === "whole" && startMs !== 0 || duration2 != null && (startMs >= duration2 || endMs > duration2))
         throw new Error("Invalid track range");
-      const id = randomUUID2();
+      const id = randomUUID6();
       this.db.prepare("INSERT INTO segment VALUES (?,?,?,?,?)").run(id, track, startMs, endMs, kind);
       return id;
     });
   }
   segmentContent(segment, content, occurrence = 1) {
-    if (!positive(occurrence)) throw new Error("Invalid occurrence");
+    if (!positive2(occurrence)) throw new Error("Invalid occurrence");
     this.db.prepare("INSERT INTO segment_content VALUES (?,?,?)").run(segment, content, occurrence);
   }
   realization(work, performanceWork, label = null) {
     this.entity(work, "work");
     if (this.performanceWork(performanceWork).target_id !== work)
       throw new Error("Work/performance mismatch");
-    const id = randomUUID2();
+    const id = randomUUID6();
     this.db.prepare("INSERT INTO realization VALUES (?,?,?,?)").run(id, work, performanceWork, label);
     return id;
   }
@@ -35944,7 +37170,7 @@ var Catalogue = class {
   } = {}) {
     return transaction(this.db, () => {
       const row = this.db.prepare("SELECT * FROM realization WHERE id=?").get(realization);
-      if (!row || !positive(sequence) || !positive(occurrence))
+      if (!row || !positive2(sequence) || !positive2(occurrence))
         throw new Error("Invalid realization item");
       this.checkMovement(row.work_id, movement);
       const content = this.db.prepare(
@@ -35968,7 +37194,7 @@ var Catalogue = class {
         throw new Error(
           "Overlapping playback requires explicit artistic occurrence approval"
         );
-      const id = randomUUID2();
+      const id = randomUUID6();
       this.db.prepare("INSERT INTO realization_item VALUES (?,?,?,?,?,?)").run(id, realization, movement, segment, sequence, occurrence);
       return id;
     });
@@ -36022,7 +37248,7 @@ var Catalogue = class {
     this.entity(entity);
     if (typeof text7 !== "string" || !text7.trim())
       throw new Error("Invalid alias");
-    const id = randomUUID2();
+    const id = randomUUID6();
     this.db.prepare("INSERT INTO alias VALUES (?,?,?,?,?,?,?)").run(
       id,
       entity,
@@ -36040,7 +37266,7 @@ var Catalogue = class {
       (v) => typeof v === "string" && v.length
     ))
       throw new Error("Invalid catalogue number");
-    const id = randomUUID2();
+    const id = randomUUID6();
     this.db.prepare("INSERT INTO catalogue_number VALUES (?,?,?,?,?,NULL)").run(id, entity, system, display2, normalized3);
     return id;
   }
@@ -36048,7 +37274,7 @@ var Catalogue = class {
     const ref = json([instance, String(album)]);
     const existing = this.db.prepare("SELECT id FROM metadata_target WHERE album_ref=?").get(ref);
     if (existing) return existing.id;
-    const id = randomUUID2();
+    const id = randomUUID6();
     this.db.prepare("INSERT INTO metadata_target(id,album_ref) VALUES (?,?)").run(id, ref);
     return id;
   }
@@ -36065,13 +37291,13 @@ var Catalogue = class {
     };
   }
 };
-async function openCatalogue(folder, options) {
-  const { db, filename } = await openDatabase(folder, options);
+async function openCatalogue(folder2, options) {
+  const { db, filename } = await openDatabase(folder2, options);
   return new Catalogue(db, filename);
 }
 
 // src/model/metadata.js
-import { randomUUID as randomUUID3 } from "node:crypto";
+import { randomUUID as randomUUID7 } from "node:crypto";
 var providerOrder = { musicbrainz: 0, openopus: 1 };
 var Metadata = class {
   constructor(catalogue) {
@@ -36103,7 +37329,7 @@ var Metadata = class {
     ).get(target, field2, source, provider, recordId);
     if (prior)
       this.db.prepare("UPDATE assertion SET state='superseded' WHERE id=?").run(prior.id);
-    const id = randomUUID3();
+    const id = randomUUID7();
     this.db.prepare("INSERT INTO assertion VALUES (?,?,?,?,?,?,?,?,?,?,?,?)").run(
       id,
       target,
@@ -36302,12 +37528,12 @@ var Metadata = class {
 };
 
 // src/model/reconcile.js
-import { randomUUID as randomUUID4 } from "node:crypto";
+import { randomUUID as randomUUID8 } from "node:crypto";
 
 // src/model/fingerprint.js
-import { createHash } from "node:crypto";
+import { createHash as createHash2 } from "node:crypto";
 import { createReadStream } from "node:fs";
-import fs2 from "node:fs/promises";
+import fs7 from "node:fs/promises";
 var AUDIO_PREFIX = "audio-sha256-v2:";
 var CONTAINER_PREFIX = "file-sha256-v1:";
 var tagSensitive = (fingerprint2) => typeof fingerprint2 === "string" && fingerprint2.startsWith(CONTAINER_PREFIX);
@@ -36382,7 +37608,7 @@ async function wavRanges(handle, size) {
   return ranges.some(([s, e]) => e > s) ? ranges : null;
 }
 async function audioRanges(file) {
-  const handle = await fs2.open(file, "r");
+  const handle = await fs7.open(file, "r");
   try {
     const { size } = await handle.stat();
     const magic = await readAt(handle, 0, 12);
@@ -36404,7 +37630,7 @@ async function audioRanges(file) {
   }
 }
 async function hashRanges(file, ranges) {
-  const hash = createHash("sha256");
+  const hash = createHash2("sha256");
   for (const [start, end] of ranges) {
     if (end <= start) continue;
     for await (const bytes of createReadStream(file, { start, end: end - 1 }))
@@ -36420,7 +37646,7 @@ async function fingerprint(file) {
     ranges = null;
   }
   if (ranges) return `${AUDIO_PREFIX}${await hashRanges(file, ranges)}`;
-  const { size } = await fs2.stat(file);
+  const { size } = await fs7.stat(file);
   return `${CONTAINER_PREFIX}${await hashRanges(file, [[0, size]])}`;
 }
 
@@ -37503,7 +38729,7 @@ function reconcile(catalogue, snapshot2) {
     }
     for (const item of tracks.filter((t) => !claimed.has(t))) {
       if (demand.has(item)) continue;
-      const id = randomUUID4();
+      const id = randomUUID8();
       db.prepare(
         "INSERT INTO track_link VALUES (?,?,?,?,'active',?,1,?,?)"
       ).run(
@@ -37557,7 +38783,7 @@ function classify(catalogue, target, hints, { manual = null, actor: actor4 = nul
 }
 
 // src/model/editor-search.js
-import path2 from "node:path";
+import path7 from "node:path";
 var searchText = (value) => String(value ?? "").normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 var matchesSearch = (value, query) => {
   const haystack = searchText(value);
@@ -37571,7 +38797,7 @@ function ownedTracks(catalogue, { albumId = null } = {}) {
     ORDER BY t.created_at,t.id`
   ).all(...albumId === null ? [] : [String(albumId)]).map((row) => {
     const evidence = JSON.parse(row.evidence), hints = evidence.hints || {};
-    const title = hints.title || evidence.title || path2.basename(evidence.path);
+    const title = hints.title || evidence.title || path7.basename(evidence.path);
     const album = hints.album || "", artist = hints.artist || hints.albumArtist || evidence.artist || "";
     return {
       ...row,
@@ -37595,136 +38821,12 @@ function ownedTracks(catalogue, { albumId = null } = {}) {
 }
 
 // src/source.js
-import { randomUUID as randomUUID8 } from "node:crypto";
-import fs5 from "node:fs/promises";
-import path5 from "node:path";
+import { randomUUID as randomUUID10 } from "node:crypto";
+import fs8 from "node:fs/promises";
+import path8 from "node:path";
 
 // src/slskd.js
-import { randomUUID as randomUUID6 } from "node:crypto";
-
-// src/store.js
-import { createHash as createHash2, randomUUID as randomUUID5 } from "node:crypto";
-import fs3 from "node:fs/promises";
-import path3 from "node:path";
-var sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-async function readJson(file, fallback) {
-  try {
-    return JSON.parse(await fs3.readFile(file, "utf8"));
-  } catch {
-    return fallback;
-  }
-}
-async function writeJson(file, value) {
-  await fs3.mkdir(path3.dirname(file), { recursive: true });
-  const temp = `${file}.${process.pid}.${randomUUID5()}.tmp`;
-  await fs3.writeFile(temp, JSON.stringify(value));
-  await fs3.rename(temp, file);
-}
-async function tryLock(dir, staleMs) {
-  try {
-    await fs3.mkdir(dir);
-  } catch (error) {
-    if (error.code !== "EEXIST") throw error;
-    const stat = await fs3.stat(dir).catch(() => null);
-    if (stat && Date.now() - stat.mtimeMs < staleMs) return null;
-    await fs3.rm(dir, { recursive: true, force: true });
-    try {
-      await fs3.mkdir(dir);
-    } catch {
-      return null;
-    }
-  }
-  let released = false;
-  return {
-    async touch() {
-      if (released) return;
-      const now = /* @__PURE__ */ new Date();
-      await fs3.utimes(dir, now, now).catch(() => {
-      });
-    },
-    async release() {
-      released = true;
-      await fs3.rm(dir, { recursive: true, force: true }).catch(() => {
-      });
-    }
-  };
-}
-async function withLock(dir, staleMs, run, { waitMs = 3e4 } = {}) {
-  const until = Date.now() + waitMs;
-  for (; ; ) {
-    const lock = await tryLock(dir, staleMs);
-    if (lock) {
-      try {
-        return await run(lock);
-      } finally {
-        await lock.release();
-      }
-    }
-    if (Date.now() > until) throw new Error(`Timed out waiting for ${path3.basename(dir)}`);
-    await sleep(50 + Math.random() * 100);
-  }
-}
-var Throttle = class {
-  constructor(folder, intervalMs) {
-    this.lockDir = path3.join(folder, "mb-throttle.lock");
-    this.stateFile = path3.join(folder, "mb-throttle.json");
-    this.intervalMs = intervalMs;
-  }
-  async run(dispatch) {
-    if (!this.intervalMs) return dispatch();
-    return withLock(this.lockDir, 12e4, async () => {
-      const state = await readJson(this.stateFile, { next: 0 });
-      const wait = (Number(state.next) || 0) - Date.now();
-      if (wait > 0) await sleep(wait);
-      await writeJson(this.stateFile, { next: Date.now() + this.intervalMs });
-      try {
-        return await dispatch();
-      } finally {
-        await writeJson(this.stateFile, { next: Date.now() + this.intervalMs });
-      }
-    }, { waitMs: 12e4 });
-  }
-};
-var FileCache = class {
-  constructor(folder) {
-    this.folder = folder;
-  }
-  file(key) {
-    const hash = createHash2("sha1").update(key).digest("hex");
-    return path3.join(this.folder, hash.slice(0, 2), `${hash}.json`);
-  }
-  async get(key, ttlMs) {
-    const entry = await readJson(this.file(key), null);
-    if (!entry || Date.now() - entry.time > ttlMs) return null;
-    return entry.value;
-  }
-  async set(key, value) {
-    await writeJson(this.file(key), { time: Date.now(), key, value }).catch(() => {
-    });
-  }
-};
-async function pruneCache(folder, maxAgeMs) {
-  const stamp = path3.join(folder, ".pruned");
-  const last3 = (await fs3.stat(stamp).catch(() => null))?.mtimeMs ?? 0;
-  if (Date.now() - last3 < 24 * 60 * 6e4) return 0;
-  await fs3.mkdir(folder, { recursive: true });
-  await fs3.writeFile(stamp, "");
-  let removed = 0;
-  for (const dir of await fs3.readdir(folder).catch(() => [])) {
-    const sub = path3.join(folder, dir);
-    for (const name of await fs3.readdir(sub).catch(() => [])) {
-      const file = path3.join(sub, name);
-      const stat = await fs3.stat(file).catch(() => null);
-      if (stat && Date.now() - stat.mtimeMs > maxAgeMs) {
-        await fs3.rm(file, { force: true });
-        removed++;
-      }
-    }
-  }
-  return removed;
-}
-
-// src/slskd.js
+import { randomUUID as randomUUID9 } from "node:crypto";
 var Slskd = class {
   constructor({ url, apiKey }, fetchImpl = fetch) {
     if (!url || !apiKey) throw new Error("Set the slskd URL and API key on the plugin's page");
@@ -37769,7 +38871,7 @@ var Slskd = class {
   }
   // Starts a search and returns its id.
   async startSearch(searchText2, searchTimeoutMs) {
-    const id = randomUUID6();
+    const id = randomUUID9();
     const body = { id, searchText: searchText2, searchTimeout: searchTimeoutMs, filterResponses: true, minimumResponseFileCount: 1, responseLimit: 200, fileLimit: 2e4 };
     await this.request("POST", "/searches", body, { timeoutMs: searchTimeoutMs + 15e3 });
     return id;
@@ -37809,328 +38911,6 @@ var Slskd = class {
 };
 var FAILED_STATES = /Errored|Rejected|Cancelled|TimedOut|Aborted|Failed/i;
 var isSucceeded = (state) => /Completed/i.test(state) && /Succeeded/i.test(state);
-
-// src/tags.js
-var import_node_taglib_sharp = __toESM(require_dist(), 1);
-import { randomUUID as randomUUID7 } from "node:crypto";
-import { closeSync, fstatSync, openSync, readSync } from "node:fs";
-import fs4 from "node:fs/promises";
-import path4 from "node:path";
-import_node_taglib_sharp.Id3v2Settings.useNumericGenres = false;
-var READ_STYLE = import_node_taglib_sharp.ReadStyle.None | import_node_taglib_sharp.ReadStyle.PictureLazy;
-var READ_WITH_PROPERTIES = import_node_taglib_sharp.ReadStyle.Average | import_node_taglib_sharp.ReadStyle.PictureLazy;
-var ADDED_TAG_TYPES = import_node_taglib_sharp.TagTypes.Id3v1 | import_node_taglib_sharp.TagTypes.Ape | import_node_taglib_sharp.TagTypes.MovieId | import_node_taglib_sharp.TagTypes.DivX;
-var ITUNES_MEAN = "com.apple.iTunes";
-var MUSICBRAINZ_UFID_OWNER = "http://musicbrainz.org";
-var AUDIO_EXTENSIONS = /* @__PURE__ */ new Set([".flac", ".mp3", ".m4a", ".mp4", ".ogg", ".oga", ".opus"]);
-var isAudioPath = (file) => AUDIO_EXTENSIONS.has(path4.extname(file).toLowerCase());
-var text = (value) => value == null ? "" : String(value).trim();
-var texts = (value) => (Array.isArray(value) ? value : [value]).map(text).filter(Boolean);
-var positive2 = (value) => {
-  const number = Number(value);
-  return Number.isSafeInteger(number) && number > 0 ? number : 0;
-};
-var xiphOf = (file) => file.getTag(import_node_taglib_sharp.TagTypes.Xiph, false);
-var id3Of = (file) => file.getTag(import_node_taglib_sharp.TagTypes.Id3v2, false);
-var appleOf = (file) => file.getTag(import_node_taglib_sharp.TagTypes.Apple, false);
-function userTextFrames(id3, description) {
-  const wanted = description.toLowerCase();
-  return id3.getFramesByClassType(import_node_taglib_sharp.Id3v2FrameClassType.UserTextInformationFrame).filter((frame) => frame.description.toLowerCase() === wanted);
-}
-function textField(xiphName, id3Description, apple) {
-  const box = apple.box ? import_node_taglib_sharp.ByteVector.fromString(apple.box, import_node_taglib_sharp.StringType.Latin1) : null;
-  return {
-    read(file) {
-      const xiph = xiphOf(file);
-      const id3 = id3Of(file);
-      const appleTag = appleOf(file);
-      for (const values of [
-        xiph?.getField(xiphName),
-        id3 && userTextFrames(id3, id3Description).flatMap((frame) => frame.text || []),
-        appleTag && (box ? appleTag.getQuickTimeStrings(box) : appleTag.getItunesStrings(ITUNES_MEAN, apple.name))
-      ]) {
-        const found = texts(values ?? []);
-        if (found.length) return found;
-      }
-      return [];
-    },
-    write(file, values) {
-      const xiph = xiphOf(file);
-      if (xiph) xiph.setFieldAsStrings(xiphName, ...values);
-      const appleTag = appleOf(file);
-      if (appleTag) {
-        if (box) appleTag.setQuickTimeStrings(box, values);
-        else appleTag.setItunesStrings(ITUNES_MEAN, apple.name, ...values);
-      }
-      const id3 = id3Of(file);
-      if (id3) {
-        for (const frame of userTextFrames(id3, id3Description)) id3.removeFrame(frame);
-        if (values.length) {
-          const frame = import_node_taglib_sharp.Id3v2UserTextInformationFrame.fromDescription(id3Description);
-          frame.text = values;
-          id3.addFrame(frame);
-        }
-      }
-    }
-  };
-}
-var workField = textField("WORK", "WORK", { box: "\xA9wrk" });
-var workIdField = textField("MUSICBRAINZ_WORKID", "MusicBrainz Work Id", { name: "MusicBrainz Work Id" });
-var artistIdsField = textField("MUSICBRAINZ_ARTISTID", "MusicBrainz Artist Id", { name: "MusicBrainz Artist Id" });
-var albumArtistIdsField = textField("MUSICBRAINZ_ALBUMARTISTID", "MusicBrainz Album Artist Id", { name: "MusicBrainz Album Artist Id" });
-var movementNameField = textField("MOVEMENTNAME", "MOVEMENTNAME", { name: "MOVEMENTNAME" });
-var movementNumberField = textField("MOVEMENT", "MOVEMENT", { name: "MOVEMENT" });
-var movementTotalField = textField("MOVEMENTTOTAL", "MOVEMENTTOTAL", { name: "MOVEMENTTOTAL" });
-var catalogueField = textField("CLASSICAL_CATALOGUE", "CLASSICAL_CATALOGUE", { name: "CLASSICAL_CATALOGUE" });
-var performersField = {
-  read: (file) => texts(xiphOf(file)?.getField("PERFORMER") ?? []),
-  write(file, values) {
-    xiphOf(file)?.setFieldAsStrings("PERFORMER", ...values);
-  }
-};
-var WRITERS = {
-  title: {
-    read: (file) => texts(file.tag.title),
-    write: (file, values) => file.tag.title = values[0] ?? void 0
-  },
-  artist: {
-    read: (file) => texts(file.tag.performers),
-    write: (file, values) => file.tag.performers = values
-  },
-  albumArtist: {
-    read: (file) => texts(file.tag.albumArtists),
-    write: (file, values) => file.tag.albumArtists = values
-  },
-  composer: {
-    read: (file) => texts(file.tag.composers),
-    write: (file, values) => file.tag.composers = values
-  },
-  composerSort: {
-    read: (file) => texts(file.tag.composersSort),
-    write: (file, values) => file.tag.composersSort = values
-  },
-  conductor: {
-    read: (file) => texts(file.tag.conductor),
-    write: (file, values) => file.tag.conductor = values[0] ?? void 0
-  },
-  performers: performersField,
-  movementName: movementNameField,
-  movementNumber: movementNumberField,
-  movementTotal: movementTotalField,
-  catalogue: catalogueField,
-  work: { read: (file) => workField.read(file), write: (file, values) => workField.write(file, values) },
-  workId: { read: (file) => workIdField.read(file), write: (file, values) => workIdField.write(file, values) },
-  recordingMbid: {
-    read: (file) => texts(file.tag.musicBrainzTrackId),
-    write: (file, values) => {
-      const id3 = id3Of(file);
-      for (const frame of id3?.getFramesByClassType(import_node_taglib_sharp.Id3v2FrameClassType.UniqueFileIdentifierFrame) || []) {
-        if (frame.owner === MUSICBRAINZ_UFID_OWNER) id3.removeFrame(frame);
-      }
-      file.tag.musicBrainzTrackId = values[0] ?? void 0;
-    }
-  }
-};
-var CLASSICAL_FIELDS = ["composer", "composerSort", "work", "movementName", "movementNumber", "movementTotal", "performers", "conductor", "catalogue", "workId"];
-var NOT_ID3 = /* @__PURE__ */ new Set(["movementName", "movementNumber", "movementTotal", "performers"]);
-var FORMAT_FIELDS = {
-  ".flac": CLASSICAL_FIELDS,
-  ".mp3": CLASSICAL_FIELDS.filter((field2) => !NOT_ID3.has(field2))
-};
-var writableFields = (filePath) => FORMAT_FIELDS[path4.extname(String(filePath || "")).toLowerCase()] || [];
-function isFragmentedMp4(filePath) {
-  const fd = openSync(filePath, "r");
-  try {
-    const size = fstatSync(fd).size;
-    const header = Buffer.alloc(16);
-    for (let offset = 0; offset + 8 <= size; ) {
-      readSync(fd, header, 0, 16, offset);
-      const type = header.toString("latin1", 4, 8);
-      if (offset === 0 && type !== "ftyp") return false;
-      if (type === "moof") return true;
-      const boxSize = header.readUInt32BE(0);
-      const length = boxSize === 1 ? Number(header.readBigUInt64BE(8)) : boxSize === 0 ? size - offset : boxSize;
-      if (length < 8) return false;
-      offset += length;
-    }
-    return false;
-  } finally {
-    closeSync(fd);
-  }
-}
-var UnsupportedFormat = class extends Error {
-};
-function openFile(filePath, readStyle = READ_STYLE, asPath = filePath) {
-  if (!isAudioPath(asPath)) throw new UnsupportedFormat(`can't tag ${path4.extname(asPath) || "this kind of"} files`);
-  if (isFragmentedMp4(filePath)) throw new UnsupportedFormat("can't tag fragmented MP4 files");
-  try {
-    return import_node_taglib_sharp.File.createFromPath(filePath, `taglib/${path4.extname(asPath).slice(1).toLowerCase()}`, readStyle);
-  } catch (error) {
-    if (/unsupported format/i.test(String(error?.message))) throw new UnsupportedFormat("can't tag this kind of file");
-    throw error;
-  }
-}
-function readValues(filePath, fields) {
-  const file = openFile(filePath);
-  try {
-    return Object.fromEntries(fields.map((field2) => [field2, WRITERS[field2].read(file)]));
-  } finally {
-    file.dispose();
-  }
-}
-function readTags(filePath) {
-  const file = openFile(filePath, READ_WITH_PROPERTIES);
-  try {
-    const tag = file.tag;
-    return {
-      title: text(tag.title),
-      artist: text(tag.performers?.[0]),
-      albumArtist: text(tag.albumArtists?.[0]),
-      album: text(tag.album),
-      recordingMbid: text(tag.musicBrainzTrackId),
-      releaseMbid: text(tag.musicBrainzReleaseId),
-      releaseGroupMbid: text(tag.musicBrainzReleaseGroupId),
-      // Every album artist ID: taglib's own property has only the first.
-      albumArtistMbids: [...new Set([...albumArtistIdsField.read(file), text(tag.musicBrainzReleaseArtistId)].flatMap((v) => texts(v.split(/[;/]/))))],
-      artistMbids: artistIdsField.read(file).flatMap((value) => texts(value.split(/[;/]/))),
-      conductor: text(tag.conductor),
-      // Vorbis PERFORMER, one value a performer, often with the instrument
-      // in brackets: "Martha Argerich (piano)".
-      performers: texts(xiphOf(file)?.getField("PERFORMER") ?? []),
-      genres: texts(tag.genres ?? []).flatMap((genre) => texts(genre.split(";"))),
-      composer: texts(tag.composers ?? []),
-      work: workField.read(file)[0] ?? "",
-      // Some taggers put the work here and leave WORK empty.
-      grouping: text(tag.grouping),
-      workId: workIdField.read(file)[0] ?? "",
-      trackNumber: positive2(tag.track),
-      discNumber: positive2(tag.disc),
-      durationMs: Math.round(file.properties?.durationMilliseconds || 0),
-      year: Number.isSafeInteger(tag.year) && tag.year > 0 ? tag.year : null,
-      label: text(tag.publisher)
-    };
-  } finally {
-    file.dispose();
-  }
-}
-var same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-async function writeTags(filePath, values) {
-  const source = path4.resolve(filePath);
-  const preview = openFile(source);
-  let changed;
-  try {
-    changed = Object.keys(values).filter((field2) => !same(WRITERS[field2].read(preview), texts(values[field2])));
-  } finally {
-    preview.dispose();
-  }
-  if (!changed.length) return [];
-  const extension = path4.extname(source);
-  const working = path4.join(path4.dirname(source), `.${path4.basename(source, extension)}.${randomUUID7()}.tagging`);
-  await fs4.copyFile(source, working, fs4.constants.COPYFILE_FICLONE);
-  try {
-    const file = openFile(working, READ_STYLE, source);
-    try {
-      file.removeTags(ADDED_TAG_TYPES & ~file.tagTypesOnDisk);
-      const id3 = id3Of(file);
-      if (id3 && !(file.tagTypesOnDisk & import_node_taglib_sharp.TagTypes.Id3v2)) id3.version = 4;
-      for (const field2 of changed) WRITERS[field2].write(file, texts(values[field2]));
-      file.save();
-    } finally {
-      file.dispose();
-    }
-    const verified2 = openFile(working, READ_STYLE, source);
-    try {
-      for (const field2 of changed) {
-        if (!same(WRITERS[field2].read(verified2), texts(values[field2])))
-          throw new Error(`Tag verification failed for ${field2}`);
-      }
-    } finally {
-      verified2.dispose();
-    }
-    await fs4.rename(working, source);
-  } catch (error) {
-    await fs4.rm(working, { force: true }).catch(() => {
-    });
-    throw error;
-  }
-  return changed;
-}
-
-// src/works.js
-var SUFFIX = "(?:[a-z]{1,3}(?![a-z]))?";
-var CATALOGUES = [
-  [/\bBWV\s*(\d+[a-z]?)/i, "BWV"],
-  [/\bHWV\s*(\d+[a-z]?)/i, "HWV"],
-  [/\bRV\s*(\d+[a-z]?)/i, "RV"],
-  [/\bK(?:V|\.)?\s*(\d+[a-z]?)\b/, "K"],
-  [/\bD\.?\s*(\d+[a-z]?)\b/, "D"],
-  [/\bHob\.?\s*([IVXL]+[a-z]?:\s*\d+[a-z]?)/i, "Hob"],
-  [new RegExp(`\\bWoO\\s*(\\d+${SUFFIX})`, "i"), "WoO"],
-  // "S. 161", and Hyperion's "S161", "S166r" or "S534ii/bis". Searle's own
-  // sub-numbers after a slash name a piece too ("S. 534/2b", "S. 385/3",
-  // "S163d/ii").
-  [new RegExp(`\\bS(?:\\.\\s*|(?=\\d))(\\d+${SUFFIX}(?:\\/(?:bis|[ivx]{1,4}(?![a-z])|\\d+${SUFFIX}))?)`), "S"],
-  [new RegExp(`\\bSz\\.?\\s*(\\d+${SUFFIX})`, "i"), "Sz"],
-  [new RegExp(`\\bBB\\s*(\\d+${SUFFIX})`), "BB"],
-  [new RegExp(`\\bTrV\\s*(\\d+${SUFFIX})`, "i"), "TrV"],
-  [new RegExp(`\\bL\\.\\s*(\\d+${SUFFIX})`), "L"],
-  [new RegExp(`\\bFP\\s*(\\d+${SUFFIX})`), "FP"],
-  // Ravel's (Marnat): "Boléro, M 81", "Pavane…, M.19". Capital M only.
-  // "M. 63/2" is the second of M. 63's pieces.
-  [new RegExp(`(?<![\\p{L}\\d])M(?:\\.\\s*|\\s+)(\\d+${SUFFIX}(?:\\/\\d+)?)(?![\\d])`, "u"), "M"]
-];
-var OPUS = /\bop(?:us|\.)?\s*(\d+[a-z]?)(?:\s*,?\s*(?:no\.?|nr\.?|n°)\s*(\d+))?/i;
-var PIECE = /^\s*,?\s*(?:no\.?|nr\.?|n°)\s*(\d+[a-z]{0,3})(?![a-z\d])/i;
-function catalogueMatch(title) {
-  const text7 = String(title || "");
-  for (const [pattern, prefix] of CATALOGUES) {
-    const match2 = text7.match(pattern);
-    if (match2) return { prefix, number: match2[1].replace(/\s+/g, ""), end: match2.index + match2[0].length, text: text7 };
-  }
-  return null;
-}
-function catalogueNumber(title) {
-  const match2 = catalogueMatch(title);
-  if (match2) return `${match2.prefix} ${match2.number}`;
-  const opus = String(title || "").match(OPUS);
-  if (opus) return `op ${opus[1]}${opus[2] ? ` no ${opus[2]}` : ""}`;
-  return "";
-}
-function cataloguePiece(title) {
-  const match2 = catalogueMatch(title);
-  return match2 ? match2.text.slice(match2.end).match(PIECE)?.[1]?.toLowerCase() || "" : "";
-}
-function shortWorkTitle(title) {
-  let text7 = String(title || "").split(":")[0];
-  text7 = text7.replace(OPUS, " ");
-  for (const [pattern] of CATALOGUES) text7 = text7.replace(pattern, " ");
-  text7 = text7.replace(/\bin\s+[A-G](?:[- ]?(?:flat|sharp|♭|♯|b|#))?\s*(?:major|minor|maj|min|dur|moll)\b/gi, " ").replace(/\b(?:no|nr|n°)\.?\s*(?=\d)/gi, " ").replace(/[“”"'’,;()[\]]/g, " ");
-  return searchWords(text7);
-}
-function searchWords(text7) {
-  return String(text7 || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim().split(/\s+/).filter(Boolean).join(" ");
-}
-function surname(person) {
-  if (!person) return "";
-  const sort = String(person.sortName || "");
-  if (sort.includes(",")) return searchWords(sort.split(",")[0]);
-  return searchWords(person.name);
-}
-function creditString(credit) {
-  return (credit || []).map((entry) => `${entry.name ?? entry.artist?.name ?? ""}${entry.joinphrase ?? ""}`).join("").trim();
-}
-async function topWork(mb, work, depth = 0, inc = "artist-rels+work-rels", { stop: stop2 = () => false } = {}) {
-  if (!work || depth >= 3) return work;
-  const parent = (work.relations || []).find((rel) => rel.type === "parts" && rel.direction === "backward" && rel.work?.id);
-  if (!parent) return work;
-  const data = await mb.get("work", parent.work.id, inc);
-  return data && !stop2(data, work) ? topWork(mb, data, depth + 1, inc, { stop: stop2 }) : work;
-}
-var RELEASE_INC = "recordings+artist-credits+release-groups+media";
-function releaseYear(date) {
-  const year = Number(String(date || "").slice(0, 4));
-  return Number.isInteger(year) && year > 0 ? year : null;
-}
 
 // src/settings.js
 var DEFAULT_SEPARATOR = " \u2014 ";
@@ -38330,7 +39110,7 @@ function searchLadder(info, { albumTitle = "" } = {}) {
   }
   return ladder;
 }
-var haystackOf = (folder) => ` ${words([folder.directory, ...folder.files.map((f) => f.filename)].join(" ")).join(" ")} `;
+var haystackOf = (folder2) => ` ${words([folder2.directory, ...folder2.files.map((f) => f.filename)].join(" ")).join(" ")} `;
 var has = (haystack, name) => {
   const wanted = words(name);
   return wanted.length > 0 && wanted.every((word) => haystack.includes(` ${word} `));
@@ -38339,8 +39119,8 @@ var coverage = (haystack, text7) => {
   const wanted = words(text7).filter((word) => word.length > 1);
   return wanted.length ? wanted.filter((word) => haystack.includes(` ${word} `)).length / wanted.length : 0;
 };
-function scoreFolder(folder, info, { albumTitle = "", movements = [] } = {}) {
-  const haystack = haystackOf(folder);
+function scoreFolder(folder2, info, { albumTitle = "", movements = [] } = {}) {
+  const haystack = haystackOf(folder2);
   const reasons = [];
   let score = 0;
   const performer = surname(info.performer);
@@ -38368,10 +39148,10 @@ function scoreFolder(folder, info, { albumTitle = "", movements = [] } = {}) {
     const named = movements.filter((title) => coverage(haystack, title) >= 0.5).length / movements.length;
     if (named > 0) score += Math.round(named * 8), reasons.push(`movements ${Math.round(named * 100)}%`);
   }
-  if (folder.format === "flac") score += 5, reasons.push("lossless");
+  if (folder2.format === "flac") score += 5, reasons.push("lossless");
   return { score: Math.min(score, 100), rejected: null, reasons };
 }
-var folderKey = (folder) => `${fold(folder.directory.split(/[\\/]/).pop())}|${folder.files.map((f) => f.size).join(",")}`;
+var folderKey = (folder2) => `${fold(folder2.directory.split(/[\\/]/).pop())}|${folder2.files.map((f) => f.size).join(",")}`;
 function rankCandidates(candidates2) {
   const sorted = [...candidates2].sort((a, b) => b.match.score - a.match.score || a.availability - b.availability);
   const firstOf = /* @__PURE__ */ new Map();
@@ -38478,10 +39258,10 @@ function groupFolders(responses) {
       });
     }
   }
-  for (const folder of folders.values()) {
-    folder.files.sort((a, b) => naturalCompare(remoteBase(a.filename), remoteBase(b.filename)));
-    const extensions = new Set(folder.files.map((f) => f.extension));
-    folder.format = extensions.size === 1 ? [...extensions][0] : null;
+  for (const folder2 of folders.values()) {
+    folder2.files.sort((a, b) => naturalCompare(remoteBase(a.filename), remoteBase(b.filename)));
+    const extensions = new Set(folder2.files.map((f) => f.extension));
+    folder2.format = extensions.size === 1 ? [...extensions][0] : null;
   }
   return [...folders.values()];
 }
@@ -38494,27 +39274,27 @@ function linesUp(files, tracks, options = {}) {
   if (files.length !== tracks.length) return false;
   return files.every((file, i) => file.lengthMs != null && lengthGap(file.lengthMs, tracks[i], options) <= LENGTH_TOLERANCE_MS);
 }
-function folderDiscs(folder, release, options = {}) {
+function folderDiscs(folder2, release, options = {}) {
   const all = release.discs.flatMap((disc2) => disc2.tracks);
-  if (release.discs.length > 1 && linesUp(folder.files, all, options)) return release.discs.map((d) => d.position);
-  const disc = release.discs.find((d) => linesUp(folder.files, d.tracks, options));
+  if (release.discs.length > 1 && linesUp(folder2.files, all, options)) return release.discs.map((d) => d.position);
+  const disc = release.discs.find((d) => linesUp(folder2.files, d.tracks, options));
   return disc ? [disc.position] : null;
 }
-var folderScore = (folder) => (folder.freeSlot ? 0 : 1e9) + folder.queueLength * 1e6 + (LOSSLESS.has(folder.format) ? 0 : 1e5) - Math.min(folder.speed, 99999);
-function mapFiles(folder, release, discPositions) {
+var folderScore = (folder2) => (folder2.freeSlot ? 0 : 1e9) + folder2.queueLength * 1e6 + (LOSSLESS.has(folder2.format) ? 0 : 1e5) - Math.min(folder2.speed, 99999);
+function mapFiles(folder2, release, discPositions) {
   const tracks = discPositions.flatMap((position) => {
     const disc = release.discs.find((d) => d.position === position);
     return disc.tracks.map((track) => ({ disc: position, track }));
   });
-  return folder.files.map((file, i) => ({ file, ...tracks[i] }));
+  return folder2.files.map((file, i) => ({ file, ...tracks[i] }));
 }
 function albumCandidates(folders, release) {
   const byUser = /* @__PURE__ */ new Map();
-  for (const folder of folders) {
-    const discs = folderDiscs(folder, release);
+  for (const folder2 of folders) {
+    const discs = folderDiscs(folder2, release);
     if (!discs) continue;
-    if (!byUser.has(folder.username)) byUser.set(folder.username, []);
-    byUser.get(folder.username).push({ folder, discs });
+    if (!byUser.has(folder2.username)) byUser.set(folder2.username, []);
+    byUser.get(folder2.username).push({ folder: folder2, discs });
   }
   const wanted = release.discs.map((d) => d.position);
   const candidates2 = [];
@@ -38528,7 +39308,7 @@ function albumCandidates(folders, release) {
       match2.discs.forEach((d) => covered.add(d));
     }
     if (!wanted.every((d) => covered.has(d))) continue;
-    const files = chosen.flatMap(({ folder, discs }) => mapFiles(folder, release, discs));
+    const files = chosen.flatMap(({ folder: folder2, discs }) => mapFiles(folder2, release, discs));
     const first = chosen[0].folder;
     candidates2.push({ username, folders: chosen.map((c) => c.folder), files, score: Math.max(...chosen.map((c) => folderScore(c.folder))), format: first.format, bitRate: first.files[0]?.bitRate ?? null });
   }
@@ -38536,12 +39316,12 @@ function albumCandidates(folders, release) {
 }
 function trackCandidates(folders, release, discPosition, trackIndexInDisc) {
   const out = [];
-  for (const folder of folders) {
-    const discs = folderDiscs(folder, release, { anyEdition: true });
+  for (const folder2 of folders) {
+    const discs = folderDiscs(folder2, release, { anyEdition: true });
     if (!discs?.includes(discPosition)) continue;
-    const mapped = mapFiles(folder, release, discs);
+    const mapped = mapFiles(folder2, release, discs);
     const hit = mapped.find((m) => m.disc === discPosition && m.track === release.discs.find((d) => d.position === discPosition).tracks[trackIndexInDisc]);
-    if (hit) out.push({ folder, ...hit, score: folderScore(folder) });
+    if (hit) out.push({ folder: folder2, ...hit, score: folderScore(folder2) });
   }
   return out.sort((a, b) => a.score - b.score);
 }
@@ -38552,14 +39332,14 @@ function describeMisses(folders, release, options = {}) {
   let wrongCount = 0;
   let wrongLengths = 0;
   let closest = null;
-  for (const folder of folders) {
-    if (folderDiscs(folder, release, options)) continue;
-    if (!counts.has(folder.files.length)) wrongCount++;
-    else if (folder.files.some((f) => f.lengthMs == null)) noLengths++;
+  for (const folder2 of folders) {
+    if (folderDiscs(folder2, release, options)) continue;
+    if (!counts.has(folder2.files.length)) wrongCount++;
+    else if (folder2.files.some((f) => f.lengthMs == null)) noLengths++;
     else {
       wrongLengths++;
-      const tracks = release.discs.find((d) => d.tracks.length === folder.files.length)?.tracks ?? release.discs.flatMap((d) => d.tracks);
-      const offs = folder.files.map((f, i) => tracks[i] ? lengthGap(f.lengthMs, tracks[i], options) : Infinity);
+      const tracks = release.discs.find((d) => d.tracks.length === folder2.files.length)?.tracks ?? release.discs.flatMap((d) => d.tracks);
+      const offs = folder2.files.map((f, i) => tracks[i] ? lengthGap(f.lengthMs, tracks[i], options) : Infinity);
       const worst = Math.max(...offs);
       if (!closest || worst < closest.worst) closest = { worst, at: offs.indexOf(worst) + 1, over: offs.filter((o) => o > LENGTH_TOLERANCE_MS).length };
     }
@@ -38615,16 +39395,16 @@ async function searchFolders(ctx, slskd, ladder, { info, albumTitle, movements, 
       continue;
     }
     let qualified = 0;
-    for (const folder of found) {
-      const key = `${folder.username}\0${folder.directory}`;
+    for (const folder2 of found) {
+      const key = `${folder2.username}\0${folder2.directory}`;
       if (kept.has(key)) continue;
-      const match2 = scoreFolder(folder, info, { albumTitle, movements });
+      const match2 = scoreFolder(folder2, info, { albumTitle, movements });
       if (match2.rejected) {
-        if (rejected.length < 200) rejected.push({ username: folder.username, directory: folder.directory, reason: match2.rejected, step });
+        if (rejected.length < 200) rejected.push({ username: folder2.username, directory: folder2.directory, reason: match2.rejected, step });
         continue;
       }
       qualified++;
-      kept.set(key, Object.assign(folder, { match: match2, step }));
+      kept.set(key, Object.assign(folder2, { match: match2, step }));
     }
     const done = accept([...kept.values()]);
     steps.push({ step, label, query, folders: found.length, qualified, stopped: done });
@@ -38635,11 +39415,11 @@ async function searchFolders(ctx, slskd, ladder, { info, albumTitle, movements, 
 var DIAGNOSTICS = "slskd-searches.json";
 var KEEP_DIAGNOSTICS = 25;
 async function recordSearch(ctx, record) {
-  const file = path5.join(ctx.dataFolder, DIAGNOSTICS);
+  const file = path8.join(ctx.dataFolder, DIAGNOSTICS);
   const previous = await readJson(file, []);
   await writeJson(file, [{ at: Date.now(), ...record }, ...Array.isArray(previous) ? previous : []].slice(0, KEEP_DIAGNOSTICS)).catch((error) => ctx.log(`Couldn't save slskd diagnostics: ${error.message}`));
 }
-var searchDiagnostics = (ctx) => readJson(path5.join(ctx.dataFolder, DIAGNOSTICS), []);
+var searchDiagnostics = (ctx) => readJson(path8.join(ctx.dataFolder, DIAGNOSTICS), []);
 var describe = (candidate) => ({
   username: candidate.username,
   directory: candidate.folders?.[0]?.directory ?? candidate.folder?.directory,
@@ -38760,7 +39540,7 @@ async function searchAlbum(ctx, album, { manual = false } = {}) {
     }
   }));
 }
-var downloadsDir = (ctx) => path5.join(ctx.dataFolder, "downloads");
+var downloadsDir = (ctx) => path8.join(ctx.dataFolder, "downloads");
 async function startDownload(ctx, result, kind) {
   const data = result?.data;
   if (!data?.username || !Array.isArray(data.files) || !data.files.length) throw new Error("The result has no files to download");
@@ -38774,8 +39554,8 @@ async function startDownload(ctx, result, kind) {
   }
   const slskd = slskdFor(ctx);
   await slskd.enqueue(data.username, data.files.map((f) => ({ filename: f.filename, size: f.size })));
-  const id = randomUUID8();
-  await writeJson(path5.join(downloadsDir(ctx), `${id}.json`), { kind, key, username: data.username, files: data.files, startedAt: Date.now() });
+  const id = randomUUID10();
+  await writeJson(path8.join(downloadsDir(ctx), `${id}.json`), { kind, key, username: data.username, files: data.files, startedAt: Date.now() });
   return { pending: id };
 }
 var downloadKey = (username, files) => `${username}\0${files.map((f) => f.filename).sort().join("\0")}`;
@@ -38783,11 +39563,11 @@ var KEEP_DOWNLOADS_MS = 2 * 24 * 60 * 6e4;
 var MISSING_GRACE_MS = 2 * 6e4;
 async function findDownload(ctx, key) {
   const dir = downloadsDir(ctx);
-  for (const name of await fs5.readdir(dir).catch(() => [])) {
+  for (const name of await fs8.readdir(dir).catch(() => [])) {
     if (!name.endsWith(".json")) continue;
-    const record = await readJson(path5.join(dir, name), null);
+    const record = await readJson(path8.join(dir, name), null);
     if (!record || Date.now() - (record.startedAt || 0) > KEEP_DOWNLOADS_MS) {
-      await fs5.rm(path5.join(dir, name), { force: true });
+      await fs8.rm(path8.join(dir, name), { force: true });
       continue;
     }
     if (record.key === key && !record.failed) return name.replace(/\.json$/, "");
@@ -38796,20 +39576,20 @@ async function findDownload(ctx, key) {
 }
 async function locate(downloadFolder, file) {
   const base = remoteBase(file.filename);
-  const direct = path5.join(downloadFolder, remoteBase(remoteDir(file.filename)), base);
-  const stat = await fs5.stat(direct).catch(() => null);
+  const direct = path8.join(downloadFolder, remoteBase(remoteDir(file.filename)), base);
+  const stat = await fs8.stat(direct).catch(() => null);
   if (stat?.isFile()) return direct;
   let seen = 0;
   const walk = async (dir, depth) => {
     if (depth > 4) return null;
-    for (const entry of await fs5.readdir(dir, { withFileTypes: true }).catch(() => [])) {
+    for (const entry of await fs8.readdir(dir, { withFileTypes: true }).catch(() => [])) {
       if (++seen > 5e4) return null;
-      const full = path5.join(dir, entry.name);
+      const full = path8.join(dir, entry.name);
       if (entry.isDirectory()) {
         const found = await walk(full, depth + 1);
         if (found) return found;
       } else if (entry.isFile() && (entry.name === base || entry.name.replace(/_\d{15,}(?=\.[^.]+$)/, "") === base)) {
-        const s = await fs5.stat(full).catch(() => null);
+        const s = await fs8.stat(full).catch(() => null);
         if (s && (!file.size || s.size === file.size)) return full;
       }
     }
@@ -38818,7 +39598,7 @@ async function locate(downloadFolder, file) {
   return walk(downloadFolder, 0);
 }
 async function downloadStatus(ctx, id, directory) {
-  const record = await readJson(path5.join(downloadsDir(ctx), `${id}.json`), null);
+  const record = await readJson(path8.join(downloadsDir(ctx), `${id}.json`), null);
   if (!record) throw new Error("This download is unknown to the plugin");
   const slskd = slskdFor(ctx);
   const transfers = await slskd.downloads(record.username);
@@ -38837,7 +39617,7 @@ async function downloadStatus(ctx, id, directory) {
     }
   }
   const failed = states.find((state) => FAILED_STATES.test(state));
-  if (failed) await writeJson(path5.join(downloadsDir(ctx), `${id}.json`), { ...record, failed: true });
+  if (failed) await writeJson(path8.join(downloadsDir(ctx), `${id}.json`), { ...record, failed: true });
   if (failed) throw new Error(`slskd: ${remoteBase(record.files[states.indexOf(failed)].filename)} ${failed.replace(/^Completed,\s*/, "").toLowerCase()}`);
   if (!states.every(isSucceeded)) return { done: false };
   return finishDownload(ctx, id, record, directory);
@@ -38869,20 +39649,20 @@ async function finishDownload(ctx, id, record, directory) {
 var formatBytes = (bytes) => bytes >= 1024 ** 3 ? `${(bytes / 1024 ** 3).toFixed(1)} GB` : `${Math.max(1, Math.round(bytes / 1024 ** 2))} MB`;
 async function freeBytes(ctx, dir) {
   if (ctx.freeBytes) return ctx.freeBytes(dir);
-  for (let at = dir; ; at = path5.dirname(at)) {
-    const stats = await fs5.statfs(at).catch(() => null);
+  for (let at = dir; ; at = path8.dirname(at)) {
+    const stats = await fs8.statfs(at).catch(() => null);
     if (stats) return stats.bavail * stats.bsize;
-    if (path5.dirname(at) === at) return Infinity;
+    if (path8.dirname(at) === at) return Infinity;
   }
 }
-var link = (ctx, local, target) => (ctx.linkFile ?? fs5.link)(local, target);
+var link = (ctx, local, target) => (ctx.linkFile ?? fs8.link)(local, target);
 async function copyInto(local, target) {
-  const temp = `${target}.${randomUUID8()}.part`;
+  const temp = `${target}.${randomUUID10()}.part`;
   try {
-    await fs5.copyFile(local, temp);
-    await fs5.rename(temp, target);
+    await fs8.copyFile(local, temp);
+    await fs8.rename(temp, target);
   } catch (error) {
-    await fs5.rm(temp, { force: true }).catch(() => {
+    await fs8.rm(temp, { force: true }).catch(() => {
     });
     throw error;
   }
@@ -38894,15 +39674,15 @@ async function moveIntoPlace(ctx, id, record, directory) {
     const local = await locate(downloadFolder, file);
     if (!local) throw new Error(`Couldn't find ${remoteBase(file.filename)} in slskd's download folder`);
     const name = `${String(file.disc || 1).padStart(2, "0")}-${String(i + 1).padStart(3, "0")} ${remoteBase(file.filename)}`.replace(/[\\/]/g, "_");
-    const target = path5.join(directory, record.kind === "album" ? name : remoteBase(file.filename));
-    files.push({ local, target, file, size: (await fs5.stat(local)).size });
+    const target = path8.join(directory, record.kind === "album" ? name : remoteBase(file.filename));
+    files.push({ local, target, file, size: (await fs8.stat(local)).size });
   }
-  await fs5.mkdir(directory, { recursive: true });
+  await fs8.mkdir(directory, { recursive: true });
   const todo = [];
   for (const entry of files) {
-    const there = await fs5.stat(entry.target).catch(() => null);
+    const there = await fs8.stat(entry.target).catch(() => null);
     if (!there || there.size !== entry.size) {
-      await fs5.rm(entry.target, { force: true });
+      await fs8.rm(entry.target, { force: true });
       todo.push(entry);
     }
   }
@@ -38940,11 +39720,11 @@ async function moveIntoPlace(ctx, id, record, directory) {
       await writeTags(target, { title: [file.title], artist: [file.artist].filter(Boolean), recordingMbid: [file.recordingId] });
       tagged++;
     } catch (error) {
-      ctx.log(`Couldn't tag ${path5.basename(target)}: ${error.message}`);
+      ctx.log(`Couldn't tag ${path8.basename(target)}: ${error.message}`);
     }
   }
   ctx.log(`Download ${id}: ${files.length} file(s) ${linked ? "linked" : "copied"}, ${tagged} identified and tagged`);
-  return record.kind === "album" ? { done: true } : { done: true, path: path5.basename(files[0].target) };
+  return record.kind === "album" ? { done: true } : { done: true, path: path8.basename(files[0].target) };
 }
 
 // src/model/auto-match.js
@@ -39109,6 +39889,26 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
   const composerIndex = { people: composerPeople(catalogue) };
   const knownComposers = rows.length ? knownComposerNames(catalogue) : /* @__PURE__ */ new Set();
   const numbered = allowStructuredTitles ? numberedRuns(rows) : /* @__PURE__ */ new Set();
+  const workHead = (hints) => clean3(String(hints?.work || "").split(/\s*:\s*/, 1)[0]);
+  const sharedHeads = /* @__PURE__ */ new Map();
+  for (const row of rows) {
+    const head = workHead(row.evidence.hints);
+    if (!head) continue;
+    const key = `${row.evidence.albumId}\0${words2(head)}`;
+    sharedHeads.set(key, (sharedHeads.get(key) || 0) + 1);
+  }
+  const namesComposer = (head, composers) => {
+    const heading = words2(head).split(" ").filter(Boolean);
+    return composers.some((name) => {
+      const own = words2(name).split(" ").filter(Boolean);
+      return heading.length && heading.every((word) => own.includes(word)) || heading.includes(own.at(-1));
+    });
+  };
+  const sharedWorkTag = (row, hints) => {
+    const head = workHead(hints);
+    if (!head || !hints.composer?.length || isCollectionLike(head) || namesComposer(head, hints.composer)) return null;
+    return (sharedHeads.get(`${row.evidence.albumId}\0${words2(head)}`) || 0) >= 2 ? { title: head, evidence: "work-tag" } : null;
+  };
   for (const row of rows) {
     const tagged = row.evidence.hints || {};
     const hints = { ...tagged, title: withoutComposer(tagged.title, tagged.composer) };
@@ -39128,7 +39928,7 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
       evidence: "musicbrainz-parent",
       identity: provider.workId,
       ...provider.standalone && { standalone: true }
-    } : proposedWork(hints, allowStructuredTitles) || numberedRun(hints, numbered);
+    } : proposedWork(hints, allowStructuredTitles) || numberedRun(hints, numbered) || sharedWorkTag(row, hints);
     if (proposal && !provider && (proposal.evidence === "work-tag" && standalonePiece(hints, proposal.title) || proposal.evidence === "grouping-tag" && standalonePiece(hints, proposal.title, hints.grouping)))
       proposal.standalone = true;
     const credit = hints.composer?.length || provider?.composers?.length ? null : artistCredits(hints, { knownComposers });
@@ -39143,7 +39943,7 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
     if (!proposal || !composers.length || !Number.isSafeInteger(trackNumber) || trackNumber < 1) {
       explain?.set(row.id, {
         work: proposal?.title ?? null,
-        reason: !proposal ? "no work named: no WORK or GROUPING tag, and the title names no work" : !composers.length ? credit?.confidence === "medium" ? "composer only guessed from the artist field" : "no composer tag" : "no track number"
+        reason: !proposal ? workHead(hints) ? isCollectionLike(workHead(hints)) ? `WORK tag \u201C${workHead(hints)}\u201D not taken: it names a collection, not one work` : `WORK tag \u201C${workHead(hints)}\u201D not taken: it names no form or catalogue number, and no other track of the album shares it` : "no work named: no WORK or GROUPING tag, and the title names no work" : !composers.length ? credit?.confidence === "medium" ? "composer only guessed from the artist field" : "no composer tag" : "no track number"
       });
       continue;
     }
@@ -39430,9 +40230,10 @@ var withoutRepeatedComposer = (text7, workTitle) => {
   const match2 = clean3(text7).match(/^([^:]{2,60}):\s+(\S.*)$/);
   return match2 && words2(match2[2]).startsWith(words2(workTitle)) && words2(match2[1]).split(" ").length <= 3 ? match2[2] : text7;
 };
+var insideNumber = (text7, match2) => match2[0] === ":" && /\b[IVXLCDM]+$/i.test(text7.slice(0, match2.index)) && /^\d/.test(text7.slice(match2.index + 1));
 function stripWorkPrefixOnce(title, workTitle) {
   const text7 = clean3(title);
-  const separators = [...text7.matchAll(SEPARATOR)];
+  const separators = [...text7.matchAll(SEPARATOR)].filter((match2) => !insideNumber(text7, match2));
   const tailAt = (match2) => clean3(text7.slice(match2.index + match2[0].length));
   for (const match2 of separators) {
     const tail = tailAt(match2);
@@ -39553,10 +40354,9 @@ function composerEntity(catalogue, metadata, index, name, mbid = null) {
   }
   const existing = index.people.get(key) || [];
   if (existing.length === 1) return existing[0];
+  if (existing.length > 1) return null;
   const person = catalogue.createEntity("person", { roles: ["composer"] });
   metadata.derived(person, "name", name);
-  if (existing.length > 1)
-    catalogue.review("identity", person, { reason: "same-name-composers", name });
   index.people.set(key, [...existing, person]);
   return person;
 }
@@ -39791,6 +40591,18 @@ function creditMovementComposers(catalogue, metadata, index, recording, track, g
   const work = new Set(group.composers.map(normalized));
   (track.composers || []).filter((name) => !work.has(normalized(name))).forEach((name, i) => {
     const person = composerEntity(catalogue, metadata, index, name, group.composerIds?.[name]);
+    if (!person) {
+      raiseReview(catalogue, "contributor_identity", recording, {
+        reason: "ambiguous-name",
+        name,
+        kind: "person",
+        role: "composer",
+        instrument: null,
+        candidates: index.people.get(words2(name)) || [],
+        key: `ambiguous|${words2(name)}|composer`
+      });
+      return;
+    }
     if (!catalogue.db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role='composer' AND state='active'").get(recording, person))
       catalogue.credit(recording, person, "composer", { position: i + 1 });
   });
@@ -40064,14 +40876,10 @@ function createGroup(catalogue, group, actor4, index) {
       }
       work = catalogue.createEntity("work");
       metadata.derived(work, "title", group.work);
-      group.composers.forEach(
-        (name, i) => catalogue.credit(
-          work,
-          composerEntity(catalogue, metadata, index, name, group.composerIds?.[name]),
-          "composer",
-          { position: i + 1 }
-        )
-      );
+      group.composers.forEach((name, i) => {
+        const person = composerEntity(catalogue, metadata, index, name, group.composerIds?.[name]);
+        if (person) catalogue.credit(work, person, "composer", { position: i + 1 });
+      });
       if (group.providerAliases?.length)
         metadata.derived(work, "aliases", group.providerAliases);
       else if (catalogued2) {
@@ -40476,7 +41284,7 @@ function foldRepeatedMovements(catalogue, work, existing, setSubject, actor4) {
       })[0] || ""
     ])
   );
-  const same3 = (a, b) => {
+  const same4 = (a, b) => {
     if (trackNumber.get(a.id) && trackNumber.get(b.id) && trackNumber.get(a.id) !== trackNumber.get(b.id)) return false;
     const [pa, pb] = [pieceNumber(a.title, setSubject), pieceNumber(b.title, setSubject)];
     if (pa != null && pb != null && pa !== pb) return false;
@@ -40499,7 +41307,7 @@ function foldRepeatedMovements(catalogue, work, existing, setSubject, actor4) {
   }
   let split = null;
   if (runs.length === 1 && runs[0].by.length === 1) {
-    const restart = existing.findIndex((m, i) => i > 0 && same3(existing[0], m));
+    const restart = existing.findIndex((m, i) => i > 0 && same4(existing[0], m));
     if (restart < 1 || existing.length % restart) return false;
     split = runs[0].by[0];
     runs = [];
@@ -40521,7 +41329,7 @@ function foldRepeatedMovements(catalogue, work, existing, setSubject, actor4) {
     if (split && run.movements.length !== first.movements.length) return false;
     let from = 0;
     for (const movement of run.movements) {
-      const match2 = first.movements.findIndex((m, i) => i >= from && same3(m, movement));
+      const match2 = first.movements.findIndex((m, i) => i >= from && same4(m, movement));
       if (match2 < 0) return false;
       pairs.push([movement.id, first.movements[match2].id]);
       from = match2 + 1;
@@ -40575,9 +41383,9 @@ var hasManualEdits = (catalogue, ids) => ids.some(
 );
 function transferIdentities(db, keep, drop) {
   for (const row of db.prepare("SELECT * FROM external_identity WHERE entity_id=?").all(drop)) {
-    const same3 = db.prepare("SELECT state FROM external_identity WHERE entity_id=? AND provider=? AND record_kind=? AND record_id=?").get(keep, row.provider, row.record_kind, row.record_id);
-    if (same3) {
-      if (row.state === "active" && same3.state !== "active")
+    const same4 = db.prepare("SELECT state FROM external_identity WHERE entity_id=? AND provider=? AND record_kind=? AND record_id=?").get(keep, row.provider, row.record_kind, row.record_id);
+    if (same4) {
+      if (row.state === "active" && same4.state !== "active")
         db.prepare("UPDATE external_identity SET state='active' WHERE entity_id=? AND provider=? AND record_kind=? AND record_id=?").run(keep, row.provider, row.record_kind, row.record_id);
       db.prepare("DELETE FROM external_identity WHERE entity_id=? AND provider=? AND record_kind=? AND record_id=?").run(drop, row.provider, row.record_kind, row.record_id);
     } else
@@ -41003,6 +41811,12 @@ function repairMovementTitles(catalogue, { albumId = null } = {}) {
     const workTitle = titles.get(row.work);
     const current = JSON.parse(row.value);
     if (typeof workTitle !== "string" || typeof current !== "string") continue;
+    const cut = current.match(/^(\d+):\s*(\S.*)$/);
+    if (cut && new RegExp(`\\b[IVXLCDM]+:${cut[1]}\\b`, "i").test(workTitle) && MOVEMENT_PREFIX.test(cut[2])) {
+      metadata.derived(row.movement, "title", cut[2]);
+      repaired++;
+      continue;
+    }
     if (!words2(current).includes(words2(workTitle))) continue;
     const stripped = stripWorkPrefix(current, workTitle);
     if (stripped && stripped !== current) {
@@ -41416,12 +42230,14 @@ function resolvedValues(c) {
   }
   return values;
 }
-function classicalTracks(c) {
+function classicalTracks(c, { workId = null } = {}) {
   const tracks = /* @__PURE__ */ new Map();
   for (const row of c.db.prepare(
-    `SELECT t.id,t.core_id,t.evidence FROM track_link t JOIN classification k ON k.target_id=t.id
-       WHERE t.state='active' AND k.state='classical'`
-  ).iterate()) {
+    workId ? `SELECT DISTINCT t.id,t.core_id,t.evidence FROM realization r JOIN realization_item i ON i.realization_id=r.id
+           JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id JOIN classification k ON k.target_id=t.id
+           WHERE r.work_id=? AND t.state='active' AND k.state='classical'` : `SELECT t.id,t.core_id,t.evidence FROM track_link t JOIN classification k ON k.target_id=t.id
+           WHERE t.state='active' AND k.state='classical'`
+  ).iterate(...workId ? [workId] : [])) {
     const evidence = parse3(row.evidence, {});
     tracks.set(row.id, { id: row.id, coreId: String(row.core_id), albumId: evidence.albumId == null ? null : String(evidence.albumId), durationMs: Number(evidence.durationMs) || 0, hints: evidence.hints || {} });
   }
@@ -41431,7 +42247,22 @@ var yearOf = (value) => {
   const match2 = String(value || "").match(/\b(1[5-9]\d\d|20\d\d)\b/);
   return match2 ? Number(match2[1]) : null;
 };
-function ownedRecordings(c, tracks = classicalTracks(c), values = resolvedValues(c), { workId = null } = {}) {
+function lazyValues(c) {
+  const statement = c.db.prepare(
+    `SELECT f.field,a.value FROM field_resolution f JOIN assertion a ON a.id=f.assertion_id
+     WHERE f.target_id=? AND f.field IN ('title','name','aliases')`
+  );
+  const seen = /* @__PURE__ */ new Map();
+  return {
+    get(id) {
+      if (!seen.has(id)) seen.set(id, Object.fromEntries(statement.all(id).map((row) => [row.field, parse3(row.value, null)])));
+      return seen.get(id);
+    }
+  };
+}
+function ownedRecordings(c, tracks = void 0, values = void 0, { workId = null } = {}) {
+  tracks ??= classicalTracks(c, { workId });
+  values ??= workId ? lazyValues(c) : resolvedValues(c);
   const rows = c.db.prepare(
     `SELECT r.id AS realization,r.work_id,r.performance_work_id,pw.source_id AS performance_id,r.label,i.movement_id,i.sequence,s.track_link_id,s.start_ms,s.end_ms
        FROM realization r JOIN relation pw ON pw.id=r.performance_work_id
@@ -41515,7 +42346,7 @@ function reissueState(c) {
   return { linked, unlinked };
 }
 function groupRecordings(recordings, state = null) {
-  const same3 = (a, b) => {
+  const same4 = (a, b) => {
     if (state && a.performanceId && b.performanceId && a.performanceId !== b.performanceId) {
       const key = performancePair(a.performanceId, b.performanceId);
       if (state.linked.has(key)) return true;
@@ -41525,7 +42356,7 @@ function groupRecordings(recordings, state = null) {
   };
   const groups = [];
   for (const recording of recordings) {
-    const group = groups.find((g) => g.realizations.some((other) => same3(recording, other)));
+    const group = groups.find((g) => g.realizations.some((other) => same4(recording, other)));
     if (group) group.realizations.push(recording);
     else groups.push({ key: recording.id, realizations: [recording] });
   }
@@ -41955,11 +42786,11 @@ function facetCounts(c, docIds, wanted) {
 }
 
 // src/model/editor-v2.js
-import path10 from "node:path";
-import { randomUUID as randomUUID13 } from "node:crypto";
+import path11 from "node:path";
+import { randomUUID as randomUUID14 } from "node:crypto";
 
 // src/model/history.js
-import { randomUUID as randomUUID9 } from "node:crypto";
+import { randomUUID as randomUUID11 } from "node:crypto";
 var list3 = (ids) => [...ids];
 var marks = (ids) => list3(ids).map(() => "?").join(",") || "NULL";
 function workClosure(c, workIds) {
@@ -42024,7 +42855,7 @@ function recordChange(c, { kind, summary, works = [], contributors = [], actor: 
     const rows = snapshot(c, set);
     const result = change();
     const after = c.db.prepare("SELECT coalesce(max(id),0) AS n FROM audit_event").get().n;
-    const id = randomUUID9();
+    const id = randomUUID11();
     c.db.prepare("INSERT INTO change_set(id,kind,actor,summary,data,created_at) VALUES (?,?,?,?,?,?)").run(id, kind, actor4, summary.slice(0, 500), JSON.stringify({ set: serialSet(set), rows, after, ...contributors.length && { contributors, credits: creditState(c, contributors) }, ...extra }), Date.now());
     return { result, changeId: id };
   });
@@ -42127,622 +42958,12 @@ function deleteWorks(c, workIds, actor4, { names }) {
 }
 
 // src/model/tag-write.js
-import { randomUUID as randomUUID12 } from "node:crypto";
-import fs8 from "node:fs";
-import path9 from "node:path";
-
-// src/tagger.js
-import { randomUUID as randomUUID10 } from "node:crypto";
-
-// src/model/write-guard.js
-import fs6 from "node:fs/promises";
-import path6 from "node:path";
-async function modelAllowsTagging(ctx, realPath) {
-  const filename = path6.join(ctx.dataFolder, "model", "classical.sqlite");
-  try {
-    await fs6.access(filename);
-  } catch (error) {
-    if (error.code === "ENOENT") return true;
-    throw error;
-  }
-  let db;
-  try {
-    const { DatabaseSync } = await import("node:sqlite");
-    db = new DatabaseSync(filename, { readOnly: true });
-    const rows = db.prepare(
-      `SELECT t.state AS link_state,c.state FROM track_link t
-      LEFT JOIN classification c ON c.target_id=t.id
-      WHERE json_extract(t.evidence,'$.observedRealPath')=? OR json_extract(t.evidence,'$.path')=? OR json_extract(t.evidence,'$.readPath')=?`
-    ).all(realPath, realPath, realPath);
-    return !rows.length || rows.every(
-      (row) => row.link_state === "active" && row.state === "classical"
-    );
-  } catch (error) {
-    ctx.log?.(`Classical model cannot authorize tagging: ${error.message}`);
-    return false;
-  } finally {
-    db?.close();
-  }
-}
-
-// src/tagger.js
-import fs7 from "node:fs/promises";
-import path7 from "node:path";
-
-// src/aurral.js
-var Aurral = class {
-  constructor(api, fetchImpl = fetch) {
-    if (!api?.url || !api?.key) throw new Error("Aurral API access is off. Turn it on on the plugin's page.");
-    this.url = api.url.replace(/\/+$/, "");
-    this.key = api.key;
-    this.fetch = fetchImpl;
-  }
-  async request(method, route, body) {
-    const response = await this.fetch(`${this.url}${route}`, {
-      method,
-      headers: { "X-Api-Key": this.key, ...body !== void 0 && { "Content-Type": "application/json" } },
-      body: body === void 0 ? void 0 : JSON.stringify(body),
-      signal: AbortSignal.timeout(3e4)
-    });
-    const data = await response.json().catch(() => null);
-    if (!response.ok) {
-      const detail = data?.message || data?.error || response.statusText;
-      throw new Error(`Aurral answered ${response.status} for ${route}: ${detail}`);
-    }
-    return data;
-  }
-  // Re-reads files whose tags changed, so the Library shows the new ones.
-  refreshLibrary() {
-    return this.request("POST", "/library/refresh", { mode: "quick" });
-  }
-  users() {
-    return this.request("GET", "/users");
-  }
-  async staticPlaylists() {
-    const status = await this.request("GET", "/playlists/status");
-    return status?.staticPlaylists ?? [];
-  }
-  createPlaylist(name, tracks) {
-    return this.request("POST", "/playlists/static-playlists", { name, tracks, downloadMissing: true });
-  }
-  updatePlaylist(id, name, tracks) {
-    return this.request("PUT", `/playlists/static-playlists/${encodeURIComponent(id)}`, { name, tracks });
-  }
-};
-
-// src/tagger.js
-var LOCK_STALE_MS2 = 2 * 6e4;
-var SAVE_EVERY_MS = 3e4;
-var queueDir = (ctx) => path7.join(ctx.dataFolder, "queue");
-var processedFile = (ctx) => path7.join(ctx.dataFolder, "processed.json");
-var indexFile = (ctx) => path7.join(ctx.dataFolder, "library-index.json");
-var originalsFile = (ctx) => path7.join(ctx.dataFolder, "originals.json");
-var excludedFile = (ctx) => path7.join(ctx.dataFolder, "excluded.json");
-var TAG_FIELDS = ["artist", "albumArtist", "composer", "work", "workId"];
-var TAGGING_VERSION = 2;
-var outdated = (record) => record && (record.status === "tagged" || record.status === "unchanged") && (record.v ?? 1) < TAGGING_VERSION;
-var lockDir = (ctx) => path7.join(ctx.dataFolder, "tagging.lock");
-var yieldFile = (ctx) => path7.join(ctx.dataFolder, "tagging.yield");
-var YIELD_FRESH_MS = 10 * 6e4;
-var PRIORITY_WAIT_MS = 5 * 6e4;
-var ACTION_CLAIM_MS = 2 * 6e4;
-async function enqueue(ctx, filePaths, { force = false, source = null } = {}) {
-  await fs7.mkdir(queueDir(ctx), { recursive: true });
-  const ids = [];
-  for (const filePath of filePaths) {
-    if (!filePath) continue;
-    const id = `${Date.now().toString().padStart(15, "0")}-${randomUUID10()}`;
-    await writeJson(path7.join(queueDir(ctx), `${id}.json`), { path: filePath, force, source, at: Date.now() });
-    ids.push(id);
-  }
-  return ids;
-}
-async function queuedEntries(ctx) {
-  const names = (await fs7.readdir(queueDir(ctx)).catch(() => [])).filter((n) => n.endsWith(".json")).sort();
-  return names.map((name) => ({ name, file: path7.join(queueDir(ctx), name) }));
-}
-var queueLength = async (ctx) => (await queuedEntries(ctx)).length;
-async function allowedPath(ctx, filePath) {
-  const real = await fs7.realpath(filePath).catch(() => null);
-  if (!real) return null;
-  for (const root of [ctx.libraryFolder, ctx.dataFolder]) {
-    if (!root) continue;
-    const base = await fs7.realpath(root).catch(() => null);
-    if (!base) continue;
-    const relative = path7.relative(base, real);
-    if (relative && !relative.startsWith("..") && !path7.isAbsolute(relative)) return real;
-  }
-  return null;
-}
-var statKey = (stat) => ({ mtimeMs: Math.round(stat.mtimeMs), size: stat.size });
-var sameStat = (record, stat) => record && record.mtimeMs === Math.round(stat.mtimeMs) && record.size === stat.size;
-function indexEntry(tags, stat) {
-  return {
-    ...statKey(stat),
-    title: tags.title,
-    artist: tags.artist,
-    album: tags.album,
-    albumArtist: tags.albumArtist,
-    recordingMbid: tags.recordingMbid,
-    releaseMbid: tags.releaseMbid,
-    releaseGroupMbid: tags.releaseGroupMbid,
-    albumArtistMbids: tags.albumArtistMbids,
-    trackNumber: tags.trackNumber,
-    discNumber: tags.discNumber,
-    durationMs: tags.durationMs,
-    workId: tags.workId
-  };
-}
-var State = class {
-  constructor(ctx, lock) {
-    this.ctx = ctx;
-    this.lock = lock;
-    this.dirty = 0;
-    this.savedAt = Date.now();
-    this.refs = 0;
-    this.admins = 0;
-    this.background = 0;
-    this.claimed = /* @__PURE__ */ new Set();
-    this.busyPaths = /* @__PURE__ */ new Map();
-  }
-  async load() {
-    this.processed = await readJson(processedFile(this.ctx), {});
-    this.index = await readJson(indexFile(this.ctx), {});
-    this.originals = await readJson(originalsFile(this.ctx), {});
-    this.excluded = await readJson(excludedFile(this.ctx), {});
-  }
-  // Saved every 30 seconds while working, and at the end: the index of a
-  // large Library is several megabytes.
-  async save(force = false) {
-    if (!this.dirty || !force && Date.now() - this.savedAt < SAVE_EVERY_MS) return;
-    this.savedAt = Date.now();
-    this.dirty = 0;
-    await writeJson(processedFile(this.ctx), this.processed);
-    await writeJson(indexFile(this.ctx), this.index);
-    await writeJson(originalsFile(this.ctx), this.originals);
-    await writeJson(excludedFile(this.ctx), this.excluded);
-    await this.lock.touch();
-  }
-  // One call at a time works on a file.
-  async exclusive(file, work) {
-    while (this.busyPaths.has(file)) await this.busyPaths.get(file).catch(() => {
-    });
-    const running = work();
-    this.busyPaths.set(file, running);
-    try {
-      return await running;
-    } finally {
-      this.busyPaths.delete(file);
-    }
-  }
-};
-var Session = class {
-  constructor(ctx, state, priority) {
-    this.ctx = ctx;
-    this.state = state;
-    this.priority = priority;
-    this.changedFiles = 0;
-    this.stats = { tagged: 0, unchanged: 0, skipped: {}, failed: 0, left: 0 };
-  }
-  get processed() {
-    return this.state.processed;
-  }
-  get index() {
-    return this.state.index;
-  }
-  get originals() {
-    return this.state.originals;
-  }
-  get excluded() {
-    return this.state.excluded;
-  }
-  get dirty() {
-    return this.state.dirty;
-  }
-  set dirty(value) {
-    this.state.dirty = value;
-  }
-  save(force = false) {
-    return this.state.save(force);
-  }
-  // True when an admin action wants the lock and this is background work:
-  // one in this process, or one waiting in another.
-  async shouldYield() {
-    if (this.priority) return false;
-    if (this.state.admins > 0) this.yielding = true;
-    else if (!this.yieldCheckedAt || Date.now() - this.yieldCheckedAt >= 500) {
-      this.yieldCheckedAt = Date.now();
-      const stat = await fs7.stat(yieldFile(this.ctx)).catch(() => null);
-      this.yielding = Boolean(stat && Date.now() - stat.mtimeMs < YIELD_FRESH_MS);
-    }
-    if (this.yielding && !this.yieldLogged) {
-      this.yieldLogged = true;
-      this.ctx.log("Pausing background tagging for an admin action");
-    }
-    return this.yielding;
-  }
-  record(filePath, stat, result) {
-    this.processed[filePath] = { ...statKey(stat), ...result, at: Date.now() };
-    this.dirty++;
-    if (result.status === "skipped") this.stats.skipped[result.reason] = (this.stats.skipped[result.reason] || 0) + 1;
-    else this.stats[result.status]++;
-  }
-  // Returns false when MusicBrainz can't be reached, so the caller stops.
-  async processFile(filePath, options = {}) {
-    const real = await allowedPath(this.ctx, filePath);
-    if (!real) {
-      this.ctx.log(`Not tagging ${filePath}: it isn't in the Library folder`);
-      this.stats.skipped["outside the Library"] = (this.stats.skipped["outside the Library"] || 0) + 1;
-      return true;
-    }
-    if (!isAudioPath(real)) return true;
-    return this.state.exclusive(real, () => this.processReal(real, options));
-  }
-  // `queuedAt`: when the request to tag was made. Classical tags an admin
-  // removed after that stay removed.
-  async processReal(real, { force = false, prefilter = false, upgrade = false, queuedAt = null } = {}) {
-    const { ctx } = this;
-    const stat = await fs7.stat(real);
-    if (!await modelAllowsTagging(ctx, real)) {
-      this.record(real, stat, { status: "skipped", reason: "model classification or link requires review" });
-      return true;
-    }
-    if (!force && sameStat(this.processed[real], stat) && !(upgrade && outdated(this.processed[real]))) return true;
-    let tags;
-    try {
-      tags = readTags(real);
-    } catch (error) {
-      this.record(real, stat, { status: "skipped", reason: error instanceof UnsupportedFormat ? "unsupported format" : "unreadable" });
-      return true;
-    }
-    this.index[real] = indexEntry(tags, stat);
-    if (!tags.recordingMbid) {
-      this.record(real, stat, { status: "skipped", reason: "no recording ID" });
-      return true;
-    }
-    if (this.excluded[tags.recordingMbid]) {
-      if (!force || queuedAt && (this.excluded[tags.recordingMbid].at ?? 0) > queuedAt) {
-        this.record(real, stat, { status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
-        return true;
-      }
-      delete this.excluded[tags.recordingMbid];
-    }
-    if (prefilter && ctx.resolver.classifyGenres(new Set(tags.genres.map((g) => g.toLowerCase()))) === false) {
-      this.record(real, stat, { status: "skipped", reason: "non-classical", recording: tags.recordingMbid });
-      return true;
-    }
-    const fields = await ctx.resolver.resolve(tags.recordingMbid, {
-      trackArtistIds: tags.artistMbids,
-      albumArtistIds: tags.albumArtistMbids,
-      releaseGroupId: tags.releaseGroupMbid || null,
-      confirmed: force
-    });
-    if (!fields) {
-      const reason = ctx.resolver.skipReason;
-      if (reason === "unreachable") return false;
-      this.record(real, stat, { status: "skipped", reason, recording: tags.recordingMbid });
-      return true;
-    }
-    const values = { artist: [fields.artist], composer: fields.composers };
-    if (fields.workId) Object.assign(values, { work: [fields.work], workId: [fields.workId] });
-    const albumArtist = await this.englishAlbumArtist(tags);
-    if (albumArtist) values.albumArtist = [albumArtist];
-    let changed;
-    try {
-      if (!this.originals[real]) {
-        this.originals[real] = { ...readValues(real, TAG_FIELDS), recording: tags.recordingMbid };
-        this.dirty++;
-        await writeJson(originalsFile(ctx), this.originals);
-      }
-      changed = await writeTags(real, values);
-    } catch (error) {
-      ctx.log(`Couldn't tag ${real}: ${error.message}`);
-      this.record(real, stat, { status: "skipped", reason: "couldn't write tags", recording: tags.recordingMbid });
-      return true;
-    }
-    const after = await fs7.stat(real);
-    this.index[real] = { ...this.index[real], ...statKey(after), artist: fields.artist, workId: fields.workId || "" };
-    this.record(real, after, {
-      v: TAGGING_VERSION,
-      status: changed.length ? "tagged" : "unchanged",
-      recording: tags.recordingMbid,
-      artist: fields.artist,
-      workId: fields.workId
-    });
-    if (changed.length) {
-      this.changedFiles++;
-      ctx.log(`Tagged ${path7.basename(real)}: ${fields.artist}`);
-    }
-    return true;
-  }
-  // Puts back the tags a file had before the plugin changed them. Files
-  // tagged before the plugin kept backups get the artist MusicBrainz credits
-  // for that track on its release, which is what Aurral writes.
-  async untagFile(filePath, mode = "restore") {
-    const real = await allowedPath(this.ctx, filePath);
-    if (!real || !isAudioPath(real)) return "skipped";
-    return this.state.exclusive(real, () => this.untagReal(real, mode));
-  }
-  async untagReal(real, mode = "restore") {
-    const { ctx } = this;
-    if (!await modelAllowsTagging(ctx, real)) return "skipped";
-    let tags;
-    try {
-      tags = readTags(real);
-    } catch {
-      return "skipped";
-    }
-    if (tags.recordingMbid) this.excluded[tags.recordingMbid] = { at: Date.now() };
-    const original = this.originals[real];
-    let values;
-    if (mode === "clear") values = { composer: [], work: [], workId: [] };
-    else if (original) values = Object.fromEntries(TAG_FIELDS.map((field2) => [field2, original[field2] ?? []]));
-    else {
-      const credit = await this.trackCredit(tags);
-      values = { composer: [], work: [], workId: [], ...credit && { artist: [credit] } };
-      if (tags.albumArtistMbids.length === 1) {
-        const name = (await ctx.mb.get("artist", tags.albumArtistMbids[0], "aliases+genres"))?.name;
-        if (name) values.albumArtist = [name];
-      }
-    }
-    const changed = await writeTags(real, values);
-    if (mode !== "clear") delete this.originals[real];
-    const after = await fs7.stat(real);
-    this.index[real] = { ...this.index[real] ?? {}, ...indexEntry(readTags(real), after) };
-    this.record(real, after, { status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
-    this.stats.skipped["classical tags removed"]--;
-    if (changed.length) {
-      this.changedFiles++;
-      ctx.log(`Removed classical tags from ${path7.basename(real)}`);
-    }
-    return changed.length ? original && mode !== "clear" ? "restored" : "cleared" : "unchanged";
-  }
-  async englishAlbumArtist(tags) {
-    if (tags.albumArtistMbids.length !== 1) return null;
-    const artist = await this.ctx.resolver.getArtist(tags.albumArtistMbids[0]);
-    if (!artist?.name) return null;
-    const [name] = await this.ctx.resolver.englishNames(artist);
-    return name || null;
-  }
-  // MusicBrainz's artist credit for this recording on the file's release,
-  // else on the recording itself.
-  async trackCredit(tags) {
-    const { mb } = this.ctx;
-    if (tags.releaseMbid) {
-      const release = await mb.get("release", tags.releaseMbid, RELEASE_INC);
-      for (const medium of release?.media || [])
-        for (const track of medium.tracks || [])
-          if (track.recording?.id === tags.recordingMbid) {
-            const credit = creditString(track["artist-credit"] || track.recording["artist-credit"]);
-            if (credit) return credit;
-          }
-    }
-    const recording = await mb.get("recording", tags.recordingMbid, "artist-credits");
-    return creditString(recording?.["artist-credit"]) || null;
-  }
-  async drainQueue(until, onlyIds = null) {
-    for (const entry of await queuedEntries(this.ctx)) {
-      if (Date.now() > until || await this.shouldYield()) return false;
-      if (onlyIds && !onlyIds.has(entry.name.replace(/\.json$/, ""))) continue;
-      if (this.state.claimed.has(entry.name)) continue;
-      this.state.claimed.add(entry.name);
-      try {
-        const job = await readJson(entry.file, null);
-        if (!this.priority && job?.source === "action" && Date.now() - (job.at || 0) < ACTION_CLAIM_MS) continue;
-        if (job?.path) {
-          const reachable = await this.processFile(job.path, { force: job.force, queuedAt: job.at });
-          if (!reachable) return false;
-        }
-        await fs7.rm(entry.file, { force: true });
-      } finally {
-        this.state.claimed.delete(entry.name);
-      }
-      await this.save();
-    }
-    return true;
-  }
-  // Walks the Library, refreshing the index, and returns files that have a
-  // recording ID and were never processed (or changed since). Stops at
-  // `until`; unchanged files cost only a stat, so the next run gets further.
-  async scan(until) {
-    const root = this.ctx.libraryFolder;
-    const pending = [];
-    const seen = /* @__PURE__ */ new Set();
-    let complete = true;
-    const walk = async (dir) => {
-      if (Date.now() > until || await this.shouldYield()) {
-        complete = false;
-        return;
-      }
-      const entries2 = await fs7.readdir(dir, { withFileTypes: true }).catch(() => []);
-      for (const entry of entries2) {
-        if (Date.now() > until || await this.shouldYield()) {
-          complete = false;
-          return;
-        }
-        if (entry.name.startsWith(".")) continue;
-        const full = path7.join(dir, entry.name);
-        if (entry.isDirectory()) await walk(full);
-        else if (entry.isFile() && isAudioPath(full)) {
-          seen.add(full);
-          const stat = await fs7.stat(full).catch(() => null);
-          if (!stat) continue;
-          if (!sameStat(this.index[full], stat)) {
-            try {
-              this.index[full] = indexEntry(readTags(full), stat);
-            } catch {
-              delete this.index[full];
-              continue;
-            }
-            this.dirty++;
-            await this.save();
-          }
-          if (this.index[full].recordingMbid && (!sameStat(this.processed[full], stat) || outdated(this.processed[full]))) pending.push(full);
-        }
-      }
-    };
-    if (root) await walk(root);
-    if (complete) {
-      for (const file of Object.keys(this.index)) if (file.startsWith(root) && !seen.has(file)) delete this.index[file];
-    }
-    this.scanComplete = complete;
-    return pending;
-  }
-};
-var held = /* @__PURE__ */ new Map();
-async function openState(ctx, priority) {
-  let lock = await tryLock(lockDir(ctx), LOCK_STALE_MS2);
-  if (!lock && priority) {
-    ctx.log("Waiting for background tagging in another process to pause");
-    const until = Date.now() + PRIORITY_WAIT_MS;
-    while (!lock && Date.now() < until) {
-      await writeJson(yieldFile(ctx), { at: Date.now() });
-      await sleep(500);
-      lock = await tryLock(lockDir(ctx), LOCK_STALE_MS2);
-    }
-    await fs7.rm(yieldFile(ctx), { force: true });
-    if (!lock) ctx.log("Tagging in another process didn't pause within 5 minutes");
-  }
-  if (!lock) return null;
-  const state = new State(ctx, lock);
-  try {
-    await state.load();
-  } catch (error) {
-    await lock.release();
-    throw error;
-  }
-  state.heartbeat = setInterval(() => lock.touch(), 3e4);
-  return state;
-}
-async function withTagging(ctx, work, { priority = false } = {}) {
-  const key = path7.resolve(ctx.dataFolder);
-  let entry;
-  for (; ; ) {
-    entry = held.get(key);
-    if (!entry) {
-      entry = { opening: openState(ctx, priority), state: null };
-      held.set(key, entry);
-      try {
-        entry.state = await entry.opening;
-      } catch (error) {
-        held.delete(key);
-        throw error;
-      }
-      if (!entry.state) {
-        held.delete(key);
-        return null;
-      }
-      break;
-    }
-    if (!entry.state) {
-      if (!priority) return null;
-      await entry.opening.catch(() => {
-      });
-      if (held.get(key) === entry && entry.state) break;
-      continue;
-    }
-    if (!priority && entry.state.background > 0) return null;
-    break;
-  }
-  const { state } = entry;
-  const session = new Session(ctx, state, priority);
-  state.refs++;
-  if (priority) state.admins++;
-  else state.background++;
-  try {
-    await work(session);
-    return session.stats;
-  } finally {
-    if (priority) state.admins--;
-    else state.background--;
-    if (--state.refs === 0) {
-      held.delete(key);
-      clearInterval(state.heartbeat);
-      await state.save(true).catch((error) => ctx.log(`Couldn't save progress: ${error.message}`));
-      await state.lock.release();
-    } else {
-      await state.save().catch(() => {
-      });
-    }
-    if (session.changedFiles) await refreshLibrary(ctx);
-  }
-}
-async function refreshLibrary(ctx) {
-  if (!ctx.api?.url || !ctx.api?.key) return;
-  try {
-    await new Aurral(ctx.api, ctx.fetch).refreshLibrary();
-  } catch (error) {
-    ctx.log(`Couldn't ask Aurral to rescan the Library: ${error.message}`);
-  }
-}
-async function runQueue(ctx, budgetMs, onlyIds = null, { priority = false } = {}) {
-  const until = Date.now() + budgetMs;
-  return withTagging(
-    ctx,
-    async (session) => {
-      await session.drainQueue(until, onlyIds);
-      session.stats.left = onlyIds ? (await queuedEntries(ctx)).filter((e) => onlyIds.has(e.name.replace(/\.json$/, ""))).length : await queueLength(ctx);
-    },
-    { priority }
-  );
-}
-async function runScheduled(ctx, budgetMs) {
-  const until = Date.now() + budgetMs;
-  return withTagging(ctx, async (session) => {
-    if (!await session.drainQueue(until)) return;
-    const pending = await session.scan(until);
-    session.stats.found = pending.length;
-    for (const file of pending) {
-      if (Date.now() > until || await session.shouldYield()) break;
-      if (!await session.processFile(file, { prefilter: true, upgrade: true })) break;
-      await session.save();
-    }
-    session.stats.left = await queueLength(ctx) + pending.filter((f) => !session.processed[f]).length;
-  });
-}
-async function libraryIndex(ctx, budgetMs, { priority = false } = {}) {
-  let index = null;
-  await withTagging(
-    ctx,
-    async (session) => {
-      await session.scan(Date.now() + budgetMs);
-      index = session.index;
-    },
-    { priority }
-  );
-  return index ?? await readJson(indexFile(ctx), {});
-}
-async function untagFiles(ctx, paths, budgetMs, { priority = false, mode = "restore" } = {}) {
-  const until = Date.now() + budgetMs;
-  const counts = { restored: 0, cleared: 0, unchanged: 0, "no backup": 0, skipped: 0, left: 0 };
-  const stats = await withTagging(ctx, async (session) => {
-    for (const file of paths) {
-      if (Date.now() > until) {
-        counts.left++;
-        continue;
-      }
-      try {
-        counts[await session.untagFile(file, mode)]++;
-      } catch (error) {
-        ctx.log(`Couldn't remove classical tags from ${file}: ${error.message}`);
-        counts.skipped++;
-      }
-    }
-  }, { priority });
-  return stats ? counts : null;
-}
-function describeStats(stats) {
-  if (!stats) return "Another tagging run is in progress";
-  const parts = [`${stats.tagged} tagged`];
-  if (stats.unchanged) parts.push(`${stats.unchanged} already right`);
-  for (const [reason, count] of Object.entries(stats.skipped)) parts.push(`${count} skipped (${reason})`);
-  if (stats.failed) parts.push(`${stats.failed} failed`);
-  if (stats.left) parts.push(`${stats.left} left for the next run`);
-  return parts.join(", ");
-}
+import { randomUUID as randomUUID13 } from "node:crypto";
+import fs9 from "node:fs";
+import path10 from "node:path";
 
 // src/model/presentation.js
-import path8 from "node:path";
+import path9 from "node:path";
 var text4 = (value, fallback) => typeof value === "string" && value.trim() ? value.trim() : fallback;
 var DisplayValues = class {
   constructor(c) {
@@ -42808,7 +43029,7 @@ var fitGroup = (group) => ({
   items: group.items.map(fitItem),
   missing: fitMovements(group.missing)
 });
-var trackTitle = (evidence) => text4(evidence.hints?.title, path8.basename(evidence.path || "Track"));
+var trackTitle = (evidence) => text4(evidence.hints?.title, path9.basename(evidence.path || "Track"));
 function actor(input) {
   const user = input?.user;
   if (!Number.isSafeInteger(user?.id) || user.id <= 0)
@@ -42932,12 +43153,12 @@ function sameCredits(last3, heading, names) {
   const these = new Set(names.map(words4));
   if (last3.names.length === these.size && last3.names.every((name) => these.has(name))) return true;
   const shared = last3.names.filter((name) => these.has(name));
-  const same3 = shared.length > 0 && Boolean(catalogueNumber(last3.title)) && catalogueNumber(last3.title) === catalogueNumber(heading);
-  if (same3) {
+  const same4 = shared.length > 0 && Boolean(catalogueNumber(last3.title)) && catalogueNumber(last3.title) === catalogueNumber(heading);
+  if (same4) {
     last3.composer = last3.credited.filter((name) => shared.includes(words4(name))).join(", ");
     last3.names = shared;
   }
-  return same3;
+  return same4;
 }
 function pieceGroups(c, album, following) {
   const rows = c.db.prepare(
@@ -43162,7 +43383,7 @@ function recordingEntry(c, metadata, workId, movements, id, entries2, fact, rele
 }
 async function readWork(input) {
   const user = actor(input);
-  const c = await openCatalogue(path8.join(input.dataFolder, "model"));
+  const c = await openCatalogue(path9.join(input.dataFolder, "model"));
   try {
     return renderWork(c, input.resourceId, user);
   } finally {
@@ -43171,7 +43392,7 @@ async function readWork(input) {
 }
 async function mutateWork(input) {
   const user = actor(input);
-  const c = await openCatalogue(path8.join(input.dataFolder, "model"));
+  const c = await openCatalogue(path9.join(input.dataFolder, "model"));
   try {
     return applyWorkMutation(c, input, user);
   } finally {
@@ -43216,7 +43437,7 @@ function applyWorkMutation(c, input, user) {
 }
 async function albumPresentation(input) {
   actor(input);
-  const c = await openCatalogue(path8.join(input.dataFolder, "model"));
+  const c = await openCatalogue(path9.join(input.dataFolder, "model"));
   try {
     return renderAlbumPresentation(c, input.album.id, input.capabilities);
   } finally {
@@ -43248,7 +43469,7 @@ function renderTrackLinks(c, trackIds) {
 }
 async function trackLinks(input) {
   actor(input);
-  const c = await openCatalogue(path8.join(input.dataFolder, "model"));
+  const c = await openCatalogue(path9.join(input.dataFolder, "model"));
   try {
     return renderTrackLinks(c, input.trackIds);
   } finally {
@@ -43308,7 +43529,7 @@ function proposedTags(c, trackLinkId) {
 }
 
 // src/model/jobs.js
-import { randomUUID as randomUUID11 } from "node:crypto";
+import { randomUUID as randomUUID12 } from "node:crypto";
 var ModelJobs = class _ModelJobs {
   constructor(catalogue) {
     this.db = catalogue.db;
@@ -43321,7 +43542,7 @@ var ModelJobs = class _ModelJobs {
         "SELECT id FROM model_job WHERE key=? AND state IN ('queued','running','retry')"
       ).get(key);
       if (existing) return existing.id;
-      const id = randomUUID11();
+      const id = randomUUID12();
       this.db.prepare(
         `INSERT INTO model_job(id,type,key,input,state,max_attempts,created_at)
         VALUES (?,?,?,?,'queued',?,?)`
@@ -43473,11 +43694,11 @@ var STATUS = {
   "read-only": "Read only",
   missing: "No longer in the Library"
 };
-var same2 = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+var same3 = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 var writable = (file) => {
   try {
-    fs8.accessSync(file, fs8.constants.W_OK);
-    fs8.accessSync(path9.dirname(file), fs8.constants.W_OK);
+    fs9.accessSync(file, fs9.constants.W_OK);
+    fs9.accessSync(path10.dirname(file), fs9.constants.W_OK);
     return true;
   } catch {
     return false;
@@ -43488,7 +43709,7 @@ function previewTrack(c, link3) {
   if (!row) return { link: link3, file: "", name: "", title: "", status: "missing", reason: STATUS.missing, fields: [] };
   const evidence = JSON.parse(row.evidence);
   const file = evidence.readPath || evidence.path || "";
-  const name = path9.basename(evidence.path || file);
+  const name = path10.basename(evidence.path || file);
   const base = { link: link3, file, name, title: evidence.hints?.title || name, albumId: evidence.albumId == null ? null : String(evidence.albumId) };
   const plan = proposedTags(c, link3);
   const planned = Object.keys(plan.fields);
@@ -43496,7 +43717,7 @@ function previewTrack(c, link3) {
   const fields = writableFields(file);
   const entry = (field2, current2) => ({ field: field2, current: current2, proposed: plan.fields[field2], writable: fields.includes(field2) });
   if (!fields.length)
-    return { ...base, workId: plan.workId, status: "unsupported", reason: `Classical tags can't be written to ${path9.extname(file).slice(1).toUpperCase() || "these"} files yet`, fields: planned.map((field2) => entry(field2, null)) };
+    return { ...base, workId: plan.workId, status: "unsupported", reason: `Classical tags can't be written to ${path10.extname(file).slice(1).toUpperCase() || "these"} files yet`, fields: planned.map((field2) => entry(field2, null)) };
   let current;
   try {
     current = readValues(file, planned.filter((field2) => fields.includes(field2)));
@@ -43504,7 +43725,7 @@ function previewTrack(c, link3) {
     return { ...base, workId: plan.workId, status: "unreadable", reason: String(error.message || error).slice(0, 200), fields: [] };
   }
   const entries2 = planned.map((field2) => entry(field2, fields.includes(field2) ? current[field2] : null));
-  const changes = entries2.filter((field2) => field2.writable && !same2(field2.current, field2.proposed));
+  const changes = entries2.filter((field2) => field2.writable && !same3(field2.current, field2.proposed));
   const status = !changes.length ? "unchanged" : writable(file) ? "change" : "read-only";
   return { ...base, workId: plan.workId, status, reason: status === "read-only" ? "The file or its folder can't be written" : "", fields: entries2 };
 }
@@ -43514,7 +43735,7 @@ function createPreview(c, links, who, { scope = "" } = {}) {
   if (ids.length > PREVIEW_LIMIT) throw new Error(`Preview at most ${PREVIEW_LIMIT} files at a time`);
   const tracks = ids.map((id) => previewTrack(c, id));
   c.db.prepare("DELETE FROM change_set WHERE kind='tag_preview' AND created_at<?").run(Date.now() - 7 * 864e5);
-  const token = randomUUID12();
+  const token = randomUUID13();
   const changing = tracks.filter((track) => track.status === "change").length;
   c.db.prepare("INSERT INTO change_set(id,kind,actor,summary,data,created_at) VALUES (?,?,?,?,?,?)").run(token, "tag_preview", who, `${changing} of ${tracks.length} files would change`, JSON.stringify({ scope, tracks }), Date.now());
   return token;
@@ -43538,7 +43759,7 @@ function queueWrite(c, token, who, now = Date.now()) {
 function queueRestore(c, { run = null, backup = null }, who) {
   const rows = backup ? c.db.prepare("SELECT id FROM tag_backup WHERE id=? AND restored_at IS NULL").all(String(backup)) : c.db.prepare("SELECT id FROM tag_backup WHERE run_id=? AND restored_at IS NULL").all(String(run || ""));
   if (!rows.length) throw new Error(backup ? "This file's tags were restored already." : "Every file of this run was restored already.");
-  const id = new ModelJobs(c).enqueue(TAG_JOB, `${TAG_JOB}:restore:${randomUUID12()}`, { mode: "restore", backups: rows.map((row) => row.id), run, actor: who }, { maxAttempts: 3 });
+  const id = new ModelJobs(c).enqueue(TAG_JOB, `${TAG_JOB}:restore:${randomUUID13()}`, { mode: "restore", backups: rows.map((row) => row.id), run, actor: who }, { maxAttempts: 3 });
   return { id, files: rows.length };
 }
 async function writeOne(ctx, c, job, session, entry, actor4) {
@@ -43553,11 +43774,11 @@ async function writeOne(ctx, c, job, session, entry, actor4) {
     } catch (error) {
       return { status: "failed", reason: `Couldn't be read: ${error.message}` };
     }
-    if (!same2(now, Object.fromEntries(fields.map((field2) => [field2.field, field2.current])))) return { status: "skipped", reason: "Its tags changed since the preview" };
+    if (!same3(now, Object.fromEntries(fields.map((field2) => [field2.field, field2.current])))) return { status: "skipped", reason: "Its tags changed since the preview" };
     const proposed = Object.fromEntries(fields.map((field2) => [field2.field, field2.proposed]));
-    if (same2(now, proposed)) return { status: "unchanged" };
+    if (same3(now, proposed)) return { status: "unchanged" };
     const before = await fingerprint(real);
-    const backup = randomUUID12();
+    const backup = randomUUID13();
     c.db.prepare("INSERT INTO tag_backup VALUES (?,?,?,?,?,?,?,?,?,?)").run(backup, entry.link, real, before, JSON.stringify(now), JSON.stringify(proposed), job.id, actor4 || "admin", Date.now(), null);
     try {
       await writeTags(real, proposed);
@@ -43568,10 +43789,10 @@ async function writeOne(ctx, c, job, session, entry, actor4) {
     session.changedFiles++;
     const after = await fingerprint(real);
     const read = readValues(real, names);
-    if (!same2(read, proposed) || before?.startsWith(AUDIO_PREFIX) && after !== before) {
+    if (!same3(read, proposed) || before?.startsWith(AUDIO_PREFIX) && after !== before) {
       await writeTags(real, now);
       c.db.prepare("UPDATE tag_backup SET restored_at=? WHERE id=?").run(Date.now(), backup);
-      return { status: "failed", reason: !same2(read, proposed) ? "The written tags didn't read back; the old ones were put back" : "The audio changed; the old tags were put back" };
+      return { status: "failed", reason: !same3(read, proposed) ? "The written tags didn't read back; the old ones were put back" : "The audio changed; the old tags were put back" };
     }
     return { status: "written", backup };
   });
@@ -43579,7 +43800,7 @@ async function writeOne(ctx, c, job, session, entry, actor4) {
 async function restoreOne(ctx, c, session, backup) {
   const row = c.db.prepare("SELECT * FROM tag_backup WHERE id=?").get(backup);
   if (!row) return { status: "failed", reason: "No backup" };
-  const base = { link: row.track_link_id, name: path9.basename(row.path), backup };
+  const base = { link: row.track_link_id, name: path10.basename(row.path), backup };
   if (row.restored_at) return { ...base, status: "unchanged", reason: "Restored already" };
   const real = await allowedPath(ctx, row.path);
   if (!real) return { ...base, status: "failed", reason: "Not in the Library folder" };
@@ -43592,10 +43813,10 @@ async function restoreOne(ctx, c, session, backup) {
     } catch (error) {
       return { ...base, status: "failed", reason: `Couldn't be read: ${error.message}` };
     }
-    if (!same2(now, written)) return { ...base, status: "skipped", reason: "Its tags changed since they were written; nothing was put back" };
+    if (!same3(now, written)) return { ...base, status: "skipped", reason: "Its tags changed since they were written; nothing was put back" };
     await writeTags(real, old);
     session.changedFiles++;
-    if (!same2(readValues(real, Object.keys(old)), old)) return { ...base, status: "failed", reason: "The old tags didn't read back" };
+    if (!same3(readValues(real, Object.keys(old)), old)) return { ...base, status: "failed", reason: "The old tags didn't read back" };
     c.db.prepare("UPDATE tag_backup SET restored_at=? WHERE id=?").run(Date.now(), backup);
     return { ...base, status: "restored" };
   });
@@ -43637,11 +43858,11 @@ async function runTagJobs(ctx, { budgetMs = 25 * 6e4 } = {}) {
   const stats = await withTagging(
     ctx,
     async (session) => {
-      const c = await openCatalogue(path9.join(ctx.dataFolder, "model"));
+      const c = await openCatalogue(path10.join(ctx.dataFolder, "model"));
       c.db.exec("PRAGMA busy_timeout=60000");
       try {
         const jobs = new ModelJobs(c);
-        const owner = randomUUID12();
+        const owner = randomUUID13();
         for (let job; Date.now() < deadline && (job = jobs.claim(owner, { leaseMs: 12e4, type: TAG_JOB })); ) await runOne(ctx, c, jobs, job, session, deadline);
       } finally {
         c.close();
@@ -43814,7 +44035,7 @@ function realizationTracks(c, realization) {
        WHERE i.realization_id=? ORDER BY i.sequence,i.id`
   ).all(realization).map((row) => ({ ...row, evidence: JSON.parse(row.evidence) }));
 }
-var trackTitle2 = (evidence) => evidence.hints?.title || evidence.title || path10.basename(evidence.path || "Track");
+var trackTitle2 = (evidence) => evidence.hints?.title || evidence.title || path11.basename(evidence.path || "Track");
 function albums(c, albumId = null) {
   const map = /* @__PURE__ */ new Map();
   for (const track of ownedTracks(c, { albumId })) {
@@ -43973,12 +44194,12 @@ function compareWorks(c, a, b) {
   ];
   const rows = facts.map(([label, of]) => {
     const [left, right] = [of(a), of(b)];
-    const same3 = searchText(left) === searchText(right);
+    const same4 = searchText(left) === searchText(right);
     return {
       id: label,
       label,
       detail: `This: ${left || "\u2014"} | Other: ${right || "\u2014"}`.slice(0, 500),
-      badge: same3 ? { label: "Same", tone: "muted" } : { label: "Differs", tone: "warning" }
+      badge: same4 ? { label: "Same", tone: "muted" } : { label: "Differs", tone: "warning" }
     };
   });
   return {
@@ -44600,7 +44821,7 @@ function rememberAlbumTracks(c, albumId, selected, who) {
   const tracks = albums(c, albumId).get(albumId)?.tracks.filter((track) => ids.has(track.id)).map((track) => track.id) || [];
   if (tracks.length !== ids.size) fail("A selected track is no longer on this album");
   c.db.prepare("DELETE FROM change_set WHERE kind='selection' AND created_at<?").run(Date.now() - 864e5);
-  const token = randomUUID13();
+  const token = randomUUID14();
   c.db.prepare("INSERT INTO change_set(id,kind,actor,summary,data,created_at) VALUES (?,?,?,?,?,?)").run(token, "selection", who, `${tracks.length} tracks`, JSON.stringify({ albumId, tracks }), Date.now());
   return token;
 }
@@ -44931,7 +45152,7 @@ function trackView(c, track) {
           { label: "Performer", value: evidence.hints?.artist || "Unknown" },
           { label: "Composer tag", value: (evidence.hints?.composer || []).join(", ") || "None" },
           { label: "WORK tag", value: evidence.hints?.work || "None" },
-          { label: "File", value: path10.basename(evidence.path || "") }
+          { label: "File", value: path11.basename(evidence.path || "") }
         ]
       },
       {
@@ -45139,7 +45360,7 @@ function reviewView(c, id) {
     );
   if (review.kind === "track_link" && track)
     (review.evidence.candidates || []).slice(0, 5).forEach(
-      (candidate, index) => actions.unshift(action(`Link to ${path10.basename(candidate.path || "")}`.slice(0, 100), "relink-track", { id, candidate: String(index) }))
+      (candidate, index) => actions.unshift(action(`Link to ${path11.basename(candidate.path || "")}`.slice(0, 100), "relink-track", { id, candidate: String(index) }))
     );
   for (const candidate of (Array.isArray(review.evidence.candidates) ? review.evidence.candidates : []).slice(0, 5))
     if (typeof candidate === "string" && c.db.prepare("SELECT 1 FROM entity WHERE id=? AND deleted_at IS NULL").get(candidate))
@@ -45217,6 +45438,39 @@ function reviewView(c, id) {
     sections.push({ type: "rows", id: "decide", title: "Decide", rows });
   }
   const choices = [];
+  if (review.kind === "auto_match" && review.status === "open") {
+    const albumId = review.evidence.albumId;
+    const mappable = albumId != null && Array.isArray(review.evidence.tracks);
+    if (review.evidence.reason === "movement-mismatch" && mappable && live(review.evidence.work))
+      choices.push({
+        id: "map",
+        label: `Map these tracks to \u201C${labelOf(c, review.evidence.work) || "the work"}\u201D`.slice(0, 500),
+        detail: "Opens the album's grouping step for these tracks, to say which movement each one is.",
+        actions: [action("Map these tracks", "review-map", { id, work: review.evidence.work })]
+      });
+    if (review.evidence.reason === "ambiguous-work" && mappable)
+      for (const candidate of (review.evidence.candidates || []).filter(live).slice(0, 5))
+        choices.push({
+          id: `use-${candidate}`,
+          label: `Use \u201C${labelOf(c, candidate) || "Untitled work"}\u201D`.slice(0, 500),
+          // Titles can be the same: who wrote it, how many recordings, and where.
+          detail: candidateSummary(c, candidate),
+          selection: candidate,
+          actions: [action("Use this work", "review-map", { id, work: candidate })]
+        });
+    if (review.evidence.reason === "uncertain-composer" && mappable) {
+      const names = (review.evidence.composers || []).join(", ");
+      choices.push(
+        {
+          id: "yes",
+          label: `Yes, the composer is ${names || "the one named"}`.slice(0, 500),
+          detail: `Makes \u201C${review.evidence.work}\u201D from these tracks, as matching would have.`.slice(0, 500),
+          actions: [action("Yes", "review-confirm-composer", { id })]
+        },
+        { id: "no", label: "No", detail: "Nothing is made, and this isn't asked again for these tracks.", actions: [action("No", "resolve-review", { id })] }
+      );
+    }
+  }
   if (review.kind === "contributor_identity" && review.evidence.reason === "ambiguous-name")
     for (const candidate of (review.evidence.candidates || []).filter(live).slice(0, 5))
       choices.push({
@@ -45291,11 +45545,59 @@ function newView(kind) {
   return { crumbs: [], title: forms.title, badges: [], actions: [], sections: [{ ...forms.section, actions: [open("Cancel", "")] }] };
 }
 var TABS = ["works", "composers", "performers", "albums", "review", "search", "activity"];
-function activityList(c, downloads) {
+var LEGACY_LABELS = { artist: "Artist", albumArtist: "Album artist", composer: "Composer", work: "Work", workId: "MusicBrainz work" };
+var REQUEST_STATE = { waiting: ["Waiting for you", "warning"], writing: ["Writing", "warning"], done: ["Written", "success"] };
+function tagRequestRow(request) {
+  const changing = request.files.filter((file) => file.status === "change").length;
+  const [label, tone] = REQUEST_STATE[request.state] || ["", "muted"];
+  return {
+    id: `tag-request:${request.id}`,
+    label: `${MODES[request.mode]}: ${request.what}`.slice(0, 500),
+    detail: `${changing} file${changing === 1 ? "" : "s"} \xB7 ${new Date(request.createdAt).toISOString().slice(0, 16).replace("T", " ")} UTC`,
+    badge: { label, tone },
+    selection: `tag-request:${request.id}`,
+    search: `tag request ${MODES[request.mode]} ${request.what}`
+  };
+}
+function tagRequestView(request) {
+  if (!request) fail("This tag request is gone. Choose the action again from the album or artist menu.");
+  const changing = request.files.filter((file) => file.status === "change");
+  const [label, tone] = REQUEST_STATE[request.state] || ["", "muted"];
+  const show = (values) => values?.length ? values.join("; ") : "\u2014";
+  const what = request.mode === "tag" ? "write these tags to" : "put these tags back on";
+  return {
+    crumbs: [],
+    title: `${MODES[request.mode]}: ${request.what}`.slice(0, 500),
+    subtitle: request.state === "done" ? request.message || "Written" : `${changing.length} file${changing.length === 1 ? "" : "s"} would change. Nothing is written until you confirm.`,
+    badges: [{ label, tone }],
+    actions: request.state === "waiting" ? [
+      action(`Write ${changing.length} file${changing.length === 1 ? "" : "s"}`, "maintenance-tag-request", { request: request.id, confirm: true }, {
+        tone: "danger",
+        confirm: `${MODES[request.mode]}: ${what} ${changing.length} file${changing.length === 1 ? "" : "s"}? A file changed since this request is left alone.`
+      }),
+      action("Discard", "maintenance-tag-request-discard", { request: request.id })
+    ] : [open("Refresh", `tag-request:${request.id}`)],
+    sections: [
+      {
+        type: "rows",
+        id: "files",
+        title: "Files",
+        rows: request.files.slice(0, 500).map((file, i) => ({
+          id: `file-${i}`,
+          label: path11.basename(file.file || "") || "File",
+          detail: (file.status === "change" ? Object.keys(file.values).filter((field2) => JSON.stringify(file.current[field2]) !== JSON.stringify(file.values[field2])).map((field2) => `${LEGACY_LABELS[field2] || field2}: ${show(file.current[field2])} \u2192 ${show(file.values[field2])}`).join(" \xB7 ") : file.reason || "Already right").slice(0, 500),
+          badge: file.result ? { label: file.result.status === "skipped" ? `Skipped: ${file.result.reason || ""}`.slice(0, 80) : file.result.status[0].toUpperCase() + file.result.status.slice(1), tone: file.result.status === "skipped" || file.result.status === "failed" ? "warning" : "success" } : { label: file.status === "change" ? "Will change" : file.status === "unchanged" ? "Unchanged" : "Skipped", tone: file.status === "change" ? "warning" : "muted" }
+        }))
+      }
+    ]
+  };
+}
+function activityList(c, downloads, tagRequests = null) {
   const maintenance2 = { id: "maintenance", label: "Maintenance", detail: "Library scan, MusicBrainz lookups and their progress", badge: { label: "Tools", tone: "muted" }, selection: "maintenance", search: "maintenance scan musicbrainz lookups" };
   const changes = historyList(c).map((item) => ({ ...item, at: c.db.prepare("SELECT created_at FROM change_set WHERE id=?").get(item.id.slice(7))?.created_at || 0 }));
   const searches = downloadsList(downloads).map((item, index) => ({ ...item, at: (Array.isArray(downloads) ? downloads[index]?.at : 0) || 0 }));
-  return [maintenance2, ...[...changes, ...searches].sort((a, b) => b.at - a.at).map(({ at, ...item }) => item)];
+  const requests = (tagRequests || []).filter((request) => request.state !== "done").map(tagRequestRow);
+  return [maintenance2, ...requests, ...[...changes, ...searches].sort((a, b) => b.at - a.at).map(({ at, ...item }) => item)];
 }
 function maintenanceView(status) {
   if (!status) fail("Maintenance needs the plugin's runtime");
@@ -45619,7 +45921,7 @@ function searchList(c, q) {
 }
 function listFor(c, tab, q, extra = {}) {
   if (tab === "search") return searchList(c, q);
-  if (tab === "activity") return activityList(c, extra.downloads);
+  if (tab === "activity") return activityList(c, extra.downloads, extra.tagRequests);
   if (tab === "works") {
     const labels = /* @__PURE__ */ new Map();
     for (const row of c.db.prepare(
@@ -45741,7 +46043,7 @@ function hoistFormActions(view) {
   }
   return view;
 }
-function renderV2(c, query, revision2, { downloads = null, maintenance: maintenance2 = null, formActions = false, orderField = false } = {}) {
+function renderV2(c, query, revision2, { downloads = null, maintenance: maintenance2 = null, tagRequests = null, formActions = false, orderField = false } = {}) {
   const q = String(query.q || "");
   if (q.length > 200) fail("Search is too long");
   let offset = Number(query.offset || 0);
@@ -45754,7 +46056,7 @@ function renderV2(c, query, revision2, { downloads = null, maintenance: maintena
     const subjectRow = subject ? c.db.prepare("SELECT kind,data FROM entity WHERE id=?").get(subject.a) : null;
     tab = subject ? subject.review ? "review" : subjectRow?.kind === "work" ? "works" : subjectRow && isComposer2(c, { id: subject.a, data: JSON.parse(subjectRow.data) }) ? "composers" : "performers" : selection.startsWith("slskd:") || selection === "maintenance" || selection.startsWith("change:") ? "activity" : selection.startsWith("roles:") ? "performers" : selection.startsWith("performers:") ? "albums" : selection.startsWith("bulk:") ? "works" : selection.startsWith("album:") || selection.startsWith("track:") ? "albums" : selection.startsWith("review:") ? "review" : selection.startsWith("new:") ? { work: "works", composer: "composers", performer: "performers" }[selection.slice(4)] || "works" : kind?.kind === "person" ? isComposer2(c, { id: parseEntitySelection(selection).id, data: JSON.parse(kind.data) }) ? "composers" : "performers" : kind?.kind === "ensemble" ? "performers" : "works";
   }
-  const all = listFor(c, tab, q, { downloads });
+  const all = listFor(c, tab, q, { downloads, tagRequests });
   const { text: words5, keep } = listFilters(tab, q);
   const filtered = all.filter(keep).filter((item) => !words5 || tab === "search" || matchesSearch(item.search, words5));
   if (query.offset === "" && selection) {
@@ -45772,6 +46074,7 @@ function renderV2(c, query, revision2, { downloads = null, maintenance: maintena
     const [token, index] = selection.slice(5).split(":");
     view = tagPreviewView(c, token, index === void 0 ? null : Number(index));
   } else if (selection.startsWith("tag-run:")) view = tagRunView(c, selection.slice(8));
+  else if (selection.startsWith("tag-request:")) view = tagRequestView((tagRequests || []).find((request) => request.id === selection.slice(12)));
   else if (selection.startsWith("slskd:")) view = downloadView(downloads, Number(selection.slice(6)));
   else if (selection.startsWith("change:")) view = changeView(c, selection.slice(7));
   else if (selection === "maintenance") view = maintenanceView(maintenance2);
@@ -45897,6 +46200,8 @@ var V2_COMMANDS = {
   "unassign-tracks": ["albumId", "tracks", "page"],
   "unassign-album": ["albumId", "work", "page"],
   "create-work-from-album": ["albumId", "tracks", "include", "title", "composer", "composerName", "createAnyway", "page", "move"],
+  "review-map": ["id", "work"],
+  "review-confirm-composer": ["id"],
   "resolve-review": ["id"],
   "resolve-reviews": ["ids", "as"],
   "choose-provider-value": ["id", "field", "assertion"],
@@ -45920,6 +46225,40 @@ function addAlias(c, entity, text7) {
   const fold2 = searchText(spelling);
   if (c.db.prepare("SELECT text FROM alias WHERE entity_id=?").all(entity).some((row) => searchText(row.text) === fold2)) return;
   c.alias(entity, spelling);
+}
+function candidateSummary(c, work) {
+  const composers = credits2(c, work).filter((credit) => credit.role === "composer").map((credit) => credit.name);
+  const recordings = c.db.prepare("SELECT count(*) AS n FROM realization WHERE work_id=?").get(work).n;
+  const first = c.db.prepare(
+    `SELECT t.evidence FROM realization r JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
+       JOIN track_link t ON t.id=s.track_link_id WHERE r.work_id=? ORDER BY t.created_at,t.id LIMIT 1`
+  ).get(work);
+  const album = first ? JSON.parse(first.evidence).hints?.album : "";
+  return [composers.join(", ") || "No composer", `${recordings} recording${recordings === 1 ? "" : "s"}`, album && `first on ${album}`].filter(Boolean).join(" \xB7 ").slice(0, 500);
+}
+function workFromTracks(c, m, who, { albumId, tracks, title, composer = "", composerName = "", createAnyway, move = false }) {
+  const similar = warnDuplicate(c, title, composer ? [labelOf(c, composer)].filter(Boolean) : composerName ? [composerName] : [], createAnyway);
+  if (composer) c.entity(composer, "person");
+  else if (composerName) {
+    const existing = entities(c, ["person"]).filter((person) => searchText(person.label) === searchText(composerName) && isComposer2(c, person));
+    if (existing.length === 1) composer = existing[0].id;
+    else {
+      composer = c.createEntity("person", { roles: ["composer"] });
+      m.manual(composer, "name", composerName, { actor: who, pin: true });
+    }
+  }
+  const owned = new Map(ownedTracks(c, { albumId }).map((track) => [track.id, track]));
+  const ordered = tracks.map((id) => owned.get(id)).filter(Boolean);
+  if (ordered.length !== tracks.length) fail("A track is no longer indexed");
+  const work = createWork(c, m, who, {
+    title,
+    composer,
+    movements: ordered.map((track) => movementTitle({ title: track.title, work: track.evidence.hints?.work }, title) || track.title)
+  });
+  rememberDistinct(c, work, similar, who);
+  const movements = workMovements(c, work).map((movement) => movement.id);
+  assignTracks(c, m, who, work, tracks, movements, { move });
+  return { work, movements };
 }
 function createWork(c, m, who, { title, composer, movements }) {
   const work = c.createEntity("work");
@@ -46125,7 +46464,7 @@ function applyV2(c, request, who) {
       if (!works.length || works.length > 500) fail("Choose at least one work");
       for (const work of works) c.entity(work, "work");
       c.db.prepare("DELETE FROM change_set WHERE kind='selection' AND created_at<?").run(Date.now() - 864e5);
-      const token = randomUUID13();
+      const token = randomUUID14();
       c.db.prepare("INSERT INTO change_set(id,kind,actor,summary,data,created_at) VALUES (?,?,?,?,?,?)").run(token, "selection", who, `${works.length} works`, JSON.stringify({ works }), Date.now());
       return { selection: `bulk:${token}`, message: "" };
     }
@@ -46182,8 +46521,8 @@ function applyV2(c, request, who) {
             if (replace)
               for (const { id } of c.db.prepare(`SELECT id FROM credit WHERE target_id=? AND state='active' AND role IN (${[...PERFORMING_ROLES2].map(() => "?").join(",")})`).all(performance2, ...PERFORMING_ROLES2))
                 c.removeCredit(id);
-            const same3 = c.db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ? AND state='active'").get(performance2, contributor.id, role, instrument);
-            if (!same3) {
+            const same4 = c.db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ? AND state='active'").get(performance2, contributor.id, role, instrument);
+            if (!same4) {
               const position = c.db.prepare("SELECT coalesce(max(position),0)+1 AS n FROM credit WHERE target_id=?").get(performance2).n;
               c.credit(performance2, contributor.id, role, { instrument, position });
             }
@@ -46221,9 +46560,9 @@ function applyV2(c, request, who) {
       for (const credit of credits_) {
         try {
           transaction(c.db, () => {
-            const same3 = c.db.prepare("SELECT id,state FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?").get(credit.target_id, target.id, to, credit.instrument);
-            if (same3?.state === "active") throw new Error(`already credited as ${roleLabel(to).toLowerCase()}`);
-            if (same3) c.db.prepare("DELETE FROM credit WHERE id=?").run(same3.id);
+            const same4 = c.db.prepare("SELECT id,state FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?").get(credit.target_id, target.id, to, credit.instrument);
+            if (same4?.state === "active") throw new Error(`already credited as ${roleLabel(to).toLowerCase()}`);
+            if (same4) c.db.prepare("DELETE FROM credit WHERE id=?").run(same4.id);
             c.db.prepare("UPDATE credit SET role=?,source='manual' WHERE id=?").run(to, credit.id);
             c.audit("editor.change-roles", credit.target_id, { contributor: target.id, from, to }, who);
           });
@@ -46262,7 +46601,8 @@ function applyV2(c, request, who) {
       if (!review) fail("This review item is already resolved");
       const evidence = JSON.parse(review.evidence);
       const performance2 = review.target_id;
-      c.entity(performance2, "performance");
+      const targetKind = c.entity(performance2).kind;
+      if (!["performance", "recording"].includes(targetKind)) fail("This review item is about something else");
       const position = () => c.db.prepare("SELECT coalesce(max(position),0)+1 AS n FROM credit WHERE target_id=?").get(performance2).n;
       let chosen;
       if (review.kind === "contributor_identity") {
@@ -46280,7 +46620,7 @@ function applyV2(c, request, who) {
       }
       c.db.prepare("UPDATE review_item SET status='resolved' WHERE id=?").run(id);
       const next = nextReview(c, id);
-      return { selection: next ? `review:${next}` : "", tab: "review", message: `Credited \u201C${labelOf(c, chosen) || "them"}\u201D on ${performanceLabel(c, performance2)}.`.slice(0, 500) };
+      return { selection: next ? `review:${next}` : "", tab: "review", message: `Credited \u201C${labelOf(c, chosen) || "them"}\u201D on ${targetKind === "recording" ? `\u201C${entityLabel(c, performance2, "recording")}\u201D` : performanceLabel(c, performance2)}.`.slice(0, 500) };
     }
     case "keep-distinct": {
       const id = str(v.id, "review item", { max: 200 });
@@ -46497,30 +46837,42 @@ function applyV2(c, request, who) {
       );
       if (!tracks.length) fail("Choose at least one track for the work");
       const title = str(v.title, "work title", { max: 2e3, field: "title" }).trim();
-      let composer = str(v.composer ?? "", "composer", { optional: true, max: 200 });
+      const composer = str(v.composer ?? "", "composer", { optional: true, max: 200 });
       const composerName = str(v.composerName ?? "", "composer name", { optional: true, max: 500 }).trim();
-      const similar = warnDuplicate(c, title, composer ? [labelOf(c, composer)].filter(Boolean) : composerName ? [composerName] : [], v.createAnyway);
-      if (composer) c.entity(composer, "person");
-      else if (composerName) {
-        const existing = entities(c, ["person"]).filter((person) => searchText(person.label) === searchText(composerName) && isComposer2(c, person));
-        if (existing.length === 1) composer = existing[0].id;
-        else {
-          composer = c.createEntity("person", { roles: ["composer"] });
-          m.manual(composer, "name", composerName, { actor: who, pin: true });
-        }
-      }
-      const owned = new Map(ownedTracks(c, { albumId }).map((track) => [track.id, track]));
-      const ordered = tracks.map((id) => owned.get(id)).filter(Boolean);
-      if (ordered.length !== tracks.length) fail("A track is no longer indexed");
-      const work = createWork(c, m, who, {
-        title,
-        composer,
-        movements: ordered.map((track) => movementTitle({ title: track.title, work: track.evidence.hints?.work }, title) || track.title)
-      });
-      rememberDistinct(c, work, similar, who);
-      const movements = workMovements(c, work).map((movement) => movement.id);
-      assignTracks(c, m, who, work, tracks, movements, { move: selected });
+      const { work, movements } = workFromTracks(c, m, who, { albumId, tracks, title, composer, composerName, createAnyway: v.createAnyway, move: selected });
       return { selection: selected ? albumSelection(albumId, "", pageOf(v)) : work, message: `Created \u201C${title}\u201D with ${movements.length} movements.`, ...selected && { focus: "tracks" } };
+    }
+    // Review E3: an auto-match review's tracks, mapped to the work chosen in
+    // it, through the album's own grouping step.
+    case "review-map": {
+      const id = str(v.id, "review item", { max: 200 });
+      const review = c.db.prepare("SELECT * FROM review_item WHERE id=? AND kind='auto_match' AND status='open'").get(id);
+      if (!review) fail("This review item is already resolved");
+      const evidence = JSON.parse(review.evidence);
+      const work = str(v.work, "work", { max: 200 });
+      if (work !== evidence.work && !(evidence.candidates || []).includes(work)) fail("Choose one of the works this review names");
+      c.entity(work, "work");
+      const albumId = String(evidence.albumId ?? "");
+      const onAlbum = new Set(albums(c, albumId).get(albumId)?.tracks.map((track) => track.id) || []);
+      const tracks = (evidence.tracks || []).filter((track) => onAlbum.has(track));
+      if (!tracks.length) fail("These tracks are no longer on the album");
+      const move = rememberAlbumTracks(c, albumId, tracks, who);
+      return { selection: albumSelection(albumId, work, 0, move), message: "Say which movement each track is, then apply. The review closes once they are in the work.", focus: "assign" };
+    }
+    // Review E3: the composer read from the artist field is right.
+    case "review-confirm-composer": {
+      const id = str(v.id, "review item", { max: 200 });
+      const review = c.db.prepare("SELECT * FROM review_item WHERE id=? AND kind='auto_match' AND status='open'").get(id);
+      if (!review) fail("This review item is already resolved");
+      const evidence = JSON.parse(review.evidence);
+      if (evidence.reason !== "uncertain-composer") fail("This review isn't about a composer");
+      const albumId = String(evidence.albumId ?? "");
+      const free = (evidence.tracks || []).filter((track) => !attachments(c, track).length);
+      if (!free.length) fail("These tracks are in a work already");
+      const { work, movements } = workFromTracks(c, m, who, { albumId, tracks: free, title: String(evidence.work || "").trim(), composerName: String(evidence.composers?.[0] || ""), createAnyway: true });
+      c.db.prepare("UPDATE review_item SET status='resolved' WHERE id=?").run(id);
+      const next = nextReview(c, id);
+      return { selection: next ? `review:${next}` : work, message: `Created \u201C${labelOf(c, work)}\u201D with ${movements.length} movements.`.slice(0, 500) };
     }
     case "choose-provider-value": {
       const id = str(v.id, "review item", { max: 200 });
@@ -47069,7 +47421,7 @@ Provider value: ${providerText}`;
                 options: choices.map(
                   (t) => option(
                     t.id,
-                    `${t.label} \xB7 ${path11.basename(path11.dirname(t.evidence.path))} / ${path11.basename(t.evidence.path)} \xB7 ${t.classification || "unsure"}`
+                    `${t.label} \xB7 ${path12.basename(path12.dirname(t.evidence.path))} / ${path12.basename(t.evidence.path)} \xB7 ${t.classification || "unsure"}`
                   )
                 )
               }),
@@ -47109,7 +47461,7 @@ Provider value: ${providerText}`;
                 options: attached.map(
                   (i) => option(
                     i.id,
-                    `${i.movement_id ? label(i.movement_id) : "Whole work"} \xB7 ${path11.basename(JSON.parse(c.db.prepare("SELECT evidence FROM track_link WHERE id=?").get(i.track_link_id).evidence).path)}`
+                    `${i.movement_id ? label(i.movement_id) : "Whole work"} \xB7 ${path12.basename(JSON.parse(c.db.prepare("SELECT evidence FROM track_link WHERE id=?").get(i.track_link_id).evidence).path)}`
                   )
                 )
               })
@@ -47132,7 +47484,7 @@ Provider value: ${providerText}`;
       `Owned track: ${selectedTrack.title}
 Album: ${selectedTrack.album || "Unknown album"}
 Performer: ${selectedTrack.artist || "Unknown performer"}
-File: ${path11.basename(selectedTrack.evidence.path)}
+File: ${path12.basename(selectedTrack.evidence.path)}
 Classification: ${selectedTrack.classification || "unsure"}`.slice(
         0,
         8e3
@@ -47360,9 +47712,9 @@ function apply(c, input, who) {
       if (!CREDIT_ROLES.includes(role)) fail2("Choose a role from the list");
       if (PERSON_ROLES.has(role) && who2.kind !== "person") fail2(`An ensemble can't be credited as ${role}; choose a person or another role`);
       if (ENSEMBLE_ROLES.has(role) && who2.kind !== "ensemble") fail2(`Only an ensemble can be credited as ${role}`);
-      const same3 = c.db.prepare("SELECT id,state FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ? AND id!=?").get(selection, credit.contributor_id, role, instrument, credit.id);
-      if (same3?.state === "active") fail2("That role credit already exists");
-      if (same3) c.db.prepare("DELETE FROM credit WHERE id=?").run(same3.id);
+      const same4 = c.db.prepare("SELECT id,state FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ? AND id!=?").get(selection, credit.contributor_id, role, instrument, credit.id);
+      if (same4?.state === "active") fail2("That role credit already exists");
+      if (same4) c.db.prepare("DELETE FROM credit WHERE id=?").run(same4.id);
       c.db.prepare("UPDATE credit SET role=?,instrument=?,source='manual' WHERE id=?").run(role, instrument, credit.id);
       break;
     }
@@ -47556,18 +47908,20 @@ function apply(c, input, who) {
 }
 async function readEditor(input) {
   actor2(input);
-  const c = await openCatalogue(path11.join(input.dataFolder, "model"));
+  const c = await openCatalogue(path12.join(input.dataFolder, "model"));
   try {
     if (input.capabilities.adminForms >= 2) {
       const query = input.query || {};
       const maintenance2 = (query.tab === "activity" || query.selection === "maintenance") && input.maintenance ? await input.maintenance.status() : null;
       const downloads = query.tab === "activity" || String(query.selection || "").startsWith("slskd:") ? await searchDiagnostics({ dataFolder: input.dataFolder }) : null;
+      const tagRequests = query.tab === "activity" || String(query.selection || "").startsWith("tag-request:") ? listRequests({ dataFolder: input.dataFolder }) : null;
       if (query.tab === "search" && query.q) ensureSearchIndex(c);
       return readTransaction(
         c.db,
         () => query.lookup ? lookupV2(c, query) : renderV2(c, query, revision(c, query.selection || ""), {
           downloads,
           maintenance: maintenance2,
+          tagRequests,
           formActions: input.capabilities.formActions === true,
           orderField: input.capabilities.orderField === true
         })
@@ -47583,12 +47937,13 @@ async function mutateEditor(input) {
     actor2(input);
     if (!input.maintenance) return { ok: false, status: 400, message: "Maintenance needs the plugin's runtime" };
     try {
-      return { ok: true, message: await input.maintenance.run(input.mutation.command, input.user), selection: "maintenance" };
+      const result = await input.maintenance.run(input.mutation.command, input.user, input.mutation.values || {});
+      return typeof result === "string" ? { ok: true, message: result, selection: "maintenance" } : { ok: true, ...result };
     } catch (error) {
       return { ok: false, status: 400, message: String(error.message || error).slice(0, 500) };
     }
   }
-  const who = actor2(input), c = await openCatalogue(path11.join(input.dataFolder, "model"));
+  const who = actor2(input), c = await openCatalogue(path12.join(input.dataFolder, "model"));
   try {
     try {
       const result = transaction(c.db, () => {
@@ -47613,10 +47968,10 @@ async function mutateEditor(input) {
 }
 
 // src/model/pages.js
-import path12 from "node:path";
+import path13 from "node:path";
 
 // src/model/pages-entities.js
-import { randomUUID as randomUUID14 } from "node:crypto";
+import { randomUUID as randomUUID15 } from "node:crypto";
 var PAGE_ID = "classical";
 var PAGE_SIZE = 100;
 var RECORDINGS_PAGE = 50;
@@ -48168,7 +48523,7 @@ function saveQueue(c, workId, user, mutation) {
   transaction(c.db, () => {
     if (c.db.prepare("SELECT count(*) AS n FROM saved_queue WHERE user_id=? AND work_id=?").get(user.id, workId).n >= SAVED_LIMIT)
       throw new Error(`A work keeps ${SAVED_LIMIT} saved comparisons. Delete one first.`);
-    c.db.prepare("INSERT INTO saved_queue(id,user_id,name,work_id,items,created_at) VALUES (?,?,?,?,?,?)").run(randomUUID14(), user.id, name, workId, JSON.stringify(items), Date.now());
+    c.db.prepare("INSERT INTO saved_queue(id,user_id,name,work_id,items,created_at) VALUES (?,?,?,?,?,?)").run(randomUUID15(), user.id, name, workId, JSON.stringify(items), Date.now());
   });
 }
 function mutateEntity(c, resource, mutation, user) {
@@ -48362,7 +48717,7 @@ function renderClassical(c, resourceId, query = {}, user = { id: 1, role: "user"
 }
 async function readClassical(input) {
   const user = actor3(input);
-  const c = await openCatalogue(path12.join(input.dataFolder, "model"));
+  const c = await openCatalogue(path13.join(input.dataFolder, "model"));
   try {
     return renderClassical(c, input.resourceId, input.query || {}, user);
   } finally {
@@ -48377,7 +48732,7 @@ function applyClassicalMutation(c, resourceId, mutation, user) {
 }
 async function mutateClassical(input) {
   const user = actor3(input);
-  const c = await openCatalogue(path12.join(input.dataFolder, "model"));
+  const c = await openCatalogue(path13.join(input.dataFolder, "model"));
   try {
     return applyClassicalMutation(c, input.resourceId, input.mutation, user);
   } finally {
@@ -48386,9 +48741,9 @@ async function mutateClassical(input) {
 }
 
 // src/model/runtime.js
-import { createHash as createHash5, randomUUID as randomUUID15 } from "node:crypto";
-import fs9 from "node:fs/promises";
-import path13 from "node:path";
+import { createHash as createHash5, randomUUID as randomUUID16 } from "node:crypto";
+import fs10 from "node:fs/promises";
+import path14 from "node:path";
 
 // src/user-operations.js
 var UserOperations = class {
@@ -48435,7 +48790,7 @@ var UserOperations = class {
 function englishTitle(work, fallback = work.title) {
   return ClassicalResolver.bestEnglishAlias(work.aliases)?.name ?? fallback;
 }
-var modelFolder = (ctx) => path13.join(ctx.dataFolder, "model");
+var modelFolder = (ctx) => path14.join(ctx.dataFolder, "model");
 var emptyTags = () => ({
   title: "",
   artist: "",
@@ -48491,7 +48846,7 @@ async function modelStatus(ctx) {
 }
 var PLUGIN_ID = "aurral-classical";
 var SYNC_INTERVAL_MS = 6 * 60 * 6e4;
-var syncFlag = (ctx) => path13.join(modelFolder(ctx), "sync-requested");
+var syncFlag = (ctx) => path14.join(modelFolder(ctx), "sync-requested");
 async function hostLibrary(ctx) {
   if (ctx.userOperations)
     return new UserOperations(ctx.userOperations, ctx.fetch).library();
@@ -48516,15 +48871,15 @@ async function hostLibrary(ctx) {
 }
 var canReadHostLibrary = (ctx) => !!(ctx.userOperations || ctx.api?.url && ctx.api?.key);
 async function requestModelSync(ctx) {
-  await fs9.mkdir(modelFolder(ctx), { recursive: true });
-  await fs9.writeFile(syncFlag(ctx), `${Date.now()}:${randomUUID15()}`);
+  await fs10.mkdir(modelFolder(ctx), { recursive: true });
+  await fs10.writeFile(syncFlag(ctx), `${Date.now()}:${randomUUID16()}`);
 }
-var readSyncFlag = (ctx) => fs9.readFile(syncFlag(ctx), "utf8").catch(() => null);
+var readSyncFlag = (ctx) => fs10.readFile(syncFlag(ctx), "utf8").catch(() => null);
 async function clearSyncFlag(ctx, seen) {
-  if (seen != null && await readSyncFlag(ctx) === seen) await fs9.rm(syncFlag(ctx), { force: true });
+  if (seen != null && await readSyncFlag(ctx) === seen) await fs10.rm(syncFlag(ctx), { force: true });
 }
 async function modelSyncDue(ctx, { now = Date.now() } = {}) {
-  const requested = await fs9.access(syncFlag(ctx)).then(() => true, () => false);
+  const requested = await fs10.access(syncFlag(ctx)).then(() => true, () => false);
   const catalogue = await openCatalogue(modelFolder(ctx));
   try {
     if (catalogue.db.prepare(
@@ -48568,7 +48923,7 @@ async function enqueueModelScan(ctx, actor4, { system = false } = {}) {
     const library = await hostLibrary(ctx);
     let instance = catalogue.db.prepare("SELECT * FROM core_instance LIMIT 1").get();
     if (!instance) {
-      const id2 = randomUUID15();
+      const id2 = randomUUID16();
       catalogue.db.prepare("INSERT INTO core_instance VALUES (?,?,0)").run(id2, ctx.settings.libraryEpoch || "initial");
       instance = { id: id2, generation: 0 };
     }
@@ -48613,18 +48968,18 @@ async function enqueueModelScan(ctx, actor4, { system = false } = {}) {
 }
 var REUSED = Symbol("reused");
 async function scanFile(file, root, prior) {
-  const real = await fs9.realpath(file.readPath);
-  const relative = path13.relative(root, real);
-  if (!relative || relative === ".." || relative.startsWith(`..${path13.sep}`) || path13.isAbsolute(relative))
+  const real = await fs10.realpath(file.readPath);
+  const relative = path14.relative(root, real);
+  if (!relative || relative === ".." || relative.startsWith(`..${path14.sep}`) || path14.isAbsolute(relative))
     throw new Error("Indexed model file is outside the configured library");
-  const before = await fs9.stat(real);
+  const before = await fs10.stat(real);
   const unchanged = prior?.fingerprint && prior.observedRealPath === real && prior.size === before.size && prior.mtimeMs === before.mtimeMs && (prior.ctimeMs != null ? prior.ctimeMs === before.ctimeMs : prior.ino === before.ino);
   if (unchanged && prior.hints && !prior.hints.tagsUnreadable && prior.ctimeMs != null && ["title", "album", "artist", "albumId", "trackNumber", "discNumber", "recordingMbid"].every((key) => prior[key] === file[key]))
     return { ...prior, ...file, ino: before.ino, durationMs: prior.durationMs, [REUSED]: true };
   const hash = unchanged ? prior.fingerprint : await fingerprint(real);
   const parsed = readModelTags(real);
   const tags = parsed || emptyTags();
-  const after = await fs9.stat(real);
+  const after = await fs10.stat(real);
   if (before.size !== after.size || before.mtimeMs !== after.mtimeMs || before.ino !== after.ino)
     throw new Error("Library file changed during model scan; retry required");
   const kept = !parsed && prior?.hints && sameAudio2(prior, hash) ? prior : null;
@@ -48709,14 +49064,14 @@ function markSeen(catalogue, album, progress) {
   catalogue.db.prepare(
     `INSERT INTO model_job(id,type,key,input,state,progress,max_attempts,created_at)
        VALUES (?,?,?,?,'done',?,1,?)`
-  ).run(randomUUID15(), IDENTIFY, album.key, JSON.stringify({ albumId: album.albumId }), JSON.stringify(progress), Date.now());
+  ).run(randomUUID16(), IDENTIFY, album.key, JSON.stringify({ albumId: album.albumId }), JSON.stringify(progress), Date.now());
 }
 function queueAlbumIdentification(catalogue, { now = Date.now() } = {}) {
   return transaction(catalogue.db, () => {
     const pending = pendingIdentification(catalogue);
     if (!keyRan(catalogue, BASELINE_KEY)) {
       for (const album of pending) if (!keyRan(catalogue, album.key)) markSeen(catalogue, album, { baseline: true, tracks: album.tracks });
-      catalogue.db.prepare(`INSERT INTO model_job(id,type,key,input,state,max_attempts,created_at) VALUES (?,?,?,'{}','done',1,?)`).run(randomUUID15(), `${IDENTIFY}_baseline`, BASELINE_KEY, now);
+      catalogue.db.prepare(`INSERT INTO model_job(id,type,key,input,state,max_attempts,created_at) VALUES (?,?,?,'{}','done',1,?)`).run(randomUUID16(), `${IDENTIFY}_baseline`, BASELINE_KEY, now);
       return 0;
     }
     const jobs = new ModelJobs(catalogue);
@@ -48757,7 +49112,7 @@ async function queueAlbumMatch(ctx, actor4, albumId) {
     throw new Error("Automatic work matching requires a current host admin");
   const catalogue = await openCatalogue(modelFolder(ctx));
   try {
-    const key = `${IDENTIFY}:${RULES}:manual:${albumId}:${randomUUID15()}`;
+    const key = `${IDENTIFY}:${RULES}:manual:${albumId}:${randomUUID16()}`;
     new ModelJobs(catalogue).enqueue(IDENTIFY, key, { albumId: String(albumId) }, { maxAttempts: 5 });
     return key;
   } finally {
@@ -48967,12 +49322,12 @@ async function runEnglishNames(ctx, catalogue, jobs, job, deadline) {
         if (typeof title === "string") {
           const { entry, verified: verified2 } = await englishEntryFor(ctx, catalogue, work);
           const english = entry && ClassicalResolver.bestEnglishAlias(entry.aliases)?.name || entry && headingFor(catalogue, work, null, title);
-          const same3 = verified2 || catalogueSubject(title) && [entry?.title, english].some((name) => catalogueSubject(name || "") === catalogueSubject(title));
-          if (english && same3 && english !== title) {
+          const same4 = verified2 || catalogueSubject(title) && [entry?.title, english].some((name) => catalogueSubject(name || "") === catalogueSubject(title));
+          if (english && same4 && english !== title) {
             metadata.derived(work, "title", english);
             progress.renamed++;
           }
-          const above = entry && (verified2 || same3) && (entry.relations || []).find((rel) => rel.type === "parts" && rel.direction === "backward" && rel.work?.id);
+          const above = entry && (verified2 || same4) && (entry.relations || []).find((rel) => rel.type === "parts" && rel.direction === "backward" && rel.work?.id);
           const hasParts = (entry?.relations || []).some((rel) => rel.type === "parts" && rel.direction === "forward");
           if (above && hasParts && (isCollectionLike(above.work.title || "") || namesCatalogueRange(above.work.title || ""))) {
             const filed = catalogue.db.prepare("SELECT 1 FROM relation WHERE kind='collection_member' AND target_id=?").get(work);
@@ -49065,7 +49420,7 @@ async function runIdentification(ctx, catalogue, jobs, first, owner, deadline) {
 async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 200, checkpointMs = 1e4 } = {}) {
   const catalogue = await openCatalogue(modelFolder(ctx));
   catalogue.db.exec("PRAGMA busy_timeout=60000");
-  const jobs = new ModelJobs(catalogue), owner = randomUUID15(), deadline = Date.now() + budgetMs;
+  const jobs = new ModelJobs(catalogue), owner = randomUUID16(), deadline = Date.now() + budgetMs;
   try {
     const job = jobs.claim(owner, { leaseMs: 6e4 });
     if (!job) return;
@@ -49082,7 +49437,7 @@ async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 200, checkpointMs
       const legacy = job.progress.collected || [];
       const collected = [...legacy, ...jobs.chunks(job.id, chunks)];
       let saved = legacy.length ? 0 : collected.length;
-      const save = (extra = {}) => {
+      const save2 = (extra = {}) => {
         const items = collected.slice(saved);
         const ok = jobs.checkpoint(
           job,
@@ -49098,7 +49453,7 @@ async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 200, checkpointMs
       const errors = job.progress.errors || [];
       let errorCount = job.progress.errorCount || 0;
       let reused = job.progress.reused || 0;
-      const root = await fs9.realpath(ctx.libraryFolder);
+      const root = await fs10.realpath(ctx.libraryFolder);
       const previous = new Map(
         catalogue.db.prepare(
           "SELECT core_id,file_id,evidence FROM track_link WHERE instance_id=? AND state='active'"
@@ -49142,11 +49497,11 @@ async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 200, checkpointMs
           }
           await new Promise((resolve) => setImmediate(resolve));
         }
-        if (!save()) return;
+        if (!save2()) return;
         if (cancelled) break;
       }
       const done = cursor === input.files.length;
-      const committed = save({
+      const committed = save2({
         done,
         commit: done ? () => {
           const rows = reconcile(catalogue, {
@@ -49309,10 +49664,10 @@ async function cancelModelScan(ctx, actor4) {
 }
 
 // src/model/classification-report.js
-import path14 from "node:path";
-async function openModelReadOnly(folder) {
+import path15 from "node:path";
+async function openModelReadOnly(folder2) {
   const { DatabaseSync } = await import("node:sqlite");
-  return new DatabaseSync(path14.join(folder, "classical.sqlite"), { readOnly: true });
+  return new DatabaseSync(path15.join(folder2, "classical.sqlite"), { readOnly: true });
 }
 var describe2 = (signal) => `${signal.signal}${signal.value ? ` "${signal.value}"` : ""} +${signal.points}`;
 function classificationReport(db, { albumId = null, all = false } = {}) {
@@ -49343,7 +49698,7 @@ function classificationReport(db, { albumId = null, all = false } = {}) {
       trackId: String(row.core_id),
       albumId: album,
       album: hints.album || "",
-      title: hints.title || path14.basename(evidence.path || ""),
+      title: hints.title || path15.basename(evidence.path || ""),
       artist: hints.artist || "",
       genres: hints.genres || [],
       composer: hints.composer || [],
@@ -49369,10 +49724,10 @@ function classificationReport(db, { albumId = null, all = false } = {}) {
   return { tracks, summary };
 }
 async function albumClassificationSummary(ctx, albumId) {
-  const folder = path14.join(ctx.dataFolder, "model");
+  const folder2 = path15.join(ctx.dataFolder, "model");
   let db;
   try {
-    db = await openModelReadOnly(folder);
+    db = await openModelReadOnly(folder2);
   } catch {
     return "No classical model yet. Run Scan classical model (read only) first.";
   }
@@ -49389,7 +49744,7 @@ async function albumClassificationSummary(ctx, albumId) {
 }
 
 // src/search/provider.js
-import path15 from "node:path";
+import path16 from "node:path";
 var SECTION_IDS = new Set(SECTIONS.map(([id]) => id));
 var PAGE2 = "classical";
 function linkFor(item, capabilities = {}) {
@@ -49435,7 +49790,7 @@ function searchResult(c, query, capabilities = {}) {
 }
 async function search(input) {
   if (!Number.isSafeInteger(input?.user?.id) || input.user.id <= 0) throw new Error("A real user account is required");
-  const c = await openCatalogue(path15.join(input.dataFolder, "model"));
+  const c = await openCatalogue(path16.join(input.dataFolder, "model"));
   try {
     return searchResult(c, input.query, input.capabilities);
   } finally {
@@ -49444,7 +49799,7 @@ async function search(input) {
 }
 
 // src/mb.js
-import path16 from "node:path";
+import path17 from "node:path";
 
 // src/version.js
 var VERSION = true ? "1.0.59" : "dev";
@@ -49467,7 +49822,7 @@ var MusicBrainz = class {
     this.userAgent = `AurralClassical/${VERSION} ( ${REPOSITORY} )`;
     this.fetch = fetchImpl;
     this.log = log2;
-    this.cache = new FileCache(path16.join(dataFolder, "mb-cache"));
+    this.cache = new FileCache(path17.join(dataFolder, "mb-cache"));
     const isPublic = this.base === PUBLIC_MB;
     this.throttle = new Throttle(dataFolder, intervalMs ?? (isPublic ? 1e3 : 0));
     this.maxRetries = maxRetries;
@@ -49604,44 +49959,6 @@ function tagInBackground(ctx) {
     background = null;
   });
 }
-async function tagNow(ctx, paths, what) {
-  if (!paths.length) return `No files to tag in ${what}`;
-  const ids = new Set(
-    await enqueue(ctx, paths, { force: true, source: "action" })
-  );
-  const stats = await runQueue(ctx, ACTION_BUDGET_MS, ids, { priority: true });
-  if (stats) return `${what}: ${describeStats(stats)}`.slice(0, 500);
-  return `Queued ${paths.length} files from ${what}. Tagging is busy and will get to them.`;
-}
-async function untagNow(ctx, paths, what, mode = "restore") {
-  if (!paths.length) return `No files in ${what}`;
-  {
-    const counts = await untagFiles(ctx, paths, ACTION_BUDGET_MS, {
-      priority: true,
-      mode
-    });
-    if (counts) {
-      const parts = [`${counts.restored} restored`];
-      if (counts.cleared)
-        parts.push(
-          `${counts.cleared} cleared${mode === "clear" ? " (existing backups retained)" : " (original tags unavailable)"}`
-        );
-      if (counts.unchanged)
-        parts.push(`${counts.unchanged} already had no classical tags`);
-      if (counts["no backup"])
-        parts.push(
-          `${counts["no backup"]} couldn't be restored (no backup, and MusicBrainz has no credit)`
-        );
-      if (counts.skipped) parts.push(`${counts.skipped} skipped`);
-      if (counts.left) parts.push(`${counts.left} left: run it again`);
-      return `${what}: ${parts.join(", ")}. The plugin won't tag these recordings again unless you tag them as classical.`.slice(
-        0,
-        500
-      );
-    }
-    return `Tagging is busy. Try again in a few minutes.`;
-  }
-}
 function artistFiles(index, artist) {
   const albumIds = new Set(
     artist.albums.flatMap((a) => [a.mbid]).filter(Boolean)
@@ -49673,7 +49990,7 @@ function maintenance(input) {
         enrich: await enrichmentStatus(ctx).catch(() => null)
       };
     },
-    async run(command, user) {
+    async run(command, user, values = {}) {
       if (command === "maintenance-scan") {
         const id = await enqueueModelScan(ctx, user);
         start();
@@ -49694,6 +50011,17 @@ function maintenance(input) {
           return `Work names and books were looked up already: ${queued.renamed} of ${queued.total} works renamed, ${queued.filed || 0} filed under their book.`;
         start();
         return "Looking up work names and books on MusicBrainz in the background, one request a second.";
+      }
+      if (command === "maintenance-tag-request") {
+        if (user?.role !== "admin") throw new Error("Writing tags requires a current host admin");
+        if (values?.confirm !== true) throw new Error("Confirm writing the tags first");
+        const id = String(values.request || "");
+        applyRequest(ctx, id, user).catch((error) => log(`Classical tag request stopped: ${error.message}`));
+        return { message: "Writing the tags in the background. This page shows the result; reload it in a moment.", selection: `tag-request:${id}` };
+      }
+      if (command === "maintenance-tag-request-discard") {
+        await discardRequest(ctx, String(values?.request || ""));
+        return { message: "Discarded; nothing was written.", selection: "" };
       }
       if (command === "maintenance-enrich") {
         const queued = await queueEnrichment(ctx, user);
@@ -49832,36 +50160,24 @@ var index_default = {
         message: `Clear classical fields will remove ${counts.composer} composer, ${counts.work} work and ${counts.workId} work-ID values. Restore originals uses backups instead; original values may remain. No files changed.`
       };
     },
+    // These four only plan what they would write (v0.3 8.7); an admin
+    // confirms the plan in the editor's Activity → Tag requests.
     async "clear-classical"(input) {
-      return {
-        message: await untagNow(
-          makeContext(input),
-          input.album.tracks.map((t) => t.path).filter(Boolean),
-          `"${input.album.title}"`,
-          "clear"
-        )
-      };
+      const paths = input.album.tracks.map((t) => t.path).filter(Boolean);
+      return { message: (await requestTags(makeContext(input), paths, { mode: "clear", what: `"${input.album.title}"`, actor: input.user })).message };
     },
     async "tag-album"(input) {
-      const ctx = makeContext(input);
       const paths = input.album.tracks.map((t) => t.path).filter(Boolean);
-      return { message: await tagNow(ctx, paths, `"${input.album.title}"`) };
+      return { message: (await requestTags(makeContext(input), paths, { mode: "tag", what: `"${input.album.title}"`, actor: input.user })).message };
     },
     async "untag-album"(input) {
-      const ctx = makeContext(input);
       const paths = input.album.tracks.map((t) => t.path).filter(Boolean);
-      return { message: await untagNow(ctx, paths, `"${input.album.title}"`) };
+      return { message: (await requestTags(makeContext(input), paths, { mode: "restore", what: `"${input.album.title}"`, actor: input.user })).message };
     },
     async "tag-artist"(input) {
       const ctx = makeContext(input);
       const index = await libraryIndex(ctx, 10 * 6e4, { priority: true });
-      return {
-        message: await tagNow(
-          ctx,
-          artistFiles(index, input.artist),
-          input.artist.name
-        )
-      };
+      return { message: (await requestTags(ctx, artistFiles(index, input.artist), { mode: "tag", what: input.artist.name, actor: input.user })).message };
     }
   },
   events: {
@@ -49897,7 +50213,7 @@ var index_default = {
     if (remainingMs <= 0) return;
     const stats = await runScheduled(ctx, remainingMs);
     if (stats) log(`Scheduled tagging: ${describeStats(stats)}`);
-    await pruneCache(path17.join(ctx.dataFolder, "mb-cache"), TTL.default).catch(
+    await pruneCache(path18.join(ctx.dataFolder, "mb-cache"), TTL.default).catch(
       () => {
       }
     );

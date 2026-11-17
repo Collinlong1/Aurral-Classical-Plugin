@@ -294,3 +294,43 @@ test("legacy editor renames also retain the old composer spelling", async (t) =>
   assert.equal(count(c, "person"), 1);
   assert.equal(count(c, "work"), 1);
 });
+
+// Review L12 (#23): once two people share a composer's name, matching makes
+// no third; an admin says which one wrote the movement.
+test("L12: a movement composer whose name two people share is never made again; it is asked about once", async (t) => {
+  generation = 0;
+  const c = await setup(t);
+  const m = new Metadata(c);
+  const twins = [1, 2].map(() => {
+    const id = c.createEntity("person");
+    m.manual(id, "name", "Franz Xaver Süßmayr", { actor: "admin" });
+    return id;
+  });
+  const requiem = (albumId) =>
+    album(albumId, "", "Requiem in D minor, K. 626", { titles: ["I. Introitus", "II. Kyrie", "III. Lacrimosa"], composer: "Wolfgang Amadeus Mozart" }).map((track, i) =>
+      i === 2 ? { ...track, hints: { ...track.hints, composer: ["Wolfgang Amadeus Mozart", "Franz Xaver Süßmayr"] } } : track,
+    );
+  scan(c, [...requiem("a"), ...requiem("b")]);
+  for (const albumId of ["a", "b"]) autoMatchTaggedWorks(c, { albumId, actor: "test" });
+  autoMatchTaggedWorks(c, { actor: "test" });
+  const named = c.db
+    .prepare("SELECT e.id FROM entity e JOIN field_resolution f ON f.target_id=e.id AND f.field='name' JOIN assertion a ON a.id=f.assertion_id WHERE e.kind='person' AND e.deleted_at IS NULL AND a.value=?")
+    .all(JSON.stringify("Franz Xaver Süßmayr"))
+    .map((row) => row.id)
+    .sort();
+  assert.deepEqual(named, [...twins].sort(), "no third Süßmayr");
+  // The work is made, with Mozart; the Lacrimosa's extra composer waits for an admin.
+  assert.equal(count(c, "work"), 1);
+  assert.equal(c.db.prepare("SELECT count(*) AS n FROM credit WHERE role='composer' AND contributor_id IN (?,?)").get(...twins).n, 0);
+  const reviews = c.db.prepare("SELECT target_id,evidence FROM review_item WHERE kind='contributor_identity' AND status='open'").all().map((row) => JSON.parse(row.evidence));
+  assert.ok(reviews.length >= 1 && reviews.every((evidence) => evidence.reason === "ambiguous-name" && evidence.name === "Franz Xaver Süßmayr" && evidence.role === "composer"), JSON.stringify(reviews));
+  // An admin answers each: the Lacrimosa's recording credits the first one.
+  for (const { id, target_id: recording } of c.db.prepare("SELECT id,target_id FROM review_item WHERE kind='contributor_identity' AND status='open'").all()) {
+    await edit(c, "use-contributor", { id, contributor: twins[0] }, `review:${id}`);
+    assert.ok(c.db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role='composer' AND state='active'").get(recording, twins[0]));
+  }
+  // Matching again asks nothing more and makes no one.
+  autoMatchTaggedWorks(c, { actor: "test" });
+  assert.equal(c.db.prepare("SELECT count(*) AS n FROM review_item WHERE kind='contributor_identity' AND status='open'").get().n, 0);
+  assert.equal(count(c, "person"), 3, "Mozart and the two Süßmayrs");
+});

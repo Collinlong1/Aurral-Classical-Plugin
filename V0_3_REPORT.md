@@ -1,3 +1,50 @@
+# v0.3 — summary for review
+
+v0.3 adds the Classical Library, contributors, classical tag writing and MusicBrainz details, in the plan's ten phases. Each phase's issues are closed when their PR merges; their results and verification follow below, newest first.
+
+- **Phase 0 (#10–#20):** matching fixes from the November 11 review (composer aliases and merges, deliberate separate works, removals, safe undo, exact-file moves, tag-sensitive retags, presentation limits, excerpts, variation ranges).
+- **Phase 1 (#48, #51–#55, #59):** schema 5; credit provenance; conductor, performer and artist-ID evidence; derived performer credits; contributor identity by aliases and MusicBrainz IDs; reissue links; contributor search fields.
+- **Phase 2 (#56–#58, #60–#63):** the editor's performer list, credits, contributor details and membership, bulk credits, mapping tag names, contributor merges and deletions with undo, identity and credit reviews.
+- **Phase 3 (#64, core #51–#56):** generic core hooks: resource view 2, the Library entry, item and track links.
+- **Phases 4–6 (#65–#77, #79):** the Classical home and lists; composer, contributor and ensemble pages; work and recording pages; links into the player; saved comparisons with ranges; movement boundaries.
+- **Phase 7 (#78, #80, #81):** MusicBrainz details that never override an admin's values.
+- **Phase 8 (#82–#88):** classical tag writing from a preview, with backups, verification and restore; the album and artist menu actions plan and an admin confirms.
+- **Phase 9 (#89–#93):** a 10,000-track benchmark, a real rollback to the schema 4 build, restart persistence of v0.3 data, phone-width screenshots of every new page, and these documents.
+
+Settings added: **Write classical tags to files** (`enableTagWriting`, off by default). Schema: 5 (additive; rollback by restoring `before-v5-*.sqlite` offline, tested against the real schema 4 build). Paired core: `aurral-classical` with the Phase 3 hooks and 6.5's whole-track playlist labels (`9fec213`); the integration workflows pin it.
+
+Not part of v0.3 and still open: review and optional issues #28–#50. Not run in this environment: `pnpm eden test`, and the Compose workflow (no Docker); both integration workflows run in CI.
+
+---
+
+# v0.3 Phases 8.7–9.5 and review fixes L12, L9, L4, E3 / issues #88–#93, #23, #25–#27
+
+## Result
+
+- `src/tag-requests.js` (new): `requestTags`, `applyRequest`, `listRequests`, `readRequest`, `discardRequest`, `untagMessage`. `src/tagger.js`: `processReal`/`untagReal` take `plan` and `values`. `src/index.js`: the four menu actions call `requestTags`; `maintenance-tag-request` and `-discard`. `src/model/editor.js`: maintenance commands get their values and may name a page; Activity lists requests. `src/model/editor-v2.js`: request rows and view.
+- `scripts/perf-catalogue.mjs` (new), `test/perf.test.js` (new); `src/search/engine.js`: `classicalTracks({ workId })`, `lazyValues`, `ownedRecordings` scoped to a work.
+- `test/migration-rollback.test.js` (new); `.github/workflows/ci.yml`: full history for the test job.
+- `dev/editor-fixtures.mjs v03` and its checks; `.github/workflows/phase3-integration.yml` runs it and uploads the v0.3 screenshots.
+- `dev/classical-pages-browser.mjs`, `dev/editor-tag-preview-browser.mjs`: every v0.3 page photographed at both widths, no sideways scroll at phone width.
+- `src/model/auto-match.js`: `composerEntity` returns no one for a shared name (L12); `insideNumber` and the repair (L9); `sharedWorkTag` with the composer-name guard and explanations (L4). `src/model/catalogue.js`: settled auto-match reviews stay settled (E3). `src/model/editor-v2.js`: auto-match Decide rows, `review-map`, `review-confirm-composer`, `workFromTracks`, `candidateSummary`; `use-contributor` credits a recording too.
+- `test/corpus/apple-baseline.json`: 30 improved results saved, none worse.
+
+## Verification
+
+On Node 22.23: full `npm test` 468/468.
+
+- 8.7, `test/tagger.test.js`: choosing an action writes nothing and leaves a request with planned values; no catalogue is created; the editor lists and shows it and passes the confirmation on; a file changed after the request is skipped; confirming twice writes once; restore and clear plan too; discard; nothing to change makes no request. The 20 existing tagger tests now confirm their request (`act`) and pass with their old messages, including the failed-replacement and non-classical cases.
+- 9.1, `test/perf.test.js`: 28 page reads, warm, each under 1000 ms; slowest 76 ms (editor album page) on this machine.
+- 9.2, `test/migration-rollback.test.js` against `58dd615^`.
+- L12, `test/auto-match.test.js`: two Süßmayrs stay two through two albums and rematches; the review is answered with Use this record and isn't asked again. It failed on the previous code (a third person).
+- L9, L4, E3, `test/messy-matching.test.js`: Hoboken titles and the repair; Má vlast becomes a work of three movements, a lone free-text WORK tag and a collection don't, with the dry run's reasons; dismissed reviews stay dismissed through rescans, a changed track list asks again, Yes makes the work with that composer, ambiguous candidates are told apart and Use this work opens the grouping step for exactly those tracks.
+- Apple corpus: blocks match on 196/204 albums (work-tags style); the regression L4 first caused on 1452886617 is fixed by the composer-name guard.
+- Browser, Node 26.12, Chromium at 1280 and 390 px: all ten checks pass; the new screenshots were checked by eye.
+
+Not run here: `dev/editor-fixtures.mjs v03` and the Compose restart (no Docker; CI runs them), `pnpm eden test`, remote CI.
+
+---
+
 # v0.3 Phases 6.6–8.6 — movement boundaries, MusicBrainz details, classical tag writing / issues #78–#87
 
 ## Result

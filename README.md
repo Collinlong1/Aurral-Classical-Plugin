@@ -9,7 +9,8 @@ using the same rules, so beets no longer needs to touch these files.
   (Composer — Arranger — Soloist — Ensemble — Conductor), plus `COMPOSER`,
   `WORK` and `MUSICBRAINZ_WORKID`, all from MusicBrainz.
 * **Tag as classical.** An admin-only artist and album menu item, for files
-  that were already in the Library.
+  that were already in the Library. It plans the change; an admin confirms it
+  in the editor before anything is written.
 * **Compare recordings.** On a work page (fork), a movement across every owned
   recording, with **Play comparison** and **Save as playlist**. (The track and album menu item was removed
   in 1.0.54.)
@@ -103,11 +104,14 @@ skips them too. The audio is never re-encoded.
 ## Tag as classical
 
 Admins see **Tag as classical** in the menu of an artist or an album in the
-Library. It retags that album's files, or every file of that artist (by
-MusicBrainz album artist ID, release, or album artist name), straight away,
-even ones the plugin has seen before. It runs in the background and reports
-how many it tagged and why it skipped the rest. Use it for music that was in
-the Library before the plugin, or after fixing a Work on MusicBrainz.
+Library. It works out the tags for that album's files, or every file of that
+artist (by MusicBrainz album artist ID, release, or album artist name), even
+ones the plugin has seen before, and writes nothing yet: the editor's
+**Activity → Tag requests** shows each file's change, and an admin confirms
+(**Write N files**) or discards it. Files changed since the request are left
+alone. It reports how many it tagged and why it skipped the rest. Use it for
+music that was in the Library before the plugin, or after fixing a Work on
+MusicBrainz.
 
 Here the admin has said the music is classical, so missing evidence doesn't
 stop it; signs that it isn't classical (a soundtrack, Christmas or crossover
@@ -119,7 +123,9 @@ file while one runs, even when Aurral runs it in another process.
 
 ## Remove classical tags
 
-Admins see **Remove classical tags** in the album menu. Before it first changes
+Admins see **Restore original tags** and **Clear classical tags** in the album
+menu. Like Tag as classical, they make a request an admin confirms in the
+editor before any file changes. Before the plugin first changes
 a file, the plugin keeps its `ARTIST`, `ALBUMARTIST`, `COMPOSER`, `WORK` and
 `MUSICBRAINZ_WORKID` in its data folder; this puts them back. Files tagged
 before the plugin kept these (or by the beets plugin) get the artist

@@ -20,6 +20,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # test/migration-rollback.test.js runs the last schema 4 build from git.
+          fetch-depth: 0
 
       - name: Read the version
         id: version

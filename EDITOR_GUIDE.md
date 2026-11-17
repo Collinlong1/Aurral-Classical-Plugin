@@ -2,7 +2,7 @@
 
 Open **Settings → Plugins → Aurral Classical → Pages → Open Classical metadata editor** as an admin. It needs the matching fork (admin pages v2) and the plugin's `page:editor` capability. Older fork builds with only admin forms v1 still get the previous editor.
 
-Everything here changes the classical catalogue only. Audio files are never written.
+Everything here changes the classical catalogue only. Audio files change only when you write classical tags from a preview and confirm it (below), with **Write classical tags to files** on in the plugin's settings.
 
 ## Layout
 
@@ -49,8 +49,11 @@ Searching, no matches and lookup failures are separate states. **Try again** ret
 
 **Review.** The Review tab lists what needs a decision, with the action that settles it. Settle the item on screen and the next one opens; **Skip** moves on without settling. An entry under review shows its own edit form, so most fixes happen without leaving the queue. Tick several to settle them together.
 - unsure classifications: **Send to Classical** / **Not classical**;
-- albums whose tracks didn't line up with a work, or that several works or composers could fit: **Open album** and an **Open** link per candidate. Assigning the album resolves the item;
-- albums whose composer appears only in the artist field ("Composer; Performers") with nothing else naming them: **Open album**, then create or assign the work. Nothing is created automatically for these;
+- albums whose tracks didn't line up with a work: **Decide** offers **Map these tracks**, which opens the album's grouping step for exactly those tracks. Assigning them resolves the item;
+- albums that several works of one title could fit: **Decide** lists each with its composer, number of recordings and first album, so identical titles can be told apart; **Use this work** opens the grouping step with it;
+- albums whose composer appears only in the artist field ("Composer; Performers") with nothing else naming them: **Decide** asks **Yes, the composer is …** (the work is made from those tracks, as matching would have) or **No** (nothing is made);
+- a composer or performer named on a track whose name several people share: **Use this record** credits the right one. Matching never makes another person of that name;
+- an item you dismissed or decided isn't raised again by later scans while its tracks are the same; a changed track list asks again;
 - possible duplicate works ("Possible duplicate of “…”" and why): the question and both entries first, then **Decide**: **Merge…** (the merge step above: see both outcomes and choose the work that stays), **Keep separate** (remembered: matching won't merge them or ask again) or **Skip**; both works side by side, field by field with differences marked, follow;
 - a MusicBrainz match held back: either "already linked to “…”" (another entry has that MusicBrainz work) or "only N% sure" (links need 95%). The page shows the MusicBrainz link, the certainty, what matched, the entry that has the link (with its composers and recordings, and both works side by side) and **Decide**: **Merge…** when they are the same piece (choose the one that stays in the merge step), **Link the record here instead** when this entry is the right one (the other loses the link), **Keep separate** to leave both as they are, or **Skip**. An unsure match offers **Link to this MusicBrainz work** or Dismiss;
 - composers who share a name: **Decide** offers **Merge…** with each same-named person (choose who stays in the merge step), **Keep separate** or **Skip**;
@@ -60,6 +63,12 @@ Searching, no matches and lookup failures are separate states. **Try again** ret
 Dismiss items you've checked.
 
 **Creating a work that already exists.** The choose-work step offers **Suggested works** with **Use this work**. Creating a matching title or catalogue number (and composer) still requires **Create anyway**.
+
+**Where movements start.** A track holding several movements of one recording (an attacca, or an album that gave them one track) shows **Where each movement starts** on its track page. Enter each later movement's start as m:ss, h:mm:ss or seconds; the first starts at 0:00 and the last runs to the end of the file. Each movement then plays only its part, on the album page and in comparisons. The file isn't changed.
+
+**Write classical tags.** **Preview classical tags** (on an album, ticked tracks, a work's Recordings or a track) reads each file and lists what it holds and what the catalogue proposes, field by field: composer and sort name, work, movement name, number and total, performers, conductor, catalogue number and MusicBrainz work. Titles, albums and album artists are never proposed. MP3 files take no movement or performer tags; other formats are listed as not supported yet. Nothing is written until **Write N files**, which asks first and needs **Write classical tags to files** on. Each file is read again and left alone if it changed since the preview, its old values are kept, and its audio must not change. The run's page lists every file's result; **Restore this file** or **Restore all** puts the old values back while the file still holds what was written. A track's page lists its tag writes.
+
+**Tag requests.** The album and artist menu actions **Tag as classical**, **Restore original tags** and **Clear classical tags** no longer write when chosen: they work out what they would write and leave a request under **Activity → Tag requests**. Open it to see each file's change, then **Write N files** or **Discard**. Files changed since the request are left alone.
 
 **Credits.** Roles: composer, soloist, performer, conductor, orchestra, ensemble, choir, arranger and lyricist. Orchestra, ensemble and choir need an ensemble; the others except performer need a person.
 
@@ -71,7 +80,8 @@ Scans run on their own when the plugin schedule and API access are on: after dow
 
 ## Activity
 
-- **Maintenance** (pinned first): the model's state, **Scan the library** (or Continue / Cancel), and the one-time lookups **Identify earlier albums** and **Work names from MusicBrainz**. They run on the model worker in the background and continue on the plugin schedule; reload to see progress. These used to be album-menu actions.
+- **Maintenance** (pinned first): the model's state, **Scan the library** (or Continue / Cancel), and the lookups **Identify earlier albums**, **Work names from MusicBrainz** and **Details from MusicBrainz** (sort names, dates and other names for everyone and every work with a MusicBrainz ID; your own values stay). They run on the model worker in the background and continue on the plugin schedule; reload to see progress. These used to be album-menu actions.
+- **Tag requests** waiting for you (from the album and artist menus), first.
 - **Merges and deletions**, each with **Undo**.
 - **slskd searches**: each step of the query ladder, the candidates with their scores and reasons, and the folders rejected with theirs.
 
