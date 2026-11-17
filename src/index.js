@@ -1,6 +1,7 @@
 import path from "node:path";
 import { Worker, isMainThread, parentPort, workerData } from "node:worker_threads";
 import { readEditor, mutateEditor } from "./model/editor.js";
+import { readClassical, mutateClassical, PAGE_ID } from "./model/pages.js";
 import {
   albumPresentation,
   readWork,
@@ -211,9 +212,17 @@ function maintenance(input) {
 export default {
   pages: {
     read: (input) =>
-      input.pageId === "work" ? readWork(input) : readEditor({ ...input, maintenance: maintenance(input) }),
+      input.pageId === PAGE_ID
+        ? readClassical(input)
+        : input.pageId === "work"
+          ? readWork(input)
+          : readEditor({ ...input, maintenance: maintenance(input) }),
     mutate: (input) =>
-      input.pageId === "work" ? mutateWork(input) : mutateEditor({ ...input, maintenance: maintenance(input) }),
+      input.pageId === PAGE_ID
+        ? mutateClassical(input)
+        : input.pageId === "work"
+          ? mutateWork(input)
+          : mutateEditor({ ...input, maintenance: maintenance(input) }),
   },
   albumPresentation,
   search,

@@ -1,3 +1,57 @@
+# v0.3 Phase 4.3 — Classical Library home / issue #67
+
+## Result
+
+- `src/model/pages.js`: `listCounts` (one SQL count a list, the same documents `listView` lists), `recentWorks` (realization → item → segment → active track link, newest first, ten), `homeView`.
+- `src/search/engine.js`: title sorts compare numbers numerically.
+- `dev/classical-pages-browser.mjs`; `.github/workflows/phase3-integration.yml` runs it; both integration workflows pin core 263901077859edad33eabfa2d468fb7a2d0f84b4.
+
+## Verification
+
+On Node 22.23: full `npm test` 428/428. New `test/pages.test.js`: the home's Browse rows link to all six lists and each count equals that list's own total (3 composers, 3 works, 2 conductors, 5 recordings); recently added orders works by their newest track (a second release of the Levit sonata added last puts the sonata first, "Added Nov 10, 2026"), and a work whose tracks are all missing drops off; an empty Library's home says how it fills. `test/search.test.js` adds title order by number. `dev/classical-pages-browser.mjs` passes locally on Node 26.12 against core 2639010 in Chromium at both widths, with screenshots checked by eye.
+
+---
+
+# v0.3 Phase 4.2 — Classical Library lists / issue #66
+
+## Result
+
+- `src/search/engine.js`: `searchCatalogue({ browse, accept, sort })`; `SORT_ORDERS`; performer and composer documents carry `data.entity`; stamp `v4`.
+- `src/model/pages.js`: `LISTS`, `PAGE_SIZE` (100), `listView`: header with the count, `sort`, `filters` (up to ten facets), `rows`, `empty` ("No works match.", "No more works." past the end, or none yet), and `pager` when there are more than 100.
+
+## Verification
+
+On Node 22.23: full `npm test` 425/425. New `test/search.test.js` tests: the fixture's three composers in name order; works by title and by catalogue number; conductors are exactly Barenboim and Karajan; no orchestra in the performer list; a composer filter and a query narrow lists, and a query adds "Best match"; an unknown list is refused. A 230-work library lists 100, 100 and 30 rows with pagers at offsets 0 and 200, catalogue order puts Op. 1009 tenth, and a page past the end says "No more works."
+
+---
+
+# v0.3 Phase 4.1 — Classical page routing / issue #65
+
+## Result
+
+- `manifest.json`: page `classical` (non-admin); `library: {pageId: "classical", resourceId: "home", label: "Classical"}`.
+- `src/model/pages.js`: `parseResource`, `renderClassical(c, resourceId, query)`, `readClassical`, `mutateClassical` (refuses: no actions yet). A real user is required.
+- `src/index.js`: `pages.read`/`mutate` route `classical`, then `work`, then the editor.
+- `test/library-fixture.js`: the search test's Library, shared.
+
+## Verification
+
+On Node 22.23: full `npm test` 423/423. `test/manifest.test.js` now checks the `library` entry against the host's rules (a non-admin page, label up to 40) and, through the built bundle, that every resource kind answers a view 2 page, entity pages name Beethoven, Barenboim, the Moonlight sonata and one of its recordings, a work opens the `work` page, unknown resources and missing entities are refused, an API key (user 0) is refused, and the v1 `work` page still answers.
+
+---
+
+# v0.3 Phase 3.6 — fork delta for the core hooks / issue #64
+
+## Result
+
+- `UPSTREAM_DELTA.md`, `FORK_FEATURE_INVENTORY.md` and `HANDOFF.md`: the six plugin-facing core changes of core 3.1–3.5 (resource view 2 with query pass-through, resource mutations, the Library entry, item links, track links), each generic, capability-gated and additive. Core 3.6 (#55) documents them in `plugin-api.md` and `aurral-plugin.d.ts`.
+
+## Verification
+
+Docs only. Core on Node 26.12 (the version `.nvmrc` pins): `pnpm run check` passes with the unsafe-any baseline at 1089; `pnpm test` 389 files, 2671 tests pass, the perf budget included; `pnpm run build` passes. Each hook has a core unit test in `.tests/plugins/plugins.test.ts` (view 2, the Library entry, item links on albums, pages and search, track links) and `.tests/frontend/audio-queue.test.ts` (links on queued tracks). Under Node 22 the container's core run fails 14 network-mocked tests in unrelated files because undici 8's dispatcher doesn't fit Node 22's built-in fetch; it is not a regression.
+
+---
+
 # v0.3 Phase 2.7 — contributor reviews / issue #63
 
 ## Result

@@ -127,8 +127,18 @@
       "id": "work",
       "label": "Classical work",
       "admin": false
+    },
+    {
+      "id": "classical",
+      "label": "Classical",
+      "admin": false
     }
   ],
   "albumPresentation": true,
-  "search": true
+  "search": true,
+  "library": {
+    "pageId": "classical",
+    "resourceId": "home",
+    "label": "Classical"
+  }
 }

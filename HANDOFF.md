@@ -1,3 +1,37 @@
+# v0.3 Phase 4.3 — the Classical Library home and recently added works (issue #67)
+
+Last of four plugin commits in this PR (3.6, 4.1–4.3). The `classical` page's `home` shows the number of works and recordings, a Browse row per list with its count (counted as the lists count, from the search index), and up to ten Recently added works: those whose newest active `track_link.created_at` among the tracks that play part of them is latest, with their composers and the day. An empty Library says how the page fills. List titles now sort numbers as numbers (No. 2 before No. 10).
+
+New `dev/classical-pages-browser.mjs` (asked for by core #53) renders the real home and lists through core's own `pluginLinks.ts` and `PluginResourceView` in Chromium at 1280 and 390 px: home counts, Works with 100 rows and the pager, a composer filter, and a conductor opening a contributor page, with no sideways scroll on a phone. It found core's filters squeezed to "A…" at phone width; core commit 2639010 wraps them two a row. Both integration workflows now pin that core commit, and the work-view workflow runs the new check. No schema change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
+# v0.3 Phase 4.2 — six Classical Library lists (issue #66)
+
+Third of four plugin commits in this PR (3.6, 4.1–4.3). `list:composer`, `list:work`, `list:performer`, `list:conductor`, `list:ensemble` and `list:recording` are view 2 pages built by `listView(c, kind, query)` in `src/model/pages.js` on `searchCatalogue`: 100 rows a page with core's pager, the search page's facets as filters (all but "Library"), and sort orders per list (works by title, catalogue number or date written; recordings by work, catalogue number, newest or oldest; contributors by sort name), plus "Best match" when the URL has a query. `searchCatalogue` gains `browse` (list every document of the given kinds with no query), `accept` (keep some documents) and `sort` (from the stored `sort_*` keys; documents without a key follow). Performer documents now record whether the contributor is a person or an ensemble (index stamp v4, rebuilt on first read): performers and conductors are people, ensembles are ensembles. Composer and contributor rows open their Classical pages; work and recording rows open the v1 work page until 6.1. No schema change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
+# v0.3 Phase 4.1 — the Classical Library page (issue #65)
+
+Second of four plugin commits in this PR (3.6, 4.1–4.3). `manifest.json` adds page `classical` (`"admin": false`) and a `library` entry for its `home`, so with core 3.3 the Library's navigation shows "Classical" when an admin leaves the "Library navigation" switch on. New `src/model/pages.js` answers `pages.read` for it with view 2 pages: `home`, `list:<kind>`, `composer:<id>`, `person:<id>`, `ensemble:<id>`, `work:<id>` and `recording:<key>`, read through the search index; an unknown resource is "not found". Home and lists are filled by 4.3 and 4.2; entity pages name the entity, and a work or recording opens the v1 `work` page that plays it, until their own phases (4.4, 5.1, 5.3, 6.1, 6.2). The v1 `work` page answers as before; the page has no mutations yet. The search test's Library fixture moves to `test/library-fixture.js`. No schema change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
+# v0.3 Phase 3.6 — plugin-facing core hooks in the fork delta (issue #64, core #51–#56)
+
+First of four plugin commits in this PR (3.6, 4.1–4.3), paired with core 3.1–3.6 (core branch `claude/pensive-bardeen-5dat3q`). All six core hooks are generic, additive and off unless a plugin declares them and the admin's capability switch is on; stock plugins and older hosts are unchanged. Documented in core `plugin-api.md` and typed in `aurral-plugin.d.ts`.
+
+- **Resource view 2 and query pass-through (#51, #53).** A non-admin page answers `pages.read` with `{version: 2, title, sections}`: typed header, rows, groups, tracks, details, pager, tabs, filters, sort and empty sections, rendered by core (`PluginResourceView.tsx`). Hosts send `capabilities.resourceView: 2` and `query: {q, sort, tab, page, filters}` from the page's URL. Version 1 work pages still work. Core builds every path; stale tracks are dropped.
+- **Resource mutations (#51).** `favourite-item` and `delete-queue` (with `target`) and `save-queue` (with `name`, `itemIds`) beside `favourite`, `pick` and `admin-pick`; a view 2 page's tracks can be saved as a playlist.
+- **Library entry (#52).** Manifest `library: {pageId, resourceId, label}` adds one entry to the Library's navigation for a non-admin page, behind the "Library navigation" switch; listed lazily by `GET /api/plugins/library` (kept off bootstrap for the perf budget).
+- **Item links (#54).** Up to six `{label, link}` on playable items, album groups and search results; they ride into the queue and the player's track menu. A filter link away from its page opens the plugin's search. `capabilities.itemLinks: 1`.
+- **Track links (#56).** Manifest `trackLinks: true` and a `trackLinks({trackIds})` export answer `GET /api/plugins/track-links`, merged across plugins and cached per track on the client, for tracks queued from ordinary pages. `/api/plugins/actions` reports whether any plugin answers.
+
+The plugin uses these from 4.1 (the `classical` Library page and entry). No schema change.
+
+Verification: `V0_3_REPORT.md`.
+
 # v0.3 Phase 2.7 — identity and credit conflict review actions (issue #63)
 
 Last of ten commits in one PR (1.5–1.7, 2.1–2.7). Implements #63 only; #63 has no later comments. E3 (#27) itself, for auto-match reviews, stays open; this applies its durable-dismissal rule to the two contributor review kinds, as #63 asks.
