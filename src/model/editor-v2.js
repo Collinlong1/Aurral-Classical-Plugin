@@ -12,6 +12,7 @@ import { readValues } from "../tags.js";
 import { contributorFor, contributorIndex } from "./contributors.js";
 import { CHANGE_KINDS, deleteWorks, deletionImpact, recentChanges, recordChange, undoChange } from "./history.js";
 import { FIELD_LABELS, STATUS, createPreview, loadPreview, queueRestore, queueWrite, tagRun } from "./tag-write.js";
+import { MODES } from "../tag-requests.js";
 import {
   mapToMovements,
   distinctKey,
@@ -1771,6 +1772,40 @@ function reviewView(c, id) {
   }
   // Which record a tag name means, or whose credit holds.
   const choices = [];
+  // Auto-match reviews (review E3): decide here instead of only dismissing.
+  if (review.kind === "auto_match" && review.status === "open") {
+    const albumId = review.evidence.albumId;
+    const mappable = albumId != null && Array.isArray(review.evidence.tracks);
+    if (review.evidence.reason === "movement-mismatch" && mappable && live(review.evidence.work))
+      choices.push({
+        id: "map",
+        label: `Map these tracks to “${labelOf(c, review.evidence.work) || "the work"}”`.slice(0, 500),
+        detail: "Opens the album's grouping step for these tracks, to say which movement each one is.",
+        actions: [action("Map these tracks", "review-map", { id, work: review.evidence.work })],
+      });
+    if (review.evidence.reason === "ambiguous-work" && mappable)
+      for (const candidate of (review.evidence.candidates || []).filter(live).slice(0, 5))
+        choices.push({
+          id: `use-${candidate}`,
+          label: `Use “${labelOf(c, candidate) || "Untitled work"}”`.slice(0, 500),
+          // Titles can be the same: who wrote it, how many recordings, and where.
+          detail: candidateSummary(c, candidate),
+          selection: candidate,
+          actions: [action("Use this work", "review-map", { id, work: candidate })],
+        });
+    if (review.evidence.reason === "uncertain-composer" && mappable) {
+      const names = (review.evidence.composers || []).join(", ");
+      choices.push(
+        {
+          id: "yes",
+          label: `Yes, the composer is ${names || "the one named"}`.slice(0, 500),
+          detail: `Makes “${review.evidence.work}” from these tracks, as matching would have.`.slice(0, 500),
+          actions: [action("Yes", "review-confirm-composer", { id })],
+        },
+        { id: "no", label: "No", detail: "Nothing is made, and this isn't asked again for these tracks.", actions: [action("No", "resolve-review", { id })] },
+      );
+    }
+  }
   if (review.kind === "contributor_identity" && review.evidence.reason === "ambiguous-name")
     for (const candidate of (review.evidence.candidates || []).filter(live).slice(0, 5))
       choices.push({
@@ -1853,11 +1888,73 @@ const TABS = ["works", "composers", "performers", "albums", "review", "search", 
 
 // Activity: maintenance first, then merges, deletions and slskd searches,
 // newest first, each opening its own view.
-function activityList(c, downloads) {
+// v0.3 8.7: what the album and artist menu actions planned to write.
+const LEGACY_LABELS = { artist: "Artist", albumArtist: "Album artist", composer: "Composer", work: "Work", workId: "MusicBrainz work" };
+const REQUEST_STATE = { waiting: ["Waiting for you", "warning"], writing: ["Writing", "warning"], done: ["Written", "success"] };
+function tagRequestRow(request) {
+  const changing = request.files.filter((file) => file.status === "change").length;
+  const [label, tone] = REQUEST_STATE[request.state] || ["", "muted"];
+  return {
+    id: `tag-request:${request.id}`,
+    label: `${MODES[request.mode]}: ${request.what}`.slice(0, 500),
+    detail: `${changing} file${changing === 1 ? "" : "s"} · ${new Date(request.createdAt).toISOString().slice(0, 16).replace("T", " ")} UTC`,
+    badge: { label, tone },
+    selection: `tag-request:${request.id}`,
+    search: `tag request ${MODES[request.mode]} ${request.what}`,
+  };
+}
+function tagRequestView(request) {
+  if (!request) fail("This tag request is gone. Choose the action again from the album or artist menu.");
+  const changing = request.files.filter((file) => file.status === "change");
+  const [label, tone] = REQUEST_STATE[request.state] || ["", "muted"];
+  const show = (values) => (values?.length ? values.join("; ") : "—");
+  const what = request.mode === "tag" ? "write these tags to" : "put these tags back on";
+  return {
+    crumbs: [],
+    title: `${MODES[request.mode]}: ${request.what}`.slice(0, 500),
+    subtitle: request.state === "done" ? request.message || "Written" : `${changing.length} file${changing.length === 1 ? "" : "s"} would change. Nothing is written until you confirm.`,
+    badges: [{ label, tone }],
+    actions:
+      request.state === "waiting"
+        ? [
+            action(`Write ${changing.length} file${changing.length === 1 ? "" : "s"}`, "maintenance-tag-request", { request: request.id, confirm: true }, {
+              tone: "danger",
+              confirm: `${MODES[request.mode]}: ${what} ${changing.length} file${changing.length === 1 ? "" : "s"}? A file changed since this request is left alone.`,
+            }),
+            action("Discard", "maintenance-tag-request-discard", { request: request.id }),
+          ]
+        : [open("Refresh", `tag-request:${request.id}`)],
+    sections: [
+      {
+        type: "rows",
+        id: "files",
+        title: "Files",
+        rows: request.files.slice(0, 500).map((file, i) => ({
+          id: `file-${i}`,
+          label: path.basename(file.file || "") || "File",
+          detail: (file.status === "change"
+            ? Object.keys(file.values)
+                .filter((field) => JSON.stringify(file.current[field]) !== JSON.stringify(file.values[field]))
+                .map((field) => `${LEGACY_LABELS[field] || field}: ${show(file.current[field])} → ${show(file.values[field])}`)
+                .join(" · ")
+            : file.reason || "Already right"
+          ).slice(0, 500),
+          badge: file.result
+            ? { label: file.result.status === "skipped" ? `Skipped: ${file.result.reason || ""}`.slice(0, 80) : file.result.status[0].toUpperCase() + file.result.status.slice(1), tone: file.result.status === "skipped" || file.result.status === "failed" ? "warning" : "success" }
+            : { label: file.status === "change" ? "Will change" : file.status === "unchanged" ? "Unchanged" : "Skipped", tone: file.status === "change" ? "warning" : "muted" },
+        })),
+      },
+    ],
+  };
+}
+
+function activityList(c, downloads, tagRequests = null) {
   const maintenance = { id: "maintenance", label: "Maintenance", detail: "Library scan, MusicBrainz lookups and their progress", badge: { label: "Tools", tone: "muted" }, selection: "maintenance", search: "maintenance scan musicbrainz lookups" };
   const changes = historyList(c).map((item) => ({ ...item, at: c.db.prepare("SELECT created_at FROM change_set WHERE id=?").get(item.id.slice(7))?.created_at || 0 }));
   const searches = downloadsList(downloads).map((item, index) => ({ ...item, at: (Array.isArray(downloads) ? downloads[index]?.at : 0) || 0 }));
-  return [maintenance, ...[...changes, ...searches].sort((a, b) => b.at - a.at).map(({ at, ...item }) => item)];
+  // Requests waiting for an admin come first.
+  const requests = (tagRequests || []).filter((request) => request.state !== "done").map(tagRequestRow);
+  return [maintenance, ...requests, ...[...changes, ...searches].sort((a, b) => b.at - a.at).map(({ at, ...item }) => item)];
 }
 
 // Library-wide work, kept out of album menus: one place to see the model's
@@ -2214,7 +2311,7 @@ function searchList(c, q) {
 }
 function listFor(c, tab, q, extra = {}) {
   if (tab === "search") return searchList(c, q);
-  if (tab === "activity") return activityList(c, extra.downloads);
+  if (tab === "activity") return activityList(c, extra.downloads, extra.tagRequests);
   if (tab === "works") {
     // Labels, composers and recording counts for every work in three
     // queries, not three per work.
@@ -2376,7 +2473,7 @@ function hoistFormActions(view) {
   return view;
 }
 
-export function renderV2(c, query, revision, { downloads = null, maintenance = null, formActions = false, orderField = false } = {}) {
+export function renderV2(c, query, revision, { downloads = null, maintenance = null, tagRequests = null, formActions = false, orderField = false } = {}) {
   const q = String(query.q || "");
   if (q.length > 200) fail("Search is too long");
   let offset = Number(query.offset || 0);
@@ -2410,7 +2507,7 @@ export function renderV2(c, query, revision, { downloads = null, maintenance = n
               ? "performers"
               : "works";
   }
-  const all = listFor(c, tab, q, { downloads });
+  const all = listFor(c, tab, q, { downloads, tagRequests });
   const { text: words, keep } = listFilters(tab, q);
   const filtered = all.filter(keep).filter((item) => !words || tab === "search" || matchesSearch(item.search, words));
   // An empty offset (a link that opens an entry, or a reload of one) shows
@@ -2430,6 +2527,7 @@ export function renderV2(c, query, revision, { downloads = null, maintenance = n
     const [token, index] = selection.slice(5).split(":");
     view = tagPreviewView(c, token, index === undefined ? null : Number(index));
   } else if (selection.startsWith("tag-run:")) view = tagRunView(c, selection.slice(8));
+  else if (selection.startsWith("tag-request:")) view = tagRequestView((tagRequests || []).find((request) => request.id === selection.slice(12)));
   else if (selection.startsWith("slskd:")) view = downloadView(downloads, Number(selection.slice(6)));
   else if (selection.startsWith("change:")) view = changeView(c, selection.slice(7));
   else if (selection === "maintenance") view = maintenanceView(maintenance);
@@ -2581,6 +2679,8 @@ export const V2_COMMANDS = {
   "unassign-tracks": ["albumId", "tracks", "page"],
   "unassign-album": ["albumId", "work", "page"],
   "create-work-from-album": ["albumId", "tracks", "include", "title", "composer", "composerName", "createAnyway", "page", "move"],
+  "review-map": ["id", "work"],
+  "review-confirm-composer": ["id"],
   "resolve-review": ["id"],
   "resolve-reviews": ["ids", "as"],
   "choose-provider-value": ["id", "field", "assertion"],
@@ -2608,6 +2708,47 @@ function addAlias(c, entity, text) {
   const fold = searchText(spelling);
   if (c.db.prepare("SELECT text FROM alias WHERE entity_id=?").all(entity).some((row) => searchText(row.text) === fold)) return;
   c.alias(entity, spelling);
+}
+
+// "Symphony No. 5 · Ludwig van Beethoven · 3 recordings · first on Album A".
+function candidateSummary(c, work) {
+  const composers = credits(c, work).filter((credit) => credit.role === "composer").map((credit) => credit.name);
+  const recordings = c.db.prepare("SELECT count(*) AS n FROM realization WHERE work_id=?").get(work).n;
+  const first = c.db
+    .prepare(
+      `SELECT t.evidence FROM realization r JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
+       JOIN track_link t ON t.id=s.track_link_id WHERE r.work_id=? ORDER BY t.created_at,t.id LIMIT 1`,
+    )
+    .get(work);
+  const album = first ? JSON.parse(first.evidence).hints?.album : "";
+  return [composers.join(", ") || "No composer", `${recordings} recording${recordings === 1 ? "" : "s"}`, album && `first on ${album}`].filter(Boolean).join(" · ").slice(0, 500);
+}
+
+// A work made from an album's tracks, as an admin does from the album page:
+// its composer by name (the one composer of that name, else a new one).
+function workFromTracks(c, m, who, { albumId, tracks, title, composer = "", composerName = "", createAnyway, move = false }) {
+  const similar = warnDuplicate(c, title, composer ? [labelOf(c, composer)].filter(Boolean) : composerName ? [composerName] : [], createAnyway);
+  if (composer) c.entity(composer, "person");
+  else if (composerName) {
+    const existing = entities(c, ["person"]).filter((person) => searchText(person.label) === searchText(composerName) && isComposer(c, person));
+    if (existing.length === 1) composer = existing[0].id;
+    else {
+      composer = c.createEntity("person", { roles: ["composer"] });
+      m.manual(composer, "name", composerName, { actor: who, pin: true });
+    }
+  }
+  const owned = new Map(ownedTracks(c, { albumId }).map((track) => [track.id, track]));
+  const ordered = tracks.map((id) => owned.get(id)).filter(Boolean);
+  if (ordered.length !== tracks.length) fail("A track is no longer indexed");
+  const work = createWork(c, m, who, {
+    title,
+    composer,
+    movements: ordered.map((track) => movementTitle({ title: track.title, work: track.evidence.hints?.work }, title) || track.title),
+  });
+  rememberDistinct(c, work, similar, who);
+  const movements = workMovements(c, work).map((movement) => movement.id);
+  assignTracks(c, m, who, work, tracks, movements, { move });
+  return { work, movements };
 }
 
 function createWork(c, m, who, { title, composer, movements }) {
@@ -2976,8 +3117,11 @@ export function applyV2(c, request, who) {
       const review = c.db.prepare("SELECT * FROM review_item WHERE id=? AND status='open' AND kind IN ('contributor_identity','credit_conflict')").get(id);
       if (!review) fail("This review item is already resolved");
       const evidence = JSON.parse(review.evidence);
+      // A performance's credit, or a recording's: a movement's own composer
+      // (review L12) is credited on its recording.
       const performance = review.target_id;
-      c.entity(performance, "performance");
+      const targetKind = c.entity(performance).kind;
+      if (!["performance", "recording"].includes(targetKind)) fail("This review item is about something else");
       const position = () => c.db.prepare("SELECT coalesce(max(position),0)+1 AS n FROM credit WHERE target_id=?").get(performance).n;
       let chosen;
       if (review.kind === "contributor_identity") {
@@ -2995,7 +3139,7 @@ export function applyV2(c, request, who) {
       }
       c.db.prepare("UPDATE review_item SET status='resolved' WHERE id=?").run(id);
       const next = nextReview(c, id);
-      return { selection: next ? `review:${next}` : "", tab: "review", message: `Credited “${labelOf(c, chosen) || "them"}” on ${performanceLabel(c, performance)}.`.slice(0, 500) };
+      return { selection: next ? `review:${next}` : "", tab: "review", message: `Credited “${labelOf(c, chosen) || "them"}” on ${targetKind === "recording" ? `“${entityLabel(c, performance, "recording")}”` : performanceLabel(c, performance)}.`.slice(0, 500) };
     }
     case "keep-distinct": {
       const id = str(v.id, "review item", { max: 200 });
@@ -3234,30 +3378,42 @@ export function applyV2(c, request, who) {
       );
       if (!tracks.length) fail("Choose at least one track for the work");
       const title = str(v.title, "work title", { max: 2000, field: "title" }).trim();
-      let composer = str(v.composer ?? "", "composer", { optional: true, max: 200 });
+      const composer = str(v.composer ?? "", "composer", { optional: true, max: 200 });
       const composerName = str(v.composerName ?? "", "composer name", { optional: true, max: 500 }).trim();
-      const similar = warnDuplicate(c, title, composer ? [labelOf(c, composer)].filter(Boolean) : composerName ? [composerName] : [], v.createAnyway);
-      if (composer) c.entity(composer, "person");
-      else if (composerName) {
-        const existing = entities(c, ["person"]).filter((person) => searchText(person.label) === searchText(composerName) && isComposer(c, person));
-        if (existing.length === 1) composer = existing[0].id;
-        else {
-          composer = c.createEntity("person", { roles: ["composer"] });
-          m.manual(composer, "name", composerName, { actor: who, pin: true });
-        }
-      }
-      const owned = new Map(ownedTracks(c, { albumId }).map((track) => [track.id, track]));
-      const ordered = tracks.map((id) => owned.get(id)).filter(Boolean);
-      if (ordered.length !== tracks.length) fail("A track is no longer indexed");
-      const work = createWork(c, m, who, {
-        title,
-        composer,
-        movements: ordered.map((track) => movementTitle({ title: track.title, work: track.evidence.hints?.work }, title) || track.title),
-      });
-      rememberDistinct(c, work, similar, who);
-      const movements = workMovements(c, work).map((movement) => movement.id);
-      assignTracks(c, m, who, work, tracks, movements, { move: selected });
+      const { work, movements } = workFromTracks(c, m, who, { albumId, tracks, title, composer, composerName, createAnyway: v.createAnyway, move: selected });
       return { selection: selected ? albumSelection(albumId, "", pageOf(v)) : work, message: `Created “${title}” with ${movements.length} movements.`, ...(selected && { focus: "tracks" }) };
+    }
+    // Review E3: an auto-match review's tracks, mapped to the work chosen in
+    // it, through the album's own grouping step.
+    case "review-map": {
+      const id = str(v.id, "review item", { max: 200 });
+      const review = c.db.prepare("SELECT * FROM review_item WHERE id=? AND kind='auto_match' AND status='open'").get(id);
+      if (!review) fail("This review item is already resolved");
+      const evidence = JSON.parse(review.evidence);
+      const work = str(v.work, "work", { max: 200 });
+      if (work !== evidence.work && !(evidence.candidates || []).includes(work)) fail("Choose one of the works this review names");
+      c.entity(work, "work");
+      const albumId = String(evidence.albumId ?? "");
+      const onAlbum = new Set(albums(c, albumId).get(albumId)?.tracks.map((track) => track.id) || []);
+      const tracks = (evidence.tracks || []).filter((track) => onAlbum.has(track));
+      if (!tracks.length) fail("These tracks are no longer on the album");
+      const move = rememberAlbumTracks(c, albumId, tracks, who);
+      return { selection: albumSelection(albumId, work, 0, move), message: "Say which movement each track is, then apply. The review closes once they are in the work.", focus: "assign" };
+    }
+    // Review E3: the composer read from the artist field is right.
+    case "review-confirm-composer": {
+      const id = str(v.id, "review item", { max: 200 });
+      const review = c.db.prepare("SELECT * FROM review_item WHERE id=? AND kind='auto_match' AND status='open'").get(id);
+      if (!review) fail("This review item is already resolved");
+      const evidence = JSON.parse(review.evidence);
+      if (evidence.reason !== "uncertain-composer") fail("This review isn't about a composer");
+      const albumId = String(evidence.albumId ?? "");
+      const free = (evidence.tracks || []).filter((track) => !attachments(c, track).length);
+      if (!free.length) fail("These tracks are in a work already");
+      const { work, movements } = workFromTracks(c, m, who, { albumId, tracks: free, title: String(evidence.work || "").trim(), composerName: String(evidence.composers?.[0] || ""), createAnyway: true });
+      c.db.prepare("UPDATE review_item SET status='resolved' WHERE id=?").run(id);
+      const next = nextReview(c, id);
+      return { selection: next ? `review:${next}` : work, message: `Created “${labelOf(c, work)}” with ${movements.length} movements.`.slice(0, 500) };
     }
     case "choose-provider-value": {
       const id = str(v.id, "review item", { max: 200 });

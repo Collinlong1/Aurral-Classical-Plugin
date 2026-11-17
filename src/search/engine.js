@@ -86,14 +86,20 @@ export function resolvedValues(c) {
   return values;
 }
 
-export function classicalTracks(c) {
+// Every classical track, or with `workId` only the tracks that play part of
+// that work (a work page must not read the whole Library).
+export function classicalTracks(c, { workId = null } = {}) {
   const tracks = new Map();
   for (const row of c.db
     .prepare(
-      `SELECT t.id,t.core_id,t.evidence FROM track_link t JOIN classification k ON k.target_id=t.id
-       WHERE t.state='active' AND k.state='classical'`,
+      workId
+        ? `SELECT DISTINCT t.id,t.core_id,t.evidence FROM realization r JOIN realization_item i ON i.realization_id=r.id
+           JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id JOIN classification k ON k.target_id=t.id
+           WHERE r.work_id=? AND t.state='active' AND k.state='classical'`
+        : `SELECT t.id,t.core_id,t.evidence FROM track_link t JOIN classification k ON k.target_id=t.id
+           WHERE t.state='active' AND k.state='classical'`,
     )
-    .iterate()) {
+    .iterate(...(workId ? [workId] : []))) {
     const evidence = parse(row.evidence, {});
     tracks.set(row.id, { id: row.id, coreId: String(row.core_id), albumId: evidence.albumId == null ? null : String(evidence.albumId), durationMs: Number(evidence.durationMs) || 0, hints: evidence.hints || {} });
   }
@@ -108,7 +114,25 @@ const yearOf = (value) => {
 // Owned recordings, one per realization, with what identifies the
 // performance across releases: MusicBrainz recording IDs, else the same
 // performers and work with every part within two seconds.
-export function ownedRecordings(c, tracks = classicalTracks(c), values = resolvedValues(c), { workId = null } = {}) {
+// Resolved names, read one entity at a time and kept: a work page needs only
+// its performers', where resolvedValues would read the whole catalogue.
+export function lazyValues(c) {
+  const statement = c.db.prepare(
+    `SELECT f.field,a.value FROM field_resolution f JOIN assertion a ON a.id=f.assertion_id
+     WHERE f.target_id=? AND f.field IN ('title','name','aliases')`,
+  );
+  const seen = new Map();
+  return {
+    get(id) {
+      if (!seen.has(id)) seen.set(id, Object.fromEntries(statement.all(id).map((row) => [row.field, parse(row.value, null)])));
+      return seen.get(id);
+    },
+  };
+}
+
+export function ownedRecordings(c, tracks = undefined, values = undefined, { workId = null } = {}) {
+  tracks ??= classicalTracks(c, { workId });
+  values ??= workId ? lazyValues(c) : resolvedValues(c);
   const rows = c.db
     .prepare(
       `SELECT r.id AS realization,r.work_id,r.performance_work_id,pw.source_id AS performance_id,r.label,i.movement_id,i.sequence,s.track_link_id,s.start_ms,s.end_ms

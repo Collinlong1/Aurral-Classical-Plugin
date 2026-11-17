@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { Metadata } from "./metadata.js";
+import { raiseReview } from "./contributors.js";
 import { transaction } from "./database.js";
 import { catalogueNumber, cataloguePiece } from "../works.js";
 import { artistCredits, composersOf } from "./credits.js";
@@ -258,6 +259,33 @@ function candidates(
   // artist field.
   const knownComposers = rows.length ? knownComposerNames(catalogue) : new Set();
   const numbered = allowStructuredTitles ? numberedRuns(rows) : new Set();
+  // Review L4: a WORK tag with no form word or catalogue number ("Má vlast",
+  // "The Planets") names a work when at least two tracks of the album share
+  // it. Counted per album before any track is placed.
+  const workHead = (hints) => clean(String(hints?.work || "").split(/\s*:\s*/, 1)[0]);
+  const sharedHeads = new Map();
+  for (const row of rows) {
+    const head = workHead(row.evidence.hints);
+    if (!head) continue;
+    const key = `${row.evidence.albumId}\u0000${words(head)}`;
+    sharedHeads.set(key, (sharedHeads.get(key) || 0) + 1);
+  }
+  // A head that names the track's own composer ("W. A. Mozart: The London
+  // Sketchbook…") is a credit, not a work.
+  const namesComposer = (head, composers) => {
+    const heading = words(head).split(" ").filter(Boolean);
+    return composers.some((name) => {
+      const own = words(name).split(" ").filter(Boolean);
+      // Every word of the head is the composer's ("W. A. Mozart"), or the
+      // head carries their surname.
+      return (heading.length && heading.every((word) => own.includes(word))) || heading.includes(own.at(-1));
+    });
+  };
+  const sharedWorkTag = (row, hints) => {
+    const head = workHead(hints);
+    if (!head || !hints.composer?.length || isCollectionLike(head) || namesComposer(head, hints.composer)) return null;
+    return (sharedHeads.get(`${row.evidence.albumId}\u0000${words(head)}`) || 0) >= 2 ? { title: head, evidence: "work-tag" } : null;
+  };
   for (const row of rows) {
     const tagged = row.evidence.hints || {};
     const hints = { ...tagged, title: withoutComposer(tagged.title, tagged.composer) };
@@ -288,7 +316,7 @@ function candidates(
           identity: provider.workId,
           ...(provider.standalone && { standalone: true }),
         }
-      : proposedWork(hints, allowStructuredTitles) || numberedRun(hints, numbered);
+      : proposedWork(hints, allowStructuredTitles) || numberedRun(hints, numbered) || sharedWorkTag(row, hints);
     // GROUPING names a whole piece the way WORK does.
     if (
       proposal &&
@@ -323,7 +351,11 @@ function candidates(
       explain?.set(row.id, {
         work: proposal?.title ?? null,
         reason: !proposal
-          ? "no work named: no WORK or GROUPING tag, and the title names no work"
+          ? workHead(hints)
+            ? isCollectionLike(workHead(hints))
+              ? `WORK tag “${workHead(hints)}” not taken: it names a collection, not one work`
+              : `WORK tag “${workHead(hints)}” not taken: it names no form or catalogue number, and no other track of the album shares it`
+            : "no work named: no WORK or GROUPING tag, and the title names no work"
           : !composers.length
             ? credit?.confidence === "medium"
               ? "composer only guessed from the artist field"
@@ -731,9 +763,12 @@ const withoutRepeatedComposer = (text, workTitle) => {
   const match = clean(text).match(/^([^:]{2,60}):\s+(\S.*)$/);
   return match && words(match[2]).startsWith(words(workTitle)) && words(match[1]).split(" ").length <= 3 ? match[2] : text;
 };
+// The colon inside a catalogue number such as "Hob. XVI:52" (a roman
+// numeral, a colon, a digit) separates nothing (review L9).
+const insideNumber = (text, match) => match[0] === ":" && /\b[IVXLCDM]+$/i.test(text.slice(0, match.index)) && /^\d/.test(text.slice(match.index + 1));
 function stripWorkPrefixOnce(title, workTitle) {
   const text = clean(title);
-  const separators = [...text.matchAll(SEPARATOR)];
+  const separators = [...text.matchAll(SEPARATOR)].filter((match) => !insideNumber(text, match));
   const tailAt = (match) => clean(text.slice(match.index + match[0].length));
   // A numbered movement starts the movement part: "…: I. Allegro".
   for (const match of separators) {
@@ -903,13 +938,13 @@ function composerEntity(catalogue, metadata, index, name, mbid = null) {
     return person;
   }
   const existing = index.people.get(key) || [];
-  // Reuse a composer only when exactly one person has this name; two
-  // same-named composers stay separate until an admin resolves them.
+  // Reuse a composer only when exactly one person has this name. When
+  // several share it, nobody is chosen and nobody new is made (review L12:
+  // each match used to add another); the caller asks an admin.
   if (existing.length === 1) return existing[0];
+  if (existing.length > 1) return null;
   const person = catalogue.createEntity("person", { roles: ["composer"] });
   metadata.derived(person, "name", name);
-  if (existing.length > 1)
-    catalogue.review("identity", person, { reason: "same-name-composers", name });
   index.people.set(key, [...existing, person]);
   return person;
 }
@@ -1267,6 +1302,19 @@ function creditMovementComposers(catalogue, metadata, index, recording, track, g
     .filter((name) => !work.has(normalized(name)))
     .forEach((name, i) => {
       const person = composerEntity(catalogue, metadata, index, name, group.composerIds?.[name]);
+      if (!person) {
+        // Several people have this name: an admin says which wrote it, once.
+        raiseReview(catalogue, "contributor_identity", recording, {
+          reason: "ambiguous-name",
+          name,
+          kind: "person",
+          role: "composer",
+          instrument: null,
+          candidates: index.people.get(words(name)) || [],
+          key: `ambiguous|${words(name)}|composer`,
+        });
+        return;
+      }
       if (!catalogue.db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role='composer' AND state='active'").get(recording, person))
         catalogue.credit(recording, person, "composer", { position: i + 1 });
     });
@@ -1639,14 +1687,11 @@ function createGroup(catalogue, group, actor, index) {
       }
       work = catalogue.createEntity("work");
       metadata.derived(work, "title", group.work);
-      group.composers.forEach((name, i) =>
-        catalogue.credit(
-          work,
-          composerEntity(catalogue, metadata, index, name, group.composerIds?.[name]),
-          "composer",
-          { position: i + 1 },
-        ),
-      );
+      // An ambiguous composer stops the group before this (ambiguous-composer).
+      group.composers.forEach((name, i) => {
+        const person = composerEntity(catalogue, metadata, index, name, group.composerIds?.[name]);
+        if (person) catalogue.credit(work, person, "composer", { position: i + 1 });
+      });
       if (group.providerAliases?.length)
         metadata.derived(work, "aliases", group.providerAliases);
       else if (catalogued) {
@@ -2894,6 +2939,14 @@ export function repairMovementTitles(catalogue, { albumId = null } = {}) {
     const workTitle = titles.get(row.work);
     const current = JSON.parse(row.value);
     if (typeof workTitle !== "string" || typeof current !== "string") continue;
+    // "52: I. Allegro", cut from "Hob. XVI:52: I. Allegro" before L9 was
+    // fixed: the number is the work's own catalogue number's.
+    const cut = current.match(/^(\d+):\s*(\S.*)$/);
+    if (cut && new RegExp(`\\b[IVXLCDM]+:${cut[1]}\\b`, "i").test(workTitle) && MOVEMENT_PREFIX.test(cut[2])) {
+      metadata.derived(row.movement, "title", cut[2]);
+      repaired++;
+      continue;
+    }
     // Only a title that still spells out its work ("Rachmaninoff: Piano
     // Concerto No. 1…: I. Vivace"); "IV. Menuet I - V. Menuet II" is
     // already the movement.

@@ -117,6 +117,7 @@ jobs:
         env:
           AURRAL_CORE_PATH: ${{ github.workspace }}/core
         run: |
+          docker compose -f compose.dev.yaml exec -T aurral node /plugin/dev/editor-fixtures.mjs v03
           docker compose -f compose.dev.yaml exec -T aurral node /plugin/dev/editor-fixtures.mjs check
           docker compose -f compose.dev.yaml restart aurral
           for attempt in $(seq 1 60); do
@@ -131,6 +132,16 @@ jobs:
           name: editor-browser-evidence
           path: plugin/browser-evidence
           if-no-files-found: ignore
+      # v0.3 9.4: every new page at 1280 and 390 px (each check fails if a
+      # page scrolls sideways at phone width).
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v0.3-pages-desktop-and-phone
+          path: |
+            plugin/.scratch/classical-pages/*.png
+            plugin/.scratch/editor-tag-preview/*.png
+          if-no-files-found: warn
       - name: Capture logs and stop fixture
         if: always()
         working-directory: plugin

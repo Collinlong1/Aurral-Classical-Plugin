@@ -66,6 +66,19 @@ export class Catalogue {
       .run(actor, action, target, json(data), Date.now());
   }
   review(kind, target, evidence) {
+    // An auto-match review an admin settled stays settled while its reason
+    // and tracks are the same (review E3); a changed track list asks again.
+    if (kind === "auto_match" && Array.isArray(evidence?.tracks)) {
+      const tracks = JSON.stringify([...evidence.tracks].sort());
+      const settled = this.db
+        .prepare("SELECT evidence FROM review_item WHERE kind=? AND target_id=? AND status='resolved'")
+        .all(kind, target)
+        .some((row) => {
+          const prior = JSON.parse(row.evidence);
+          return prior.reason === evidence.reason && Array.isArray(prior.tracks) && JSON.stringify([...prior.tracks].sort()) === tracks;
+        });
+      if (settled) return false;
+    }
     this.db
       .prepare(
         `INSERT INTO review_item VALUES (?,?,?,?, 'open',?)

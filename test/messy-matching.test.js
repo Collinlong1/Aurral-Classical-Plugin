@@ -14,7 +14,7 @@ import { openCatalogue } from "../src/model/catalogue.js";
 import { Metadata } from "../src/model/metadata.js";
 import { reconcile, classify } from "../src/model/reconcile.js";
 import { renderAlbumPresentation, renderWork } from "../src/model/presentation.js";
-import { renderV2 } from "../src/model/editor-v2.js";
+import { renderV2, applyV2 } from "../src/model/editor-v2.js";
 import { autoMatchLibrary } from "../src/model/runtime.js";
 import { movementNumberReport } from "../src/model/movement-report.js";
 import path from "node:path";
@@ -1700,4 +1700,120 @@ test("matching: a WORK tag starting at a collection of works names the work furt
   assert.equal(e.db.prepare("SELECT count(*) AS n FROM realization_item").get().n, 0);
   autoMatchTaggedWorks(e, { actor: "model-scan", allowStructuredTitles: true });
   assert.deepEqual(placed(e), expected);
+});
+
+// Review L9 (#25): the colon inside "Hob. XVI:52" separates nothing.
+test("L9: a Hoboken number's colon stays in the work, and titles already cut at it are repaired", async (t) => {
+  const work = "Piano Sonata in E-flat major, Hob. XVI:52";
+  assert.equal(stripWorkPrefix(`${work}: I. Allegro`, work), "I. Allegro");
+  assert.equal(stripWorkPrefix(`${work}: II. Adagio`, null), "II. Adagio");
+  assert.equal(stripWorkPrefix("Piano Trio in G major, Hob. XV:25: III. Rondo all'Ongarese. Presto", "Piano Trio in G major, Hob. XV:25"), "III. Rondo all'Ongarese. Presto");
+  // Other colons still separate.
+  assert.equal(stripWorkPrefix("Symphony No. 5: I. Allegro con brio", "Symphony No. 5"), "I. Allegro con brio");
+  // A scan of the album names the movements, not "52: I. Allegro".
+  const c = await catalogueWith(t, [
+    { id: "haydn", album: "Haydn: Sonatas", albumArtist: "Pianist", artist: "Pianist", titles: ["I. Allegro", "II. Adagio", "III. Finale. Presto"].map((title) => ({ title: `${work}: ${title}`, composer: ["Joseph Haydn"], genres: ["Classical"] })) },
+  ]);
+  autoMatchTaggedWorks(c, { albumId: "haydn", actor: "test", allowStructuredTitles: true });
+  const made = c.db.prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL").all();
+  assert.equal(made.length, 1);
+  assert.deepEqual(workMovementTitles(c, made[0].id), ["I. Allegro", "II. Adagio", "III. Finale. Presto"]);
+  // A title stored before the fix is repaired; an admin's own title is not.
+  const { repairMovementTitles } = await import("../src/model/auto-match.js");
+  const [first, second] = workMovementTitles(c, made[0].id, true);
+  const m = new Metadata(c);
+  m.derived(first, "title", "52: I. Allegro");
+  m.manual(second, "title", "52: II. Adagio", { actor: "admin", pin: true });
+  repairMovementTitles(c);
+  assert.deepEqual(workMovementTitles(c, made[0].id).slice(0, 2), ["I. Allegro", "52: II. Adagio"]);
+});
+
+// Review L4 (#26): a WORK tag with no form word or catalogue number.
+test("L4: a free-text WORK tag shared by tracks of one album makes the work; one track alone, or a collection, does not", async (t) => {
+  const smetana = (title, work = "Má vlast") => ({ title, work, composer: ["Bedřich Smetana"], genres: ["Classical"] });
+  const c = await catalogueWith(t, [
+    { id: "vlast", album: "Smetana: Má vlast", albumArtist: "Czech Philharmonic", artist: "Czech Philharmonic", titles: [smetana("Vyšehrad"), smetana("Vltava"), smetana("Šárka")] },
+    { id: "single", album: "Encores", albumArtist: "Pianist", artist: "Pianist", titles: [smetana("Polka", "Bohemian Dances")] },
+    // A collection's name is no work, however many tracks share it. (A
+    // free-text name the collection rule doesn't know, such as "Favourite
+    // Arias", does become one: the risk #26 accepted.)
+    { id: "songs", album: "Songs", albumArtist: "Soprano", artist: "Soprano", titles: [smetana("Song 1", "Spanish Songs"), smetana("Song 2", "Spanish Songs")] },
+  ]);
+  for (const albumId of ["vlast", "single", "songs"]) autoMatchTaggedWorks(c, { albumId, actor: "test" });
+  const works = c.db.prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL").all().map((row) => row.id);
+  assert.equal(works.length, 1, "only Má vlast is a work");
+  assert.equal(new Metadata(c).resolve(works[0], "title").value, "Má vlast");
+  assert.deepEqual(workMovementTitles(c, works[0]), ["Vyšehrad", "Vltava", "Šárka"]);
+  assert.deepEqual(renderAlbumPresentation(c, "vlast").groups.map((group) => [group.title, group.items.length]), [["Má vlast", 3]]);
+  // The dry run says why the lone WORK tag and the collection weren't taken.
+  const { explainMatching } = await import("../src/model/auto-match.js");
+  const reasons = (albumId) => [...new Set([...explainMatching(c, albumId).values()].map((row) => row.reason))];
+  assert.deepEqual(reasons("single"), ["WORK tag “Bohemian Dances” not taken: it names no form or catalogue number, and no other track of the album shares it"]);
+  assert.deepEqual(reasons("songs"), ["WORK tag “Spanish Songs” not taken: it names a collection, not one work"]);
+});
+
+// Review E3 (#27): a settled auto-match review stays settled, and the review
+// offers decisions instead of only Dismiss.
+test("E3: dismissed auto-match reviews stay dismissed until their tracks change, and each kind can be decided", async (t) => {
+  const c = await catalogueWith(t, [
+    { id: "guest", album: "Late Night Sessions", albumArtist: "Some Quartet", artist: "Anna Example; Some Quartet", titles: ["Suite for Strings, Op. 5 - I. Prelude", "Suite for Strings, Op. 5 - II. Air"] },
+  ]);
+  const match = () => autoMatchTaggedWorks(c, { albumId: "guest", actor: "admin", allowStructuredTitles: true });
+  const open = () => c.db.prepare("SELECT id,target_id,evidence FROM review_item WHERE kind='auto_match' AND status='open'").all().map((row) => ({ ...row, evidence: JSON.parse(row.evidence) }));
+  const run = (command, values) => applyV2(c, { command, values }, "admin");
+  const view = (id) => renderV2(c, { tab: "review", selection: `review:${id}` }).view;
+  match();
+  let [review] = open();
+  assert.equal(review.evidence.reason, "uncertain-composer");
+  // Decide offers Yes and No.
+  const decide = view(review.id).sections.find((section) => section.id === "decide");
+  assert.deepEqual(decide.rows.map((row) => [row.label, row.actions[0].command]), [
+    ["Yes, the composer is Anna Example", "review-confirm-composer"],
+    ["No", "resolve-review"],
+  ]);
+  // Dismissed: the next scan doesn't ask again.
+  run("resolve-review", { id: review.id });
+  match();
+  match();
+  assert.deepEqual(open(), []);
+  // New evidence for the same track (another track list) asks again.
+  assert.notEqual(c.review("auto_match", review.target_id, { ...review.evidence, tracks: [review.target_id] }), false);
+  [review] = open();
+  // Yes: the work is made from the tracks, with that composer, and it closes.
+  c.db.prepare("UPDATE review_item SET evidence=? WHERE id=?").run(JSON.stringify({ ...review.evidence, tracks: JSON.parse(c.db.prepare("SELECT evidence FROM review_item WHERE kind='auto_match' AND status='resolved'").get().evidence).tracks }), review.id);
+  const made = run("review-confirm-composer", { id: review.id });
+  assert.match(made.message, /^Created “Suite for Strings, Op\. 5” with 2 movements\.$/);
+  const work = c.db.prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL").get().id;
+  const composer = c.db.prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer'").get(work).contributor_id;
+  assert.equal(new Metadata(c).resolve(composer, "name").value, "Anna Example");
+  assert.deepEqual(open(), []);
+  match();
+  assert.deepEqual(open(), [], "nothing is asked once the tracks are in a work");
+
+  // An ambiguous work: two works of one title, told apart by their details.
+  const m = new Metadata(c);
+  const twin = c.createEntity("work");
+  m.manual(twin, "title", "Suite for Strings, Op. 5", { actor: "admin" });
+  const tracks = c.db.prepare("SELECT id FROM track_link ORDER BY core_id").all().map((row) => row.id);
+  c.review("auto_match", tracks[1], { reason: "ambiguous-work", candidates: [work, twin], albumId: "guest", tracks });
+  const ambiguous = open()[0];
+  const rows = view(ambiguous.id).sections.find((section) => section.id === "decide").rows;
+  assert.deepEqual(rows.map((row) => [row.label, row.detail]), [
+    ["Use “Suite for Strings, Op. 5”", "Anna Example · 1 recording · first on Late Night Sessions"],
+    ["Use “Suite for Strings, Op. 5”", "No composer · 0 recordings"],
+  ]);
+  // Use this work: the album's grouping step opens for exactly these tracks.
+  const used = run("review-map", rows[1].actions[0].arguments);
+  const { parseAlbumSelection } = await import("../src/model/editor-v2.js");
+  const opened = parseAlbumSelection(used.selection);
+  assert.deepEqual([opened.albumId, opened.work], ["guest", twin]);
+  assert.deepEqual(JSON.parse(c.db.prepare("SELECT data FROM change_set WHERE id=?").get(opened.move).data).tracks.sort(), [...tracks].sort());
+  assert.equal(used.focus, "assign");
+  assert.throws(() => run("review-map", { id: ambiguous.id, work: "elsewhere" }), /Choose one of the works/);
+  // A movement mismatch offers to map the tracks to its work.
+  run("resolve-review", { id: ambiguous.id });
+  c.review("auto_match", tracks[0], { reason: "movement-mismatch", work, albumId: "guest", tracks: [tracks[0]] });
+  const mismatch = open()[0];
+  const map = view(mismatch.id).sections.find((section) => section.id === "decide").rows[0];
+  assert.deepEqual([map.label, map.actions[0].command], ["Map these tracks to “Suite for Strings, Op. 5”", "review-map"]);
 });

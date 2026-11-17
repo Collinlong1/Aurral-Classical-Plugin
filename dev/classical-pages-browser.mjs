@@ -147,11 +147,20 @@ try {
   for (const [name, viewport] of [["desktop", { width: 1280, height: 900 }], ["phone", { width: 390, height: 844 }]]) {
     const page = await browser.newPage({ viewport });
     page.on("pageerror", (error) => errors.push(`${name}: ${error.message}`));
+    // Every page is photographed at both widths; at phone width none may
+    // scroll sideways (v0.3 9.4).
+    const shot = async (label, options = { fullPage: true }) => {
+      if (name === "phone") {
+        const width = await page.evaluate(() => document.documentElement.scrollWidth);
+        assert.ok(width <= 390, `${label}: no sideways scroll at phone width (${width}px)`);
+      }
+      await page.screenshot({ path: path.join(output, `${label}-${name}.png`), ...options });
+    };
     await page.goto(`${base}/home`);
     await page.getByRole("heading", { name: "Classical", level: 1 }).waitFor();
     await page.getByText("113 works · 116 recordings").waitFor();
     await page.getByRole("heading", { name: "Recently added" }).waitFor();
-    await page.screenshot({ path: path.join(output, `home-${name}.png`), fullPage: true });
+    await shot("home", { fullPage: true });
     // Home -> Works: 100 rows, sort and pager.
     await page.getByRole("link", { name: "Works" }).first().click();
     await page.getByRole("heading", { name: "Works", level: 1 }).waitFor();
@@ -172,10 +181,11 @@ try {
     await page.getByRole("heading", { name: "As soloist or performer" }).waitFor();
     await page.getByRole("heading", { name: "As conductor" }).waitFor();
     await page.getByRole("heading", { name: "Often with" }).waitFor();
-    await page.screenshot({ path: path.join(output, `person-${name}.png`), fullPage: true });
+    await shot("person", { fullPage: true });
     // A collaborator opens an ensemble page (5.2, 5.3).
     await page.getByRole("link", { name: "Chicago Symphony Orchestra" }).click();
     await page.getByRole("heading", { name: "Chicago Symphony Orchestra", level: 1 }).waitFor();
+    await shot("ensemble");
     // A recording's composer heading opens the composer page (4.4).
     await page.getByRole("link", { name: "Antonín Dvořák" }).click();
     await page.getByRole("heading", { name: "Antonín Dvořák", level: 1 }).waitFor();
@@ -185,7 +195,7 @@ try {
     await page.goto(`${base}/composer:${c.db.prepare("SELECT ref FROM search_doc WHERE kind='composer' AND title LIKE 'Ludwig%'").get().ref}`);
     await page.getByText("Composer · 111 works").waitFor();
     assert.equal(await page.locator("section[aria-label=Works] .plugin-view__row").count(), 100, name);
-    await page.screenshot({ path: path.join(output, `composer-${name}.png`), fullPage: false });
+    await shot("composer", { fullPage: false });
     // The work page (6.1): recordings with completeness, then a movement.
     // The Moonlight is on the second page (110 Bagatelles come first).
     await page.getByRole("button", { name: "Next" }).first().click();
@@ -193,7 +203,7 @@ try {
     await page.getByRole("heading", { name: /Piano Sonata No\. 14/, level: 1 }).waitFor();
     await page.getByRole("heading", { name: "Recordings", level: 2 }).waitFor();
     assert.ok((await page.locator(".plugin-view__badge", { hasText: "Complete" }).count()) >= 2, name);
-    await page.screenshot({ path: path.join(output, `work-${name}.png`), fullPage: true });
+    await shot("work", { fullPage: true });
     // Play: the player gets "Work: movement" titles (6.4) and each item's links (6.3).
     await page.evaluate(() => (window.__queued = []));
     await page.getByRole("button", { name: "Play all" }).click();
@@ -205,13 +215,15 @@ try {
     await page.getByRole("menuitem", { name: "Go to Recording" }).click();
     await page.getByRole("heading", { name: "Credits" }).waitFor();
     await page.getByRole("heading", { name: "Movements" }).waitFor();
-    await page.screenshot({ path: path.join(output, `recording-${name}.png`), fullPage: true });
+    await shot("recording", { fullPage: true });
     await page.getByRole("button", { name: /^More for II\. Allegretto/ }).first().click();
     await page.getByRole("menuitem", { name: "Go to Work" }).click();
     await page.getByRole("heading", { name: /Piano Sonata No\. 14/, level: 1 }).waitFor();
     // Movements tab, then compare one movement across recordings.
     await page.getByRole("button", { name: /^Movements/ }).click();
     await page.waitForURL(/tab=movements/);
+    await page.locator("section[aria-label=Movements] .plugin-view__row").first().waitFor();
+    await shot("work-movements");
     await page.locator("section[aria-label=Movements] .plugin-view__row button", { hasText: "II. Allegretto" }).click();
     await page.waitForURL(/filters=movement/);
     await page.getByRole("heading", { name: "Compare: II. Allegretto" }).waitFor();
@@ -224,14 +236,14 @@ try {
     // In the order saved; one is a range of a two-movement track.
     assert.deepEqual(parts.map((t) => [t.title, t.start, t.end]), ranged.map((item) => [`${MOONLIGHT}: II. Allegretto`, item.startMs, item.endMs]), name);
     assert.deepEqual(ranged.map((item) => item.endMs).sort(), [300000, null]);
-    await page.screenshot({ path: path.join(output, `saved-${name}.png`), fullPage: true });
+    await shot("saved", { fullPage: true });
     assert.equal(new URL(page.url()).pathname, `/plugins/${PLUGIN}/classical/${encodeURIComponent(savedQueue)}`);
     if (name === "phone") {
       await page.goto(`${base}/list:work`);
       const width = await page.evaluate(() => document.documentElement.scrollWidth);
       assert.ok(width <= 390, `no sideways scroll at phone width (${width}px)`);
     }
-    await page.screenshot({ path: path.join(output, `list-${name}.png`), fullPage: false });
+    await shot("list", { fullPage: false });
     await page.close();
   }
   assert.deepEqual(errors, []);

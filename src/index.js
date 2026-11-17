@@ -29,6 +29,7 @@ import { readValues } from "./tags.js";
 import { albumClassificationSummary } from "./model/classification-report.js";
 import { search } from "./search/provider.js";
 import { runTagJobs } from "./model/tag-write.js";
+import { applyRequest, discardRequest, requestTags } from "./tag-requests.js";
 import { MusicBrainz, mbBaseUrl, TTL } from "./mb.js";
 import { ClassicalResolver } from "./resolver.js";
 import { parseOrder, parseSeparator, slskdSettings } from "./settings.js";
@@ -46,7 +47,6 @@ import {
   libraryIndex,
   runQueue,
   runScheduled,
-  untagFiles,
 } from "./tagger.js";
 import { pruneCache } from "./store.js";
 
@@ -109,46 +109,6 @@ function tagInBackground(ctx) {
     });
 }
 
-async function tagNow(ctx, paths, what) {
-  if (!paths.length) return `No files to tag in ${what}`;
-  const ids = new Set(
-    await enqueue(ctx, paths, { force: true, source: "action" }),
-  );
-  const stats = await runQueue(ctx, ACTION_BUDGET_MS, ids, { priority: true });
-  if (stats) return `${what}: ${describeStats(stats)}`.slice(0, 500);
-  return `Queued ${paths.length} files from ${what}. Tagging is busy and will get to them.`;
-}
-
-async function untagNow(ctx, paths, what, mode = "restore") {
-  if (!paths.length) return `No files in ${what}`;
-  {
-    const counts = await untagFiles(ctx, paths, ACTION_BUDGET_MS, {
-      priority: true,
-      mode,
-    });
-    if (counts) {
-      const parts = [`${counts.restored} restored`];
-      if (counts.cleared)
-        parts.push(
-          `${counts.cleared} cleared${mode === "clear" ? " (existing backups retained)" : " (original tags unavailable)"}`,
-        );
-      if (counts.unchanged)
-        parts.push(`${counts.unchanged} already had no classical tags`);
-      if (counts["no backup"])
-        parts.push(
-          `${counts["no backup"]} couldn't be restored (no backup, and MusicBrainz has no credit)`,
-        );
-      if (counts.skipped) parts.push(`${counts.skipped} skipped`);
-      if (counts.left) parts.push(`${counts.left} left: run it again`);
-      return `${what}: ${parts.join(", ")}. The plugin won't tag these recordings again unless you tag them as classical.`.slice(
-        0,
-        500,
-      );
-    }
-    return `Tagging is busy. Try again in a few minutes.`;
-  }
-}
-
 function artistFiles(index, artist) {
   const albumIds = new Set(
     artist.albums.flatMap((a) => [a.mbid]).filter(Boolean),
@@ -190,7 +150,7 @@ function maintenance(input) {
         enrich: await enrichmentStatus(ctx).catch(() => null),
       };
     },
-    async run(command, user) {
+    async run(command, user, values = {}) {
       if (command === "maintenance-scan") {
         const id = await enqueueModelScan(ctx, user);
         start();
@@ -213,6 +173,18 @@ function maintenance(input) {
           return `Work names and books were looked up already: ${queued.renamed} of ${queued.total} works renamed, ${queued.filed || 0} filed under their book.`;
         start();
         return "Looking up work names and books on MusicBrainz in the background, one request a second.";
+      }
+      // A tag request from the album or artist menu, confirmed (v0.3 8.7).
+      if (command === "maintenance-tag-request") {
+        if (user?.role !== "admin") throw new Error("Writing tags requires a current host admin");
+        if (values?.confirm !== true) throw new Error("Confirm writing the tags first");
+        const id = String(values.request || "");
+        applyRequest(ctx, id, user).catch((error) => log(`Classical tag request stopped: ${error.message}`));
+        return { message: "Writing the tags in the background. This page shows the result; reload it in a moment.", selection: `tag-request:${id}` };
+      }
+      if (command === "maintenance-tag-request-discard") {
+        await discardRequest(ctx, String(values?.request || ""));
+        return { message: "Discarded; nothing was written.", selection: "" };
       }
       if (command === "maintenance-enrich") {
         const queued = await queueEnrichment(ctx, user);
@@ -388,39 +360,27 @@ export default {
         message: `Clear classical fields will remove ${counts.composer} composer, ${counts.work} work and ${counts.workId} work-ID values. Restore originals uses backups instead; original values may remain. No files changed.`,
       };
     },
+    // These four only plan what they would write (v0.3 8.7); an admin
+    // confirms the plan in the editor's Activity → Tag requests.
     async "clear-classical"(input) {
-      return {
-        message: await untagNow(
-          makeContext(input),
-          input.album.tracks.map((t) => t.path).filter(Boolean),
-          `"${input.album.title}"`,
-          "clear",
-        ),
-      };
+      const paths = input.album.tracks.map((t) => t.path).filter(Boolean);
+      return { message: (await requestTags(makeContext(input), paths, { mode: "clear", what: `"${input.album.title}"`, actor: input.user })).message };
     },
     async "tag-album"(input) {
-      const ctx = makeContext(input);
       const paths = input.album.tracks.map((t) => t.path).filter(Boolean);
-      return { message: await tagNow(ctx, paths, `"${input.album.title}"`) };
+      return { message: (await requestTags(makeContext(input), paths, { mode: "tag", what: `"${input.album.title}"`, actor: input.user })).message };
     },
 
     async "untag-album"(input) {
-      const ctx = makeContext(input);
       const paths = input.album.tracks.map((t) => t.path).filter(Boolean);
-      return { message: await untagNow(ctx, paths, `"${input.album.title}"`) };
+      return { message: (await requestTags(makeContext(input), paths, { mode: "restore", what: `"${input.album.title}"`, actor: input.user })).message };
     },
 
     async "tag-artist"(input) {
       const ctx = makeContext(input);
       // Reads the Library first, so a fresh install finds the artist's files.
       const index = await libraryIndex(ctx, 10 * 60_000, { priority: true });
-      return {
-        message: await tagNow(
-          ctx,
-          artistFiles(index, input.artist),
-          input.artist.name,
-        ),
-      };
+      return { message: (await requestTags(ctx, artistFiles(index, input.artist), { mode: "tag", what: input.artist.name, actor: input.user })).message };
     },
   },
 
