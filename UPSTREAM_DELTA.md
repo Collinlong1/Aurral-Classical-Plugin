@@ -1,3 +1,9 @@
+# Bug fix — concurrent openers each copied the catalogue before upgrading (November 17, 2026)
+
+Reported from a deployment: a health check opened the catalogue from four processes at once while it needed an upgrade. `openDatabase` backed up the whole database before taking any lock, so all four copied it (about 760 MB each), the disk filled and every copy failed. Upgrades are now serialised by `upgrade.lock` in the model folder (exclusive create, with the owner's PID): one opener backs up and migrates; the others wait (up to 30 minutes), then re-read the schema version and find nothing to do. A lock whose process is gone, or older than six hours, is taken over. Before copying, the opener checks free space (`fs.statfs`) for the database's size plus 64 MB and refuses with "Not enough disk space to back up the classical database before upgrading: N MB needed, M MB free", leaving the catalogue unchanged. A multi-step upgrade makes one backup of the database as it was (named for the first step), not one per step. The backup's integrity check no longer leaves `-wal`/`-shm` files behind. A current catalogue opens without the lock. No schema or core change; bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
 # v0.3 Phase 4.3 — the Classical Library home and recently added works (issue #67)
 
 Last of four plugin commits in this PR (3.6, 4.1–4.3). The `classical` page's `home` shows the number of works and recordings, a Browse row per list with its count (counted as the lists count, from the search index), and up to ten Recently added works: those whose newest active `track_link.created_at` among the tracks that play part of them is latest, with their composers and the day. An empty Library says how the page fills. List titles now sort numbers as numbers (No. 2 before No. 10).

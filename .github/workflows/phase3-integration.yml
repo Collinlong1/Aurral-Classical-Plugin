@@ -22,10 +22,10 @@ jobs:
           repository: Collinlong1/aurral
           # Core aurral-classical with the v0.2 hooks (search, manual
           # search, comparisons, admin page selection and pages), synced
-          # with upstream through #1891, plus the v0.3 0.09 C1 fix and
+          # with upstream through #1930, plus the v0.3 0.09 C1 fix and
           # the v0.3 3.1-3.6 hooks (view 2 pages, Library entry, item and
-          # track links), on the paired core review branch.
-          ref: 263901077859edad33eabfa2d468fb7a2d0f84b4
+          # track links).
+          ref: e96e63fc864e140d6d4af041b678d32fce00fcd8
           path: core
       - uses: actions/setup-node@v4
         with:

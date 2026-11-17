@@ -1011,12 +1011,10 @@ test("schema 1 upgrades to user-scoped Phase 4 state without changing catalogue 
       .get(),
   );
   upgraded.close();
-  assert.ok(
-    (await fs.readdir(path.join(folders.dataFolder, "backups"))).some((file) =>
-      file.startsWith("before-v2-"),
-    ),
-  );
-  assert.ok((await fs.readdir(path.join(folders.dataFolder, "backups"))).some((file) => file.startsWith("before-v4-")));
+  // One copy of the schema 1 database before the whole upgrade, not one per step.
+  const backups = (await fs.readdir(path.join(folders.dataFolder, "backups"))).filter((file) => file.endsWith(".sqlite"));
+  assert.equal(backups.filter((file) => file.startsWith("before-v1-")).length, 1, "the schema 1 creation");
+  assert.deepEqual(backups.filter((file) => !file.startsWith("before-v1-")).map((file) => file.slice(0, 10)), ["before-v2-"]);
 });
 
 test("schema 4 migrates to 5 additively, and its backup restores for the schema 4 build", async (t) => {
