@@ -3,7 +3,7 @@ import { transaction } from "./database.js";
 import { json } from "./catalogue.js";
 import { tagSensitive } from "./fingerprint.js";
 import { sameRetaggedFile, repairRetaggedLinks } from "./retag-repair.js";
-import { classificationEvidence } from "./classify-evidence.js";
+import { classificationEvidence, albumMajority } from "./classify-evidence.js";
 
 const sameAudio = (a, b) =>
   a.size != null &&
@@ -276,15 +276,19 @@ export function classify(
     // Track-level decision from the track's own evidence; see
     // classify-evidence.js. Pins (above) and an album pin passed down as
     // `inherited` take precedence.
-    const { score, decision } = classificationEvidence(hints);
+    const { score, decision, reason } = classificationEvidence(hints);
     const state = manual || inherited || decision;
+    // A composer credit is all most tagged pop has; such a track stays
+    // unsure (lieder and early music are often tagged no better) but asks no
+    // one. An admin sends its album to Classical, or the album's majority does.
+    const ask = state === "unsure" && (manual || inherited || reason !== "composer credit only");
     catalogue.db
       .prepare(
         `INSERT INTO classification VALUES (?,?,?,?,?,1,?) ON CONFLICT(target_id)
       DO UPDATE SET state=excluded.state,pinned=excluded.pinned,score=excluded.score,evidence=excluded.evidence,updated_at=excluded.updated_at`,
       )
       .run(target, state, manual ? 1 : 0, score, json(hints), Date.now());
-    if (state === "unsure")
+    if (ask)
       catalogue.review("classification", target, { hints, score });
     else
       catalogue.db
@@ -295,4 +299,18 @@ export function classify(
     if (manual) catalogue.audit("classification.pin", target, { state }, actor);
     return state;
   });
+}
+
+// After each track of an album is classified: when the album's majority is
+// classical (`albumMajority`), its other tracks are too, unless pinned. They
+// keep the track's own hints, marked with where the decision came from, and
+// their classification reviews close. `tracks`: [{ id, hints, state }], the
+// album's tracks with the states just given; returns their states after.
+export function liftAlbumMajority(catalogue, tracks) {
+  if (!albumMajority(tracks)) return tracks.map((track) => track.state);
+  return tracks.map((track) =>
+    track.state === "classical"
+      ? track.state
+      : classify(catalogue, track.id, { ...track.hints, inheritedFrom: "album majority" }, { inherited: "classical" }),
+  );
 }

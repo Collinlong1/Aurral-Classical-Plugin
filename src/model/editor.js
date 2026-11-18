@@ -5,6 +5,7 @@ import { openCatalogue, CREDIT_ROLES, PERSON_ROLES, ENSEMBLE_ROLES } from "./cat
 import { Metadata } from "./metadata.js";
 import { readTransaction, transaction } from "./database.js";
 import { classify } from "./reconcile.js";
+import { deriveWorkFields } from "./auto-match.js";
 import { searchText, matchesSearch, ownedTracks } from "./editor-search.js";
 import { searchDiagnostics } from "../source.js";
 import { ensureSearchIndex } from "../search/engine.js";
@@ -961,6 +962,8 @@ function apply(c, input, who) {
         manual(id, "title", title);
         c.relate("movement", selection, id, { position: i + 1 });
       });
+      // Catalogue number, key and form from the title now, not at the next scan.
+      deriveWorkFields(c, selection, m);
       break;
     }
     case "edit-field": {

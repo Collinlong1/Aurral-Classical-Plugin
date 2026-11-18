@@ -55,3 +55,36 @@ test("title, WORK and album text count as classical evidence; no evidence is not
   classify(c, links[5].id, {}, { manual: "classical", actor: "admin" });
   assert.equal(classify(c, links[5].id, { title: "Song for a Friend" }), "classical");
 });
+
+// L17 (#35): a composer credit alone keeps a track unsure without asking the
+// admin about it; any other classical evidence still does.
+test("a track with only a composer credit is unsure with no review item", async (t) => {
+  const folders = await tempFolders();
+  const c = await openCatalogue(folders.dataFolder);
+  t.after(async () => {
+    c.close();
+    await fs.rm(folders.root, { recursive: true, force: true });
+  });
+  const links = reconcile(c, {
+    version: 1,
+    complete: true,
+    instanceId: "i",
+    epoch: "e",
+    generation: 1,
+    tracks: [0, 1, 2].map((i) => ({ coreId: `t${i}`, fileId: `f${i}`, path: `/library/${i}.flac`, size: 1, durationMs: 1000 })),
+  });
+  const open = (track) => c.db.prepare("SELECT count(*) AS n FROM review_item WHERE kind='classification' AND status='open' AND target_id=?").get(track).n;
+  assert.equal(classify(c, links[0].id, { title: "Hey Jude", artist: "The Beatles", composer: ["John Lennon", "Paul McCartney"] }), "unsure");
+  assert.equal(open(links[0].id), 0);
+  assert.equal(classify(c, links[1].id, { title: "Gute Nacht", composer: ["Franz Schubert"] }), "unsure", "a lied tagged with its composer only stays unsure");
+  assert.equal(open(links[1].id), 0);
+  assert.equal(classify(c, links[2].id, { title: "Adagio", composer: ["Someone"] }), "unsure");
+  assert.equal(open(links[2].id), 1, "a form or tempo word still asks");
+  // An item opened before this closes at the next classification.
+  c.review("classification", links[0].id, { hints: {}, score: 0 });
+  classify(c, links[0].id, { title: "Hey Jude", artist: "The Beatles", composer: ["John Lennon", "Paul McCartney"] });
+  assert.equal(open(links[0].id), 0);
+  // An admin's "unsure" is a question the admin asked: it stays.
+  classify(c, links[0].id, {}, { manual: "unsure", actor: "admin" });
+  assert.equal(open(links[0].id), 1);
+});

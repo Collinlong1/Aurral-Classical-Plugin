@@ -209,7 +209,12 @@ test("a merge adds the movements the kept work lacks and opens them; either way 
   assert.ok(section(stepView, "keep-first").items.some((item) => /V\. Finale/.test(item.label)));
   const form = section(stepView, "merge");
   const direction = form.fields.find((f) => f.key === "direction");
-  assert.deepEqual(direction.options.map((o) => [o.value, o.label]), [["from", "The one you opened"], ["into", "The other one"]]);
+  // #37 (U2): each choice is named, with its recordings.
+  assert.deepEqual(direction.options.map((o) => o.value), ["from", "into"]);
+  assert.ok(direction.options.every((o) => /^“.+” \(\d+ recordings?\)$/.test(o.label)), JSON.stringify(direction.options));
+  assert.ok(!direction.options.some((o) => /other one|one you opened/.test(o.label)));
+  // The comparison comes first, the choice last.
+  assert.deepEqual(stepView.sections.map((s) => s.id), ["compare", "keep-first", "keep-second", "merge"]);
   assert.equal(direction.value, "from", "the work with recordings stays by default");
   // (This host predates form footers, so Cancel is in the header.)
   assert.equal(stepView.actions.find((a) => a.label === "Cancel").arguments.selection, `${keep}!merge`, "Cancel returns to the merge form");

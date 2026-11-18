@@ -5,7 +5,7 @@ import { randomUUID } from "node:crypto";
 import { CREDIT_ROLES, PERSON_ROLES, ENSEMBLE_ROLES } from "./catalogue.js";
 import { Metadata } from "./metadata.js";
 import { transaction } from "./database.js";
-import { classify } from "./reconcile.js";
+import { classify, liftAlbumMajority } from "./reconcile.js";
 import { searchText, matchesSearch, ownedTracks } from "./editor-search.js";
 import { searchCatalogue } from "../search/engine.js";
 import { readValues } from "../tags.js";
@@ -14,6 +14,7 @@ import { CHANGE_KINDS, deleteWorks, deletionImpact, recentChanges, recordChange,
 import { FIELD_LABELS, STATUS, createPreview, loadPreview, queueRestore, queueWrite, tagRun } from "./tag-write.js";
 import { MODES } from "../tag-requests.js";
 import {
+  deriveWorkFields,
   mapToMovements,
   distinctKey,
   mergeContributor,
@@ -434,7 +435,7 @@ function compareWorks(c, a, b) {
     type: "rows",
     id: "compare",
     title: "Side by side",
-    note: "This work first, the other second. Open either to edit it; the comparison updates when you come back.",
+    note: `This work first, the other second.${rows.find((row) => row.id === "Composers").badge.label === "Differs" ? " The composers differ: the work that stays keeps its own composers (each outcome below says which)." : ""} Open either to edit it; the comparison updates when you come back.`,
     rows,
     actions: [open("Edit this work", a), open("Edit the other work", b)],
   };
@@ -450,7 +451,7 @@ function mergeOutcome(c, keep, drop) {
       { label: "Stays", value: `“${label(keep)}”, with its name and fields`, selection: keep },
       { label: "Removed", value: `“${label(drop)}”` },
       { label: "Credits moved", value: `${moving}, to “${label(keep)}”` },
-      { label: "Undo", value: "Not possible: check before merging" },
+      { label: "Undo", value: "From Activity, until either entry changes again" },
     ];
   }
   const keptComposers = credits(c, keep).filter((credit) => credit.role === "composer");
@@ -502,6 +503,8 @@ function mergeView(c, a, b, review) {
   // Duplicates usually share a name, so each is also named by its role.
   const count = (id) => `${weight(id)} ${work ? "recording" : "credit"}${weight(id) === 1 ? "" : "s"}`;
   const named = { [a]: `${label(a)} (the one you opened · ${count(a)})`, [b]: `${label(b)} (the other · ${count(b)})` };
+  const sameName = label(a) === label(b);
+  const choice = (id, role) => `${label(id)} (${sameName ? `${role} · ` : ""}${count(id)})`.slice(0, 200);
   const back = review ? `review:${review}` : work ? entitySelection(a, 0, "merge") : a;
   return {
     crumbs: [],
@@ -510,6 +513,8 @@ function mergeView(c, a, b, review) {
     badges: [],
     actions: [],
     sections: [
+      // What the two are, then what each choice does, then the choice.
+      ...(work ? [compareWorks(c, a, b)] : []),
       { type: "details", id: "keep-first", title: `If ${named[a]} stays`.slice(0, 200), items: mergeOutcome(c, a, b) },
       { type: "details", id: "keep-second", title: `If ${named[b]} stays`.slice(0, 200), items: mergeOutcome(c, b, a) },
       {
@@ -518,7 +523,7 @@ function mergeView(c, a, b, review) {
         title: "Merge",
         note: work
           ? "Choose the work that stays. Recordings and other credits move to it; its composers stay when present. The other work is removed. You can undo it from Activity."
-          : "Choose the entry that stays. Everything from the other moves to it, then the other is removed. This can't be undone.",
+          : "Choose the entry that stays. Everything from the other moves to it, then the other is removed. You can undo it from Activity.",
         command: "merge-entity",
         arguments: { target: a, into: b, confirm: true, ...(review && { review }) },
         submitLabel: "Merge",
@@ -530,14 +535,14 @@ function mergeView(c, a, b, review) {
             type: "select",
             // The one with more recordings (or credits) by default.
             value: weight(a) > weight(b) ? "from" : "into",
+            // By name; two of one name also by which is which.
             options: [
-              { value: "from", label: "The one you opened" },
-              { value: "into", label: "The other one" },
+              { value: "from", label: choice(a, "the one you opened") },
+              { value: "into", label: choice(b, "the other") },
             ],
           },
         ],
       },
-      ...(work ? [compareWorks(c, a, b)] : []),
     ],
   };
 }
@@ -2702,6 +2707,27 @@ function mergePeople(c, keep, drop, who) {
   );
 }
 
+// The albums these tracks are on, and an album's unpinned-album tracks with
+// their hints and states, for the album-majority rule.
+function albumsOf(c, tracks) {
+  const albums = tracks.map((track) => c.db.prepare("SELECT CAST(json_extract(evidence,'$.albumId') AS TEXT) AS album FROM track_link WHERE id=?").get(track)?.album);
+  return [...new Set(albums.filter((album) => album != null))];
+}
+function albumTracks(c, albumId) {
+  const rows = c.db
+    .prepare(
+      `SELECT t.id,t.instance_id,t.evidence,c.state FROM track_link t LEFT JOIN classification c ON c.target_id=t.id
+       WHERE t.state='active' AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?`,
+    )
+    .all(albumId);
+  const target = rows.length ? c.albumTarget(rows[0].instance_id, albumId) : null;
+  if (!target || c.db.prepare("SELECT 1 FROM classification WHERE target_id=? AND pinned=1").get(target)) return [];
+  return rows.map((row) => {
+    const { albumOverride, inheritedFrom, ...hints } = JSON.parse(row.evidence).hints || {};
+    return { id: row.id, hints, state: row.state };
+  });
+}
+
 // An alias for a contributor, once per spelling.
 function addAlias(c, entity, text) {
   const spelling = String(text ?? "").trim();
@@ -2761,6 +2787,8 @@ function createWork(c, m, who, { title, composer, movements }) {
     m.manual(movement, "title", name, { actor: who, pin: true });
     c.relate("movement", work, movement, { position: index + 1 });
   });
+  // Catalogue number, key and form from the title now, not at the next scan.
+  deriveWorkFields(c, work, m);
   return work;
 }
 // Puts tracks on a work's movements. "new" adds a movement named after the
@@ -3264,6 +3292,8 @@ export function applyV2(c, request, who) {
         } else classify(c, track, {}, { manual: v.state, actor: who });
         c.db.prepare("UPDATE review_item SET status='resolved' WHERE kind='classification' AND target_id=? AND status='open'").run(track);
       }
+      // Back to automatic: the album's majority applies, as at the next scan.
+      if (v.state === "automatic") for (const albumId of albumsOf(c, tracks)) liftAlbumMajority(c, albumTracks(c, albumId));
       const verb = { classical: "Sent to Classical", not_classical: "Removed from Classical", automatic: "Using automatic detection" }[v.state];
       return { message: `${verb}${tracks.length > 1 ? ` (${tracks.length} tracks)` : ""}.` };
     }

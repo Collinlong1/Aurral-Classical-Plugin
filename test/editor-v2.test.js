@@ -1034,6 +1034,22 @@ test("#29 a page of the kept work or person opened before a merge is stale", asy
   assert.equal((await raw(stalePerson, "delete-entity", { target: keep })).status, 409);
 });
 
+// #37 (U2): the merge step names both entries, explains a composer
+// difference, and says person merges undo like work merges.
+test("#37 the merge step names its choices, explains differing composers and offers undo for people", async (t) => {
+  const s = await spellingWorks(t);
+  const view = (await s.read({ selection: `merge:${s.b}:${s.a}` })).view;
+  assert.match(section(view, "compare").note, /composers differ: the work that stays keeps its own composers/);
+  const keep = (await s.ok("create-contributor", { name: "Fixture Pianist", kind: "person" })).selection;
+  const drop = (await s.ok("create-contributor", { name: "F. Pianist", kind: "person" })).selection;
+  const people = (await s.read({ selection: `merge:${drop}:${keep}` })).view;
+  const form = section(people, "merge");
+  assert.match(form.note, /undo it from Activity/);
+  assert.deepEqual(form.fields[0].options.map((o) => o.label), ["“F. Pianist” (0 credits)", "“Fixture Pianist” (0 credits)"]);
+  assert.match(section(people, "keep-first").items.find((item) => item.label === "Undo").value, /From Activity/);
+  assert.equal(people.sections.at(-1).id, "merge");
+});
+
 test("#13 a work merge keeps its composers, previews both directions, and later albums join", async (t) => {
   const s = await spellingWorks(t);
   const [keptPerson] = composerCredits(s, s.a), [droppedPerson] = composerCredits(s, s.b);
@@ -1615,4 +1631,22 @@ test("tag preview: current and proposed values per file, and files that can't or
   // Track pages offer the preview; a stale or unknown preview says so.
   assert.ok((await lib.read(`track:${opus}`)).actions.some((a) => a.command === "tag-preview-open"));
   await assert.rejects(lib.read("tags:nothing"), /preview is gone/);
+});
+
+// #39 (U4): a new work's catalogue number, key and form come from its title
+// at once, from the new-work form and from an album's tracks alike.
+test("#39 a new work has its catalogue number, key and form at once", async (t) => {
+  const s = await setup(t);
+  const m = new Metadata(s.c);
+  const fields = (work) => Object.fromEntries(["catalogue", "key", "form"].map((field) => [field, m.resolve(work, field).value]));
+  const made = (await s.ok("create-work", { title: "Piano Sonata No. 14 in C-sharp minor, Op. 27 No. 2", composer: "", movements: [] })).selection;
+  const own = fields(made);
+  assert.ok(own.catalogue && own.key && own.form, JSON.stringify(own));
+  assert.match(String(own.catalogue), /27/);
+  assert.match(String(own.key), /C.sharp minor/i);
+  const fromAlbum = (await s.ok("create-work-from-album", { albumId: "A", tracks: s.trackIds("A"), title: "Symphony No. 5 in C minor, Op. 67", composer: "", composerName: "Ludwig van Beethoven" }, "album:A")).selection;
+  assert.ok(fields(fromAlbum).catalogue && fields(fromAlbum).key, JSON.stringify(fields(fromAlbum)));
+  // Derived, so the admin's own values still win and a later edit replaces them.
+  await s.ok("save-entity", { target: made, key: "C-sharp minor (Moonlight)" }, made);
+  assert.equal(fields(made).key, "C-sharp minor (Moonlight)");
 });

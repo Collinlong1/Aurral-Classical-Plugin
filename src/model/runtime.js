@@ -6,7 +6,7 @@ import { openCatalogue } from "./catalogue.js";
 import { Metadata } from "./metadata.js";
 import { transaction, verifyOnce } from "./database.js";
 import { ModelJobs } from "./jobs.js";
-import { reconcile, classify } from "./reconcile.js";
+import { reconcile, classify, liftAlbumMajority } from "./reconcile.js";
 import { UserOperations } from "../user-operations.js";
 import { readTags } from "../tags.js";
 import { autoMatchTaggedWorks, catalogueSubject, collectionTitle, isCollectionLike, joinCollection, namesCatalogueRange, splitTitle, titleHead, withoutComposer } from "./auto-match.js";
@@ -983,11 +983,13 @@ export async function runModelJobs(
                     { inherited },
                   );
                   if (row.albumId != null) {
-                    if (!albums.has(row.albumId)) albums.set(row.albumId, []);
-                    albums.get(row.albumId).push(state);
+                    if (!albums.has(row.albumId)) albums.set(row.albumId, { pinned: Boolean(inherited), tracks: [] });
+                    albums.get(row.albumId).tracks.push({ id: row.id, hints: row.hints, state });
                   }
                 }
-                for (const [albumId, states] of albums) {
+                for (const [albumId, album] of albums) {
+                  // An album pin decided its tracks already.
+                  const states = album.pinned ? album.tracks.map((track) => track.state) : liftAlbumMajority(catalogue, album.tracks);
                   const target = catalogue.albumTarget(
                     input.instanceId,
                     albumId,

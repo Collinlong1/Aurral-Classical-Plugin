@@ -7,7 +7,7 @@
 // fetched, and no media is touched. scripts/model-admin.mjs prints it for a
 // whole library ("dry run"); the album action shows a short summary.
 import path from "node:path";
-import { classificationEvidence } from "./classify-evidence.js";
+import { classificationEvidence, albumMajority } from "./classify-evidence.js";
 
 export async function openModelReadOnly(folder) {
   const { DatabaseSync } = await import("node:sqlite");
@@ -35,11 +35,10 @@ export function classificationReport(db, { albumId = null, all = false } = {}) {
        ORDER BY json_extract(t.evidence,'$.albumId'),json_extract(t.evidence,'$.hints.discNumber'),json_extract(t.evidence,'$.hints.trackNumber'),t.id`,
     )
     .all(...(albumId == null ? [] : [String(albumId)]));
-  const tracks = [];
-  const summary = { tracks: 0, stored: {}, next: {}, changes: 0, pinned: 0, albumPinned: 0 };
+  const entries = [];
   for (const row of rows) {
     const evidence = JSON.parse(row.evidence);
-    const { albumOverride, ...hints } = evidence.hints || {};
+    const { albumOverride, inheritedFrom, ...hints } = evidence.hints || {};
     const album = evidence.albumId == null ? null : String(evidence.albumId);
     const albumPin = album == null ? null : albumPins.get(album) ?? null;
     const automatic = classificationEvidence(hints);
@@ -65,6 +64,32 @@ export function classificationReport(db, { albumId = null, all = false } = {}) {
       next,
       changes: next !== stored,
     };
+    entries.push({ entry, hints });
+  }
+  // An album whose majority is classical lifts its other unpinned tracks, as
+  // the scan does (albums are listed together, in order).
+  const byAlbum = new Map();
+  for (const item of entries) {
+    if (item.entry.albumId == null) continue;
+    if (!byAlbum.has(item.entry.albumId)) byAlbum.set(item.entry.albumId, []);
+    byAlbum.get(item.entry.albumId).push(item);
+  }
+  for (const album of byAlbum.values()) {
+    // An album pin decides its tracks already.
+    if (album.some(({ entry }) => entry.source === "album pin")) continue;
+    if (!albumMajority(album.map(({ entry, hints }) => ({ hints, state: entry.next })))) continue;
+    for (const { entry } of album)
+      if (entry.source === "automatic" && entry.next !== "classical") {
+        entry.next = "classical";
+        entry.source = "album majority";
+        entry.reason = "two thirds of the album is classical";
+        entry.changes = entry.next !== entry.stored;
+      }
+  }
+  const tracks = [];
+  const summary = { tracks: 0, stored: {}, next: {}, changes: 0, pinned: 0, albumPinned: 0 };
+  for (const { entry } of entries) {
+    const { stored, next, source } = entry;
     summary.tracks++;
     summary.stored[stored] = (summary.stored[stored] || 0) + 1;
     summary.next[next] = (summary.next[next] || 0) + 1;
