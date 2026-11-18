@@ -9,7 +9,7 @@ import { reconcile, classify } from "../src/model/reconcile.js";
 import { autoMatchTaggedWorks, repairMergedIdentities, mergeDuplicateAutoWorks, distinctKey, repairDuplicateRealizations } from "../src/model/auto-match.js";
 import { mutateEditor as mutateRaw } from "../src/model/editor.js";
 import { tempFolders } from "./helpers.js";
-import { renderAlbumPresentation } from "../src/model/presentation.js";
+import { renderAlbumPresentation, applyWorkMutation } from "../src/model/presentation.js";
 
 const titles = ["I. Allegro con brio", "II. Andante con moto", "III. Allegro", "IV. Allegro"];
 async function setup(t) {
@@ -1011,6 +1011,29 @@ function addSpellingAlbum(s, album, composer, generation) {
   autoMatchTaggedWorks(s.c);
 }
 
+// #29 (review E4): a merge changes the entry it keeps, so a page opened on
+// that entry before the merge can neither save nor delete.
+test("#29 a page of the kept work or person opened before a merge is stale", async (t) => {
+  const s = await spellingWorks(t);
+  const raw = (revision, command, values) => mutateRaw({ ...s.input, mutation: { revision, command, values } });
+  const staleWork = (await s.read({ selection: s.a })).revision;
+  await s.ok("merge-entity", { target: s.b, into: s.a, confirm: true }, `merge:${s.b}:${s.a}`);
+  assert.notEqual((await s.read({ selection: s.a })).revision, staleWork);
+  assert.equal((await raw(staleWork, "delete-entity", { target: s.a })).status, 409);
+  assert.equal((await raw(staleWork, "save-entity", { target: s.a, title: "Stale save" })).status, 409);
+  assert.ok(live(s, s.a));
+  // The undo still works: the kept work's own merge row is the merge's.
+  await s.ok("undo-change", { id: latestMerge(s).id }, `change:${latestMerge(s).id}`);
+  assert.ok(live(s, s.b));
+
+  const keep = (await s.ok("create-contributor", { name: "Fixture Pianist", kind: "person" })).selection;
+  const drop = (await s.ok("create-contributor", { name: "F. Pianist", kind: "person" })).selection;
+  const stalePerson = (await s.read({ selection: keep })).revision;
+  await s.ok("merge-entity", { target: drop, into: keep, confirm: true }, drop);
+  assert.equal((await raw(stalePerson, "save-entity", { target: keep, name: "Stale name" })).status, 409);
+  assert.equal((await raw(stalePerson, "delete-entity", { target: keep })).status, 409);
+});
+
 test("#13 a work merge keeps its composers, previews both directions, and later albums join", async (t) => {
   const s = await spellingWorks(t);
   const [keptPerson] = composerCredits(s, s.a), [droppedPerson] = composerCredits(s, s.b);
@@ -1400,6 +1423,41 @@ for (const kind of ["merge", "delete"]) {
     assert.deepEqual(s.c.db.prepare("PRAGMA foreign_key_check").all(), []);
   });
 }
+
+// #31 (review E8): favourites and picks set on the merged work after the
+// merge survive its undo; a pick goes back with its recording.
+test("#31 undoing a merge keeps favourites and picks made after it", async (t) => {
+  const s = await spellingWorks(t);
+  const fromB = s.c.db.prepare("SELECT id FROM realization WHERE work_id=?").get(s.b).id;
+  const act = (user, command, extra = {}) => applyWorkMutation(s.c, { resourceId: s.a, mutation: { command, ...extra } }, user);
+  const listener = (id) => ({ id, role: "user" });
+  // Before the merge: user 5 likes B, user 6 likes A.
+  applyWorkMutation(s.c, { resourceId: s.b, mutation: { command: "favourite", value: true } }, listener(5));
+  act(listener(6), "favourite", { value: true });
+  await s.ok("merge-entity", { target: s.b, into: s.a, confirm: true }, `merge:${s.b}:${s.a}`);
+  const change = latestMerge(s);
+  act(listener(2), "favourite", { value: true });
+  act(listener(3), "pick", { realizationId: fromB });
+  act({ id: 1, role: "admin" }, "admin-pick", { realizationId: fromB });
+  act(listener(5), "favourite", { value: false });
+  await s.ok("undo-change", { id: change.id }, `change:${change.id}`);
+  const state = (user, work) => s.c.db.prepare("SELECT favourite,picked_realization_id AS pick FROM user_work_state WHERE user_id=? AND work_id=?").get(user, work);
+  assert.equal(state(2, s.a)?.favourite, 1, "a favourite on the merged work stays on the kept work");
+  assert.equal(state(3, s.b)?.pick, fromB, "a pick goes back with its recording");
+  assert.equal(state(3, s.a)?.pick ?? null, null);
+  assert.equal(s.c.db.prepare("SELECT realization_id FROM admin_work_pick WHERE work_id=?").get(s.b)?.realization_id, fromB);
+  assert.equal(state(5, s.b).favourite, 0, "a favourite taken from the merged work is taken from both");
+  assert.equal(state(6, s.a).favourite, 1, "an earlier favourite is restored as it was");
+  assert.deepEqual(s.c.db.prepare("PRAGMA foreign_key_check").all(), []);
+  // A merge recorded before listener state was saved compares by time.
+  await s.ok("merge-entity", { target: s.b, into: s.a, confirm: true }, `merge:${s.b}:${s.a}`);
+  const old = latestMerge(s);
+  s.c.db.prepare("UPDATE change_set SET data=json_remove(data,'$.listeners'),created_at=created_at-1000 WHERE id=?").run(old.id);
+  act(listener(7), "favourite", { value: true });
+  await s.ok("undo-change", { id: old.id }, `change:${old.id}`);
+  assert.equal(state(7, s.a)?.favourite, 1);
+  assert.equal(state(6, s.a).favourite, 1);
+});
 
 test("#17 group selection does not block deletion undo while tracks remain free", async (t) => {
   const s = await removalFixture(t);

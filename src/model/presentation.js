@@ -2,7 +2,7 @@ import path from "node:path";
 import { openCatalogue } from "./catalogue.js";
 import { transaction } from "./database.js";
 import { NUMBERED_SET, isCollectionLike, numberedPiece, movementTitle, splitTitle, withoutComposer } from "./auto-match.js";
-import { catalogueNumber } from "../works.js";
+import { catalogueNumber, foldedCatalogue } from "../works.js";
 import { composersOf } from "./credits.js";
 import { groupRecordings, ownedRecordings, reissueState } from "../search/engine.js";
 import { performerNames } from "./contributors.js";
@@ -235,8 +235,8 @@ const ACT = /,\s*(?:act|akt|atto|acte|part|pt\.?|teil|scene|szene)\s*[ivxlc\d]+\
 const nameBeforeComma = (title) => words(String(title).split(",")[0]);
 function sameNamedWork(a, b) {
   if (a === b) return true;
-  const catalogueA = catalogueNumber(a).toLowerCase();
-  const catalogueB = catalogueNumber(b).toLowerCase();
+  const catalogueA = foldedCatalogue(a);
+  const catalogueB = foldedCatalogue(b);
   if (catalogueA && catalogueB) return catalogueA === catalogueB;
   // The shorter must be the longer cut at a comma: "Études, Book 1" and
   // "Études, Book 3" are different books.

@@ -36,10 +36,15 @@ const ORDINARY = wordList([
 // don't: soundtracks, game music, crossover. Verified classical works within
 // them are still allowed.
 const CONTEXT = wordList([...HARD_NON_CLASSICAL_GENRES, "score", "game", "anime"]);
+// Names classical libraries use that other music uses as much: a mood
+// ("Romantic"), radio formats ("Contemporary"), film and game scores
+// ("Orchestral"), rock and electronic music ("Avant-Garde", "Minimalism").
+// Each supports classical evidence but never decides on its own.
+const AMBIGUOUS_NAMES = new Set(["romantic", "contemporary", "avant garde", "modern composition", "orchestral", "symphony", "minimalism"].map(normGenre));
 // Classical genres are whole genre names ("Classical", "Chamber Music",
 // "Baroque"), or names with the word classical in them.
 const CLASSICAL_NAMES = new Set(
-  [...DEFAULT_CLASSICAL_GENRES, "romantic", "classical period", "early romantic", "late romantic", "contemporary", "modern composition", "avant garde"].map(normGenre),
+  [...DEFAULT_CLASSICAL_GENRES, "classical period", "early romantic", "late romantic"].map(normGenre).filter((genre) => !AMBIGUOUS_NAMES.has(genre)),
 );
 const CLASSICAL_WORD = /(^|\s)classical(\s|$)/;
 // An album titled as a film, television or game soundtrack is that context
@@ -49,13 +54,14 @@ const SOUNDTRACK_ALBUM =
   /(?<!\p{L})(?:(?:original\s+)?(?:motion\s+picture|film|movie|television|tv|series|game|video\s+game)\s+(?:soundtrack|score)|original\s+(?:soundtrack|score)|music\s+from\s+(?:and\s+inspired\s+by\s+)?the\s+(?:motion\s+picture|film|movie|series)|soundtrack|o\.?s\.?t\.?)(?!\p{L})/iu;
 
 export function genreKinds(genres = []) {
-  const kinds = { classical: [], ordinary: [], context: [] };
+  const kinds = { classical: [], ambiguous: [], ordinary: [], context: [] };
   for (const raw of genres) {
     const genre = normGenre(raw);
     if (!genre) continue;
     if (ORDINARY.test(genre)) kinds.ordinary.push(raw);
     else if (CONTEXT.test(genre)) kinds.context.push(raw);
     else if (CLASSICAL_NAMES.has(genre) || CLASSICAL_WORD.test(genre)) kinds.classical.push(raw);
+    else if (AMBIGUOUS_NAMES.has(genre)) kinds.ambiguous.push(raw);
   }
   return kinds;
 }
@@ -104,6 +110,7 @@ export function classificationEvidence(hints = {}) {
   const add = (points, signal, value) => signals.push({ points, signal, kind: STRONG.has(signal) ? "strong" : "supporting", ...(value != null && { value: String(value) }) });
 
   if (kinds.classical.length) add(4, "classical genre", kinds.classical.join("; "));
+  else if (kinds.ambiguous.length) add(2, "ambiguous classical genre", kinds.ambiguous.join("; "));
   if (hints.movement) add(4, "movement tag", hints.movement);
   if (hints.classicalComposerRelation) add(4, "classical composer relation");
   const catalogue = hints.catalogueNumber || (ownText + " \n " + album).match(CATALOGUE_NUMBER)?.[0];

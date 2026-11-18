@@ -93,6 +93,20 @@ test("rejected saves name the field they are about, so the host can show them th
   assert.equal(self.field, "into");
   const created = await s.mutate("create-work", { title: "", movements: [] }, "new:work");
   assert.equal(created.field, "title");
+  // #32 (E5): empty and over-long values in a save, and in a bulk edit.
+  const empty = await s.mutate("save-entity", { target: work, title: "" }, work);
+  assert.deepEqual([empty.ok, empty.status, empty.field], [false, 400, "title"]);
+  const long = await s.mutate("save-entity", { target: work, title: "x".repeat(10001) }, work);
+  assert.deepEqual([long.ok, long.field], [false, "title"]);
+  assert.match(long.message, /10,000 characters or fewer/);
+  const second = (await s.mutate("create-work", { title: "Field suite two", movements: [] }, "")).selection;
+  const bulk = (await s.mutate("bulk-edit-open", { works: [work, second] }, "")).selection;
+  const bulkLong = await s.mutate("bulk-edit", { token: bulk.slice("bulk:".length), period: "x".repeat(10001) }, bulk);
+  assert.deepEqual([bulkLong.ok, bulkLong.field], [false, "period"]);
+  // #32 (U1): a likely duplicate is a question for this form, not a conflict
+  // to reload: 400, about "Create anyway".
+  const duplicate = await s.mutate("create-work", { title: "Field suite", movements: [] }, "new:work");
+  assert.deepEqual([duplicate.ok, duplicate.status, duplicate.field], [false, 400, "createAnyway"]);
   // A refusal about no particular field names none.
   const stale = await s.mutate("set-movement-order", { work, movements: ["x"], positions: ["1"] }, `${work}!reorder`);
   assert.deepEqual([stale.status, stale.field], [409, undefined]);

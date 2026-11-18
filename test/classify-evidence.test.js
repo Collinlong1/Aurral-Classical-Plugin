@@ -24,7 +24,7 @@ test("classification: popular genres outweigh credits, titles and WORK tags", ()
 test("classification: genre names are matched whole, not by substring", () => {
   for (const genre of ["Rock Opera", "Baroque Pop", "Chamber Pop", "New Romantic", "Synthpop"])
     assert.deepEqual(genreKinds([genre]).classical, [], genre);
-  for (const genre of ["Classical", "Chamber Music", "Baroque", "Opera", "Modern Classical", "Romantic", "Choral"])
+  for (const genre of ["Classical", "Chamber Music", "Baroque", "Opera", "Modern Classical", "Contemporary Classical", "Choral"])
     assert.deepEqual(genreKinds([genre]).classical, [genre], genre);
   assert.deepEqual(genreKinds(["Classical Crossover"]).context, ["Classical Crossover"]);
   assert.deepEqual(genreKinds(["Video Game Music", "Soundtrack", "Score"]).context.length, 3);
@@ -80,4 +80,21 @@ test("classification: the evidence adds up to the score and says why", () => {
   assert.equal(result.score, result.signals.reduce((sum, s) => sum + s.points, 0));
   assert.match(result.reason, /verified classical work/);
   assert.ok(result.signals.every((s) => ["strong", "supporting"].includes(s.kind)));
+});
+
+// L15 (#34): moods, radio formats and score genres support classical
+// evidence but never decide alone; such a track with nothing else is unsure.
+test("classification: Romantic, Contemporary, Avant-Garde and Orchestral alone are unsure", () => {
+  for (const genre of ["Romantic", "Contemporary", "Avant-Garde", "Modern Composition", "Orchestral", "Symphony", "Minimalism"])
+    assert.deepEqual([genreKinds([genre]).classical, genreKinds([genre]).ambiguous], [[], [genre]], genre);
+  assert.equal(decide({ title: "Always Be Mine", artist: "A Singer", album: "Love Songs", genres: ["Romantic"] }), "unsure");
+  assert.equal(decide({ title: "Shine On", artist: "A Band", album: "Greatest Hits", genres: ["Contemporary"] }), "unsure");
+  assert.equal(decide({ title: "Holy Mountain", artist: "A Band", album: "Noise", genres: ["Avant-Garde"] }), "unsure");
+  assert.equal(decide({ title: "The Imperial March", artist: "John Williams", composer: ["John Williams"], album: "The Empire Strikes Back", genres: ["Orchestral"] }), "unsure");
+  assert.equal(decide({ title: "Dragonborn", artist: "Jeremy Soule", album: "Skyrim", genres: ["Orchestral"] }), "unsure");
+  // One more signal of its own makes it classical.
+  assert.equal(decide({ title: "Nocturne in E-flat, Op. 9 No. 2", artist: "Arthur Rubinstein", composer: ["Frédéric Chopin"], album: "Nocturnes", genres: ["Romantic"] }), "classical");
+  assert.equal(decide({ title: "Symphony No. 5: IV. Adagietto", artist: "Berliner Philharmoniker", composer: ["Gustav Mahler"], album: "Mahler 5", genres: ["Orchestral"] }), "classical");
+  assert.equal(decide({ title: "Song", genres: ["Classical", "Romantic"] }), "classical");
+  assert.equal(decide({ title: "Always Be Mine", genres: ["Pop", "Romantic"] }), "not_classical");
 });
