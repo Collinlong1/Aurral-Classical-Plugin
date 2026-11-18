@@ -82,6 +82,19 @@ const FORM =
 const NAME_WORD = "\\p{Lu}[\\p{L}'’.\\-]+";
 const COMPOSER_ALBUM = new RegExp(`^(?!The\\s)${NAME_WORD}(?:\\s+(?:van|von|de|da|di|du|del|der|le|la|${NAME_WORD})){0,3}:\\s`, "u");
 
+// What a release adds to a song's title: "(Live at Wembley)", "- 2009
+// Remaster", "[Single Version]". Arrangements, movements and performers
+// ("(Arr. for piano)", ": I. Allegro") are not this.
+const RELEASE_SUFFIX =
+  /^\s*(?:[([]\s*[^)\]]*?|[-–—]\s*(?:\d{4}\s+)?)?\b(?:live|remaster(?:ed)?|version|mix|remix|edit|demo|acoustic|mono|stereo|single|radio|bonus|take|session|unplugged|reprise|mtv|bbc)\b/i;
+function releaseOf(work, title) {
+  const words = plain(work).split(" ").filter(Boolean);
+  if (!words.length) return false;
+  const text = String(title || "").normalize("NFKD").replace(/\p{M}/gu, "");
+  const start = new RegExp(`^[^\\p{L}\\p{N}]*${words.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("[^\\p{L}\\p{N}]+")}(?![\\p{L}\\p{N}])`, "iu");
+  const head = text.match(start);
+  return Boolean(head) && RELEASE_SUFFIX.test(text.slice(head[0].length));
+}
 const plain = (value) =>
   String(value || "")
     .normalize("NFKD")
@@ -116,8 +129,9 @@ export function classificationEvidence(hints = {}) {
   const catalogue = hints.catalogueNumber || (ownText + " \n " + album).match(CATALOGUE_NUMBER)?.[0];
   if (catalogue) add(3, "catalogue number", catalogue);
   // A WORK tag naming the song itself (Picard's track relationships on any
-  // recording) says nothing about classical music.
-  if (work && plain(work) !== plain(title)) add(3, "WORK tag", hints.work);
+  // recording) says nothing about classical music, nor does one a live or
+  // remastered release's title adds to ("Finale (Live at Wembley)").
+  if (work && plain(work) !== plain(title) && !releaseOf(work, title)) add(3, "WORK tag", hints.work);
   const tempo = ownText.match(TEMPO)?.[0];
   if (!hints.movement && tempo) add(2, "tempo word in title", tempo);
   const numbered = !hints.movement && ownText.match(NUMBERED_TEMPO)?.[0];
@@ -200,4 +214,17 @@ export function classificationEvidence(hints = {}) {
     reason = "no classical evidence";
   }
   return { signals, score, kinds, decision, reason };
+}
+
+// L18: a track an album's other tracks show to be classical is classical too
+// ("Clair de lune" untagged on a Debussy album). It takes two thirds of the
+// album classical, and no track there with a popular genre or in a
+// soundtrack, game or crossover release. `tracks`: [{ hints, state }].
+export function albumMajority(tracks) {
+  const classical = tracks.filter((track) => track.state === "classical").length;
+  if (!classical || classical === tracks.length || classical * 3 < tracks.length * 2) return false;
+  return tracks.every((track) => {
+    const { kinds } = classificationEvidence(track.hints || {});
+    return !kinds.ordinary.length && !kinds.context.length;
+  });
 }

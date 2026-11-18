@@ -1,3 +1,17 @@
+# Review fixes L17, L16, U2, L18, U4 (issues #35–#39)
+
+The next five open review issues, by number. Plugin only; no core or schema change; no settings added.
+
+- **L17 (#35)** A track whose only classical evidence is a composer credit stays unsure but opens no classification review (`classify`, reason "composer credit only"); one opened before closes at the next scan, as every track is classified then. An admin's own "unsure" still asks. Lieder and early music tagged with only a composer stay unsure, not "not classical", as the issue requires; L18 covers them on classical albums.
+- **L16 (#36)** A WORK tag that a release's title only adds to ("Finale (Live at Wembley)", "Finale - 2009 Remaster", "[Single Version]") is no evidence, like a WORK tag equal to the title. Arrangements, movements and performers after it still count. The issue's trigger is now unsure, not "not classical": "Finale" is still a tempo word.
+- **U2 (#37)** The merge step's choices are the entries' names with their recordings or credits (two of one name also say which is which); **Side by side** comes first, then each outcome, then the choice. When composers differ, the comparison says the work that stays keeps its own (the composer row itself came with #13). Found on the way: the person-merge step still said "This can't be undone" and "Undo: Not possible", though person merges have undone from Activity since Phase 2.
+- **L18 (#38)** `albumMajority` (classify-evidence.js): when two thirds of an album's tracks are classical and no track there has a popular genre or a soundtrack, game or crossover context, the scan makes its other unpinned tracks classical (hints marked `inheritedFrom: "album majority"`) and closes their reviews (`liftAlbumMajority`, reconcile.js). An album pin or a track pin still wins. The read-only classification report predicts it ("album majority"), and the editor's **Use automatic detection** applies it at once.
+- **U4 (#39)** Creating a work (the New work form and from an album's tracks) fills its catalogue number, key, form and other fields from the title right away (`deriveWorkFields`); they are derived values, so the admin's own still win.
+
+Measured on the Apple corpus with genres removed (4,827 tracks): with a composer tag, open classification reviews 1,178 → 861 and classical 3,649 → 3,708; with only the movement part as title, reviews 2,345 → 1,790. The non-classical corpus does no worse. Bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
 # Review fixes L5, E4, E8, E5/U1, L15 (issues #28, #29, #31, #32, #34)
 
 The next five open review issues, by number. The user chose "unsure" for #34's tracks. Plugin only; no core or schema change; no settings added.

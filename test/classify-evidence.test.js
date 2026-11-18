@@ -98,3 +98,17 @@ test("classification: Romantic, Contemporary, Avant-Garde and Orchestral alone a
   assert.equal(decide({ title: "Song", genres: ["Classical", "Romantic"] }), "classical");
   assert.equal(decide({ title: "Always Be Mine", genres: ["Pop", "Romantic"] }), "not_classical");
 });
+
+// L16 (#36): a WORK tag that a live or remastered release's title only adds to
+// names the song, as one equal to the title does.
+test("classification: a WORK tag repeated in a live or remastered title is no evidence", () => {
+  const work = (hints) => classificationEvidence(hints).signals.some((s) => s.signal === "WORK tag");
+  for (const title of ["Finale (Live at Wembley)", "Finale - 2009 Remaster", "Finale [Single Version]", "Finale – Live"])
+    assert.equal(work({ title, work: "Finale", composer: ["Freddie Mercury"] }), false, title);
+  assert.notEqual(decide({ title: "Finale (Live at Wembley)", work: "Finale", composer: ["Freddie Mercury"] }), "classical");
+  // Still evidence: a different piece, an arrangement, a movement after it.
+  assert.equal(decide({ title: "Gute Nacht", work: "Winterreise, D. 911", composer: ["Franz Schubert"] }), "classical");
+  assert.equal(work({ title: "Adagio for Strings (Arr. for choir)", work: "Adagio for Strings" }), true);
+  assert.equal(work({ title: "Symphony No. 5: I. Trauermarsch (Live)", work: "Symphony No. 5" }), true);
+  assert.equal(work({ title: "Finale of the Night", work: "Finale" }), true);
+});

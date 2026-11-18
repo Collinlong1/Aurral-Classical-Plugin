@@ -13,7 +13,32 @@ v0.3 adds the Classical Library, contributors, classical tag writing and MusicBr
 
 Settings added: **Write classical tags to files** (`enableTagWriting`, off by default). Schema: 5 (additive; rollback by restoring `before-v5-*.sqlite` offline, tested against the real schema 4 build). Paired core: `aurral-classical` with the Phase 3 hooks and 6.5's whole-track playlist labels (`9fec213`); the integration workflows pin it.
 
-Not part of v0.3: review and optional issues #28–#50. #28, #29, #31, #32 and #34 are fixed for review (November 18, below); the rest remain open. Not run in this environment: `pnpm eden test`, and the Compose workflow (no Docker); both integration workflows run in CI.
+Not part of v0.3: review and optional issues #28–#50. #28, #29, #31, #32, #34 and #35–#39 are fixed for review (November 18, below); the rest remain open. Not run in this environment: `pnpm eden test`, and the Compose workflow (no Docker); both integration workflows run in CI.
+
+---
+
+# Review fixes L17, L16, U2, L18, U4 / issues #35–#39
+
+## Result
+
+- `src/model/reconcile.js`: `classify` opens no review for "composer credit only" (L17); `liftAlbumMajority` (L18).
+- `src/model/classify-evidence.js`: `releaseOf` and `RELEASE_SUFFIX` (L16); `albumMajority` (L18).
+- `src/model/runtime.js`: the scan's commit lifts each unpinned album's majority before the album roll-up (L18). `src/model/classification-report.js`: predicts it. `src/model/editor-v2.js`: **Use automatic detection** applies it.
+- `src/model/editor-v2.js`: `mergeView` names its choices and puts the comparison first; `compareWorks` explains differing composers; person merges say they undo (U2). `createWork` and the v1 `create-work` (`src/model/editor.js`) call `deriveWorkFields` (U4).
+- `dev/editor-reorder-review-browser.mjs`: the named choice and the comparison above the form.
+
+## Verification
+
+On Node 22.23: full `npm test` 477/477. Each new test failed on the previous code first:
+
+- L17, `test/classify.test.js`: "Hey Jude" and "Gute Nacht" with only a composer are unsure with no review; "Adagio" with a composer still asks; an earlier review closes; an admin's "unsure" asks.
+- L16, `test/classify-evidence.test.js`: live, remaster, single-version and dash suffixes are no evidence; "Gute Nacht" with WORK "Winterreise, D. 911" is classical; an arrangement, a movement after the work, and a longer title still count.
+- L18, `test/sync.test.js`: a real scan of FLAC files: a Debussy album of eight classical tracks lifts "Clair de lune" (no evidence) and "Rêverie" (composer only) and closes the review; a compilation with three of ten does not; a track pin wins on the next scan; the read-only report predicts no change and names the source.
+- U2, `test/editor-v2.test.js` and `test/editor-v0.2-workflow.test.js`: named choices, section order, the composer note, person-merge undo text.
+- U4, `test/editor-v2.test.js`: catalogue, key and form right after the New work form and after a work from an album; an admin's key replaces the derived one.
+- Browser, Chromium at 1280 and 390 px, real core renderer (`e797883`): the merge step's named choice and Side by side above the form; all ten local checks pass; screenshots checked by eye. At phone width the select shows a long same-name label cut short; the options show it whole.
+
+Not run here: `dev/editor-browser.mjs` and the Compose restart (no Docker; CI runs them), `pnpm eden test`, remote CI.
 
 ---
 

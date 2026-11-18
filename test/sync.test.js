@@ -496,3 +496,98 @@ test("after tags are written, a rescan keeps links, placements and manual values
   const again = await lib.read((await lib.mutate("tag-preview-open", { albumId: "fifth" }, "album:fifth")).selection);
   assert.deepEqual(again.sections.map((s) => s.title), ["Already up to date (4)"]);
 });
+
+// L18 (#38): an album two thirds classical makes its other tracks classical
+// at the scan; a compilation with fewer does not, nor does a pinned track.
+test("a scan lifts the rest of an album whose majority is classical", async (t) => {
+  const folders = await tempFolders();
+  t.after(() => fs.rm(folders.root, { recursive: true, force: true }));
+  const albums = {
+    debussy: [
+      ...Array.from({ length: 8 }, (_, i) => ({ title: `Prélude No. ${i + 1}`, genre: "Classical", composer: "Claude Debussy" })),
+      { title: "Clair de lune", genre: "", composer: "" },
+      { title: "Rêverie", genre: "", composer: "Claude Debussy" },
+    ],
+    mix: [
+      ...Array.from({ length: 3 }, (_, i) => ({ title: `Gymnopédie No. ${i + 1}`, genre: "Classical", composer: "Erik Satie" })),
+      ...Array.from({ length: 7 }, (_, i) => ({ title: `Chill ${i + 1}`, genre: "", composer: "" })),
+    ],
+  };
+  const entries = Object.entries(albums).flatMap(([album, tracks]) => tracks.map((track) => ({ ...track, album })));
+  const files = [];
+  for (const [i, track] of entries.entries()) {
+    const file = await copyFixture("sine.flac", path.join(folders.libraryFolder, `${i}.flac`));
+    const { size } = await fs.stat(file);
+    const fd = await fs.open(file, "r+");
+    await fd.write(Buffer.from([i + 1]), 0, 1, size - 50);
+    await fd.close();
+    const tagged = File.createFromPath(file);
+    try {
+      tagged.tag.title = track.title;
+      tagged.tag.album = track.album;
+      tagged.tag.genres = track.genre ? [track.genre] : [];
+      tagged.tag.composers = track.composer ? [track.composer] : [];
+      tagged.save();
+    } finally {
+      tagged.dispose();
+    }
+    files.push(file);
+  }
+  const ctx = {
+    ...folders,
+    settings: {},
+    api: { url: "http://host.test/api", key: "plugin-key" },
+    fetch: async () =>
+      response({
+        version: 1,
+        complete: true,
+        library: {
+          albums: Object.keys(albums).map((id) => ({ id, title: id })),
+          tracks: files.map((file, i) => ({ id: i, title: entries[i].title, files: [{ id: i, path: file, available: true, durationMs: 1000, albumId: entries[i].album }] })),
+        },
+      }),
+  };
+  const scan = async () => {
+    await enqueueModelScan(ctx, { id: 1, role: "admin" });
+    await runModelJobs(ctx, { budgetMs: 60_000 });
+  };
+  await scan();
+  const states = async () => {
+    const c = await openCatalogue(path.join(ctx.dataFolder, "model"));
+    try {
+      return {
+        tracks: c.db.prepare("SELECT t.core_id AS id,c.state,c.evidence FROM track_link t JOIN classification c ON c.target_id=t.id ORDER BY CAST(t.core_id AS INTEGER)").all().map((row) => ({ ...row, evidence: JSON.parse(row.evidence) })),
+        reviews: c.db.prepare("SELECT count(*) AS n FROM review_item WHERE kind='classification' AND status='open'").get().n,
+      };
+    } finally {
+      c.close();
+    }
+  };
+  let { tracks, reviews } = await states();
+  assert.deepEqual(tracks.slice(0, 10).map((row) => row.state), Array(10).fill("classical"));
+  assert.equal(tracks[8].evidence.inheritedFrom, "album majority");
+  assert.deepEqual(tracks.slice(10).map((row) => row.state), [...Array(3).fill("classical"), ...Array(7).fill("not_classical")]);
+  assert.equal(reviews, 0, "Rêverie's composer-only review closes with the lift");
+  // A track pin wins over the album's majority.
+  const c = await openCatalogue(path.join(ctx.dataFolder, "model"));
+  try {
+    const { classify } = await import("../src/model/reconcile.js");
+    classify(c, c.db.prepare("SELECT id FROM track_link WHERE core_id='8'").get().id, {}, { manual: "not_classical", actor: "admin" });
+  } finally {
+    c.close();
+  }
+  await scan();
+  ({ tracks } = await states());
+  assert.equal(tracks[8].state, "not_classical");
+  assert.equal(tracks[9].state, "classical");
+  // The read-only report predicts what the scan did.
+  const { openModelReadOnly, classificationReport } = await import("../src/model/classification-report.js");
+  const db = await openModelReadOnly(path.join(ctx.dataFolder, "model"));
+  try {
+    const report = classificationReport(db, { all: true });
+    assert.equal(report.summary.changes, 0);
+    assert.equal(report.tracks.find((row) => row.title === "Rêverie").source, "album majority");
+  } finally {
+    db.close();
+  }
+});

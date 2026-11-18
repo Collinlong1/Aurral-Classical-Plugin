@@ -189,7 +189,10 @@ try {
       await merge.getByRole("combobox", { name: "Entry that stays", exact: true }).scrollIntoViewIfNeeded();
       await page.waitForTimeout(1000);
       await merge.getByRole("combobox", { name: "Entry that stays", exact: true }).click();
-      await page.getByRole("option", { name: "The one you opened", exact: true }).click();
+      // #37: two works of one name are told apart by which is which.
+      await page.getByRole("option", { name: "“Sketch” (the one you opened · 0 recordings)", exact: true }).click();
+      const [compareBox, mergeBox] = [await group("Side by side").boundingBox(), await merge.boundingBox()];
+      assert.ok(compareBox && mergeBox && compareBox.y < mergeBox.y, "Side by side sits above the Merge form");
       await page.screenshot({ path: path.join(output, `merge-${width}.png`), fullPage: true, animations: "disabled" });
       await merge.getByRole("button", { name: "Merge", exact: true }).click();
       await page.locator(".plugin-admin__feedback").filter({ hasText: /^Merged into “Sketch”/ }).waitFor();
