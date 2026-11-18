@@ -339,6 +339,8 @@ function pieceGroups(c, album, following) {
 export function compareAlbumGroups(a, b) {
   return (
     a.first - b.first ||
+    // Two works cut from one track by ranges: the one that plays first.
+    (a.items[0]?.startMs ?? 0) - (b.items[0]?.startMs ?? 0) ||
     b.items.length - a.items.length ||
     (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)
   );

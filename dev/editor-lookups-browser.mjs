@@ -57,7 +57,7 @@ await build({
   format: "esm",
   outfile: path.join(output, "app.js"),
   loader: { ".woff2": "file", ".woff": "file" },
-  define: { "import.meta.env.DEV": "true", "import.meta.env.VITE_API_URL": '""' },
+  define: { "import.meta.env.DEV": "true", "import.meta.env.VITE_API_URL": '""', "import.meta.env.VITE_HOSTED": "false" },
 });
 
 let revision = 1;

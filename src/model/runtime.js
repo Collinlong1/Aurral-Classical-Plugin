@@ -349,6 +349,9 @@ async function scanFile(file, root, prior) {
       ...(tags.performers.length && { performers: tags.performers }),
       ...(tags.artistMbids.length && { artistMbids: tags.artistMbids }),
       workId: tags.workId,
+      // Picard's (and iTunes') movement fields, only when set.
+      ...(tags.movementName && { movement: tags.movementName }),
+      ...(tags.movementNumber && { movementNumber: tags.movementNumber }),
       recordingMbid: tags.recordingMbid || file.recordingMbid || "",
       composerDistinct:
         tags.composer.length > 0 && !tags.composer.includes(tags.artist),

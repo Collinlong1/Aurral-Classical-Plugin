@@ -100,6 +100,21 @@ const movementNameField = textField("MOVEMENTNAME", "MOVEMENTNAME", { name: "MOV
 const movementNumberField = textField("MOVEMENT", "MOVEMENT", { name: "MOVEMENT" });
 const movementTotalField = textField("MOVEMENTTOTAL", "MOVEMENTTOTAL", { name: "MOVEMENTTOTAL" });
 const catalogueField = textField("CLASSICAL_CATALOGUE", "CLASSICAL_CATALOGUE", { name: "CLASSICAL_CATALOGUE" });
+// Read only (Optional 1): iTunes writes the movement as ©mvn and its number
+// as ©mvi, a whole number, beside Picard's freeform MOVEMENTNAME.
+const appleMovementName = textField("MOVEMENTNAME", "MOVEMENTNAME", { box: "©mvn" });
+const APPLE_MOVEMENT_NUMBER = ByteVector.fromString("©mvi", StringType.Latin1);
+function movementNumberOf(file) {
+  const tagged = positive(movementNumberField.read(file)[0]?.split("/")[0]);
+  if (tagged) return tagged;
+  try {
+    const [data] = appleOf(file)?.getQuickTimeData(APPLE_MOVEMENT_NUMBER, 21) ?? [];
+    const bytes = data ? [...data.toByteArray()] : [];
+    return positive(bytes.reduce((n, byte) => n * 256 + byte, 0));
+  } catch {
+    return 0;
+  }
+}
 
 // Performers as Picard writes them to Vorbis comments: PERFORMER, one value
 // each, "Name (instrument)". Picard's ID3 frame for them (TMCL) is dropped by
@@ -241,6 +256,8 @@ export function readTags(filePath) {
       // Some taggers put the work here and leave WORK empty.
       grouping: text(tag.grouping),
       workId: workIdField.read(file)[0] ?? "",
+      movementName: movementNameField.read(file)[0] ?? appleMovementName.read(file)[0] ?? "",
+      movementNumber: movementNumberOf(file),
       trackNumber: positive(tag.track),
       discNumber: positive(tag.disc),
       durationMs: Math.round(file.properties?.durationMilliseconds || 0),

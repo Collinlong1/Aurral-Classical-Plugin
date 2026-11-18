@@ -1630,6 +1630,31 @@ test("multi-work attacca tracks retain separate ranges and reject overlap or mix
   );
 });
 
+// L14 (#41): two works cut from one track by ranges are listed in the order
+// they play, not by their random ids. Twelve albums make a lucky pass unlikely.
+test("two works sharing one track by ranges are listed in start order", async (t) => {
+  const { c, m } = await setup(t);
+  const links = reconcile(c, snapshot(Array.from({ length: 12 }, (_, i) => track(i, { albumId: `bach-${i}`, durationMs: 4000, hints: { title: "Prelude and Fugue in C", album: "Bach", composer: ["Johann Sebastian Bach"] } }))));
+  for (const link of links) {
+    classify(c, link.id, {}, { manual: "classical", actor: "admin" });
+    const p = c.createEntity("performance"),
+      recording = c.createEntity("recording", { durationMs: 4000 });
+    c.relate("recording_performance", recording, p);
+    // The fugue is made first, so creation order can't pass the test either.
+    for (const [position, title, startMs, endMs] of [[2, "Fugue in C", 1500, 4000], [1, "Prelude in C", 0, 1500]]) {
+      const work = c.createEntity("work");
+      m.manual(work, "title", title, { actor: "admin", pin: true });
+      const pw = c.relate("performance_work", p, work, { position });
+      const content = c.recordingContent(recording, pw, { position, startMs, endMs });
+      const seg = c.segment(link.id, { startMs, endMs });
+      c.segmentContent(seg, content);
+      c.realizationItem(c.realization(work, pw), seg);
+    }
+  }
+  for (let i = 0; i < 12; i++)
+    assert.deepEqual(renderAlbumPresentation(c, `bach-${i}`).groups.map((group) => group.title), ["Prelude in C", "Fugue in C"], `album ${i}`);
+});
+
 test("reconciliation distinguishes reissues, changed audio, interrupted evidence and stable-file moves", async (t) => {
   const { c } = await setup(t);
   const [first, second] = reconcile(

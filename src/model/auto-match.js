@@ -3,9 +3,10 @@ import { Metadata } from "./metadata.js";
 import { raiseReview } from "./contributors.js";
 import { transaction } from "./database.js";
 import { catalogueNumber, cataloguePiece, foldedCatalogue } from "../works.js";
-import { artistCredits, composersOf } from "./credits.js";
+import { artistCredits, composersOf, uninvertedName } from "./credits.js";
 import { conductorConflicts, deriveCredits } from "./contributors.js";
 import { linkReissues } from "./reissues.js";
+import { recordChange } from "./history.js";
 
 const MULTI_MOVEMENT =
   /\b(symphon(?:y|ie)|sinfonia|sonata|sonatina|concerto|suite|partita|quartet|quintet|sextet|septet|octet|nonet|trio|serenade|divertimento|cassation|mass|missa|requiem|stabat mater|magnificat|te deum|vespers|cantata|oratorio|passion|variations?|ballet)\b/i;
@@ -335,7 +336,7 @@ function candidates(
     const rawComposers = [
       ...new Set(
         (hints.composer?.length ? hints.composer : provider?.composers?.length ? provider.composers : credit?.composers || [])
-          .map(clean)
+          .map((name) => uninvertedName(clean(name)))
           .filter(Boolean),
       ),
     ];
@@ -413,7 +414,7 @@ function candidates(
     group.tracks.push({
       ...row,
       composers,
-      providerMovement: provider?.movement ? clean(provider.movement) : null,
+      providerMovement: provider?.movement ? clean(provider.movement) : taggedMovement(hints),
       providerLeaf: provider?.leafWorkId || null,
       title: clean(tagged.title),
       // The title without a "Composer: " prefix, for reading the movement.
@@ -654,6 +655,20 @@ function existingIdentity(catalogue, recordKind, recordId) {
     .get(recordKind, recordId)?.entity_id;
 }
 
+// Optional 1: a WORK tag with Picard's MOVEMENTNAME (and MOVEMENT number)
+// says which movement a track is outright, whatever its title says: "III.
+// Allegro". Without WORK the movement field alone names no work.
+const ROMAN_DIGITS = [[10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"]];
+function taggedMovement(hints) {
+  const name = clean(hints.movement);
+  if (!clean(hints.work) || !name) return null;
+  let n = Number(hints.movementNumber) || 0;
+  if (!n || n > 39 || MOVEMENT_PREFIX.test(name)) return name;
+  let numeral = "";
+  for (const [value, digits] of ROMAN_DIGITS) while (n >= value) (numeral += digits), (n -= value);
+  return `${numeral}. ${name}`;
+}
+
 // Identity keys shared across albums. Album placement never changes which
 // work a performance realizes, so two albums of the same work share it.
 const words = (value) =>
@@ -699,8 +714,9 @@ function legacyCatalogueSubject(title) {
 }
 const keyOf = (subjectOf) => (title, composers) =>
   JSON.stringify([
-    [...new Set(composers.map(words))].filter(Boolean).sort(),
-    subjectOf(title) || `title:${words(title).replace(KEY_PHRASE, " ").replace(/\s+/g, " ").trim()}`,
+    [...new Set(composers.map((name) => words(uninvertedName(name))))].filter(Boolean).sort(),
+    // "Op. posth." names no one piece, so it is left out like the key.
+    subjectOf(title) || `title:${words(title).replace(KEY_PHRASE, " ").replace(/\bop(?:us)? posth\b/g, " ").replace(/\s+/g, " ").trim()}`,
   ]);
 export const workKey = keyOf(catalogueSubject);
 // Two works an admin chose to keep apart.
@@ -897,8 +913,10 @@ function composerPeople(catalogue) {
     const other = resolvedName(catalogue, id, "aliases");
     const names = [name, ...(Array.isArray(other) ? other : []),
       ...catalogue.db.prepare("SELECT text FROM alias WHERE entity_id=?").all(id).map((a) => a.text)];
-    for (const spelling of names) {
-      const key = words(String(spelling));
+    // "Beethoven, Ludwig van", as an earlier scan may have named someone,
+    // is found as "Ludwig van Beethoven" too.
+    for (const spelling of names.flatMap((text) => [String(text), uninvertedName(text)])) {
+      const key = words(spelling);
       if (key) people.set(key, [...new Set([...(people.get(key) || []), id])]);
     }
   }
@@ -2616,6 +2634,27 @@ function compatibleAutoWorks(catalogue, a, b) {
   return ![...composers(a)].some(([name, ids]) => distinctIdentities(ids, other.get(name) || new Set()));
 }
 
+// A merge matching makes, recorded in Activity like an admin's so it can be
+// undone (Optional 5). Undoing it keeps the two apart: matching won't merge
+// them again. False, with nothing recorded, when the movements don't line up.
+const NOT_MERGED = Symbol("not merged");
+function recordedMerge(catalogue, keep, drop, actor) {
+  const title = (id) => resolvedName(catalogue, id, "title") || "Untitled work";
+  try {
+    recordChange(
+      catalogue,
+      { kind: "merge", summary: `Matching merged “${title(drop)}” into “${title(keep)}”`, works: [keep, drop], actor: actor || "model-scan", extra: { keepApart: [distinctKey(keep, drop)] } },
+      () => {
+        if (!mergeWork(catalogue, keep, drop, actor)) throw NOT_MERGED;
+      },
+    );
+    return true;
+  } catch (error) {
+    if (error === NOT_MERGED) return false;
+    throw error;
+  }
+}
+
 // Repairs catalogues built by the per-album grouping rule: same-named composers
 // and same works that were created once per album. Only auto-created entities
 // without manual edits are merged; anything else is left for review.
@@ -2653,7 +2692,7 @@ export function mergeDuplicateAutoWorks(catalogue, { actor = null } = {}) {
         // Same title and number, different verified MusicBrainz works or
         // composers: kept apart, for an admin to decide.
         else if (!compatibleAutoWorks(catalogue, keep, id)) catalogue.review("identity", id, { reason: "duplicate-work", keep, evidence: "different MusicBrainz identities" });
-        else if (mergeWork(catalogue, keep, id, actor)) works++;
+        else if (recordedMerge(catalogue, keep, id, actor)) works++;
         else catalogue.review("identity", id, { reason: "duplicate-work", keep });
     }
     return { people, works };
@@ -2876,7 +2915,7 @@ const INSTRUMENT =
   /\b(piano|violin|viola|cello|violoncello|double bass|flute|oboe|clarinet|bassoon|horn|trumpet|trombone|organ|harpsichord|guitar|harp|string|wind|piano and violin|violin and piano|cello and piano)\s+(?=(?:sonata|sonatina|concerto|quartet|quintet|trio|sextet|octet|suite|partita)\b)/i;
 const KEY = /\bin\s+([a-h])(?:[\s-]?(flat|sharp|♭|♯))?\s+(major|minor)\b/i;
 const CATALOGUE_TEXT =
-  /\b(?:op(?:us|\.)?\s*\d+[a-z]?(?:\s*,?\s*no\.?\s*\d+)?|TWV\s*\d+(?:\s*:\s*[a-z]{0,3}\d+[a-z]?)?|(?:BWV|HWV|RV|WoO|K(?:V|\.)?|D\.?|Hob\.?\s*[IVXL]+[a-z]?:?)\s*\d+[a-z]?)/gi;
+  /\b(?:op(?:us|\.)?\s*\d+[a-z]?(?:\s*,?\s*no\.?\s*\d+)?|op(?:us|\.)?\s*posth\b\.?|TWV\s*\d+(?:\s*:\s*[a-z]{0,3}\d+[a-z]?)?|(?:BWV|HWV|RV|WoO|Kk\.?|Wq\.?|K(?:V|\.)?|D\.?|Hob\.?\s*[IVXL]+[a-z]?:?)\s*\d+[a-z]?|(?<=,\s*)(?:H\.|Z\.?)\s*\d+[a-z]?)/gi;
 const tidyCatalogue = (value) =>
   clean(value)
     .replace(/^op(?:us|\.)?\s*/i, "Op. ")
@@ -3169,11 +3208,6 @@ export function autoMatchTaggedWorks(
       .all())
       if (!combinedWorks.has(work) && sectionTitles(String(JSON.parse(value) ?? "")).length > 1) combinedWorks.add(work);
     for (const work of combinedWorks) splitCombinedMovements(catalogue, work, actor);
-    const metadata = new Metadata(catalogue);
-    for (const { id } of catalogue.db
-      .prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL")
-      .all())
-      deriveWorkFields(catalogue, id, metadata);
   }
   recordTaggedLeaves(catalogue, { albumId });
   const index = catalogueIndex(catalogue);
@@ -3181,6 +3215,21 @@ export function autoMatchTaggedWorks(
   for (const group of groups)
     if (createGroup(catalogue, group, actor, index)) created++;
   keyMovementTitles(catalogue, { albumId });
+  // Key, catalogue number and form from each work's title, for the works
+  // made just now too: every work in the library pass, the album's in an
+  // album's match (Optional 4).
+  const metadata = new Metadata(catalogue);
+  for (const { id } of catalogue.db
+    .prepare(
+      albumId == null
+        ? "SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL"
+        : `SELECT DISTINCT r.work_id AS id FROM realization r JOIN realization_item i ON i.realization_id=r.id
+           JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id
+           JOIN entity e ON e.id=r.work_id AND e.deleted_at IS NULL
+           WHERE CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?`,
+    )
+    .all(...(albumId == null ? [] : [String(albumId)])))
+    deriveWorkFields(catalogue, id, metadata);
   // Who plays each newly matched performance, from its tags; and where the
   // tags now disagree with a conductor an admin set.
   deriveCredits(catalogue, { albumId });

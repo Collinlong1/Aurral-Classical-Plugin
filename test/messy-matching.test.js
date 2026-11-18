@@ -1848,3 +1848,121 @@ test("L5: two TWV 55 suites on one album are two works, and an old join of them 
   assert.equal(repaired[0][1], made[0][1], "the D major suite keeps its work");
   assert.notEqual(repaired[1][1], made[0][1]);
 });
+
+// Optional 2 (#44): "Surname, Given" composer tags key and credit as "Given
+// Surname"; a person an earlier scan named the inverted way is reused.
+test("Optional 2: inverted composer names join the same work and person", async (t) => {
+  const { uninvertedName } = await import("../src/model/credits.js");
+  assert.equal(uninvertedName("Beethoven, Ludwig van"), "Ludwig van Beethoven");
+  assert.equal(uninvertedName("Strauss, Jr."), "Strauss, Jr.");
+  assert.equal(workKey("Symphony No. 5, Op. 67", ["Beethoven, Ludwig van"]), workKey("Symphony No. 5, Op. 67", ["Ludwig van Beethoven"]));
+  const movements = ["I. Allegro con brio", "II. Andante con moto"];
+  const on = (composer) => (title) => ({ title: `Symphony No. 5 in C minor, Op. 67: ${title}`, composer: [composer], genres: ["Classical"] });
+  const c = await catalogueWith(t, [
+    { id: "old", album: "Old rip", albumArtist: "Orchestra", artist: "Orchestra", titles: movements.map(on("Beethoven, Ludwig van")) },
+    { id: "new", album: "New rip", albumArtist: "Orchestra", artist: "Orchestra", titles: movements.map(on("Ludwig van Beethoven")) },
+  ]);
+  // An earlier scan's person, named the inverted way.
+  const earlier = c.createEntity("person", { roles: ["composer"] });
+  new Metadata(c).derived(earlier, "name", "Beethoven, Ludwig van");
+  for (const albumId of ["old", "new"]) autoMatchTaggedWorks(c, { albumId, actor: "admin", allowStructuredTitles: true });
+  const works = ["old", "new"].map((albumId) => renderAlbumPresentation(c, albumId).groups[0].workId);
+  assert.ok(works[0]);
+  assert.equal(works[0], works[1]);
+  const people = c.db.prepare("SELECT count(*) AS n FROM entity WHERE kind='person' AND deleted_at IS NULL").get().n;
+  assert.equal(people, 1, "no second Beethoven");
+});
+
+// Optional 3 (#45): Kk., Wq., H. and Z. numbers are work identities;
+// "Op. posth." is classical evidence but names no one piece.
+test("Optional 3: Kk., Wq., H. and Z. numbers tell works apart; Op. posth. is evidence only", async (t) => {
+  assert.equal(catalogueSubject("Sonata in E major, Kk. 380"), "cat:kk:380");
+  assert.equal(catalogueSubject("Flute Concerto in D minor, Wq. 22"), "cat:wq:22");
+  assert.equal(catalogueSubject("Symphonie fantastique, H. 48"), "cat:h:48");
+  assert.equal(catalogueSubject("Dido and Aeneas, Z 626"), "cat:z:626");
+  assert.equal(catalogueSubject("Nocturne in C-sharp minor, Op. posth."), "");
+  assert.equal(workKey("Nocturne in C-sharp minor, Op. posth.", ["Chopin"]), workKey("Nocturne in C-sharp minor", ["Chopin"]));
+  assert.ok(classificationEvidence({ title: "Waltz in A minor, Op. posth." }).signals.some((s) => s.signal === "catalogue number"));
+  assert.equal(decide({ title: "Nocturne in C-sharp minor, Op. posth.", composer: ["Frédéric Chopin"] }), "classical");
+  const scarlatti = (title) => ({ title, composer: ["Domenico Scarlatti"], genres: ["Classical"] });
+  const c = await catalogueWith(t, [
+    { id: "one", album: "Scarlatti Sonatas I", albumArtist: "Pianist", artist: "Pianist", titles: [scarlatti("Sonata in E major, Kk. 380")] },
+    { id: "two", album: "Scarlatti Sonatas II", albumArtist: "Pianist", artist: "Pianist", titles: [scarlatti("Sonata in D minor, Kk. 141")] },
+  ]);
+  for (const albumId of ["one", "two"]) autoMatchTaggedWorks(c, { albumId, actor: "admin", allowStructuredTitles: true });
+  const [a, b] = ["one", "two"].map((albumId) => renderAlbumPresentation(c, albumId)?.groups[0]?.workId);
+  assert.ok(a && b);
+  assert.notEqual(a, b, "two sonatas, two works");
+});
+
+// Optional 1 (#46): with WORK set, Picard's MOVEMENTNAME and MOVEMENT name the
+// movement whatever the title says; read from a real file too.
+test("Optional 1: movement tags name the movements when WORK is set", async (t) => {
+  const { copyFixture } = await import("./helpers.js");
+  const { readTags, writeTags } = await import("../src/tags.js");
+  const folders = await tempFolders();
+  t.after(() => fs.rm(folders.root, { recursive: true, force: true }));
+  const file = await copyFixture("sine.flac", path.join(folders.root, "movement.flac"));
+  await writeTags(file, { work: ["Symphony No. 5 in C minor, Op. 67"], movementName: ["Andante con moto"], movementNumber: ["2"] });
+  const read = readTags(file);
+  assert.deepEqual([read.movementName, read.movementNumber], ["Andante con moto", 2]);
+
+  const parts = ["Allegro con brio", "Andante con moto", "Allegro", "Allegro"];
+  const tagged = (album) => parts.map((movement, i) => ({ title: `Beethoven 5 - ${i + 1}`, work: "Symphony No. 5 in C minor, Op. 67", movement, movementNumber: i + 1, composer: ["Ludwig van Beethoven"], genres: ["Classical"] }));
+  const c = await catalogueWith(t, [
+    { id: "a", album: "Rip A", albumArtist: "Orchestra", artist: "Orchestra", titles: tagged("a") },
+    { id: "b", album: "Rip B", albumArtist: "Other", artist: "Other", titles: tagged("b") },
+  ]);
+  for (const albumId of ["a", "b"]) autoMatchTaggedWorks(c, { albumId, actor: "admin", allowStructuredTitles: true });
+  const [a, b] = ["a", "b"].map((albumId) => renderAlbumPresentation(c, albumId).groups);
+  assert.deepEqual(a.map((group) => group.items.map((item) => item.title)), [["I. Allegro con brio", "II. Andante con moto", "III. Allegro", "IV. Allegro"]]);
+  assert.equal(a[0].workId, b[0].workId, "both albums are one work");
+});
+
+// Optional 4 (#49): a work an album's match makes shows its key and catalogue
+// number at once, as one the library pass makes does.
+test("Optional 4: works made by an album's match have their key and catalogue number", async (t) => {
+  const titles = ["I. Allegro con brio", "II. Andante con moto"].map((part) => ({ title: `Symphony No. 5 in C minor, Op. 67: ${part}`, composer: ["Ludwig van Beethoven"], genres: ["Classical"] }));
+  const c = await catalogueWith(t, [
+    { id: "album", album: "Beethoven 5", albumArtist: "Orchestra", artist: "Orchestra", titles },
+    { id: "library", album: "Beethoven 5 again", albumArtist: "Other", artist: "Other", titles: titles.map((track) => ({ ...track, title: track.title.replace("Symphony No. 5 in C minor, Op. 67", "Symphony No. 7 in A major, Op. 92") })) },
+  ]);
+  const metadata = new Metadata(c);
+  const fields = (albumId) => {
+    const work = renderAlbumPresentation(c, albumId).groups[0].workId;
+    return ["key", "catalogue"].map((field) => metadata.resolve(work, field).value);
+  };
+  autoMatchTaggedWorks(c, { albumId: "album", actor: "admin", allowStructuredTitles: true });
+  assert.deepEqual(fields("album").map(Boolean), [true, true], JSON.stringify(fields("album")));
+  autoMatchTaggedWorks(c, { albumId: null, actor: "model-scan", allowStructuredTitles: true });
+  assert.deepEqual(fields("library").map(Boolean), [true, true], JSON.stringify(fields("library")));
+});
+
+// Optional 5 (#50): a merge matching makes is in Activity; undoing it brings
+// both works back, and matching doesn't merge them again.
+test("Optional 5: a scan-time work merge can be undone from Activity and stays undone", async (t) => {
+  const { recentChanges, undoChange } = await import("../src/model/history.js");
+  const c = await catalogueWith(t, []);
+  const metadata = new Metadata(c);
+  const composer = c.createEntity("person", { roles: ["composer"] });
+  metadata.derived(composer, "name", "Sergei Rachmaninoff");
+  const work = (title, album) => {
+    const id = c.createEntity("work");
+    metadata.derived(id, "title", title);
+    c.credit(id, composer, "composer", { position: 1 });
+    c.externalIdentity(id, "embedded-tags", "album-work", `${title}-${album}`, { evidence: { albumId: album } });
+    return id;
+  };
+  const vocalise = [work("Vocalise, op. 34 no. 14", "a"), work("Vocalise, Op. 34 No. 14", "b")];
+  const live = (id) => c.db.prepare("SELECT deleted_at FROM entity WHERE id=?").get(id).deleted_at == null;
+  autoMatchTaggedWorks(c, { actor: "model-scan", allowStructuredTitles: true });
+  assert.deepEqual(vocalise.map(live), [true, false]);
+  const [change] = recentChanges(c);
+  assert.equal(change?.kind, "merge");
+  assert.equal(change.summary, "Matching merged “Vocalise, Op. 34 No. 14” into “Vocalise, op. 34 no. 14”");
+  undoChange(c, change.id, "admin");
+  assert.deepEqual(vocalise.map(live), [true, true]);
+  autoMatchTaggedWorks(c, { actor: "model-scan", allowStructuredTitles: true });
+  assert.deepEqual(vocalise.map(live), [true, true], "the next scan leaves them apart");
+  assert.equal(recentChanges(c).filter((row) => row.kind === "merge").length, 1);
+});

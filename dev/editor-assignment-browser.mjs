@@ -34,7 +34,7 @@ await build({
   },
   bundle: true, nodePaths: [path.join(core, "frontend/node_modules")], jsx: "automatic", format: "esm",
   outfile: path.join(output, "app.js"), loader: { ".woff2": "file", ".woff": "file" },
-  define: { "import.meta.env.DEV": "true", "import.meta.env.VITE_API_URL": '""' },
+  define: { "import.meta.env.DEV": "true", "import.meta.env.VITE_API_URL": '""', "import.meta.env.VITE_HOSTED": "false" },
 });
 
 // Core's page transport fills these optional collections before rendering.

@@ -78,7 +78,9 @@ test("combined searches, role-aware filters and one recording across releases", 
   c.credit(soloist.target_id, barenboim, "soloist", { instrument: "piano" });
   assert.deepEqual(
     searchCatalogue(c, { q: "", filters: { instrument: ["piano"] }, kinds: ["recording"] }).sections[0].items.map((i) => i.title),
-    ["Daniel Barenboim"],
+    // Levit's recording too: the piano sonata's instrumentation comes from
+    // its title as soon as matching makes the work (#49).
+    ["Daniel Barenboim", "Igor Levit"],
   );
   assert.equal(c.db.prepare("SELECT count(*) AS n FROM search_facet WHERE facet='performer' AND value LIKE 'name:%'").get().n, 0);
   // Sort keys are stored with each document.
