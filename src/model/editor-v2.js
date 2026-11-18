@@ -41,7 +41,7 @@ export function warnDuplicate(c, title, composers, createAnyway) {
   const similar = similarWorks(c, title, composers);
   if (createAnyway === true || !similar.length) return similar;
   const names = similar.slice(0, 3).map((id) => `“${labelOf(c, id) || "Untitled work"}”`).join(", ");
-  throw new EditorV2Error(`A similar work already exists: ${names}. Assign to it instead, or tick “Create anyway”.`, 409);
+  throw new EditorV2Error(`A similar work already exists: ${names}. Assign to it instead, or tick “Create anyway”.`, 400, "createAnyway");
 }
 // A deliberate new work stays separate from every similar entry the admin saw.
 export function rememberDistinct(c, work, similar, who) {
@@ -2637,7 +2637,8 @@ export function lookupV2(c, query) {
 // ---- commands --------------------------------------------------------------
 
 const str = (value, label, { optional = false, max = 10000, field } = {}) => {
-  if (typeof value !== "string" || value.length > max || (!optional && !value.trim())) fail(`Enter a valid ${label}`, field);
+  if (typeof value === "string" && value.length > max) fail(`Keep the ${label} to ${max.toLocaleString("en-US")} characters or fewer`, field);
+  if (typeof value !== "string" || (!optional && !value.trim())) fail(`Enter a valid ${label}`, field);
   return value;
 };
 const lines = (value) =>
@@ -2837,10 +2838,10 @@ export function applyV2(c, request, who) {
       for (const [key, , type] of fields) {
         if (!Object.hasOwn(v, key)) continue;
         const resolved = m.resolve(target, key);
-        const next = type === "lines" ? lines(v[key]) : str(v[key], key, { optional: true }).trim();
+        const next = type === "lines" ? lines(v[key]) : str(v[key], key, { optional: true, field: key }).trim();
         const current = type === "lines" ? (Array.isArray(resolved.value) ? resolved.value : resolved.value ? [String(resolved.value)] : []) : display(resolved.value);
         if (JSON.stringify(next) === JSON.stringify(current)) continue;
-        if ((key === "title" || key === "name") && !next) fail(`${key === "name" ? "Name" : "Title"} can't be empty. Use Mark blank to clear it on purpose.`);
+        if ((key === "title" || key === "name") && !next) fail(`${key === "name" ? "Name" : "Title"} can't be empty. Use Mark blank to clear it on purpose.`, key);
         if (key === "date" && next && !validDate(next)) fail("Use a valid year, year-month or full ISO date", key);
         // A renamed contributor keeps the old name as an alias, so tags
         // spelled that way still land on them; every other spelling given
@@ -2986,7 +2987,7 @@ export function applyV2(c, request, who) {
       const values = Object.fromEntries(
         BULK_FIELDS.flatMap(([key, , type]) => {
           if (!Object.hasOwn(v, key)) return [];
-          const value = type === "lines" ? lines(v[key]) : str(v[key], key, { optional: true }).trim();
+          const value = type === "lines" ? lines(v[key]) : str(v[key], key, { optional: true, field: key }).trim();
           return (type === "lines" ? value.length : value) ? [[key, value]] : [];
         }),
       );

@@ -1,3 +1,17 @@
+# Review fixes L5, E4, E8, E5/U1, L15 (issues #28, #29, #31, #32, #34)
+
+The next five open review issues, by number. The user chose "unsure" for #34's tracks. Plugin only; no core or schema change; no settings added.
+
+- **L5 (#28)** Telemann's TWV numbers keep their piece: "TWV 55:D1" and "TWV 55:g4" are two works (`cat:twv:55:D1`), the key letter's case kept (D major, d minor), and the all-digit "TWV 40:2" form too (the issue's pattern missed it). `catalogueReadings` reads the new form, so `repairSiblingJoins` takes apart joins earlier versions made on unedited auto works at the next scan; `legacyCatalogueSubject` keeps the old `cat:twv:55` so album records made before still count. Found on the way: `src/works.js` read "TWV 55:D1" as Schubert "D 1", and the title-to-catalogue reader took "TWV 55" and "D1" apart; TWV now comes first in both. `foldedCatalogue` (works.js) compares catalogue numbers without folding the TWV key's case (`sameCatalogue`, `sameNamedWork`).
+- **E4 (#29)** A merge writes an audit row on the entry it keeps (`work.merge-into`, `person.merge-into`; also for the scan's completion-split merge), so a page of that entry opened before the merge can neither save nor delete (409). Worse than filed: a stale delete alone also succeeded. No undo exclusion was needed: rows written inside a recorded change count as its own.
+- **E8 (#31)** A change now records listeners' favourites, picks and admin picks as they stood right after it. Undo compares, then puts later edits back on the restored works: a favourite stays on the work it was given to (one taken away from a merged work is taken from each part), and a pick goes with its recording to the work that holds it again (the issue's plan would have left the pick on a work that no longer has that recording). Changes recorded before this compare by time and never clear anything.
+- **E5/U1 (#32)** "A similar work already exists" is 400 with `field: "createAnyway"`, shown beside **Create anyway** instead of as a conflict with Reload. Saves and bulk edits name the field for an empty title or name and for over-long values ("Keep the title to 10,000 characters or fewer").
+- **L15 (#34)** "Romantic", "Contemporary", "Avant-Garde", "Modern Composition", "Orchestral", "Symphony" and "Minimalism" are an "ambiguous classical genre" (2 points, supporting) in `classify-evidence.js`: with one more signal of the track's own the track is classical, otherwise unsure (the user's choice over not classical). The shared `DEFAULT_CLASSICAL_GENRES` and the legacy tagger are unchanged. Each such unsure track gets a review item until #35 (L17) is decided. Measured on the Apple corpus with its genre replaced by one of these: 260 of 4,827 tracks (5.4%) move from classical to unsure in store-style titles, 25 (0.5%) with WORK tags; the saved corpora (tagged "Classical") are unchanged. Accepted edge: a pop song titled with a form word and tagged "Symphony" (Clean Bandit's "Symphony") is still classical.
+
+Bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
 # v0.3 Phases 8.7–9.5 and review fixes L12, L9, L4, E3 — v0.3 complete for review (issues #88–#93, #23, #25–#27)
 
 The last six v0.3 issues and the next four open review issues, by number: 8.7 (#88), 9.1 (#89), 9.2 (#91), 9.3 (#90), 9.4 (#93), 9.5 (#92), L12 (#23), L9 (#25), L4 (#26), E3 (#27). Plugin only; no core or schema change. v0.3 is now implemented for review: summary at the top of `V0_3_REPORT.md`.

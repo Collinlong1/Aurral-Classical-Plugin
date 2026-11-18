@@ -6,6 +6,8 @@
 const SUFFIX = "(?:[a-z]{1,3}(?![a-z]))?";
 // "op. 67", "BWV 1007", "K. 550", "D 960", "Hob. XVI:52", "RV 269"...
 const CATALOGUES = [
+  // Before "D": the "D1" in Telemann's "TWV 55:D1" is a key, not a D number.
+  [/\bTWV\s*(\d+(?:\s*:\s*[A-Za-z]{0,3}\d+[a-z]?)?)/i, "TWV"],
   [/\bBWV\s*(\d+[a-z]?)/i, "BWV"],
   [/\bHWV\s*(\d+[a-z]?)/i, "HWV"],
   [/\bRV\s*(\d+[a-z]?)/i, "RV"],
@@ -47,6 +49,13 @@ export function catalogueNumber(title) {
   const opus = String(title || "").match(OPUS);
   if (opus) return `op ${opus[1]}${opus[2] ? ` no ${opus[2]}` : ""}`;
   return "";
+}
+
+// A catalogue number for comparing: case doesn't matter, except in the key
+// letter of a TWV number ("TWV 55:D1" is D major, "TWV 55:d1" d minor).
+export function foldedCatalogue(title) {
+  const number = catalogueNumber(title);
+  return number.startsWith("TWV ") ? `twv ${number.slice(4)}` : number.toLowerCase();
 }
 
 // The number of the piece within that catalogue number, as "S164e No. 2"

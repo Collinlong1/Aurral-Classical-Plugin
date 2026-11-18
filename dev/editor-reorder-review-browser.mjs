@@ -1,4 +1,4 @@
-// Movement reordering and review/merge decisions through the real plugin
+// Movement reordering, review/merge decisions and the duplicate-work warning through the real plugin
 // commands and core renderer.
 // All data is synthetic; no Aurral server, media, or provider is accessed.
 import assert from "node:assert/strict";
@@ -66,7 +66,7 @@ const server = http.createServer(async (req, res) => {
       const result = await mutateEditor({ ...fixture.input, mutation });
       res.setHeader("Content-Type", "application/json");
       res.writeHead(result.ok ? 200 : result.status || 400);
-      res.end(JSON.stringify(result.ok ? result : { error: result.message }));
+      res.end(JSON.stringify(result.ok ? result : { error: result.message, ...(result.field && { field: result.field }) }));
     } else if (/\.(js|css|woff2?)$/.test(url.pathname)) {
       const file = path.join(output, path.basename(url.pathname));
       res.setHeader("Content-Type", file.endsWith(".js") ? "text/javascript" : file.endsWith(".css") ? "text/css" : "font/woff2");
@@ -196,8 +196,21 @@ try {
       const removed = fixture.c.db.prepare("SELECT id FROM entity WHERE id IN (?,?) AND deleted_at IS NOT NULL").all(a, b).map((row) => row.id);
       assert.deepEqual(removed, [a], "the work chosen to stay is kept");
       assert.equal(fixture.c.db.prepare("SELECT status FROM review_item WHERE id=?").get(review).status, "resolved");
+      // #32: a likely duplicate asks about "Create anyway", beside that box;
+      // it is no conflict, so nothing offers Reload.
+      await page.goto(`${origin}/editor?selection=new:work`);
+      await page.getByLabel("Title", { exact: true }).fill("Order suite");
+      await page.getByRole("button", { name: "Create work", exact: true }).click();
+      const warning = page.locator(".plugin-admin__field-error").filter({ hasText: "similar work already exists" });
+      await warning.waitFor();
+      assert.equal(await page.getByRole("button", { name: "Reload", exact: true }).count(), 0, "a duplicate warning offers no Reload");
+      await page.screenshot({ path: path.join(output, `duplicate-${width}.png`), animations: "disabled" });
+      await page.getByLabel("Create anyway", { exact: true }).check();
+      await page.getByRole("button", { name: "Create work", exact: true }).click();
+      await page.waitForFunction(() => !new URLSearchParams(location.search).get("selection")?.startsWith("new:"));
+      assert.equal(fixture.c.db.prepare("SELECT count(*) AS n FROM field_resolution f JOIN assertion a ON a.id=f.assertion_id WHERE f.field='title' AND a.value=?").get(JSON.stringify("Order suite")).n, 2);
       assert.deepEqual(errors, []);
-      console.log(`PASS: local reorder by buttons, keyboard and drag with one save; review question, decisions and merge step (${width}px)`);
+      console.log(`PASS: local reorder by buttons, keyboard and drag with one save; review question, decisions and merge step; duplicate warning beside Create anyway (${width}px)`);
     } finally {
       await context.close();
       for (const clean of cleanup.reverse()) await clean();

@@ -43,7 +43,7 @@ Searching, no matches and lookup failures are separate states. **Try again** ret
 
 **Edit together.** Tick works in the list → **Edit together**: period, form, key, instrumentation, or add a composer to all of them (empty fields are left alone), or **Use provider values** to unpin what you set by hand.
 
-**Undo.** Merges and deletions appear in **Activity**; open one and **Undo**. Undo is refused when those entries changed afterwards, so it never discards a later edit.
+**Undo.** Merges and deletions appear in **Activity**; open one and **Undo**. Undo is refused when those entries changed afterwards, so it never discards a later edit. Favourites and picks listeners made since are kept: a pick goes back with its recording.
 
 **Duplicates.** On a work, composer or performer, **Merge with another …**: choose the other entry and **Continue**. The merge step names both ("the one you opened" and "the other", with their recordings or credits), shows what happens if either stays, and the two works side by side. Choose the **Entry that stays**, then **Merge**; **Cancel** goes back without merging. Recordings, credits, favourites, picks and MusicBrainz/tag identities move into the entry that stays; the other is removed. A user who liked either work keeps the like; where both works had a pick, the kept work's pick wins. Movements are matched by title (or number, where one is untitled); a movement the staying work doesn't have is added to it, at the end, with its tracks, and the work opens at its Movements so you can put it in order with **Reorder movements**. An unused entry can be deleted.
 

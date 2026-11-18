@@ -35505,6 +35505,8 @@ import path4 from "node:path";
 // src/works.js
 var SUFFIX = "(?:[a-z]{1,3}(?![a-z]))?";
 var CATALOGUES = [
+  // Before "D": the "D1" in Telemann's "TWV 55:D1" is a key, not a D number.
+  [/\bTWV\s*(\d+(?:\s*:\s*[A-Za-z]{0,3}\d+[a-z]?)?)/i, "TWV"],
   [/\bBWV\s*(\d+[a-z]?)/i, "BWV"],
   [/\bHWV\s*(\d+[a-z]?)/i, "HWV"],
   [/\bRV\s*(\d+[a-z]?)/i, "RV"],
@@ -35541,6 +35543,10 @@ function catalogueNumber(title) {
   const opus = String(title || "").match(OPUS);
   if (opus) return `op ${opus[1]}${opus[2] ? ` no ${opus[2]}` : ""}`;
   return "";
+}
+function foldedCatalogue(title) {
+  const number = catalogueNumber(title);
+  return number.startsWith("TWV ") ? `twv ${number.slice(4)}` : number.toLowerCase();
 }
 function cataloguePiece(title) {
   const match2 = catalogueMatch(title);
@@ -38487,19 +38493,21 @@ var ORDINARY = wordList([
   "k pop"
 ]);
 var CONTEXT = wordList([...HARD_NON_CLASSICAL_GENRES, "score", "game", "anime"]);
+var AMBIGUOUS_NAMES = new Set(["romantic", "contemporary", "avant garde", "modern composition", "orchestral", "symphony", "minimalism"].map(normGenre));
 var CLASSICAL_NAMES = new Set(
-  [...DEFAULT_CLASSICAL_GENRES, "romantic", "classical period", "early romantic", "late romantic", "contemporary", "modern composition", "avant garde"].map(normGenre)
+  [...DEFAULT_CLASSICAL_GENRES, "classical period", "early romantic", "late romantic"].map(normGenre).filter((genre) => !AMBIGUOUS_NAMES.has(genre))
 );
 var CLASSICAL_WORD2 = /(^|\s)classical(\s|$)/;
 var SOUNDTRACK_ALBUM = new RegExp("(?<!\\p{L})(?:(?:original\\s+)?(?:motion\\s+picture|film|movie|television|tv|series|game|video\\s+game)\\s+(?:soundtrack|score)|original\\s+(?:soundtrack|score)|music\\s+from\\s+(?:and\\s+inspired\\s+by\\s+)?the\\s+(?:motion\\s+picture|film|movie|series)|soundtrack|o\\.?s\\.?t\\.?)(?!\\p{L})", "iu");
 function genreKinds(genres = []) {
-  const kinds2 = { classical: [], ordinary: [], context: [] };
+  const kinds2 = { classical: [], ambiguous: [], ordinary: [], context: [] };
   for (const raw of genres) {
     const genre = normGenre(raw);
     if (!genre) continue;
     if (ORDINARY.test(genre)) kinds2.ordinary.push(raw);
     else if (CONTEXT.test(genre)) kinds2.context.push(raw);
     else if (CLASSICAL_NAMES.has(genre) || CLASSICAL_WORD2.test(genre)) kinds2.classical.push(raw);
+    else if (AMBIGUOUS_NAMES.has(genre)) kinds2.ambiguous.push(raw);
   }
   return kinds2;
 }
@@ -38523,6 +38531,7 @@ function classificationEvidence(hints = {}) {
   const signals = [];
   const add = (points, signal, value) => signals.push({ points, signal, kind: STRONG.has(signal) ? "strong" : "supporting", ...value != null && { value: String(value) } });
   if (kinds2.classical.length) add(4, "classical genre", kinds2.classical.join("; "));
+  else if (kinds2.ambiguous.length) add(2, "ambiguous classical genre", kinds2.ambiguous.join("; "));
   if (hints.movement) add(4, "movement tag", hints.movement);
   if (hints.classicalComposerRelation) add(4, "classical composer relation");
   const catalogue = hints.catalogueNumber || (ownText + " \n " + album).match(CATALOGUE_NUMBER)?.[0];
@@ -39771,8 +39780,8 @@ var MOVEMENT_PREFIX = /^(?:[IVXLCDM]+|\d+)[.)\s:-]/i;
 var clean3 = (value) => String(value || "").trim().replace(/\s+/g, " ");
 var normalized = (value) => clean3(value).normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase();
 var sameCatalogue = (a, b) => {
-  const number = catalogueNumber(a).toLowerCase();
-  return Boolean(number) && number === catalogueNumber(b).toLowerCase();
+  const number = foldedCatalogue(a);
+  return Boolean(number) && number === foldedCatalogue(b);
 };
 var identity = (...values) => createHash3("sha256").update(JSON.stringify(values)).digest("hex");
 var NUMBERED_SET = new RegExp("(?<!\\p{L})(pr[e\xE9]ludes|[e\xE9]tudes|nocturnes|mazurkas|waltzes|valses|impromptus|ballades|polonaises|bagatelles|intermezzi|consolations|po[e\xE8]mes|morceaux|songs without words|lieder ohne worte)(?!\\p{L})", "iu");
@@ -40163,7 +40172,10 @@ function existingIdentity(catalogue, recordKind, recordId) {
 var words2 = (value) => normalized(value).replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 var CATALOGUE = /\b(op|opus|bwv|kv|k|d|hob|rv|woo|hwv|sz|twv|bb)\s*((?:[ivxlc]+\s+)?\d+[a-z]?)(?:\s+(?:no|nr|n)\s*(\d+))?\b/;
 var KEY_PHRASE = /\bin\s+[a-h](?:\s*(?:flat|sharp|b|#))?(?:\s+(?:major|minor|dur|moll))?\b/g;
+var TWV = /\b[Tt][Ww][Vv]\s*(\d+)\s*:\s*([A-Za-z]{0,3}\d+[a-z]?)(?![\p{L}\d])/u;
 function catalogueSubject(title) {
+  const twv = String(title || "").match(TWV);
+  if (twv) return `cat:twv:${twv[1]}:${twv[2]}`;
   const slashed = String(title || "").match(/\bop(?:us|\.)?\s*(\d+[a-z]?)\s*\/\s*(\d+)\b(?![a-z])/i);
   if (slashed && (Number(slashed[2]) < Number.parseInt(slashed[1], 10) || Number(slashed[2]) <= 12)) return `cat:op:${slashed[1].toLowerCase()}:${slashed[2]}`;
   const cat = words2(title).match(CATALOGUE);
@@ -40174,6 +40186,8 @@ function catalogueSubject(title) {
   return number ? `cat:${number.replace(/\s+/g, ":")}${piece ? `:${piece}` : ""}` : "";
 }
 function legacyCatalogueSubject(title) {
+  const twv = String(title || "").match(TWV);
+  if (twv) return `cat:twv:${twv[1]}`;
   if (words2(title).match(CATALOGUE)) return catalogueSubject(title);
   const [system, number = ""] = catalogueNumber(title).toLowerCase().split(" ");
   return system ? `cat:${system}:${number.match(/^\d+/)?.[0] ?? number}` : "";
@@ -41440,6 +41454,7 @@ function mergeContributor(catalogue, keep, drop, actor4) {
   }
   catalogue.db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), drop);
   catalogue.audit("person.merge", drop, { into: keep }, actor4);
+  catalogue.audit("person.merge-into", keep, { from: drop }, actor4);
 }
 var isComposer = (catalogue, id) => catalogue.db.prepare(
   `SELECT 1 FROM entity WHERE id=? AND deleted_at IS NULL AND (json_extract(data,'$.roles') LIKE '%composer%'
@@ -41540,6 +41555,7 @@ function mergeWork(catalogue, keep, drop, actor4, { addMissing = false } = {}) {
   transferIdentities(db, keep, drop);
   db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), drop);
   catalogue.audit("work.merge", drop, { into: keep, ...added.length && { addedMovements: added } }, actor4);
+  catalogue.audit("work.merge-into", keep, { from: drop }, actor4);
   return addMissing ? { added } : true;
 }
 function mergePreview(catalogue, keep, drop, { addMissing = false } = {}) {
@@ -41598,7 +41614,7 @@ function mergeDuplicateAutoWorks(catalogue, { actor: actor4 = null } = {}) {
 }
 var ROMAN_SUFFIX = /^(?:i{1,3}|iv|v|vi{1,3}|ix|x)$/;
 function catalogueReadings(subject) {
-  const match2 = subject.match(/^cat:([a-z]+):(\d+)([a-z]*)(?:\/([0-9a-z]+))?(?::([0-9a-z/]+))?$/);
+  const match2 = subject.match(/^cat:([a-z]+):(\d+)([a-z]*)(?:\/([0-9a-z]+))?(?::([0-9A-Za-z/]+))?$/);
   if (!match2) return null;
   const [, system, base, suffix, slash, piece] = match2;
   const sub = piece || (slash && /^\d/.test(slash) ? slash : "") || "";
@@ -41734,6 +41750,7 @@ function repairCompletionSplits(catalogue, albumId, actor4) {
         transferIdentities(db, keep.work, drop.work);
         db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(now, now, drop.work);
         catalogue.audit("work.merge", drop.work, { into: keep.work, reason: "completion-split" }, actor4);
+        catalogue.audit("work.merge-into", keep.work, { from: drop.work, reason: "completion-split" }, actor4);
       }
       const metadata = new Metadata(catalogue);
       const index = catalogueIndex(catalogue);
@@ -41756,7 +41773,7 @@ function repairCompletionSplits(catalogue, albumId, actor4) {
 }
 var INSTRUMENT = /\b(piano|violin|viola|cello|violoncello|double bass|flute|oboe|clarinet|bassoon|horn|trumpet|trombone|organ|harpsichord|guitar|harp|string|wind|piano and violin|violin and piano|cello and piano)\s+(?=(?:sonata|sonatina|concerto|quartet|quintet|trio|sextet|octet|suite|partita)\b)/i;
 var KEY = /\bin\s+([a-h])(?:[\s-]?(flat|sharp|♭|♯))?\s+(major|minor)\b/i;
-var CATALOGUE_TEXT = /\b(?:op(?:us|\.)?\s*\d+[a-z]?(?:\s*,?\s*no\.?\s*\d+)?|(?:BWV|HWV|RV|WoO|TWV|K(?:V|\.)?|D\.?|Hob\.?\s*[IVXL]+[a-z]?:?)\s*\d+[a-z]?)/gi;
+var CATALOGUE_TEXT = /\b(?:op(?:us|\.)?\s*\d+[a-z]?(?:\s*,?\s*no\.?\s*\d+)?|TWV\s*\d+(?:\s*:\s*[a-z]{0,3}\d+[a-z]?)?|(?:BWV|HWV|RV|WoO|K(?:V|\.)?|D\.?|Hob\.?\s*[IVXL]+[a-z]?:?)\s*\d+[a-z]?)/gi;
 var tidyCatalogue = (value) => clean3(value).replace(/^op(?:us|\.)?\s*/i, "Op. ").replace(/\s*,?\s*no\.?\s*(\d)/i, " No. $1");
 function workFieldsFromTitle(title) {
   const text7 = clean3(title);
@@ -42842,6 +42859,67 @@ function predicates(set) {
     ["entity", any("id", e)]
   ];
 }
+function listenerState(c, set) {
+  const tables = new Map(predicates(set));
+  const rows = (table) => {
+    const [where, ids] = tables.get(table);
+    return c.db.prepare(`SELECT * FROM ${table} WHERE ${where}`).all(...ids).map((row) => ({ ...row }));
+  };
+  return { user_work_state: rows("user_work_state"), admin_work_pick: rows("admin_work_pick") };
+}
+function laterListenerEdits(c, set, data, createdAt) {
+  const now = listenerState(c, set);
+  const userKey = (row) => `${row.user_id}|${row.work_id}`;
+  if (!data.listeners) {
+    return {
+      users: now.user_work_state.filter((row) => row.updated_at > createdAt).map((row) => ({ row, before: null, legacy: true })),
+      picks: now.admin_work_pick.filter((row) => row.updated_at > createdAt).map((row) => ({ row, before: null })),
+      removedPicks: []
+    };
+  }
+  const was = new Map(data.listeners.user_work_state.map((row) => [userKey(row), row]));
+  const users = now.user_work_state.filter((row) => JSON.stringify(row) !== JSON.stringify(was.get(userKey(row)))).map((row) => ({ row, before: was.get(userKey(row)) || null }));
+  const picks = new Map(now.admin_work_pick.map((row) => [row.work_id, row]));
+  return {
+    users,
+    picks: now.admin_work_pick.filter((row) => JSON.stringify(row) !== JSON.stringify(data.listeners.admin_work_pick.find((old) => old.work_id === row.work_id))).map((row) => ({ row })),
+    removedPicks: data.listeners.admin_work_pick.filter((row) => !picks.has(row.work_id))
+  };
+}
+function reapplyListenerEdits(c, set, edits) {
+  const liveWork = (id) => Boolean(id && c.db.prepare("SELECT 1 FROM entity WHERE id=? AND kind='work' AND deleted_at IS NULL").get(id));
+  const workOf = (realization) => realization && c.db.prepare("SELECT work_id FROM realization WHERE id=?").get(realization)?.work_id;
+  const works = list3(set.entities).filter(liveWork);
+  const upsert = (user, work, column, value, at) => {
+    c.db.prepare(
+      `INSERT INTO user_work_state(user_id,work_id,favourite,picked_realization_id,updated_at) VALUES (?,?,0,NULL,?)
+         ON CONFLICT(user_id,work_id) DO UPDATE SET updated_at=max(updated_at,excluded.updated_at)`
+    ).run(user, work, at);
+    c.db.prepare(`UPDATE user_work_state SET ${column}=? WHERE user_id=? AND work_id=?`).run(value, user, work);
+  };
+  for (const { row, before, legacy } of edits.users) {
+    if ((before?.favourite ?? 0) !== row.favourite) {
+      if (row.favourite && liveWork(row.work_id)) upsert(row.user_id, row.work_id, "favourite", 1, row.updated_at);
+      else if (!row.favourite && !legacy)
+        for (const work of works) c.db.prepare("UPDATE user_work_state SET favourite=0 WHERE user_id=? AND work_id=?").run(row.user_id, work);
+    }
+    if ((before?.picked_realization_id ?? null) !== row.picked_realization_id) {
+      const work = workOf(row.picked_realization_id);
+      if (row.picked_realization_id && liveWork(work)) upsert(row.user_id, work, "picked_realization_id", row.picked_realization_id, row.updated_at);
+      else if (!row.picked_realization_id && !legacy && liveWork(row.work_id))
+        c.db.prepare("UPDATE user_work_state SET picked_realization_id=NULL WHERE user_id=? AND work_id=?").run(row.user_id, row.work_id);
+    }
+  }
+  for (const { row } of edits.picks) {
+    const work = workOf(row.realization_id);
+    if (liveWork(work))
+      c.db.prepare(
+        `INSERT INTO admin_work_pick VALUES (?,?,?,?) ON CONFLICT(work_id) DO UPDATE SET
+           realization_id=excluded.realization_id,actor_id=excluded.actor_id,updated_at=excluded.updated_at`
+      ).run(work, row.realization_id, row.actor_id, row.updated_at);
+  }
+  for (const row of edits.removedPicks) c.db.prepare("DELETE FROM admin_work_pick WHERE work_id=?").run(row.work_id);
+}
 function snapshot(c, set) {
   const rows = {};
   for (const [table, [where, ids]] of predicates(set)) rows[table] = c.db.prepare(`SELECT * FROM ${table} WHERE ${where}`).all(...ids).map((row) => ({ ...row }));
@@ -42856,7 +42934,7 @@ function recordChange(c, { kind, summary, works = [], contributors = [], actor: 
     const result = change();
     const after = c.db.prepare("SELECT coalesce(max(id),0) AS n FROM audit_event").get().n;
     const id = randomUUID11();
-    c.db.prepare("INSERT INTO change_set(id,kind,actor,summary,data,created_at) VALUES (?,?,?,?,?,?)").run(id, kind, actor4, summary.slice(0, 500), JSON.stringify({ set: serialSet(set), rows, after, ...contributors.length && { contributors, credits: creditState(c, contributors) }, ...extra }), Date.now());
+    c.db.prepare("INSERT INTO change_set(id,kind,actor,summary,data,created_at) VALUES (?,?,?,?,?,?)").run(id, kind, actor4, summary.slice(0, 500), JSON.stringify({ set: serialSet(set), rows, after, listeners: listenerState(c, set), ...contributors.length && { contributors, credits: creditState(c, contributors) }, ...extra }), Date.now());
     return { result, changeId: id };
   });
 }
@@ -42884,6 +42962,7 @@ function undoChange(c, id, actor4) {
           WHERE e.value IN (${marks(ids)})) LIMIT 1`).get(id, ...ids);
     const creditsChanged = data.contributors && creditState(c, data.contributors) !== data.credits;
     if (later || laterChange || creditsChanged) throw new Error("These entries changed after this, so undoing it would lose that change. Undo the later changes first, or fix it by hand.");
+    const listeners = laterListenerEdits(c, set, data, row.created_at);
     c.db.exec("PRAGMA defer_foreign_keys=ON");
     const tables = predicates(set);
     for (const [table, [where, args]] of tables) c.db.prepare(`DELETE FROM ${table} WHERE ${where}`).run(...args);
@@ -42895,6 +42974,7 @@ function undoChange(c, id, actor4) {
     const named = [...new Set((data.rows.credit || []).map((credit) => credit.contributor_id))];
     if (named.length)
       c.db.prepare(`UPDATE entity SET deleted_at=NULL,updated_at=? WHERE kind IN ('person','ensemble') AND deleted_at IS NOT NULL AND id IN (${marks(named)})`).run(Date.now(), ...named);
+    reapplyListenerEdits(c, set, listeners);
     if (c.db.prepare("PRAGMA foreign_key_check").all().length) throw new Error("Undo would break the catalogue's links; nothing was changed");
     for (const key of data.suppressions || []) c.db.prepare("DELETE FROM match_suppression WHERE key=?").run(key);
     c.db.prepare("UPDATE change_set SET undone_at=? WHERE id=?").run(Date.now(), id);
@@ -43142,8 +43222,8 @@ var ACT = /,\s*(?:act|akt|atto|acte|part|pt\.?|teil|scene|szene)\s*[ivxlc\d]+\b.
 var nameBeforeComma = (title) => words4(String(title).split(",")[0]);
 function sameNamedWork(a, b) {
   if (a === b) return true;
-  const catalogueA = catalogueNumber(a).toLowerCase();
-  const catalogueB = catalogueNumber(b).toLowerCase();
+  const catalogueA = foldedCatalogue(a);
+  const catalogueB = foldedCatalogue(b);
   if (catalogueA && catalogueB) return catalogueA === catalogueB;
   const [short, long] = a.length <= b.length ? [a, b] : [b, a];
   const name = nameBeforeComma(long);
@@ -43894,7 +43974,7 @@ function warnDuplicate(c, title, composers, createAnyway) {
   const similar = similarWorks(c, title, composers);
   if (createAnyway === true || !similar.length) return similar;
   const names = similar.slice(0, 3).map((id) => `\u201C${labelOf(c, id) || "Untitled work"}\u201D`).join(", ");
-  throw new EditorV2Error(`A similar work already exists: ${names}. Assign to it instead, or tick \u201CCreate anyway\u201D.`, 409);
+  throw new EditorV2Error(`A similar work already exists: ${names}. Assign to it instead, or tick \u201CCreate anyway\u201D.`, 400, "createAnyway");
 }
 function rememberDistinct(c, work, similar, who) {
   for (const other of similar)
@@ -46161,7 +46241,8 @@ function lookupV2(c, query) {
   return { version: 2, lookup: kind, options: options.slice(0, 50).map((o) => ({ ...o, label: o.label.slice(0, 500), ...o.detail && { detail: o.detail.slice(0, 500) } })) };
 }
 var str = (value, label, { optional = false, max = 1e4, field: field2 } = {}) => {
-  if (typeof value !== "string" || value.length > max || !optional && !value.trim()) fail(`Enter a valid ${label}`, field2);
+  if (typeof value === "string" && value.length > max) fail(`Keep the ${label} to ${max.toLocaleString("en-US")} characters or fewer`, field2);
+  if (typeof value !== "string" || !optional && !value.trim()) fail(`Enter a valid ${label}`, field2);
   return value;
 };
 var lines = (value) => (Array.isArray(value) ? value : typeof value === "string" ? value.split("\n") : []).map((line) => String(line).trim()).filter(Boolean);
@@ -46338,10 +46419,10 @@ function applyV2(c, request, who) {
       for (const [key, , type] of fields) {
         if (!Object.hasOwn(v, key)) continue;
         const resolved = m.resolve(target, key);
-        const next = type === "lines" ? lines(v[key]) : str(v[key], key, { optional: true }).trim();
+        const next = type === "lines" ? lines(v[key]) : str(v[key], key, { optional: true, field: key }).trim();
         const current = type === "lines" ? Array.isArray(resolved.value) ? resolved.value : resolved.value ? [String(resolved.value)] : [] : display(resolved.value);
         if (JSON.stringify(next) === JSON.stringify(current)) continue;
-        if ((key === "title" || key === "name") && !next) fail(`${key === "name" ? "Name" : "Title"} can't be empty. Use Mark blank to clear it on purpose.`);
+        if ((key === "title" || key === "name") && !next) fail(`${key === "name" ? "Name" : "Title"} can't be empty. Use Mark blank to clear it on purpose.`, key);
         if (key === "date" && next && !validDate(next)) fail("Use a valid year, year-month or full ISO date", key);
         if (key === "name" && (entity.kind === "person" || entity.kind === "ensemble") && current.trim()) addAlias(c, target, current);
         if (key === "aliases" && (entity.kind === "person" || entity.kind === "ensemble")) for (const spelling of next) addAlias(c, target, spelling);
@@ -46474,7 +46555,7 @@ function applyV2(c, request, who) {
       const values = Object.fromEntries(
         BULK_FIELDS.flatMap(([key, , type]) => {
           if (!Object.hasOwn(v, key)) return [];
-          const value = type === "lines" ? lines(v[key]) : str(v[key], key, { optional: true }).trim();
+          const value = type === "lines" ? lines(v[key]) : str(v[key], key, { optional: true, field: key }).trim();
           return (type === "lines" ? value.length : value) ? [[key, value]] : [];
         })
       );

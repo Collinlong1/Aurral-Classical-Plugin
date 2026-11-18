@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { Metadata } from "./metadata.js";
 import { raiseReview } from "./contributors.js";
 import { transaction } from "./database.js";
-import { catalogueNumber, cataloguePiece } from "../works.js";
+import { catalogueNumber, cataloguePiece, foldedCatalogue } from "../works.js";
 import { artistCredits, composersOf } from "./credits.js";
 import { conductorConflicts, deriveCredits } from "./contributors.js";
 import { linkReissues } from "./reissues.js";
@@ -20,8 +20,8 @@ const normalized = (value) =>
     .replace(/\p{M}/gu, "")
     .toLowerCase();
 const sameCatalogue = (a, b) => {
-  const number = catalogueNumber(a).toLowerCase();
-  return Boolean(number) && number === catalogueNumber(b).toLowerCase();
+  const number = foldedCatalogue(a);
+  return Boolean(number) && number === foldedCatalogue(b);
 };
 const identity = (...values) =>
   createHash("sha256").update(JSON.stringify(values)).digest("hex");
@@ -664,8 +664,14 @@ const CATALOGUE =
   /\b(op|opus|bwv|kv|k|d|hob|rv|woo|hwv|sz|twv|bb)\s*((?:[ivxlc]+\s+)?\d+[a-z]?)(?:\s+(?:no|nr|n)\s*(\d+))?\b/;
 const KEY_PHRASE =
   /\bin\s+[a-h](?:\s*(?:flat|sharp|b|#))?(?:\s+(?:major|minor|dur|moll))?\b/g;
+// Telemann's TWV numbers are a group and a piece: "TWV 55:D1" and "TWV 55:g4"
+// are two suites, and the letter is the key, so its case is kept (D major,
+// d minor). "TWV 40:2" has no key letter.
+const TWV = /\b[Tt][Ww][Vv]\s*(\d+)\s*:\s*([A-Za-z]{0,3}\d+[a-z]?)(?![\p{L}\d])/u;
 // The catalogue number a work's identity rests on, or "" without one.
 export function catalogueSubject(title) {
+  const twv = String(title || "").match(TWV);
+  if (twv) return `cat:twv:${twv[1]}:${twv[2]}`;
   // "Op. 27/2" is "Op. 27 No. 2", not op. 27; "Op. 2/3" too. A second
   // number above both is a range ("Op. 30/31").
   const slashed = String(title || "").match(/\bop(?:us|\.)?\s*(\d+[a-z]?)\s*\/\s*(\d+)\b(?![a-z])/i);
@@ -683,7 +689,10 @@ export function catalogueSubject(title) {
 }
 // Before 1.0.23 the systems read by `catalogueNumber` alone kept only the
 // digits: S172a and S172b were S172.
+// Until review fix L5 a TWV number kept only its group: "TWV 55:D1" was TWV 55.
 function legacyCatalogueSubject(title) {
+  const twv = String(title || "").match(TWV);
+  if (twv) return `cat:twv:${twv[1]}`;
   if (words(title).match(CATALOGUE)) return catalogueSubject(title);
   const [system, number = ""] = catalogueNumber(title).toLowerCase().split(" ");
   return system ? `cat:${system}:${number.match(/^\d+/)?.[0] ?? number}` : "";
@@ -2430,6 +2439,8 @@ export function mergeContributor(catalogue, keep, drop, actor) {
     .prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?")
     .run(Date.now(), Date.now(), drop);
   catalogue.audit("person.merge", drop, { into: keep }, actor);
+  // The kept record changed too: a page opened on it before the merge is stale.
+  catalogue.audit("person.merge-into", keep, { from: drop }, actor);
 }
 
 // Merge composers that earlier auto-match passes created once per album.
@@ -2566,6 +2577,8 @@ export function mergeWork(catalogue, keep, drop, actor, { addMissing = false } =
   transferIdentities(db, keep, drop);
   db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), drop);
   catalogue.audit("work.merge", drop, { into: keep, ...(added.length && { addedMovements: added }) }, actor);
+  // The kept work changed too: a page opened on it before the merge is stale.
+  catalogue.audit("work.merge-into", keep, { from: drop }, actor);
   return addMissing ? { added } : true;
 }
 
@@ -2656,7 +2669,7 @@ export function mergeDuplicateAutoWorks(catalogue, { actor = null } = {}) {
 // "S443i") and two systems ("Sz. 107", "BB 105") are not.
 const ROMAN_SUFFIX = /^(?:i{1,3}|iv|v|vi{1,3}|ix|x)$/;
 function catalogueReadings(subject) {
-  const match = subject.match(/^cat:([a-z]+):(\d+)([a-z]*)(?:\/([0-9a-z]+))?(?::([0-9a-z/]+))?$/);
+  const match = subject.match(/^cat:([a-z]+):(\d+)([a-z]*)(?:\/([0-9a-z]+))?(?::([0-9A-Za-z/]+))?$/);
   if (!match) return null;
   const [, system, base, suffix, slash, piece] = match;
   const sub = piece || (slash && /^\d/.test(slash) ? slash : "") || "";
@@ -2832,6 +2845,7 @@ function repairCompletionSplits(catalogue, albumId, actor) {
         transferIdentities(db, keep.work, drop.work);
         db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(now, now, drop.work);
         catalogue.audit("work.merge", drop.work, { into: keep.work, reason: "completion-split" }, actor);
+        catalogue.audit("work.merge-into", keep.work, { from: drop.work, reason: "completion-split" }, actor);
       }
       // The kept work names only the composers every movement shares; its
       // own movements keep their other composers on their recordings.
@@ -2862,7 +2876,7 @@ const INSTRUMENT =
   /\b(piano|violin|viola|cello|violoncello|double bass|flute|oboe|clarinet|bassoon|horn|trumpet|trombone|organ|harpsichord|guitar|harp|string|wind|piano and violin|violin and piano|cello and piano)\s+(?=(?:sonata|sonatina|concerto|quartet|quintet|trio|sextet|octet|suite|partita)\b)/i;
 const KEY = /\bin\s+([a-h])(?:[\s-]?(flat|sharp|♭|♯))?\s+(major|minor)\b/i;
 const CATALOGUE_TEXT =
-  /\b(?:op(?:us|\.)?\s*\d+[a-z]?(?:\s*,?\s*no\.?\s*\d+)?|(?:BWV|HWV|RV|WoO|TWV|K(?:V|\.)?|D\.?|Hob\.?\s*[IVXL]+[a-z]?:?)\s*\d+[a-z]?)/gi;
+  /\b(?:op(?:us|\.)?\s*\d+[a-z]?(?:\s*,?\s*no\.?\s*\d+)?|TWV\s*\d+(?:\s*:\s*[a-z]{0,3}\d+[a-z]?)?|(?:BWV|HWV|RV|WoO|K(?:V|\.)?|D\.?|Hob\.?\s*[IVXL]+[a-z]?:?)\s*\d+[a-z]?)/gi;
 const tidyCatalogue = (value) =>
   clean(value)
     .replace(/^op(?:us|\.)?\s*/i, "Op. ")

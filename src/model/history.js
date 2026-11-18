@@ -79,6 +79,85 @@ function predicates(set) {
   ];
 }
 
+// Listener state on these works: favourites, picks and admin picks. Users set
+// them from the work page, which writes no audit row, so undo compares them
+// with how they stood right after the change.
+function listenerState(c, set) {
+  const tables = new Map(predicates(set));
+  const rows = (table) => {
+    const [where, ids] = tables.get(table);
+    return c.db.prepare(`SELECT * FROM ${table} WHERE ${where}`).all(...ids).map((row) => ({ ...row }));
+  };
+  return { user_work_state: rows("user_work_state"), admin_work_pick: rows("admin_work_pick") };
+}
+// What listeners did after the change: rows that differ from just after it.
+// Changes recorded before the state was saved compare by time instead.
+function laterListenerEdits(c, set, data, createdAt) {
+  const now = listenerState(c, set);
+  const userKey = (row) => `${row.user_id}|${row.work_id}`;
+  if (!data.listeners) {
+    return {
+      users: now.user_work_state.filter((row) => row.updated_at > createdAt).map((row) => ({ row, before: null, legacy: true })),
+      picks: now.admin_work_pick.filter((row) => row.updated_at > createdAt).map((row) => ({ row, before: null })),
+      removedPicks: [],
+    };
+  }
+  const was = new Map(data.listeners.user_work_state.map((row) => [userKey(row), row]));
+  const users = now.user_work_state
+    .filter((row) => JSON.stringify(row) !== JSON.stringify(was.get(userKey(row))))
+    .map((row) => ({ row, before: was.get(userKey(row)) || null }));
+  const picks = new Map(now.admin_work_pick.map((row) => [row.work_id, row]));
+  return {
+    users,
+    picks: now.admin_work_pick
+      .filter((row) => JSON.stringify(row) !== JSON.stringify(data.listeners.admin_work_pick.find((old) => old.work_id === row.work_id)))
+      .map((row) => ({ row })),
+    removedPicks: data.listeners.admin_work_pick.filter((row) => !picks.has(row.work_id)),
+  };
+}
+// Puts listeners' later edits back on the restored works. A favourite stays on
+// the work it was given to (a favourite taken away from a merged work is
+// taken from each work it held); a pick goes with its recording, to the work
+// that recording belongs to again.
+function reapplyListenerEdits(c, set, edits) {
+  const liveWork = (id) => Boolean(id && c.db.prepare("SELECT 1 FROM entity WHERE id=? AND kind='work' AND deleted_at IS NULL").get(id));
+  const workOf = (realization) => realization && c.db.prepare("SELECT work_id FROM realization WHERE id=?").get(realization)?.work_id;
+  const works = list(set.entities).filter(liveWork);
+  const upsert = (user, work, column, value, at) => {
+    c.db
+      .prepare(
+        `INSERT INTO user_work_state(user_id,work_id,favourite,picked_realization_id,updated_at) VALUES (?,?,0,NULL,?)
+         ON CONFLICT(user_id,work_id) DO UPDATE SET updated_at=max(updated_at,excluded.updated_at)`,
+      )
+      .run(user, work, at);
+    c.db.prepare(`UPDATE user_work_state SET ${column}=? WHERE user_id=? AND work_id=?`).run(value, user, work);
+  };
+  for (const { row, before, legacy } of edits.users) {
+    if ((before?.favourite ?? 0) !== row.favourite) {
+      if (row.favourite && liveWork(row.work_id)) upsert(row.user_id, row.work_id, "favourite", 1, row.updated_at);
+      else if (!row.favourite && !legacy)
+        for (const work of works) c.db.prepare("UPDATE user_work_state SET favourite=0 WHERE user_id=? AND work_id=?").run(row.user_id, work);
+    }
+    if ((before?.picked_realization_id ?? null) !== row.picked_realization_id) {
+      const work = workOf(row.picked_realization_id);
+      if (row.picked_realization_id && liveWork(work)) upsert(row.user_id, work, "picked_realization_id", row.picked_realization_id, row.updated_at);
+      else if (!row.picked_realization_id && !legacy && liveWork(row.work_id))
+        c.db.prepare("UPDATE user_work_state SET picked_realization_id=NULL WHERE user_id=? AND work_id=?").run(row.user_id, row.work_id);
+    }
+  }
+  for (const { row } of edits.picks) {
+    const work = workOf(row.realization_id);
+    if (liveWork(work))
+      c.db
+        .prepare(
+          `INSERT INTO admin_work_pick VALUES (?,?,?,?) ON CONFLICT(work_id) DO UPDATE SET
+           realization_id=excluded.realization_id,actor_id=excluded.actor_id,updated_at=excluded.updated_at`,
+        )
+        .run(work, row.realization_id, row.actor_id, row.updated_at);
+  }
+  for (const row of edits.removedPicks) c.db.prepare("DELETE FROM admin_work_pick WHERE work_id=?").run(row.work_id);
+}
+
 function snapshot(c, set) {
   const rows = {};
   for (const [table, [where, ids]] of predicates(set)) rows[table] = c.db.prepare(`SELECT * FROM ${table} WHERE ${where}`).all(...ids).map((row) => ({ ...row }));
@@ -100,7 +179,7 @@ export function recordChange(c, { kind, summary, works = [], contributors = [], 
     const id = randomUUID();
     c.db
       .prepare("INSERT INTO change_set(id,kind,actor,summary,data,created_at) VALUES (?,?,?,?,?,?)")
-      .run(id, kind, actor, summary.slice(0, 500), JSON.stringify({ set: serialSet(set), rows, after, ...(contributors.length && { contributors, credits: creditState(c, contributors) }), ...extra }), Date.now());
+      .run(id, kind, actor, summary.slice(0, 500), JSON.stringify({ set: serialSet(set), rows, after, listeners: listenerState(c, set), ...(contributors.length && { contributors, credits: creditState(c, contributors) }), ...extra }), Date.now());
     return { result, changeId: id };
   });
 }
@@ -135,6 +214,7 @@ export function undoChange(c, id, actor) {
     // A credit given to or taken from these people since, from any page.
     const creditsChanged = data.contributors && creditState(c, data.contributors) !== data.credits;
     if (later || laterChange || creditsChanged) throw new Error("These entries changed after this, so undoing it would lose that change. Undo the later changes first, or fix it by hand.");
+    const listeners = laterListenerEdits(c, set, data, row.created_at);
     c.db.exec("PRAGMA defer_foreign_keys=ON");
     const tables = predicates(set);
     for (const [table, [where, args]] of tables) c.db.prepare(`DELETE FROM ${table} WHERE ${where}`).run(...args);
@@ -148,6 +228,7 @@ export function undoChange(c, id, actor) {
     const named = [...new Set((data.rows.credit || []).map((credit) => credit.contributor_id))];
     if (named.length)
       c.db.prepare(`UPDATE entity SET deleted_at=NULL,updated_at=? WHERE kind IN ('person','ensemble') AND deleted_at IS NOT NULL AND id IN (${marks(named)})`).run(Date.now(), ...named);
+    reapplyListenerEdits(c, set, listeners);
     if (c.db.prepare("PRAGMA foreign_key_check").all().length) throw new Error("Undo would break the catalogue's links; nothing was changed");
     for (const key of data.suppressions || []) c.db.prepare("DELETE FROM match_suppression WHERE key=?").run(key);
     c.db.prepare("UPDATE change_set SET undone_at=? WHERE id=?").run(Date.now(), id);

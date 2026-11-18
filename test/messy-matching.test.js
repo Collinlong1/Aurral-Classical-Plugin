@@ -14,6 +14,7 @@ import { openCatalogue } from "../src/model/catalogue.js";
 import { Metadata } from "../src/model/metadata.js";
 import { reconcile, classify } from "../src/model/reconcile.js";
 import { renderAlbumPresentation, renderWork } from "../src/model/presentation.js";
+import { catalogueNumber } from "../src/works.js";
 import { renderV2, applyV2 } from "../src/model/editor-v2.js";
 import { autoMatchLibrary } from "../src/model/runtime.js";
 import { movementNumberReport } from "../src/model/movement-report.js";
@@ -1816,4 +1817,34 @@ test("E3: dismissed auto-match reviews stay dismissed until their tracks change,
   const mismatch = open()[0];
   const map = view(mismatch.id).sections.find((section) => section.id === "decide").rows[0];
   assert.deepEqual([map.label, map.actions[0].command], ["Map these tracks to “Suite for Strings, Op. 5”", "review-map"]);
+});
+
+// L5 (#28): Telemann's TWV numbers are a group and a piece. "TWV 55:D1" and
+// "TWV 55:g4" are two suites; the key letter's case is part of the number.
+test("L5: two TWV 55 suites on one album are two works, and an old join of them comes apart", async (t) => {
+  assert.notEqual(catalogueSubject("Ouverture-Suite, TWV 55:D1"), catalogueSubject("Ouverture-Suite, TWV 55:d1"));
+  assert.equal(catalogueSubject("Ouverture-Suite in D major, TWV 55: D1"), catalogueSubject("Ouverture-Suite, TWV 55:D1"));
+  assert.equal(catalogueSubject("Fantasia No. 1, TWV 40:2"), "cat:twv:40:2");
+  assert.equal(provablyDifferent(catalogueSubject("Suite, TWV 55:D1"), catalogueSubject("Suite, TWV 55:g4")), true);
+  assert.equal(catalogueNumber("Ouverture-Suite, TWV 55:D1"), "TWV 55:D1", "the D1 is a key, not a Schubert number");
+  const telemann = (title) => ({ title, composer: ["Georg Philipp Telemann"], genres: ["Classical"] });
+  const parts = ["I. Ouverture", "II. Air", "III. Menuet", "IV. Gigue"];
+  const suites = ["Ouverture-Suite in D major, TWV 55:D1", "Ouverture-Suite in G minor, TWV 55:g4"];
+  const c = await catalogueWith(t, [
+    { id: "suites", album: "Telemann: Ouvertures", albumArtist: "Ensemble", artist: "Ensemble", titles: suites.flatMap((suite) => parts.map((part) => telemann(`${suite}: ${part}`))) },
+  ]);
+  const match = () => autoMatchTaggedWorks(c, { albumId: "suites", actor: "admin", allowStructuredTitles: true });
+  match();
+  const blocks = () => renderAlbumPresentation(c, "suites").groups.map((group) => [group.title, group.workId, group.items.length]);
+  const made = blocks();
+  assert.deepEqual(made.map(([title, , n]) => [title, n]), suites.map((suite) => [suite, 4]));
+  assert.notEqual(made[0][1], made[1][1]);
+  // What earlier versions made of it: the g minor suite joined to the D major's work.
+  assert.ok(mergeWork(c, made[0][1], made[1][1], "model-scan"));
+  assert.equal(new Set(blocks().map(([, work]) => work)).size, 1);
+  match();
+  const repaired = blocks();
+  assert.deepEqual(repaired.map(([title, , n]) => [title, n]), suites.map((suite) => [suite, 4]));
+  assert.equal(repaired[0][1], made[0][1], "the D major suite keeps its work");
+  assert.notEqual(repaired[1][1], made[0][1]);
 });

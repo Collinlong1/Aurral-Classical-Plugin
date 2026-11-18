@@ -13,7 +13,32 @@ v0.3 adds the Classical Library, contributors, classical tag writing and MusicBr
 
 Settings added: **Write classical tags to files** (`enableTagWriting`, off by default). Schema: 5 (additive; rollback by restoring `before-v5-*.sqlite` offline, tested against the real schema 4 build). Paired core: `aurral-classical` with the Phase 3 hooks and 6.5's whole-track playlist labels (`9fec213`); the integration workflows pin it.
 
-Not part of v0.3 and still open: review and optional issues #28–#50. Not run in this environment: `pnpm eden test`, and the Compose workflow (no Docker); both integration workflows run in CI.
+Not part of v0.3: review and optional issues #28–#50. #28, #29, #31, #32 and #34 are fixed for review (November 18, below); the rest remain open. Not run in this environment: `pnpm eden test`, and the Compose workflow (no Docker); both integration workflows run in CI.
+
+---
+
+# Review fixes L5, E4, E8, E5/U1, L15 / issues #28, #29, #31, #32, #34
+
+## Result
+
+- `src/model/auto-match.js`: `TWV`, `catalogueSubject` and `legacyCatalogueSubject` for TWV numbers, `catalogueReadings` accepts a key letter's case, `CATALOGUE_TEXT` reads a whole TWV number, `sameCatalogue` uses `foldedCatalogue` (L5); merges audit the kept entry (E4). `src/works.js`: TWV before D; `foldedCatalogue`. `src/model/presentation.js`: `sameNamedWork` uses it.
+- `src/model/history.js`: `listenerState`, `laterListenerEdits`, `reapplyListenerEdits`; `recordChange` saves `listeners` (E8).
+- `src/model/editor-v2.js`: `warnDuplicate` is 400 on `createAnyway`; `str` names the field and says when a value is too long; save and bulk edit pass their field keys (E5/U1).
+- `src/model/classify-evidence.js`: `AMBIGUOUS_NAMES`, `kinds.ambiguous`, the "ambiguous classical genre" signal (L15).
+- `dev/editor-reorder-review-browser.mjs`: the duplicate warning in the real renderer; its test server passes `field` as core does.
+
+## Verification
+
+On Node 22.23: full `npm test` 472/472. Each new test failed on the previous code first:
+
+- L5, `test/messy-matching.test.js`: subjects and catalogue numbers for D1/d1/g4 and "TWV 40:2"; two TWV 55 suites on one album are two works; a join rebuilt with `mergeWork` comes apart on the next match and the D major suite keeps its work.
+- E4, `test/editor-v2.test.js`: after a merge, a page of the kept work opened before it gets 409 on delete and save, and the merge still undoes; the same for a kept person.
+- E8, `test/editor-v2.test.js`: after undo, a later favourite stays on the kept work, a later pick and admin pick go back with their recording to the dropped work, a favourite taken away from the merged work is gone from both, an earlier favourite is restored; a change recorded without listener state still keeps a later favourite.
+- E5/U1, `test/editor-footer.test.js`: empty and over-long title in a save, an over-long bulk-edit value, and the duplicate warning name their fields (400).
+- L15, `test/classify-evidence.test.js`: the issue's triggers are unsure; Chopin's Nocturne with "Romantic" and Mahler with "Orchestral" are classical; with "Pop" a "Romantic" song is not classical. Both corpus suites pass unchanged.
+- Browser, Node 22.23, Chromium at 1280 and 390 px: `dev/editor-reorder-review-browser.mjs` shows the duplicate warning under **Create anyway** with no Reload, then creates the work once ticked; screenshot checked by eye. The other nine checks pass, built against core `e797883`. Seen there, not changed (core): the renderer marks text fields `aria-invalid` on a field error but not a checkbox.
+
+Not run here: `dev/editor-browser.mjs` and the Compose restart (no Docker; CI runs them), `pnpm eden test`, remote CI.
 
 ---
 
