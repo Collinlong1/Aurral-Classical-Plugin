@@ -622,3 +622,17 @@ test("tracks with no file inside a work stay under its heading", async () => {
   assert.deepEqual(groups.map((group) => group.trackIds), [[1, 2, 3]]);
 });
 
+test("a catalogued piece is headed by itself, not by an uncatalogued collection above it", async () => {
+  const admin = { id: 1, role: "admin" };
+  const entities = symphonyEntities();
+  // As MusicBrainz files Chopin: "Ballade No. 1, op. 23" is a part of "Ballades".
+  entities["work:sym5"] = { ...entities["work:sym5"], title: "Ballade No. 1 in G minor, op. 23", relations: [...entities["work:sym5"].relations, { type: "parts", "target-type": "work", direction: "backward", work: { id: "ballades", title: "Ballades" } }] };
+  entities["work:ballades"] = { id: "ballades", title: "Ballades", relations: [] };
+  globalThis.fetch = fakeFetch({ entities });
+  const one = await copyFixture("sine.flac", path.join(folders.libraryFolder, "ballade", "01.flac"));
+  const album = { id: 13, title: "Ballade", tracks: [{ id: 1, path: one }] };
+  await plugin.actions["tag-album"](input({ user: admin, album }));
+  const { groups } = await plugin.albumPresentation(input({ album }));
+  assert.deepEqual(groups.map((group) => group.title), ["Ballade No. 1 in G minor, op. 23"]);
+});
+

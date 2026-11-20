@@ -35994,7 +35994,8 @@ var Session = class {
   }
   async rememberWork(real, recording, fields) {
     const work = fields.workId ? await this.ctx.resolver.getWork(fields.workId) : null;
-    const top = work ? await topWork(this.ctx.mb, work) : null;
+    const stop = (above, below) => Boolean(catalogueNumber(below.title)) && !catalogueNumber(above.title);
+    const top = work ? await topWork(this.ctx.mb, work, 0, void 0, { stop }) : null;
     const people = fields.people || {};
     const performers = [...people.soloists || [], ...people.ensembles || [], ...people.conductors || []].map((p) => p.name);
     this.state.works[real] = {
@@ -36283,7 +36284,7 @@ async function albumPresentation(ctx, album) {
 import path5 from "node:path";
 
 // src/version.js
-var VERSION = "1.1.1";
+var VERSION = "1.1.2";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js

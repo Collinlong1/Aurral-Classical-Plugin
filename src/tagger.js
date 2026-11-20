@@ -5,7 +5,7 @@ import { randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { isAudioPath, readTags, readValues, UnsupportedFormat, writeTags } from "./tags.js";
-import { creditString, RELEASE_INC, topWork } from "./works.js";
+import { catalogueNumber, creditString, RELEASE_INC, topWork } from "./works.js";
 import { Aurral } from "./aurral.js";
 import { readJson, sleep, tryLock, writeJson } from "./store.js";
 
@@ -355,7 +355,10 @@ class Session {
 
   async rememberWork(real, recording, fields) {
     const work = fields.workId ? await this.ctx.resolver.getWork(fields.workId) : null;
-    const top = work ? await topWork(this.ctx.mb, work) : null;
+    // A catalogued piece doesn't climb into an uncatalogued collection:
+    // "Ballade No. 1, op. 23" is its own work, not a part of "Ballades".
+    const stop = (above, below) => Boolean(catalogueNumber(below.title)) && !catalogueNumber(above.title);
+    const top = work ? await topWork(this.ctx.mb, work, 0, undefined, { stop }) : null;
     const people = fields.people || {};
     const performers = [...(people.soloists || []), ...(people.ensembles || []), ...(people.conductors || [])].map((p) => p.name);
     this.state.works[real] = {
