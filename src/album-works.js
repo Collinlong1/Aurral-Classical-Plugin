@@ -1,6 +1,6 @@
 // Album page headings: consecutive tracks of one work, from the works the
-// tagger kept when it planned or tagged them. Answers from the data folder
-// only, since Aurral waits on it while the page loads.
+// tagger kept when it planned or tagged them, by the path Aurral gives. No
+// disk access per track: Aurral waits on this while the page loads.
 import fs from "node:fs/promises";
 import path from "node:path";
 import { readWorks } from "./tagger.js";
@@ -30,8 +30,7 @@ export async function albumPresentation(ctx, album) {
       if (current) gap.push(track.id);
       continue;
     }
-    const real = await fs.realpath(track.path).catch(() => track.path);
-    const entry = known[real];
+    const entry = known[track.path];
     if (!entry?.work?.id) {
       current = null;
       gap = [];

@@ -636,3 +636,12 @@ test("a catalogued piece is headed by itself, not by an uncatalogued collection 
   assert.deepEqual(groups.map((group) => group.title), ["Ballade No. 1 in G minor, op. 23"]);
 });
 
+test("headings find tracks by the path Aurral gives, through a symlinked folder", async () => {
+  const admin = { id: 1, role: "admin" };
+  const real = await copyFixture("sine.flac", path.join(folders.libraryFolder, "real", "01.flac"));
+  await fs.symlink(path.dirname(real), path.join(folders.libraryFolder, "linked"));
+  const album = { id: 14, title: "Linked", tracks: [{ id: 1, path: path.join(folders.libraryFolder, "linked", "01.flac") }] };
+  await plugin.actions["tag-album"](input({ user: admin, album }));
+  assert.deepEqual((await plugin.albumPresentation(input({ album }))).groups.map((group) => group.trackIds), [[1]]);
+});
+

@@ -111,7 +111,7 @@ export async function requestTags(ctx, paths, { mode, what, actor, target = null
         }
         if (!inside) outside.add(real);
         if (mode === "tag") {
-          if (!(await session.processReal(real, { force: true, plan }))) {
+          if (!(await session.processReal(real, { force: true, plan, asPath: file }))) {
             unreachable = true;
             break;
           }

@@ -206,7 +206,7 @@ class Session {
       return true;
     }
     if (!isAudioPath(real)) return true;
-    return this.state.exclusive(real, () => this.processReal(real, options));
+    return this.state.exclusive(real, () => this.processReal(real, { ...options, asPath: filePath }));
   }
 
   // `queuedAt`: when the request to tag was made. Classical tags an admin
@@ -215,7 +215,8 @@ class Session {
   // `plan` (v0.3 8.7): an array that receives what would be written, with
   // the file's current values, instead of writing or recording anything.
   // `values`: write exactly these (a confirmed plan) instead of looking up.
-  async processReal(real, { force = false, prefilter = false, upgrade = false, queuedAt = null, plan = null, values: planned = null } = {}) {
+  // `asPath`: the path Aurral knows the file by, when it isn't `real`.
+  async processReal(real, { force = false, prefilter = false, upgrade = false, queuedAt = null, plan = null, values: planned = null, asPath = null } = {}) {
     const { ctx } = this;
     const stat = await fs.stat(real);
     const skip = (result) => (plan ? plan.push({ file: real, status: "skipped", reason: result.reason }) : this.record(real, stat, result));
@@ -260,7 +261,7 @@ class Session {
         skip({ status: "skipped", reason, recording: tags.recordingMbid });
         return true;
       }
-      await this.rememberWork(real, tags.recordingMbid, fields);
+      await this.rememberWork(real, tags.recordingMbid, fields, asPath);
       values = { artist: [fields.artist], composer: fields.composers };
       if (fields.workId) Object.assign(values, { work: [fields.work], workId: [fields.workId] });
       // Aurral files an album under one album artist and names it after the
@@ -353,7 +354,9 @@ class Session {
     return changed.length ? (original && mode !== "clear" ? "restored" : "cleared") : "unchanged";
   }
 
-  async rememberWork(real, recording, fields) {
+  // Kept under Aurral's path as well, so album headings look tracks up
+  // without touching the disk (box sets run to thousands of tracks).
+  async rememberWork(real, recording, fields, asPath = null) {
     const work = fields.workId ? await this.ctx.resolver.getWork(fields.workId) : null;
     // A catalogued piece doesn't climb into an uncatalogued collection:
     // "Ballade No. 1, op. 23" is its own work, not a part of "Ballades".
@@ -367,6 +370,7 @@ class Session {
       composer: fields.classicalComposers || "",
       performers: [...new Set(performers)].join(" · "),
     };
+    if (asPath && asPath !== real) this.state.works[asPath] = this.state.works[real];
     this.dirty++;
   }
 
