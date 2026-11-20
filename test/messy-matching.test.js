@@ -254,7 +254,7 @@ test("matching: a work whose movements credit different completers is one work",
   // the names come in.
   assert.deepEqual(
     renderAlbumPresentation(c, "unmatched").groups.map((group) => [group.composer, group.items.length, group.detail]),
-    [[mozart, 8, "Not matched to a work"]],
+    [[mozart, 8, undefined]],
   );
   autoMatchTaggedWorks(c, { albumId: "history", actor: "admin", allowStructuredTitles: true });
   const works = c.db.prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL").all();

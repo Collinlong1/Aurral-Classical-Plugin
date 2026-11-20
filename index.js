@@ -39658,10 +39658,9 @@ function pieceGroups(c, album, following) {
     ...piece,
     first: items[0].position,
     items: items.map(({ position, ...item }) => item),
-    movementCount: items.length,
-    // Several tracks under one heading look like a work; say when they are
-    // not one yet. Sets such as "Études" are never made into works.
-    ...items.length > 1 && !isCollectionLike(piece.title) && !NUMBERED_SET.test(piece.title) && { detail: "Not matched to a work" }
+    movementCount: items.length
+    // Changed from the aurral-classical branch: no "Not matched to a work"
+    // note, which pointed to the editor; this plugin has none.
   }));
 }
 function compareAlbumGroups(a, b) {
@@ -43246,7 +43245,7 @@ async function applyRequest(ctx, id, actor2) {
 import path10 from "node:path";
 
 // src/version.js
-var VERSION = "1.2.1";
+var VERSION = "1.2.2";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js

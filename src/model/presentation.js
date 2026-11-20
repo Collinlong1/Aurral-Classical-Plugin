@@ -1,7 +1,7 @@
 import path from "node:path";
 import { openCatalogue } from "./catalogue.js";
 import { transaction } from "./database.js";
-import { NUMBERED_SET, isCollectionLike, numberedPiece, movementTitle, splitTitle, withoutComposer } from "./auto-match.js";
+import { NUMBERED_SET, numberedPiece, movementTitle, splitTitle, withoutComposer } from "./auto-match.js";
 import { catalogueNumber, foldedCatalogue } from "../works.js";
 import { composersOf } from "./credits.js";
 import { groupRecordings, ownedRecordings, reissueState } from "../search/engine.js";
@@ -326,9 +326,8 @@ function pieceGroups(c, album, following) {
     first: items[0].position,
     items: items.map(({ position, ...item }) => item),
     movementCount: items.length,
-    // Several tracks under one heading look like a work; say when they are
-    // not one yet. Sets such as "Études" are never made into works.
-    ...(items.length > 1 && !isCollectionLike(piece.title) && !NUMBERED_SET.test(piece.title) && { detail: "Not matched to a work" }),
+    // Changed from the aurral-classical branch: no "Not matched to a work"
+    // note, which pointed to the editor; this plugin has none.
   }));
 }
 
