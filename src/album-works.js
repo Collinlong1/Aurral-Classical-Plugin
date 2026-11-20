@@ -4,6 +4,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { readWorks } from "./tagger.js";
+import { movementTitle } from "./titles.js";
 
 const cached = new Map();
 
@@ -25,9 +26,13 @@ export async function albumPresentation(ctx, album) {
   // Tracks with no file yet (still downloading, or missing) between two
   // tracks of one work stay under its heading.
   let gap = [];
+  const add = (group, track, entry) => {
+    group.trackIds.push(track.id);
+    group.titles.push(movementTitle({ title: track.title || "", work: entry?.movement || "" }, group.title) || track.title || "");
+  };
   for (const track of album?.tracks || []) {
     if (!track.path) {
-      if (current) gap.push(track.id);
+      if (current) gap.push(track);
       continue;
     }
     const entry = known[track.path];
@@ -37,7 +42,8 @@ export async function albumPresentation(ctx, album) {
       continue;
     }
     if (current?.workId === entry.work.id) {
-      current.trackIds.push(...gap, track.id);
+      for (const missing of gap) add(current, missing, null);
+      add(current, track, entry);
       gap = [];
       continue;
     }
@@ -46,8 +52,10 @@ export async function albumPresentation(ctx, album) {
       workId: entry.work.id,
       title: entry.work.title || "Untitled work",
       ...(entry.composer && { subtitle: entry.composer }),
-      trackIds: [track.id],
+      trackIds: [],
+      titles: [],
     };
+    add(current, track, entry);
     groups.push(current);
   }
   if (!groups.length) return null;

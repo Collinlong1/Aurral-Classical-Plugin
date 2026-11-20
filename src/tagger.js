@@ -367,6 +367,7 @@ class Session {
     this.state.works[real] = {
       recording,
       work: top?.id ? { id: top.id, title: top.title || fields.work || "" } : null,
+      movement: work?.title || fields.work || "",
       composer: fields.classicalComposers || "",
       performers: [...new Set(performers)].join(" · "),
     };

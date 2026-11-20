@@ -8445,11 +8445,11 @@ var require_genres = __commonJS({
           const trimRegex = /^\(+|\)+$/g;
           text2 = text2.replace(trimRegex, "");
         }
-        const normalized = text2.trim();
-        if (!/^\d+$/.test(normalized)) {
+        const normalized2 = text2.trim();
+        if (!/^\d+$/.test(normalized2)) {
           return 255;
         }
-        const index = parseInt(normalized, 10);
+        const index = parseInt(normalized2, 10);
         return Number.isNaN(index) ? 255 : index;
       }
     };
@@ -36004,6 +36004,7 @@ var Session = class {
     this.state.works[real] = {
       recording,
       work: top?.id ? { id: top.id, title: top.title || fields.work || "" } : null,
+      movement: work?.title || fields.work || "",
       composer: fields.classicalComposers || "",
       performers: [...new Set(performers)].join(" \xB7 ")
     };
@@ -36236,6 +36237,73 @@ function describeStats(stats) {
   return parts.join(", ");
 }
 
+// src/titles.js
+var MULTI_MOVEMENT = /\b(symphon(?:y|ie)|sinfonia|sonata|sonatina|concerto|suite|partita|quartet|quintet|sextet|septet|octet|nonet|trio|serenade|divertimento|cassation|mass|missa|requiem|stabat mater|magnificat|te deum|vespers|cantata|oratorio|passion|variations?|ballet)\b/i;
+var MOVEMENT_PREFIX = /^(?:[IVXLCDM]+|\d+)[.)\s:-]/i;
+var clean = (value) => String(value || "").trim().replace(/\s+/g, " ");
+var normalized = (value) => clean(value).normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase();
+var NUMBERED_SET = new RegExp("(?<!\\p{L})(pr[e\xE9]ludes|[e\xE9]tudes|nocturnes|mazurkas|waltzes|valses|impromptus|ballades|polonaises|bagatelles|intermezzi|consolations|po[e\xE8]mes|morceaux|songs without words|lieder ohne worte)(?!\\p{L})", "iu");
+var WORK_HEAD = /^(.+?)(?:\s*[:;]\s+|\s+[–—-]\s+|:(?=["“„'‘]))(.+)$/;
+var COMMA_MOVEMENT = /^(.{4,}?),\s+((?:[IVXLC]+|\d{1,2})\.\s+(?!\d)\S.*)$/;
+function splitTitle(title) {
+  const text2 = clean(title);
+  const match = text2.match(WORK_HEAD);
+  const comma = text2.match(COMMA_MOVEMENT);
+  if (comma && (!match || comma[1].length < match[1].length) && (catalogueNumber(comma[1]) || MULTI_MOVEMENT.test(comma[1])))
+    return { head: clean(comma[1]), tail: clean(comma[2]) };
+  return match ? { head: clean(match[1]), tail: clean(match[2]) } : { head: "", tail: text2 };
+}
+var words = (value) => normalized(value).replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+function movementTitle(track, workTitle) {
+  const fromTitle = stripWorkPrefix(clean(track.title), workTitle);
+  if (fromTitle !== clean(track.title) || MOVEMENT_PREFIX.test(fromTitle)) return fromTitle;
+  const work = clean(track.work);
+  if (work.includes(":")) {
+    const tail = clean(work.slice(work.indexOf(":") + 1));
+    if (tail) return stripWorkPrefix(tail, workTitle);
+  }
+  return fromTitle;
+}
+var SEPARATOR = /[:;]\s*|\s+[–—-]\s+/g;
+var NICKNAME = /^["“„«'‘][^"”»'’]+["”»'’]\s*(?:[:;]|\s[–—-])\s*(.+)$/;
+function stripWorkPrefix(title, workTitle, depth = 0) {
+  const stripped = stripWorkPrefixOnce(title, workTitle);
+  const again2 = stripWorkPrefixOnce(withoutRepeatedComposer(stripped, workTitle), workTitle);
+  return depth < 2 && again2 !== stripped && words(stripped).includes(words(workTitle)) ? stripWorkPrefix(again2, workTitle, depth + 1) : stripped;
+}
+var withoutRepeatedComposer = (text2, workTitle) => {
+  const match = clean(text2).match(/^([^:]{2,60}):\s+(\S.*)$/);
+  return match && words(match[2]).startsWith(words(workTitle)) && words(match[1]).split(" ").length <= 3 ? match[2] : text2;
+};
+var insideNumber = (text2, match) => match[0] === ":" && /\b[IVXLCDM]+$/i.test(text2.slice(0, match.index)) && /^\d/.test(text2.slice(match.index + 1));
+function stripWorkPrefixOnce(title, workTitle) {
+  const text2 = clean(title);
+  const separators = [...text2.matchAll(SEPARATOR)].filter((match) => !insideNumber(text2, match));
+  const tailAt = (match) => clean(text2.slice(match.index + match[0].length));
+  for (const match of separators) {
+    const tail = tailAt(match);
+    if (tail && MOVEMENT_PREFIX.test(tail)) return tail;
+  }
+  const workWords = words(workTitle);
+  const workCatalogue = catalogueNumber(workTitle).toLowerCase();
+  const comma = splitTitle(text2);
+  if (comma.head && text2.startsWith(`${comma.head},`) && (workWords && words(comma.head) === workWords || workCatalogue && catalogueNumber(comma.head).toLowerCase() === workCatalogue))
+    return comma.tail;
+  const workName = words(String(workTitle).split(",")[0]);
+  for (const match of separators) {
+    const head = text2.slice(0, match.index);
+    const tail = tailAt(match);
+    const headWords = words(head);
+    const namesWork = workWords && (headWords === workWords || headWords.startsWith(`${workWords} `) || workWords.startsWith(`${headWords} `)) || workCatalogue && catalogueNumber(head).toLowerCase() === workCatalogue || workName.length >= 4 && words(head.split(",")[0]) === workName;
+    if (!tail || !namesWork) continue;
+    return clean(tail.match(NICKNAME)?.[1] ?? tail);
+  }
+  const set = clean(workTitle);
+  const rest = set && NUMBERED_SET.test(set) && normalized(text2).startsWith(normalized(set)) ? text2.slice(set.length).match(/^[,\s]+(no\.?\s*\d+\b.*)$/i) : null;
+  if (rest) return rest[1].charAt(0).toUpperCase() + rest[1].slice(1);
+  return text2;
+}
+
 // src/album-works.js
 var cached = /* @__PURE__ */ new Map();
 async function works(ctx) {
@@ -36253,9 +36321,13 @@ async function albumPresentation(ctx, album) {
   const groups = [];
   let current = null;
   let gap = [];
+  const add = (group, track, entry) => {
+    group.trackIds.push(track.id);
+    group.titles.push(movementTitle({ title: track.title || "", work: entry?.movement || "" }, group.title) || track.title || "");
+  };
   for (const track of album?.tracks || []) {
     if (!track.path) {
-      if (current) gap.push(track.id);
+      if (current) gap.push(track);
       continue;
     }
     const entry = known[track.path];
@@ -36265,7 +36337,8 @@ async function albumPresentation(ctx, album) {
       continue;
     }
     if (current?.workId === entry.work.id) {
-      current.trackIds.push(...gap, track.id);
+      for (const missing of gap) add(current, missing, null);
+      add(current, track, entry);
       gap = [];
       continue;
     }
@@ -36274,8 +36347,10 @@ async function albumPresentation(ctx, album) {
       workId: entry.work.id,
       title: entry.work.title || "Untitled work",
       ...entry.composer && { subtitle: entry.composer },
-      trackIds: [track.id]
+      trackIds: [],
+      titles: []
     };
+    add(current, track, entry);
     groups.push(current);
   }
   if (!groups.length) return null;
@@ -36286,7 +36361,7 @@ async function albumPresentation(ctx, album) {
 import path5 from "node:path";
 
 // src/version.js
-var VERSION = "1.1.4";
+var VERSION = "1.1.5";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js
@@ -37228,7 +37303,7 @@ var CYRILLIC = {
 function fold(value) {
   return String(value ?? "").toLowerCase().replace(/[^\u0000-\u007f]/g, (ch) => LETTERS[ch] ?? CYRILLIC[ch] ?? ch).normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 }
-var words = (value) => fold(value).split(" ").filter(Boolean);
+var words2 = (value) => fold(value).split(" ").filter(Boolean);
 var SYSTEMS = [
   ["bwv", "bwv"],
   ["buxwv", "buxwv"],
@@ -37298,13 +37373,13 @@ function searchLadder(info, { albumTitle = "" } = {}) {
   }
   return ladder;
 }
-var haystackOf = (folder2) => ` ${words([folder2.directory, ...folder2.files.map((f) => f.filename)].join(" ")).join(" ")} `;
+var haystackOf = (folder2) => ` ${words2([folder2.directory, ...folder2.files.map((f) => f.filename)].join(" ")).join(" ")} `;
 var has = (haystack, name) => {
-  const wanted = words(name);
+  const wanted = words2(name);
   return wanted.length > 0 && wanted.every((word) => haystack.includes(` ${word} `));
 };
 var coverage = (haystack, text2) => {
-  const wanted = words(text2).filter((word) => word.length > 1);
+  const wanted = words2(text2).filter((word) => word.length > 1);
   return wanted.length ? wanted.filter((word) => haystack.includes(` ${word} `)).length / wanted.length : 0;
 };
 function scoreFolder(folder2, info, { albumTitle = "", movements = [] } = {}) {

@@ -541,7 +541,14 @@ test("menu actions show the planned tags and write nothing until Write planned t
   const admin = { id: 1, role: "admin" };
   const one = await copyFixture("sine.flac", path.join(folders.libraryFolder, "req", "01.flac"));
   const two = await copyFixture("sine.mp3", path.join(folders.libraryFolder, "req", "02.mp3"));
-  const album = { id: 7, title: "Request", tracks: [{ id: 1, path: one }, { id: 2, path: two }] };
+  const album = {
+    id: 7,
+    title: "Request",
+    tracks: [
+      { id: 1, path: one, title: "Symphony No. 5 in C minor, Op. 67: I. Allegro con brio" },
+      { id: 2, path: two, title: "Beethoven: Symphony No. 5 in C minor, Op. 67 - I. Allegro con brio (Live)" },
+    ],
+  };
   const bytes = async () => Promise.all([one, two].map((file) => fs.readFile(file)));
   const before = await bytes();
 
@@ -561,6 +568,8 @@ test("menu actions show the planned tags and write nothing until Write planned t
   const headings = await plugin.albumPresentation(input({ album }));
   assert.equal(headings.label, "By work");
   assert.deepEqual(headings.groups.map((group) => group.trackIds), [[1, 2]]);
+  // Each track is named by its movement, as on the aurral-classical branch.
+  assert.deepEqual(headings.groups[0].titles, ["I. Allegro con brio", "I. Allegro con brio (Live)"]);
   assert.ok(headings.groups[0].title);
 
   // Someone edits the MP3 after the plan; writing changes the FLAC only.
