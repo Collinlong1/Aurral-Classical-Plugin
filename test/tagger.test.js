@@ -586,10 +586,14 @@ test("a read-only folder is previewed but never written", async (t) => {
   const file = await copyFixture("sine.flac", path.join(folder, "01.flac"));
   await fs.chmod(file, 0o444);
   await fs.chmod(folder, 0o555);
-  t.after(() => fs.chmod(folder, 0o755));
-  const album = { id: 9, title: "Read only", tracks: [{ id: 3, path: file }] };
-  const planned = await plugin.actions["tag-album"](input({ user: admin, album }));
-  assert.match(planned.message, /These files are read-only, so they can't be written\.$/);
-  assert.ok((await plugin.albumPresentation(input({ album }))).groups.length);
+  try {
+    const album = { id: 9, title: "Read only", tracks: [{ id: 3, path: file }] };
+    const planned = await plugin.actions["tag-album"](input({ user: admin, album }));
+    assert.match(planned.message, /These files are read-only, so they can't be written\.$/);
+    assert.ok((await plugin.albumPresentation(input({ album }))).groups.length);
+  } finally {
+    // The shared cleanup runs before t.after, and can't delete inside a read-only folder.
+    await fs.chmod(folder, 0o755);
+  }
 });
 
