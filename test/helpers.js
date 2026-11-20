@@ -88,7 +88,7 @@ export function symphonyEntities(recordingId = RECORDING) {
 
 export const EXPECTED_ARTIST = "Ludwig van Beethoven — Berlin Philharmonic — Herbert von Karajan";
 
-export const baseSettings = { mbMirror: MB };
+export const baseSettings = { mbMirror: MB, enableFileWrites: true };
 
 export async function waitFor(check, timeoutMs = 10_000) {
   const until = Date.now() + timeoutMs;

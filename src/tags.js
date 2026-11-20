@@ -57,7 +57,7 @@ function textField(xiphName, id3Description, apple) {
       const appleTag = appleOf(file);
       for (const values of [
         xiph?.getField(xiphName),
-        id3 && userTextFrames(id3, id3Description)[0]?.text,
+        id3 && userTextFrames(id3, id3Description).flatMap((frame) => frame.text || []),
         appleTag && (box ? appleTag.getQuickTimeStrings(box) : appleTag.getItunesStrings(ITUNES_MEAN, apple.name)),
       ]) {
         const found = texts(values ?? []);
@@ -91,6 +91,26 @@ const workIdField = textField("MUSICBRAINZ_WORKID", "MusicBrainz Work Id", { nam
 const artistIdsField = textField("MUSICBRAINZ_ARTISTID", "MusicBrainz Artist Id", { name: "MusicBrainz Artist Id" });
 const albumArtistIdsField = textField("MUSICBRAINZ_ALBUMARTISTID", "MusicBrainz Album Artist Id", { name: "MusicBrainz Album Artist Id" });
 
+// v0.3 8.2. Movement fields as Picard writes them to Vorbis comments.
+// Picard's ID3 frames for them (MVNM, MVIN) are not frames node-taglib-sharp
+// can write, so MP3 leaves them out (FORMAT_FIELDS). A work's catalogue
+// number has no Picard field (CATALOGNUMBER is the release's): it is the
+// plugin's own CLASSICAL_CATALOGUE.
+const movementNameField = textField("MOVEMENTNAME", "MOVEMENTNAME", { name: "MOVEMENTNAME" });
+const movementNumberField = textField("MOVEMENT", "MOVEMENT", { name: "MOVEMENT" });
+const movementTotalField = textField("MOVEMENTTOTAL", "MOVEMENTTOTAL", { name: "MOVEMENTTOTAL" });
+const catalogueField = textField("CLASSICAL_CATALOGUE", "CLASSICAL_CATALOGUE", { name: "CLASSICAL_CATALOGUE" });
+
+// Performers as Picard writes them to Vorbis comments: PERFORMER, one value
+// each, "Name (instrument)". Picard's ID3 frame for them (TMCL) is dropped by
+// node-taglib-sharp when it saves, so MP3 leaves them out (FORMAT_FIELDS).
+const performersField = {
+  read: (file) => texts(xiphOf(file)?.getField("PERFORMER") ?? []),
+  write(file, values) {
+    xiphOf(file)?.setFieldAsStrings("PERFORMER", ...values);
+  },
+};
+
 // Fields the plugin writes. Each value is a list of strings.
 const WRITERS = {
   title: {
@@ -109,6 +129,19 @@ const WRITERS = {
     read: (file) => texts(file.tag.composers),
     write: (file, values) => (file.tag.composers = values),
   },
+  composerSort: {
+    read: (file) => texts(file.tag.composersSort),
+    write: (file, values) => (file.tag.composersSort = values),
+  },
+  conductor: {
+    read: (file) => texts(file.tag.conductor),
+    write: (file, values) => (file.tag.conductor = values[0] ?? undefined),
+  },
+  performers: performersField,
+  movementName: movementNameField,
+  movementNumber: movementNumberField,
+  movementTotal: movementTotalField,
+  catalogue: catalogueField,
   work: { read: (file) => workField.read(file), write: (file, values) => workField.write(file, values) },
   workId: { read: (file) => workIdField.read(file), write: (file, values) => workIdField.write(file, values) },
   recordingMbid: {
@@ -122,6 +155,18 @@ const WRITERS = {
     },
   },
 };
+
+// What each format may be written for classical tags (v0.3 8.2): FLAC, and
+// MP3 without the movement fields and performers (no Picard ID3 frame this
+// library writes). Other formats are listed as unsupported until their
+// round-trip tests pass.
+export const CLASSICAL_FIELDS = ["composer", "composerSort", "work", "movementName", "movementNumber", "movementTotal", "performers", "conductor", "catalogue", "workId"];
+const NOT_ID3 = new Set(["movementName", "movementNumber", "movementTotal", "performers"]);
+export const FORMAT_FIELDS = {
+  ".flac": CLASSICAL_FIELDS,
+  ".mp3": CLASSICAL_FIELDS.filter((field) => !NOT_ID3.has(field)),
+};
+export const writableFields = (filePath) => FORMAT_FIELDS[path.extname(String(filePath || "")).toLowerCase()] || [];
 
 // taglib grows the header of a fragmented MP4 without moving the data offsets
 // its fragments point at, which breaks the audio. Aurral refuses them too.
@@ -186,13 +231,21 @@ export function readTags(filePath) {
       // Every album artist ID: taglib's own property has only the first.
       albumArtistMbids: [...new Set([...albumArtistIdsField.read(file), text(tag.musicBrainzReleaseArtistId)].flatMap((v) => texts(v.split(/[;/]/))))],
       artistMbids: artistIdsField.read(file).flatMap((value) => texts(value.split(/[;/]/))),
+      conductor: text(tag.conductor),
+      // Vorbis PERFORMER, one value a performer, often with the instrument
+      // in brackets: "Martha Argerich (piano)".
+      performers: texts(xiphOf(file)?.getField("PERFORMER") ?? []),
       genres: texts(tag.genres ?? []).flatMap((genre) => texts(genre.split(";"))),
       composer: texts(tag.composers ?? []),
       work: workField.read(file)[0] ?? "",
+      // Some taggers put the work here and leave WORK empty.
+      grouping: text(tag.grouping),
       workId: workIdField.read(file)[0] ?? "",
       trackNumber: positive(tag.track),
       discNumber: positive(tag.disc),
       durationMs: Math.round(file.properties?.durationMilliseconds || 0),
+      year: Number.isSafeInteger(tag.year) && tag.year > 0 ? tag.year : null,
+      label: text(tag.publisher),
     };
   } finally {
     file.dispose();
@@ -232,6 +285,15 @@ export async function writeTags(filePath, values) {
       file.save();
     } finally {
       file.dispose();
+    }
+    const verified = openFile(working, READ_STYLE, source);
+    try {
+      for (const field of changed) {
+        if (!same(WRITERS[field].read(verified), texts(values[field])))
+          throw new Error(`Tag verification failed for ${field}`);
+      }
+    } finally {
+      verified.dispose();
     }
     await fs.rename(working, source);
   } catch (error) {

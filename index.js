@@ -4014,7 +4014,7 @@ var require_byteVector = __commonJS({
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ByteVector = exports.Encoding = exports.StringType = void 0;
     var IConv = require_lib();
-    var fs5 = __require("fs");
+    var fs7 = __require("fs");
     var utils_1 = require_utils();
     var StringType2;
     (function(StringType3) {
@@ -4235,9 +4235,9 @@ var require_byteVector = __commonJS({
        * Creates a {@link ByteVector} using the contents of a file as the data
        * @param path Path to the file to store in the ByteVector
        */
-      static fromPath(path7) {
-        utils_1.Guards.truthy(path7, "path");
-        const fileBuffer = fs5.readFileSync(path7);
+      static fromPath(path9) {
+        utils_1.Guards.truthy(path9, "path");
+        const fileBuffer = fs7.readFileSync(path9);
         return _ByteVector.fromByteArray(fileBuffer);
       }
       /**
@@ -5252,7 +5252,7 @@ var require_stream = __commonJS({
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Stream = exports.SeekOrigin = void 0;
-    var fs5 = __require("fs");
+    var fs7 = __require("fs");
     var utils_1 = require_utils();
     var byteVector_1 = require_byteVector();
     var SeekOrigin;
@@ -5267,14 +5267,14 @@ var require_stream = __commonJS({
         this._canWrite = canWrite;
         this._fd = fd;
         this._position = 0;
-        this._length = fs5.fstatSync(fd).size;
+        this._length = fs7.fstatSync(fd).size;
       }
-      static createAsRead(path7) {
-        const fd = fs5.openSync(path7, "r");
+      static createAsRead(path9) {
+        const fd = fs7.openSync(path9, "r");
         return new _Stream(fd, false);
       }
-      static createAsReadWrite(path7) {
-        const fd = fs5.openSync(path7, "r+");
+      static createAsReadWrite(path9) {
+        const fd = fs7.openSync(path9, "r+");
         return new _Stream(fd, true);
       }
       // #endregion
@@ -5300,11 +5300,11 @@ var require_stream = __commonJS({
       // #region Public Methods
       /** @inheritDoc */
       close() {
-        fs5.closeSync(this._fd);
+        fs7.closeSync(this._fd);
       }
       /** @inheritDoc */
       read(buffer, bufferOffset, length) {
-        const bytes = fs5.readSync(this._fd, buffer, bufferOffset, length, this._position);
+        const bytes = fs7.readSync(this._fd, buffer, bufferOffset, length, this._position);
         this._position += bytes;
         return bytes;
       }
@@ -5332,7 +5332,7 @@ var require_stream = __commonJS({
         if (length === this._length) {
           return;
         }
-        fs5.ftruncateSync(this._fd, length);
+        fs7.ftruncateSync(this._fd, length);
         this._length = length;
         if (this._position > this._length) {
           this._position = this._length;
@@ -5347,7 +5347,7 @@ var require_stream = __commonJS({
           throw new Error("Invalid operation: this stream is a read-only stream");
         }
         const origLength = this._length;
-        const bytes = fs5.writeSync(this._fd, buffer, bufferOffset, length, this._position);
+        const bytes = fs7.writeSync(this._fd, buffer, bufferOffset, length, this._position);
         this._position += bytes;
         if (this._position > origLength) {
           this._length = this._position;
@@ -5373,9 +5373,9 @@ var require_fileAbstraction = __commonJS({
        * @param path Path of the file to use in the new instance
        * @throws Error Thrown if `path` is falsy
        */
-      constructor(path7) {
-        utils_1.Guards.truthy(path7, "path");
-        this._name = path7;
+      constructor(path9) {
+        utils_1.Guards.truthy(path9, "path");
+        this._name = path9;
       }
       /** @inheritDoc */
       get name() {
@@ -8655,7 +8655,7 @@ var require_picture = __commonJS({
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PictureLazy = exports.Picture = exports.PictureType = void 0;
-    var path7 = __require("path");
+    var path9 = __require("path");
     var byteVector_1 = require_byteVector();
     var fileAbstraction_1 = require_fileAbstraction();
     var utils_1 = require_utils();
@@ -8700,7 +8700,7 @@ var require_picture = __commonJS({
         utils_1.Guards.truthy(filePath, "filePath");
         const picture = new _Picture();
         picture.data = byteVector_1.ByteVector.fromPath(filePath);
-        picture.filename = path7.basename(filePath);
+        picture.filename = path9.basename(filePath);
         picture.description = picture.filename;
         picture.mimeType = _Picture.getMimeTypeFromFilename(picture.filename);
         picture.type = picture.mimeType.startsWith("image/") ? PictureType.FrontCover : PictureType.NotAPicture;
@@ -9049,7 +9049,7 @@ var require_picture = __commonJS({
         utils_1.Guards.truthy(filePath, "path");
         const picture = new _PictureLazy();
         picture._file = new fileAbstraction_1.LocalFileAbstraction(filePath);
-        picture._filename = path7.basename(filePath);
+        picture._filename = path9.basename(filePath);
         picture._description = picture._filename;
         picture._mimeType = Picture.getMimeTypeFromFilename(picture._filename);
         picture._type = picture._mimeType.startsWith("image/") ? PictureType.FrontCover : PictureType.NotAPicture;
@@ -35206,39 +35206,391 @@ var require_dist = __commonJS({
 });
 
 // src/index.js
-import path6 from "node:path";
+import path8 from "node:path";
 
-// src/mb.js
-import path2 from "node:path";
+// src/album-works.js
+import fs4 from "node:fs/promises";
+import path4 from "node:path";
 
-// src/store.js
-import { createHash, randomUUID } from "node:crypto";
+// src/tagger.js
+import { randomUUID as randomUUID3 } from "node:crypto";
+import fs3 from "node:fs/promises";
+import path3 from "node:path";
+
+// src/tags.js
+var import_node_taglib_sharp = __toESM(require_dist(), 1);
+import { randomUUID } from "node:crypto";
+import { closeSync, fstatSync, openSync, readSync } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
+import_node_taglib_sharp.Id3v2Settings.useNumericGenres = false;
+var READ_STYLE = import_node_taglib_sharp.ReadStyle.None | import_node_taglib_sharp.ReadStyle.PictureLazy;
+var READ_WITH_PROPERTIES = import_node_taglib_sharp.ReadStyle.Average | import_node_taglib_sharp.ReadStyle.PictureLazy;
+var ADDED_TAG_TYPES = import_node_taglib_sharp.TagTypes.Id3v1 | import_node_taglib_sharp.TagTypes.Ape | import_node_taglib_sharp.TagTypes.MovieId | import_node_taglib_sharp.TagTypes.DivX;
+var ITUNES_MEAN = "com.apple.iTunes";
+var MUSICBRAINZ_UFID_OWNER = "http://musicbrainz.org";
+var AUDIO_EXTENSIONS = /* @__PURE__ */ new Set([".flac", ".mp3", ".m4a", ".mp4", ".ogg", ".oga", ".opus"]);
+var isAudioPath = (file) => AUDIO_EXTENSIONS.has(path.extname(file).toLowerCase());
+var text = (value) => value == null ? "" : String(value).trim();
+var texts = (value) => (Array.isArray(value) ? value : [value]).map(text).filter(Boolean);
+var positive = (value) => {
+  const number = Number(value);
+  return Number.isSafeInteger(number) && number > 0 ? number : 0;
+};
+var xiphOf = (file) => file.getTag(import_node_taglib_sharp.TagTypes.Xiph, false);
+var id3Of = (file) => file.getTag(import_node_taglib_sharp.TagTypes.Id3v2, false);
+var appleOf = (file) => file.getTag(import_node_taglib_sharp.TagTypes.Apple, false);
+function userTextFrames(id3, description) {
+  const wanted = description.toLowerCase();
+  return id3.getFramesByClassType(import_node_taglib_sharp.Id3v2FrameClassType.UserTextInformationFrame).filter((frame) => frame.description.toLowerCase() === wanted);
+}
+function textField(xiphName, id3Description, apple) {
+  const box = apple.box ? import_node_taglib_sharp.ByteVector.fromString(apple.box, import_node_taglib_sharp.StringType.Latin1) : null;
+  return {
+    read(file) {
+      const xiph = xiphOf(file);
+      const id3 = id3Of(file);
+      const appleTag = appleOf(file);
+      for (const values of [
+        xiph?.getField(xiphName),
+        id3 && userTextFrames(id3, id3Description).flatMap((frame) => frame.text || []),
+        appleTag && (box ? appleTag.getQuickTimeStrings(box) : appleTag.getItunesStrings(ITUNES_MEAN, apple.name))
+      ]) {
+        const found = texts(values ?? []);
+        if (found.length) return found;
+      }
+      return [];
+    },
+    write(file, values) {
+      const xiph = xiphOf(file);
+      if (xiph) xiph.setFieldAsStrings(xiphName, ...values);
+      const appleTag = appleOf(file);
+      if (appleTag) {
+        if (box) appleTag.setQuickTimeStrings(box, values);
+        else appleTag.setItunesStrings(ITUNES_MEAN, apple.name, ...values);
+      }
+      const id3 = id3Of(file);
+      if (id3) {
+        for (const frame of userTextFrames(id3, id3Description)) id3.removeFrame(frame);
+        if (values.length) {
+          const frame = import_node_taglib_sharp.Id3v2UserTextInformationFrame.fromDescription(id3Description);
+          frame.text = values;
+          id3.addFrame(frame);
+        }
+      }
+    }
+  };
+}
+var workField = textField("WORK", "WORK", { box: "\xA9wrk" });
+var workIdField = textField("MUSICBRAINZ_WORKID", "MusicBrainz Work Id", { name: "MusicBrainz Work Id" });
+var artistIdsField = textField("MUSICBRAINZ_ARTISTID", "MusicBrainz Artist Id", { name: "MusicBrainz Artist Id" });
+var albumArtistIdsField = textField("MUSICBRAINZ_ALBUMARTISTID", "MusicBrainz Album Artist Id", { name: "MusicBrainz Album Artist Id" });
+var movementNameField = textField("MOVEMENTNAME", "MOVEMENTNAME", { name: "MOVEMENTNAME" });
+var movementNumberField = textField("MOVEMENT", "MOVEMENT", { name: "MOVEMENT" });
+var movementTotalField = textField("MOVEMENTTOTAL", "MOVEMENTTOTAL", { name: "MOVEMENTTOTAL" });
+var catalogueField = textField("CLASSICAL_CATALOGUE", "CLASSICAL_CATALOGUE", { name: "CLASSICAL_CATALOGUE" });
+var performersField = {
+  read: (file) => texts(xiphOf(file)?.getField("PERFORMER") ?? []),
+  write(file, values) {
+    xiphOf(file)?.setFieldAsStrings("PERFORMER", ...values);
+  }
+};
+var WRITERS = {
+  title: {
+    read: (file) => texts(file.tag.title),
+    write: (file, values) => file.tag.title = values[0] ?? void 0
+  },
+  artist: {
+    read: (file) => texts(file.tag.performers),
+    write: (file, values) => file.tag.performers = values
+  },
+  albumArtist: {
+    read: (file) => texts(file.tag.albumArtists),
+    write: (file, values) => file.tag.albumArtists = values
+  },
+  composer: {
+    read: (file) => texts(file.tag.composers),
+    write: (file, values) => file.tag.composers = values
+  },
+  composerSort: {
+    read: (file) => texts(file.tag.composersSort),
+    write: (file, values) => file.tag.composersSort = values
+  },
+  conductor: {
+    read: (file) => texts(file.tag.conductor),
+    write: (file, values) => file.tag.conductor = values[0] ?? void 0
+  },
+  performers: performersField,
+  movementName: movementNameField,
+  movementNumber: movementNumberField,
+  movementTotal: movementTotalField,
+  catalogue: catalogueField,
+  work: { read: (file) => workField.read(file), write: (file, values) => workField.write(file, values) },
+  workId: { read: (file) => workIdField.read(file), write: (file, values) => workIdField.write(file, values) },
+  recordingMbid: {
+    read: (file) => texts(file.tag.musicBrainzTrackId),
+    write: (file, values) => {
+      const id3 = id3Of(file);
+      for (const frame of id3?.getFramesByClassType(import_node_taglib_sharp.Id3v2FrameClassType.UniqueFileIdentifierFrame) || []) {
+        if (frame.owner === MUSICBRAINZ_UFID_OWNER) id3.removeFrame(frame);
+      }
+      file.tag.musicBrainzTrackId = values[0] ?? void 0;
+    }
+  }
+};
+var CLASSICAL_FIELDS = ["composer", "composerSort", "work", "movementName", "movementNumber", "movementTotal", "performers", "conductor", "catalogue", "workId"];
+var NOT_ID3 = /* @__PURE__ */ new Set(["movementName", "movementNumber", "movementTotal", "performers"]);
+var FORMAT_FIELDS = {
+  ".flac": CLASSICAL_FIELDS,
+  ".mp3": CLASSICAL_FIELDS.filter((field) => !NOT_ID3.has(field))
+};
+function isFragmentedMp4(filePath) {
+  const fd = openSync(filePath, "r");
+  try {
+    const size = fstatSync(fd).size;
+    const header = Buffer.alloc(16);
+    for (let offset = 0; offset + 8 <= size; ) {
+      readSync(fd, header, 0, 16, offset);
+      const type = header.toString("latin1", 4, 8);
+      if (offset === 0 && type !== "ftyp") return false;
+      if (type === "moof") return true;
+      const boxSize = header.readUInt32BE(0);
+      const length = boxSize === 1 ? Number(header.readBigUInt64BE(8)) : boxSize === 0 ? size - offset : boxSize;
+      if (length < 8) return false;
+      offset += length;
+    }
+    return false;
+  } finally {
+    closeSync(fd);
+  }
+}
+var UnsupportedFormat = class extends Error {
+};
+function openFile(filePath, readStyle = READ_STYLE, asPath = filePath) {
+  if (!isAudioPath(asPath)) throw new UnsupportedFormat(`can't tag ${path.extname(asPath) || "this kind of"} files`);
+  if (isFragmentedMp4(filePath)) throw new UnsupportedFormat("can't tag fragmented MP4 files");
+  try {
+    return import_node_taglib_sharp.File.createFromPath(filePath, `taglib/${path.extname(asPath).slice(1).toLowerCase()}`, readStyle);
+  } catch (error) {
+    if (/unsupported format/i.test(String(error?.message))) throw new UnsupportedFormat("can't tag this kind of file");
+    throw error;
+  }
+}
+function readValues(filePath, fields) {
+  const file = openFile(filePath);
+  try {
+    return Object.fromEntries(fields.map((field) => [field, WRITERS[field].read(file)]));
+  } finally {
+    file.dispose();
+  }
+}
+function readTags(filePath) {
+  const file = openFile(filePath, READ_WITH_PROPERTIES);
+  try {
+    const tag = file.tag;
+    return {
+      title: text(tag.title),
+      artist: text(tag.performers?.[0]),
+      albumArtist: text(tag.albumArtists?.[0]),
+      album: text(tag.album),
+      recordingMbid: text(tag.musicBrainzTrackId),
+      releaseMbid: text(tag.musicBrainzReleaseId),
+      releaseGroupMbid: text(tag.musicBrainzReleaseGroupId),
+      // Every album artist ID: taglib's own property has only the first.
+      albumArtistMbids: [...new Set([...albumArtistIdsField.read(file), text(tag.musicBrainzReleaseArtistId)].flatMap((v) => texts(v.split(/[;/]/))))],
+      artistMbids: artistIdsField.read(file).flatMap((value) => texts(value.split(/[;/]/))),
+      conductor: text(tag.conductor),
+      // Vorbis PERFORMER, one value a performer, often with the instrument
+      // in brackets: "Martha Argerich (piano)".
+      performers: texts(xiphOf(file)?.getField("PERFORMER") ?? []),
+      genres: texts(tag.genres ?? []).flatMap((genre) => texts(genre.split(";"))),
+      composer: texts(tag.composers ?? []),
+      work: workField.read(file)[0] ?? "",
+      // Some taggers put the work here and leave WORK empty.
+      grouping: text(tag.grouping),
+      workId: workIdField.read(file)[0] ?? "",
+      trackNumber: positive(tag.track),
+      discNumber: positive(tag.disc),
+      durationMs: Math.round(file.properties?.durationMilliseconds || 0),
+      year: Number.isSafeInteger(tag.year) && tag.year > 0 ? tag.year : null,
+      label: text(tag.publisher)
+    };
+  } finally {
+    file.dispose();
+  }
+}
+var same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+async function writeTags(filePath, values) {
+  const source = path.resolve(filePath);
+  const preview = openFile(source);
+  let changed;
+  try {
+    changed = Object.keys(values).filter((field) => !same(WRITERS[field].read(preview), texts(values[field])));
+  } finally {
+    preview.dispose();
+  }
+  if (!changed.length) return [];
+  const extension = path.extname(source);
+  const working = path.join(path.dirname(source), `.${path.basename(source, extension)}.${randomUUID()}.tagging`);
+  await fs.copyFile(source, working, fs.constants.COPYFILE_FICLONE);
+  try {
+    const file = openFile(working, READ_STYLE, source);
+    try {
+      file.removeTags(ADDED_TAG_TYPES & ~file.tagTypesOnDisk);
+      const id3 = id3Of(file);
+      if (id3 && !(file.tagTypesOnDisk & import_node_taglib_sharp.TagTypes.Id3v2)) id3.version = 4;
+      for (const field of changed) WRITERS[field].write(file, texts(values[field]));
+      file.save();
+    } finally {
+      file.dispose();
+    }
+    const verified = openFile(working, READ_STYLE, source);
+    try {
+      for (const field of changed) {
+        if (!same(WRITERS[field].read(verified), texts(values[field])))
+          throw new Error(`Tag verification failed for ${field}`);
+      }
+    } finally {
+      verified.dispose();
+    }
+    await fs.rename(working, source);
+  } catch (error) {
+    await fs.rm(working, { force: true }).catch(() => {
+    });
+    throw error;
+  }
+  return changed;
+}
+
+// src/works.js
+var SUFFIX = "(?:[a-z]{1,3}(?![a-z]))?";
+var CATALOGUES = [
+  // Before "D": the "D1" in Telemann's "TWV 55:D1" is a key, not a D number.
+  [/\bTWV\s*(\d+(?:\s*:\s*[A-Za-z]{0,3}\d+[a-z]?)?)/i, "TWV"],
+  [/\bBWV\s*(\d+[a-z]?)/i, "BWV"],
+  [/\bHWV\s*(\d+[a-z]?)/i, "HWV"],
+  [/\bRV\s*(\d+[a-z]?)/i, "RV"],
+  [/\bK(?:V|\.)?\s*(\d+[a-z]?)\b/, "K"],
+  [/\bD\.?\s*(\d+[a-z]?)\b/, "D"],
+  [/\bHob\.?\s*([IVXL]+[a-z]?:\s*\d+[a-z]?)/i, "Hob"],
+  [new RegExp(`\\bWoO\\s*(\\d+${SUFFIX})`, "i"), "WoO"],
+  // "S. 161", and Hyperion's "S161", "S166r" or "S534ii/bis". Searle's own
+  // sub-numbers after a slash name a piece too ("S. 534/2b", "S. 385/3",
+  // "S163d/ii").
+  [new RegExp(`\\bS(?:\\.\\s*|(?=\\d))(\\d+${SUFFIX}(?:\\/(?:bis|[ivx]{1,4}(?![a-z])|\\d+${SUFFIX}))?)`), "S"],
+  [new RegExp(`\\bSz\\.?\\s*(\\d+${SUFFIX})`, "i"), "Sz"],
+  [new RegExp(`\\bBB\\s*(\\d+${SUFFIX})`), "BB"],
+  [new RegExp(`\\bTrV\\s*(\\d+${SUFFIX})`, "i"), "TrV"],
+  [new RegExp(`\\bL\\.\\s*(\\d+${SUFFIX})`), "L"],
+  [new RegExp(`\\bFP\\s*(\\d+${SUFFIX})`), "FP"],
+  // Ravel's (Marnat): "Boléro, M 81", "Pavane…, M.19". Capital M only.
+  // "M. 63/2" is the second of M. 63's pieces.
+  [new RegExp(`(?<![\\p{L}\\d])M(?:\\.\\s*|\\s+)(\\d+${SUFFIX}(?:\\/\\d+)?)(?![\\d])`, "u"), "M"]
+];
+var OPUS = /\bop(?:us|\.)?\s*(\d+[a-z]?)(?:\s*,?\s*(?:no\.?|nr\.?|n°)\s*(\d+))?/i;
+function catalogueMatch(title) {
+  const text2 = String(title || "");
+  for (const [pattern, prefix] of CATALOGUES) {
+    const match = text2.match(pattern);
+    if (match) return { prefix, number: match[1].replace(/\s+/g, ""), end: match.index + match[0].length, text: text2 };
+  }
+  return null;
+}
+function catalogueNumber(title) {
+  const match = catalogueMatch(title);
+  if (match) return `${match.prefix} ${match.number}`;
+  const opus = String(title || "").match(OPUS);
+  if (opus) return `op ${opus[1]}${opus[2] ? ` no ${opus[2]}` : ""}`;
+  return "";
+}
+function shortWorkTitle(title) {
+  let text2 = String(title || "").split(":")[0];
+  text2 = text2.replace(OPUS, " ");
+  for (const [pattern] of CATALOGUES) text2 = text2.replace(pattern, " ");
+  text2 = text2.replace(/\bin\s+[A-G](?:[- ]?(?:flat|sharp|♭|♯|b|#))?\s*(?:major|minor|maj|min|dur|moll)\b/gi, " ").replace(/\b(?:no|nr|n°)\.?\s*(?=\d)/gi, " ").replace(/[“”"'’,;()[\]]/g, " ");
+  return searchWords(text2);
+}
+function searchWords(text2) {
+  return String(text2 || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim().split(/\s+/).filter(Boolean).join(" ");
+}
+function surname(person) {
+  if (!person) return "";
+  const sort = String(person.sortName || "");
+  if (sort.includes(",")) return searchWords(sort.split(",")[0]);
+  return searchWords(person.name);
+}
+function creditString(credit) {
+  return (credit || []).map((entry) => `${entry.name ?? entry.artist?.name ?? ""}${entry.joinphrase ?? ""}`).join("").trim();
+}
+async function topWork(mb, work, depth = 0, inc = "artist-rels+work-rels", { stop = () => false } = {}) {
+  if (!work || depth >= 3) return work;
+  const parent = (work.relations || []).find((rel) => rel.type === "parts" && rel.direction === "backward" && rel.work?.id);
+  if (!parent) return work;
+  const data = await mb.get("work", parent.work.id, inc);
+  return data && !stop(data, work) ? topWork(mb, data, depth + 1, inc, { stop }) : work;
+}
+var RELEASE_INC = "recordings+artist-credits+release-groups+media";
+function releaseYear(date) {
+  const year = Number(String(date || "").slice(0, 4));
+  return Number.isInteger(year) && year > 0 ? year : null;
+}
+
+// src/aurral.js
+var Aurral = class {
+  constructor(api, fetchImpl = fetch) {
+    if (!api?.url || !api?.key) throw new Error("Aurral API access is off. Turn it on on the plugin's page.");
+    this.url = api.url.replace(/\/+$/, "");
+    this.key = api.key;
+    this.fetch = fetchImpl;
+  }
+  async request(method, route, body) {
+    const response = await this.fetch(`${this.url}${route}`, {
+      method,
+      headers: { "X-Api-Key": this.key, ...body !== void 0 && { "Content-Type": "application/json" } },
+      body: body === void 0 ? void 0 : JSON.stringify(body),
+      signal: AbortSignal.timeout(3e4)
+    });
+    const data = await response.json().catch(() => null);
+    if (!response.ok) {
+      const detail = data?.message || data?.error || response.statusText;
+      throw new Error(`Aurral answered ${response.status} for ${route}: ${detail}`);
+    }
+    return data;
+  }
+  // Re-reads files whose tags changed, so the Library shows the new ones.
+  refreshLibrary() {
+    return this.request("POST", "/library/refresh", { mode: "quick" });
+  }
+};
+
+// src/store.js
+import { createHash, randomUUID as randomUUID2 } from "node:crypto";
+import fs2 from "node:fs/promises";
+import path2 from "node:path";
 var sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 async function readJson(file, fallback) {
   try {
-    return JSON.parse(await fs.readFile(file, "utf8"));
+    return JSON.parse(await fs2.readFile(file, "utf8"));
   } catch {
     return fallback;
   }
 }
 async function writeJson(file, value) {
-  await fs.mkdir(path.dirname(file), { recursive: true });
-  const temp = `${file}.${process.pid}.${randomUUID()}.tmp`;
-  await fs.writeFile(temp, JSON.stringify(value));
-  await fs.rename(temp, file);
+  await fs2.mkdir(path2.dirname(file), { recursive: true });
+  const temp = `${file}.${process.pid}.${randomUUID2()}.tmp`;
+  await fs2.writeFile(temp, JSON.stringify(value));
+  await fs2.rename(temp, file);
 }
 async function tryLock(dir, staleMs) {
   try {
-    await fs.mkdir(dir);
+    await fs2.mkdir(dir);
   } catch (error) {
     if (error.code !== "EEXIST") throw error;
-    const stat = await fs.stat(dir).catch(() => null);
+    const stat = await fs2.stat(dir).catch(() => null);
     if (stat && Date.now() - stat.mtimeMs < staleMs) return null;
-    await fs.rm(dir, { recursive: true, force: true });
+    await fs2.rm(dir, { recursive: true, force: true });
     try {
-      await fs.mkdir(dir);
+      await fs2.mkdir(dir);
     } catch {
       return null;
     }
@@ -35248,12 +35600,12 @@ async function tryLock(dir, staleMs) {
     async touch() {
       if (released) return;
       const now = /* @__PURE__ */ new Date();
-      await fs.utimes(dir, now, now).catch(() => {
+      await fs2.utimes(dir, now, now).catch(() => {
       });
     },
     async release() {
       released = true;
-      await fs.rm(dir, { recursive: true, force: true }).catch(() => {
+      await fs2.rm(dir, { recursive: true, force: true }).catch(() => {
       });
     }
   };
@@ -35269,35 +35621,38 @@ async function withLock(dir, staleMs, run, { waitMs = 3e4 } = {}) {
         await lock.release();
       }
     }
-    if (Date.now() > until) throw new Error(`Timed out waiting for ${path.basename(dir)}`);
+    if (Date.now() > until) throw new Error(`Timed out waiting for ${path2.basename(dir)}`);
     await sleep(50 + Math.random() * 100);
   }
 }
 var Throttle = class {
-  constructor(folder, intervalMs) {
-    this.lockDir = path.join(folder, "mb-throttle.lock");
-    this.stateFile = path.join(folder, "mb-throttle.json");
+  constructor(folder2, intervalMs) {
+    this.lockDir = path2.join(folder2, "mb-throttle.lock");
+    this.stateFile = path2.join(folder2, "mb-throttle.json");
     this.intervalMs = intervalMs;
   }
-  async wait() {
-    if (!this.intervalMs) return;
-    const slot = await withLock(this.lockDir, 5e3, async () => {
+  async run(dispatch) {
+    if (!this.intervalMs) return dispatch();
+    return withLock(this.lockDir, 12e4, async () => {
       const state = await readJson(this.stateFile, { next: 0 });
-      const at = Math.max(Date.now(), Number(state.next) || 0);
-      await writeJson(this.stateFile, { next: at + this.intervalMs });
-      return at;
-    });
-    const wait = slot - Date.now();
-    if (wait > 0) await sleep(wait);
+      const wait = (Number(state.next) || 0) - Date.now();
+      if (wait > 0) await sleep(wait);
+      await writeJson(this.stateFile, { next: Date.now() + this.intervalMs });
+      try {
+        return await dispatch();
+      } finally {
+        await writeJson(this.stateFile, { next: Date.now() + this.intervalMs });
+      }
+    }, { waitMs: 12e4 });
   }
 };
 var FileCache = class {
-  constructor(folder) {
-    this.folder = folder;
+  constructor(folder2) {
+    this.folder = folder2;
   }
   file(key) {
     const hash = createHash("sha1").update(key).digest("hex");
-    return path.join(this.folder, hash.slice(0, 2), `${hash}.json`);
+    return path2.join(this.folder, hash.slice(0, 2), `${hash}.json`);
   }
   async get(key, ttlMs) {
     const entry = await readJson(this.file(key), null);
@@ -35309,20 +35664,20 @@ var FileCache = class {
     });
   }
 };
-async function pruneCache(folder, maxAgeMs) {
-  const stamp = path.join(folder, ".pruned");
-  const last = (await fs.stat(stamp).catch(() => null))?.mtimeMs ?? 0;
+async function pruneCache(folder2, maxAgeMs) {
+  const stamp = path2.join(folder2, ".pruned");
+  const last = (await fs2.stat(stamp).catch(() => null))?.mtimeMs ?? 0;
   if (Date.now() - last < 24 * 60 * 6e4) return 0;
-  await fs.mkdir(folder, { recursive: true });
-  await fs.writeFile(stamp, "");
+  await fs2.mkdir(folder2, { recursive: true });
+  await fs2.writeFile(stamp, "");
   let removed = 0;
-  for (const dir of await fs.readdir(folder).catch(() => [])) {
-    const sub = path.join(folder, dir);
-    for (const name of await fs.readdir(sub).catch(() => [])) {
-      const file = path.join(sub, name);
-      const stat = await fs.stat(file).catch(() => null);
+  for (const dir of await fs2.readdir(folder2).catch(() => [])) {
+    const sub = path2.join(folder2, dir);
+    for (const name of await fs2.readdir(sub).catch(() => [])) {
+      const file = path2.join(sub, name);
+      const stat = await fs2.stat(file).catch(() => null);
       if (stat && Date.now() - stat.mtimeMs > maxAgeMs) {
-        await fs.rm(file, { force: true });
+        await fs2.rm(file, { force: true });
         removed++;
       }
     }
@@ -35330,8 +35685,597 @@ async function pruneCache(folder, maxAgeMs) {
   return removed;
 }
 
+// src/tagger.js
+var LOCK_STALE_MS = 2 * 6e4;
+var SAVE_EVERY_MS = 3e4;
+var queueDir = (ctx) => path3.join(ctx.dataFolder, "queue");
+var processedFile = (ctx) => path3.join(ctx.dataFolder, "processed.json");
+var indexFile = (ctx) => path3.join(ctx.dataFolder, "library-index.json");
+var originalsFile = (ctx) => path3.join(ctx.dataFolder, "originals.json");
+var excludedFile = (ctx) => path3.join(ctx.dataFolder, "excluded.json");
+var worksFile = (ctx) => path3.join(ctx.dataFolder, "works.json");
+var TAG_FIELDS = ["artist", "albumArtist", "composer", "work", "workId"];
+var TAGGING_VERSION = 2;
+var outdated = (record) => record && (record.status === "tagged" || record.status === "unchanged") && (record.v ?? 1) < TAGGING_VERSION;
+var lockDir = (ctx) => path3.join(ctx.dataFolder, "tagging.lock");
+var yieldFile = (ctx) => path3.join(ctx.dataFolder, "tagging.yield");
+var YIELD_FRESH_MS = 10 * 6e4;
+var PRIORITY_WAIT_MS = 5 * 6e4;
+var ACTION_CLAIM_MS = 2 * 6e4;
+async function enqueue(ctx, filePaths, { force = false, source = null } = {}) {
+  await fs3.mkdir(queueDir(ctx), { recursive: true });
+  const ids = [];
+  for (const filePath of filePaths) {
+    if (!filePath) continue;
+    const id = `${Date.now().toString().padStart(15, "0")}-${randomUUID3()}`;
+    await writeJson(path3.join(queueDir(ctx), `${id}.json`), { path: filePath, force, source, at: Date.now() });
+    ids.push(id);
+  }
+  return ids;
+}
+async function queuedEntries(ctx) {
+  const names = (await fs3.readdir(queueDir(ctx)).catch(() => [])).filter((n) => n.endsWith(".json")).sort();
+  return names.map((name) => ({ name, file: path3.join(queueDir(ctx), name) }));
+}
+var queueLength = async (ctx) => (await queuedEntries(ctx)).length;
+async function allowedPath(ctx, filePath) {
+  const real = await fs3.realpath(filePath).catch(() => null);
+  if (!real) return null;
+  for (const root of [ctx.libraryFolder, ctx.dataFolder]) {
+    if (!root) continue;
+    const base = await fs3.realpath(root).catch(() => null);
+    if (!base) continue;
+    const relative = path3.relative(base, real);
+    if (relative && !relative.startsWith("..") && !path3.isAbsolute(relative)) return real;
+  }
+  return null;
+}
+var statKey = (stat) => ({ mtimeMs: Math.round(stat.mtimeMs), size: stat.size });
+var sameStat = (record, stat) => record && record.mtimeMs === Math.round(stat.mtimeMs) && record.size === stat.size;
+function indexEntry(tags, stat) {
+  return {
+    ...statKey(stat),
+    title: tags.title,
+    artist: tags.artist,
+    album: tags.album,
+    albumArtist: tags.albumArtist,
+    recordingMbid: tags.recordingMbid,
+    releaseMbid: tags.releaseMbid,
+    releaseGroupMbid: tags.releaseGroupMbid,
+    albumArtistMbids: tags.albumArtistMbids,
+    trackNumber: tags.trackNumber,
+    discNumber: tags.discNumber,
+    durationMs: tags.durationMs,
+    workId: tags.workId
+  };
+}
+var State = class {
+  constructor(ctx, lock) {
+    this.ctx = ctx;
+    this.lock = lock;
+    this.dirty = 0;
+    this.savedAt = Date.now();
+    this.refs = 0;
+    this.admins = 0;
+    this.background = 0;
+    this.claimed = /* @__PURE__ */ new Set();
+    this.busyPaths = /* @__PURE__ */ new Map();
+  }
+  async load() {
+    this.processed = await readJson(processedFile(this.ctx), {});
+    this.index = await readJson(indexFile(this.ctx), {});
+    this.originals = await readJson(originalsFile(this.ctx), {});
+    this.excluded = await readJson(excludedFile(this.ctx), {});
+    this.works = await readJson(worksFile(this.ctx), {});
+  }
+  // Saved every 30 seconds while working, and at the end: the index of a
+  // large Library is several megabytes.
+  async save(force = false) {
+    if (!this.dirty || !force && Date.now() - this.savedAt < SAVE_EVERY_MS) return;
+    this.savedAt = Date.now();
+    this.dirty = 0;
+    await writeJson(processedFile(this.ctx), this.processed);
+    await writeJson(indexFile(this.ctx), this.index);
+    await writeJson(originalsFile(this.ctx), this.originals);
+    await writeJson(excludedFile(this.ctx), this.excluded);
+    await writeJson(worksFile(this.ctx), this.works);
+    await this.lock.touch();
+  }
+  // One call at a time works on a file.
+  async exclusive(file, work) {
+    while (this.busyPaths.has(file)) await this.busyPaths.get(file).catch(() => {
+    });
+    const running = work();
+    this.busyPaths.set(file, running);
+    try {
+      return await running;
+    } finally {
+      this.busyPaths.delete(file);
+    }
+  }
+};
+var Session = class {
+  constructor(ctx, state, priority) {
+    this.ctx = ctx;
+    this.state = state;
+    this.priority = priority;
+    this.changedFiles = 0;
+    this.stats = { tagged: 0, unchanged: 0, skipped: {}, failed: 0, left: 0 };
+  }
+  get processed() {
+    return this.state.processed;
+  }
+  get index() {
+    return this.state.index;
+  }
+  get originals() {
+    return this.state.originals;
+  }
+  get excluded() {
+    return this.state.excluded;
+  }
+  get dirty() {
+    return this.state.dirty;
+  }
+  set dirty(value) {
+    this.state.dirty = value;
+  }
+  save(force = false) {
+    return this.state.save(force);
+  }
+  // True when an admin action wants the lock and this is background work:
+  // one in this process, or one waiting in another.
+  async shouldYield() {
+    if (this.priority) return false;
+    if (this.state.admins > 0) this.yielding = true;
+    else if (!this.yieldCheckedAt || Date.now() - this.yieldCheckedAt >= 500) {
+      this.yieldCheckedAt = Date.now();
+      const stat = await fs3.stat(yieldFile(this.ctx)).catch(() => null);
+      this.yielding = Boolean(stat && Date.now() - stat.mtimeMs < YIELD_FRESH_MS);
+    }
+    if (this.yielding && !this.yieldLogged) {
+      this.yieldLogged = true;
+      this.ctx.log("Pausing background tagging for an admin action");
+    }
+    return this.yielding;
+  }
+  record(filePath, stat, result) {
+    this.processed[filePath] = { ...statKey(stat), ...result, at: Date.now() };
+    this.dirty++;
+    if (result.status === "skipped") this.stats.skipped[result.reason] = (this.stats.skipped[result.reason] || 0) + 1;
+    else this.stats[result.status]++;
+  }
+  // Returns false when MusicBrainz can't be reached, so the caller stops.
+  async processFile(filePath, options = {}) {
+    const real = await allowedPath(this.ctx, filePath);
+    if (!real) {
+      this.ctx.log(`Not tagging ${filePath}: it isn't in the Library folder`);
+      this.stats.skipped["outside the Library"] = (this.stats.skipped["outside the Library"] || 0) + 1;
+      return true;
+    }
+    if (!isAudioPath(real)) return true;
+    return this.state.exclusive(real, () => this.processReal(real, options));
+  }
+  // `queuedAt`: when the request to tag was made. Classical tags an admin
+  // removed after that stay removed.
+  //
+  // `plan` (v0.3 8.7): an array that receives what would be written, with
+  // the file's current values, instead of writing or recording anything.
+  // `values`: write exactly these (a confirmed plan) instead of looking up.
+  async processReal(real, { force = false, prefilter = false, upgrade = false, queuedAt = null, plan = null, values: planned = null } = {}) {
+    const { ctx } = this;
+    const stat = await fs3.stat(real);
+    const skip = (result) => plan ? plan.push({ file: real, status: "skipped", reason: result.reason }) : this.record(real, stat, result);
+    if (!force && sameStat(this.processed[real], stat) && !(upgrade && outdated(this.processed[real]))) return true;
+    let tags;
+    try {
+      tags = readTags(real);
+    } catch (error) {
+      skip({ status: "skipped", reason: error instanceof UnsupportedFormat ? "unsupported format" : "unreadable" });
+      return true;
+    }
+    if (!plan) this.index[real] = indexEntry(tags, stat);
+    if (!tags.recordingMbid) {
+      skip({ status: "skipped", reason: "no recording ID" });
+      return true;
+    }
+    if (this.excluded[tags.recordingMbid]) {
+      if (!force || queuedAt && (this.excluded[tags.recordingMbid].at ?? 0) > queuedAt) {
+        skip({ status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
+        return true;
+      }
+      if (!plan) delete this.excluded[tags.recordingMbid];
+    }
+    if (prefilter && ctx.resolver.classifyGenres(new Set(tags.genres.map((g) => g.toLowerCase()))) === false) {
+      this.record(real, stat, { status: "skipped", reason: "non-classical", recording: tags.recordingMbid });
+      return true;
+    }
+    let values = planned;
+    let fields = planned && { artist: planned.artist?.[0] || "", workId: planned.workId?.[0] || "" };
+    if (!values) {
+      fields = await ctx.resolver.resolve(tags.recordingMbid, {
+        trackArtistIds: tags.artistMbids,
+        albumArtistIds: tags.albumArtistMbids,
+        releaseGroupId: tags.releaseGroupMbid || null,
+        confirmed: force
+      });
+      if (!fields) {
+        const reason = ctx.resolver.skipReason;
+        if (reason === "unreachable") return false;
+        skip({ status: "skipped", reason, recording: tags.recordingMbid });
+        return true;
+      }
+      await this.rememberWork(real, tags.recordingMbid, fields);
+      values = { artist: [fields.artist], composer: fields.composers };
+      if (fields.workId) Object.assign(values, { work: [fields.work], workId: [fields.workId] });
+      const albumArtist = await this.englishAlbumArtist(tags);
+      if (albumArtist) values.albumArtist = [albumArtist];
+    }
+    if (plan) {
+      plan.push({ file: real, status: "planned", recording: tags.recordingMbid, values, current: readValues(real, Object.keys(values)) });
+      return true;
+    }
+    let changed;
+    try {
+      if (!this.originals[real]) {
+        this.originals[real] = { ...readValues(real, TAG_FIELDS), recording: tags.recordingMbid };
+        this.dirty++;
+        await writeJson(originalsFile(ctx), this.originals);
+      }
+      changed = await writeTags(real, values);
+    } catch (error) {
+      ctx.log(`Couldn't tag ${real}: ${error.message}`);
+      this.record(real, stat, { status: "skipped", reason: "couldn't write tags", recording: tags.recordingMbid });
+      return true;
+    }
+    const after = await fs3.stat(real);
+    this.index[real] = { ...this.index[real], ...statKey(after), artist: fields.artist, workId: fields.workId || "" };
+    this.record(real, after, {
+      v: TAGGING_VERSION,
+      status: changed.length ? "tagged" : "unchanged",
+      recording: tags.recordingMbid,
+      artist: fields.artist,
+      workId: fields.workId
+    });
+    if (changed.length) {
+      this.changedFiles++;
+      ctx.log(`Tagged ${path3.basename(real)}: ${fields.artist}`);
+    }
+    return true;
+  }
+  // Puts back the tags a file had before the plugin changed them. Files
+  // tagged before the plugin kept backups get the artist MusicBrainz credits
+  // for that track on its release, which is what Aurral writes.
+  async untagFile(filePath, mode = "restore") {
+    const real = await allowedPath(this.ctx, filePath);
+    if (!real || !isAudioPath(real)) return "skipped";
+    return this.state.exclusive(real, () => this.untagReal(real, mode));
+  }
+  // `plan` and `values` as in processReal.
+  async untagReal(real, mode = "restore", { plan = null, values: planned = null } = {}) {
+    const { ctx } = this;
+    const skip = (reason) => plan ? (plan.push({ file: real, status: "skipped", reason }), "skipped") : "skipped";
+    let tags;
+    try {
+      tags = readTags(real);
+    } catch {
+      return skip("unreadable");
+    }
+    if (tags.recordingMbid && !plan) this.excluded[tags.recordingMbid] = { at: Date.now() };
+    const original = this.originals[real];
+    let values = planned;
+    if (!values) {
+      if (mode === "clear") values = { composer: [], work: [], workId: [] };
+      else if (original) values = Object.fromEntries(TAG_FIELDS.map((field) => [field, original[field] ?? []]));
+      else {
+        const credit = await this.trackCredit(tags);
+        values = { composer: [], work: [], workId: [], ...credit && { artist: [credit] } };
+        if (tags.albumArtistMbids.length === 1) {
+          const name = (await ctx.mb.get("artist", tags.albumArtistMbids[0], "aliases+genres"))?.name;
+          if (name) values.albumArtist = [name];
+        }
+      }
+    }
+    if (plan) {
+      plan.push({ file: real, status: "planned", recording: tags.recordingMbid, restore: Boolean(original), values, current: readValues(real, Object.keys(values)) });
+      return "planned";
+    }
+    const changed = await writeTags(real, values);
+    if (mode !== "clear") delete this.originals[real];
+    const after = await fs3.stat(real);
+    this.index[real] = { ...this.index[real] ?? {}, ...indexEntry(readTags(real), after) };
+    this.record(real, after, { status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
+    this.stats.skipped["classical tags removed"]--;
+    if (changed.length) {
+      this.changedFiles++;
+      ctx.log(`Removed classical tags from ${path3.basename(real)}`);
+    }
+    return changed.length ? original && mode !== "clear" ? "restored" : "cleared" : "unchanged";
+  }
+  async rememberWork(real, recording, fields) {
+    const work = fields.workId ? await this.ctx.resolver.getWork(fields.workId) : null;
+    const top = work ? await topWork(this.ctx.mb, work) : null;
+    const people = fields.people || {};
+    const performers = [...people.soloists || [], ...people.ensembles || [], ...people.conductors || []].map((p) => p.name);
+    this.state.works[real] = {
+      recording,
+      work: top?.id ? { id: top.id, title: top.title || fields.work || "" } : null,
+      composer: fields.classicalComposers || "",
+      performers: [...new Set(performers)].join(" \xB7 ")
+    };
+    this.dirty++;
+  }
+  async englishAlbumArtist(tags) {
+    if (tags.albumArtistMbids.length !== 1) return null;
+    const artist = await this.ctx.resolver.getArtist(tags.albumArtistMbids[0]);
+    if (!artist?.name) return null;
+    const [name] = await this.ctx.resolver.englishNames(artist);
+    return name || null;
+  }
+  // MusicBrainz's artist credit for this recording on the file's release,
+  // else on the recording itself.
+  async trackCredit(tags) {
+    const { mb } = this.ctx;
+    if (tags.releaseMbid) {
+      const release = await mb.get("release", tags.releaseMbid, RELEASE_INC);
+      for (const medium of release?.media || [])
+        for (const track of medium.tracks || [])
+          if (track.recording?.id === tags.recordingMbid) {
+            const credit = creditString(track["artist-credit"] || track.recording["artist-credit"]);
+            if (credit) return credit;
+          }
+    }
+    const recording = await mb.get("recording", tags.recordingMbid, "artist-credits");
+    return creditString(recording?.["artist-credit"]) || null;
+  }
+  async drainQueue(until, onlyIds = null) {
+    for (const entry of await queuedEntries(this.ctx)) {
+      if (Date.now() > until || await this.shouldYield()) return false;
+      if (onlyIds && !onlyIds.has(entry.name.replace(/\.json$/, ""))) continue;
+      if (this.state.claimed.has(entry.name)) continue;
+      this.state.claimed.add(entry.name);
+      try {
+        const job = await readJson(entry.file, null);
+        if (!this.priority && job?.source === "action" && Date.now() - (job.at || 0) < ACTION_CLAIM_MS) continue;
+        if (job?.path) {
+          const reachable = await this.processFile(job.path, { force: job.force, queuedAt: job.at });
+          if (!reachable) return false;
+        }
+        await fs3.rm(entry.file, { force: true });
+      } finally {
+        this.state.claimed.delete(entry.name);
+      }
+      await this.save();
+    }
+    return true;
+  }
+  // Walks the Library, refreshing the index, and returns files that have a
+  // recording ID and were never processed (or changed since). Stops at
+  // `until`; unchanged files cost only a stat, so the next run gets further.
+  async scan(until) {
+    const root = this.ctx.libraryFolder;
+    const pending = [];
+    const seen = /* @__PURE__ */ new Set();
+    let complete = true;
+    const walk = async (dir) => {
+      if (Date.now() > until || await this.shouldYield()) {
+        complete = false;
+        return;
+      }
+      const entries = await fs3.readdir(dir, { withFileTypes: true }).catch(() => []);
+      for (const entry of entries) {
+        if (Date.now() > until || await this.shouldYield()) {
+          complete = false;
+          return;
+        }
+        if (entry.name.startsWith(".")) continue;
+        const full = path3.join(dir, entry.name);
+        if (entry.isDirectory()) await walk(full);
+        else if (entry.isFile() && isAudioPath(full)) {
+          seen.add(full);
+          const stat = await fs3.stat(full).catch(() => null);
+          if (!stat) continue;
+          if (!sameStat(this.index[full], stat)) {
+            try {
+              this.index[full] = indexEntry(readTags(full), stat);
+            } catch {
+              delete this.index[full];
+              continue;
+            }
+            this.dirty++;
+            await this.save();
+          }
+          if (this.index[full].recordingMbid && (!sameStat(this.processed[full], stat) || outdated(this.processed[full]))) pending.push(full);
+        }
+      }
+    };
+    if (root) await walk(root);
+    if (complete) {
+      for (const file of Object.keys(this.index)) if (file.startsWith(root) && !seen.has(file)) delete this.index[file];
+    }
+    this.scanComplete = complete;
+    return pending;
+  }
+};
+var held = /* @__PURE__ */ new Map();
+async function openState(ctx, priority) {
+  let lock = await tryLock(lockDir(ctx), LOCK_STALE_MS);
+  if (!lock && priority) {
+    ctx.log("Waiting for background tagging in another process to pause");
+    const until = Date.now() + PRIORITY_WAIT_MS;
+    while (!lock && Date.now() < until) {
+      await writeJson(yieldFile(ctx), { at: Date.now() });
+      await sleep(500);
+      lock = await tryLock(lockDir(ctx), LOCK_STALE_MS);
+    }
+    await fs3.rm(yieldFile(ctx), { force: true });
+    if (!lock) ctx.log("Tagging in another process didn't pause within 5 minutes");
+  }
+  if (!lock) return null;
+  const state = new State(ctx, lock);
+  try {
+    await state.load();
+  } catch (error) {
+    await lock.release();
+    throw error;
+  }
+  state.heartbeat = setInterval(() => lock.touch(), 3e4);
+  return state;
+}
+async function withTagging(ctx, work, { priority = false } = {}) {
+  const key = path3.resolve(ctx.dataFolder);
+  let entry;
+  for (; ; ) {
+    entry = held.get(key);
+    if (!entry) {
+      entry = { opening: openState(ctx, priority), state: null };
+      held.set(key, entry);
+      try {
+        entry.state = await entry.opening;
+      } catch (error) {
+        held.delete(key);
+        throw error;
+      }
+      if (!entry.state) {
+        held.delete(key);
+        return null;
+      }
+      break;
+    }
+    if (!entry.state) {
+      if (!priority) return null;
+      await entry.opening.catch(() => {
+      });
+      if (held.get(key) === entry && entry.state) break;
+      continue;
+    }
+    if (!priority && entry.state.background > 0) return null;
+    break;
+  }
+  const { state } = entry;
+  const session = new Session(ctx, state, priority);
+  state.refs++;
+  if (priority) state.admins++;
+  else state.background++;
+  try {
+    await work(session);
+    return session.stats;
+  } finally {
+    if (priority) state.admins--;
+    else state.background--;
+    if (--state.refs === 0) {
+      held.delete(key);
+      clearInterval(state.heartbeat);
+      await state.save(true).catch((error) => ctx.log(`Couldn't save progress: ${error.message}`));
+      await state.lock.release();
+    } else {
+      await state.save().catch(() => {
+      });
+    }
+    if (session.changedFiles) await refreshLibrary(ctx);
+  }
+}
+async function refreshLibrary(ctx) {
+  if (!ctx.api?.url || !ctx.api?.key) return;
+  try {
+    await new Aurral(ctx.api, ctx.fetch).refreshLibrary();
+  } catch (error) {
+    ctx.log(`Couldn't ask Aurral to rescan the Library: ${error.message}`);
+  }
+}
+async function runQueue(ctx, budgetMs, onlyIds = null, { priority = false } = {}) {
+  const until = Date.now() + budgetMs;
+  return withTagging(
+    ctx,
+    async (session) => {
+      await session.drainQueue(until, onlyIds);
+      session.stats.left = onlyIds ? (await queuedEntries(ctx)).filter((e) => onlyIds.has(e.name.replace(/\.json$/, ""))).length : await queueLength(ctx);
+    },
+    { priority }
+  );
+}
+async function runScheduled(ctx, budgetMs) {
+  const until = Date.now() + budgetMs;
+  return withTagging(ctx, async (session) => {
+    if (!await session.drainQueue(until)) return;
+    const pending = await session.scan(until);
+    session.stats.found = pending.length;
+    for (const file of pending) {
+      if (Date.now() > until || await session.shouldYield()) break;
+      if (!await session.processFile(file, { prefilter: true, upgrade: true })) break;
+      await session.save();
+    }
+    session.stats.left = await queueLength(ctx) + pending.filter((f) => !session.processed[f]).length;
+  });
+}
+async function libraryIndex(ctx, budgetMs, { priority = false } = {}) {
+  let index = null;
+  await withTagging(
+    ctx,
+    async (session) => {
+      await session.scan(Date.now() + budgetMs);
+      index = session.index;
+    },
+    { priority }
+  );
+  return index ?? await readJson(indexFile(ctx), {});
+}
+var readWorks = (ctx) => readJson(worksFile(ctx), {});
+function describeStats(stats) {
+  if (!stats) return "Another tagging run is in progress";
+  const parts = [`${stats.tagged} tagged`];
+  if (stats.unchanged) parts.push(`${stats.unchanged} already right`);
+  for (const [reason, count] of Object.entries(stats.skipped)) parts.push(`${count} skipped (${reason})`);
+  if (stats.failed) parts.push(`${stats.failed} failed`);
+  if (stats.left) parts.push(`${stats.left} left for the next run`);
+  return parts.join(", ");
+}
+
+// src/album-works.js
+var cached = /* @__PURE__ */ new Map();
+async function works(ctx) {
+  const file = path4.join(ctx.dataFolder, "works.json");
+  const stat = await fs4.stat(file).catch(() => null);
+  if (!stat) return {};
+  const hit = cached.get(file);
+  if (hit?.mtimeMs === stat.mtimeMs) return hit.works;
+  const value = await readWorks(ctx);
+  cached.set(file, { mtimeMs: stat.mtimeMs, works: value });
+  return value;
+}
+async function albumPresentation(ctx, album) {
+  const known = await works(ctx);
+  const groups = [];
+  let current = null;
+  for (const track of album?.tracks || []) {
+    const real = track.path ? await fs4.realpath(track.path).catch(() => track.path) : null;
+    const entry = real ? known[real] : null;
+    if (!entry?.work?.id) {
+      current = null;
+      continue;
+    }
+    if (current?.workId === entry.work.id) {
+      current.trackIds.push(track.id);
+      continue;
+    }
+    current = {
+      workId: entry.work.id,
+      title: entry.work.title || "Untitled work",
+      ...entry.composer && { subtitle: entry.composer },
+      ...entry.performers && { detail: entry.performers },
+      trackIds: [track.id]
+    };
+    groups.push(current);
+  }
+  if (!groups.length) return null;
+  return { label: "By work", groups: groups.map(({ workId, ...group }) => group) };
+}
+
+// src/mb.js
+import path5 from "node:path";
+
 // src/version.js
-var VERSION = true ? "1.0.4" : "dev";
+var VERSION = "1.1.0";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js
@@ -35351,7 +36295,7 @@ var MusicBrainz = class {
     this.userAgent = `AurralClassical/${VERSION} ( ${REPOSITORY} )`;
     this.fetch = fetchImpl;
     this.log = log2;
-    this.cache = new FileCache(path2.join(dataFolder, "mb-cache"));
+    this.cache = new FileCache(path5.join(dataFolder, "mb-cache"));
     const isPublic = this.base === PUBLIC_MB;
     this.throttle = new Throttle(dataFolder, intervalMs ?? (isPublic ? 1e3 : 0));
     this.maxRetries = maxRetries;
@@ -35374,12 +36318,11 @@ var MusicBrainz = class {
   }
   // True when MusicBrainz answers at all.
   async ping() {
-    await this.throttle.wait();
     try {
-      const response = await this.fetch(`${this.base}/ws/2/artist/1f9df192-a621-4f54-8850-2c5373b7eac9?fmt=json`, {
+      const response = await this.throttle.run(() => this.fetch(`${this.base}/ws/2/artist/1f9df192-a621-4f54-8850-2c5373b7eac9?fmt=json`, {
         headers: { "User-Agent": this.userAgent, Accept: "application/json" },
         signal: AbortSignal.timeout(15e3)
-      });
+      }));
       return response.status < 500 ? true : `it answered ${response.status}`;
     } catch (error) {
       return error.cause?.code || error.message;
@@ -35388,10 +36331,10 @@ var MusicBrainz = class {
   async request(pathAndQuery, ttlMs) {
     const key = `${this.base}|${pathAndQuery}`;
     if (ttlMs > 0) {
-      const cached = await this.cache.get(key, ttlMs);
-      if (cached !== null) {
-        this.lastResult = cached.missing ? "missing" : "ok";
-        return cached.missing ? null : cached;
+      const cached2 = await this.cache.get(key, ttlMs);
+      if (cached2 !== null) {
+        this.lastResult = cached2.missing ? "missing" : "ok";
+        return cached2.missing ? null : cached2;
       }
     }
     this.lastResult = "failed";
@@ -35399,14 +36342,13 @@ var MusicBrainz = class {
     const url = `${this.base}/ws/2/${pathAndQuery}`;
     let lastError = null;
     for (let attempt = 0; attempt < this.maxRetries; attempt++) {
-      await this.throttle.wait();
       this.requests++;
       let response;
       try {
-        response = await this.fetch(url, {
+        response = await this.throttle.run(() => this.fetch(url, {
           headers: { "User-Agent": this.userAgent, Accept: "application/json" },
           signal: AbortSignal.timeout(2e4)
-        });
+        }));
       } catch (error) {
         lastError = error;
         if (attempt < this.maxRetries - 1) await sleep(this.retryWaitMs * (attempt + 1));
@@ -36140,7 +37082,7 @@ function slskdSettings(settings) {
 }
 
 // src/slskd.js
-import { randomUUID as randomUUID2 } from "node:crypto";
+import { randomUUID as randomUUID4 } from "node:crypto";
 var Slskd = class {
   constructor({ url, apiKey }, fetchImpl = fetch) {
     if (!url || !apiKey) throw new Error("Set the slskd URL and API key on the plugin's page");
@@ -36185,7 +37127,7 @@ var Slskd = class {
   }
   // Starts a search and returns its id.
   async startSearch(searchText, searchTimeoutMs) {
-    const id = randomUUID2();
+    const id = randomUUID4();
     const body = { id, searchText, searchTimeout: searchTimeoutMs, filterResponses: true, minimumResponseFileCount: 1, responseLimit: 200, fileLimit: 2e4 };
     await this.request("POST", "/searches", body, { timeoutMs: searchTimeoutMs + 15e3 });
     return id;
@@ -36227,266 +37169,184 @@ var FAILED_STATES = /Errored|Rejected|Cancelled|TimedOut|Aborted|Failed/i;
 var isSucceeded = (state) => /Completed/i.test(state) && /Succeeded/i.test(state);
 
 // src/source.js
-import { randomUUID as randomUUID4 } from "node:crypto";
-import fs3 from "node:fs/promises";
-import path4 from "node:path";
+import { randomUUID as randomUUID5 } from "node:crypto";
+import fs5 from "node:fs/promises";
+import path6 from "node:path";
 
-// src/tags.js
-var import_node_taglib_sharp = __toESM(require_dist(), 1);
-import { randomUUID as randomUUID3 } from "node:crypto";
-import { closeSync, fstatSync, openSync, readSync } from "node:fs";
-import fs2 from "node:fs/promises";
-import path3 from "node:path";
-import_node_taglib_sharp.Id3v2Settings.useNumericGenres = false;
-var READ_STYLE = import_node_taglib_sharp.ReadStyle.None | import_node_taglib_sharp.ReadStyle.PictureLazy;
-var READ_WITH_PROPERTIES = import_node_taglib_sharp.ReadStyle.Average | import_node_taglib_sharp.ReadStyle.PictureLazy;
-var ADDED_TAG_TYPES = import_node_taglib_sharp.TagTypes.Id3v1 | import_node_taglib_sharp.TagTypes.Ape | import_node_taglib_sharp.TagTypes.MovieId | import_node_taglib_sharp.TagTypes.DivX;
-var ITUNES_MEAN = "com.apple.iTunes";
-var MUSICBRAINZ_UFID_OWNER = "http://musicbrainz.org";
-var AUDIO_EXTENSIONS = /* @__PURE__ */ new Set([".flac", ".mp3", ".m4a", ".mp4", ".ogg", ".oga", ".opus"]);
-var isAudioPath = (file) => AUDIO_EXTENSIONS.has(path3.extname(file).toLowerCase());
-var text = (value) => value == null ? "" : String(value).trim();
-var texts = (value) => (Array.isArray(value) ? value : [value]).map(text).filter(Boolean);
-var positive = (value) => {
-  const number = Number(value);
-  return Number.isSafeInteger(number) && number > 0 ? number : 0;
+// src/search/normalize.js
+var LETTERS = { \u00F8: "o", \u00E6: "ae", \u0153: "oe", \u00DF: "ss", \u0142: "l", \u0111: "d", \u00F0: "d", \u00FE: "th", \u0131: "i", \u0127: "h", \u014B: "n" };
+var CYRILLIC = {
+  \u0430: "a",
+  \u0431: "b",
+  \u0432: "v",
+  \u0433: "g",
+  \u0434: "d",
+  \u0435: "e",
+  \u0451: "e",
+  \u0436: "zh",
+  \u0437: "z",
+  \u0438: "i",
+  \u0439: "i",
+  \u043A: "k",
+  \u043B: "l",
+  \u043C: "m",
+  \u043D: "n",
+  \u043E: "o",
+  \u043F: "p",
+  \u0440: "r",
+  \u0441: "s",
+  \u0442: "t",
+  \u0443: "u",
+  \u0444: "f",
+  \u0445: "kh",
+  \u0446: "ts",
+  \u0447: "ch",
+  \u0448: "sh",
+  \u0449: "shch",
+  \u044A: "",
+  \u044B: "y",
+  \u044C: "",
+  \u044D: "e",
+  \u044E: "yu",
+  \u044F: "ya",
+  \u0456: "i",
+  \u0457: "i",
+  \u0454: "e",
+  \u0491: "g"
 };
-var xiphOf = (file) => file.getTag(import_node_taglib_sharp.TagTypes.Xiph, false);
-var id3Of = (file) => file.getTag(import_node_taglib_sharp.TagTypes.Id3v2, false);
-var appleOf = (file) => file.getTag(import_node_taglib_sharp.TagTypes.Apple, false);
-function userTextFrames(id3, description) {
-  const wanted = description.toLowerCase();
-  return id3.getFramesByClassType(import_node_taglib_sharp.Id3v2FrameClassType.UserTextInformationFrame).filter((frame) => frame.description.toLowerCase() === wanted);
+function fold(value) {
+  return String(value ?? "").toLowerCase().replace(/[^\u0000-\u007f]/g, (ch) => LETTERS[ch] ?? CYRILLIC[ch] ?? ch).normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 }
-function textField(xiphName, id3Description, apple) {
-  const box = apple.box ? import_node_taglib_sharp.ByteVector.fromString(apple.box, import_node_taglib_sharp.StringType.Latin1) : null;
-  return {
-    read(file) {
-      const xiph = xiphOf(file);
-      const id3 = id3Of(file);
-      const appleTag = appleOf(file);
-      for (const values of [
-        xiph?.getField(xiphName),
-        id3 && userTextFrames(id3, id3Description)[0]?.text,
-        appleTag && (box ? appleTag.getQuickTimeStrings(box) : appleTag.getItunesStrings(ITUNES_MEAN, apple.name))
-      ]) {
-        const found = texts(values ?? []);
-        if (found.length) return found;
-      }
-      return [];
-    },
-    write(file, values) {
-      const xiph = xiphOf(file);
-      if (xiph) xiph.setFieldAsStrings(xiphName, ...values);
-      const appleTag = appleOf(file);
-      if (appleTag) {
-        if (box) appleTag.setQuickTimeStrings(box, values);
-        else appleTag.setItunesStrings(ITUNES_MEAN, apple.name, ...values);
-      }
-      const id3 = id3Of(file);
-      if (id3) {
-        for (const frame of userTextFrames(id3, id3Description)) id3.removeFrame(frame);
-        if (values.length) {
-          const frame = import_node_taglib_sharp.Id3v2UserTextInformationFrame.fromDescription(id3Description);
-          frame.text = values;
-          id3.addFrame(frame);
-        }
-      }
-    }
-  };
-}
-var workField = textField("WORK", "WORK", { box: "\xA9wrk" });
-var workIdField = textField("MUSICBRAINZ_WORKID", "MusicBrainz Work Id", { name: "MusicBrainz Work Id" });
-var artistIdsField = textField("MUSICBRAINZ_ARTISTID", "MusicBrainz Artist Id", { name: "MusicBrainz Artist Id" });
-var albumArtistIdsField = textField("MUSICBRAINZ_ALBUMARTISTID", "MusicBrainz Album Artist Id", { name: "MusicBrainz Album Artist Id" });
-var WRITERS = {
-  title: {
-    read: (file) => texts(file.tag.title),
-    write: (file, values) => file.tag.title = values[0] ?? void 0
-  },
-  artist: {
-    read: (file) => texts(file.tag.performers),
-    write: (file, values) => file.tag.performers = values
-  },
-  albumArtist: {
-    read: (file) => texts(file.tag.albumArtists),
-    write: (file, values) => file.tag.albumArtists = values
-  },
-  composer: {
-    read: (file) => texts(file.tag.composers),
-    write: (file, values) => file.tag.composers = values
-  },
-  work: { read: (file) => workField.read(file), write: (file, values) => workField.write(file, values) },
-  workId: { read: (file) => workIdField.read(file), write: (file, values) => workIdField.write(file, values) },
-  recordingMbid: {
-    read: (file) => texts(file.tag.musicBrainzTrackId),
-    write: (file, values) => {
-      const id3 = id3Of(file);
-      for (const frame of id3?.getFramesByClassType(import_node_taglib_sharp.Id3v2FrameClassType.UniqueFileIdentifierFrame) || []) {
-        if (frame.owner === MUSICBRAINZ_UFID_OWNER) id3.removeFrame(frame);
-      }
-      file.tag.musicBrainzTrackId = values[0] ?? void 0;
-    }
-  }
-};
-function isFragmentedMp4(filePath) {
-  const fd = openSync(filePath, "r");
-  try {
-    const size = fstatSync(fd).size;
-    const header = Buffer.alloc(16);
-    for (let offset = 0; offset + 8 <= size; ) {
-      readSync(fd, header, 0, 16, offset);
-      const type = header.toString("latin1", 4, 8);
-      if (offset === 0 && type !== "ftyp") return false;
-      if (type === "moof") return true;
-      const boxSize = header.readUInt32BE(0);
-      const length = boxSize === 1 ? Number(header.readBigUInt64BE(8)) : boxSize === 0 ? size - offset : boxSize;
-      if (length < 8) return false;
-      offset += length;
-    }
-    return false;
-  } finally {
-    closeSync(fd);
-  }
-}
-var UnsupportedFormat = class extends Error {
-};
-function openFile(filePath, readStyle = READ_STYLE, asPath = filePath) {
-  if (!isAudioPath(asPath)) throw new UnsupportedFormat(`can't tag ${path3.extname(asPath) || "this kind of"} files`);
-  if (isFragmentedMp4(filePath)) throw new UnsupportedFormat("can't tag fragmented MP4 files");
-  try {
-    return import_node_taglib_sharp.File.createFromPath(filePath, `taglib/${path3.extname(asPath).slice(1).toLowerCase()}`, readStyle);
-  } catch (error) {
-    if (/unsupported format/i.test(String(error?.message))) throw new UnsupportedFormat("can't tag this kind of file");
-    throw error;
-  }
-}
-function readValues(filePath, fields) {
-  const file = openFile(filePath);
-  try {
-    return Object.fromEntries(fields.map((field) => [field, WRITERS[field].read(file)]));
-  } finally {
-    file.dispose();
-  }
-}
-function readTags(filePath) {
-  const file = openFile(filePath, READ_WITH_PROPERTIES);
-  try {
-    const tag = file.tag;
-    return {
-      title: text(tag.title),
-      artist: text(tag.performers?.[0]),
-      albumArtist: text(tag.albumArtists?.[0]),
-      album: text(tag.album),
-      recordingMbid: text(tag.musicBrainzTrackId),
-      releaseMbid: text(tag.musicBrainzReleaseId),
-      releaseGroupMbid: text(tag.musicBrainzReleaseGroupId),
-      // Every album artist ID: taglib's own property has only the first.
-      albumArtistMbids: [...new Set([...albumArtistIdsField.read(file), text(tag.musicBrainzReleaseArtistId)].flatMap((v) => texts(v.split(/[;/]/))))],
-      artistMbids: artistIdsField.read(file).flatMap((value) => texts(value.split(/[;/]/))),
-      genres: texts(tag.genres ?? []).flatMap((genre) => texts(genre.split(";"))),
-      composer: texts(tag.composers ?? []),
-      work: workField.read(file)[0] ?? "",
-      workId: workIdField.read(file)[0] ?? "",
-      trackNumber: positive(tag.track),
-      discNumber: positive(tag.disc),
-      durationMs: Math.round(file.properties?.durationMilliseconds || 0)
-    };
-  } finally {
-    file.dispose();
-  }
-}
-var same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-async function writeTags(filePath, values) {
-  const source = path3.resolve(filePath);
-  const preview = openFile(source);
-  let changed;
-  try {
-    changed = Object.keys(values).filter((field) => !same(WRITERS[field].read(preview), texts(values[field])));
-  } finally {
-    preview.dispose();
-  }
-  if (!changed.length) return [];
-  const extension = path3.extname(source);
-  const working = path3.join(path3.dirname(source), `.${path3.basename(source, extension)}.${randomUUID3()}.tagging`);
-  await fs2.copyFile(source, working, fs2.constants.COPYFILE_FICLONE);
-  try {
-    const file = openFile(working, READ_STYLE, source);
-    try {
-      file.removeTags(ADDED_TAG_TYPES & ~file.tagTypesOnDisk);
-      const id3 = id3Of(file);
-      if (id3 && !(file.tagTypesOnDisk & import_node_taglib_sharp.TagTypes.Id3v2)) id3.version = 4;
-      for (const field of changed) WRITERS[field].write(file, texts(values[field]));
-      file.save();
-    } finally {
-      file.dispose();
-    }
-    await fs2.rename(working, source);
-  } catch (error) {
-    await fs2.rm(working, { force: true }).catch(() => {
-    });
-    throw error;
-  }
-  return changed;
-}
-
-// src/works.js
-var CATALOGUES = [
-  [/\bBWV\s*(\d+[a-z]?)/i, "BWV"],
-  [/\bHWV\s*(\d+[a-z]?)/i, "HWV"],
-  [/\bRV\s*(\d+[a-z]?)/i, "RV"],
-  [/\bK(?:V|\.)?\s*(\d+[a-z]?)\b/, "K"],
-  [/\bD\.?\s*(\d+[a-z]?)\b/, "D"],
-  [/\bHob\.?\s*([IVXL]+[a-z]?:\s*\d+[a-z]?)/i, "Hob"],
-  [/\bWoO\s*(\d+)/i, "WoO"],
-  [/\bS\.\s*(\d+)/, "S"],
-  [/\bSz\.?\s*(\d+)/i, "Sz"],
-  [/\bBB\s*(\d+)/, "BB"],
-  [/\bTrV\s*(\d+)/i, "TrV"],
-  [/\bL\.\s*(\d+)/, "L"],
-  [/\bFP\s*(\d+)/, "FP"]
+var words = (value) => fold(value).split(" ").filter(Boolean);
+var SYSTEMS = [
+  ["bwv", "bwv"],
+  ["buxwv", "buxwv"],
+  ["swv", "swv"],
+  ["hwv", "hwv"],
+  ["fp", "fp"],
+  ["jb", "jb"],
+  ["cd", "cd"],
+  ["z", "z"],
+  ["twv", "twv"],
+  ["wwv", "wwv"],
+  ["rv", "rv"],
+  ["hob", "hob"],
+  ["wab", "wab"],
+  ["woo", "woo"],
+  ["kv", "k"],
+  ["k", "k"],
+  ["d", "d"],
+  ["s", "s"],
+  ["sz", "sz"],
+  ["bb", "bb"],
+  ["trv", "trv"],
+  ["fs", "fs"],
+  ["l", "l"],
+  ["kk", "kk"],
+  ["jw", "jw"],
+  ["op", "op"],
+  ["opus", "op"],
+  ["opp", "op"]
 ];
-var OPUS = /\bop(?:us|\.)?\s*(\d+[a-z]?)(?:\s*,?\s*(?:no\.?|nr\.?|n°)\s*(\d+))?/i;
-function catalogueNumber(title) {
-  const text2 = String(title || "");
-  for (const [pattern, prefix] of CATALOGUES) {
-    const match = text2.match(pattern);
-    if (match) return `${prefix} ${match[1].replace(/\s+/g, "")}`;
+var PREFIX = SYSTEMS.map(([written]) => written).sort((a, b) => b.length - a.length).join("|");
+var ROMAN = "(?:x{0,3})(?:ix|iv|v?i{0,3})";
+var HOBOKEN = new RegExp(`\\bhob\\.?\\s*(${ROMAN}[a-z]?)\\s*[:/.\\s]\\s*(\\d+[a-z]?)`, "giu");
+var NUMBERED = new RegExp(
+  `(?<![\\p{L}\\p{N}])(${PREFIX})\\.?\\s*(\\d+[a-z]?)(?:\\s*(?:,\\s*|\\/|\\s+)(?:(?:no|nr|n\xB0|num|number|#)\\.?\\s*)?(\\d+[a-z]?)(?![\\p{L}\\p{N}]))?`,
+  "giu"
+);
+var SYSTEM = new Map(SYSTEMS);
+
+// src/slskd-ranking.js
+var GOOD_SCORE = 60;
+var REVIEW_SCORE = 45;
+function searchLadder(info, { albumTitle = "" } = {}) {
+  if (!info?.performer) return [];
+  const performer = surname(info.performer);
+  const conductor = info.conductor && info.conductor !== info.performer ? surname(info.conductor) : "";
+  const ensemble = info.ensemble && info.ensemble !== info.performer ? surname(info.ensemble) : "";
+  const composer = surname(info.composer);
+  const work = shortWorkTitle(info.workTitle);
+  const catalogue = catalogueNumber(info.workTitle) || catalogueNumber(info.movementTitle);
+  const album = searchWords(albumTitle);
+  const steps = [
+    { step: 1, label: "Performer + album", parts: [performer, album] },
+    { step: 2, label: "Performer + work", parts: [performer, work, catalogue] },
+    { step: 3, label: "Conductor or orchestra + album", parts: [conductor || ensemble, album], skip: !(conductor || ensemble) },
+    { step: 4, label: "Performer + composer + work", parts: [performer, composer, work] },
+    { step: 5, label: "Broad work search", parts: [composer, work, catalogue] }
+  ];
+  const seen = /* @__PURE__ */ new Set();
+  const ladder = [];
+  for (const { step, label, parts, skip } of steps) {
+    if (skip) continue;
+    const query = searchWords(parts.filter(Boolean).join(" "));
+    if (query.split(" ").length < 2 || seen.has(query.toLowerCase())) continue;
+    seen.add(query.toLowerCase());
+    ladder.push({ step, label, query });
   }
-  const opus = text2.match(OPUS);
-  if (opus) return `op ${opus[1]}${opus[2] ? ` no ${opus[2]}` : ""}`;
-  return "";
+  return ladder;
 }
-function shortWorkTitle(title) {
-  let text2 = String(title || "").split(":")[0];
-  text2 = text2.replace(OPUS, " ");
-  for (const [pattern] of CATALOGUES) text2 = text2.replace(pattern, " ");
-  text2 = text2.replace(/\bin\s+[A-G](?:[- ]?(?:flat|sharp|♭|♯|b|#))?\s*(?:major|minor|maj|min|dur|moll)\b/gi, " ").replace(/\b(?:no|nr|n°)\.?\s*(?=\d)/gi, " ").replace(/[“”"'’,;()[\]]/g, " ");
-  return searchWords(text2);
+var haystackOf = (folder2) => ` ${words([folder2.directory, ...folder2.files.map((f) => f.filename)].join(" ")).join(" ")} `;
+var has = (haystack, name) => {
+  const wanted = words(name);
+  return wanted.length > 0 && wanted.every((word) => haystack.includes(` ${word} `));
+};
+var coverage = (haystack, text2) => {
+  const wanted = words(text2).filter((word) => word.length > 1);
+  return wanted.length ? wanted.filter((word) => haystack.includes(` ${word} `)).length / wanted.length : 0;
+};
+function scoreFolder(folder2, info, { albumTitle = "", movements = [] } = {}) {
+  const haystack = haystackOf(folder2);
+  const reasons = [];
+  let score = 0;
+  const performer = surname(info.performer);
+  const conductor = info.conductor && info.conductor !== info.performer ? surname(info.conductor) : "";
+  const ensemble = info.ensemble && info.ensemble !== info.performer ? surname(info.ensemble) : "";
+  const hasPerformer = has(haystack, performer);
+  const hasConductor = Boolean(conductor) && has(haystack, conductor);
+  const hasEnsemble = Boolean(ensemble) && has(haystack, ensemble);
+  if (!hasPerformer && !hasConductor && !hasEnsemble)
+    return {
+      score: 0,
+      rejected: info.composer && has(haystack, surname(info.composer)) ? "names the composer but none of the performers" : "names none of the performers",
+      reasons
+    };
+  if (hasPerformer) score += 30, reasons.push(`performer ${performer}`);
+  if (hasConductor) score += 12, reasons.push(`conductor ${conductor}`);
+  if (hasEnsemble) score += 12, reasons.push(`ensemble ${ensemble}`);
+  const album = coverage(haystack, albumTitle);
+  if (album > 0) score += Math.round(album * 20), reasons.push(`release title ${Math.round(album * 100)}%`);
+  const work = coverage(haystack, shortWorkTitle(info.workTitle));
+  if (work > 0) score += Math.round(work * 10), reasons.push(`work ${Math.round(work * 100)}%`);
+  const catalogue = catalogueNumber(info.workTitle) || catalogueNumber(info.movementTitle);
+  if (catalogue && coverage(haystack, catalogue) === 1) score += 10, reasons.push(`catalogue ${catalogue}`);
+  if (movements.length) {
+    const named = movements.filter((title) => coverage(haystack, title) >= 0.5).length / movements.length;
+    if (named > 0) score += Math.round(named * 8), reasons.push(`movements ${Math.round(named * 100)}%`);
+  }
+  if (folder2.format === "flac") score += 5, reasons.push("lossless");
+  return { score: Math.min(score, 100), rejected: null, reasons };
 }
-function searchWords(text2) {
-  return String(text2 || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim().split(/\s+/).filter(Boolean).join(" ");
+var folderKey = (folder2) => `${fold(folder2.directory.split(/[\\/]/).pop())}|${folder2.files.map((f) => f.size).join(",")}`;
+function rankCandidates(candidates) {
+  const sorted = [...candidates].sort((a, b) => b.match.score - a.match.score || a.availability - b.availability);
+  const firstOf = /* @__PURE__ */ new Map();
+  for (const candidate of sorted) {
+    const key = candidate.folders.map(folderKey).join("||");
+    if (firstOf.has(key)) candidate.duplicateOf = firstOf.get(key);
+    else firstOf.set(key, `${candidate.username}:${candidate.folders[0].directory}`);
+  }
+  const unique2 = sorted.filter((c) => !c.duplicateOf);
+  return unique2.flatMap((c) => [c, ...sorted.filter((d) => d.duplicateOf === `${c.username}:${c.folders[0].directory}`)]);
 }
-function surname(person) {
-  if (!person) return "";
-  const sort = String(person.sortName || "");
-  if (sort.includes(",")) return searchWords(sort.split(",")[0]);
-  return searchWords(person.name);
-}
-function creditString(credit) {
-  return (credit || []).map((entry) => `${entry.name ?? entry.artist?.name ?? ""}${entry.joinphrase ?? ""}`).join("").trim();
-}
-async function topWork(mb, work, depth = 0) {
-  if (!work || depth >= 3) return work;
-  const parent = (work.relations || []).find((rel) => rel.type === "parts" && rel.direction === "backward" && rel.work?.id);
-  if (!parent) return work;
-  const data = await mb.get("work", parent.work.id, "artist-rels+work-rels");
-  return data ? topWork(mb, data, depth + 1) : work;
-}
-var RELEASE_INC = "recordings+artist-credits+release-groups+media";
-function releaseYear(date) {
-  const year = Number(String(date || "").slice(0, 4));
-  return Number.isInteger(year) && year > 0 ? year : null;
+var isAmbiguous = (candidate) => candidate.match.score < REVIEW_SCORE;
+function withLineUp(match, { whole }) {
+  return {
+    ...match,
+    score: Math.min(100, match.score + (whole ? 25 : 20)),
+    reasons: [...match.reasons, whole ? "every track lines up with the release" : "the track lines up with an edition of the release"]
+  };
 }
 
 // src/source.js
@@ -36575,10 +37435,10 @@ function groupFolders(responses) {
       });
     }
   }
-  for (const folder of folders.values()) {
-    folder.files.sort((a, b) => naturalCompare(remoteBase(a.filename), remoteBase(b.filename)));
-    const extensions = new Set(folder.files.map((f) => f.extension));
-    folder.format = extensions.size === 1 ? [...extensions][0] : null;
+  for (const folder2 of folders.values()) {
+    folder2.files.sort((a, b) => naturalCompare(remoteBase(a.filename), remoteBase(b.filename)));
+    const extensions = new Set(folder2.files.map((f) => f.extension));
+    folder2.format = extensions.size === 1 ? [...extensions][0] : null;
   }
   return [...folders.values()];
 }
@@ -36591,27 +37451,27 @@ function linesUp(files, tracks, options = {}) {
   if (files.length !== tracks.length) return false;
   return files.every((file, i) => file.lengthMs != null && lengthGap(file.lengthMs, tracks[i], options) <= LENGTH_TOLERANCE_MS);
 }
-function folderDiscs(folder, release, options = {}) {
+function folderDiscs(folder2, release, options = {}) {
   const all = release.discs.flatMap((disc2) => disc2.tracks);
-  if (release.discs.length > 1 && linesUp(folder.files, all, options)) return release.discs.map((d) => d.position);
-  const disc = release.discs.find((d) => linesUp(folder.files, d.tracks, options));
+  if (release.discs.length > 1 && linesUp(folder2.files, all, options)) return release.discs.map((d) => d.position);
+  const disc = release.discs.find((d) => linesUp(folder2.files, d.tracks, options));
   return disc ? [disc.position] : null;
 }
-var folderScore = (folder) => (folder.freeSlot ? 0 : 1e9) + folder.queueLength * 1e6 + (LOSSLESS.has(folder.format) ? 0 : 1e5) - Math.min(folder.speed, 99999);
-function mapFiles(folder, release, discPositions) {
+var folderScore = (folder2) => (folder2.freeSlot ? 0 : 1e9) + folder2.queueLength * 1e6 + (LOSSLESS.has(folder2.format) ? 0 : 1e5) - Math.min(folder2.speed, 99999);
+function mapFiles(folder2, release, discPositions) {
   const tracks = discPositions.flatMap((position) => {
     const disc = release.discs.find((d) => d.position === position);
     return disc.tracks.map((track) => ({ disc: position, track }));
   });
-  return folder.files.map((file, i) => ({ file, ...tracks[i] }));
+  return folder2.files.map((file, i) => ({ file, ...tracks[i] }));
 }
 function albumCandidates(folders, release) {
   const byUser = /* @__PURE__ */ new Map();
-  for (const folder of folders) {
-    const discs = folderDiscs(folder, release);
+  for (const folder2 of folders) {
+    const discs = folderDiscs(folder2, release);
     if (!discs) continue;
-    if (!byUser.has(folder.username)) byUser.set(folder.username, []);
-    byUser.get(folder.username).push({ folder, discs });
+    if (!byUser.has(folder2.username)) byUser.set(folder2.username, []);
+    byUser.get(folder2.username).push({ folder: folder2, discs });
   }
   const wanted = release.discs.map((d) => d.position);
   const candidates = [];
@@ -36625,7 +37485,7 @@ function albumCandidates(folders, release) {
       match.discs.forEach((d) => covered.add(d));
     }
     if (!wanted.every((d) => covered.has(d))) continue;
-    const files = chosen.flatMap(({ folder, discs }) => mapFiles(folder, release, discs));
+    const files = chosen.flatMap(({ folder: folder2, discs }) => mapFiles(folder2, release, discs));
     const first = chosen[0].folder;
     candidates.push({ username, folders: chosen.map((c) => c.folder), files, score: Math.max(...chosen.map((c) => folderScore(c.folder))), format: first.format, bitRate: first.files[0]?.bitRate ?? null });
   }
@@ -36633,12 +37493,12 @@ function albumCandidates(folders, release) {
 }
 function trackCandidates(folders, release, discPosition, trackIndexInDisc) {
   const out = [];
-  for (const folder of folders) {
-    const discs = folderDiscs(folder, release, { anyEdition: true });
+  for (const folder2 of folders) {
+    const discs = folderDiscs(folder2, release, { anyEdition: true });
     if (!discs?.includes(discPosition)) continue;
-    const mapped = mapFiles(folder, release, discs);
+    const mapped = mapFiles(folder2, release, discs);
     const hit = mapped.find((m) => m.disc === discPosition && m.track === release.discs.find((d) => d.position === discPosition).tracks[trackIndexInDisc]);
-    if (hit) out.push({ folder, ...hit, score: folderScore(folder) });
+    if (hit) out.push({ folder: folder2, ...hit, score: folderScore(folder2) });
   }
   return out.sort((a, b) => a.score - b.score);
 }
@@ -36649,14 +37509,14 @@ function describeMisses(folders, release, options = {}) {
   let wrongCount = 0;
   let wrongLengths = 0;
   let closest = null;
-  for (const folder of folders) {
-    if (folderDiscs(folder, release, options)) continue;
-    if (!counts.has(folder.files.length)) wrongCount++;
-    else if (folder.files.some((f) => f.lengthMs == null)) noLengths++;
+  for (const folder2 of folders) {
+    if (folderDiscs(folder2, release, options)) continue;
+    if (!counts.has(folder2.files.length)) wrongCount++;
+    else if (folder2.files.some((f) => f.lengthMs == null)) noLengths++;
     else {
       wrongLengths++;
-      const tracks = release.discs.find((d) => d.tracks.length === folder.files.length)?.tracks ?? release.discs.flatMap((d) => d.tracks);
-      const offs = folder.files.map((f, i) => tracks[i] ? lengthGap(f.lengthMs, tracks[i], options) : Infinity);
+      const tracks = release.discs.find((d) => d.tracks.length === folder2.files.length)?.tracks ?? release.discs.flatMap((d) => d.tracks);
+      const offs = folder2.files.map((f, i) => tracks[i] ? lengthGap(f.lengthMs, tracks[i], options) : Infinity);
       const worst = Math.max(...offs);
       if (!closest || worst < closest.worst) closest = { worst, at: offs.indexOf(worst) + 1, over: offs.filter((o) => o > LENGTH_TOLERANCE_MS).length };
     }
@@ -36671,61 +37531,77 @@ async function classicalInfo(ctx, recordingId, { albumArtistIds = [], releaseGro
   const movement = fields.workId ? await ctx.mb.get("work", fields.workId, "artist-rels+work-rels") : null;
   const work = movement ? await topWork(ctx.mb, movement) : null;
   const people = fields.people;
-  const performer = people.conductors[0] || people.soloists[0] || people.ensembles[0] || null;
+  const performer = people.soloists[0] || people.conductors[0] || people.ensembles[0] || null;
   return {
     fields,
     composer: people.composers[0] || null,
     performer,
+    conductor: people.conductors[0] || null,
+    ensemble: people.ensembles[0] || null,
     workTitle: work?.title || fields.work || "",
     movementTitle: fields.work || ""
   };
 }
-function searchQueries(info, { albumTitle = "", album = false } = {}) {
-  const composer = surname(info.composer);
-  const performer = surname(info.performer);
-  const work = shortWorkTitle(info.workTitle);
-  const catalogue = catalogueNumber(info.workTitle) || catalogueNumber(info.movementTitle);
-  const title = searchWords(albumTitle);
-  const byWork = [
-    [composer, work, catalogue, performer],
-    [composer, catalogue, performer],
-    [composer, work, performer]
-  ];
-  const byAlbum = [
-    [composer, title, performer],
-    [composer, title]
-  ];
-  const candidates = album ? [...byAlbum, ...byWork] : [byWork[0], byAlbum[0], byWork[1], byWork[2], byAlbum[1]];
-  const seen = /* @__PURE__ */ new Set();
-  const queries = [];
-  for (const parts of candidates) {
-    const query = searchWords(parts.filter(Boolean).join(" "));
-    if (query.split(" ").length < 3 || seen.has(query.toLowerCase())) continue;
-    seen.add(query.toLowerCase());
-    queries.push(query);
-  }
-  return queries;
-}
-async function searchFolders(ctx, slskd, queries, accept, started) {
+async function searchFolders(ctx, slskd, ladder, { info, albumTitle, movements, accept }, started) {
   const deadline = started + SEARCH_BUDGET_MS;
-  let folders = [];
-  for (const query of queries) {
+  const kept = /* @__PURE__ */ new Map();
+  const rejected = [];
+  const steps = [];
+  for (const { step, label, query } of ladder) {
     const listenMs = Math.min(SEARCH_TIMEOUT_MS, deadline - Date.now() - 3e3);
     if (listenMs < 5e3) {
       ctx.log(`Out of time before searching for "${query}"`);
+      steps.push({ step, label, query, skipped: "out of time" });
       break;
     }
-    ctx.log(`Searching Soulseek for "${query}" (${Math.round(listenMs / 1e3)}s)`);
+    ctx.log(`Searching Soulseek for "${query}" (${label}, ${Math.round(listenMs / 1e3)}s)`);
+    let found = [];
     try {
       const responses = await slskd.search(query, { searchTimeoutMs: listenMs, deadline: Math.min(deadline, Date.now() + listenMs + 4e3) });
-      folders = folders.concat(groupFolders(responses));
+      found = groupFolders(responses);
     } catch (error) {
-      if (!folders.length && query === queries.at(-1)) throw error;
+      if (!kept.size && step === ladder.at(-1).step) throw error;
       ctx.log(`A Soulseek search failed: ${error.message}`);
+      steps.push({ step, label, query, error: error.message });
+      continue;
     }
-    if (accept(folders)) break;
+    let qualified = 0;
+    for (const folder2 of found) {
+      const key = `${folder2.username}\0${folder2.directory}`;
+      if (kept.has(key)) continue;
+      const match = scoreFolder(folder2, info, { albumTitle, movements });
+      if (match.rejected) {
+        if (rejected.length < 200) rejected.push({ username: folder2.username, directory: folder2.directory, reason: match.rejected, step });
+        continue;
+      }
+      qualified++;
+      kept.set(key, Object.assign(folder2, { match, step }));
+    }
+    const done = accept([...kept.values()]);
+    steps.push({ step, label, query, folders: found.length, qualified, stopped: done });
+    if (done) break;
   }
-  return folders;
+  return { folders: [...kept.values()], rejected, steps };
+}
+var DIAGNOSTICS = "slskd-searches.json";
+var KEEP_DIAGNOSTICS = 25;
+async function recordSearch(ctx, record) {
+  const file = path6.join(ctx.dataFolder, DIAGNOSTICS);
+  const previous = await readJson(file, []);
+  await writeJson(file, [{ at: Date.now(), ...record }, ...Array.isArray(previous) ? previous : []].slice(0, KEEP_DIAGNOSTICS)).catch((error) => ctx.log(`Couldn't save slskd diagnostics: ${error.message}`));
+}
+var describe = (candidate) => ({
+  username: candidate.username,
+  directory: candidate.folders?.[0]?.directory ?? candidate.folder?.directory,
+  score: candidate.match.score,
+  reasons: candidate.match.reasons,
+  step: candidate.step,
+  ...candidate.duplicateOf && { duplicateOf: candidate.duplicateOf },
+  ...isAmbiguous(candidate) && { review: true }
+});
+function chooseCandidates(candidates, { manual }) {
+  const ranked = rankCandidates(candidates);
+  return { ranked, offered: manual ? ranked : ranked.filter((candidate) => !isAmbiguous(candidate)) };
 }
 function slskdFor(ctx) {
   const settings = slskdSettings(ctx.settings);
@@ -36741,7 +37617,7 @@ function locateTrack(release, track) {
   const index = disc ? disc.tracks.findIndex((t) => t.position === track.trackNumber) : -1;
   return { discPosition: disc?.position ?? null, index };
 }
-async function searchTrack(ctx, track) {
+async function searchTrack(ctx, track, { manual = false } = {}) {
   const started = Date.now();
   if (!track?.releaseMbid) return [];
   const release = await loadRelease(ctx.mb, track.releaseMbid);
@@ -36752,12 +37628,22 @@ async function searchTrack(ctx, track) {
   const info = await classicalInfo(ctx, recordingId, { releaseGroupId: release.releaseGroupId });
   if (!info) return [];
   const slskd = slskdFor(ctx);
-  const queries = searchQueries(info, { albumTitle: release.title });
-  const folders = await searchFolders(ctx, slskd, queries, (found) => trackCandidates(found, release, discPosition, index).length > 0, started);
   const target = release.discs.find((d) => d.position === discPosition).tracks[index];
+  const ladder = searchLadder(info, { albumTitle: release.title });
+  const withScore = (found) => trackCandidates(found, release, discPosition, index).map((c) => ({ ...c, username: c.folder.username, folders: [c.folder], match: withLineUp(c.folder.match, { whole: false }), step: c.folder.step, availability: c.score }));
+  const { folders, rejected, steps } = await searchFolders(
+    ctx,
+    slskd,
+    ladder,
+    { info, albumTitle: release.title, movements: [target.title], accept: (found) => withScore(found).some((c) => c.match.score >= GOOD_SCORE) },
+    started
+  );
   ctx.log(`Release ${release.id}: ${describeMisses(folders, release, { anyEdition: true })}`);
   const seen = /* @__PURE__ */ new Set();
-  return trackCandidates(folders, release, discPosition, index).filter((c) => !seen.has(`${c.folder.username}\0${c.file.filename}`) && seen.add(`${c.folder.username}\0${c.file.filename}`)).slice(0, MAX_RESULTS).map((c) => ({
+  const unique2 = withScore(folders).filter((c) => !seen.has(`${c.folder.username}\0${c.file.filename}`) && seen.add(`${c.folder.username}\0${c.file.filename}`));
+  const { ranked, offered } = chooseCandidates(unique2, { manual });
+  await recordSearch(ctx, { kind: "track", manual, release: { id: release.id, title: release.title }, track: target.title, performer: info.performer?.name || null, steps, candidates: ranked.slice(0, 30).map(describe), rejected: rejected.slice(0, 30), offered: offered.length });
+  return offered.slice(0, MAX_RESULTS).map((c) => ({
     id: `${c.folder.username}:${c.file.filename}`.slice(0, 500),
     title: track.title || target.title,
     artist: track.artist || release.artist,
@@ -36771,7 +37657,7 @@ async function searchTrack(ctx, track) {
     }
   }));
 }
-async function searchAlbum(ctx, album) {
+async function searchAlbum(ctx, album, { manual = false } = {}) {
   const started = Date.now();
   if (!album?.releaseMbid) return [];
   const release = await loadRelease(ctx.mb, album.releaseMbid);
@@ -36785,10 +37671,23 @@ async function searchAlbum(ctx, album) {
   }
   if (!info) return [];
   const slskd = slskdFor(ctx);
-  const queries = searchQueries(info, { albumTitle: release.title, album: true });
-  const folders = await searchFolders(ctx, slskd, queries, (found) => albumCandidates(found, release).length > 0, started);
+  const ladder = searchLadder(info, { albumTitle: release.title });
+  const movements = release.discs.flatMap((d) => d.tracks.map((t) => t.title)).slice(0, 60);
+  const withScore = (found) => albumCandidates(found, release).map((c) => {
+    const lead = [...c.folders].sort((a, b) => a.match.score - b.match.score)[0];
+    return { ...c, match: withLineUp(lead.match, { whole: true }), step: lead.step, availability: c.score };
+  });
+  const { folders, rejected, steps } = await searchFolders(
+    ctx,
+    slskd,
+    ladder,
+    { info, albumTitle: release.title, movements, accept: (found) => withScore(found).some((c) => c.match.score >= GOOD_SCORE) },
+    started
+  );
   ctx.log(`Release ${release.id}: ${describeMisses(folders, release)}`);
-  return albumCandidates(folders, release).slice(0, MAX_RESULTS).map((c) => ({
+  const { ranked, offered } = chooseCandidates(withScore(folders), { manual });
+  await recordSearch(ctx, { kind: "album", manual, release: { id: release.id, title: release.title }, performer: info.performer?.name || null, steps, candidates: ranked.slice(0, 30).map(describe), rejected: rejected.slice(0, 30), offered: offered.length });
+  return offered.slice(0, MAX_RESULTS).map((c) => ({
     id: `${c.username}:${c.folders.map((f) => f.directory).join("|")}`.slice(0, 500),
     title: album.title || release.title,
     artist: album.artist || release.artist,
@@ -36811,7 +37710,7 @@ async function searchAlbum(ctx, album) {
     }
   }));
 }
-var downloadsDir = (ctx) => path4.join(ctx.dataFolder, "downloads");
+var downloadsDir = (ctx) => path6.join(ctx.dataFolder, "downloads");
 async function startDownload(ctx, result, kind) {
   const data = result?.data;
   if (!data?.username || !Array.isArray(data.files) || !data.files.length) throw new Error("The result has no files to download");
@@ -36825,8 +37724,8 @@ async function startDownload(ctx, result, kind) {
   }
   const slskd = slskdFor(ctx);
   await slskd.enqueue(data.username, data.files.map((f) => ({ filename: f.filename, size: f.size })));
-  const id = randomUUID4();
-  await writeJson(path4.join(downloadsDir(ctx), `${id}.json`), { kind, key, username: data.username, files: data.files, startedAt: Date.now() });
+  const id = randomUUID5();
+  await writeJson(path6.join(downloadsDir(ctx), `${id}.json`), { kind, key, username: data.username, files: data.files, startedAt: Date.now() });
   return { pending: id };
 }
 var downloadKey = (username, files) => `${username}\0${files.map((f) => f.filename).sort().join("\0")}`;
@@ -36834,11 +37733,11 @@ var KEEP_DOWNLOADS_MS = 2 * 24 * 60 * 6e4;
 var MISSING_GRACE_MS = 2 * 6e4;
 async function findDownload(ctx, key) {
   const dir = downloadsDir(ctx);
-  for (const name of await fs3.readdir(dir).catch(() => [])) {
+  for (const name of await fs5.readdir(dir).catch(() => [])) {
     if (!name.endsWith(".json")) continue;
-    const record = await readJson(path4.join(dir, name), null);
+    const record = await readJson(path6.join(dir, name), null);
     if (!record || Date.now() - (record.startedAt || 0) > KEEP_DOWNLOADS_MS) {
-      await fs3.rm(path4.join(dir, name), { force: true });
+      await fs5.rm(path6.join(dir, name), { force: true });
       continue;
     }
     if (record.key === key && !record.failed) return name.replace(/\.json$/, "");
@@ -36847,20 +37746,20 @@ async function findDownload(ctx, key) {
 }
 async function locate(downloadFolder, file) {
   const base = remoteBase(file.filename);
-  const direct = path4.join(downloadFolder, remoteBase(remoteDir(file.filename)), base);
-  const stat = await fs3.stat(direct).catch(() => null);
+  const direct = path6.join(downloadFolder, remoteBase(remoteDir(file.filename)), base);
+  const stat = await fs5.stat(direct).catch(() => null);
   if (stat?.isFile()) return direct;
   let seen = 0;
   const walk = async (dir, depth) => {
     if (depth > 4) return null;
-    for (const entry of await fs3.readdir(dir, { withFileTypes: true }).catch(() => [])) {
+    for (const entry of await fs5.readdir(dir, { withFileTypes: true }).catch(() => [])) {
       if (++seen > 5e4) return null;
-      const full = path4.join(dir, entry.name);
+      const full = path6.join(dir, entry.name);
       if (entry.isDirectory()) {
         const found = await walk(full, depth + 1);
         if (found) return found;
       } else if (entry.isFile() && (entry.name === base || entry.name.replace(/_\d{15,}(?=\.[^.]+$)/, "") === base)) {
-        const s = await fs3.stat(full).catch(() => null);
+        const s = await fs5.stat(full).catch(() => null);
         if (s && (!file.size || s.size === file.size)) return full;
       }
     }
@@ -36869,7 +37768,7 @@ async function locate(downloadFolder, file) {
   return walk(downloadFolder, 0);
 }
 async function downloadStatus(ctx, id, directory) {
-  const record = await readJson(path4.join(downloadsDir(ctx), `${id}.json`), null);
+  const record = await readJson(path6.join(downloadsDir(ctx), `${id}.json`), null);
   if (!record) throw new Error("This download is unknown to the plugin");
   const slskd = slskdFor(ctx);
   const transfers = await slskd.downloads(record.username);
@@ -36888,7 +37787,7 @@ async function downloadStatus(ctx, id, directory) {
     }
   }
   const failed = states.find((state) => FAILED_STATES.test(state));
-  if (failed) await writeJson(path4.join(downloadsDir(ctx), `${id}.json`), { ...record, failed: true });
+  if (failed) await writeJson(path6.join(downloadsDir(ctx), `${id}.json`), { ...record, failed: true });
   if (failed) throw new Error(`slskd: ${remoteBase(record.files[states.indexOf(failed)].filename)} ${failed.replace(/^Completed,\s*/, "").toLowerCase()}`);
   if (!states.every(isSucceeded)) return { done: false };
   return finishDownload(ctx, id, record, directory);
@@ -36920,20 +37819,20 @@ async function finishDownload(ctx, id, record, directory) {
 var formatBytes = (bytes) => bytes >= 1024 ** 3 ? `${(bytes / 1024 ** 3).toFixed(1)} GB` : `${Math.max(1, Math.round(bytes / 1024 ** 2))} MB`;
 async function freeBytes(ctx, dir) {
   if (ctx.freeBytes) return ctx.freeBytes(dir);
-  for (let at = dir; ; at = path4.dirname(at)) {
-    const stats = await fs3.statfs(at).catch(() => null);
+  for (let at = dir; ; at = path6.dirname(at)) {
+    const stats = await fs5.statfs(at).catch(() => null);
     if (stats) return stats.bavail * stats.bsize;
-    if (path4.dirname(at) === at) return Infinity;
+    if (path6.dirname(at) === at) return Infinity;
   }
 }
-var link = (ctx, local, target) => (ctx.linkFile ?? fs3.link)(local, target);
+var link = (ctx, local, target) => (ctx.linkFile ?? fs5.link)(local, target);
 async function copyInto(local, target) {
-  const temp = `${target}.${randomUUID4()}.part`;
+  const temp = `${target}.${randomUUID5()}.part`;
   try {
-    await fs3.copyFile(local, temp);
-    await fs3.rename(temp, target);
+    await fs5.copyFile(local, temp);
+    await fs5.rename(temp, target);
   } catch (error) {
-    await fs3.rm(temp, { force: true }).catch(() => {
+    await fs5.rm(temp, { force: true }).catch(() => {
     });
     throw error;
   }
@@ -36945,15 +37844,15 @@ async function moveIntoPlace(ctx, id, record, directory) {
     const local = await locate(downloadFolder, file);
     if (!local) throw new Error(`Couldn't find ${remoteBase(file.filename)} in slskd's download folder`);
     const name = `${String(file.disc || 1).padStart(2, "0")}-${String(i + 1).padStart(3, "0")} ${remoteBase(file.filename)}`.replace(/[\\/]/g, "_");
-    const target = path4.join(directory, record.kind === "album" ? name : remoteBase(file.filename));
-    files.push({ local, target, file, size: (await fs3.stat(local)).size });
+    const target = path6.join(directory, record.kind === "album" ? name : remoteBase(file.filename));
+    files.push({ local, target, file, size: (await fs5.stat(local)).size });
   }
-  await fs3.mkdir(directory, { recursive: true });
+  await fs5.mkdir(directory, { recursive: true });
   const todo = [];
   for (const entry of files) {
-    const there = await fs3.stat(entry.target).catch(() => null);
+    const there = await fs5.stat(entry.target).catch(() => null);
     if (!there || there.size !== entry.size) {
-      await fs3.rm(entry.target, { force: true });
+      await fs5.rm(entry.target, { force: true });
       todo.push(entry);
     }
   }
@@ -36991,575 +37890,196 @@ async function moveIntoPlace(ctx, id, record, directory) {
       await writeTags(target, { title: [file.title], artist: [file.artist].filter(Boolean), recordingMbid: [file.recordingId] });
       tagged++;
     } catch (error) {
-      ctx.log(`Couldn't tag ${path4.basename(target)}: ${error.message}`);
+      ctx.log(`Couldn't tag ${path6.basename(target)}: ${error.message}`);
     }
   }
   ctx.log(`Download ${id}: ${files.length} file(s) ${linked ? "linked" : "copied"}, ${tagged} identified and tagged`);
-  return record.kind === "album" ? { done: true } : { done: true, path: path4.basename(files[0].target) };
+  return record.kind === "album" ? { done: true } : { done: true, path: path6.basename(files[0].target) };
 }
 
-// src/tagger.js
-import { randomUUID as randomUUID5 } from "node:crypto";
-import fs4 from "node:fs/promises";
-import path5 from "node:path";
-
-// src/aurral.js
-var Aurral = class {
-  constructor(api, fetchImpl = fetch) {
-    if (!api?.url || !api?.key) throw new Error("Aurral API access is off. Turn it on on the plugin's page.");
-    this.url = api.url.replace(/\/+$/, "");
-    this.key = api.key;
-    this.fetch = fetchImpl;
-  }
-  async request(method, route, body) {
-    const response = await this.fetch(`${this.url}${route}`, {
-      method,
-      headers: { "X-Api-Key": this.key, ...body !== void 0 && { "Content-Type": "application/json" } },
-      body: body === void 0 ? void 0 : JSON.stringify(body),
-      signal: AbortSignal.timeout(3e4)
-    });
-    const data = await response.json().catch(() => null);
-    if (!response.ok) {
-      const detail = data?.message || data?.error || response.statusText;
-      throw new Error(`Aurral answered ${response.status} for ${route}: ${detail}`);
-    }
-    return data;
-  }
-  // Re-reads files whose tags changed, so the Library shows the new ones.
-  refreshLibrary() {
-    return this.request("POST", "/library/refresh", { mode: "quick" });
-  }
-};
-
-// src/tagger.js
-var LOCK_STALE_MS = 2 * 6e4;
-var SAVE_EVERY_MS = 3e4;
-var queueDir = (ctx) => path5.join(ctx.dataFolder, "queue");
-var processedFile = (ctx) => path5.join(ctx.dataFolder, "processed.json");
-var indexFile = (ctx) => path5.join(ctx.dataFolder, "library-index.json");
-var originalsFile = (ctx) => path5.join(ctx.dataFolder, "originals.json");
-var excludedFile = (ctx) => path5.join(ctx.dataFolder, "excluded.json");
-var TAG_FIELDS = ["artist", "albumArtist", "composer", "work", "workId"];
-var TAGGING_VERSION = 2;
-var outdated = (record) => record && (record.status === "tagged" || record.status === "unchanged") && (record.v ?? 1) < TAGGING_VERSION;
-var lockDir = (ctx) => path5.join(ctx.dataFolder, "tagging.lock");
-var yieldFile = (ctx) => path5.join(ctx.dataFolder, "tagging.yield");
-var YIELD_FRESH_MS = 10 * 6e4;
-var PRIORITY_WAIT_MS = 5 * 6e4;
-var ACTION_CLAIM_MS = 2 * 6e4;
-async function enqueue(ctx, filePaths, { force = false, source = null } = {}) {
-  await fs4.mkdir(queueDir(ctx), { recursive: true });
-  const ids = [];
-  for (const filePath of filePaths) {
-    if (!filePath) continue;
-    const id = `${Date.now().toString().padStart(15, "0")}-${randomUUID5()}`;
-    await writeJson(path5.join(queueDir(ctx), `${id}.json`), { path: filePath, force, source, at: Date.now() });
-    ids.push(id);
-  }
-  return ids;
+// src/tag-requests.js
+import { randomUUID as randomUUID6 } from "node:crypto";
+import fs6 from "node:fs";
+import fsp from "node:fs/promises";
+import path7 from "node:path";
+var MODES = { tag: "Tag as classical", restore: "Remove classical tags", clear: "Clear classical tags" };
+var KEEP_MS = 7 * 864e5;
+var ID = /^[0-9a-f-]{36}$/;
+var folder = (ctx) => path7.join(ctx.dataFolder, "tag-requests");
+var fileOf = (ctx, id) => path7.join(folder(ctx), `${id}.json`);
+var same2 = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+function untagMessage(counts, what, mode) {
+  const parts = [`${counts.restored} restored`];
+  if (counts.cleared) parts.push(`${counts.cleared} cleared${mode === "clear" ? " (existing backups retained)" : " (original tags unavailable)"}`);
+  if (counts.unchanged) parts.push(`${counts.unchanged} already had no classical tags`);
+  if (counts["no backup"]) parts.push(`${counts["no backup"]} couldn't be restored (no backup, and MusicBrainz has no credit)`);
+  if (counts.skipped) parts.push(`${counts.skipped} skipped`);
+  if (counts.changed) parts.push(`${counts.changed} skipped (changed since the request)`);
+  if (counts.left) parts.push(`${counts.left} left: run it again`);
+  return `${what}: ${parts.join(", ")}. The plugin won't tag these recordings again unless you tag them as classical.`.slice(0, 500);
 }
-async function queuedEntries(ctx) {
-  const names = (await fs4.readdir(queueDir(ctx)).catch(() => [])).filter((n) => n.endsWith(".json")).sort();
-  return names.map((name) => ({ name, file: path5.join(queueDir(ctx), name) }));
+function save(ctx, request) {
+  fs6.mkdirSync(folder(ctx), { recursive: true });
+  const target = fileOf(ctx, request.id);
+  fs6.writeFileSync(`${target}.tmp`, JSON.stringify(request));
+  fs6.renameSync(`${target}.tmp`, target);
 }
-var queueLength = async (ctx) => (await queuedEntries(ctx)).length;
-async function allowedPath(ctx, filePath) {
-  const real = await fs4.realpath(filePath).catch(() => null);
-  if (!real) return null;
-  for (const root of [ctx.libraryFolder, ctx.dataFolder]) {
-    if (!root) continue;
-    const base = await fs4.realpath(root).catch(() => null);
-    if (!base) continue;
-    const relative = path5.relative(base, real);
-    if (relative && !relative.startsWith("..") && !path5.isAbsolute(relative)) return real;
+function readRequest(ctx, id) {
+  if (!ID.test(String(id || ""))) return null;
+  try {
+    return JSON.parse(fs6.readFileSync(fileOf(ctx, id), "utf8"));
+  } catch {
+    return null;
   }
-  return null;
 }
-var statKey = (stat) => ({ mtimeMs: Math.round(stat.mtimeMs), size: stat.size });
-var sameStat = (record, stat) => record && record.mtimeMs === Math.round(stat.mtimeMs) && record.size === stat.size;
-function indexEntry(tags, stat) {
+function listRequests(ctx) {
+  let names = [];
+  try {
+    names = fs6.readdirSync(folder(ctx)).filter((name) => name.endsWith(".json"));
+  } catch {
+    return [];
+  }
+  const out = [];
+  for (const name of names) {
+    const request = readRequest(ctx, name.slice(0, -5));
+    if (!request) continue;
+    if (Date.now() - request.createdAt > KEEP_MS) fs6.rmSync(fileOf(ctx, request.id), { force: true });
+    else out.push(request);
+  }
+  return out.sort((a, b) => b.createdAt - a.createdAt).slice(0, 50);
+}
+var writable = (file) => fsp.access(path7.dirname(file), fs6.constants.W_OK).then(
+  () => fsp.access(file, fs6.constants.W_OK).then(() => true)
+).catch(() => false);
+function commonValue(files, field) {
+  const counts = /* @__PURE__ */ new Map();
+  for (const entry of files) {
+    if (entry.status !== "change") continue;
+    const value = (entry.values?.[field] || []).join("; ");
+    if (value) counts.set(value, (counts.get(value) || 0) + 1);
+  }
+  return [...counts].sort((a, b) => b[1] - a[1])[0] || null;
+}
+function waitingRequest(ctx, target) {
+  return listRequests(ctx).find((request) => request.target === target && request.state === "waiting") || null;
+}
+async function requestTags(ctx, paths, { mode, what, actor, target = null }) {
+  if (!MODES[mode]) throw new Error("Unknown tag request");
+  if (!paths.length) return { message: mode === "tag" ? `No files to tag in ${what}` : `No files in ${what}` };
+  const plan = [];
+  let unreachable = false;
+  const stats = await withTagging(
+    ctx,
+    async (session) => {
+      for (const file of paths) {
+        const real = await allowedPath(ctx, file);
+        if (!real || !isAudioPath(real)) {
+          plan.push({ file, status: "skipped", reason: real ? "not an audio file" : "outside the Library" });
+          continue;
+        }
+        if (mode === "tag") {
+          if (!await session.processReal(real, { force: true, plan })) {
+            unreachable = true;
+            break;
+          }
+        } else await session.untagReal(real, mode, { plan });
+      }
+    },
+    { priority: true }
+  );
+  if (!stats) return { message: "Tagging is busy. Try again in a few minutes." };
+  const files = plan.map((entry) => entry.status === "planned" ? { ...entry, status: same2(entry.current, entry.values) ? "unchanged" : "change" } : entry);
+  let readOnly = 0;
+  for (const entry of files) if (entry.status === "change" && !await writable(entry.file)) readOnly++;
+  const count = (status) => files.filter((entry) => entry.status === status).length;
+  const changing = count("change");
+  const reasons = {};
+  for (const entry of files) if (entry.status === "skipped") reasons[entry.reason] = (reasons[entry.reason] || 0) + 1;
+  const notes = [
+    count("unchanged") && `${count("unchanged")} already right`,
+    ...Object.entries(reasons).map(([reason, n]) => `${n} skipped (${reason})`),
+    unreachable && "MusicBrainz couldn't be reached, so the rest wait"
+  ].filter(Boolean);
+  if (!changing) return { message: `${what}: nothing to write${notes.length ? ` (${notes.join(", ")})` : ""}.`.slice(0, 500) };
+  const request = { id: randomUUID6(), mode, what, target, actor: String(actor?.id ?? ""), createdAt: Date.now(), state: "waiting", files };
+  save(ctx, request);
+  const shown = [
+    ["artist", "Artist"],
+    ["work", "Work"],
+    ["albumArtist", "Album artist"]
+  ].flatMap(([field, label]) => {
+    const common = commonValue(files, field);
+    return common ? [`${label}: ${common[0]}${common[1] < changing ? ` (${common[1]} files)` : ""}`] : [];
+  });
+  const end = readOnly === changing ? "These files are read-only, so they can't be written." : `Choose Write planned tags to write them${readOnly ? `; ${readOnly} are read-only and will be skipped` : ""}.`;
   return {
-    ...statKey(stat),
-    title: tags.title,
-    artist: tags.artist,
-    album: tags.album,
-    albumArtist: tags.albumArtist,
-    recordingMbid: tags.recordingMbid,
-    releaseMbid: tags.releaseMbid,
-    releaseGroupMbid: tags.releaseGroupMbid,
-    albumArtistMbids: tags.albumArtistMbids,
-    trackNumber: tags.trackNumber,
-    discNumber: tags.discNumber,
-    durationMs: tags.durationMs,
-    workId: tags.workId
+    id: request.id,
+    message: `${what}: nothing written yet. ${changing} file${changing === 1 ? "" : "s"} would change. ${shown.join(". ")}${shown.length ? ". " : ""}${end}${notes.length ? ` Also ${notes.join(", ")}.` : ""}`.slice(0, 500)
   };
 }
-var State = class {
-  constructor(ctx, lock) {
-    this.ctx = ctx;
-    this.lock = lock;
-    this.dirty = 0;
-    this.savedAt = Date.now();
-    this.refs = 0;
-    this.admins = 0;
-    this.background = 0;
-    this.claimed = /* @__PURE__ */ new Set();
-    this.busyPaths = /* @__PURE__ */ new Map();
-  }
-  async load() {
-    this.processed = await readJson(processedFile(this.ctx), {});
-    this.index = await readJson(indexFile(this.ctx), {});
-    this.originals = await readJson(originalsFile(this.ctx), {});
-    this.excluded = await readJson(excludedFile(this.ctx), {});
-  }
-  // Saved every 30 seconds while working, and at the end: the index of a
-  // large Library is several megabytes.
-  async save(force = false) {
-    if (!this.dirty || !force && Date.now() - this.savedAt < SAVE_EVERY_MS) return;
-    this.savedAt = Date.now();
-    this.dirty = 0;
-    await writeJson(processedFile(this.ctx), this.processed);
-    await writeJson(indexFile(this.ctx), this.index);
-    await writeJson(originalsFile(this.ctx), this.originals);
-    await writeJson(excludedFile(this.ctx), this.excluded);
-    await this.lock.touch();
-  }
-  // One call at a time works on a file.
-  async exclusive(file, work) {
-    while (this.busyPaths.has(file)) await this.busyPaths.get(file).catch(() => {
-    });
-    const running = work();
-    this.busyPaths.set(file, running);
-    try {
-      return await running;
-    } finally {
-      this.busyPaths.delete(file);
-    }
-  }
-};
-var Session = class {
-  constructor(ctx, state, priority) {
-    this.ctx = ctx;
-    this.state = state;
-    this.priority = priority;
-    this.changedFiles = 0;
-    this.stats = { tagged: 0, unchanged: 0, skipped: {}, failed: 0, left: 0 };
-  }
-  get processed() {
-    return this.state.processed;
-  }
-  get index() {
-    return this.state.index;
-  }
-  get originals() {
-    return this.state.originals;
-  }
-  get excluded() {
-    return this.state.excluded;
-  }
-  get dirty() {
-    return this.state.dirty;
-  }
-  set dirty(value) {
-    this.state.dirty = value;
-  }
-  save(force = false) {
-    return this.state.save(force);
-  }
-  // True when an admin action wants the lock and this is background work:
-  // one in this process, or one waiting in another.
-  async shouldYield() {
-    if (this.priority) return false;
-    if (this.state.admins > 0) this.yielding = true;
-    else if (!this.yieldCheckedAt || Date.now() - this.yieldCheckedAt >= 500) {
-      this.yieldCheckedAt = Date.now();
-      const stat = await fs4.stat(yieldFile(this.ctx)).catch(() => null);
-      this.yielding = Boolean(stat && Date.now() - stat.mtimeMs < YIELD_FRESH_MS);
-    }
-    if (this.yielding && !this.yieldLogged) {
-      this.yieldLogged = true;
-      this.ctx.log("Pausing background tagging for an admin action");
-    }
-    return this.yielding;
-  }
-  record(filePath, stat, result) {
-    this.processed[filePath] = { ...statKey(stat), ...result, at: Date.now() };
-    this.dirty++;
-    if (result.status === "skipped") this.stats.skipped[result.reason] = (this.stats.skipped[result.reason] || 0) + 1;
-    else this.stats[result.status]++;
-  }
-  // Returns false when MusicBrainz can't be reached, so the caller stops.
-  async processFile(filePath, options = {}) {
-    const real = await allowedPath(this.ctx, filePath);
-    if (!real) {
-      this.ctx.log(`Not tagging ${filePath}: it isn't in the Library folder`);
-      this.stats.skipped["outside the Library"] = (this.stats.skipped["outside the Library"] || 0) + 1;
-      return true;
-    }
-    if (!isAudioPath(real)) return true;
-    return this.state.exclusive(real, () => this.processReal(real, options));
-  }
-  // `queuedAt`: when the request to tag was made. Classical tags an admin
-  // removed after that stay removed.
-  async processReal(real, { force = false, prefilter = false, upgrade = false, queuedAt = null } = {}) {
-    const { ctx } = this;
-    const stat = await fs4.stat(real);
-    if (!force && sameStat(this.processed[real], stat) && !(upgrade && outdated(this.processed[real]))) return true;
-    let tags;
-    try {
-      tags = readTags(real);
-    } catch (error) {
-      this.record(real, stat, { status: "skipped", reason: error instanceof UnsupportedFormat ? "unsupported format" : "unreadable" });
-      return true;
-    }
-    this.index[real] = indexEntry(tags, stat);
-    if (!tags.recordingMbid) {
-      this.record(real, stat, { status: "skipped", reason: "no recording ID" });
-      return true;
-    }
-    if (this.excluded[tags.recordingMbid]) {
-      if (!force || queuedAt && (this.excluded[tags.recordingMbid].at ?? 0) > queuedAt) {
-        this.record(real, stat, { status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
-        return true;
-      }
-      delete this.excluded[tags.recordingMbid];
-    }
-    if (prefilter && ctx.resolver.classifyGenres(new Set(tags.genres.map((g) => g.toLowerCase()))) === false) {
-      this.record(real, stat, { status: "skipped", reason: "non-classical", recording: tags.recordingMbid });
-      return true;
-    }
-    const fields = await ctx.resolver.resolve(tags.recordingMbid, {
-      trackArtistIds: tags.artistMbids,
-      albumArtistIds: tags.albumArtistMbids,
-      releaseGroupId: tags.releaseGroupMbid || null,
-      confirmed: force
-    });
-    if (!fields) {
-      const reason = ctx.resolver.skipReason;
-      if (reason === "unreachable") return false;
-      this.record(real, stat, { status: "skipped", reason, recording: tags.recordingMbid });
-      return true;
-    }
-    const values = { artist: [fields.artist], composer: fields.composers };
-    if (fields.workId) Object.assign(values, { work: [fields.work], workId: [fields.workId] });
-    const albumArtist = await this.englishAlbumArtist(tags);
-    if (albumArtist) values.albumArtist = [albumArtist];
-    let changed;
-    try {
-      if (!this.originals[real]) {
-        this.originals[real] = { ...readValues(real, TAG_FIELDS), recording: tags.recordingMbid };
-        this.dirty++;
-      }
-      changed = await writeTags(real, values);
-    } catch (error) {
-      ctx.log(`Couldn't tag ${real}: ${error.message}`);
-      this.record(real, stat, { status: "skipped", reason: "couldn't write tags", recording: tags.recordingMbid });
-      return true;
-    }
-    const after = await fs4.stat(real);
-    this.index[real] = { ...this.index[real], ...statKey(after), artist: fields.artist, workId: fields.workId || "" };
-    this.record(real, after, {
-      v: TAGGING_VERSION,
-      status: changed.length ? "tagged" : "unchanged",
-      recording: tags.recordingMbid,
-      artist: fields.artist,
-      workId: fields.workId
-    });
-    if (changed.length) {
-      this.changedFiles++;
-      ctx.log(`Tagged ${path5.basename(real)}: ${fields.artist}`);
-    }
-    return true;
-  }
-  // Puts back the tags a file had before the plugin changed them. Files
-  // tagged before the plugin kept backups get the artist MusicBrainz credits
-  // for that track on its release, which is what Aurral writes.
-  async untagFile(filePath) {
-    const real = await allowedPath(this.ctx, filePath);
-    if (!real || !isAudioPath(real)) return "skipped";
-    return this.state.exclusive(real, () => this.untagReal(real));
-  }
-  async untagReal(real) {
-    const { ctx } = this;
-    let tags;
-    try {
-      tags = readTags(real);
-    } catch {
-      return "skipped";
-    }
-    if (tags.recordingMbid) this.excluded[tags.recordingMbid] = { at: Date.now() };
-    const original = this.originals[real];
-    let values;
-    if (original) values = Object.fromEntries(TAG_FIELDS.map((field) => [field, original[field] ?? []]));
-    else {
-      const credit = await this.trackCredit(tags);
-      if (!credit) return "no backup";
-      values = { artist: [credit] };
-      if (tags.albumArtistMbids.length === 1) {
-        const name = (await ctx.mb.get("artist", tags.albumArtistMbids[0], "aliases+genres"))?.name;
-        if (name) values.albumArtist = [name];
-      }
-    }
-    const changed = await writeTags(real, values);
-    delete this.originals[real];
-    const after = await fs4.stat(real);
-    this.index[real] = { ...this.index[real] ?? {}, ...indexEntry(readTags(real), after) };
-    this.record(real, after, { status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
-    this.stats.skipped["classical tags removed"]--;
-    if (changed.length) {
-      this.changedFiles++;
-      ctx.log(`Removed classical tags from ${path5.basename(real)}`);
-    }
-    return changed.length ? "restored" : "unchanged";
-  }
-  async englishAlbumArtist(tags) {
-    if (tags.albumArtistMbids.length !== 1) return null;
-    const artist = await this.ctx.resolver.getArtist(tags.albumArtistMbids[0]);
-    if (!artist?.name) return null;
-    const [name] = await this.ctx.resolver.englishNames(artist);
-    return name || null;
-  }
-  // MusicBrainz's artist credit for this recording on the file's release,
-  // else on the recording itself.
-  async trackCredit(tags) {
-    const { mb } = this.ctx;
-    if (tags.releaseMbid) {
-      const release = await mb.get("release", tags.releaseMbid, RELEASE_INC);
-      for (const medium of release?.media || [])
-        for (const track of medium.tracks || [])
-          if (track.recording?.id === tags.recordingMbid) {
-            const credit = creditString(track["artist-credit"] || track.recording["artist-credit"]);
-            if (credit) return credit;
-          }
-    }
-    const recording = await mb.get("recording", tags.recordingMbid, "artist-credits");
-    return creditString(recording?.["artist-credit"]) || null;
-  }
-  async drainQueue(until, onlyIds = null) {
-    for (const entry of await queuedEntries(this.ctx)) {
-      if (Date.now() > until || await this.shouldYield()) return false;
-      if (onlyIds && !onlyIds.has(entry.name.replace(/\.json$/, ""))) continue;
-      if (this.state.claimed.has(entry.name)) continue;
-      this.state.claimed.add(entry.name);
-      try {
-        const job = await readJson(entry.file, null);
-        if (!this.priority && job?.source === "action" && Date.now() - (job.at || 0) < ACTION_CLAIM_MS) continue;
-        if (job?.path) {
-          const reachable = await this.processFile(job.path, { force: job.force, queuedAt: job.at });
-          if (!reachable) return false;
-        }
-        await fs4.rm(entry.file, { force: true });
-      } finally {
-        this.state.claimed.delete(entry.name);
-      }
-      await this.save();
-    }
-    return true;
-  }
-  // Walks the Library, refreshing the index, and returns files that have a
-  // recording ID and were never processed (or changed since). Stops at
-  // `until`; unchanged files cost only a stat, so the next run gets further.
-  async scan(until) {
-    const root = this.ctx.libraryFolder;
-    const pending = [];
-    const seen = /* @__PURE__ */ new Set();
-    let complete = true;
-    const walk = async (dir) => {
-      if (Date.now() > until || await this.shouldYield()) {
-        complete = false;
-        return;
-      }
-      const entries = await fs4.readdir(dir, { withFileTypes: true }).catch(() => []);
-      for (const entry of entries) {
-        if (Date.now() > until || await this.shouldYield()) {
-          complete = false;
-          return;
-        }
-        if (entry.name.startsWith(".")) continue;
-        const full = path5.join(dir, entry.name);
-        if (entry.isDirectory()) await walk(full);
-        else if (entry.isFile() && isAudioPath(full)) {
-          seen.add(full);
-          const stat = await fs4.stat(full).catch(() => null);
-          if (!stat) continue;
-          if (!sameStat(this.index[full], stat)) {
-            try {
-              this.index[full] = indexEntry(readTags(full), stat);
-            } catch {
-              delete this.index[full];
-              continue;
-            }
-            this.dirty++;
-            await this.save();
-          }
-          if (this.index[full].recordingMbid && (!sameStat(this.processed[full], stat) || outdated(this.processed[full]))) pending.push(full);
-        }
-      }
-    };
-    if (root) await walk(root);
-    if (complete) {
-      for (const file of Object.keys(this.index)) if (file.startsWith(root) && !seen.has(file)) delete this.index[file];
-    }
-    this.scanComplete = complete;
-    return pending;
-  }
-};
-var held = /* @__PURE__ */ new Map();
-async function openState(ctx, priority) {
-  let lock = await tryLock(lockDir(ctx), LOCK_STALE_MS);
-  if (!lock && priority) {
-    ctx.log("Waiting for background tagging in another process to pause");
-    const until = Date.now() + PRIORITY_WAIT_MS;
-    while (!lock && Date.now() < until) {
-      await writeJson(yieldFile(ctx), { at: Date.now() });
-      await sleep(500);
-      lock = await tryLock(lockDir(ctx), LOCK_STALE_MS);
-    }
-    await fs4.rm(yieldFile(ctx), { force: true });
-    if (!lock) ctx.log("Tagging in another process didn't pause within 5 minutes");
-  }
-  if (!lock) return null;
-  const state = new State(ctx, lock);
-  try {
-    await state.load();
-  } catch (error) {
-    await lock.release();
-    throw error;
-  }
-  state.heartbeat = setInterval(() => lock.touch(), 3e4);
-  return state;
-}
-async function withTagging(ctx, work, { priority = false } = {}) {
-  const key = path5.resolve(ctx.dataFolder);
-  let entry;
-  for (; ; ) {
-    entry = held.get(key);
-    if (!entry) {
-      entry = { opening: openState(ctx, priority), state: null };
-      held.set(key, entry);
-      try {
-        entry.state = await entry.opening;
-      } catch (error) {
-        held.delete(key);
-        throw error;
-      }
-      if (!entry.state) {
-        held.delete(key);
-        return null;
-      }
-      break;
-    }
-    if (!entry.state) {
-      if (!priority) return null;
-      await entry.opening.catch(() => {
-      });
-      if (held.get(key) === entry && entry.state) break;
-      continue;
-    }
-    if (!priority && entry.state.background > 0) return null;
-    break;
-  }
-  const { state } = entry;
-  const session = new Session(ctx, state, priority);
-  state.refs++;
-  if (priority) state.admins++;
-  else state.background++;
-  try {
-    await work(session);
-    return session.stats;
-  } finally {
-    if (priority) state.admins--;
-    else state.background--;
-    if (--state.refs === 0) {
-      held.delete(key);
-      clearInterval(state.heartbeat);
-      await state.save(true).catch((error) => ctx.log(`Couldn't save progress: ${error.message}`));
-      await state.lock.release();
-    } else {
-      await state.save().catch(() => {
-      });
-    }
-    if (session.changedFiles) await refreshLibrary(ctx);
-  }
-}
-async function refreshLibrary(ctx) {
-  if (!ctx.api?.url || !ctx.api?.key) return;
-  try {
-    await new Aurral(ctx.api, ctx.fetch).refreshLibrary();
-  } catch (error) {
-    ctx.log(`Couldn't ask Aurral to rescan the Library: ${error.message}`);
-  }
-}
-async function runQueue(ctx, budgetMs, onlyIds = null, { priority = false } = {}) {
-  const until = Date.now() + budgetMs;
-  return withTagging(
+async function applyRequest(ctx, id, actor) {
+  const request = readRequest(ctx, id);
+  if (!request) throw new Error("This tag request is gone. Choose the action again.");
+  if (request.state !== "waiting") return { message: request.message || "This tag request was written already." };
+  request.state = "writing";
+  save(ctx, request);
+  const counts = { restored: 0, cleared: 0, unchanged: 0, "no backup": 0, skipped: 0, changed: 0, left: 0 };
+  let session;
+  const stats = await withTagging(
     ctx,
-    async (session) => {
-      await session.drainQueue(until, onlyIds);
-      session.stats.left = onlyIds ? (await queuedEntries(ctx)).filter((e) => onlyIds.has(e.name.replace(/\.json$/, ""))).length : await queueLength(ctx);
-    },
-    { priority }
-  );
-}
-async function runScheduled(ctx, budgetMs) {
-  const until = Date.now() + budgetMs;
-  return withTagging(ctx, async (session) => {
-    if (!await session.drainQueue(until)) return;
-    const pending = await session.scan(until);
-    session.stats.found = pending.length;
-    for (const file of pending) {
-      if (Date.now() > until || await session.shouldYield()) break;
-      if (!await session.processFile(file, { prefilter: true, upgrade: true })) break;
-      await session.save();
-    }
-    session.stats.left = await queueLength(ctx) + pending.filter((f) => !session.processed[f]).length;
-  });
-}
-async function libraryIndex(ctx, budgetMs, { priority = false } = {}) {
-  let index = null;
-  await withTagging(
-    ctx,
-    async (session) => {
-      await session.scan(Date.now() + budgetMs);
-      index = session.index;
-    },
-    { priority }
-  );
-  return index ?? await readJson(indexFile(ctx), {});
-}
-async function untagFiles(ctx, paths, budgetMs, { priority = false } = {}) {
-  const until = Date.now() + budgetMs;
-  const counts = { restored: 0, unchanged: 0, "no backup": 0, skipped: 0, left: 0 };
-  const stats = await withTagging(ctx, async (session) => {
-    for (const file of paths) {
-      if (Date.now() > until) {
-        counts.left++;
-        continue;
+    async (current) => {
+      session = current;
+      for (const entry of request.files) {
+        if (entry.status !== "change") continue;
+        const real = await allowedPath(ctx, entry.file);
+        if (!real) {
+          entry.result = { status: "skipped", reason: "outside the Library" };
+          counts.skipped++;
+          continue;
+        }
+        entry.result = await session.state.exclusive(real, async () => {
+          let now;
+          try {
+            now = readValues(real, Object.keys(entry.values));
+          } catch {
+            return { status: "skipped", reason: "unreadable" };
+          }
+          if (!same2(now, entry.current)) return { status: "skipped", reason: "changed since the request", changed: true };
+          if (request.mode === "tag") {
+            await session.processReal(real, { force: true, values: entry.values });
+            const record = session.processed[real];
+            return { status: record?.status || "failed", reason: record?.reason };
+          }
+          return { status: await session.untagReal(real, request.mode, { values: entry.values }) };
+        }).catch((error) => {
+          ctx.log(`Couldn't write tags to ${real}: ${error.message}`);
+          if (request.mode === "tag") session.stats.failed++;
+          return { status: "skipped", reason: String(error.message || error).slice(0, 200) };
+        });
+        if (entry.result.changed) {
+          counts.changed++;
+          session.stats.skipped["changed since the request"] = (session.stats.skipped["changed since the request"] || 0) + 1;
+        } else if (request.mode !== "tag") counts[entry.result.status] = (counts[entry.result.status] || 0) + 1;
       }
-      try {
-        counts[await session.untagFile(file)]++;
-      } catch (error) {
-        ctx.log(`Couldn't remove classical tags from ${file}: ${error.message}`);
-        counts.skipped++;
-      }
-    }
-  }, { priority });
-  return stats ? counts : null;
-}
-function describeStats(stats) {
-  if (!stats) return "Another tagging run is in progress";
-  const parts = [`${stats.tagged} tagged`];
-  if (stats.unchanged) parts.push(`${stats.unchanged} already right`);
-  for (const [reason, count] of Object.entries(stats.skipped)) parts.push(`${count} skipped (${reason})`);
-  if (stats.failed) parts.push(`${stats.failed} failed`);
-  if (stats.left) parts.push(`${stats.left} left for the next run`);
-  return parts.join(", ");
+    },
+    { priority: true }
+  );
+  if (!stats) {
+    request.state = "waiting";
+    save(ctx, request);
+    return { message: "Tagging is busy. Try again in a few minutes." };
+  }
+  request.state = "done";
+  request.writtenAt = Date.now();
+  request.writtenBy = String(actor?.id ?? "");
+  request.message = request.mode === "tag" ? `${request.what}: ${describeStats(stats)}`.slice(0, 500) : untagMessage(counts, request.what, request.mode);
+  save(ctx, request);
+  return { message: request.message };
 }
 
 // src/index.js
 var BACKGROUND_BUDGET_MS = 4 * 6e4;
 var SCHEDULE_BUDGET_MS = 8.5 * 6e4;
-var ACTION_BUDGET_MS = 25 * 6e4;
 var log = (...args) => console.log(...args);
 function makeContext(input, { fetchImpl = fetch } = {}) {
   const settings = input.settings || {};
@@ -37582,6 +38102,9 @@ function makeContext(input, { fetchImpl = fetch } = {}) {
 }
 var background = null;
 var again = false;
+async function waitForBackgroundTagging() {
+  while (background) await background;
+}
 function tagInBackground(ctx) {
   if (background) {
     again = true;
@@ -37597,34 +38120,18 @@ function tagInBackground(ctx) {
     background = null;
   });
 }
-async function tagNow(ctx, paths, what) {
-  if (!paths.length) return `No files to tag in ${what}`;
-  const ids = new Set(await enqueue(ctx, paths, { force: true, source: "action" }));
-  const stats = await runQueue(ctx, ACTION_BUDGET_MS, ids, { priority: true });
-  if (stats) return `${what}: ${describeStats(stats)}`.slice(0, 500);
-  return `Queued ${paths.length} files from ${what}. Tagging is busy and will get to them.`;
-}
-async function untagNow(ctx, paths, what) {
-  if (!paths.length) return `No files in ${what}`;
-  {
-    const counts = await untagFiles(ctx, paths, ACTION_BUDGET_MS, { priority: true });
-    if (counts) {
-      const parts = [`${counts.restored} restored`];
-      if (counts.unchanged) parts.push(`${counts.unchanged} already had no classical tags`);
-      if (counts["no backup"]) parts.push(`${counts["no backup"]} couldn't be restored (no backup, and MusicBrainz has no credit)`);
-      if (counts.skipped) parts.push(`${counts.skipped} skipped`);
-      if (counts.left) parts.push(`${counts.left} left: run it again`);
-      return `${what}: ${parts.join(", ")}. The plugin won't tag these recordings again unless you tag them as classical.`.slice(0, 500);
-    }
-    return `Tagging is busy. Try again in a few minutes.`;
-  }
-}
 function artistFiles(index, artist) {
   const albumIds = new Set(artist.albums.flatMap((a) => [a.mbid]).filter(Boolean));
   const name = String(artist.name || "").toLowerCase();
   return Object.entries(index).filter(
     ([, entry]) => artist.mbid && entry.albumArtistMbids?.includes(artist.mbid) || albumIds.has(entry.releaseGroupMbid) || albumIds.has(entry.releaseMbid) || name && String(entry.albumArtist || "").toLowerCase() === name
   ).map(([file]) => file);
+}
+var albumPaths = (album) => album.tracks.map((t) => t.path).filter(Boolean);
+async function writePlanned(ctx, target, what, user) {
+  const request = waitingRequest(ctx, target);
+  if (!request) return `${what}: nothing is planned. Choose Tag as classical or Remove classical tags first.`;
+  return (await applyRequest(ctx, request.id, user)).message;
 }
 var index_default = {
   async test(input) {
@@ -37642,43 +38149,55 @@ var index_default = {
       if (!slskd.downloadFolder) parts.push("set slskd's download folder to download");
     } else parts.push("slskd isn't set up, so the download source is off");
     parts.push(`Artists read like ${ctx.resolver.order.filter((r) => r !== "credited").join(ctx.resolver.separator)}`);
+    parts.push(ctx.settings.enableFileWrites === true ? "new downloads are tagged automatically" : "new downloads aren't tagged automatically");
     return { message: parts.join(". ").slice(0, 500) };
   },
   actions: {
     async "tag-album"(input) {
       const ctx = makeContext(input);
-      const paths = input.album.tracks.map((t) => t.path).filter(Boolean);
-      return { message: await tagNow(ctx, paths, `"${input.album.title}"`) };
+      const what = `"${input.album.title}"`;
+      return { message: (await requestTags(ctx, albumPaths(input.album), { mode: "tag", what, actor: input.user, target: `album:${input.album.id}` })).message };
     },
     async "untag-album"(input) {
       const ctx = makeContext(input);
-      const paths = input.album.tracks.map((t) => t.path).filter(Boolean);
-      return { message: await untagNow(ctx, paths, `"${input.album.title}"`) };
+      const what = `"${input.album.title}"`;
+      return { message: (await requestTags(ctx, albumPaths(input.album), { mode: "restore", what, actor: input.user, target: `album:${input.album.id}` })).message };
+    },
+    async "write-album"(input) {
+      const ctx = makeContext(input);
+      return { message: await writePlanned(ctx, `album:${input.album.id}`, `"${input.album.title}"`, input.user) };
     },
     async "tag-artist"(input) {
       const ctx = makeContext(input);
       const index = await libraryIndex(ctx, 10 * 6e4, { priority: true });
-      return { message: await tagNow(ctx, artistFiles(index, input.artist), input.artist.name) };
+      return { message: (await requestTags(ctx, artistFiles(index, input.artist), { mode: "tag", what: input.artist.name, actor: input.user, target: `artist:${input.artist.id}` })).message };
+    },
+    async "write-artist"(input) {
+      const ctx = makeContext(input);
+      return { message: await writePlanned(ctx, `artist:${input.artist.id}`, input.artist.name, input.user) };
     }
   },
   events: {
     async "download.finished"(input) {
       const ctx = makeContext(input);
-      if (!input.track?.path) return;
+      if (ctx.settings.enableFileWrites !== true || !input.track?.path) return;
       await enqueue(ctx, [input.track.path], { source: input.source });
       tagInBackground(ctx);
     }
   },
   async scheduled(input) {
     const ctx = makeContext(input);
-    const stats = await runScheduled(ctx, SCHEDULE_BUDGET_MS);
-    if (stats) log(`Scheduled tagging: ${describeStats(stats)}`);
-    await pruneCache(path6.join(ctx.dataFolder, "mb-cache"), TTL.default).catch(() => {
+    if (ctx.settings.enableFileWrites === true) {
+      const stats = await runScheduled(ctx, SCHEDULE_BUDGET_MS);
+      if (stats) log(`Scheduled tagging: ${describeStats(stats)}`);
+    }
+    await pruneCache(path8.join(ctx.dataFolder, "mb-cache"), TTL.default).catch(() => {
     });
   },
+  albumPresentation: (input) => albumPresentation(makeContext(input), input.album),
   downloadSource: {
-    search: (input) => searchTrack(makeContext(input), input.track),
-    searchAlbum: (input) => searchAlbum(makeContext(input), input.album),
+    search: (input) => searchTrack(makeContext(input), input.track, { manual: input.manual === true }),
+    searchAlbum: (input) => searchAlbum(makeContext(input), input.album, { manual: input.manual === true }),
     download: (input) => startDownload(makeContext(input), input.result, "track"),
     downloadAlbum: (input) => startDownload(makeContext(input), input.result, "album"),
     status: (input) => downloadStatus(makeContext(input), input.id, input.directory)
@@ -37686,5 +38205,6 @@ var index_default = {
 };
 export {
   index_default as default,
-  makeContext
+  makeContext,
+  waitForBackgroundTagging
 };

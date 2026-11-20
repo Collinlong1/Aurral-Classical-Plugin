@@ -5,7 +5,7 @@ import { randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { isAudioPath, readTags, readValues, UnsupportedFormat, writeTags } from "./tags.js";
-import { creditString, RELEASE_INC } from "./works.js";
+import { creditString, RELEASE_INC, topWork } from "./works.js";
 import { Aurral } from "./aurral.js";
 import { readJson, sleep, tryLock, writeJson } from "./store.js";
 
@@ -20,6 +20,9 @@ const originalsFile = (ctx) => path.join(ctx.dataFolder, "originals.json");
 // Recordings whose classical tags an admin removed: never tagged again
 // unless an admin tags them as classical.
 const excludedFile = (ctx) => path.join(ctx.dataFolder, "excluded.json");
+// The work each file belongs to, for the album page's headings. Kept when a
+// file is planned or tagged, so read-only Libraries get headings too.
+const worksFile = (ctx) => path.join(ctx.dataFolder, "works.json");
 export const TAG_FIELDS = ["artist", "albumArtist", "composer", "work", "workId"];
 // Raised when the plugin writes more than before, so files it already
 // tagged are tagged once more by the schedule (2: the album artist).
@@ -53,7 +56,7 @@ async function queuedEntries(ctx) {
 export const queueLength = async (ctx) => (await queuedEntries(ctx)).length;
 
 // Only files in the Library or the plugin's own folder are ever written.
-async function allowedPath(ctx, filePath) {
+export async function allowedPath(ctx, filePath) {
   const real = await fs.realpath(filePath).catch(() => null);
   if (!real) return null;
   for (const root of [ctx.libraryFolder, ctx.dataFolder]) {
@@ -108,6 +111,7 @@ class State {
     this.index = await readJson(indexFile(this.ctx), {});
     this.originals = await readJson(originalsFile(this.ctx), {});
     this.excluded = await readJson(excludedFile(this.ctx), {});
+    this.works = await readJson(worksFile(this.ctx), {});
   }
 
   // Saved every 30 seconds while working, and at the end: the index of a
@@ -120,6 +124,7 @@ class State {
     await writeJson(indexFile(this.ctx), this.index);
     await writeJson(originalsFile(this.ctx), this.originals);
     await writeJson(excludedFile(this.ctx), this.excluded);
+    await writeJson(worksFile(this.ctx), this.works);
     await this.lock.touch();
   }
 
@@ -206,28 +211,33 @@ class Session {
 
   // `queuedAt`: when the request to tag was made. Classical tags an admin
   // removed after that stay removed.
-  async processReal(real, { force = false, prefilter = false, upgrade = false, queuedAt = null } = {}) {
+  //
+  // `plan` (v0.3 8.7): an array that receives what would be written, with
+  // the file's current values, instead of writing or recording anything.
+  // `values`: write exactly these (a confirmed plan) instead of looking up.
+  async processReal(real, { force = false, prefilter = false, upgrade = false, queuedAt = null, plan = null, values: planned = null } = {}) {
     const { ctx } = this;
     const stat = await fs.stat(real);
+    const skip = (result) => (plan ? plan.push({ file: real, status: "skipped", reason: result.reason }) : this.record(real, stat, result));
     if (!force && sameStat(this.processed[real], stat) && !(upgrade && outdated(this.processed[real]))) return true;
     let tags;
     try {
       tags = readTags(real);
     } catch (error) {
-      this.record(real, stat, { status: "skipped", reason: error instanceof UnsupportedFormat ? "unsupported format" : "unreadable" });
+      skip({ status: "skipped", reason: error instanceof UnsupportedFormat ? "unsupported format" : "unreadable" });
       return true;
     }
-    this.index[real] = indexEntry(tags, stat);
+    if (!plan) this.index[real] = indexEntry(tags, stat);
     if (!tags.recordingMbid) {
-      this.record(real, stat, { status: "skipped", reason: "no recording ID" });
+      skip({ status: "skipped", reason: "no recording ID" });
       return true;
     }
     if (this.excluded[tags.recordingMbid]) {
       if (!force || (queuedAt && (this.excluded[tags.recordingMbid].at ?? 0) > queuedAt)) {
-        this.record(real, stat, { status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
+        skip({ status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
         return true;
       }
-      delete this.excluded[tags.recordingMbid];
+      if (!plan) delete this.excluded[tags.recordingMbid];
     }
     // Scanned files whose own genre tags say "not classical" skip the
     // lookups. Aurral writes the album's MusicBrainz genres to its files.
@@ -235,30 +245,40 @@ class Session {
       this.record(real, stat, { status: "skipped", reason: "non-classical", recording: tags.recordingMbid });
       return true;
     }
-    const fields = await ctx.resolver.resolve(tags.recordingMbid, {
-      trackArtistIds: tags.artistMbids,
-      albumArtistIds: tags.albumArtistMbids,
-      releaseGroupId: tags.releaseGroupMbid || null,
-      confirmed: force,
-    });
-    if (!fields) {
-      const reason = ctx.resolver.skipReason;
-      if (reason === "unreachable") return false;
-      this.record(real, stat, { status: "skipped", reason, recording: tags.recordingMbid });
+    let values = planned;
+    let fields = planned && { artist: planned.artist?.[0] || "", workId: planned.workId?.[0] || "" };
+    if (!values) {
+      fields = await ctx.resolver.resolve(tags.recordingMbid, {
+        trackArtistIds: tags.artistMbids,
+        albumArtistIds: tags.albumArtistMbids,
+        releaseGroupId: tags.releaseGroupMbid || null,
+        confirmed: force,
+      });
+      if (!fields) {
+        const reason = ctx.resolver.skipReason;
+        if (reason === "unreachable") return false;
+        skip({ status: "skipped", reason, recording: tags.recordingMbid });
+        return true;
+      }
+      await this.rememberWork(real, tags.recordingMbid, fields);
+      values = { artist: [fields.artist], composer: fields.composers };
+      if (fields.workId) Object.assign(values, { work: [fields.work], workId: [fields.workId] });
+      // Aurral files an album under one album artist and names it after the
+      // album artist tag. That name in English, as in the artist tag; albums
+      // credited to several artists (as beets tags them) are left as they are.
+      const albumArtist = await this.englishAlbumArtist(tags);
+      if (albumArtist) values.albumArtist = [albumArtist];
+    }
+    if (plan) {
+      plan.push({ file: real, status: "planned", recording: tags.recordingMbid, values, current: readValues(real, Object.keys(values)) });
       return true;
     }
-    const values = { artist: [fields.artist], composer: fields.composers };
-    if (fields.workId) Object.assign(values, { work: [fields.work], workId: [fields.workId] });
-    // Aurral files an album under one album artist and names it after the
-    // album artist tag. That name in English, as in the artist tag; albums
-    // credited to several artists (as beets tags them) are left as they are.
-    const albumArtist = await this.englishAlbumArtist(tags);
-    if (albumArtist) values.albumArtist = [albumArtist];
     let changed;
     try {
       if (!this.originals[real]) {
         this.originals[real] = { ...readValues(real, TAG_FIELDS), recording: tags.recordingMbid };
         this.dirty++;
+        await writeJson(originalsFile(ctx), this.originals);
       }
       changed = await writeTags(real, values);
     } catch (error) {
@@ -285,35 +305,43 @@ class Session {
   // Puts back the tags a file had before the plugin changed them. Files
   // tagged before the plugin kept backups get the artist MusicBrainz credits
   // for that track on its release, which is what Aurral writes.
-  async untagFile(filePath) {
+  async untagFile(filePath, mode = "restore") {
     const real = await allowedPath(this.ctx, filePath);
     if (!real || !isAudioPath(real)) return "skipped";
-    return this.state.exclusive(real, () => this.untagReal(real));
+    return this.state.exclusive(real, () => this.untagReal(real, mode));
   }
 
-  async untagReal(real) {
+  // `plan` and `values` as in processReal.
+  async untagReal(real, mode = "restore", { plan = null, values: planned = null } = {}) {
     const { ctx } = this;
+    const skip = (reason) => (plan ? (plan.push({ file: real, status: "skipped", reason }), "skipped") : "skipped");
     let tags;
     try {
       tags = readTags(real);
     } catch {
-      return "skipped";
+      return skip("unreadable");
     }
-    if (tags.recordingMbid) this.excluded[tags.recordingMbid] = { at: Date.now() };
+    if (tags.recordingMbid && !plan) this.excluded[tags.recordingMbid] = { at: Date.now() };
     const original = this.originals[real];
-    let values;
-    if (original) values = Object.fromEntries(TAG_FIELDS.map((field) => [field, original[field] ?? []]));
-    else {
-      const credit = await this.trackCredit(tags);
-      if (!credit) return "no backup";
-      values = { artist: [credit] };
-      if (tags.albumArtistMbids.length === 1) {
-        const name = (await ctx.mb.get("artist", tags.albumArtistMbids[0], "aliases+genres"))?.name;
-        if (name) values.albumArtist = [name];
+    let values = planned;
+    if (!values) {
+      if (mode === "clear") values = { composer: [], work: [], workId: [] };
+      else if (original) values = Object.fromEntries(TAG_FIELDS.map((field) => [field, original[field] ?? []]));
+      else {
+        const credit = await this.trackCredit(tags);
+        values = { composer: [], work: [], workId: [], ...(credit && { artist: [credit] }) };
+        if (tags.albumArtistMbids.length === 1) {
+          const name = (await ctx.mb.get("artist", tags.albumArtistMbids[0], "aliases+genres"))?.name;
+          if (name) values.albumArtist = [name];
+        }
       }
     }
+    if (plan) {
+      plan.push({ file: real, status: "planned", recording: tags.recordingMbid, restore: Boolean(original), values, current: readValues(real, Object.keys(values)) });
+      return "planned";
+    }
     const changed = await writeTags(real, values);
-    delete this.originals[real];
+    if (mode !== "clear") delete this.originals[real];
     const after = await fs.stat(real);
     this.index[real] = { ...(this.index[real] ?? {}), ...indexEntry(readTags(real), after) };
     this.record(real, after, { status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
@@ -322,7 +350,21 @@ class Session {
       this.changedFiles++;
       ctx.log(`Removed classical tags from ${path.basename(real)}`);
     }
-    return changed.length ? "restored" : "unchanged";
+    return changed.length ? (original && mode !== "clear" ? "restored" : "cleared") : "unchanged";
+  }
+
+  async rememberWork(real, recording, fields) {
+    const work = fields.workId ? await this.ctx.resolver.getWork(fields.workId) : null;
+    const top = work ? await topWork(this.ctx.mb, work) : null;
+    const people = fields.people || {};
+    const performers = [...(people.soloists || []), ...(people.ensembles || []), ...(people.conductors || [])].map((p) => p.name);
+    this.state.works[real] = {
+      recording,
+      work: top?.id ? { id: top.id, title: top.title || fields.work || "" } : null,
+      composer: fields.classicalComposers || "",
+      performers: [...new Set(performers)].join(" · "),
+    };
+    this.dirty++;
   }
 
   async englishAlbumArtist(tags) {
@@ -569,9 +611,9 @@ export async function libraryIndex(ctx, budgetMs, { priority = false } = {}) {
   return index ?? (await readJson(indexFile(ctx), {}));
 }
 
-export async function untagFiles(ctx, paths, budgetMs, { priority = false } = {}) {
+export async function untagFiles(ctx, paths, budgetMs, { priority = false, mode = "restore" } = {}) {
   const until = Date.now() + budgetMs;
-  const counts = { restored: 0, unchanged: 0, "no backup": 0, skipped: 0, left: 0 };
+  const counts = { restored: 0, cleared: 0, unchanged: 0, "no backup": 0, skipped: 0, left: 0 };
   const stats = await withTagging(ctx, async (session) => {
     for (const file of paths) {
       if (Date.now() > until) {
@@ -579,7 +621,7 @@ export async function untagFiles(ctx, paths, budgetMs, { priority = false } = {}
         continue;
       }
       try {
-        counts[await session.untagFile(file)]++;
+        counts[await session.untagFile(file, mode)]++;
       } catch (error) {
         ctx.log(`Couldn't remove classical tags from ${file}: ${error.message}`);
         counts.skipped++;
@@ -591,6 +633,7 @@ export async function untagFiles(ctx, paths, budgetMs, { priority = false } = {}
 
 export const readProcessed = (ctx) => readJson(processedFile(ctx), {});
 export const readIndex = (ctx) => readJson(indexFile(ctx), {});
+export const readWorks = (ctx) => readJson(worksFile(ctx), {});
 
 export function describeStats(stats) {
   if (!stats) return "Another tagging run is in progress";

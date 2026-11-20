@@ -2,9 +2,9 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { afterEach, beforeEach, test } from "node:test";
-import { File, TagTypes } from "node-taglib-sharp";
-import plugin, { makeContext } from "../src/index.js";
-import { readTags } from "../src/tags.js";
+import { File, TagTypes, Id3v2UserTextInformationFrame } from "node-taglib-sharp";
+import plugin, { makeContext, waitForBackgroundTagging } from "../src/index.js";
+import { readTags, readValues, writeTags } from "../src/tags.js";
 import { enqueue, readProcessed, runQueue, withTagging } from "../src/tagger.js";
 import { baseSettings, copyFixture, EXPECTED_ARTIST, fakeFetch, RECORDING, symphonyEntities, tempFolders, waitFor } from "./helpers.js";
 
@@ -18,11 +18,77 @@ beforeEach(async () => {
   globalThis.fetch = fetchImpl;
 });
 afterEach(async () => {
+  await waitForBackgroundTagging();
   globalThis.fetch = realFetch;
   await fs.rm(folders.root, { recursive: true, force: true });
 });
 
 const input = (extra = {}) => ({ settings: baseSettings, libraryFolder: folders.libraryFolder, dataFolder: folders.dataFolder, ...extra });
+
+// The album and artist menu actions only plan (v0.3 8.7); `act` chooses one
+// and then confirms its request, as an admin does in the editor. Returns the
+// confirmed run's message, or the plan's when nothing was planned.
+async function act(name, request) {
+  const { listRequests, applyRequest } = await import("../src/tag-requests.js");
+  const before = new Set(listRequests(request).map((entry) => entry.id));
+  const planned = await plugin.actions[name](request);
+  const made = listRequests(request).find((entry) => !before.has(entry.id));
+  if (!made) return planned;
+  return applyRequest(makeContext(request), made.id, request.user);
+}
+
+test("enabling the plugin without file-write opt-in never tags existing media", async () => {
+  const file = await copyFixture("sine.flac", path.join(folders.libraryFolder, "readonly-default.flac"));
+  const before = await fs.readFile(file);
+  const settings = { mbMirror: baseSettings.mbMirror };
+  await plugin.events["download.finished"](input({ settings, track: { path: file } }));
+  await plugin.scheduled(input({ settings }));
+  assert.deepEqual(await fs.readFile(file), before);
+});
+
+test("a failed atomic replacement preserves original audio and the persisted backup", async () => {
+  const file = await copyFixture("sine.flac", path.join(folders.libraryFolder,"failure.flac"));
+  const album = {title:"Failure",tracks:[{path:file}]};
+  await act("tag-album", input({user:{id:1,role:"admin"},album}));
+  const before = await fs.readFile(file);
+  const backup = await fs.readFile(path.join(folders.dataFolder,"originals.json"));
+  const rename = fs.rename;
+  fs.rename = async (source, target) => {
+    if (String(source).endsWith(".tagging")) throw Object.assign(new Error("Read-only fixture"),{code:"EROFS"});
+    return rename(source,target);
+  };
+  try {
+    const result = await act("untag-album", input({user:{id:1,role:"admin"},album}));
+    assert.match(result.message,/1 skipped/);
+  } finally { fs.rename = rename; }
+  assert.deepEqual(await fs.readFile(file),before);
+  assert.deepEqual(await fs.readFile(path.join(folders.dataFolder,"originals.json")),backup);
+});
+
+test("conductor, performer and artist ID tags are read in each format that has them", async () => {
+  for (const ext of ["flac", "mp3"]) {
+    const file = await copyFixture(`sine.${ext}`, path.join(folders.libraryFolder, `credits.${ext}`));
+    const f = File.createFromPath(file);
+    try {
+      f.tag.conductor = "Claudio Abbado";
+      const xiph = f.getTag(TagTypes.Xiph, false);
+      if (xiph) {
+        xiph.setFieldAsStrings("PERFORMER", "Maurizio Pollini (piano)", "Wiener Philharmoniker");
+        xiph.setFieldAsStrings("MUSICBRAINZ_ARTISTID", "id-1; id-2");
+      }
+      f.save();
+    } finally {
+      f.dispose();
+    }
+    const tags = readTags(file);
+    assert.equal(tags.conductor, "Claudio Abbado", ext);
+    // PERFORMER is a Vorbis comment; other formats have no such field.
+    assert.deepEqual(tags.performers, ext === "flac" ? ["Maurizio Pollini (piano)", "Wiener Philharmoniker"] : [], ext);
+    assert.deepEqual(tags.artistMbids, ext === "flac" ? ["id-1", "id-2"] : [], ext);
+  }
+  const plain = readTags(await copyFixture("sine.flac", path.join(folders.libraryFolder, "plain.flac")));
+  assert.deepEqual([plain.conductor, plain.performers], ["", []]);
+});
 
 function otherTags(file) {
   const f = File.createFromPath(file);
@@ -42,6 +108,14 @@ function otherTags(file) {
 for (const ext of ["flac", "mp3", "m4a", "opus"]) {
   test(`download.finished tags a ${ext} in the background and keeps every other tag`, async () => {
     const file = await copyFixture(`sine.${ext}`, path.join(folders.libraryFolder, "Beethoven", `01 Allegro.${ext}`));
+    // Some taggers put the work in GROUPING: the model reads it in every format.
+    const grouped = File.createFromPath(file);
+    try {
+      grouped.tag.grouping = "Symphony No. 5 in C minor, op. 67";
+      grouped.save();
+    } finally {
+      grouped.dispose();
+    }
     const before = otherTags(file);
     const started = Date.now();
     await plugin.events["download.finished"](input({ event: "download.finished", track: { path: file, mbid: RECORDING }, source: "test" }));
@@ -52,6 +126,7 @@ for (const ext of ["flac", "mp3", "m4a", "opus"]) {
     assert.deepEqual(tags.composer, ["Ludwig van Beethoven"]);
     assert.equal(tags.work, "Symphony No. 5 in C minor, op. 67: I. Allegro con brio");
     assert.equal(tags.workId, "mvt1");
+    assert.equal(tags.grouping, "Symphony No. 5 in C minor, op. 67");
     assert.equal(tags.recordingMbid, RECORDING);
     assert.equal(tags.title, "Symphony No. 5: I.");
     assert.deepEqual(otherTags(file), before);
@@ -127,7 +202,7 @@ test("only one process tags at a time", async () => {
 
 test("Tag as classical on an album retags its files", async () => {
   const file = await copyFixture("sine.opus", path.join(folders.libraryFolder, "album", "01.opus"));
-  const result = await plugin.actions["tag-album"](
+  const result = await act("tag-album", 
     input({ user: { id: 1, role: "admin" }, album: { title: "Symphony No. 5", tracks: [{ path: file }, { path: null }] } }),
   );
   assert.match(result.message, /1 tagged/);
@@ -142,7 +217,7 @@ test("Tag as classical on an artist finds the artist's files", async () => {
   f.tag.albumArtists = ["Someone Else"];
   f.save();
   f.dispose();
-  const result = await plugin.actions["tag-artist"](
+  const result = await act("tag-artist", 
     input({ user: { id: 1, role: "admin" }, artist: { id: 3, name: "Ludwig van Beethoven", mbid: null, albums: [] } }),
   );
   assert.match(result.message, /^Ludwig van Beethoven: 1 tagged/);
@@ -172,6 +247,35 @@ const tagsOf = (file) => {
   return { artist: t.artist, composer: t.composer, work: t.work, workId: t.workId, recording: t.recordingMbid, title: t.title };
 };
 
+for (const ext of ["flac", "mp3", "m4a", "opus"]) {
+  test(`restore preserves seven original classical values in ${ext}`, async () => {
+    const file = await copyFixture(`sine.${ext}`, path.join(folders.libraryFolder, `restore.${ext}`));
+    const values = Array.from({ length: 7 }, (_, i) => `Original ${i + 1}`);
+    const original = { composer: values, work: values, workId: values };
+    await writeTags(file, original);
+    const album = { title: "Restore", tracks: [{ path: file }] };
+    await act("tag-album", input({ user: { id: 1, role: "admin" }, album }));
+    const result = await act("untag-album", input({ user: { id: 1, role: "admin" }, album }));
+    assert.match(result.message, /1 restored/);
+    assert.deepEqual(readValues(file, Object.keys(original)), original);
+  });
+
+  test(`no-backup removal clears every one of seven classical values in ${ext}`, async () => {
+    const file = await copyFixture(`sine.${ext}`, path.join(folders.libraryFolder, `seven.${ext}`));
+    const values = Array.from({ length: 7 }, (_, i) => `Value ${i + 1}`);
+    await writeTags(file, { composer: values, work: values, workId: values });
+    const unrelated = otherTags(file);
+    const recording = readTags(file).recordingMbid;
+    const result = await act("untag-album", input({ user: { id: 1, role: "admin" }, album: { title: "Seven", tracks: [{ path: file }] } }));
+    assert.match(result.message, /1 cleared/);
+    assert.deepEqual(readValues(file, ["composer", "work", "workId"]), { composer: [], work: [], workId: [] });
+    assert.deepEqual(otherTags(file), unrelated);
+    assert.equal(readTags(file).recordingMbid, recording);
+    await plugin.scheduled(input());
+    assert.deepEqual(readValues(file, ["composer", "work", "workId"]), { composer: [], work: [], workId: [] });
+  });
+}
+
 for (const ext of ["flac", "mp3", "m4a"]) {
   test(`Remove classical tags restores a ${ext} exactly, and it stays untagged`, async () => {
     const file = await copyFixture(`sine.${ext}`, path.join(folders.libraryFolder, "album", `01.${ext}`));
@@ -180,7 +284,7 @@ for (const ext of ["flac", "mp3", "m4a"]) {
     await plugin.scheduled(input());
     assert.equal(readTags(file).artist, EXPECTED_ARTIST);
     const album = { title: "Symphony No. 5", tracks: [{ path: file }] };
-    const result = await plugin.actions["untag-album"](input({ user: { id: 1, role: "admin" }, album }));
+    const result = await act("untag-album", input({ user: { id: 1, role: "admin" }, album }));
     assert.match(result.message, /^"Symphony No. 5": 1 restored/);
     assert.deepEqual(tagsOf(file), before);
     assert.deepEqual(otherTags(file), others);
@@ -188,7 +292,7 @@ for (const ext of ["flac", "mp3", "m4a"]) {
     await plugin.scheduled(input());
     assert.deepEqual(tagsOf(file), before);
     // ...until an admin tags it as classical again.
-    await plugin.actions["tag-album"](input({ user: { id: 1, role: "admin" }, album }));
+    await act("tag-album", input({ user: { id: 1, role: "admin" }, album }));
     assert.equal(readTags(file).artist, EXPECTED_ARTIST);
   });
 }
@@ -208,8 +312,8 @@ test("files tagged before backups get MusicBrainz's credit for the track back", 
   f.tag.musicBrainzReleaseId = "rel1";
   f.save();
   f.dispose();
-  const result = await plugin.actions["untag-album"](input({ user: { id: 1, role: "admin" }, album: { title: "Old", tracks: [{ path: file }] } }));
-  assert.match(result.message, /1 restored/);
+  const result = await act("untag-album", input({ user: { id: 1, role: "admin" }, album: { title: "Old", tracks: [{ path: file }] } }));
+  assert.match(result.message, /1 cleared/);
   assert.equal(readTags(file).artist, "Berliner Philharmoniker, Herbert von Karajan");
 });
 
@@ -228,7 +332,7 @@ test("files with no evidence of being classical are left alone, unless an admin 
   const processed = await readProcessed(makeContext(input()));
   assert.equal(processed[await fs.realpath(file)].reason, "not clearly classical");
   assert.equal(readTags(file).artist, "Berliner Philharmoniker, Herbert von Karajan");
-  await plugin.actions["tag-album"](input({ user: { id: 1, role: "admin" }, album: { title: "Unsure", tracks: [{ path: file }] } }));
+  await act("tag-album", input({ user: { id: 1, role: "admin" }, album: { title: "Unsure", tracks: [{ path: file }] } }));
   assert.equal(readTags(file).artist, EXPECTED_ARTIST);
 });
 
@@ -242,7 +346,7 @@ test("soundtracks and Christmas albums are never tagged, even by Tag as classica
     f.tag.musicBrainzReleaseGroupId = "rg-x";
     f.save();
     f.dispose();
-    const result = await plugin.actions["tag-album"](input({ user: { id: 1, role: "admin" }, album: { title: "X", tracks: [{ path: file }] } }));
+    const result = await act("tag-album", input({ user: { id: 1, role: "admin" }, album: { title: "X", tracks: [{ path: file }] } }));
     assert.match(result.message, /skipped \(non-classical\)/);
     assert.equal(readTags(file).artist, "Berliner Philharmoniker, Herbert von Karajan");
   }
@@ -252,7 +356,8 @@ test("Aurral is asked to rescan the Library after tags change, and only then", a
   const refreshes = [];
   globalThis.fetch = fakeFetch({
     entities: symphonyEntities(),
-    aurral: (method, route, body) => (refreshes.push([method, route, body]), new Response("{}", { status: 202 })),
+    // The classical model's scheduled sync also asks for a library snapshot; this test is about refreshes.
+    aurral: (method, route, body) => (route.includes("/user-operations/") || refreshes.push([method, route, body]), new Response("{}", { status: 202 })),
   });
   const api = { url: "http://aurral.test/api", key: "plugin-key" };
   await copyFixture("sine.flac", path.join(folders.libraryFolder, "a", "01.flac"));
@@ -303,7 +408,7 @@ test("an album Aurral files under one artist gets that artist's English name", a
   await plugin.scheduled(input());
   assert.equal(readTags(file).albumArtist, "Pyotr Tchaikovsky");
   // Remove classical tags puts it back.
-  await plugin.actions["untag-album"](input({ user: { id: 1, role: "admin" }, album: { title: "X", tracks: [{ path: file }] } }));
+  await act("untag-album", input({ user: { id: 1, role: "admin" }, album: { title: "X", tracks: [{ path: file }] } }));
   assert.equal(readTags(file).albumArtist, "Пётр Ильич Чайковский");
 });
 
@@ -351,9 +456,9 @@ test("an admin action runs while another is still going, instead of waiting for 
   const long = withTagging(ctx, () => gate, { priority: true });
   await new Promise((r) => setTimeout(r, 50));
   const started = Date.now();
-  const tagged = await plugin.actions["tag-album"](input({ user: { id: 1, role: "admin" }, album: { title: "Busy", tracks: [{ path: file }] } }));
+  const tagged = await act("tag-album", input({ user: { id: 1, role: "admin" }, album: { title: "Busy", tracks: [{ path: file }] } }));
   assert.match(tagged.message, /1 tagged/);
-  const untagged = await plugin.actions["untag-album"](input({ user: { id: 1, role: "admin" }, album: { title: "Busy", tracks: [{ path: file }] } }));
+  const untagged = await act("untag-album", input({ user: { id: 1, role: "admin" }, album: { title: "Busy", tracks: [{ path: file }] } }));
   assert.match(untagged.message, /1 restored/);
   assert.ok(Date.now() - started < 10_000);
   release();
@@ -396,7 +501,7 @@ test("background tagging in another process pauses for an admin action", async (
     await lock.release();
   })();
   const started = Date.now();
-  const result = await plugin.actions["tag-album"](input({ user: { id: 1, role: "admin" }, album: { title: "Busy", tracks: [{ path: file }] } }));
+  const result = await act("tag-album", input({ user: { id: 1, role: "admin" }, album: { title: "Busy", tracks: [{ path: file }] } }));
   await other;
   assert.ok(Date.now() - started < 10_000);
   assert.match(result.message, /1 tagged/);
@@ -406,7 +511,7 @@ test("background tagging in another process pauses for an admin action", async (
 test("a Tag as classical left in the queue doesn't undo a later Remove classical tags", async () => {
   const file = await copyFixture("sine.flac", path.join(folders.libraryFolder, "later", "01.flac"));
   const album = { title: "Later", tracks: [{ path: file }] };
-  await plugin.actions["tag-album"](input({ user: { id: 1, role: "admin" }, album }));
+  await act("tag-album", input({ user: { id: 1, role: "admin" }, album }));
   const ctx = makeContext(input());
   // A Tag as classical that was cut off (the plugin restarted) leaves its
   // request queued; then the admin removes the tags.
@@ -415,7 +520,7 @@ test("a Tag as classical left in the queue doesn't undo a later Remove classical
   const job = JSON.parse(await fs.readFile(path.join(folders.dataFolder, "queue", queued), "utf8"));
   job.at -= 10 * 60_000;
   await fs.writeFile(path.join(folders.dataFolder, "queue", queued), JSON.stringify(job));
-  await plugin.actions["untag-album"](input({ user: { id: 1, role: "admin" }, album }));
+  await act("untag-album", input({ user: { id: 1, role: "admin" }, album }));
   await plugin.scheduled(input());
   assert.notEqual(readTags(file).artist, EXPECTED_ARTIST);
   assert.deepEqual(await fs.readdir(path.join(folders.dataFolder, "queue")), []);
@@ -423,6 +528,68 @@ test("a Tag as classical left in the queue doesn't undo a later Remove classical
 
 test("Tag as classical on an artist works on a fresh install, before any scan", async () => {
   await copyFixture("sine.flac", path.join(folders.libraryFolder, "Ludwig van Beethoven", "Album", "01.flac"));
-  const result = await plugin.actions["tag-artist"](input({ user: { id: 1, role: "admin" }, artist: { id: 1, name: "Ludwig van Beethoven", mbid: null, albums: [] } }));
+  const result = await act("tag-artist", input({ user: { id: 1, role: "admin" }, artist: { id: 1, name: "Ludwig van Beethoven", mbid: null, albums: [] } }));
   assert.match(result.message, /1 tagged/);
 });
+
+// v0.3 8.2: classical fields round-trip, one at a time and with several
+// values, on every format enabled for release; others are listed as
+// unsupported, and the audio never changes.
+
+test("menu actions show the planned tags and write nothing until Write planned tags", async () => {
+  const { listRequests, readRequest } = await import("../src/tag-requests.js");
+  const admin = { id: 1, role: "admin" };
+  const one = await copyFixture("sine.flac", path.join(folders.libraryFolder, "req", "01.flac"));
+  const two = await copyFixture("sine.mp3", path.join(folders.libraryFolder, "req", "02.mp3"));
+  const album = { id: 7, title: "Request", tracks: [{ id: 1, path: one }, { id: 2, path: two }] };
+  const bytes = async () => Promise.all([one, two].map((file) => fs.readFile(file)));
+  const before = await bytes();
+
+  // Nothing planned yet.
+  assert.match((await plugin.actions["write-album"](input({ user: admin, album }))).message, /nothing is planned/);
+
+  // Tag as classical shows what it would write; nothing is written.
+  const planned = await plugin.actions["tag-album"](input({ user: admin, album }));
+  assert.match(planned.message, /^"Request": nothing written yet\. 2 files would change\. /);
+  assert.ok(planned.message.includes(`Artist: ${EXPECTED_ARTIST}.`), planned.message);
+  assert.match(planned.message, /Choose Write planned tags to write them\.$/);
+  assert.deepEqual(await bytes(), before);
+  const [request] = listRequests(input());
+  assert.deepEqual([request.mode, request.state, request.target], ["tag", "waiting", "album:7"]);
+
+  // Planning is enough for the album page to group the tracks by work.
+  const headings = await plugin.albumPresentation(input({ album }));
+  assert.equal(headings.label, "By work");
+  assert.deepEqual(headings.groups.map((group) => group.trackIds), [[1, 2]]);
+  assert.ok(headings.groups[0].title);
+
+  // Someone edits the MP3 after the plan; writing changes the FLAC only.
+  await writeTags(two, { composer: ["Someone"] });
+  const result = await plugin.actions["write-album"](input({ user: admin, album }));
+  assert.equal(result.message, '"Request": 1 tagged, 1 skipped (changed since the request)');
+  assert.deepEqual([readTags(one).artist, readTags(two).composer], [EXPECTED_ARTIST, ["Someone"]]);
+  assert.equal(readRequest(input(), request.id).state, "done");
+  assert.match((await plugin.actions["write-album"](input({ user: admin, album }))).message, /nothing is planned/);
+
+  // Remove classical tags plans too, and is written the same way.
+  const restore = await plugin.actions["untag-album"](input({ user: admin, album: { ...album, tracks: [album.tracks[0]] } }));
+  assert.match(restore.message, /nothing written yet\. 1 file would change/);
+  assert.equal(readTags(one).artist, EXPECTED_ARTIST);
+  await plugin.actions["write-album"](input({ user: admin, album }));
+  assert.equal(readTags(one).artist, "Berliner Philharmoniker, Herbert von Karajan");
+});
+
+test("a read-only folder is previewed but never written", async (t) => {
+  if (process.getuid?.() === 0) return t.skip("root can write read-only files");
+  const admin = { id: 1, role: "admin" };
+  const folder = path.join(folders.libraryFolder, "ro");
+  const file = await copyFixture("sine.flac", path.join(folder, "01.flac"));
+  await fs.chmod(file, 0o444);
+  await fs.chmod(folder, 0o555);
+  t.after(() => fs.chmod(folder, 0o755));
+  const album = { id: 9, title: "Read only", tracks: [{ id: 3, path: file }] };
+  const planned = await plugin.actions["tag-album"](input({ user: admin, album }));
+  assert.match(planned.message, /These files are read-only, so they can't be written\.$/);
+  assert.ok((await plugin.albumPresentation(input({ album }))).groups.length);
+});
+

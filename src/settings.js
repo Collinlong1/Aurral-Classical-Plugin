@@ -1,6 +1,7 @@
 import { DEFAULT_ORDER, ROLES } from "./resolver.js";
 
 export const DEFAULT_SEPARATOR = " — ";
+export const DEFAULT_COMPARE_COUNT = 10;
 const ROLE_ALIASES = {
   composer: "composers", composers: "composers",
   arranger: "arrangers", arrangers: "arrangers",
@@ -31,6 +32,11 @@ export function parseSeparator(value) {
   if (!raw.trim()) return DEFAULT_SEPARATOR;
   if (raw !== raw.trim()) return raw;
   return /^[,;]$/.test(raw) ? `${raw} ` : ` ${raw} `;
+}
+
+export function compareCount(settings) {
+  const n = Math.round(Number(settings.compareCount));
+  return Number.isFinite(n) && n > 0 ? Math.min(n, 25) : DEFAULT_COMPARE_COUNT;
 }
 
 export function slskdSettings(settings) {

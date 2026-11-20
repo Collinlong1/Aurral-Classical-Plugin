@@ -4,7 +4,8 @@ import path from "node:path";
 import { afterEach, beforeEach, test } from "node:test";
 import plugin, { makeContext } from "../src/index.js";
 import { readTags } from "../src/tags.js";
-import { downloadStatus, groupFolders, KEEP_FREE_BYTES, linesUp } from "../src/source.js";
+import { searchLadder, scoreFolder } from "../src/slskd-ranking.js";
+import { acquisitionIdentity, classicalInfo, searchQueries, performerMatches, downloadStatus, groupFolders, KEEP_FREE_BYTES, linesUp } from "../src/source.js";
 import { catalogueNumber, shortWorkTitle } from "../src/works.js";
 import { baseSettings, copyFixture, fakeFetch, json, RECORDING, SLSKD, symphonyEntities, tempFolders } from "./helpers.js";
 
@@ -51,7 +52,7 @@ function responses() {
     { username: "bob", hasFreeUploadSlot: true, queueLength: 2, uploadSpeed: 100, files: [
       file("@@b\\Karajan 1963", "1-01.mp3", 2), file("@@b\\Karajan 1963", "1-02.mp3", 301), file("@@b\\Karajan 1963", "2-01.mp3", 400), file("@@b\\Karajan 1963", "2-02.mp3", 500),
     ] },
-    { username: "carol", files: [file("@@c\\Beethoven 5", "01.flac", 2), file("@@c\\Beethoven 5", "02.flac", 305)] },
+    { username: "carol", files: [file("@@c\\Karajan Beethoven 5", "01.flac", 2), file("@@c\\Karajan Beethoven 5", "02.flac", 305)] },
     { username: "dave", files: [file("@@d\\B5", "01.flac", 2), file("@@d\\B5", "02.flac", 300), file("@@d\\B5", "03.flac", 100)] },
     { username: "erin", files: [file("@@e\\B5", "01.flac", undefined), file("@@e\\B5", "02.flac", undefined)] },
   ];
@@ -90,6 +91,33 @@ const settings = { ...baseSettings, slskdUrl: SLSKD, slskdApiKey: "key", slskdDo
 const input = (extra = {}) => ({ settings: { ...settings, slskdDownloadFolder: folders.downloads }, libraryFolder: folders.libraryFolder, dataFolder: folders.dataFolder, ...extra });
 const request = { artist: "Ludwig van Beethoven", title: "Symphony No. 5: I. Allegro con brio", album: "Symphonies 5 & 7", durationMs: 2000, trackMbid: RECORDING, releaseMbid: "rel1", trackNumber: 1, discNumber: 1, artistMbid: null, albumMbid: null, releaseYear: null };
 
+test("Liszt display credit does not replace Trifonov as acquisition performer", async () => {
+  const composer = { name: "Franz Liszt", sortName: "Liszt, Franz" };
+  const soloist = { name: "Daniil Trifonov", sortName: "Trifonov, Daniil" };
+  const conductor = { name: "Wrong priority conductor" };
+  const fields = { artist: "Franz Liszt", work: "Transcendental Étude No. 4", people: { composers: [composer], soloists: [soloist], conductors: [conductor], ensembles: [] } };
+  const ctx = { resolver: { resolve: async () => fields }, mb: { get: async () => null } };
+  const info = await classicalInfo(ctx, "liszt-recording");
+  assert.equal(info.performer, soloist);
+  // Every step leads with the performer but the last, a broad work search,
+  // whose results must still name the performer to be kept.
+  const ladder = searchLadder(info, { albumTitle: "Transcendental" });
+  assert.deepEqual(ladder.map((s) => s.step), [1, 2, 3, 4, 5]);
+  assert.ok(ladder.filter((s) => [1, 2, 4].includes(s.step)).every((s) => s.query.startsWith("Trifonov ")), JSON.stringify(ladder));
+  assert.ok(ladder.every((s) => s.step === 5 || !s.query.startsWith("Liszt")));
+  assert.equal(ladder[2].query, "Wrong priority conductor Transcendental");
+  assert.equal(scoreFolder({ directory: "Liszt - Transcendental Etudes (Horowitz)", files: [] }, info).rejected, "names the composer but none of the performers");
+  assert.equal((await acquisitionIdentity(ctx, { artist: "Franz Liszt", trackMbid: "liszt-recording" })).artist, "Daniil Trifonov");
+  assert.equal(performerMatches({ directory: "Liszt Horowitz", files: [] }, info), false);
+  assert.equal(performerMatches({ directory: "Liszt Trifonov", files: [] }, info), true);
+  fields.people.soloists = []; fields.people.conductors = [];
+  const unknown = await classicalInfo(ctx, "liszt-recording");
+  assert.deepEqual(searchQueries(unknown), []);
+  assert.deepEqual(await acquisitionIdentity(ctx, { trackMbid: "liszt-recording" }), { blocked: true });
+  ctx.resolver.resolve = async () => null;
+  assert.equal(await acquisitionIdentity(ctx, { trackMbid: "rock" }), null);
+});
+
 test("catalogue numbers and short work titles", () => {
   assert.equal(catalogueNumber("Symphony No. 5 in C minor, op. 67"), "op 67");
   assert.equal(catalogueNumber("Étude in C minor, Op. 10 No. 12"), "op 10 no 12");
@@ -114,14 +142,20 @@ test("a folder lines up only with the right count and lengths within 2 seconds",
 });
 
 test("track search returns files from folders that line up with the release", async () => {
+  const wrong = JSON.parse(JSON.stringify(state.responses[0]));
+  wrong.username = "wrong-performer";
+  wrong.files = wrong.files.map((file) => ({ ...file, filename: file.filename.replaceAll("Karajan", "Horowitz") }));
+  state.responses.push(wrong);
   const results = await plugin.downloadSource.search(input({ track: request }));
+  assert.ok(!results.some((result) => result.data.username === "wrong-performer"));
   assert.deepEqual(results.map((r) => r.data.username).sort(), ["alice", "bob"]);
   for (const r of results) {
     assert.equal(r.title, request.title);
     assert.equal(r.durationMs, 2000);
     assert.equal(r.data.files[0].recordingId, RECORDING);
   }
-  assert.equal(state.searches[0], "Beethoven Symphony 5 op 67 Karajan");
+  // The v0.2 ladder starts with performer + album.
+  assert.equal(state.searches[0], "Karajan Symphonies 5 7");
 });
 
 test("a request without a recording ID uses the release's track at its position", async () => {
@@ -153,7 +187,7 @@ const pressing = (extra = {}) => ({
 const album = { artist: "Ludwig van Beethoven", title: "Symphonies 5 & 7", releaseMbid: "rel1", releaseGroupMbid: "rg1", tracks: [] };
 // carol shares one disc; this one has both discs, the second track 5s long.
 const fullRip = { username: "frank", files: [
-  file("@@f\\B57", "01.flac", 2), file("@@f\\B57", "02.flac", 305), file("@@f\\B57", "03.flac", 400), file("@@f\\B57", "04.flac", 500),
+  file("@@f\\Karajan B57", "01.flac", 2), file("@@f\\Karajan B57", "02.flac", 305), file("@@f\\Karajan B57", "03.flac", 400), file("@@f\\Karajan B57", "04.flac", 500),
 ] };
 
 test("an album folder may match another official pressing's lengths, as in Aurral", async () => {
@@ -205,6 +239,32 @@ test("album search needs every disc, from one or several folders", async () => {
   assert.equal(results[0].trackCount, 4);
   assert.deepEqual(results[0].data.files.map((f) => f.disc), [1, 1, 2, 2]);
   assert.equal(results[0].title, album.title);
+});
+
+test("album search ranks by performer and release, keeps copies as fallbacks, and leaves ambiguous folders to a person", async () => {
+  const bob = state.responses.find((r) => r.username === "bob");
+  // The same folder shared by another user, and a folder that lines up but
+  // names only the orchestra.
+  state.responses.push({ ...JSON.parse(JSON.stringify(bob)), username: "frank", queueLength: 9 });
+  state.responses.push({ username: "gina", hasFreeUploadSlot: true, files: bob.files.map((f) => ({ ...f, filename: f.filename.replace("@@b\\Karajan 1963", "@@g\\Berlin Philharmonic live") })) });
+  // A folder naming only the composer is rejected with its reason.
+  state.responses.push({ username: "hank", files: bob.files.map((f) => ({ ...f, filename: f.filename.replace("@@b\\Karajan 1963", "@@h\\Beethoven Symphonies") })) });
+  const album = { artist: "Ludwig van Beethoven", title: "Symphonies 5 & 7", releaseMbid: "rel1", releaseGroupMbid: "rg1", tracks: [] };
+  const automatic = await plugin.downloadSource.searchAlbum(input({ album }));
+  assert.deepEqual(automatic.map((r) => r.data.username), ["alice", "bob", "frank"], "frank's copy follows bob's; gina's is left to a person");
+  const manual = await plugin.downloadSource.searchAlbum(input({ album, manual: true }));
+  assert.deepEqual(manual.map((r) => r.data.username), ["alice", "bob", "frank", "gina"]);
+  const [latest] = JSON.parse(await fs.readFile(path.join(folders.dataFolder, "slskd-searches.json"), "utf8"));
+  assert.equal(latest.manual, true);
+  assert.equal(latest.steps[0].label, "Performer + album");
+  assert.equal(latest.steps[0].query, "Karajan Symphonies 5 7");
+  assert.ok(latest.steps[0].stopped, "a good, complete folder stops the ladder");
+  const byUser = Object.fromEntries(latest.candidates.map((c) => [c.username, c]));
+  assert.ok(byUser.alice.score > byUser.bob.score, "lossless and the release title rank alice first");
+  assert.match(byUser.alice.reasons.join(", "), /performer Karajan.*every track lines up/);
+  assert.equal(byUser.frank.duplicateOf, "bob:@@b\\Karajan 1963");
+  assert.equal(byUser.gina.review, true);
+  assert.deepEqual(latest.rejected.find((r) => r.username === "hank"), { username: "hank", directory: "@@h\\Beethoven Symphonies", reason: "names the composer but none of the performers", step: 1 });
 });
 
 test("a pending track download is copied in and tagged once slskd finishes", async () => {

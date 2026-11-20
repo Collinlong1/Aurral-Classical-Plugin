@@ -1,9 +1,9 @@
 {
   "id": "aurral-classical",
   "name": "Aurral Classical",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "api": 1,
-  "description": "Tags classical music as Composer — Soloist — Ensemble — Conductor from MusicBrainz, and downloads classical albums from slskd.",
+  "description": "Tags classical music as Composer — Soloist — Ensemble — Conductor from MusicBrainz after you preview it, groups album tracks by work, and downloads classical albums from slskd.",
   "repository": "https://github.com/Collinlong1/Aurral-Classical-Plugin",
   "uses": [
     "musicbrainz.org, or your mirror",
@@ -12,6 +12,12 @@
     "Aurral's API, to refresh the Library after tagging"
   ],
   "settings": [
+    {
+      "key": "enableFileWrites",
+      "label": "Tag new downloads automatically",
+      "type": "boolean",
+      "help": "Off by default. When on, new downloads and the 15-minute Library pass write classical tags without a preview. Menu items always preview first."
+    },
     {
       "key": "mbMirror",
       "label": "MusicBrainz mirror",
@@ -51,13 +57,6 @@
   "test": true,
   "actions": [
     {
-      "id": "tag-artist",
-      "label": "Tag as classical",
-      "target": "artist",
-      "admin": true,
-      "background": true
-    },
-    {
       "id": "tag-album",
       "label": "Tag as classical",
       "target": "album",
@@ -70,8 +69,30 @@
       "target": "album",
       "admin": true,
       "background": true
+    },
+    {
+      "id": "write-album",
+      "label": "Write planned tags",
+      "target": "album",
+      "admin": true,
+      "background": true
+    },
+    {
+      "id": "tag-artist",
+      "label": "Tag as classical",
+      "target": "artist",
+      "admin": true,
+      "background": true
+    },
+    {
+      "id": "write-artist",
+      "label": "Write planned tags",
+      "target": "artist",
+      "admin": true,
+      "background": true
     }
   ],
+  "albumPresentation": true,
   "events": [
     "download.finished"
   ],

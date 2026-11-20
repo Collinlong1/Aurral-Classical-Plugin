@@ -1,15 +1,16 @@
 import path from "node:path";
+import { albumPresentation } from "./album-works.js";
 import { MusicBrainz, mbBaseUrl, TTL } from "./mb.js";
 import { ClassicalResolver } from "./resolver.js";
 import { parseOrder, parseSeparator, slskdSettings } from "./settings.js";
 import { Slskd } from "./slskd.js";
 import { downloadStatus, searchAlbum, searchTrack, startDownload } from "./source.js";
-import { describeStats, enqueue, libraryIndex, runQueue, runScheduled, untagFiles } from "./tagger.js";
+import { applyRequest, requestTags, waitingRequest } from "./tag-requests.js";
+import { describeStats, enqueue, libraryIndex, runQueue, runScheduled } from "./tagger.js";
 import { pruneCache } from "./store.js";
 
 const BACKGROUND_BUDGET_MS = 4 * 60_000; // the process stops 5 idle minutes after a call
 const SCHEDULE_BUDGET_MS = 8.5 * 60_000; // a scheduled run has 10 minutes
-const ACTION_BUDGET_MS = 25 * 60_000; // a background action has 30 minutes
 
 const log = (...args) => console.log(...args);
 
@@ -37,6 +38,9 @@ export function makeContext(input, { fetchImpl = fetch } = {}) {
 // another process may hold the lock, and then it works the queue instead.
 let background = null;
 let again = false;
+export async function waitForBackgroundTagging() {
+  while (background) await background;
+}
 function tagInBackground(ctx) {
   if (background) {
     again = true;
@@ -55,30 +59,6 @@ function tagInBackground(ctx) {
     });
 }
 
-async function tagNow(ctx, paths, what) {
-  if (!paths.length) return `No files to tag in ${what}`;
-  const ids = new Set(await enqueue(ctx, paths, { force: true, source: "action" }));
-  const stats = await runQueue(ctx, ACTION_BUDGET_MS, ids, { priority: true });
-  if (stats) return `${what}: ${describeStats(stats)}`.slice(0, 500);
-  return `Queued ${paths.length} files from ${what}. Tagging is busy and will get to them.`;
-}
-
-async function untagNow(ctx, paths, what) {
-  if (!paths.length) return `No files in ${what}`;
-  {
-    const counts = await untagFiles(ctx, paths, ACTION_BUDGET_MS, { priority: true });
-    if (counts) {
-      const parts = [`${counts.restored} restored`];
-      if (counts.unchanged) parts.push(`${counts.unchanged} already had no classical tags`);
-      if (counts["no backup"]) parts.push(`${counts["no backup"]} couldn't be restored (no backup, and MusicBrainz has no credit)`);
-      if (counts.skipped) parts.push(`${counts.skipped} skipped`);
-      if (counts.left) parts.push(`${counts.left} left: run it again`);
-      return `${what}: ${parts.join(", ")}. The plugin won't tag these recordings again unless you tag them as classical.`.slice(0, 500);
-    }
-    return `Tagging is busy. Try again in a few minutes.`;
-  }
-}
-
 function artistFiles(index, artist) {
   const albumIds = new Set(artist.albums.flatMap((a) => [a.mbid]).filter(Boolean));
   const name = String(artist.name || "").toLowerCase();
@@ -91,6 +71,14 @@ function artistFiles(index, artist) {
         (name && String(entry.albumArtist || "").toLowerCase() === name),
     )
     .map(([file]) => file);
+}
+
+const albumPaths = (album) => album.tracks.map((t) => t.path).filter(Boolean);
+
+async function writePlanned(ctx, target, what, user) {
+  const request = waitingRequest(ctx, target);
+  if (!request) return `${what}: nothing is planned. Choose Tag as classical or Remove classical tags first.`;
+  return (await applyRequest(ctx, request.id, user)).message;
 }
 
 export default {
@@ -109,35 +97,45 @@ export default {
       if (!slskd.downloadFolder) parts.push("set slskd's download folder to download");
     } else parts.push("slskd isn't set up, so the download source is off");
     parts.push(`Artists read like ${ctx.resolver.order.filter((r) => r !== "credited").join(ctx.resolver.separator)}`);
+    parts.push(ctx.settings.enableFileWrites === true ? "new downloads are tagged automatically" : "new downloads aren't tagged automatically");
     return { message: parts.join(". ").slice(0, 500) };
   },
 
   actions: {
     async "tag-album"(input) {
       const ctx = makeContext(input);
-      const paths = input.album.tracks.map((t) => t.path).filter(Boolean);
-      return { message: await tagNow(ctx, paths, `"${input.album.title}"`) };
+      const what = `"${input.album.title}"`;
+      return { message: (await requestTags(ctx, albumPaths(input.album), { mode: "tag", what, actor: input.user, target: `album:${input.album.id}` })).message };
     },
 
     async "untag-album"(input) {
       const ctx = makeContext(input);
-      const paths = input.album.tracks.map((t) => t.path).filter(Boolean);
-      return { message: await untagNow(ctx, paths, `"${input.album.title}"`) };
+      const what = `"${input.album.title}"`;
+      return { message: (await requestTags(ctx, albumPaths(input.album), { mode: "restore", what, actor: input.user, target: `album:${input.album.id}` })).message };
+    },
+
+    async "write-album"(input) {
+      const ctx = makeContext(input);
+      return { message: await writePlanned(ctx, `album:${input.album.id}`, `"${input.album.title}"`, input.user) };
     },
 
     async "tag-artist"(input) {
       const ctx = makeContext(input);
       // Reads the Library first, so a fresh install finds the artist's files.
       const index = await libraryIndex(ctx, 10 * 60_000, { priority: true });
-      return { message: await tagNow(ctx, artistFiles(index, input.artist), input.artist.name) };
+      return { message: (await requestTags(ctx, artistFiles(index, input.artist), { mode: "tag", what: input.artist.name, actor: input.user, target: `artist:${input.artist.id}` })).message };
     },
 
+    async "write-artist"(input) {
+      const ctx = makeContext(input);
+      return { message: await writePlanned(ctx, `artist:${input.artist.id}`, input.artist.name, input.user) };
+    },
   },
 
   events: {
     async "download.finished"(input) {
       const ctx = makeContext(input);
-      if (!input.track?.path) return;
+      if (ctx.settings.enableFileWrites !== true || !input.track?.path) return;
       await enqueue(ctx, [input.track.path], { source: input.source });
       tagInBackground(ctx);
     },
@@ -145,17 +143,20 @@ export default {
 
   async scheduled(input) {
     const ctx = makeContext(input);
-    const stats = await runScheduled(ctx, SCHEDULE_BUDGET_MS);
-    if (stats) log(`Scheduled tagging: ${describeStats(stats)}`);
+    if (ctx.settings.enableFileWrites === true) {
+      const stats = await runScheduled(ctx, SCHEDULE_BUDGET_MS);
+      if (stats) log(`Scheduled tagging: ${describeStats(stats)}`);
+    }
     await pruneCache(path.join(ctx.dataFolder, "mb-cache"), TTL.default).catch(() => {});
   },
 
+  albumPresentation: (input) => albumPresentation(makeContext(input), input.album),
+
   downloadSource: {
-    search: (input) => searchTrack(makeContext(input), input.track),
-    searchAlbum: (input) => searchAlbum(makeContext(input), input.album),
+    search: (input) => searchTrack(makeContext(input), input.track, { manual: input.manual === true }),
+    searchAlbum: (input) => searchAlbum(makeContext(input), input.album, { manual: input.manual === true }),
     download: (input) => startDownload(makeContext(input), input.result, "track"),
     downloadAlbum: (input) => startDownload(makeContext(input), input.result, "album"),
     status: (input) => downloadStatus(makeContext(input), input.id, input.directory),
   },
 };
-

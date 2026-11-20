@@ -54,3 +54,18 @@ test("one request a second across clients sharing a data folder", async () => {
   times.sort((x, y) => x - y);
   for (let i = 1; i < times.length; i++) assert.ok(times[i] - times[i - 1] >= 280, `requests ${times[i] - times[i - 1]}ms apart`);
 });
+
+test("provider dispatch stays serialized through delayed responses", async () => {
+  let active = 0, maximum = 0;
+  const times = [], completions = [];
+  const fetchImpl = async () => {
+    times.push(Date.now()); maximum = Math.max(maximum, ++active);
+    await new Promise(resolve => setTimeout(resolve, 80));
+    active--; completions.push(Date.now());
+    return ok({});
+  };
+  const make = () => new MusicBrainz({ settings:{},dataFolder:folders.dataFolder,fetchImpl,intervalMs:40 });
+  await Promise.all([make().get('work','slow-one'),make().get('work','slow-two'),make().get('work','slow-three')]);
+  assert.equal(maximum,1);
+  for (let i=1;i<times.length;i++) assert.ok(times[i]-completions[i-1]>=35);
+});

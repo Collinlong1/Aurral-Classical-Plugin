@@ -48,12 +48,11 @@ export class MusicBrainz {
 
   // True when MusicBrainz answers at all.
   async ping() {
-    await this.throttle.wait();
     try {
-      const response = await this.fetch(`${this.base}/ws/2/artist/1f9df192-a621-4f54-8850-2c5373b7eac9?fmt=json`, {
+      const response = await this.throttle.run(() => this.fetch(`${this.base}/ws/2/artist/1f9df192-a621-4f54-8850-2c5373b7eac9?fmt=json`, {
         headers: { "User-Agent": this.userAgent, Accept: "application/json" },
         signal: AbortSignal.timeout(15_000),
-      });
+      }));
       return response.status < 500 ? true : `it answered ${response.status}`;
     } catch (error) {
       return error.cause?.code || error.message;
@@ -74,14 +73,13 @@ export class MusicBrainz {
     const url = `${this.base}/ws/2/${pathAndQuery}`;
     let lastError = null;
     for (let attempt = 0; attempt < this.maxRetries; attempt++) {
-      await this.throttle.wait();
       this.requests++;
       let response;
       try {
-        response = await this.fetch(url, {
+        response = await this.throttle.run(() => this.fetch(url, {
           headers: { "User-Agent": this.userAgent, Accept: "application/json" },
           signal: AbortSignal.timeout(20_000),
-        });
+        }));
       } catch (error) {
         lastError = error;
         if (attempt < this.maxRetries - 1) await sleep(this.retryWaitMs * (attempt + 1));
