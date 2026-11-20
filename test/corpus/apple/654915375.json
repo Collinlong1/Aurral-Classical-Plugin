@@ -1,0 +1,1688 @@
+{
+ "id": "654915375",
+ "category": "box set",
+ "title": "J.S. Bach: Complete Sacred Cantatas, Vol. 1, BWV 1-20",
+ "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Wie schön leuchtet der Morgenstern, BWV 1: I. Coro. Wie schön leuchtet der Morgenstern",
+   "durationMs": 438960,
+   "artist": "Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Wie schön leuchtet der Morgenstern, BWV 1 · “How Brightly Shines the Morning Star”",
+    "part": "I. Coro. Wie schön leuchtet der Morgenstern",
+    "performers": "Pieter Jan Leusink, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Wie schön leuchtet der Morgenstern, BWV 1: II. Recitativo. Du wahrer Gottes und Marien Sohn (Tenore)",
+   "durationMs": 69587,
+   "artist": "Knut Schoch, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Wie schön leuchtet der Morgenstern, BWV 1 · “How Brightly Shines the Morning Star”",
+    "part": "II. Recitativo. Du wahrer Gottes und Marien Sohn (Tenore)",
+    "performers": "Knut Schoch, Pieter Jan Leusink, Holland Boys Choir, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Wie schön leuchtet der Morgenstern, BWV 1: III. Aria. Erfüllet, ihr Himmlischen (Soprano)",
+   "durationMs": 321120,
+   "artist": "Marjon Strijk, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Wie schön leuchtet der Morgenstern, BWV 1 · “How Brightly Shines the Morning Star”",
+    "part": "III. Aria. Erfüllet, ihr Himmlischen (Soprano)",
+    "performers": "Holland Boys Choir, Pieter Jan Leusink, Marjon Strijk, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Wie schön leuchtet der Morgenstern, BWV 1: IV. Recitativo. ein irdscher Glanz (Basso)",
+   "durationMs": 60693,
+   "artist": "Bas Ramselaar, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Wie schön leuchtet der Morgenstern, BWV 1 · “How Brightly Shines the Morning Star”",
+    "part": "IV. Recitativo. ein irdscher Glanz (Basso)",
+    "performers": "Bas Ramselaar, Netherlands Bach Collegium, Holland Boys Choir, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Wie schön leuchtet der Morgenstern, BWV 1: V. Aria. Unser Mund und Ton der Saiten (Tenore)",
+   "durationMs": 425427,
+   "artist": "Knut Schoch, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Wie schön leuchtet der Morgenstern, BWV 1 · “How Brightly Shines the Morning Star”",
+    "part": "V. Aria. Unser Mund und Ton der Saiten (Tenore)",
+    "performers": "Holland Boys Choir, Pieter Jan Leusink, Netherlands Bach Collegium, Knut Schoch"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Wie schön leuchtet der Morgenstern, BWV 1: VI. Choral. Wie bin ich doch so herzlich froh (Coro)",
+   "durationMs": 77160,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Wie schön leuchtet der Morgenstern, BWV 1 · “How Brightly Shines the Morning Star”",
+    "part": "VI. Choral. Wie bin ich doch so herzlich froh (Coro)",
+    "performers": "Netherlands Bach Collegium, Holland Boys Choir, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Ach Gott, vom Himmel sieh darein, BWV 2: I. Coro. Ach Gott vom Himmel sieh darein",
+   "durationMs": 253960,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Ach Gott, vom Himmel sieh darein, BWV 2 · “O God, Look Down from Heaven”",
+    "part": "I. Coro. Ach Gott vom Himmel sieh darein",
+    "performers": "Holland Boys Choir, Pieter Jan Leusink, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Ach Gott, vom Himmel sieh darein, BWV 2: II. Recitativo. Sie lehren eitel falsche List (Tenore)",
+   "durationMs": 75067,
+   "artist": "Knut Schoch, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Ach Gott, vom Himmel sieh darein, BWV 2 · “O God, Look Down from Heaven”",
+    "part": "II. Recitativo. Sie lehren eitel falsche List (Tenore)",
+    "performers": "Pieter Jan Leusink, Knut Schoch, Netherlands Bach Collegium, Holland Boys Choir"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Ach Gott, vom Himmel sieh darein, BWV 2: III. Aria. Tilg, O Gott, die Lehren (Alto)",
+   "durationMs": 228840,
+   "artist": "Sytse Buwalda, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Ach Gott, vom Himmel sieh darein, BWV 2 · “O God, Look Down from Heaven”",
+    "part": "III. Aria. Tilg, O Gott, die Lehren (Alto)",
+    "performers": "Netherlands Bach Collegium, Pieter Jan Leusink, Sytse Buwalda, Holland Boys Choir"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Ach Gott, vom Himmel sieh darein, BWV 2: IV. Recitativo. Die Armen sind verstört (Basso)",
+   "durationMs": 110493,
+   "artist": "Bas Ramselaar, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Ach Gott, vom Himmel sieh darein, BWV 2 · “O God, Look Down from Heaven”",
+    "part": "IV. Recitativo. Die Armen sind verstört (Basso)",
+    "performers": "Bas Ramselaar, Netherlands Bach Collegium, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Ach Gott, vom Himmel sieh darein, BWV 2: V. Aria. Durchs Feuer wird das Silber rein (Tenore)",
+   "durationMs": 352493,
+   "artist": "Knut Schoch, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Ach Gott, vom Himmel sieh darein, BWV 2 · “O God, Look Down from Heaven”",
+    "part": "V. Aria. Durchs Feuer wird das Silber rein (Tenore)",
+    "performers": "Pieter Jan Leusink, Knut Schoch, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Ach Gott, vom Himmel sieh darein, BWV 2: VI. Choral. Das wollst du, Gott, bewahren rein (Coro)",
+   "durationMs": 65107,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Ach Gott, vom Himmel sieh darein, BWV 2 · “O God, Look Down from Heaven”",
+    "part": "VI. Choral. Das wollst du, Gott, bewahren rein (Coro)",
+    "performers": "Netherlands Bach Collegium, Pieter Jan Leusink, Holland Boys Choir"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Ach Gott, wie manches Herzeleid, BWV 3: I. Coro. Ach Gott, wie manches Herzeleid",
+   "durationMs": 339707,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Ach Gott, wie manches Herzeleid, I, BWV 3 · “Ah God, How many a Heartache, I”",
+    "part": "I. Coro. Ach Gott, wie manches Herzeleid",
+    "performers": "Pieter Jan Leusink, Holland Boys Choir, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Ach Gott, wie manches Herzeleid, BWV 3: II. Choral, Recitativo. Wie schwerlich läßt sich Fleisch (Soprano, Alto, Tenore, Basso, Coro)",
+   "durationMs": 135213,
+   "artist": "Ruth Holton, Knut Schoch, Sytse Buwalda, Bas Ramselaar, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Ach Gott, wie manches Herzeleid, I, BWV 3 · “Ah God, How many a Heartache, I”",
+    "part": "II. Choral, Recitativo. Wie schwerlich läßt sich Fleisch (Soprano, Alto, Tenore, Basso, Coro)",
+    "performers": "Bas Ramselaar, Netherlands Bach Collegium, Holland Boys Choir, Knut Schoch, Ruth Holton, Sytse Buwalda, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Ach Gott, wie manches Herzeleid, BWV 3: III. Aria. Empfind ich Höllenangst und Pein (Basso)",
+   "durationMs": 460733,
+   "artist": "Bas Ramselaar, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "Sie werden euch in die Bann tun, BWV 44 · “They will banish You”",
+    "part": "III. Aria. Empfind ich Höllenangst und Pein (Basso)",
+    "performers": "Bas Ramselaar, Netherlands Bach Collegium, Holland Boys Choir, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Ach Gott, wie manches Herzeleid, BWV 3: IV. Recitativo. Es mag mir Leib und Geist (Tenore)",
+   "durationMs": 72533,
+   "artist": "Knut Schoch, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Ach Gott, wie manches Herzeleid, I, BWV 3 · “Ah God, How many a Heartache, I”",
+    "part": "IV. Recitativo. Es mag mir Leib und Geist (Tenore)",
+    "performers": "Holland Boys Choir, Knut Schoch, Pieter Jan Leusink, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Ach Gott, wie manches Herzeleid, BWV 3: V. Aria. Wenn sorgen auf mich dringen (Soprano, Alto)",
+   "durationMs": 453000,
+   "artist": "Ruth Holton, Sytse Buwalda, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 6,
+    "composer": "Johann Sebastian Bach",
+    "work": "Sie werden euch in die Bann tun, BWV 44 · “They will banish You”",
+    "part": "V. Aria. Wenn sorgen auf mich dringen (Soprano, Alto)",
+    "performers": "Netherlands Bach Collegium, Holland Boys Choir, Ruth Holton, Sytse Buwalda, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Ach Gott, wie manches Herzeleid, BWV 3: VI. Choral. Erhalt mein Herz im Glauben rein (Coro)",
+   "durationMs": 44213,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 7,
+    "composer": "Johann Sebastian Bach",
+    "work": "Ach Gott, wie manches Herzeleid, I, BWV 3 · “Ah God, How many a Heartache, I”",
+    "part": "VI. Choral. Erhalt mein Herz im Glauben rein (Coro)",
+    "performers": "Netherlands Bach Collegium, Pieter Jan Leusink, Holland Boys Choir"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "Christ lag in Todesbanden, BWV 4: I. Sinfonia",
+   "durationMs": 75120,
+   "artist": "Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 8,
+    "composer": "Johann Sebastian Bach",
+    "work": "Christ lag in Todesbanden, BWV 4 · “Christ Lay in Death's Bonds”",
+    "part": "I. Sinfonia",
+    "performers": "Pieter Jan Leusink, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "Christ lag in Todesbanden, BWV 4: II. Coro Versus I. Christ lag in Todesbanden",
+   "durationMs": 230573,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 8,
+    "composer": "Johann Sebastian Bach",
+    "work": "Christ lag in Todesbanden, BWV 4 · “Christ Lay in Death's Bonds”",
+    "part": "II. Coro Versus I. Christ lag in Todesbanden",
+    "performers": "Holland Boys Choir, Pieter Jan Leusink, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "Christ lag in Todesbanden, BWV 4: III. Duetto, Versus II. Den Tod niemand zwingen kunnt (Soprano, Alto)",
+   "durationMs": 222267,
+   "artist": "Ruth Holton, Sytse Buwalda, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 8,
+    "composer": "Johann Sebastian Bach",
+    "work": "Christ lag in Todesbanden, BWV 4 · “Christ Lay in Death's Bonds”",
+    "part": "III. Duetto, Versus II. Den Tod niemand zwingen kunnt (Soprano, Alto)",
+    "performers": "Sytse Buwalda, Pieter Jan Leusink, Ruth Holton, Netherlands Bach Collegium, Holland Boys Choir"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "Christ lag in Todesbanden, BWV 4: IV. Aria Versus III. Jesus Christus, Gottes Sohn (Tenore)",
+   "durationMs": 123320,
+   "artist": "Nico van der Meel, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 8,
+    "composer": "Johann Sebastian Bach",
+    "work": "Christ lag in Todesbanden, BWV 4 · “Christ Lay in Death's Bonds”",
+    "part": "IV. Aria Versus III. Jesus Christus, Gottes Sohn (Tenore)",
+    "performers": "Netherlands Bach Collegium, Nico van der Meel, Holland Boys Choir, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 23,
+   "title": "Christ lag in Todesbanden, BWV 4: V. Coro, Versus IV. Es war ein wunderlicher Krieg",
+   "durationMs": 139160,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 8,
+    "composer": "Johann Sebastian Bach",
+    "work": "Christ lag in Todesbanden, BWV 4 · “Christ Lay in Death's Bonds”",
+    "part": "V. Coro, Versus IV. Es war ein wunderlicher Krieg",
+    "performers": "Netherlands Bach Collegium, Holland Boys Choir, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 24,
+   "title": "Christ lag in Todesbanden, BWV 4: VI. Aria, Versus V. Hier ist das rechte Osterlamm (Basso)",
+   "durationMs": 187533,
+   "artist": "Bas Ramselaar, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 8,
+    "composer": "Johann Sebastian Bach",
+    "work": "Christ lag in Todesbanden, BWV 4 · “Christ Lay in Death's Bonds”",
+    "part": "VI. Aria, Versus V. Hier ist das rechte Osterlamm (Basso)",
+    "performers": "Bas Ramselaar, Netherlands Bach Collegium, Pieter Jan Leusink, Holland Boys Choir"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 25,
+   "title": "Christ lag in Todesbanden, BWV 4: VII. Duetto, Versus VI. So feiern wir das hohe Fest (Soprano, Tenore)",
+   "durationMs": 104307,
+   "artist": "Ruth Holton, Nico van der Meel, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 8,
+    "composer": "Johann Sebastian Bach",
+    "work": "Christ lag in Todesbanden, BWV 4 · “Christ Lay in Death's Bonds”",
+    "part": "VII. Duetto, Versus VI. So feiern wir das hohe Fest (Soprano, Tenore)",
+    "performers": "Ruth Holton, Netherlands Bach Collegium, Nico van der Meel, Holland Boys Choir, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 26,
+   "title": "Christ lag in Todesbanden, BWV 4: VIII. Choral, Versus VII. Wir essen und leben wohl (Coro)",
+   "durationMs": 77453,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 8,
+    "composer": "Johann Sebastian Bach",
+    "work": "Christ lag in Todesbanden, BWV 4 · “Christ Lay in Death's Bonds”",
+    "part": "VIII. Choral, Versus VII. Wir essen und leben wohl (Coro)",
+    "performers": "Holland Boys Choir, Netherlands Bach Collegium, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 27,
+   "title": "Wo soll ich fliehen hin, BWV 5: I. Coro. Wo soll ich fliehen hin",
+   "durationMs": 225733,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 9,
+    "composer": "Johann Sebastian Bach",
+    "work": "Wo soll ich fliehen hin?, BWV 5 · “Where should I flee?”",
+    "part": "I. Coro. Wo soll ich fliehen hin",
+    "performers": "Holland Boys Choir, Pieter Jan Leusink, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 28,
+   "title": "Wo soll ich fliehen hin, BWV 5: II. Recitativo. Der Sünden Wust hat mich (Basso)",
+   "durationMs": 66213,
+   "artist": "Bas Ramselaar, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 9,
+    "composer": "Johann Sebastian Bach",
+    "work": "Wo soll ich fliehen hin?, BWV 5 · “Where should I flee?”",
+    "part": "II. Recitativo. Der Sünden Wust hat mich (Basso)",
+    "performers": "Pieter Jan Leusink, Bas Ramselaar, Netherlands Bach Collegium, Holland Boys Choir"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 29,
+   "title": "Wo soll ich fliehen hin, BWV 5: III. Aria. Ergieße dich reichlich (Tenore)",
+   "durationMs": 419813,
+   "artist": "Nico van der Meel, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 9,
+    "composer": "Johann Sebastian Bach",
+    "work": "Wo soll ich fliehen hin?, BWV 5 · “Where should I flee?”",
+    "part": "III. Aria. Ergieße dich reichlich (Tenore)",
+    "performers": "Holland Boys Choir, Nico van der Meel, Pieter Jan Leusink, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 30,
+   "title": "Wo soll ich fliehen hin, BWV 5: IV. Recitativo. Mein treuer Heiland (Alto)",
+   "durationMs": 88560,
+   "artist": "Sytse Buwalda, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 9,
+    "composer": "Johann Sebastian Bach",
+    "work": "Wo soll ich fliehen hin?, BWV 5 · “Where should I flee?”",
+    "part": "IV. Recitativo. Mein treuer Heiland (Alto)",
+    "performers": "Sytse Buwalda, Holland Boys Choir, Netherlands Bach Collegium, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 31,
+   "title": "Wo soll ich fliehen hin, BWV 5: V. Aria. Verstumme, Höllenheer (Basso)",
+   "durationMs": 420760,
+   "artist": "Bas Ramselaar, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 9,
+    "composer": "Johann Sebastian Bach",
+    "work": "Wo soll ich fliehen hin?, BWV 5 · “Where should I flee?”",
+    "part": "V. Aria. Verstumme, Höllenheer (Basso)",
+    "performers": "Pieter Jan Leusink, Bas Ramselaar, Netherlands Bach Collegium, Holland Boys Choir"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 32,
+   "title": "Wo soll ich fliehen hin, BWV 5: VI. Recitativo. Ich bin ja nur (Soprano)",
+   "durationMs": 51453,
+   "artist": "Ruth Holton, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 9,
+    "composer": "Johann Sebastian Bach",
+    "work": "Wo soll ich fliehen hin?, BWV 5 · “Where should I flee?”",
+    "part": "VI. Recitativo. Ich bin ja nur (Soprano)",
+    "performers": "Pieter Jan Leusink, Netherlands Bach Collegium, Ruth Holton"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 33,
+   "title": "Wo soll ich fliehen hin, BWV 5: VII. Choral. Führ auch mein Herz und Sinn (Coro)",
+   "durationMs": 50813,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 9,
+    "composer": "Johann Sebastian Bach",
+    "work": "Wo soll ich fliehen hin?, BWV 5 · “Where should I flee?”",
+    "part": "VII. Choral. Führ auch mein Herz und Sinn (Coro)",
+    "performers": "Pieter Jan Leusink, Holland Boys Choir, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 34,
+   "title": "Bleib bei uns, denn es will Abend werden, BWV 6: I. Coro. Bleib bei uns, denn es will Abend",
+   "durationMs": 419333,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 10,
+    "composer": "Johann Sebastian Bach",
+    "work": "Bleib' bei uns, denn es will Abend werden, BWV 6 · “Stay With Us, For Evening Falls”",
+    "part": "I. Coro. Bleib bei uns, denn es will Abend",
+    "performers": "Netherlands Bach Collegium, Holland Boys Choir, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 35,
+   "title": "Bleib bei uns, denn es will Abend werden, BWV 6: II. Aria. Hochgelobter Gottessohn (Alto)",
+   "durationMs": 243480,
+   "artist": "Sytse Buwalda, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 10,
+    "composer": "Johann Sebastian Bach",
+    "work": "Bleib' bei uns, denn es will Abend werden, BWV 6 · “Stay With Us, For Evening Falls”",
+    "part": "II. Aria. Hochgelobter Gottessohn (Alto)",
+    "performers": "Holland Boys Choir, Pieter Jan Leusink, Sytse Buwalda, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 36,
+   "title": "Bleib bei uns, denn es will Abend werden, BWV 6: III. Choral. Ach bleib bei uns, Herr Jesu Christ (Soprano)",
+   "durationMs": 257707,
+   "artist": "Ruth Holton, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 10,
+    "composer": "Johann Sebastian Bach",
+    "work": "Bleib' bei uns, denn es will Abend werden, BWV 6 · “Stay With Us, For Evening Falls”",
+    "part": "III. Choral. Ach bleib bei uns, Herr Jesu Christ (Soprano)",
+    "performers": "Ruth Holton, Pieter Jan Leusink, Netherlands Bach Collegium, Holland Boys Choir"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 37,
+   "title": "Bleib bei uns, denn es will Abend werden, BWV 6: IV. Recitativo. Es hat die Dunkelheit (Basso)",
+   "durationMs": 44960,
+   "artist": "Bas Ramselaar, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 10,
+    "composer": "Johann Sebastian Bach",
+    "work": "Bleib' bei uns, denn es will Abend werden, BWV 6 · “Stay With Us, For Evening Falls”",
+    "part": "IV. Recitativo. Es hat die Dunkelheit (Basso)",
+    "performers": "Pieter Jan Leusink, Holland Boys Choir, Bas Ramselaar, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 38,
+   "title": "Bleib bei uns, denn es will Abend werden, BWV 6: V. Aria. Jesu, laß uns auf dich sehen (Tenore)",
+   "durationMs": 224213,
+   "artist": "Nico van der Meel, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 10,
+    "composer": "Johann Sebastian Bach",
+    "work": "Bleib' bei uns, denn es will Abend werden, BWV 6 · “Stay With Us, For Evening Falls”",
+    "part": "V. Aria. Jesu, laß uns auf dich sehen (Tenore)",
+    "performers": "Netherlands Bach Collegium, Nico van der Meel, Holland Boys Choir, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 39,
+   "title": "Bleib bei uns, denn es will Abend werden, BWV 6: VI. Choral. Beweis dein Macht, Herr Jesu Christ (Coro)",
+   "durationMs": 51240,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 10,
+    "composer": "Johann Sebastian Bach",
+    "work": "Bleib' bei uns, denn es will Abend werden, BWV 6 · “Stay With Us, For Evening Falls”",
+    "part": "VI. Choral. Beweis dein Macht, Herr Jesu Christ (Coro)",
+    "performers": "Holland Boys Choir, Pieter Jan Leusink, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 40,
+   "title": "Christ unser Herr zum Jordan kam, BWV 7: I. Coro. Christ unser Herr zum Jordan kam",
+   "durationMs": 375320,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 11,
+    "composer": "Johann Sebastian Bach",
+    "work": "Christ unser Herr zum Jordan kam, BWV 7 · “Christ our Lord came to Jordan”",
+    "part": "I. Coro. Christ unser Herr zum Jordan kam",
+    "performers": "Holland Boys Choir, Pieter Jan Leusink, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 41,
+   "title": "Christ unser Herr zum Jordan kam, BWV 7: II. Aria. Merkt und hört, ihr Menschenkinder (Basso)",
+   "durationMs": 338960,
+   "artist": "Bas Ramselaar, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 11,
+    "composer": "Johann Sebastian Bach",
+    "work": "Christ unser Herr zum Jordan kam, BWV 7 · “Christ our Lord came to Jordan”",
+    "part": "II. Aria. Merkt und hört, ihr Menschenkinder (Basso)",
+    "performers": "Holland Boys Choir, Bas Ramselaar, Netherlands Bach Collegium, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 42,
+   "title": "Christ unser Herr zum Jordan kam, BWV 7: III. Recitativo. Dies hat Gott klar mit Worten (Tenore)",
+   "durationMs": 72640,
+   "artist": "Nico van der Meel, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 11,
+    "composer": "Johann Sebastian Bach",
+    "work": "Christ unser Herr zum Jordan kam, BWV 7 · “Christ our Lord came to Jordan”",
+    "part": "III. Recitativo. Dies hat Gott klar mit Worten (Tenore)",
+    "performers": "Holland Boys Choir, Nico van der Meel, Pieter Jan Leusink, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 43,
+   "title": "Christ unser Herr zum Jordan kam, BWV 7: IV. Aria. Des Vaters Stimme ließ sich hören (Tenore)",
+   "durationMs": 250720,
+   "artist": "Nico van der Meel, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 11,
+    "composer": "Johann Sebastian Bach",
+    "work": "Christ unser Herr zum Jordan kam, BWV 7 · “Christ our Lord came to Jordan”",
+    "part": "IV. Aria. Des Vaters Stimme ließ sich hören (Tenore)",
+    "performers": "Nico van der Meel, Pieter Jan Leusink, Holland Boys Choir, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 44,
+   "title": "Christ unser Herr zum Jordan kam, BWV 7: V. Recitativo. Als Jesus dort nach seinen Leiden (Basso)",
+   "durationMs": 68440,
+   "artist": "Bas Ramselaar, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 11,
+    "composer": "Johann Sebastian Bach",
+    "work": "Christ unser Herr zum Jordan kam, BWV 7 · “Christ our Lord came to Jordan”",
+    "part": "V. Recitativo. Als Jesus dort nach seinen Leiden (Basso)",
+    "performers": "Holland Boys Choir, Bas Ramselaar, Netherlands Bach Collegium, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 45,
+   "title": "Christ unser Herr zum Jordan kam, BWV 7: VI. Aria. Menschen, Glaubt doch dieser (Alto)",
+   "durationMs": 201000,
+   "artist": "Sytse Buwalda, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 11,
+    "composer": "Johann Sebastian Bach",
+    "work": "Christ unser Herr zum Jordan kam, BWV 7 · “Christ our Lord came to Jordan”",
+    "part": "VI. Aria. Menschen, Glaubt doch dieser (Alto)",
+    "performers": "Pieter Jan Leusink, Netherlands Bach Collegium, Sytse Buwalda"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 46,
+   "title": "Christ unser Herr zum Jordan kam, BWV 7: VII. Choral. Das Aug allein das Wasser sieht (Coro)",
+   "durationMs": 76253,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 11,
+    "composer": "Johann Sebastian Bach",
+    "work": "Christ unser Herr zum Jordan kam, BWV 7 · “Christ our Lord came to Jordan”",
+    "part": "VII. Choral. Das Aug allein das Wasser sieht (Coro)",
+    "performers": "Holland Boys Choir, Netherlands Bach Collegium, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 47,
+   "title": "Liebster Gott, wenn werd ich sterben?, BWV 8: I. Coro. Liebster Gott, wenn werd ich sterben?",
+   "durationMs": 355560,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 12,
+    "composer": "Johann Sebastian Bach",
+    "work": "Liebster Gott, wenn werd' ich sterben?, BWV 8 · “Dearest God, When Will I Die?”",
+    "part": "I. Coro. Liebster Gott, wenn werd ich sterben?",
+    "performers": "Netherlands Bach Collegium, Pieter Jan Leusink, Holland Boys Choir"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 48,
+   "title": "Liebster Gott, wenn werd ich sterben?, BWV 8: II. Aria. Was willst du dich mein Geist (Tenore)",
+   "durationMs": 223867,
+   "artist": "Marcel Beekman, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 12,
+    "composer": "Johann Sebastian Bach",
+    "work": "Liebster Gott, wenn werd' ich sterben?, BWV 8 · “Dearest God, When Will I Die?”",
+    "part": "II. Aria. Was willst du dich mein Geist (Tenore)",
+    "performers": "Holland Boys Choir, Marcel Beekman, Netherlands Bach Collegium, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 49,
+   "title": "Liebster Gott, wenn werd ich sterben?, BWV 8: III. Recitativo. Zwar fühlt mein schwaches Herz (Alto)",
+   "durationMs": 62147,
+   "artist": "Sytse Buwalda, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 12,
+    "composer": "Johann Sebastian Bach",
+    "work": "Liebster Gott, wenn werd' ich sterben?, BWV 8 · “Dearest God, When Will I Die?”",
+    "part": "III. Recitativo. Zwar fühlt mein schwaches Herz (Alto)",
+    "performers": "Holland Boys Choir, Sytse Buwalda, Pieter Jan Leusink, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 50,
+   "title": "Liebster Gott, wenn werd ich sterben?, BWV 8: IV. Arioso. Doch weichet, ihr tollen (Basso)",
+   "durationMs": 325707,
+   "artist": "Bas Ramselaar, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 12,
+    "composer": "Johann Sebastian Bach",
+    "work": "Liebster Gott, wenn werd' ich sterben?, BWV 8 · “Dearest God, When Will I Die?”",
+    "part": "IV. Arioso. Doch weichet, ihr tollen (Basso)",
+    "performers": "Holland Boys Choir, Bas Ramselaar, Netherlands Bach Collegium, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 51,
+   "title": "Liebster Gott, wenn werd ich sterben?, BWV 8: V. Recitativo. Behalte nur, o Welt, das Meine! (Soprano)",
+   "durationMs": 65053,
+   "artist": "Ruth Holton, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 12,
+    "composer": "Johann Sebastian Bach",
+    "work": "Liebster Gott, wenn werd' ich sterben?, BWV 8 · “Dearest God, When Will I Die?”",
+    "part": "V. Recitativo. Behalte nur, o Welt, das Meine! (Soprano)",
+    "performers": "Netherlands Bach Collegium, Pieter Jan Leusink, Holland Boys Choir, Ruth Holton"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 52,
+   "title": "Liebster Gott, wenn werd ich sterben?, BWV 8: VI. Choral. Herrscher über Tod und Leben (Coro)",
+   "durationMs": 59733,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 12,
+    "composer": "Johann Sebastian Bach",
+    "work": "Liebster Gott, wenn werd' ich sterben?, BWV 8 · “Dearest God, When Will I Die?”",
+    "part": "VI. Choral. Herrscher über Tod und Leben (Coro)",
+    "performers": "Holland Boys Choir, Netherlands Bach Collegium, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 53,
+   "title": "Es ist das Heil uns Kommen her, BWV 9: I. Coro. Es ist das Heil uns kommen her",
+   "durationMs": 325053,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 13,
+    "composer": "Johann Sebastian Bach",
+    "work": "Es ist das Heil uns kommen her, BWV 9 · “Salvation has come to us”",
+    "part": "I. Coro. Es ist das Heil uns kommen her",
+    "performers": "Pieter Jan Leusink, Holland Boys Choir, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 54,
+   "title": "Es ist das Heil uns Kommen her, BWV 9: II. Recitativo. Gott gab uns ein Gesetz (Basso)",
+   "durationMs": 80347,
+   "artist": "Bas Ramselaar, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 13,
+    "composer": "Johann Sebastian Bach",
+    "work": "Es ist das Heil uns kommen her, BWV 9 · “Salvation has come to us”",
+    "part": "II. Recitativo. Gott gab uns ein Gesetz (Basso)",
+    "performers": "Pieter Jan Leusink, Holland Boys Choir, Bas Ramselaar, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 55,
+   "title": "Es ist das Heil uns Kommen her, BWV 9: III. Aria. Wir waren schon zu Tief gesunken (Tenore)",
+   "durationMs": 275187,
+   "artist": "Nico van der Meel, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 13,
+    "composer": "Johann Sebastian Bach",
+    "work": "Es ist das Heil uns kommen her, BWV 9 · “Salvation has come to us”",
+    "part": "III. Aria. Wir waren schon zu Tief gesunken (Tenore)",
+    "performers": "Pieter Jan Leusink, Holland Boys Choir, Nico van der Meel, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 56,
+   "title": "Es ist das Heil uns Kommen her, BWV 9: IV. Recitativo. Doch mußte das Gesetz (Basso)",
+   "durationMs": 78827,
+   "artist": "Bas Ramselaar, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 13,
+    "composer": "Johann Sebastian Bach",
+    "work": "Es ist das Heil uns kommen her, BWV 9 · “Salvation has come to us”",
+    "part": "IV. Recitativo. Doch mußte das Gesetz (Basso)",
+    "performers": "Holland Boys Choir, Pieter Jan Leusink, Bas Ramselaar, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 57,
+   "title": "Es ist das Heil uns Kommen her, BWV 9: V. Aria. Herr, du siehst statt guter Werke (Soprano, Alto)",
+   "durationMs": 399667,
+   "artist": "Marjon Strijk, Sytse Buwalda, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 13,
+    "composer": "Johann Sebastian Bach",
+    "work": "Es ist das Heil uns kommen her, BWV 9 · “Salvation has come to us”",
+    "part": "V. Aria. Herr, du siehst statt guter Werke (Soprano, Alto)",
+    "performers": "Pieter Jan Leusink, Marjon Strijk, Netherlands Bach Collegium, Holland Boys Choir, Sytse Buwalda"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 58,
+   "title": "Es ist das Heil uns Kommen her, BWV 9: VI. Recitativo. wenn wir die Sünd (Basso)",
+   "durationMs": 85147,
+   "artist": "Bas Ramselaar, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 13,
+    "composer": "Johann Sebastian Bach",
+    "work": "Es ist das Heil uns kommen her, BWV 9 · “Salvation has come to us”",
+    "part": "VI. Recitativo. wenn wir die Sünd (Basso)",
+    "performers": "Pieter Jan Leusink, Bas Ramselaar, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 59,
+   "title": "Es ist das Heil uns Kommen her, BWV 9: VII. Choral. Ob sichs anließ, als wollt er nicht (Coro)",
+   "durationMs": 66813,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 13,
+    "composer": "Johann Sebastian Bach",
+    "work": "Es ist das Heil uns kommen her, BWV 9 · “Salvation has come to us”",
+    "part": "VII. Choral. Ob sichs anließ, als wollt er nicht (Coro)",
+    "performers": "Pieter Jan Leusink, Netherlands Bach Collegium, Holland Boys Choir"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 60,
+   "title": "Meine Seel erhebt den Herren, BWV 10: I. Coro. Meine Seel erhebt den Herren",
+   "durationMs": 229720,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 14,
+    "composer": "Johann Sebastian Bach",
+    "work": "Meine Seel' erhebt den Herrn, BWV 10 · “My Soul Doth Magnify the Lord”",
+    "part": "I. Coro. Meine Seel erhebt den Herren",
+    "performers": "Netherlands Bach Collegium, Pieter Jan Leusink, Holland Boys Choir, The Bach Orchestra of the Netherlands"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 61,
+   "title": "Meine Seel erhebt den Herren, BWV 10: II. Aria. Herr, der du stark (Soprano)",
+   "durationMs": 391253,
+   "artist": "Ruth Holton, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 14,
+    "composer": "Johann Sebastian Bach",
+    "work": "Meine Seel' erhebt den Herrn, BWV 10 · “My Soul Doth Magnify the Lord”",
+    "part": "II. Aria. Herr, der du stark (Soprano)",
+    "performers": "Netherlands Bach Collegium, Ruth Holton, Holland Boys Choir, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 62,
+   "title": "Meine Seel erhebt den Herren, BWV 10: III. Recitativo. Des höchsten Güt und Treu (Tenore)",
+   "durationMs": 74587,
+   "artist": "Knut Schoch, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 14,
+    "composer": "Johann Sebastian Bach",
+    "work": "Meine Seel' erhebt den Herrn, BWV 10 · “My Soul Doth Magnify the Lord”",
+    "part": "III. Recitativo. Des höchsten Güt und Treu (Tenore)",
+    "performers": "Pieter Jan Leusink, Holland Boys Choir, Netherlands Bach Collegium, Knut Schoch"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 63,
+   "title": "Meine Seel erhebt den Herren, BWV 10: IV. Aria. Gewaltige stößt Gott vom Stuhl (Basso)",
+   "durationMs": 174440,
+   "artist": "Bas Ramselaar, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 14,
+    "composer": "Johann Sebastian Bach",
+    "work": "Meine Seel' erhebt den Herrn, BWV 10 · “My Soul Doth Magnify the Lord”",
+    "part": "IV. Aria. Gewaltige stößt Gott vom Stuhl (Basso)",
+    "performers": "Pieter Jan Leusink, Holland Boys Choir, Bas Ramselaar, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 64,
+   "title": "Meine Seel erhebt den Herren, BWV 10: V. Aria. Er denket der Barmherzigkeit (Alto, Tenore)",
+   "durationMs": 105413,
+   "artist": "Knut Schoch, Sytse Buwalda, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 14,
+    "composer": "Johann Sebastian Bach",
+    "work": "Meine Seel' erhebt den Herrn, BWV 10 · “My Soul Doth Magnify the Lord”",
+    "part": "V. Aria. Er denket der Barmherzigkeit (Alto, Tenore)",
+    "performers": "Holland Boys Choir, Sytse Buwalda, Knut Schoch, Netherlands Bach Collegium, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 65,
+   "title": "Meine Seel erhebt den Herren, BWV 10: VI. Recitativo. Was Gott den Vätern alter Zeiten (Tenore)",
+   "durationMs": 115347,
+   "artist": "Knut Schoch, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 14,
+    "composer": "Johann Sebastian Bach",
+    "work": "Meine Seel' erhebt den Herrn, BWV 10 · “My Soul Doth Magnify the Lord”",
+    "part": "VI. Recitativo. Was Gott den Vätern alter Zeiten (Tenore)",
+    "performers": "Netherlands Bach Collegium, Knut Schoch, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 66,
+   "title": "Meine Seel erhebt den Herren, BWV 10: VII. Choral. Lob und Preis sei Gott dem Vater (Coro)",
+   "durationMs": 62667,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 14,
+    "composer": "Johann Sebastian Bach",
+    "work": "Meine Seel' erhebt den Herrn, BWV 10 · “My Soul Doth Magnify the Lord”",
+    "part": "VII. Choral. Lob und Preis sei Gott dem Vater (Coro)",
+    "performers": "Holland Boys Choir, Netherlands Bach Collegium, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 67,
+   "title": "Weinen, klagen, sorgen, zagen, BWV 12: I. Sinfonia",
+   "durationMs": 153120,
+   "artist": "Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 15,
+    "composer": "Johann Sebastian Bach",
+    "work": "Weinen, Klagen, Sorgen, Zagen, BWV 12 · “Weeping, Lamenting, Worrying, Fearing”",
+    "part": "I. Sinfonia",
+    "performers": "Pieter Jan Leusink, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 68,
+   "title": "Weinen, klagen, sorgen, zagen, BWV 12: II. Coro. Weinen, klagen, sorgen, zagen",
+   "durationMs": 364560,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 15,
+    "composer": "Johann Sebastian Bach",
+    "work": "Weinen, Klagen, Sorgen, Zagen, BWV 12 · “Weeping, Lamenting, Worrying, Fearing”",
+    "part": "II. Coro. Weinen, klagen, sorgen, zagen",
+    "performers": "Holland Boys Choir, Netherlands Bach Collegium, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 69,
+   "title": "Weinen, klagen, sorgen, zagen, BWV 12: III. Arioso. Wir müssen durch viel Trübsal (Alto)",
+   "durationMs": 46240,
+   "artist": "Sytse Buwalda, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 15,
+    "composer": "Johann Sebastian Bach",
+    "work": "Weinen, Klagen, Sorgen, Zagen, BWV 12 · “Weeping, Lamenting, Worrying, Fearing”",
+    "part": "III. Arioso. Wir müssen durch viel Trübsal (Alto)",
+    "performers": "Netherlands Bach Collegium, Sytse Buwalda, Pieter Jan Leusink, Holland Boys Choir"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 70,
+   "title": "Weinen, klagen, sorgen, zagen, BWV 12: IV. Aria. Kreuz und Krone sind verbunden (Alto)",
+   "durationMs": 392933,
+   "artist": "Sytse Buwalda, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 15,
+    "composer": "Johann Sebastian Bach",
+    "work": "Weinen, Klagen, Sorgen, Zagen, BWV 12 · “Weeping, Lamenting, Worrying, Fearing”",
+    "part": "IV. Aria. Kreuz und Krone sind verbunden (Alto)",
+    "performers": "Pieter Jan Leusink, Netherlands Bach Collegium, Holland Boys Choir, Sytse Buwalda"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 71,
+   "title": "Weinen, klagen, sorgen, zagen, BWV 12: V. Aria. Ich folge Christo nach (Basso)",
+   "durationMs": 124720,
+   "artist": "Bas Ramselaar, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 15,
+    "composer": "Johann Sebastian Bach",
+    "work": "Weinen, Klagen, Sorgen, Zagen, BWV 12 · “Weeping, Lamenting, Worrying, Fearing”",
+    "part": "V. Aria. Ich folge Christo nach (Basso)",
+    "performers": "Pieter Jan Leusink, Bas Ramselaar, Netherlands Bach Collegium, Holland Boys Choir"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 72,
+   "title": "Weinen, klagen, sorgen, zagen, BWV 12: VI. Aria. Sei getreu, alle Pein (Tenore)",
+   "durationMs": 257107,
+   "artist": "Knut Schoch, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 15,
+    "composer": "Johann Sebastian Bach",
+    "work": "Weinen, Klagen, Sorgen, Zagen, BWV 12 · “Weeping, Lamenting, Worrying, Fearing”",
+    "part": "VI. Aria. Sei getreu, alle Pein (Tenore)",
+    "performers": "Netherlands Bach Collegium, Knut Schoch, Holland Boys Choir, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 73,
+   "title": "Weinen, klagen, sorgen, zagen, BWV 12: VII. Choral. Was Gott tut, das ist wohlgetan (Coro)",
+   "durationMs": 58893,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 15,
+    "composer": "Johann Sebastian Bach",
+    "work": "Weinen, Klagen, Sorgen, Zagen, BWV 12 · “Weeping, Lamenting, Worrying, Fearing”",
+    "part": "VII. Choral. Was Gott tut, das ist wohlgetan (Coro)",
+    "performers": "Pieter Jan Leusink, Holland Boys Choir, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 74,
+   "title": "Meine Seufzer, meine Tränen, BWV 13: I. Aria. Meine Seufzer, meine Tränen (Tenore)",
+   "durationMs": 479253,
+   "artist": "Knut Schoch, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 16,
+    "composer": "Johann Sebastian Bach",
+    "work": "Meine Seufzer, meine Tränen, BWV 13 · “My Sighs, My Tears”",
+    "part": "I. Aria. Meine Seufzer, meine Tränen (Tenore)",
+    "performers": "Holland Boys Choir, Knut Schoch, Netherlands Bach Collegium, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 75,
+   "title": "Meine Seufzer, meine Tränen, BWV 13: II. Recitativo. Mein liebster Gott (Alto)",
+   "durationMs": 61547,
+   "artist": "Sytse Buwalda, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 16,
+    "composer": "Johann Sebastian Bach",
+    "work": "Meine Seufzer, meine Tränen, BWV 13 · “My Sighs, My Tears”",
+    "part": "II. Recitativo. Mein liebster Gott (Alto)",
+    "performers": "Netherlands Bach Collegium, Pieter Jan Leusink, Holland Boys Choir, Sytse Buwalda"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 76,
+   "title": "Meine Seufzer, meine Tränen, BWV 13: III. Choral. Der Gott, hat mich versprochen (Alto)",
+   "durationMs": 182800,
+   "artist": "Sytse Buwalda, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 16,
+    "composer": "Johann Sebastian Bach",
+    "work": "Meine Seufzer, meine Tränen, BWV 13 · “My Sighs, My Tears”",
+    "part": "III. Choral. Der Gott, hat mich versprochen (Alto)",
+    "performers": "Holland Boys Choir, Sytse Buwalda, Pieter Jan Leusink, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 77,
+   "title": "Meine Seufzer, meine Tränen, BWV 13: Recitativo. Mein Kummer nimmet zu (Soprano)",
+   "durationMs": 70880,
+   "artist": "Ruth Holton, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 16,
+    "composer": "Johann Sebastian Bach",
+    "work": "Meine Seufzer, meine Tränen, BWV 13 · “My Sighs, My Tears”",
+    "part": "Recitativo. Mein Kummer nimmet zu (Soprano)",
+    "performers": "Pieter Jan Leusink, Holland Boys Choir, Ruth Holton, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 78,
+   "title": "Meine Seufzer, meine Tränen, BWV 13: V. Aria. Ächzen und erbärmlich Weinen (Basso)",
+   "durationMs": 576600,
+   "artist": "Bas Ramselaar, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 16,
+    "composer": "Johann Sebastian Bach",
+    "work": "Meine Seufzer, meine Tränen, BWV 13 · “My Sighs, My Tears”",
+    "part": "V. Aria. Ächzen und erbärmlich Weinen (Basso)",
+    "performers": "Holland Boys Choir, Bas Ramselaar, Netherlands Bach Collegium, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 79,
+   "title": "Meine Seufzer, meine Tränen, BWV 13: VI. Choral. So sei nun, Seele, deine (Coro)",
+   "durationMs": 58907,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 16,
+    "composer": "Johann Sebastian Bach",
+    "work": "Meine Seufzer, meine Tränen, BWV 13 · “My Sighs, My Tears”",
+    "part": "VI. Choral. So sei nun, Seele, deine (Coro)",
+    "performers": "Netherlands Bach Collegium, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 80,
+   "title": "Wär Gott nicht mit uns diese Zeit, BWV 14: I. Coro. Wär Gott nicht mit uns diese Zeit",
+   "durationMs": 397387,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 17,
+    "composer": "Johann Sebastian Bach",
+    "work": "Wär Gott nicht mit uns diese Zeit, BWV 14",
+    "part": "I. Coro. Wär Gott nicht mit uns diese Zeit",
+    "performers": "Pieter Jan Leusink, Netherlands Bach Collegium, Holland Boys Choir"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 81,
+   "title": "Wär Gott nicht mit uns diese Zeit, BWV 14: II. Aria. Unsre Stärke heißt zu schwach (Soprano)",
+   "durationMs": 279307,
+   "artist": "Marjon Strijk, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 17,
+    "composer": "Johann Sebastian Bach",
+    "work": "Wär Gott nicht mit uns diese Zeit, BWV 14",
+    "part": "II. Aria. Unsre Stärke heißt zu schwach (Soprano)",
+    "performers": "Netherlands Bach Collegium, Pieter Jan Leusink, Marjon Strijk, Holland Boys Choir"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 82,
+   "title": "Wär Gott nicht mit uns diese Zeit, BWV 14: III. Recitativo. Ja, hätt es Gott nur zugegeben (Tenore)",
+   "durationMs": 41200,
+   "artist": "Knut Schoch, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 17,
+    "composer": "Johann Sebastian Bach",
+    "work": "Wär Gott nicht mit uns diese Zeit, BWV 14",
+    "part": "III. Recitativo. Ja, hätt es Gott nur zugegeben (Tenore)",
+    "performers": "Holland Boys Choir, Knut Schoch, Netherlands Bach Collegium, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 83,
+   "title": "Wär Gott nicht mit uns diese Zeit, BWV 14: IV. Aria. Gott, bei deinem starken Schützen (Basso)",
+   "durationMs": 286867,
+   "artist": "Bas Ramselaar, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 17,
+    "composer": "Johann Sebastian Bach",
+    "work": "Wär Gott nicht mit uns diese Zeit, BWV 14",
+    "part": "IV. Aria. Gott, bei deinem starken Schützen (Basso)",
+    "performers": "Bas Ramselaar, Netherlands Bach Collegium, Pieter Jan Leusink, Holland Boys Choir"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 84,
+   "title": "Wär Gott nicht mit uns diese Zeit, BWV 14: VI. Choral. Gott Lob und Dank, der nicht zugab (Coro)",
+   "durationMs": 51707,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 17,
+    "composer": "Johann Sebastian Bach",
+    "work": "Wär Gott nicht mit uns diese Zeit, BWV 14",
+    "part": "VI. Choral. Gott Lob und Dank, der nicht zugab (Coro)",
+    "performers": "Holland Boys Choir, Pieter Jan Leusink, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 85,
+   "title": "Herr Gott, dich loben wir, BWV 16: I. Coro. Herr Gott, dich loben wir",
+   "durationMs": 90733,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 18,
+    "composer": "Johann Sebastian Bach",
+    "work": "Herr Gott, dich loben wir, BWV 16 · “Lord God, we praise you”",
+    "part": "I. Coro. Herr Gott, dich loben wir",
+    "performers": "Netherlands Bach Collegium, Pieter Jan Leusink, Holland Boys Choir"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 86,
+   "title": "Herr Gott, dich loben wir, BWV 16: II. Recitativo. So stimmen wir (Basso)",
+   "durationMs": 86133,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 19,
+    "composer": "Johann Sebastian Bach",
+    "work": "Singet dem Herrn ein neues Lied, BWV 190",
+    "part": "II. Recitativo. So stimmen wir (Basso)",
+    "performers": "Netherlands Bach Collegium, Pieter Jan Leusink, Bas Ramselaar"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 87,
+   "title": "Herr Gott, dich loben wir, BWV 16: III. Coro & Aria. Laßt uns jauchzen, laßt uns freuen (Basso)",
+   "durationMs": 225200,
+   "artist": "Bas Ramselaar, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 19,
+    "composer": "Johann Sebastian Bach",
+    "work": "Singet dem Herrn ein neues Lied, BWV 190",
+    "part": "III. Coro & Aria. Laßt uns jauchzen, laßt uns freuen (Basso)",
+    "performers": "Holland Boys Choir, Pieter Jan Leusink, Bas Ramselaar, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 88,
+   "title": "Herr Gott, dich loben wir, BWV 16: IV. Recitativo. Ach treuer Hort (Alto)",
+   "durationMs": 96267,
+   "artist": "Sytse Buwalda, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 20,
+    "composer": "Johann Sebastian Bach",
+    "work": "Herr Gott, dich loben wir, BWV 16 · “Lord God, we praise you”",
+    "part": "IV. Recitativo. Ach treuer Hort (Alto)",
+    "performers": "Sytse Buwalda, Holland Boys Choir, Netherlands Bach Collegium, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 89,
+   "title": "Herr Gott, dich loben wir, BWV 16: V. Aria. Geliebter Jesu, du allein (Tenore)",
+   "durationMs": 489560,
+   "artist": "Nico van der Meel, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 21,
+    "composer": "Johann Sebastian Bach",
+    "work": "Singet dem Herrn ein neues Lied, BWV 190",
+    "part": "V. Aria. Geliebter Jesu, du allein (Tenore)",
+    "performers": "Pieter Jan Leusink, Holland Boys Choir, Nico van der Meel, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 90,
+   "title": "Herr Gott, dich loben wir, BWV 16: VI. Choral. All solch dein Güt wir preisen (Coro)",
+   "durationMs": 73867,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 22,
+    "composer": "Johann Sebastian Bach",
+    "work": "Herr Gott, dich loben wir, BWV 16 · “Lord God, we praise you”",
+    "part": "VI. Choral. All solch dein Güt wir preisen (Coro)",
+    "performers": "Netherlands Bach Collegium, Pieter Jan Leusink, Holland Boys Choir"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 91,
+   "title": "Wer Dank opfert, der preiset mich, BWV 17, Prima Parte: I. Coro. Wer Dank opfert, der preiset mich",
+   "durationMs": 252467,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 23,
+    "composer": "Johann Sebastian Bach",
+    "work": "Wer Dank opfert, der preiset mich, BWV 17 · “He who offers thanks, praises me”",
+    "part": "I. Coro. Wer Dank opfert, der preiset mich",
+    "performers": "Netherlands Bach Collegium, Holland Boys Choir, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 92,
+   "title": "Wer Dank opfert, der preiset mich, BWV 17, Pt. 1: II. Recitativo. Es muß die ganze Welt (Alto)",
+   "durationMs": 63573,
+   "artist": "Sytse Buwalda, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 23,
+    "composer": "Johann Sebastian Bach",
+    "work": "Wer Dank opfert, der preiset mich, BWV 17 · “He who offers thanks, praises me”",
+    "part": "II. Recitativo. Es muß die ganze Welt (Alto)",
+    "performers": "Holland Boys Choir, Netherlands Bach Collegium, Pieter Jan Leusink, Sytse Buwalda"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 93,
+   "title": "Wer Dank opfert, der preiset mich, BWV 17, Pt. 1: III. Aria. Herr, deine Güte (Soprano)",
+   "durationMs": 199373,
+   "artist": "Ruth Holton, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 23,
+    "composer": "Johann Sebastian Bach",
+    "work": "Wer Dank opfert, der preiset mich, BWV 17 · “He who offers thanks, praises me”",
+    "part": "III. Aria. Herr, deine Güte (Soprano)",
+    "performers": "Netherlands Bach Collegium, Ruth Holton, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 94,
+   "title": "Wer Dank opfert, der preiset mich, BWV 17, Pt. 2: IV. Recitativo. Einer aber unter ihnen (Tenore)",
+   "durationMs": 44333,
+   "artist": "Knut Schoch, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 23,
+    "composer": "Johann Sebastian Bach",
+    "work": "Wer Dank opfert, der preiset mich, BWV 17 · “He who offers thanks, praises me”",
+    "part": "IV. Recitativo. Einer aber unter ihnen (Tenore)",
+    "performers": "Holland Boys Choir, Knut Schoch, Pieter Jan Leusink, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 95,
+   "title": "Wer Dank opfert, der preiset mich, BWV 17, Pt. 2: V. Aria. Welch Übermaß der Güte (Tenore)",
+   "durationMs": 210893,
+   "artist": "Knut Schoch, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 23,
+    "composer": "Johann Sebastian Bach",
+    "work": "Wer Dank opfert, der preiset mich, BWV 17 · “He who offers thanks, praises me”",
+    "part": "V. Aria. Welch Übermaß der Güte (Tenore)",
+    "performers": "Knut Schoch, Netherlands Bach Collegium, Holland Boys Choir, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 96,
+   "title": "Wer Dank opfert, der preiset mich, BWV 17, Pt. 2: VI. Recitativo. Sieh meinen Willen an (Basso)",
+   "durationMs": 73667,
+   "artist": "Bas Ramselaar, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 23,
+    "composer": "Johann Sebastian Bach",
+    "work": "Wer Dank opfert, der preiset mich, BWV 17 · “He who offers thanks, praises me”",
+    "part": "VI. Recitativo. Sieh meinen Willen an (Basso)",
+    "performers": "Holland Boys Choir, Bas Ramselaar, Netherlands Bach Collegium, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 97,
+   "title": "Wer Dank opfert, der preiset mich, BWV 17, Pt. 2: VII. Choral. Wie sich ein Vat'r erbarmet (Coro)",
+   "durationMs": 122800,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 23,
+    "composer": "Johann Sebastian Bach",
+    "work": "Wer Dank opfert, der preiset mich, BWV 17 · “He who offers thanks, praises me”",
+    "part": "VII. Choral. Wie sich ein Vat'r erbarmet (Coro)",
+    "performers": "Netherlands Bach Collegium, Pieter Jan Leusink, Holland Boys Choir"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 98,
+   "title": "Gleich wie der Regen und Schnee vom Himmel fällt, BWV 18: I. Sinfonia",
+   "durationMs": 186827,
+   "artist": "Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 24,
+    "composer": "Johann Sebastian Bach",
+    "work": "Gleich wie der Regen und Schnee, BWV 18 · “Just as the Rain and Snow Fall”",
+    "part": "I. Sinfonia",
+    "performers": "Pieter Jan Leusink, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 99,
+   "title": "Gleich wie der Regen und Schnee vom Himmel fällt, BWV 18: II. Recitativo. Gleich wie der Regen und Schnee (Basso)",
+   "durationMs": 82440,
+   "artist": "Bas Ramselaar, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 24,
+    "composer": "Johann Sebastian Bach",
+    "work": "Gleich wie der Regen und Schnee, BWV 18 · “Just as the Rain and Snow Fall”",
+    "part": "II. Recitativo. Gleich wie der Regen und Schnee (Basso)",
+    "performers": "Pieter Jan Leusink, Holland Boys Choir, Bas Ramselaar, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 100,
+   "title": "Gleich wie der Regen und Schnee vom Himmel fällt, BWV 18: III. Recitativo. Mein Gott, hier wird mein Herze (Soprano, Tenore, Basso, Coro)",
+   "durationMs": 375347,
+   "artist": "Marjon Strijk, Robert Getchell, Bas Ramselaar, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 24,
+    "composer": "Johann Sebastian Bach",
+    "work": "Gleich wie der Regen und Schnee, BWV 18 · “Just as the Rain and Snow Fall”",
+    "part": "III. Recitativo. Mein Gott, hier wird mein Herze (Soprano, Tenore, Basso, Coro)",
+    "performers": "Robert Getchell, Marjon Strijk, Bas Ramselaar, Netherlands Bach Collegium, Pieter Jan Leusink, Holland Boys Choir"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 101,
+   "title": "Gleich wie der Regen und Schnee vom Himmel fällt, BWV 18: IV. Aria. Mein Seelenschatz ist Gottes Wort (Soprano)",
+   "durationMs": 165173,
+   "artist": "Marjon Strijk, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 24,
+    "composer": "Johann Sebastian Bach",
+    "work": "Gleich wie der Regen und Schnee, BWV 18 · “Just as the Rain and Snow Fall”",
+    "part": "IV. Aria. Mein Seelenschatz ist Gottes Wort (Soprano)",
+    "performers": "Holland Boys Choir, Netherlands Bach Collegium, Marjon Strijk, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 102,
+   "title": "Gleich wie der Regen und Schnee vom Himmel fällt, BWV 18: V. Choral. Ich bitt, o Herr, aus Herzensgrund (Coro)",
+   "durationMs": 71413,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 24,
+    "composer": "Johann Sebastian Bach",
+    "work": "Gleich wie der Regen und Schnee, BWV 18 · “Just as the Rain and Snow Fall”",
+    "part": "V. Choral. Ich bitt, o Herr, aus Herzensgrund (Coro)",
+    "performers": "Holland Boys Choir, Netherlands Bach Collegium, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 103,
+   "title": "Es erhub sich ein Streit, BWV 19: I. Coro. Es erhub sich ein Streit",
+   "durationMs": 284787,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 25,
+    "composer": "Johann Sebastian Bach",
+    "work": "Es erhub sich ein Streit, BWV 19 · “There Arose a War”",
+    "part": "I. Coro. Es erhub sich ein Streit",
+    "performers": "Holland Boys Choir, Pieter Jan Leusink, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 104,
+   "title": "Es erhub sich ein Streit, BWV 19: II. Recitativo. Gottlob! Der Drache liegt (Basso)",
+   "durationMs": 62387,
+   "artist": "Bas Ramselaar, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 25,
+    "composer": "Johann Sebastian Bach",
+    "work": "Es erhub sich ein Streit, BWV 19 · “There Arose a War”",
+    "part": "II. Recitativo. Gottlob! Der Drache liegt (Basso)",
+    "performers": "Bas Ramselaar, Netherlands Bach Collegium, Holland Boys Choir, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 105,
+   "title": "Es erhub sich ein Streit, BWV 19: III. Aria. Gott schickt uns Mahanaim zu (Soprano)",
+   "durationMs": 238227,
+   "artist": "Ruth Holton, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 25,
+    "composer": "Johann Sebastian Bach",
+    "work": "Es erhub sich ein Streit, BWV 19 · “There Arose a War”",
+    "part": "III. Aria. Gott schickt uns Mahanaim zu (Soprano)",
+    "performers": "Holland Boys Choir, Ruth Holton, Pieter Jan Leusink, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 106,
+   "title": "Es erhub sich ein Streit, BWV 19: IV. Recitativo. Was ist der schnöde Mensch (Tenore)",
+   "durationMs": 54360,
+   "artist": "Nico van der Meel, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 25,
+    "composer": "Johann Sebastian Bach",
+    "work": "Es erhub sich ein Streit, BWV 19 · “There Arose a War”",
+    "part": "IV. Recitativo. Was ist der schnöde Mensch (Tenore)",
+    "performers": "Pieter Jan Leusink, Nico van der Meel, Netherlands Bach Collegium, Holland Boys Choir"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 107,
+   "title": "Es erhub sich ein Streit, BWV 19: V. Aria. Bleibt, ihr Engel, bleibt bei mir! (Tenore)",
+   "durationMs": 424333,
+   "artist": "Nico van der Meel, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 25,
+    "composer": "Johann Sebastian Bach",
+    "work": "Es erhub sich ein Streit, BWV 19 · “There Arose a War”",
+    "part": "V. Aria. Bleibt, ihr Engel, bleibt bei mir! (Tenore)",
+    "performers": "Holland Boys Choir, Netherlands Bach Collegium, Pieter Jan Leusink, Nico van der Meel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 108,
+   "title": "Es erhub sich ein Streit, BWV 19: VI. Recitativo. Laßt uns das Angesicht (Soprano)",
+   "durationMs": 41387,
+   "artist": "Ruth Holton, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 25,
+    "composer": "Johann Sebastian Bach",
+    "work": "Es erhub sich ein Streit, BWV 19 · “There Arose a War”",
+    "part": "VI. Recitativo. Laßt uns das Angesicht (Soprano)",
+    "performers": "Pieter Jan Leusink, Ruth Holton, Netherlands Bach Collegium, Holland Boys Choir"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 109,
+   "title": "Es erhub sich ein Streit, BWV 19: VII. Choral. Laß dein Engel mit mir fahren (Coro)",
+   "durationMs": 57547,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 25,
+    "composer": "Johann Sebastian Bach",
+    "work": "Es erhub sich ein Streit, BWV 19 · “There Arose a War”",
+    "part": "VII. Choral. Laß dein Engel mit mir fahren (Coro)",
+    "performers": "Netherlands Bach Collegium, Holland Boys Choir, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 110,
+   "title": "O Ewigkeit, du Donnerwort, BWV 20, Pt. 1: I. Coro. O Ewigkeit, du Donnerwort",
+   "durationMs": 283360,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 26,
+    "composer": "Johann Sebastian Bach",
+    "work": "O Ewigkeit, du Donnerwort, BWV 20 · “O Eternity, You Thunderous Word”",
+    "part": "I. Coro. O Ewigkeit, du Donnerwort",
+    "performers": "Pieter Jan Leusink, Holland Boys Choir, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 111,
+   "title": "O Ewigkeit, du Donnerwort, BWV 20, Pt. 1: II. Recitativo. Kein Unglück ist in aller Welt (Tenore)",
+   "durationMs": 55253,
+   "artist": "Knut Schoch, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 26,
+    "composer": "Johann Sebastian Bach",
+    "work": "O Ewigkeit, du Donnerwort, BWV 20 · “O Eternity, You Thunderous Word”",
+    "part": "II. Recitativo. Kein Unglück ist in aller Welt (Tenore)",
+    "performers": "Knut Schoch, Holland Boys Choir, Netherlands Bach Collegium, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 112,
+   "title": "O Ewigkeit, du Donnerwort, BWV 20, Pt. 1: III. Aria. Ewigkeit, du machst mir bange (Tenore)",
+   "durationMs": 195493,
+   "artist": "Knut Schoch, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 27,
+    "composer": "Johann Sebastian Bach",
+    "work": "O Ewigkeit, du Donnerwort, BWV 60 · “O Eternity, You Thunderous Word”",
+    "part": "III. Aria. Ewigkeit, du machst mir bange (Tenore)",
+    "performers": "Pieter Jan Leusink, Netherlands Bach Collegium, Knut Schoch"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 113,
+   "title": "O Ewigkeit, du Donnerwort, BWV 20, Pt. 1: IV. Recitativo. Gesetzt, es daurte (Basso)",
+   "durationMs": 88427,
+   "artist": "Bas Ramselaar, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 28,
+    "composer": "Johann Sebastian Bach",
+    "work": "O Ewigkeit, du Donnerwort, BWV 20 · “O Eternity, You Thunderous Word”",
+    "part": "IV. Recitativo. Gesetzt, es daurte (Basso)",
+    "performers": "Holland Boys Choir, Pieter Jan Leusink, Bas Ramselaar, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 114,
+   "title": "O Ewigkeit, du Donnerwort, BWV 20, Pt. 1: V. Aria. Gott ist gerecht (Basso)",
+   "durationMs": 306400,
+   "artist": "Bas Ramselaar, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 29,
+    "composer": "Johann Sebastian Bach",
+    "work": "O Ewigkeit, du Donnerwort, BWV 60 · “O Eternity, You Thunderous Word”",
+    "part": "V. Aria. Gott ist gerecht (Basso)",
+    "performers": "Bas Ramselaar, Netherlands Bach Collegium, Pieter Jan Leusink, Holland Boys Choir"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 115,
+   "title": "O Ewigkeit, du Donnerwort, BWV 20, Pt. 1: VI. Aria. O Mensch, errette deine Seele (Alto)",
+   "durationMs": 179387,
+   "artist": "Sytse Buwalda, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 29,
+    "composer": "Johann Sebastian Bach",
+    "work": "O Ewigkeit, du Donnerwort, BWV 60 · “O Eternity, You Thunderous Word”",
+    "part": "VI. Aria. O Mensch, errette deine Seele (Alto)",
+    "performers": "Pieter Jan Leusink, Sytse Buwalda, Holland Boys Choir, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 116,
+   "title": "O Ewigkeit, du Donnerwort, BWV 20, Pt. 1: VII. Choral. Solang ein Gott im Himmel lebt (Coro)",
+   "durationMs": 69133,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 30,
+    "composer": "Johann Sebastian Bach",
+    "work": "O Ewigkeit, du Donnerwort, BWV 20 · “O Eternity, You Thunderous Word”",
+    "part": "VII. Choral. Solang ein Gott im Himmel lebt (Coro)",
+    "performers": "Holland Boys Choir, Netherlands Bach Collegium, Pieter Jan Leusink"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 117,
+   "title": "O Ewigkeit, du Donnerwort, BWV 20, Pt. 2: VIII. Aria. Wacht auf, wacht auf (Basso)",
+   "durationMs": 165867,
+   "artist": "Bas Ramselaar, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 30,
+    "composer": "Johann Sebastian Bach",
+    "work": "O Ewigkeit, du Donnerwort, BWV 20 · “O Eternity, You Thunderous Word”",
+    "part": "VIII. Aria. Wacht auf, wacht auf (Basso)",
+    "performers": "Pieter Jan Leusink, Holland Boys Choir, Bas Ramselaar, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 118,
+   "title": "O Ewigkeit, du Donnerwort, BWV 20, Pt. 2: IX. Recitativo. Verlaß, o Mensch (Alto)",
+   "durationMs": 80693,
+   "artist": "Sytse Buwalda, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 30,
+    "composer": "Johann Sebastian Bach",
+    "work": "O Ewigkeit, du Donnerwort, BWV 20 · “O Eternity, You Thunderous Word”",
+    "part": "IX. Recitativo. Verlaß, o Mensch (Alto)",
+    "performers": "Holland Boys Choir, Pieter Jan Leusink, Sytse Buwalda, Netherlands Bach Collegium"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 119,
+   "title": "O Ewigkeit, du Donnerwort, BWV 20, Pt. 2: X. Aria. O Menschenkind, hör auf geschwind (Alto, Tenore)",
+   "durationMs": 198467,
+   "artist": "Knut Schoch, Sytse Buwalda, Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 31,
+    "composer": "Johann Sebastian Bach",
+    "work": "O Ewigkeit, du Donnerwort, BWV 60 · “O Eternity, You Thunderous Word”",
+    "part": "X. Aria. O Menschenkind, hör auf geschwind (Alto, Tenore)",
+    "performers": "Knut Schoch, Netherlands Bach Collegium, Pieter Jan Leusink, Sytse Buwalda"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 120,
+   "title": "O Ewigkeit, du Donnerwort, BWV 20, Pt. 2: XI. Choral. O Ewigkeit, du Donnerwort (Coro)",
+   "durationMs": 72347,
+   "artist": "Holland Boys Choir, Netherlands Bach Collegium & Pieter Jan Leusink",
+   "apple": {
+    "block": 32,
+    "composer": "Johann Sebastian Bach",
+    "work": "O Ewigkeit, du Donnerwort, BWV 20 · “O Eternity, You Thunderous Word”",
+    "part": "XI. Choral. O Ewigkeit, du Donnerwort (Coro)",
+    "performers": "Netherlands Bach Collegium, Pieter Jan Leusink, Holland Boys Choir"
+   }
+  }
+ ]
+}

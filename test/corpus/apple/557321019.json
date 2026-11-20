@@ -1,0 +1,946 @@
+{
+ "id": "557321019",
+ "category": "beethoven sonatas",
+ "title": "Beethoven: Piano Sonatas",
+ "artist": "Glenn Gould",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Sonata No. 1 in F Minor, Op. 2, No. 1: I. Allegro",
+   "durationMs": 235040,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 1 in F Minor, Op. 2/1",
+    "part": "I. Allegro",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Sonata No. 1 in F Minor, Op. 2, No. 1: II. Adagio",
+   "durationMs": 423133,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 1 in F Minor, Op. 2/1",
+    "part": "II. Adagio",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Sonata No. 1 in F Minor, Op. 2, No. 1: III. Menuetto. Allegretto",
+   "durationMs": 177400,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 1 in F Minor, Op. 2/1",
+    "part": "III. Menuetto. Allegretto",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Sonata No. 1 in F Minor, Op. 2, No. 1: IV. Prestissimo",
+   "durationMs": 259773,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 1 in F Minor, Op. 2/1",
+    "part": "IV. Prestissimo",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Sonata No. 2 in A Major, Op. 2, No. 2: I. Allegro vivace",
+   "durationMs": 474000,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 2,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 2 in A Major, Op. 2/2",
+    "part": "I. Allegro vivace",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Sonata No. 2 in A Major, Op. 2, No. 2: II. Largo appassionato",
+   "durationMs": 523333,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 2,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 2 in A Major, Op. 2/2",
+    "part": "II. Largo appassionato",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Sonata No. 2 in A Major, Op. 2, No. 2: III. Scherzo. Allegretto",
+   "durationMs": 150880,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 2,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 2 in A Major, Op. 2/2",
+    "part": "III. Scherzo. Allegretto",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Sonata No. 2 in A Major, Op. 2, No. 2: IV. Rondo. Grazioso",
+   "durationMs": 461520,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 2,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 2 in A Major, Op. 2/2",
+    "part": "IV. Rondo. Grazioso",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Sonata No. 3 in C Major, Op. 2, No. 3: I. Allegro con brio",
+   "durationMs": 451227,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 3,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 3 in C Major, Op. 2/3",
+    "part": "I. Allegro con brio",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Sonata No. 3 in C Major, Op. 2, No. 3: II. Adagio",
+   "durationMs": 768373,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 3,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 3 in C Major, Op. 2/3",
+    "part": "II. Adagio",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Sonata No. 3 in C Major, Op. 2, No. 3: III. Scherzo. Allegro",
+   "durationMs": 210027,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 3,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 3 in C Major, Op. 2/3",
+    "part": "III. Scherzo. Allegro",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Sonata No. 3 in C Major, Op. 2, No. 3: IV. Allegro assai",
+   "durationMs": 328787,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 3,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 3 in C Major, Op. 2/3",
+    "part": "IV. Allegro assai",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 1,
+   "title": "Sonata No. 5 in C Minor, Op. 10, No. 1: I. Allegro molto e con brio",
+   "durationMs": 165413,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 4,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 5 in C Minor, Op. 10/1",
+    "part": "I. Allegro molto e con brio",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 2,
+   "title": "Sonata No. 5 in C Minor, Op. 10, No. 1: II. Adagio molto",
+   "durationMs": 381187,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 4,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 5 in C Minor, Op. 10/1",
+    "part": "II. Adagio molto",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 3,
+   "title": "Sonata No. 5 in C Minor, Op. 10, No. 1: III. Finale. Prestissimo",
+   "durationMs": 139000,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 4,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 5 in C Minor, Op. 10/1",
+    "part": "III. Finale. Prestissimo",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 4,
+   "title": "Sonata No. 6 in F Major, Op. 10, No. 2: I. Allegro",
+   "durationMs": 264747,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 5,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 6 in F Major, Op. 10/2",
+    "part": "I. Allegro",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 5,
+   "title": "Sonata No. 6 in F Major, Op. 10, No. 2: II. Allegretto",
+   "durationMs": 242520,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 5,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 6 in F Major, Op. 10/2",
+    "part": "II. Allegretto",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 6,
+   "title": "Sonata No. 6 in F Major, Op. 10, No. 2: III. Presto",
+   "durationMs": 124507,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 5,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 6 in F Major, Op. 10/2",
+    "part": "III. Presto",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 7,
+   "title": "Sonata No. 7 in D Major, Op. 10, No. 3: I. Presto",
+   "durationMs": 235680,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 6,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 7 in D Major, Op. 10/3",
+    "part": "I. Presto",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 8,
+   "title": "Sonata No. 7 in D Major, Op. 10, No. 3: II. Largo e mesto",
+   "durationMs": 639853,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 6,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 7 in D Major, Op. 10/3",
+    "part": "II. Largo e mesto",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 9,
+   "title": "Sonata No. 7 in D Major, Op. 10, No. 3: III. Menuetto. Allegro",
+   "durationMs": 157907,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 6,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 7 in D Major, Op. 10/3",
+    "part": "III. Menuetto. Allegro",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 10,
+   "title": "Sonata No. 7 in D Major, Op. 10, No. 3: IV. Rondo. Allegro",
+   "durationMs": 168547,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 6,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 7 in D Major, Op. 10/3",
+    "part": "IV. Rondo. Allegro",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 11,
+   "title": "Sonata No. 12 in A-Flat Major, Op. 26: I. Andante con Variazioni",
+   "durationMs": 600493,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 7,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 12 in A-Flat Major, Op. 26 · “Funeral March Sonata”",
+    "part": "I. Andante con Variazioni",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 12,
+   "title": "Sonata No. 12 in A-Flat Major, Op. 26: II. Scherzo. Allegro molto",
+   "durationMs": 185293,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 7,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 12 in A-Flat Major, Op. 26 · “Funeral March Sonata”",
+    "part": "II. Scherzo. Allegro molto",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 13,
+   "title": "Sonata No. 12 in A-Flat Major, Op. 26: III. Marcia funebre sulla morte d'un Eroe",
+   "durationMs": 423107,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 7,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 12 in A-Flat Major, Op. 26 · “Funeral March Sonata”",
+    "part": "III. Marcia funebre sulla morte d'un Eroe",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 14,
+   "title": "Sonata No. 12 in A-Flat Major, Op. 26: IV. Allegro",
+   "durationMs": 159640,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 7,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 12 in A-Flat Major, Op. 26 · “Funeral March Sonata”",
+    "part": "IV. Allegro",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 1,
+   "title": "Sonata No. 8 in C Minor for Piano, Op. 13 \"Pathétique\": I. Grave - Allegro di molto e con brio",
+   "durationMs": 367053,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 8,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 8 in C Minor, Op. 13 · “Pathétique”",
+    "part": "I. Grave - Allegro di molto e con brio",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 2,
+   "title": "Sonata No. 8 in C Minor for Piano, Op. 13 \"Pathétique\": II. Adagio cantabile",
+   "durationMs": 283427,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 8,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 8 in C Minor, Op. 13 · “Pathétique”",
+    "part": "II. Adagio cantabile",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 3,
+   "title": "Sonata No. 8 in C Minor for Piano, Op. 13 \"Pathétique\": III. Rondo. Allegro",
+   "durationMs": 223720,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 8,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 8 in C Minor, Op. 13 · “Pathétique”",
+    "part": "III. Rondo. Allegro",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 4,
+   "title": "Sonata No. 9 in E Major, Op. 14, No. 1: I. Allegro",
+   "durationMs": 233827,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 9,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 9 in E Major, Op. 14/1",
+    "part": "I. Allegro",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 5,
+   "title": "Sonata No. 9 in E Major, Op. 14, No. 1: II. Allegretto",
+   "durationMs": 209493,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 9,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 9 in E Major, Op. 14/1",
+    "part": "II. Allegretto",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 6,
+   "title": "Sonata No. 9 in E Major, Op. 14, No. 1: III. Rondo. Allegro commodo",
+   "durationMs": 178733,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 9,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 9 in E Major, Op. 14/1",
+    "part": "III. Rondo. Allegro commodo",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 7,
+   "title": "Sonata No. 10 in G Major, Op. 14, No. 2: I. Allegro",
+   "durationMs": 317427,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 10,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 10 in G Major, Op. 14/2",
+    "part": "I. Allegro",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 8,
+   "title": "Sonata No. 10 in G Major, Op. 14, No. 2: II. Andante",
+   "durationMs": 477653,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 10,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 10 in G Major, Op. 14/2",
+    "part": "II. Andante",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 9,
+   "title": "Sonata No. 10 in G Major, Op. 14, No. 2: III. Scherzo. Allegro assai",
+   "durationMs": 227867,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 10,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 10 in G Major, Op. 14/2",
+    "part": "III. Scherzo. Allegro assai",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 10,
+   "title": "Sonata No. 13 in E-Flat Major, Op. 27, No. 1 \"Sonata quasi una fantasia\": I. Andante - Allegro - Tempo I - attacca:",
+   "durationMs": 472747,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 11,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 13 in E-Flat Major, Op. 27/1 · “Quasi una fantasia”",
+    "part": "I. Andante - Allegro - Tempo I - attacca:",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 11,
+   "title": "Sonata No. 13 in E-Flat Major, Op. 27, No. 1 \"Sonata quasi una fantasia\": II. Allegro molto e vivace - attacca:",
+   "durationMs": 120573,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 11,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 13 in E-Flat Major, Op. 27/1 · “Quasi una fantasia”",
+    "part": "II. Allegro molto e vivace - attacca:",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 12,
+   "title": "Sonata No. 13 in E-Flat Major, Op. 27, No. 1 \"Sonata quasi una fantasia\": III. Adagio con espressione - attacca:",
+   "durationMs": 227627,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 11,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 13 in E-Flat Major, Op. 27/1 · “Quasi una fantasia”",
+    "part": "III. Adagio con espressione - attacca:",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 13,
+   "title": "Sonata No. 13 in E-Flat Major, Op. 27, No. 1 \"Sonata quasi una fantasia\": IV. Allegro vivace",
+   "durationMs": 439453,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 11,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 13 in E-Flat Major, Op. 27/1 · “Quasi una fantasia”",
+    "part": "IV. Allegro vivace",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 14,
+   "title": "Sonata No. 14 in C-Sharp Minor, Op. 27, No. 2 \"Moonlight\": I. Adagio sostenuto - attacca:",
+   "durationMs": 250920,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 12,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 14 in C-Sharp Minor, Op. 27/2 · “Moonlight Sonata”",
+    "part": "I. Adagio sostenuto - attacca:",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 15,
+   "title": "Sonata No. 14 in C-Sharp Minor, Op. 27, No. 2 \"Moonlight\": II. Allegretto - attacca:",
+   "durationMs": 100267,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 12,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 14 in C-Sharp Minor, Op. 27/2 · “Moonlight Sonata”",
+    "part": "II. Allegretto - attacca:",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 16,
+   "title": "Sonata No. 14 in C-Sharp Minor, Op. 27, No. 2 \"Moonlight\": III. Presto agitato",
+   "durationMs": 299373,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 12,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 14 in C-Sharp Minor, Op. 27/2 · “Moonlight Sonata”",
+    "part": "III. Presto agitato",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 1,
+   "title": "Sonata No. 15 in D Major, Op. 28 \"Pastorale\": I. Allegro",
+   "durationMs": 450653,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 13,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 15 in D Major, Op. 28 · “Pastoral”",
+    "part": "I. Allegro",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 2,
+   "title": "Sonata No. 15 in D Major, Op. 28 \"Pastorale\": II. Andante",
+   "durationMs": 424960,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 13,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 15 in D Major, Op. 28 · “Pastoral”",
+    "part": "II. Andante",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 3,
+   "title": "Sonata No. 15 in D Major, Op. 28 \"Pastorale\": III. Scherzo. Allegro vivace",
+   "durationMs": 154147,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 13,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 15 in D Major, Op. 28 · “Pastoral”",
+    "part": "III. Scherzo. Allegro vivace",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 4,
+   "title": "Sonata No. 15 in D Major, Op. 28 \"Pastorale\": IV. Rondo. Allegro, ma non troppo",
+   "durationMs": 273627,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 13,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 15 in D Major, Op. 28 · “Pastoral”",
+    "part": "IV. Rondo. Allegro, ma non troppo",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 5,
+   "title": "Sonata No. 23 in F Minor, Op. 57, \"Appassionata\": I. Allegro assai",
+   "durationMs": 902907,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 14,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 23 in F Minor, Op. 57 · “Appassionata”",
+    "part": "I. Allegro assai",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 6,
+   "title": "Sonata No. 23 in F Minor, Op. 57, \"Appassionata\": II. Andante con moto",
+   "durationMs": 668560,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 14,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 23 in F Minor, Op. 57 · “Appassionata”",
+    "part": "II. Andante con moto",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 7,
+   "title": "Sonata No. 23 in F Minor, Op. 57, \"Appassionata\": III. Allegro ma non troppo - Presto",
+   "durationMs": 325867,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 14,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 23 in F Minor, Op. 57 · “Appassionata”",
+    "part": "III. Allegro ma non troppo - Presto",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 1,
+   "title": "Sonata No. 16 in G Major, Op. 31, No. 1: I. Allegro vivace",
+   "durationMs": 256653,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 15,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 16 in G Major, Op. 31/1",
+    "part": "I. Allegro vivace",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 2,
+   "title": "Sonata No. 16 in G Major, Op. 31, No. 1: II. Adagio grazioso",
+   "durationMs": 530227,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 15,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 16 in G Major, Op. 31/1",
+    "part": "II. Adagio grazioso",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 3,
+   "title": "Sonata No. 16 in G Major, Op. 31, No. 1: III. Rondo. Allegretto",
+   "durationMs": 407480,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 15,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 16 in G Major, Op. 31/1",
+    "part": "III. Rondo. Allegretto",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 4,
+   "title": "Sonata No. 17 in D Minor, Op. 31, No. 2 \"The Tempest\": I. Largo - Allegro",
+   "durationMs": 432827,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 16,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 17 in D Minor, Op. 31/2 · “The Tempest”",
+    "part": "I. Largo - Allegro",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 5,
+   "title": "Sonata No. 17 in D Minor, Op. 31, No. 2 \"The Tempest\": II. Adagio",
+   "durationMs": 528693,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 16,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 17 in D Minor, Op. 31/2 · “The Tempest”",
+    "part": "II. Adagio",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 6,
+   "title": "Sonata No. 17 in D Minor, Op. 31, No. 2 \"The Tempest\": III. Allegretto",
+   "durationMs": 273200,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 16,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 17 in D Minor, Op. 31/2 · “The Tempest”",
+    "part": "III. Allegretto",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 7,
+   "title": "Sonata No. 18 in E-Flat Major, Op. 31, No. 3: I. Allegro",
+   "durationMs": 334613,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 17,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 18 in E-Flat Major, Op. 31/3 · “The Hunt”",
+    "part": "I. Allegro",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 8,
+   "title": "Sonata No. 18 in E-Flat Major, Op. 31, No. 3: II. Scherzo. Allegretto vivace",
+   "durationMs": 209253,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 17,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 18 in E-Flat Major, Op. 31/3 · “The Hunt”",
+    "part": "II. Scherzo. Allegretto vivace",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 9,
+   "title": "Sonata No. 18 in E-Flat Major, Op. 31, No. 3: III. Menuetto. Moderato e grazioso",
+   "durationMs": 260893,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 17,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 18 in E-Flat Major, Op. 31/3 · “The Hunt”",
+    "part": "III. Menuetto. Moderato e grazioso",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 10,
+   "title": "Sonata No. 18 in E-Flat Major, Op. 31, No. 3: IV. Presto con fuoco",
+   "durationMs": 227267,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 17,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 18 in E-Flat Major, Op. 31/3 · “The Hunt”",
+    "part": "IV. Presto con fuoco",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 1,
+   "title": "Sonata No. 30 in E Major, Op. 109: I. Vivace, ma non troppo",
+   "durationMs": 197120,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 18,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 30 in E Major, Op. 109",
+    "part": "I. Vivace, ma non troppo",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 2,
+   "title": "Sonata No. 30 in E Major, Op. 109: II. Prestissimo",
+   "durationMs": 120333,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 18,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 30 in E Major, Op. 109",
+    "part": "II. Prestissimo",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 3,
+   "title": "Sonata No. 30 in E Major, Op. 109: III. Andante molto cantabile ed espressivo (Gesangvoll, mit innigster Empfindung)",
+   "durationMs": 459480,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 18,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 30 in E Major, Op. 109",
+    "part": "III. Andante molto cantabile ed espressivo (Gesangvoll, mit innigster Empfindung)",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 4,
+   "title": "Sonata No. 31 in A-Flat Major, Op. 110: I. Moderato cantabile molto espressivo",
+   "durationMs": 416627,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 19,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 31 in A-Flat Major, Op. 110",
+    "part": "I. Moderato cantabile molto espressivo",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 5,
+   "title": "Sonata No. 31 in A-Flat Major, Op. 110: II. Allegro molto",
+   "durationMs": 126520,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 19,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 31 in A-Flat Major, Op. 110",
+    "part": "II. Allegro molto",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 6,
+   "title": "Sonata No. 31 in A-Flat Major, Op. 110: III. Adagio, ma non troppo - Fuga. Allegro, ma non troppo",
+   "durationMs": 647000,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 19,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 31 in A-Flat Major, Op. 110",
+    "part": "III. Adagio, ma non troppo - Fuga. Allegro, ma non troppo",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 7,
+   "title": "Sonata No. 32 in C Minor, Op. 111: I. Maestoso - Allegro con brio ed appassionato",
+   "durationMs": 434693,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 20,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 32 in C Minor, Op. 111",
+    "part": "I. Maestoso - Allegro con brio ed appassionato",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 8,
+   "title": "Sonata No. 32 in C Minor, Op. 111: II. Arietta. Adagio molto semplice e cantabile",
+   "durationMs": 916933,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 20,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 32 in C Minor, Op. 111",
+    "part": "II. Arietta. Adagio molto semplice e cantabile",
+    "performers": "Glenn Gould"
+   }
+  }
+ ]
+}

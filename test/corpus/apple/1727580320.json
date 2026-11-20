@@ -1,0 +1,260 @@
+{
+ "id": "1727580320",
+ "category": "piano recital",
+ "title": "The Vienna Recital",
+ "artist": "Yuja Wang",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Iberia, T. 105,  Book 4: No. 10, Málaga",
+   "durationMs": 296809,
+   "artist": "Yuja Wang",
+   "apple": {
+    "block": 1,
+    "composer": "Isaac Albéniz",
+    "work": "Iberia, B. 47",
+    "part": "No. 10, Málaga",
+    "performers": "Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Piano Sonata No. 3 in F-Sharp Minor, Op. 23: I. Drammatico",
+   "durationMs": 395213,
+   "artist": "Yuja Wang",
+   "apple": {
+    "block": 2,
+    "composer": "Alexander Scriabin",
+    "work": "Piano Sonata No. 3 in F-Sharp Minor, Op. 23 · “States of the Soul”",
+    "part": "I. Drammatico",
+    "performers": "Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Piano Sonata No. 3 in F-Sharp Minor, Op. 23: II. Allegretto",
+   "durationMs": 170225,
+   "artist": "Yuja Wang",
+   "apple": {
+    "block": 2,
+    "composer": "Alexander Scriabin",
+    "work": "Piano Sonata No. 3 in F-Sharp Minor, Op. 23 · “States of the Soul”",
+    "part": "II. Allegretto",
+    "performers": "Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Piano Sonata No. 3 in F-Sharp Minor, Op. 23: III. Andante",
+   "durationMs": 279925,
+   "artist": "Yuja Wang",
+   "apple": {
+    "block": 2,
+    "composer": "Alexander Scriabin",
+    "work": "Piano Sonata No. 3 in F-Sharp Minor, Op. 23 · “States of the Soul”",
+    "part": "III. Andante",
+    "performers": "Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Piano Sonata No. 3 in F-Sharp Minor, Op. 23: IV. Presto con fuoco",
+   "durationMs": 354774,
+   "artist": "Yuja Wang",
+   "apple": {
+    "block": 2,
+    "composer": "Alexander Scriabin",
+    "work": "Piano Sonata No. 3 in F-Sharp Minor, Op. 23 · “States of the Soul”",
+    "part": "IV. Presto con fuoco",
+    "performers": "Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "24 Jazz Preludes, Op. 53: No. 11",
+   "durationMs": 161143,
+   "artist": "Yuja Wang",
+   "apple": {
+    "block": 3,
+    "composer": "Nikolai Kapustin",
+    "work": "Twenty Four Preludes, Op. 53",
+    "part": "No. 11",
+    "performers": "Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "24 Jazz Preludes, Op. 53: No. 10",
+   "durationMs": 109637,
+   "artist": "Yuja Wang",
+   "apple": {
+    "block": 3,
+    "composer": "Nikolai Kapustin",
+    "work": "Twenty Four Preludes, Op. 53",
+    "part": "No. 10",
+    "performers": "Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Iberia, T. 105, Book 3: No. 9, Lavapiés",
+   "durationMs": 346142,
+   "artist": "Yuja Wang",
+   "apple": {
+    "block": 4,
+    "composer": "Isaac Albéniz",
+    "work": "Iberia, B. 47",
+    "part": "No. 9, Lavapiés",
+    "performers": "Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Piano Sonata No. 18 in E-Flat Major, Op. 31 No. 3 \"The Hunt\": I. Allegro",
+   "durationMs": 377006,
+   "artist": "Yuja Wang",
+   "apple": {
+    "block": 5,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 18 in E-Flat Major, Op. 31/3 · “The Hunt”",
+    "part": "I. Allegro",
+    "performers": "Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Piano Sonata No. 18 in E-Flat Major, Op. 31 No. 3 \"The Hunt\": II. Scherzo. Allegretto vivace",
+   "durationMs": 207997,
+   "artist": "Yuja Wang",
+   "apple": {
+    "block": 5,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 18 in E-Flat Major, Op. 31/3 · “The Hunt”",
+    "part": "II. Scherzo. Allegretto vivace",
+    "performers": "Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Piano Sonata No. 18 in E-Flat Major, Op. 31 No. 3 \"The Hunt\": III. Minuet. Moderato e grazioso - Trio",
+   "durationMs": 182445,
+   "artist": "Yuja Wang",
+   "apple": {
+    "block": 5,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 18 in E-Flat Major, Op. 31/3 · “The Hunt”",
+    "part": "III. Minuet. Moderato e grazioso - Trio",
+    "performers": "Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Piano Sonata No. 18 in E-Flat Major, Op. 31 No. 3 \"The Hunt\": IV. Presto con fuoco",
+   "durationMs": 226124,
+   "artist": "Yuja Wang",
+   "apple": {
+    "block": 5,
+    "composer": "Ludwig van Beethoven",
+    "work": "Piano Sonata No. 18 in E-Flat Major, Op. 31/3 · “The Hunt”",
+    "part": "IV. Presto con fuoco",
+    "performers": "Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Études, Book 1: No. 6, Automne à Varsovie",
+   "durationMs": 292133,
+   "artist": "Yuja Wang",
+   "apple": {
+    "block": 6,
+    "composer": "György Ligeti",
+    "work": "Etudes, Book 1",
+    "part": "No. 6, Automne à Varsovie",
+    "performers": "Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Études, Book 2: No. 13, L'escalier du diable",
+   "durationMs": 301069,
+   "artist": "Yuja Wang",
+   "apple": {
+    "block": 7,
+    "composer": "György Ligeti",
+    "work": "Etudes, Book 2",
+    "part": "No. 13, L'escalier du diable",
+    "performers": "Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Études: No. 6",
+   "durationMs": 166514,
+   "artist": "Yuja Wang",
+   "apple": {
+    "block": 8,
+    "composer": "Philip Glass",
+    "work": "Etudes",
+    "part": "No. 6",
+    "performers": "Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Danzón No. 2 (Transcr. for Piano by Gómez-Tagle)",
+   "durationMs": 225999,
+   "artist": "Yuja Wang",
+   "apple": {
+    "block": 9,
+    "composer": "Arturo Márquez",
+    "work": "Danzón No. 2",
+    "part": "Danzón No. 2 (Transcr. for Piano by Gómez-Tagle)",
+    "performers": "Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "3 Intermezzi, Op. 117: No. 3 in C-Sharp Minor. Andante con moto",
+   "durationMs": 405776,
+   "artist": "Yuja Wang",
+   "apple": {
+    "block": 10,
+    "composer": "Johannes Brahms",
+    "work": "3 Intermezzi, Op. 117",
+    "part": "No. 3 in C-Sharp Minor. Andante con moto",
+    "performers": "Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Orfeo ed Euridice, Wq. 30: Melodie dell'Orfeo (Arr. for Piano by Sgambati)",
+   "durationMs": 185897,
+   "artist": "Yuja Wang",
+   "apple": {
+    "block": 11,
+    "composer": "Christoph Willibald Gluck",
+    "work": "Orfeo ed Euridice, Wq. 30 · “Orpheus and Eurydice”",
+    "part": "Melodie dell'Orfeo (Arr. for Piano by Sgambati)",
+    "performers": "Yuja Wang"
+   }
+  }
+ ]
+}

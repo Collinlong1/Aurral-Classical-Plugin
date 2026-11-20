@@ -1,0 +1,218 @@
+{
+ "id": "687738815",
+ "category": "solo instrument",
+ "title": "Bach: Sonatas & Partitas for Solo Violin",
+ "artist": "Isabelle Faust",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Partita II BWV 1004 in D minor: I. Allemanda",
+   "durationMs": 336960,
+   "artist": "Isabelle Faust",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 2 for Solo Violin in D Minor, BWV 1004",
+    "part": "I. Allemanda",
+    "performers": "Isabelle Faust"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Partita II BWV 1004 in D minor: II. Corrente",
+   "durationMs": 150267,
+   "artist": "Isabelle Faust",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 2 for Solo Violin in D Minor, BWV 1004",
+    "part": "II. Corrente",
+    "performers": "Isabelle Faust"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Partita II BWV 1004 in D minor: III. Sarabanda",
+   "durationMs": 262080,
+   "artist": "Isabelle Faust",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 2 for Solo Violin in D Minor, BWV 1004",
+    "part": "III. Sarabanda",
+    "performers": "Isabelle Faust"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Partita II BWV 1004 in D minor: IV. Giga",
+   "durationMs": 214560,
+   "artist": "Isabelle Faust",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 2 for Solo Violin in D Minor, BWV 1004",
+    "part": "IV. Giga",
+    "performers": "Isabelle Faust"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Partita II BWV 1004 in D minor: V. Ciaccona",
+   "durationMs": 752533,
+   "artist": "Isabelle Faust",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 2 for Solo Violin in D Minor, BWV 1004",
+    "part": "V. Ciaccona",
+    "performers": "Isabelle Faust"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Sonata III BWV 1005 in C major: I. Adagio",
+   "durationMs": 283960,
+   "artist": "Isabelle Faust",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Sonata No. 3 for Solo Violin in C Major, BWV 1005",
+    "part": "I. Adagio",
+    "performers": "Isabelle Faust"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Sonata III BWV 1005 in C major: II. Fuga",
+   "durationMs": 586307,
+   "artist": "Isabelle Faust",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Sonata No. 3 for Solo Violin in C Major, BWV 1005",
+    "part": "II. Fuga",
+    "performers": "Isabelle Faust"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Sonata III BWV 1005 in C major: III. Largo",
+   "durationMs": 174840,
+   "artist": "Isabelle Faust",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Sonata No. 3 for Solo Violin in C Major, BWV 1005",
+    "part": "III. Largo",
+    "performers": "Isabelle Faust"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Sonata III BWV 1005 in C major: IV. Allegro assai",
+   "durationMs": 285560,
+   "artist": "Isabelle Faust",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Sonata No. 3 for Solo Violin in C Major, BWV 1005",
+    "part": "IV. Allegro assai",
+    "performers": "Isabelle Faust"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Partita III BWV 1006 in E major: I. Preludio",
+   "durationMs": 219653,
+   "artist": "Isabelle Faust",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 3 for Solo Violin in E Major, BWV 1006",
+    "part": "I. Preludio",
+    "performers": "Isabelle Faust"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Partita III BWV 1006 in E major: II. Loure",
+   "durationMs": 219400,
+   "artist": "Isabelle Faust",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 3 for Solo Violin in E Major, BWV 1006",
+    "part": "II. Loure",
+    "performers": "Isabelle Faust"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Partita III BWV 1006 in E major: III. Gavotte en Rondeau",
+   "durationMs": 188347,
+   "artist": "Isabelle Faust",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 3 for Solo Violin in E Major, BWV 1006",
+    "part": "III. Gavotte en Rondeau",
+    "performers": "Isabelle Faust"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Partita III BWV 1006 in E major: IV. Menuet I - V. Menuet II",
+   "durationMs": 288480,
+   "artist": "Isabelle Faust",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 3 for Solo Violin in E Major, BWV 1006",
+    "part": "IV. Menuet I - V. Menuet II",
+    "performers": "Isabelle Faust"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Partita III BWV 1006 in E major: V. VI. Bourée",
+   "durationMs": 78013,
+   "artist": "Isabelle Faust",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 3 for Solo Violin in E Major, BWV 1006",
+    "part": "VI. Bourée",
+    "performers": "Isabelle Faust"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Partita III BWV 1006 in E major: VI. VII. Gigue",
+   "durationMs": 94573,
+   "artist": "Isabelle Faust",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 3 for Solo Violin in E Major, BWV 1006",
+    "part": "VII. Gigue",
+    "performers": "Isabelle Faust"
+   }
+  }
+ ]
+}

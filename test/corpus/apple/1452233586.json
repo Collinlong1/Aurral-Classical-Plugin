@@ -1,0 +1,386 @@
+{
+ "id": "1452233586",
+ "category": "solo instrument",
+ "title": "Rachmaninov: 24 Preludes; Piano Sonata No. 2",
+ "artist": "Vladimir Ashkenazy",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Prelude in C-Sharp Minor, Op. 3, No. 2",
+   "durationMs": 271867,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 1,
+    "composer": "Sergei Rachmaninoff",
+    "work": "5 Morceaux de fantaisie, Op. 3 · “5 Fantasy Pieces”",
+    "part": "Prelude in C-Sharp Minor, Op. 3, No. 2",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Prelude in F-Sharp Minor, Op. 23, No. 1",
+   "durationMs": 256533,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 1 in F-Sharp Minor, Op. 23/1",
+    "part": "Prelude in F-Sharp Minor, Op. 23, No. 1",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Prelude in B-Flat, Op. 23, No. 2",
+   "durationMs": 207307,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 3,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 2 in B-Flat Major, Op. 23/2",
+    "part": "Prelude in B-Flat, Op. 23, No. 2",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Prelude in D Minor, Op. 23, No. 3",
+   "durationMs": 244200,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 4,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 3 in D Minor, Op. 23/3",
+    "part": "Prelude in D Minor, Op. 23, No. 3",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Prelude in D, Op. 23, No. 4",
+   "durationMs": 330067,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 5,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 4 in D Major, Op. 23/4",
+    "part": "Prelude in D, Op. 23, No. 4",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Prelude in G Minor, Op. 23, No. 5",
+   "durationMs": 228360,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 6,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 5 in G Minor, Op. 23/5",
+    "part": "Prelude in G Minor, Op. 23, No. 5",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Prelude in E-Flat, Op. 23, No. 6",
+   "durationMs": 176733,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 7,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 9 in E-Flat Minor, Op. 23/9",
+    "part": "Prelude in E-Flat, Op. 23, No. 6",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Prelude in C Minor, Op. 23, No. 7",
+   "durationMs": 143600,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 8,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 7 in C Minor, Op. 23/7",
+    "part": "Prelude in C Minor, Op. 23, No. 7",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Prelude in A-Flat, Op. 23, No. 8",
+   "durationMs": 189507,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 9,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 8 in A-Flat Major, Op. 23/8",
+    "part": "Prelude in A-Flat, Op. 23, No. 8",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Prelude in E-Flat Minor, Op. 23, No. 9",
+   "durationMs": 106907,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 10,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 9 in E-Flat Minor, Op. 23/9",
+    "part": "Prelude in E-Flat Minor, Op. 23, No. 9",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Prelude in G-Flat, Op. 23, No. 10",
+   "durationMs": 232827,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 11,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 10 in G-Flat Major, Op. 23/10",
+    "part": "Prelude in G-Flat, Op. 23, No. 10",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Prelude in C, Op. 32, No. 1",
+   "durationMs": 76173,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 12,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 1 in C Major, Op. 32/1",
+    "part": "Prelude in C, Op. 32, No. 1",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Prelude in B-Flat Minor, Op. 32, No. 2",
+   "durationMs": 171733,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 13,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 2 in B-Flat Minor, Op. 32/2",
+    "part": "Prelude in B-Flat Minor, Op. 32, No. 2",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Prelude in E, Op. 32, No. 3",
+   "durationMs": 134227,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 14,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 3 in E Major, Op. 32/3",
+    "part": "Prelude in E, Op. 32, No. 3",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Prelude in E Minor, Op. 32, No. 4",
+   "durationMs": 315333,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 15,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 4 in E Minor, Op. 32/4",
+    "part": "Prelude in E Minor, Op. 32, No. 4",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 1,
+   "title": "Prelude in G, Op. 32, No. 5",
+   "durationMs": 201307,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 16,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 5 in G Major, Op. 32/5",
+    "part": "Prelude in G, Op. 32, No. 5",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 2,
+   "title": "Prelude in F Minor, Op. 32, No. 6",
+   "durationMs": 81893,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 17,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 6 in F Minor, Op. 32/6",
+    "part": "Prelude in F Minor, Op. 32, No. 6",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 3,
+   "title": "Prelude in F, Op. 32, No. 7",
+   "durationMs": 128227,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 18,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 7 in F Major, Op. 32/7",
+    "part": "Prelude in F, Op. 32, No. 7",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 4,
+   "title": "Prelude in A Minor, Op. 32, No. 8",
+   "durationMs": 102840,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 19,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 8 in A Minor, Op. 32/8",
+    "part": "Prelude in A Minor, Op. 32, No. 8",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 5,
+   "title": "Prelude in A, Op. 32, No. 9",
+   "durationMs": 171600,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 20,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 9 in A Major, Op. 32/9",
+    "part": "Prelude in A, Op. 32, No. 9",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 6,
+   "title": "Prelude in B Minor, Op. 32, No. 10",
+   "durationMs": 356267,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 21,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 10 in B Minor, Op. 32/10",
+    "part": "Prelude in B Minor, Op. 32, No. 10",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 7,
+   "title": "Prelude in B Major, Op. 32, No. 11",
+   "durationMs": 123267,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 22,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 11 in B Major, Op. 32/11",
+    "part": "Prelude in B Major, Op. 32, No. 11",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 8,
+   "title": "Prelude in G-Sharp Minor, Op. 32, No. 12",
+   "durationMs": 145640,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 23,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 12 in G-Sharp Minor, Op. 32/12",
+    "part": "Prelude in G-Sharp Minor, Op. 32, No. 12",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 9,
+   "title": "Prelude in D-Flat Major, Op. 32, No. 13",
+   "durationMs": 348960,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 24,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 13 in D-Flat Major, Op. 32/13",
+    "part": "Prelude in D-Flat Major, Op. 32, No. 13",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 10,
+   "title": "Piano Sonata No. 2 in B-Flat Minor, Op. 36: I. Allegro Agitato",
+   "durationMs": 625267,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 25,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Piano Sonata No. 2 in B-Flat Minor, Op. 36",
+    "part": "I. Allegro Agitato",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 11,
+   "title": "Piano Sonata No. 2 in B-Flat Minor, Op. 36: II. Non Allegro - Lento",
+   "durationMs": 480027,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 25,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Piano Sonata No. 2 in B-Flat Minor, Op. 36",
+    "part": "II. Non Allegro - Lento",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 12,
+   "title": "Piano Sonata No. 2 in B-Flat Minor, Op. 36: III. Allegro Molto",
+   "durationMs": 429773,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 25,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Piano Sonata No. 2 in B-Flat Minor, Op. 36",
+    "part": "III. Allegro Molto",
+    "performers": "Vladimir Ashkenazy"
+   }
+  }
+ ]
+}

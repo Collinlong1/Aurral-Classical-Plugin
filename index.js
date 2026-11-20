@@ -4014,7 +4014,7 @@ var require_byteVector = __commonJS({
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ByteVector = exports.Encoding = exports.StringType = void 0;
     var IConv = require_lib();
-    var fs7 = __require("fs");
+    var fs10 = __require("fs");
     var utils_1 = require_utils();
     var StringType2;
     (function(StringType3) {
@@ -4056,8 +4056,8 @@ var require_byteVector = __commonJS({
         }
         return IConv.decode(data, this._encoding);
       }
-      encode(text2) {
-        return IConv.encode(text2, this._encoding);
+      encode(text5) {
+        return IConv.encode(text5, this._encoding);
       }
     };
     exports.Encoding = Encoding;
@@ -4235,9 +4235,9 @@ var require_byteVector = __commonJS({
        * Creates a {@link ByteVector} using the contents of a file as the data
        * @param path Path to the file to store in the ByteVector
        */
-      static fromPath(path9) {
-        utils_1.Guards.truthy(path9, "path");
-        const fileBuffer = fs7.readFileSync(path9);
+      static fromPath(path13) {
+        utils_1.Guards.truthy(path13, "path");
+        const fileBuffer = fs10.readFileSync(path13);
         return _ByteVector.fromByteArray(fileBuffer);
       }
       /**
@@ -4298,19 +4298,19 @@ var require_byteVector = __commonJS({
        * @param length Number of characters from the string to store in the ByteVector. Must be a
        *        positive 32-bit integer.
        */
-      static fromString(text2, type, length = Number.MAX_SAFE_INTEGER) {
-        utils_1.Guards.notNullOrUndefined(text2, "text");
+      static fromString(text5, type, length = Number.MAX_SAFE_INTEGER) {
+        utils_1.Guards.notNullOrUndefined(text5, "text");
         if (!Number.isInteger(length) || !Number.isSafeInteger(length) || length < 0) {
           throw new Error("Argument out of range exception: length is invalid");
         }
         const vector = type === StringType2.UTF16 ? new _ByteVector(new Uint8Array([255, 254])) : _ByteVector.empty();
-        if (!text2) {
+        if (!text5) {
           return vector;
         }
-        if (text2.length > length) {
-          text2 = text2.substring(0, length);
+        if (text5.length > length) {
+          text5 = text5.substring(0, length);
         }
-        const textBytes = Encoding.getEncoding(type, vector).encode(text2);
+        const textBytes = Encoding.getEncoding(type, vector).encode(text5);
         vector.addByteArray(textBytes);
         return vector;
       }
@@ -5252,7 +5252,7 @@ var require_stream = __commonJS({
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Stream = exports.SeekOrigin = void 0;
-    var fs7 = __require("fs");
+    var fs10 = __require("fs");
     var utils_1 = require_utils();
     var byteVector_1 = require_byteVector();
     var SeekOrigin;
@@ -5267,14 +5267,14 @@ var require_stream = __commonJS({
         this._canWrite = canWrite;
         this._fd = fd;
         this._position = 0;
-        this._length = fs7.fstatSync(fd).size;
+        this._length = fs10.fstatSync(fd).size;
       }
-      static createAsRead(path9) {
-        const fd = fs7.openSync(path9, "r");
+      static createAsRead(path13) {
+        const fd = fs10.openSync(path13, "r");
         return new _Stream(fd, false);
       }
-      static createAsReadWrite(path9) {
-        const fd = fs7.openSync(path9, "r+");
+      static createAsReadWrite(path13) {
+        const fd = fs10.openSync(path13, "r+");
         return new _Stream(fd, true);
       }
       // #endregion
@@ -5300,11 +5300,11 @@ var require_stream = __commonJS({
       // #region Public Methods
       /** @inheritDoc */
       close() {
-        fs7.closeSync(this._fd);
+        fs10.closeSync(this._fd);
       }
       /** @inheritDoc */
       read(buffer, bufferOffset, length) {
-        const bytes = fs7.readSync(this._fd, buffer, bufferOffset, length, this._position);
+        const bytes = fs10.readSync(this._fd, buffer, bufferOffset, length, this._position);
         this._position += bytes;
         return bytes;
       }
@@ -5332,7 +5332,7 @@ var require_stream = __commonJS({
         if (length === this._length) {
           return;
         }
-        fs7.ftruncateSync(this._fd, length);
+        fs10.ftruncateSync(this._fd, length);
         this._length = length;
         if (this._position > this._length) {
           this._position = this._length;
@@ -5347,7 +5347,7 @@ var require_stream = __commonJS({
           throw new Error("Invalid operation: this stream is a read-only stream");
         }
         const origLength = this._length;
-        const bytes = fs7.writeSync(this._fd, buffer, bufferOffset, length, this._position);
+        const bytes = fs10.writeSync(this._fd, buffer, bufferOffset, length, this._position);
         this._position += bytes;
         if (this._position > origLength) {
           this._length = this._position;
@@ -5373,9 +5373,9 @@ var require_fileAbstraction = __commonJS({
        * @param path Path of the file to use in the new instance
        * @throws Error Thrown if `path` is falsy
        */
-      constructor(path9) {
-        utils_1.Guards.truthy(path9, "path");
-        this._name = path9;
+      constructor(path13) {
+        utils_1.Guards.truthy(path13, "path");
+        this._name = path13;
       }
       /** @inheritDoc */
       get name() {
@@ -7416,7 +7416,7 @@ var init_v1 = __esm({
 });
 
 // node_modules/uuid/dist/esm-node/parse.js
-function parse(uuid) {
+function parse3(uuid) {
   if (!validate_default(uuid)) {
     throw TypeError("Invalid UUID");
   }
@@ -7444,7 +7444,7 @@ var parse_default;
 var init_parse = __esm({
   "node_modules/uuid/dist/esm-node/parse.js"() {
     init_validate();
-    parse_default = parse;
+    parse_default = parse3;
   }
 });
 
@@ -7649,14 +7649,14 @@ var require_uuidWrapper = __commonJS({
           source = Uuid.v4();
         }
         if (typeof source === "string") {
-          const match = _UuidWrapper.GUID_REGEX.exec(source);
-          if (!match) {
+          const match2 = _UuidWrapper.GUID_REGEX.exec(source);
+          if (!match2) {
             throw new Error(`Could not parse guid ${source}`);
           }
-          const int = Number.parseInt(match[1], 16);
-          const short1 = Number.parseInt(match[2], 16);
-          const short2 = Number.parseInt(match[3], 16);
-          const short3 = Number.parseInt(match[4], 16);
+          const int = Number.parseInt(match2[1], 16);
+          const short1 = Number.parseInt(match2[2], 16);
+          const short2 = Number.parseInt(match2[3], 16);
+          const short3 = Number.parseInt(match2[4], 16);
           const bytes = new Uint8Array(16);
           const dv = new DataView(bytes.buffer);
           dv.setUint32(0, int, true);
@@ -7664,7 +7664,7 @@ var require_uuidWrapper = __commonJS({
           dv.setUint16(6, short2, true);
           dv.setUint16(8, short3, false);
           for (let i = 0; i < 12; i += 2) {
-            bytes[10 + i / 2] = Number.parseInt(match[5].substring(i, i + 2), 16);
+            bytes[10 + i / 2] = Number.parseInt(match2[5].substring(i, i + 2), 16);
           }
           source = byteVector_1.ByteVector.fromByteArray(bytes);
         }
@@ -8440,12 +8440,12 @@ var require_genres = __commonJS({
         const index = _Genres.VIDEO_GENRES.indexOf(name);
         return index < 0 ? 255 : index;
       }
-      static stringToByte(text2, allowParenthesis) {
+      static stringToByte(text5, allowParenthesis) {
         if (allowParenthesis) {
           const trimRegex = /^\(+|\)+$/g;
-          text2 = text2.replace(trimRegex, "");
+          text5 = text5.replace(trimRegex, "");
         }
-        const normalized2 = text2.trim();
+        const normalized2 = text5.trim();
         if (!/^\d+$/.test(normalized2)) {
           return 255;
         }
@@ -8655,7 +8655,7 @@ var require_picture = __commonJS({
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PictureLazy = exports.Picture = exports.PictureType = void 0;
-    var path9 = __require("path");
+    var path13 = __require("path");
     var byteVector_1 = require_byteVector();
     var fileAbstraction_1 = require_fileAbstraction();
     var utils_1 = require_utils();
@@ -8700,7 +8700,7 @@ var require_picture = __commonJS({
         utils_1.Guards.truthy(filePath, "filePath");
         const picture = new _Picture();
         picture.data = byteVector_1.ByteVector.fromPath(filePath);
-        picture.filename = path9.basename(filePath);
+        picture.filename = path13.basename(filePath);
         picture.description = picture.filename;
         picture.mimeType = _Picture.getMimeTypeFromFilename(picture.filename);
         picture.type = picture.mimeType.startsWith("image/") ? PictureType.FrontCover : PictureType.NotAPicture;
@@ -9049,7 +9049,7 @@ var require_picture = __commonJS({
         utils_1.Guards.truthy(filePath, "path");
         const picture = new _PictureLazy();
         picture._file = new fileAbstraction_1.LocalFileAbstraction(filePath);
-        picture._filename = path9.basename(filePath);
+        picture._filename = path13.basename(filePath);
         picture._description = picture._filename;
         picture._mimeType = Picture.getMimeTypeFromFilename(picture._filename);
         picture._type = picture._mimeType.startsWith("image/") ? PictureType.FrontCover : PictureType.NotAPicture;
@@ -9990,14 +9990,14 @@ var require_apeTag = __commonJS({
        * @remarks Stored in the `Year` item
        */
       get year() {
-        let text2 = this.getStringValue("Year");
-        if (!text2) {
+        let text5 = this.getStringValue("Year");
+        if (!text5) {
           return 0;
         }
-        let asInt = Number.parseInt(text2, 10);
+        let asInt = Number.parseInt(text5, 10);
         if (Number.isNaN(asInt)) {
-          text2 = text2.substring(0, 4);
-          asInt = Number.parseInt(text2, 10);
+          text5 = text5.substring(0, 4);
+          asInt = Number.parseInt(text5, 10);
           if (Number.isNaN(asInt)) {
             return 0;
           }
@@ -10315,14 +10315,14 @@ var require_apeTag = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_TRACK_GAIN` item
        */
       get replayGainTrackGain() {
-        let text2 = this.getStringValue("REPLAYGAIN_TRACK_GAIN");
-        if (!text2) {
+        let text5 = this.getStringValue("REPLAYGAIN_TRACK_GAIN");
+        if (!text5) {
           return NaN;
         }
-        if (text2.toLowerCase().endsWith("db")) {
-          text2 = text2.substring(0, text2.length - 2).trim();
+        if (text5.toLowerCase().endsWith("db")) {
+          text5 = text5.substring(0, text5.length - 2).trim();
         }
-        return Number.parseFloat(text2);
+        return Number.parseFloat(text5);
       }
       /**
        * @inheritDoc
@@ -10332,8 +10332,8 @@ var require_apeTag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.removeItem("REPLAYGAIN_TRACK_GAIN");
         } else {
-          const text2 = `${value.toFixed(2)} dB`;
-          this.setStringValue("REPLAYGAIN_TRACK_GAIN", text2);
+          const text5 = `${value.toFixed(2)} dB`;
+          this.setStringValue("REPLAYGAIN_TRACK_GAIN", text5);
         }
       }
       /**
@@ -10341,8 +10341,8 @@ var require_apeTag = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_TRACK_PEAK` item
        */
       get replayGainTrackPeak() {
-        const text2 = this.getStringValue("REPLAYGAIN_TRACK_PEAK");
-        return text2 ? Number.parseFloat(text2) : NaN;
+        const text5 = this.getStringValue("REPLAYGAIN_TRACK_PEAK");
+        return text5 ? Number.parseFloat(text5) : NaN;
       }
       /**
        * @inheritDoc
@@ -10352,8 +10352,8 @@ var require_apeTag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.removeItem("REPLAYGAIN_TRACK_PEAK");
         } else {
-          const text2 = value.toFixed(6).toString();
-          this.setStringValue("REPLAYGAIN_TRACK_PEAK", text2);
+          const text5 = value.toFixed(6).toString();
+          this.setStringValue("REPLAYGAIN_TRACK_PEAK", text5);
         }
       }
       /**
@@ -10361,14 +10361,14 @@ var require_apeTag = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_ALBUM_GAIN` item
        */
       get replayGainAlbumGain() {
-        let text2 = this.getStringValue("REPLAYGAIN_ALBUM_GAIN");
-        if (!text2) {
+        let text5 = this.getStringValue("REPLAYGAIN_ALBUM_GAIN");
+        if (!text5) {
           return NaN;
         }
-        if (text2.toLowerCase().endsWith("db")) {
-          text2 = text2.substring(0, text2.length - 2).trim();
+        if (text5.toLowerCase().endsWith("db")) {
+          text5 = text5.substring(0, text5.length - 2).trim();
         }
-        return Number.parseFloat(text2);
+        return Number.parseFloat(text5);
       }
       /**
        * @inheritDoc
@@ -10378,8 +10378,8 @@ var require_apeTag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.removeItem("REPLAYGAIN_ALBUM_GAIN");
         } else {
-          const text2 = `${value.toFixed(2).toString()} dB`;
-          this.setStringValue("REPLAYGAIN_ALBUM_GAIN", text2);
+          const text5 = `${value.toFixed(2).toString()} dB`;
+          this.setStringValue("REPLAYGAIN_ALBUM_GAIN", text5);
         }
       }
       /**
@@ -10387,8 +10387,8 @@ var require_apeTag = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_ALBUM_PEAK` item
        */
       get replayGainAlbumPeak() {
-        const text2 = this.getStringValue("REPLAYGAIN_ALBUM_PEAK");
-        return text2 ? Number.parseFloat(text2) : NaN;
+        const text5 = this.getStringValue("REPLAYGAIN_ALBUM_PEAK");
+        return text5 ? Number.parseFloat(text5) : NaN;
       }
       /**
        * @inheritDoc
@@ -10398,8 +10398,8 @@ var require_apeTag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.removeItem("REPLAYGAIN_ALBUM_PEAK");
         } else {
-          const text2 = value.toFixed(6).toString();
-          this.setStringValue("REPLAYGAIN_ALBUM_PEAK", text2);
+          const text5 = value.toFixed(6).toString();
+          this.setStringValue("REPLAYGAIN_ALBUM_PEAK", text5);
         }
       }
       /**
@@ -10631,11 +10631,11 @@ var require_apeTag = __commonJS({
         return item ? item.text : [];
       }
       getUint32Value(key, index) {
-        const text2 = this.getStringValue(key);
-        if (!text2) {
+        const text5 = this.getStringValue(key);
+        if (!text5) {
           return 0;
         }
-        const values = text2.split("/", index + 2);
+        const values = text5.split("/", index + 2);
         if (values.length < index + 1) {
           return 0;
         }
@@ -11170,10 +11170,10 @@ var require_syncData = __commonJS({
        */
       toUint: (data) => {
         utils_1.Guards.notNullOrUndefined(data, "data");
-        const last = data.length > 4 ? 3 : data.length - 1;
+        const last2 = data.length > 4 ? 3 : data.length - 1;
         let sum = 0;
-        for (let i = 0; i <= last; i++) {
-          sum |= (data.get(i) & 127) << (last - i) * 7;
+        for (let i = 0; i <= last2; i++) {
+          sum |= (data.get(i) & 127) << (last2 - i) * 7;
         }
         return sum;
       },
@@ -14597,9 +14597,9 @@ var require_synchronizedLyricsFrame = __commonJS({
        *     displayed. See {@link TimestampFormat} for possible values.
        * @param text Text for the point in time
        */
-      constructor(time, text2) {
+      constructor(time, text5) {
         utils_1.Guards.uint(time, "time");
-        this.text = text2;
+        this.text = text5;
         this._time = time;
       }
       /**
@@ -14879,13 +14879,13 @@ var require_synchronizedLyricsFrame = __commonJS({
           if (lyricsLength < 0) {
             throw new errors_1.CorruptFileError("Text delimiter for synchronized lyric not found");
           }
-          const text2 = data.subarray(offset, lyricsLength).toString(this.textEncoding);
+          const text5 = data.subarray(offset, lyricsLength).toString(this.textEncoding);
           offset += lyricsLength + delim.length;
           if (offset + 4 > data.length) {
             break;
           }
           const time = data.subarray(offset, 4).toUint();
-          l.push(new SynchronizedText(time, text2));
+          l.push(new SynchronizedText(time, text5));
           offset += 4;
         }
         this._text = l;
@@ -15034,22 +15034,22 @@ var require_textInformationFrame = __commonJS({
         if (version2 !== 3 || this.frameId !== frameIdentifiers_1.FrameIdentifiers.TDRC) {
           return super.render(version2);
         }
-        const text2 = this.toString();
-        if (text2.length < 10 || text2[4] !== "-" || text2[7] !== "-") {
+        const text5 = this.toString();
+        if (text5.length < 10 || text5[4] !== "-" || text5[7] !== "-") {
           return super.render(version2);
         }
         const output = byteVector_1.ByteVector.empty();
         let frame = new _TextInformationFrame(new frameHeader_1.Id3v2FrameHeader(frameIdentifiers_1.FrameIdentifiers.TYER));
-        frame.text = [text2.substring(0, 4)];
+        frame.text = [text5.substring(0, 4)];
         output.addByteVector(frame.render(version2));
         frame = new _TextInformationFrame(new frameHeader_1.Id3v2FrameHeader(frameIdentifiers_1.FrameIdentifiers.TDAT));
-        frame.text = [text2.substring(5, 7) + text2.substring(8, 10)];
+        frame.text = [text5.substring(5, 7) + text5.substring(8, 10)];
         output.addByteVector(frame.render(version2));
-        if (text2.length < 16 || text2[10] !== "T" || text2[13] !== ":") {
+        if (text5.length < 16 || text5[10] !== "T" || text5[13] !== ":") {
           return output;
         }
         frame = new _TextInformationFrame(new frameHeader_1.Id3v2FrameHeader(frameIdentifiers_1.FrameIdentifiers.TIME));
-        frame.text = [text2.substring(11, 13) + text2.substring(14, 16)];
+        frame.text = [text5.substring(11, 13) + text5.substring(14, 16)];
         output.addByteVector(frame.render(version2));
         return output;
       }
@@ -15140,10 +15140,10 @@ var require_textInformationFrame = __commonJS({
         }
         const encoding = _TextInformationFrame.correctEncoding(this.textEncoding, version2);
         const v = byteVector_1.ByteVector.empty();
-        let text2 = this._textFields;
+        let text5 = this._textFields;
         v.addByte(encoding);
         if (version2 > 3 && this.frameId === frameIdentifiers_1.FrameIdentifiers.TCON) {
-          text2 = text2.map((g) => {
+          text5 = text5.map((g) => {
             switch (g) {
               case _TextInformationFrame.COVER_STRING:
                 return _TextInformationFrame.COVER_ABBREV;
@@ -15161,24 +15161,24 @@ var require_textInformationFrame = __commonJS({
         const isTxxx = this.frameId === frameIdentifiers_1.FrameIdentifiers.TXXX;
         if (version2 > 3 || isTxxx) {
           if (isTxxx) {
-            if (text2.length === 0) {
-              text2 = [null, null];
-            } else if (text2.length === 1) {
-              text2 = [text2[0], null];
+            if (text5.length === 0) {
+              text5 = [null, null];
+            } else if (text5.length === 1) {
+              text5 = [text5[0], null];
             }
           }
-          for (let i = 0; i < text2.length; i++) {
+          for (let i = 0; i < text5.length; i++) {
             if (i !== 0) {
               v.addByteVector(byteVector_1.ByteVector.getTextDelimiter(encoding));
             }
-            if (text2[i]) {
-              v.addByteVector(byteVector_1.ByteVector.fromString(text2[i], encoding));
+            if (text5[i]) {
+              v.addByteVector(byteVector_1.ByteVector.fromString(text5[i], encoding));
             }
           }
         } else if (this.frameId === frameIdentifiers_1.FrameIdentifiers.TCON) {
           const numericGenres = [];
           const textGenres = [];
-          for (const s of text2) {
+          for (const s of text5) {
             if (id3v2Settings_1.default.useNumericGenres) {
               switch (s) {
                 case _TextInformationFrame.COVER_STRING:
@@ -15202,7 +15202,7 @@ var require_textInformationFrame = __commonJS({
           const genreString = `${numericGenres.join("")}${textGenres.join(";")}`;
           v.addByteVector(byteVector_1.ByteVector.fromString(genreString, encoding));
         } else {
-          v.addByteVector(byteVector_1.ByteVector.fromString(text2.join("/"), encoding));
+          v.addByteVector(byteVector_1.ByteVector.fromString(text5.join("/"), encoding));
         }
         return v;
       }
@@ -15341,8 +15341,8 @@ var require_textInformationFrame = __commonJS({
        * Gets the description stored in the current instance.
        */
       get description() {
-        const text2 = super.text;
-        return text2.length > 0 ? text2[0] : void 0;
+        const text5 = super.text;
+        return text5.length > 0 ? text5[0] : void 0;
       }
       /**
        * Sets the description stored in the current instance.
@@ -15350,13 +15350,13 @@ var require_textInformationFrame = __commonJS({
        * @param value Description to store in the current instance.
        */
       set description(value) {
-        let text2 = super.text;
-        if (text2.length > 0) {
-          text2[0] = value;
+        let text5 = super.text;
+        if (text5.length > 0) {
+          text5[0] = value;
         } else {
-          text2 = [value];
+          text5 = [value];
         }
-        super.text = text2;
+        super.text = text5;
       }
       /**
        * Gets the text contained in the current instance.
@@ -15364,11 +15364,11 @@ var require_textInformationFrame = __commonJS({
        * current instance. The value must be reassigned for the value to change.
        */
       get text() {
-        const text2 = super.text;
-        if (text2.length < 2) {
+        const text5 = super.text;
+        if (text5.length < 2) {
           return [];
         }
-        return text2.slice(1);
+        return text5.slice(1);
       }
       /**
        * Sets the text contained in the current instance.
@@ -15593,8 +15593,8 @@ var require_urlLinkFrame = __commonJS({
             }
           }
         }
-        const text2 = textFields.join("/");
-        return byteVector_1.ByteVector.concatenate(isWxxx ? encoding : void 0, byteVector_1.ByteVector.fromString(text2, byteVector_1.StringType.Latin1));
+        const text5 = textFields.join("/");
+        return byteVector_1.ByteVector.concatenate(isWxxx ? encoding : void 0, byteVector_1.ByteVector.fromString(text5, byteVector_1.StringType.Latin1));
       }
     };
     exports.UrlLinkFrame = UrlLinkFrame;
@@ -15653,8 +15653,8 @@ var require_urlLinkFrame = __commonJS({
        * Gets the description stored in the current instance.
        */
       get description() {
-        const text2 = super.text;
-        return text2.length > 0 ? text2[0] : void 0;
+        const text5 = super.text;
+        return text5.length > 0 ? text5[0] : void 0;
       }
       /**
        * Sets the description stored in the current instance.
@@ -15662,13 +15662,13 @@ var require_urlLinkFrame = __commonJS({
        */
       set description(value) {
         const normalizedValue = value || void 0;
-        let text2 = super.text;
-        if (text2.length > 0) {
-          text2[0] = normalizedValue;
+        let text5 = super.text;
+        if (text5.length > 0) {
+          text5[0] = normalizedValue;
         } else {
-          text2 = [normalizedValue];
+          text5 = [normalizedValue];
         }
-        super.text = text2;
+        super.text = text5;
       }
       /**
        * Gets the text contained in the current instance.
@@ -15676,13 +15676,13 @@ var require_urlLinkFrame = __commonJS({
        * current instance. The value must be reassigned for the value to change.
        */
       get text() {
-        const text2 = super.text;
-        if (text2.length < 2) {
+        const text5 = super.text;
+        if (text5.length < 2) {
           return [];
         }
-        const newText = new Array(text2.length - 1);
+        const newText = new Array(text5.length - 1);
         for (let i = 0; i < newText.length; i++) {
-          newText[i] = text2[i + 1];
+          newText[i] = text5[i + 1];
         }
         return newText;
       }
@@ -16229,9 +16229,9 @@ var require_id3v2Tag = __commonJS({
           }
         }
         const performersRole = [];
-        for (const roles of map.values()) {
-          if (roles.length > 0) {
-            performersRole.push(roles.join("; "));
+        for (const roles2 of map.values()) {
+          if (roles2.length > 0) {
+            performersRole.push(roles2.join("; "));
           } else {
             performersRole.push(void 0);
           }
@@ -16522,11 +16522,11 @@ var require_id3v2Tag = __commonJS({
        * @remarks Stored in the `TBPM` frame
        */
       get beatsPerMinute() {
-        const text2 = this.getTextAsString(frameIdentifiers_1.FrameIdentifiers.TBPM);
-        if (!text2) {
+        const text5 = this.getTextAsString(frameIdentifiers_1.FrameIdentifiers.TBPM);
+        if (!text5) {
           return 0;
         }
-        const num = Number.parseFloat(text2);
+        const num = Number.parseFloat(text5);
         return Number.isNaN(num) || num < 0 ? 0 : Math.round(num);
       }
       /**
@@ -16742,14 +16742,14 @@ var require_id3v2Tag = __commonJS({
        * @remarks via a TXXX `REPLAY_GAIN_TRACK_GAIN` frame
        */
       get replayGainTrackGain() {
-        let text2 = this.getUserTextAsString("REPLAYGAIN_TRACK_GAIN", false);
-        if (!text2) {
+        let text5 = this.getUserTextAsString("REPLAYGAIN_TRACK_GAIN", false);
+        if (!text5) {
           return NaN;
         }
-        if (text2.toLowerCase().endsWith("db")) {
-          text2 = text2.substring(0, text2.length - 2).trim();
+        if (text5.toLowerCase().endsWith("db")) {
+          text5 = text5.substring(0, text5.length - 2).trim();
         }
-        return Number.parseFloat(text2);
+        return Number.parseFloat(text5);
       }
       /**
        * @inheritDoc
@@ -16759,8 +16759,8 @@ var require_id3v2Tag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.setUserTextAsString("REPLAYGAIN_TRACK_GAIN", void 0, false);
         } else {
-          const text2 = `${value.toFixed(2).toString()} dB`;
-          this.setUserTextAsString("REPLAYGAIN_TRACK_GAIN", text2, false);
+          const text5 = `${value.toFixed(2).toString()} dB`;
+          this.setUserTextAsString("REPLAYGAIN_TRACK_GAIN", text5, false);
         }
       }
       /**
@@ -16768,8 +16768,8 @@ var require_id3v2Tag = __commonJS({
        * @remarks via a TXXX `REPLAYGAIN_TRACK_PEAK` frame
        */
       get replayGainTrackPeak() {
-        const text2 = this.getUserTextAsString("REPLAYGAIN_TRACK_PEAK", false);
-        return text2 ? Number.parseFloat(text2) : NaN;
+        const text5 = this.getUserTextAsString("REPLAYGAIN_TRACK_PEAK", false);
+        return text5 ? Number.parseFloat(text5) : NaN;
       }
       /**
        * @inheritDoc
@@ -16779,8 +16779,8 @@ var require_id3v2Tag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.setUserTextAsString("REPLAYGAIN_TRACK_PEAK", void 0, false);
         } else {
-          const text2 = value.toFixed(6).toString();
-          this.setUserTextAsString("REPLAYGAIN_TRACK_PEAK", text2, false);
+          const text5 = value.toFixed(6).toString();
+          this.setUserTextAsString("REPLAYGAIN_TRACK_PEAK", text5, false);
         }
       }
       /**
@@ -16788,14 +16788,14 @@ var require_id3v2Tag = __commonJS({
        * @remarks via a TXXX `REPLAYGAIN_ALBUM_GAIN` frame
        */
       get replayGainAlbumGain() {
-        let text2 = this.getUserTextAsString("REPLAYGAIN_ALBUM_GAIN", false);
-        if (!text2) {
+        let text5 = this.getUserTextAsString("REPLAYGAIN_ALBUM_GAIN", false);
+        if (!text5) {
           return NaN;
         }
-        if (text2.toLowerCase().endsWith("db")) {
-          text2 = text2.substring(0, text2.length - 2).trim();
+        if (text5.toLowerCase().endsWith("db")) {
+          text5 = text5.substring(0, text5.length - 2).trim();
         }
-        return Number.parseFloat(text2);
+        return Number.parseFloat(text5);
       }
       /**
        * @inheritDoc
@@ -16805,8 +16805,8 @@ var require_id3v2Tag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.setUserTextAsString("REPLAYGAIN_ALBUM_GAIN", void 0, false);
         } else {
-          const text2 = `${value.toFixed(2).toString()} dB`;
-          this.setUserTextAsString("REPLAYGAIN_ALBUM_GAIN", text2, false);
+          const text5 = `${value.toFixed(2).toString()} dB`;
+          this.setUserTextAsString("REPLAYGAIN_ALBUM_GAIN", text5, false);
         }
       }
       /**
@@ -16814,8 +16814,8 @@ var require_id3v2Tag = __commonJS({
        * @remarks via a TXXX `REPLAYGAIN_ALBUM_PEAK` frame
        */
       get replayGainAlbumPeak() {
-        const text2 = this.getUserTextAsString("REPLAYGAIN_ALBUM_PEAK", false);
-        return text2 ? Number.parseFloat(text2) : NaN;
+        const text5 = this.getUserTextAsString("REPLAYGAIN_ALBUM_PEAK", false);
+        return text5 ? Number.parseFloat(text5) : NaN;
       }
       /**
        * @inheritDoc
@@ -16825,8 +16825,8 @@ var require_id3v2Tag = __commonJS({
         if (value === void 0 || value === null || Number.isNaN(value)) {
           this.setUserTextAsString("REPLAYGAIN_ALBUM_PEAK", void 0, false);
         } else {
-          const text2 = value.toFixed(6).toString();
-          this.setUserTextAsString("REPLAYGAIN_ALBUM_PEAK", text2, false);
+          const text5 = value.toFixed(6).toString();
+          this.setUserTextAsString("REPLAYGAIN_ALBUM_PEAK", text5, false);
         }
       }
       /**
@@ -16931,15 +16931,15 @@ var require_id3v2Tag = __commonJS({
           super.copyTo(target, overwrite);
           return;
         }
-        const match = target;
+        const match2 = target;
         const frames = this._frameList.slice();
         while (frames.length > 0) {
           const ident = frames[0].frameId;
           let copy = true;
           if (overwrite) {
-            match.removeFrames(ident);
+            match2.removeFrames(ident);
           } else {
-            for (const f of match._frameList) {
+            for (const f of match2._frameList) {
               if (f.frameId === ident) {
                 copy = false;
                 break;
@@ -16950,7 +16950,7 @@ var require_id3v2Tag = __commonJS({
           while (i < frames.length) {
             if (frames[i].frameId === ident) {
               if (copy) {
-                match._frameList.push(frames[i].clone());
+                match2._frameList.push(frames[i].clone());
               }
               frames.splice(i, 1);
             } else {
@@ -17161,12 +17161,12 @@ var require_id3v2Tag = __commonJS({
        * @param text Text to set for the specified frame or `undefined`/`null`/`""` to remove all
        *     frames with that identifier.
        */
-      setTextFrame(ident, ...text2) {
+      setTextFrame(ident, ...text5) {
         utils_1.Guards.truthy(ident, "ident");
         let empty = true;
-        if (text2) {
-          for (let i = 0; empty && i < text2.length; i++) {
-            if (text2[i]) {
+        if (text5) {
+          for (let i = 0; empty && i < text5.length; i++) {
+            if (text5[i]) {
               empty = false;
             }
           }
@@ -17182,7 +17182,7 @@ var require_id3v2Tag = __commonJS({
             urlFrame = urlLinkFrame_1.UrlLinkFrame.fromIdentity(ident);
             this.addFrame(urlFrame);
           }
-          urlFrame.text = text2;
+          urlFrame.text = text5;
           urlFrame.textEncoding = id3v2Settings_1.default.defaultEncoding;
         } else {
           const frames = this.getFramesByClassType(frame_1.FrameClassType.TextInformationFrame);
@@ -17191,7 +17191,7 @@ var require_id3v2Tag = __commonJS({
             frame = textInformationFrame_1.TextInformationFrame.fromIdentifier(ident);
             this.addFrame(frame);
           }
-          frame.text = text2;
+          frame.text = text5;
           frame.textEncoding = id3v2Settings_1.default.defaultEncoding;
         }
       }
@@ -17256,11 +17256,11 @@ var require_id3v2Tag = __commonJS({
         return frame ? frame.text : [];
       }
       getTextAsUint32(ident, index) {
-        const text2 = this.getTextAsString(ident);
-        if (text2 === null || text2 === void 0) {
+        const text5 = this.getTextAsString(ident);
+        if (text5 === null || text5 === void 0) {
           return 0;
         }
-        const values = text2.split("/", index + 2);
+        const values = text5.split("/", index + 2);
         if (values.length < index + 1) {
           return 0;
         }
@@ -17282,21 +17282,21 @@ var require_id3v2Tag = __commonJS({
         const result = frame ? frame.text.join(";") : void 0;
         return result || void 0;
       }
-      setUfidText(owner, text2) {
+      setUfidText(owner, text5) {
         const frames = this.getFramesByClassType(frame_1.FrameClassType.UniqueFileIdentifierFrame);
         let frame = uniqueFileIdentifierFrame_1.default.find(frames, owner);
-        if (!text2 && frame) {
+        if (!text5 && frame) {
           this.removeFrame(frame);
         } else {
-          const identifier = byteVector_1.ByteVector.fromString(text2, byteVector_1.StringType.UTF8);
+          const identifier = byteVector_1.ByteVector.fromString(text5, byteVector_1.StringType.UTF8);
           frame = uniqueFileIdentifierFrame_1.default.fromData(owner, identifier);
           this.addFrame(frame);
         }
       }
-      setUserTextAsString(description, text2, caseSensitive = true) {
+      setUserTextAsString(description, text5, caseSensitive = true) {
         const frames = this.getFramesByClassType(frame_1.FrameClassType.UserTextInformationFrame);
         let frame = textInformationFrame_1.UserTextInformationFrame.findUserTextInformationFrame(frames, description, caseSensitive);
-        if (!text2) {
+        if (!text5) {
           if (frame) {
             this.removeFrame(frame);
           }
@@ -17305,7 +17305,7 @@ var require_id3v2Tag = __commonJS({
             frame = textInformationFrame_1.UserTextInformationFrame.fromDescription(description, id3v2Settings_1.default.defaultEncoding);
             this.addFrame(frame);
           }
-          frame.text = text2.split(";");
+          frame.text = text5.split(";");
         }
       }
     };
@@ -19969,11 +19969,11 @@ var require_asfTag = __commonJS({
        *     https://docs.microsoft.com/en-us/windows/win32/wmformat/wm-year
        */
       get year() {
-        const text2 = this.getDescriptorString("WM/Year");
-        if (!text2 || text2.length < 4) {
+        const text5 = this.getDescriptorString("WM/Year");
+        if (!text5 || text5.length < 4) {
           return 0;
         }
-        const parsed = Number.parseInt(text2.substring(0, 4), 10);
+        const parsed = Number.parseInt(text5.substring(0, 4), 10);
         return Number.isNaN(parsed) ? 0 : parsed;
       }
       /**
@@ -20349,8 +20349,8 @@ var require_asfTag = __commonJS({
         if (Number.isNaN(value)) {
           this.removeDescriptors("ReplayGain/Track");
         } else {
-          const text2 = value.toFixed(2);
-          this.setDescriptorString(`${text2} dB`, "ReplayGain/Track");
+          const text5 = value.toFixed(2);
+          this.setDescriptorString(`${text5} dB`, "ReplayGain/Track");
         }
       }
       /**
@@ -20369,8 +20369,8 @@ var require_asfTag = __commonJS({
         if (Number.isNaN(value)) {
           this.removeDescriptors("ReplayGain/Track Peak");
         } else {
-          const text2 = value.toFixed(6);
-          this.setDescriptorString(text2, "ReplayGain/Track Peak");
+          const text5 = value.toFixed(6);
+          this.setDescriptorString(text5, "ReplayGain/Track Peak");
         }
       }
       /**
@@ -20396,8 +20396,8 @@ var require_asfTag = __commonJS({
         if (Number.isNaN(value)) {
           this.removeDescriptors("ReplayGain/Album");
         } else {
-          const text2 = value.toFixed(2);
-          this.setDescriptorString(`${text2} dB`, "ReplayGain/Album");
+          const text5 = value.toFixed(2);
+          this.setDescriptorString(`${text5} dB`, "ReplayGain/Album");
         }
       }
       /**
@@ -20416,8 +20416,8 @@ var require_asfTag = __commonJS({
         if (Number.isNaN(value)) {
           this.removeDescriptors("ReplayGain/Album Peak");
         } else {
-          const text2 = value.toFixed(6);
-          this.setDescriptorString(text2, "ReplayGain/Album Peak");
+          const text5 = value.toFixed(6);
+          this.setDescriptorString(text5, "ReplayGain/Album Peak");
         }
       }
       /**
@@ -24175,11 +24175,11 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `DATE` field
        */
       get year() {
-        const text2 = this.getFieldFirstValue("DATE");
-        if (!text2) {
+        const text5 = this.getFieldFirstValue("DATE");
+        if (!text5) {
           return 0;
         }
-        const parsedText = Number.parseInt(text2.substring(0, 4), 10);
+        const parsedText = Number.parseInt(text5.substring(0, 4), 10);
         return Number.isNaN(parsedText) ? 0 : parsedText;
       }
       /**
@@ -24199,11 +24199,11 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `TRACKNUMBER` field
        */
       get track() {
-        const text2 = this.getFieldFirstValue("TRACKNUMBER");
-        if (!text2) {
+        const text5 = this.getFieldFirstValue("TRACKNUMBER");
+        if (!text5) {
           return 0;
         }
-        const splitText = text2.split("/");
+        const splitText = text5.split("/");
         const parsedText = Number.parseInt(splitText[0], 10);
         return Number.isNaN(parsedText) ? 0 : parsedText;
       }
@@ -24222,16 +24222,16 @@ var require_xiphComment = __commonJS({
        *     used if `TRACKTOTAL` is not available.
        */
       get trackCount() {
-        let text2 = this.getFieldFirstValue("TRACKTOTAL");
-        if (text2) {
-          const parsedValue = Number.parseInt(text2, 10);
+        let text5 = this.getFieldFirstValue("TRACKTOTAL");
+        if (text5) {
+          const parsedValue = Number.parseInt(text5, 10);
           if (!Number.isNaN(parsedValue)) {
             return parsedValue;
           }
         }
-        text2 = this.getFieldFirstValue("TRACKNUMBER");
-        if (text2) {
-          const textSplit = text2.split("/");
+        text5 = this.getFieldFirstValue("TRACKNUMBER");
+        if (text5) {
+          const textSplit = text5.split("/");
           if (textSplit.length > 1) {
             const parsedValue = Number.parseInt(textSplit[1], 10);
             if (!Number.isNaN(parsedValue)) {
@@ -24254,11 +24254,11 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `DISCNUMBER` field
        */
       get disc() {
-        const text2 = this.getFieldFirstValue("DISCNUMBER");
-        if (!text2) {
+        const text5 = this.getFieldFirstValue("DISCNUMBER");
+        if (!text5) {
           return 0;
         }
-        const splitText = text2.split("/");
+        const splitText = text5.split("/");
         const parsedText = Number.parseInt(splitText[0], 10);
         return Number.isNaN(parsedText) ? 0 : parsedText;
       }
@@ -24277,16 +24277,16 @@ var require_xiphComment = __commonJS({
        *     used if `DISCTOTAL` is not available.
        */
       get discCount() {
-        let text2 = this.getFieldFirstValue("DISCTOTAL");
-        if (text2) {
-          const parsedValue = Number.parseInt(text2, 10);
+        let text5 = this.getFieldFirstValue("DISCTOTAL");
+        if (text5) {
+          const parsedValue = Number.parseInt(text5, 10);
           if (!Number.isNaN(parsedValue)) {
             return parsedValue;
           }
         }
-        text2 = this.getFieldFirstValue("DISCNUMBER");
-        if (text2) {
-          const textSplit = text2.split("/");
+        text5 = this.getFieldFirstValue("DISCNUMBER");
+        if (text5) {
+          const textSplit = text5.split("/");
           if (textSplit.length > 1) {
             const parsedValue = Number.parseInt(textSplit[1], 10);
             if (!Number.isNaN(parsedValue)) {
@@ -24340,11 +24340,11 @@ var require_xiphComment = __commonJS({
        *     behavior can be controlled Stored in the {@link XiphSettings.useTempoToStoreBpm}.
        */
       get beatsPerMinute() {
-        let text2 = this.getFieldFirstValue("TEMPO");
-        if (!text2) {
-          text2 = this.getFieldFirstValue("BPM");
+        let text5 = this.getFieldFirstValue("TEMPO");
+        if (!text5) {
+          text5 = this.getFieldFirstValue("BPM");
         }
-        const parsedNumber = Number.parseInt(text2, 10);
+        const parsedNumber = Number.parseInt(text5, 10);
         return Number.isNaN(parsedNumber) ? 0 : parsedNumber;
       }
       /**
@@ -24396,8 +24396,8 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `DATETAGGED` field
        */
       get dateTagged() {
-        const text2 = this.getFieldFirstValue("DATETAGGED");
-        const date = new Date(text2);
+        const text5 = this.getFieldFirstValue("DATETAGGED");
+        const date = new Date(text5);
         return Number.isNaN(date.getTime()) ? void 0 : date;
       }
       /**
@@ -24601,8 +24601,8 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_TRACK_GAIN` field
        */
       get replayGainTrackGain() {
-        const text2 = this.getFieldFirstValue("REPLAYGAIN_TRACK_GAIN");
-        return Number.parseFloat(text2);
+        const text5 = this.getFieldFirstValue("REPLAYGAIN_TRACK_GAIN");
+        return Number.parseFloat(text5);
       }
       /**
        * @inheritDoc
@@ -24620,8 +24620,8 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_TRACK_PEAK` field
        */
       get replayGainTrackPeak() {
-        const text2 = this.getFieldFirstValue("REPLAYGAIN_TRACK_PEAK");
-        return Number.parseFloat(text2);
+        const text5 = this.getFieldFirstValue("REPLAYGAIN_TRACK_PEAK");
+        return Number.parseFloat(text5);
       }
       /**
        * @inheritDoc
@@ -24639,8 +24639,8 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_ALBUM_GAIN` field
        */
       get replayGainAlbumGain() {
-        const text2 = this.getFieldFirstValue("REPLAYGAIN_ALBUM_GAIN");
-        return Number.parseFloat(text2);
+        const text5 = this.getFieldFirstValue("REPLAYGAIN_ALBUM_GAIN");
+        return Number.parseFloat(text5);
       }
       /**
        * @inheritDoc
@@ -24658,8 +24658,8 @@ var require_xiphComment = __commonJS({
        * @remarks Stored in the `REPLAYGAIN_ALBUM_PEAK` field
        */
       get replayGainAlbumPeak() {
-        const text2 = this.getFieldFirstValue("REPLAYGAIN_ALBUM_PEAK");
-        return Number.parseFloat(text2);
+        const text5 = this.getFieldFirstValue("REPLAYGAIN_ALBUM_PEAK");
+        return Number.parseFloat(text5);
       }
       /**
        * @inheritDoc
@@ -29424,8 +29424,8 @@ var require_appleTag = __commonJS({
       }
       /** @inheritDoc */
       get genres() {
-        let text2 = this.getQuickTimeStrings(mpeg4BoxType_1.default.GEN);
-        if (text2.length === 0) {
+        let text5 = this.getQuickTimeStrings(mpeg4BoxType_1.default.GEN);
+        if (text5.length === 0) {
           for (const data of this.getQuickTimeData(mpeg4BoxType_1.default.GNRE)) {
             const index = data.toUshort(true);
             if (index === 0) {
@@ -29435,11 +29435,11 @@ var require_appleTag = __commonJS({
             if (!str) {
               continue;
             }
-            text2 = [str];
+            text5 = [str];
             break;
           }
         }
-        return text2;
+        return text5;
       }
       /** @inheritDoc */
       set genres(v) {
@@ -29548,8 +29548,8 @@ var require_appleTag = __commonJS({
       }
       /** @inheritDoc */
       get dateTagged() {
-        for (const text2 of this.getQuickTimeStrings(mpeg4BoxType_1.default.DTAG)) {
-          const date = new Date(text2);
+        for (const text5 of this.getQuickTimeStrings(mpeg4BoxType_1.default.DTAG)) {
+          const date = new Date(text5);
           if (!isNaN(date.getTime())) {
             return date;
           }
@@ -29607,8 +29607,8 @@ var require_appleTag = __commonJS({
       }
       /** @inheritDoc */
       set musicBrainzArtistId(v) {
-        const artistIds = v.split("/");
-        this.setItunesStrings("com.apple.iTunes", "MusicBrainz Artist Id", ...artistIds);
+        const artistIds2 = v.split("/");
+        this.setItunesStrings("com.apple.iTunes", "MusicBrainz Artist Id", ...artistIds2);
       }
       /** @inheritDoc */
       get musicBrainzReleaseGroupId() {
@@ -29694,14 +29694,14 @@ var require_appleTag = __commonJS({
       }
       /** @inheritDoc */
       get replayGainTrackGain() {
-        let text2 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_TRACK_GAIN");
-        if (!text2) {
+        let text5 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_TRACK_GAIN");
+        if (!text5) {
           return NaN;
         }
-        if (text2.toLowerCase().endsWith("db")) {
-          text2 = text2.substring(0, text2.length - 2).trim();
+        if (text5.toLowerCase().endsWith("db")) {
+          text5 = text5.substring(0, text5.length - 2).trim();
         }
-        return Number.parseFloat(text2);
+        return Number.parseFloat(text5);
       }
       /** @inheritDoc */
       set replayGainTrackGain(v) {
@@ -29710,24 +29710,24 @@ var require_appleTag = __commonJS({
       }
       /** @inheritDoc */
       get replayGainTrackPeak() {
-        const text2 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_TRACK_PEAK");
-        return text2 ? Number.parseFloat(text2) : NaN;
+        const text5 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_TRACK_PEAK");
+        return text5 ? Number.parseFloat(text5) : NaN;
       }
       /** @inheritDoc */
       set replayGainTrackPeak(v) {
-        const text2 = Number.isNaN(v) ? void 0 : v.toFixed(6);
-        this.setItunesStrings("com.apple.iTunes", "REPLAYGAIN_TRACK_PEAK", text2);
+        const text5 = Number.isNaN(v) ? void 0 : v.toFixed(6);
+        this.setItunesStrings("com.apple.iTunes", "REPLAYGAIN_TRACK_PEAK", text5);
       }
       /** @inheritDoc */
       get replayGainAlbumGain() {
-        let text2 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_ALBUM_GAIN");
-        if (!text2) {
+        let text5 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_ALBUM_GAIN");
+        if (!text5) {
           return NaN;
         }
-        if (text2.toLowerCase().endsWith("db")) {
-          text2 = text2.substring(0, text2.length - 2).trim();
+        if (text5.toLowerCase().endsWith("db")) {
+          text5 = text5.substring(0, text5.length - 2).trim();
         }
-        return Number.parseFloat(text2);
+        return Number.parseFloat(text5);
       }
       set replayGainAlbumGain(v) {
         const value = Number.isNaN(v) ? void 0 : `${v.toFixed(2)} dB`;
@@ -29735,13 +29735,13 @@ var require_appleTag = __commonJS({
       }
       /** @inheritDoc */
       get replayGainAlbumPeak() {
-        const text2 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_ALBUM_PEAK");
-        return text2 ? Number.parseFloat(text2) : NaN;
+        const text5 = this.getFirstItunesString("com.apple.iTunes", "REPLAYGAIN_ALBUM_PEAK");
+        return text5 ? Number.parseFloat(text5) : NaN;
       }
       /** @inheritDoc */
       set replayGainAlbumPeak(v) {
-        const text2 = Number.isNaN(v) ? void 0 : v.toFixed(6);
-        this.setItunesStrings("com.apple.iTunes", "REPLAYGAIN_ALBUM_PEAK", text2);
+        const text5 = Number.isNaN(v) ? void 0 : v.toFixed(6);
+        this.setItunesStrings("com.apple.iTunes", "REPLAYGAIN_ALBUM_PEAK", text5);
       }
       /** @inheritDoc */
       get initialKey() {
@@ -29855,8 +29855,8 @@ var require_appleTag = __commonJS({
       getQuickTimeStrings(boxType) {
         return this._ilstBox.getQuickTimeDataBoxes(boxType).filter((b) => utils_1.NumberUtils.hasFlag(b.flags, appleDataBox_1.AppleDataBoxFlagType.ContainsText, true)).reduce((accum, b) => {
           if (b.text) {
-            for (const text2 of b.text.split(";")) {
-              utils_1.ArrayUtils.safePush(accum, text2.trim());
+            for (const text5 of b.text.split(";")) {
+              utils_1.ArrayUtils.safePush(accum, text5.trim());
             }
           }
           return accum;
@@ -32942,12 +32942,12 @@ var require_aviStream = __commonJS({
        * Constructs and initializes a new instance with a specified stream header.
        * @param list RiffList containing the stream headers
        */
-      constructor(list) {
-        utils_1.Guards.truthy(list, "list");
-        if (list.type !== _AviStream.LIST_TYPE) {
+      constructor(list3) {
+        utils_1.Guards.truthy(list3, "list");
+        if (list3.type !== _AviStream.LIST_TYPE) {
           throw new errors_1.CorruptFileError("Stream header list does not have correct type");
         }
-        const streamHeaderData = list.getValues(_AviStream.HEADER_CHUNK_ID);
+        const streamHeaderData = list3.getValues(_AviStream.HEADER_CHUNK_ID);
         if (streamHeaderData.length !== 1) {
           throw new errors_1.CorruptFileError("Stream header list does not contain valid stream header chunks");
         }
@@ -32972,7 +32972,7 @@ var require_aviStream = __commonJS({
         this._top = streamHeaderDatum.subarray(50, 2).toUshort(false);
         this._right = streamHeaderDatum.subarray(52, 2).toUshort(false);
         this._bottom = streamHeaderDatum.subarray(54, 2).toUshort(false);
-        const streamFormatData = list.getValues(_AviStream.FORMAT_CHUNK_ID);
+        const streamFormatData = list3.getValues(_AviStream.FORMAT_CHUNK_ID);
         if (streamFormatData.length !== 1) {
           throw new errors_1.CorruptFileError("Stream header list is missing stream format chunk");
         }
@@ -33147,12 +33147,12 @@ var require_aviHeader = __commonJS({
        * Constructs and initializes a new instance by reading information from a RIFF list.
        * @param list List containing the data for the AVI headers
        */
-      constructor(list) {
-        utils_1.Guards.truthy(list, "list");
-        if (list.type !== _AviHeader.HEADER_LIST_TYPE) {
-          throw new errors_1.CorruptFileError(`Expected ${_AviHeader.HEADER_LIST_TYPE} list but got ${list.type}`);
+      constructor(list3) {
+        utils_1.Guards.truthy(list3, "list");
+        if (list3.type !== _AviHeader.HEADER_LIST_TYPE) {
+          throw new errors_1.CorruptFileError(`Expected ${_AviHeader.HEADER_LIST_TYPE} list but got ${list3.type}`);
         }
-        const mainHeaderValues = list.getValues(_AviHeader.HEADER_CHUNK_ID);
+        const mainHeaderValues = list3.getValues(_AviHeader.HEADER_CHUNK_ID);
         if (mainHeaderValues.length === 0) {
           throw new errors_1.CorruptFileError("Could not find AVI main header data");
         }
@@ -33170,7 +33170,7 @@ var require_aviHeader = __commonJS({
         this._width = mainHeaderData.subarray(32, 4).toUint(false);
         this._height = mainHeaderData.subarray(36, 4).toUint(false);
         this._durationMilliseconds = this._totalFrames * this._microsecondsPerFrame / 1e3;
-        const streamHeaderLists = list.getLists(aviStream_1.AviStream.LIST_TYPE);
+        const streamHeaderLists = list3.getLists(aviStream_1.AviStream.LIST_TYPE);
         this._streams = streamHeaderLists.map((l) => new aviStream_1.AviStream(l));
         this._codecs = this._streams.map((s) => s.codec).filter((c) => !!c);
       }
@@ -33410,11 +33410,11 @@ var require_riffList = __commonJS({
        * @param type Type ID of the list
        */
       static fromEmpty(type) {
-        const list = new _RiffList();
-        list._isLoaded = true;
-        list._type = type;
-        list._originalDataSize = 4;
-        return list;
+        const list3 = new _RiffList();
+        list3._isLoaded = true;
+        list3._type = type;
+        list3._originalDataSize = 4;
+        return list3;
       }
       /**
        * Constructs and initializes a new instance, lazily, from a position in a file.
@@ -33432,13 +33432,13 @@ var require_riffList = __commonJS({
         if (listHeader.subarray(0, 4).toString(byteVector_1.StringType.Latin1) !== _RiffList.IDENTIFIER_FOURCC) {
           throw new Error("Cannot read RIFF list from non-list chunk");
         }
-        const list = new _RiffList();
-        list._chunkStart = position;
-        list._originalDataSize = listHeader.subarray(4, 4).toUint(false);
-        list._file = file;
-        list._isLoaded = false;
-        list._type = listHeader.subarray(8, 4).toString(byteVector_1.StringType.Latin1);
-        return list;
+        const list3 = new _RiffList();
+        list3._chunkStart = position;
+        list3._originalDataSize = listHeader.subarray(4, 4).toUint(false);
+        list3._file = file;
+        list3._isLoaded = false;
+        list3._type = listHeader.subarray(8, 4).toString(byteVector_1.StringType.Latin1);
+        return list3;
       }
       // #endregion
       // #region Properties
@@ -33630,10 +33630,10 @@ var require_riffListTag = __commonJS({
     var utils_1 = require_utils();
     var RiffListTag = class extends tag_1.Tag {
       // #region Constructors
-      constructor(list) {
+      constructor(list3) {
         super();
         this._stringType = byteVector_1.StringType.UTF8;
-        this._list = list;
+        this._list = list3;
       }
       // #endregion
       // #region Properties
@@ -33769,8 +33769,8 @@ var require_infoTag = __commonJS({
     var utils_1 = require_utils();
     var InfoTag = class _InfoTag extends riffListTag_1.default {
       // #region Constructors
-      constructor(list) {
-        super(list);
+      constructor(list3) {
+        super(list3);
       }
       /**
        * Constructs and initializes a new, empty instance.
@@ -33783,9 +33783,9 @@ var require_infoTag = __commonJS({
        * a file.
        * @param list List that contains the contents of the tag
        */
-      static fromList(list) {
-        utils_1.Guards.truthy(list, "list");
-        return new _InfoTag(list);
+      static fromList(list3) {
+        utils_1.Guards.truthy(list3, "list");
+        return new _InfoTag(list3);
       }
       // #endregion
       // #region Properties
@@ -34000,17 +34000,17 @@ var require_movieIdTag = __commonJS({
     var utils_1 = require_utils();
     var MovieIdTag = class _MovieIdTag extends riffListTag_1.default {
       // #region Constructors
-      constructor(list) {
-        super(list);
+      constructor(list3) {
+        super(list3);
       }
       /**
        * Constructs and initializes a new instance by reading the contents of a raw RIFF list stored
        * a file.
        * @param list List that contains the contents of the tag
        */
-      static fromList(list) {
-        utils_1.Guards.truthy(list, "list");
-        return new _MovieIdTag(list);
+      static fromList(list3) {
+        utils_1.Guards.truthy(list3, "list");
+        return new _MovieIdTag(list3);
       }
       /**
        * Constructs and initializes a new, empty instance.
@@ -35206,260 +35206,1329 @@ var require_dist = __commonJS({
 });
 
 // src/index.js
-import path8 from "node:path";
+import path12 from "node:path";
+import { Worker, isMainThread, parentPort, workerData } from "node:worker_threads";
 
-// src/album-works.js
-import fs4 from "node:fs/promises";
-import path4 from "node:path";
+// src/model/presentation.js
+import path2 from "node:path";
 
-// src/tagger.js
-import { randomUUID as randomUUID3 } from "node:crypto";
-import fs3 from "node:fs/promises";
-import path3 from "node:path";
+// src/model/catalogue.js
+import { randomUUID as randomUUID2 } from "node:crypto";
 
-// src/tags.js
-var import_node_taglib_sharp = __toESM(require_dist(), 1);
+// src/model/database.js
 import { randomUUID } from "node:crypto";
-import { closeSync, fstatSync, openSync, readSync } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
-import_node_taglib_sharp.Id3v2Settings.useNumericGenres = false;
-var READ_STYLE = import_node_taglib_sharp.ReadStyle.None | import_node_taglib_sharp.ReadStyle.PictureLazy;
-var READ_WITH_PROPERTIES = import_node_taglib_sharp.ReadStyle.Average | import_node_taglib_sharp.ReadStyle.PictureLazy;
-var ADDED_TAG_TYPES = import_node_taglib_sharp.TagTypes.Id3v1 | import_node_taglib_sharp.TagTypes.Ape | import_node_taglib_sharp.TagTypes.MovieId | import_node_taglib_sharp.TagTypes.DivX;
-var ITUNES_MEAN = "com.apple.iTunes";
-var MUSICBRAINZ_UFID_OWNER = "http://musicbrainz.org";
-var AUDIO_EXTENSIONS = /* @__PURE__ */ new Set([".flac", ".mp3", ".m4a", ".mp4", ".ogg", ".oga", ".opus"]);
-var isAudioPath = (file) => AUDIO_EXTENSIONS.has(path.extname(file).toLowerCase());
-var text = (value) => value == null ? "" : String(value).trim();
-var texts = (value) => (Array.isArray(value) ? value : [value]).map(text).filter(Boolean);
-var positive = (value) => {
-  const number = Number(value);
-  return Number.isSafeInteger(number) && number > 0 ? number : 0;
-};
-var xiphOf = (file) => file.getTag(import_node_taglib_sharp.TagTypes.Xiph, false);
-var id3Of = (file) => file.getTag(import_node_taglib_sharp.TagTypes.Id3v2, false);
-var appleOf = (file) => file.getTag(import_node_taglib_sharp.TagTypes.Apple, false);
-function userTextFrames(id3, description) {
-  const wanted = description.toLowerCase();
-  return id3.getFramesByClassType(import_node_taglib_sharp.Id3v2FrameClassType.UserTextInformationFrame).filter((frame) => frame.description.toLowerCase() === wanted);
+
+// src/model/schema.js
+var migrations = [
+  {
+    version: 1,
+    sql: `
+CREATE TABLE entity (
+ id TEXT PRIMARY KEY, kind TEXT NOT NULL CHECK(kind IN
+ ('person','ensemble','work','movement','collection','performance','recording','release')),
+ data TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(data)), revision INTEGER NOT NULL DEFAULT 1,
+ created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL, deleted_at INTEGER
+);
+CREATE TABLE relation (
+ id TEXT PRIMARY KEY, kind TEXT NOT NULL, source_id TEXT NOT NULL REFERENCES entity(id),
+ target_id TEXT NOT NULL REFERENCES entity(id), position INTEGER NOT NULL DEFAULT 1 CHECK(position>0),
+ occurrence INTEGER NOT NULL DEFAULT 1 CHECK(occurrence>0), data TEXT NOT NULL CHECK(json_valid(data)),
+ UNIQUE(kind,source_id,target_id,occurrence), UNIQUE(kind,source_id,position)
+);
+CREATE TABLE credit (
+ id TEXT PRIMARY KEY, target_id TEXT NOT NULL REFERENCES entity(id),
+ contributor_id TEXT NOT NULL REFERENCES entity(id), role TEXT NOT NULL,
+ instrument TEXT, position INTEGER NOT NULL CHECK(position>0), assertion_id TEXT REFERENCES assertion(id),
+ UNIQUE(target_id,contributor_id,role,instrument)
+);
+CREATE TABLE external_identity (
+ entity_id TEXT NOT NULL REFERENCES entity(id), provider TEXT NOT NULL, record_kind TEXT NOT NULL,
+ record_id TEXT NOT NULL, state TEXT NOT NULL CHECK(state IN ('active','stale','deleted','conflict')),
+ evidence TEXT NOT NULL CHECK(json_valid(evidence)), PRIMARY KEY(entity_id,provider,record_kind,record_id)
+);
+CREATE UNIQUE INDEX external_identity_active ON external_identity(provider,record_kind,record_id) WHERE state='active';
+CREATE TABLE alias (
+ id TEXT PRIMARY KEY, entity_id TEXT NOT NULL REFERENCES entity(id), text TEXT NOT NULL,
+ normalized TEXT NOT NULL, language TEXT, kind TEXT NOT NULL, assertion_id TEXT REFERENCES assertion(id)
+);
+CREATE TABLE catalogue_number (
+ id TEXT PRIMARY KEY, entity_id TEXT NOT NULL REFERENCES entity(id), system TEXT NOT NULL,
+ display TEXT NOT NULL, normalized TEXT NOT NULL, assertion_id TEXT REFERENCES assertion(id)
+);
+CREATE TABLE core_instance (id TEXT PRIMARY KEY, epoch TEXT NOT NULL, generation INTEGER NOT NULL DEFAULT 0);
+CREATE TABLE track_link (
+ id TEXT PRIMARY KEY, instance_id TEXT NOT NULL REFERENCES core_instance(id), core_id TEXT NOT NULL,
+ file_id TEXT NOT NULL, state TEXT NOT NULL CHECK(state IN ('active','missing','review')),
+ evidence TEXT NOT NULL CHECK(json_valid(evidence)), revision INTEGER NOT NULL DEFAULT 1,
+ created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL
+);
+CREATE INDEX track_instance ON track_link(instance_id);
+CREATE INDEX track_path ON track_link(json_extract(evidence,'$.path'));
+CREATE INDEX track_read_path ON track_link(json_extract(evidence,'$.readPath'));
+CREATE INDEX track_real_path ON track_link(json_extract(evidence,'$.observedRealPath'));
+CREATE UNIQUE INDEX track_active ON track_link(instance_id,core_id,file_id) WHERE state='active';
+CREATE TABLE track_evidence (
+ id INTEGER PRIMARY KEY, track_link_id TEXT NOT NULL REFERENCES track_link(id), generation INTEGER NOT NULL,
+ evidence TEXT NOT NULL CHECK(json_valid(evidence)), observed_at INTEGER NOT NULL
+);
+CREATE TABLE release_item (
+ id TEXT PRIMARY KEY, release_id TEXT NOT NULL REFERENCES entity(id), disc INTEGER NOT NULL CHECK(disc>0),
+ position INTEGER NOT NULL CHECK(position>0), UNIQUE(release_id,disc,position)
+);
+CREATE TABLE release_item_recording (
+ item_id TEXT NOT NULL REFERENCES release_item(id), recording_id TEXT NOT NULL REFERENCES entity(id),
+ occurrence INTEGER NOT NULL CHECK(occurrence>0), start_ms INTEGER NOT NULL CHECK(start_ms>=0),
+ end_ms INTEGER CHECK(end_ms>start_ms), PRIMARY KEY(item_id,recording_id,occurrence)
+);
+CREATE TABLE track_release_item (
+ track_link_id TEXT NOT NULL REFERENCES track_link(id), item_id TEXT NOT NULL REFERENCES release_item(id),
+ PRIMARY KEY(track_link_id,item_id)
+);
+CREATE TABLE recording_content (
+ id TEXT PRIMARY KEY, recording_id TEXT NOT NULL REFERENCES entity(id),
+ performance_work_id TEXT NOT NULL REFERENCES relation(id), movement_id TEXT REFERENCES entity(id),
+ position INTEGER NOT NULL CHECK(position>0), start_ms INTEGER NOT NULL CHECK(start_ms>=0),
+ end_ms INTEGER CHECK(end_ms>start_ms), UNIQUE(recording_id,position)
+);
+CREATE TABLE segment (
+ id TEXT PRIMARY KEY, track_link_id TEXT NOT NULL REFERENCES track_link(id), start_ms INTEGER NOT NULL CHECK(start_ms>=0),
+ end_ms INTEGER CHECK(end_ms>start_ms), kind TEXT NOT NULL CHECK(kind IN ('whole','range')),
+ CHECK(kind='whole' OR end_ms IS NOT NULL)
+);
+CREATE TABLE segment_content (
+ segment_id TEXT NOT NULL REFERENCES segment(id), content_id TEXT NOT NULL REFERENCES recording_content(id),
+ occurrence INTEGER NOT NULL CHECK(occurrence>0), PRIMARY KEY(segment_id,content_id,occurrence)
+);
+CREATE TABLE realization (
+ id TEXT PRIMARY KEY, work_id TEXT NOT NULL REFERENCES entity(id), performance_work_id TEXT NOT NULL REFERENCES relation(id),
+ label TEXT
+);
+CREATE TABLE realization_item (
+ id TEXT PRIMARY KEY, realization_id TEXT NOT NULL REFERENCES realization(id), movement_id TEXT REFERENCES entity(id),
+ segment_id TEXT NOT NULL REFERENCES segment(id), sequence INTEGER NOT NULL CHECK(sequence>0),
+ occurrence INTEGER NOT NULL CHECK(occurrence>0), UNIQUE(realization_id,sequence)
+);
+CREATE TABLE metadata_target (
+ id TEXT PRIMARY KEY, entity_id TEXT UNIQUE REFERENCES entity(id), track_link_id TEXT UNIQUE REFERENCES track_link(id),
+ album_ref TEXT UNIQUE, CHECK((entity_id IS NOT NULL)+(track_link_id IS NOT NULL)+(album_ref IS NOT NULL)=1)
+);
+CREATE TABLE field_definition (key TEXT PRIMARY KEY, type TEXT NOT NULL CHECK(type IN ('string','number','array','object','boolean')));
+INSERT INTO field_definition VALUES
+ ('title','string'),('name','string'),('nickname','string'),('description','string'),('date','string'),
+ ('period','string'),('form','string'),('key','string'),('catalogue','array'),('instrumentation','array'),
+ ('artistDisplay','string'),('movementNumber','string'),('tempo','string'),('aliases','array');
+CREATE TABLE assertion (
+ id TEXT PRIMARY KEY, target_id TEXT NOT NULL REFERENCES metadata_target(id), field TEXT NOT NULL REFERENCES field_definition(key),
+ value TEXT NOT NULL CHECK(json_valid(value)), source TEXT NOT NULL CHECK(source IN ('manual','provider','derived')),
+ provider TEXT, record_id TEXT, state TEXT NOT NULL CHECK(state IN ('active','stale','deleted','conflict','superseded')),
+ confidence REAL CHECK(confidence BETWEEN 0 AND 1), actor TEXT, updated_at INTEGER NOT NULL,
+ prior_id TEXT REFERENCES assertion(id), CHECK(source!='provider' OR (provider IS NOT NULL AND record_id IS NOT NULL))
+);
+CREATE INDEX assertion_field ON assertion(target_id,field,updated_at);
+CREATE TABLE pinned_override (
+ target_id TEXT NOT NULL REFERENCES metadata_target(id), field TEXT NOT NULL REFERENCES field_definition(key),
+ assertion_id TEXT NOT NULL REFERENCES assertion(id), actor TEXT NOT NULL, updated_at INTEGER NOT NULL,
+ PRIMARY KEY(target_id,field)
+);
+CREATE TABLE field_resolution (
+ target_id TEXT NOT NULL REFERENCES metadata_target(id), field TEXT NOT NULL REFERENCES field_definition(key),
+ assertion_id TEXT NOT NULL REFERENCES assertion(id), PRIMARY KEY(target_id,field)
+);
+CREATE TABLE provider_record (
+ provider TEXT NOT NULL, record_id TEXT NOT NULL, target_id TEXT NOT NULL REFERENCES metadata_target(id),
+ state TEXT NOT NULL, updated_at INTEGER NOT NULL, PRIMARY KEY(provider,record_id,target_id)
+);
+CREATE TABLE classification (
+ target_id TEXT PRIMARY KEY REFERENCES metadata_target(id), state TEXT NOT NULL CHECK(state IN ('classical','not_classical','unsure')),
+ pinned INTEGER NOT NULL CHECK(pinned IN (0,1)), score INTEGER NOT NULL, evidence TEXT NOT NULL CHECK(json_valid(evidence)),
+ rule_version INTEGER NOT NULL, updated_at INTEGER NOT NULL
+);
+CREATE TABLE review_item (
+ id TEXT PRIMARY KEY, kind TEXT NOT NULL, target_id TEXT NOT NULL, evidence TEXT NOT NULL CHECK(json_valid(evidence)),
+ status TEXT NOT NULL DEFAULT 'open' CHECK(status IN ('open','resolved')), created_at INTEGER NOT NULL
+);
+CREATE UNIQUE INDEX review_open ON review_item(kind,target_id) WHERE status='open';
+CREATE TABLE audit_event (
+ id INTEGER PRIMARY KEY, actor TEXT, action TEXT NOT NULL, target_id TEXT NOT NULL,
+ data TEXT NOT NULL CHECK(json_valid(data)), created_at INTEGER NOT NULL
+);
+CREATE TABLE model_job (
+ id TEXT PRIMARY KEY, type TEXT NOT NULL, key TEXT NOT NULL, input TEXT NOT NULL CHECK(json_valid(input)),
+ state TEXT NOT NULL CHECK(state IN ('queued','running','retry','done','failed','cancelled')),
+ progress TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(progress)), owner TEXT, lease_until INTEGER NOT NULL DEFAULT 0,
+ generation INTEGER NOT NULL DEFAULT 0, attempt INTEGER NOT NULL DEFAULT 0, max_attempts INTEGER NOT NULL,
+ next_run_at INTEGER NOT NULL DEFAULT 0, cancel_requested INTEGER NOT NULL DEFAULT 0, error TEXT, created_at INTEGER NOT NULL
+);
+CREATE UNIQUE INDEX job_active ON model_job(key) WHERE state IN ('queued','running','retry');
+`
+  },
+  {
+    version: 2,
+    sql: `
+CREATE TABLE user_work_state (
+ user_id INTEGER NOT NULL CHECK(user_id>0), work_id TEXT NOT NULL REFERENCES entity(id),
+ favourite INTEGER NOT NULL DEFAULT 0 CHECK(favourite IN (0,1)), picked_realization_id TEXT REFERENCES realization(id),
+ updated_at INTEGER NOT NULL, PRIMARY KEY(user_id,work_id)
+);
+CREATE TABLE admin_work_pick (
+ work_id TEXT PRIMARY KEY REFERENCES entity(id), realization_id TEXT NOT NULL REFERENCES realization(id),
+ actor_id INTEGER NOT NULL CHECK(actor_id>0), updated_at INTEGER NOT NULL
+);
+`
+  },
+  {
+    // Album and work pages look up one album's tracks and walk from tracks
+    // to realizations; without these each view scans the whole catalogue.
+    version: 3,
+    sql: `
+CREATE INDEX track_album ON track_link(CAST(json_extract(evidence,'$.albumId') AS TEXT));
+CREATE INDEX segment_track ON segment(track_link_id);
+CREATE INDEX realization_item_segment ON realization_item(segment_id);
+CREATE INDEX relation_target ON relation(kind,target_id);
+CREATE INDEX realization_work ON realization(work_id);
+`
+  },
+  {
+    // v0.2. The search index is derived from the catalogue and rebuilt when
+    // the catalogue changes; dropping its tables loses nothing. change_set
+    // keeps what a merge or deletion removed, so it can be undone, and
+    // match_suppression keeps background matching from making a deleted
+    // work again before an admin says so.
+    version: 4,
+    sql: `
+CREATE TABLE search_doc (
+ id INTEGER PRIMARY KEY, kind TEXT NOT NULL, ref TEXT NOT NULL, work_id TEXT, title TEXT NOT NULL,
+ subtitle TEXT NOT NULL DEFAULT '', detail TEXT NOT NULL DEFAULT '', owned INTEGER NOT NULL DEFAULT 0,
+ boost REAL NOT NULL DEFAULT 0, data TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(data)), UNIQUE(kind,ref)
+);
+CREATE TABLE search_term (
+ term TEXT NOT NULL, doc INTEGER NOT NULL, field INTEGER NOT NULL, PRIMARY KEY(term,doc,field)
+) WITHOUT ROWID;
+CREATE TABLE search_key (key TEXT NOT NULL, doc INTEGER NOT NULL, PRIMARY KEY(key,doc)) WITHOUT ROWID;
+CREATE TABLE search_facet (
+ facet TEXT NOT NULL, value TEXT NOT NULL, doc INTEGER NOT NULL, label TEXT NOT NULL, PRIMARY KEY(facet,value,doc)
+) WITHOUT ROWID;
+CREATE INDEX search_facet_doc ON search_facet(doc);
+CREATE TABLE search_state (id INTEGER PRIMARY KEY CHECK(id=1), stamp TEXT NOT NULL, built_at INTEGER NOT NULL, docs INTEGER NOT NULL);
+CREATE TABLE change_set (
+ id TEXT PRIMARY KEY, kind TEXT NOT NULL, actor TEXT, summary TEXT NOT NULL,
+ data TEXT NOT NULL CHECK(json_valid(data)), created_at INTEGER NOT NULL, undone_at INTEGER
+);
+CREATE TABLE match_suppression (
+ key TEXT PRIMARY KEY, title TEXT NOT NULL, reason TEXT NOT NULL, actor TEXT, created_at INTEGER NOT NULL
+);
+`
+  },
+  {
+    // v0.3: contributor identity. Additive only; existing credits read as
+    // manual and active, and nothing existing is rewritten.
+    version: 5,
+    sql: `
+ALTER TABLE credit ADD COLUMN source TEXT NOT NULL DEFAULT 'manual' CHECK(source IN ('manual','derived','provider'));
+ALTER TABLE credit ADD COLUMN state TEXT NOT NULL DEFAULT 'active' CHECK(state IN ('active','removed'));
+CREATE INDEX credit_contributor ON credit(contributor_id);
+CREATE INDEX credit_target ON credit(target_id);
+INSERT INTO field_definition VALUES ('sortName','string'),('location','string'),('instruments','array'),('recordingDate','string');
+CREATE TABLE user_recording_state (
+ user_id INTEGER NOT NULL CHECK(user_id>0), performance_id TEXT NOT NULL REFERENCES entity(id),
+ favourite INTEGER NOT NULL DEFAULT 0 CHECK(favourite IN (0,1)), updated_at INTEGER NOT NULL,
+ PRIMARY KEY(user_id,performance_id)
+);
+CREATE TABLE saved_queue (
+ id TEXT PRIMARY KEY, user_id INTEGER NOT NULL CHECK(user_id>0), name TEXT NOT NULL,
+ work_id TEXT REFERENCES entity(id), items TEXT NOT NULL CHECK(json_valid(items)), created_at INTEGER NOT NULL
+);
+CREATE INDEX saved_queue_user ON saved_queue(user_id);
+CREATE TABLE tag_backup (
+ id TEXT PRIMARY KEY, track_link_id TEXT NOT NULL REFERENCES track_link(id), path TEXT NOT NULL, fingerprint TEXT,
+ tags TEXT NOT NULL CHECK(json_valid(tags)), written TEXT NOT NULL CHECK(json_valid(written)), run_id TEXT NOT NULL,
+ actor TEXT NOT NULL, created_at INTEGER NOT NULL, restored_at INTEGER
+);
+CREATE INDEX tag_backup_track ON tag_backup(track_link_id);
+ALTER TABLE search_doc ADD COLUMN sort_title TEXT NOT NULL DEFAULT '';
+ALTER TABLE search_doc ADD COLUMN sort_key TEXT NOT NULL DEFAULT '';
+ALTER TABLE search_doc ADD COLUMN sort_date TEXT NOT NULL DEFAULT '';
+CREATE INDEX search_doc_sort_title ON search_doc(kind,sort_title);
+`
+  }
+];
+
+// src/model/database.js
+var SCHEMA_VERSION = 5;
+function validateDatabase(db) {
+  if (db.prepare("PRAGMA integrity_check").get().integrity_check !== "ok" || db.prepare("PRAGMA foreign_key_check").all().length)
+    throw new Error("Classical database integrity check failed");
 }
-function textField(xiphName, id3Description, apple) {
-  const box = apple.box ? import_node_taglib_sharp.ByteVector.fromString(apple.box, import_node_taglib_sharp.StringType.Latin1) : null;
-  return {
-    read(file) {
-      const xiph = xiphOf(file);
-      const id3 = id3Of(file);
-      const appleTag = appleOf(file);
-      for (const values of [
-        xiph?.getField(xiphName),
-        id3 && userTextFrames(id3, id3Description).flatMap((frame) => frame.text || []),
-        appleTag && (box ? appleTag.getQuickTimeStrings(box) : appleTag.getItunesStrings(ITUNES_MEAN, apple.name))
-      ]) {
-        const found = texts(values ?? []);
-        if (found.length) return found;
+async function backupDatabase(db, destination) {
+  const { backup } = await import("node:sqlite");
+  await fs.mkdir(path.dirname(destination), { recursive: true });
+  const temporary = `${destination}.${randomUUID()}.tmp`;
+  try {
+    await backup(db, temporary);
+    const { DatabaseSync } = await import("node:sqlite");
+    const check = new DatabaseSync(temporary, { readOnly: true });
+    try {
+      validateDatabase(check);
+    } finally {
+      check.close();
+    }
+    await fs.rename(temporary, destination);
+  } finally {
+    for (const file of [temporary, `${temporary}-wal`, `${temporary}-shm`]) await fs.rm(file, { force: true });
+  }
+  return destination;
+}
+var verified = /* @__PURE__ */ new Set();
+function verifyOnce(db, filename) {
+  if (verified.has(filename)) return;
+  validateDatabase(db);
+  verified.add(filename);
+}
+var LOCK_POLL_MS = 200;
+var LOCK_STALE_MS = 6 * 3600 * 1e3;
+var BACKUP_HEADROOM = 64 * 1024 * 1024;
+var alive = (pid) => {
+  if (!Number.isSafeInteger(pid) || pid <= 0) return false;
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (error) {
+    return error.code === "EPERM";
+  }
+};
+async function staleLock(lockFile) {
+  try {
+    const [text5, stat] = await Promise.all([fs.readFile(lockFile, "utf8"), fs.stat(lockFile)]);
+    if (Date.now() - stat.mtimeMs > LOCK_STALE_MS) return text5;
+    return alive(Number(JSON.parse(text5).pid)) ? null : text5;
+  } catch (error) {
+    if (error.code === "ENOENT" || error instanceof SyntaxError) return null;
+    throw error;
+  }
+}
+async function clearStaleLock(lockFile, stale, token) {
+  const aside = `${lockFile}.stale.${token}`;
+  try {
+    await fs.rename(lockFile, aside);
+  } catch (error) {
+    if (error.code === "ENOENT") return;
+    throw error;
+  }
+  try {
+    if (await fs.readFile(aside, "utf8") !== stale) await fs.link(aside, lockFile).catch(() => {
+    });
+  } finally {
+    await fs.rm(aside, { force: true });
+  }
+}
+async function acquireUpgradeLock(folder2, timeoutMs) {
+  const lockFile = path.join(folder2, "upgrade.lock");
+  const token = randomUUID();
+  const deadline = Date.now() + timeoutMs;
+  for (; ; ) {
+    const staged = `${lockFile}.${token}`;
+    await fs.writeFile(staged, JSON.stringify({ pid: process.pid, token, at: Date.now() }));
+    try {
+      await fs.link(staged, lockFile);
+      await fs.rm(staged, { force: true });
+      return async () => {
+        try {
+          if (JSON.parse(await fs.readFile(lockFile, "utf8")).token === token) await fs.rm(lockFile, { force: true });
+        } catch {
+        }
+      };
+    } catch (error) {
+      await fs.rm(staged, { force: true });
+      if (error.code !== "EEXIST") throw error;
+    }
+    const stale = await staleLock(lockFile);
+    if (stale !== null) {
+      await clearStaleLock(lockFile, stale, token);
+      continue;
+    }
+    if (Date.now() > deadline)
+      throw new Error("The classical database is being upgraded by another process; try again when it finishes");
+    await new Promise((resolve) => setTimeout(resolve, LOCK_POLL_MS));
+  }
+}
+var mib = (bytes) => `${Math.ceil(bytes / 1024 / 1024).toLocaleString("en-US")} MB`;
+async function ensureBackupSpace(db, directory, statfs = fs.statfs) {
+  const { page_count: pages } = db.prepare("PRAGMA page_count").get();
+  const { page_size: pageSize } = db.prepare("PRAGMA page_size").get();
+  const needed = pages * pageSize + BACKUP_HEADROOM;
+  await fs.mkdir(directory, { recursive: true });
+  const disk = await statfs(directory);
+  const free = Number(disk.bavail) * Number(disk.bsize);
+  if (free < needed)
+    throw new Error(
+      `Not enough disk space to back up the classical database before upgrading: ${mib(needed)} needed, ${mib(free)} free in ${directory}`
+    );
+}
+async function openDatabase(folder2, { migrations: migrations2 = migrations, maxVersion = SCHEMA_VERSION, lockTimeoutMs = 30 * 60 * 1e3, statfs } = {}) {
+  const { DatabaseSync } = await import("node:sqlite");
+  await fs.mkdir(folder2, { recursive: true });
+  const filename = path.join(folder2, "classical.sqlite");
+  const db = new DatabaseSync(filename);
+  const versionOf = () => db.prepare("PRAGMA user_version").get().user_version;
+  const pending = (version2) => migrations2.filter((migration) => migration.version > version2 && migration.version <= maxVersion);
+  try {
+    db.exec("PRAGMA busy_timeout=5000; PRAGMA foreign_keys=ON");
+    let version2 = versionOf();
+    if (version2 > maxVersion)
+      throw new Error(
+        `Classical schema ${version2} is newer than supported ${maxVersion}; restore a compatible backup`
+      );
+    if (pending(version2).length) {
+      const release = await acquireUpgradeLock(folder2, lockTimeoutMs);
+      try {
+        version2 = versionOf();
+        if (version2 > maxVersion)
+          throw new Error(
+            `Classical schema ${version2} is newer than supported ${maxVersion}; restore a compatible backup`
+          );
+        const steps = pending(version2);
+        if (steps.length) {
+          db.exec("PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL");
+          const backups = path.join(folder2, "backups");
+          await ensureBackupSpace(db, backups, statfs);
+          await backupDatabase(db, path.join(backups, `before-v${steps[0].version}-${randomUUID()}.sqlite`));
+          for (const migration of steps) {
+            db.exec("BEGIN IMMEDIATE");
+            try {
+              version2 = versionOf();
+              if (version2 < migration.version) {
+                if (migration.version !== version2 + 1)
+                  throw new Error("Non-contiguous classical migration");
+                db.exec(migration.sql);
+                db.exec(
+                  "CREATE TABLE IF NOT EXISTS migration_journal(version INTEGER PRIMARY KEY, applied_at INTEGER NOT NULL)"
+                );
+                db.prepare("INSERT INTO migration_journal VALUES (?,?)").run(
+                  migration.version,
+                  Date.now()
+                );
+                db.exec(`PRAGMA user_version=${migration.version}`);
+                validateDatabase(db);
+              }
+              db.exec("COMMIT");
+              version2 = versionOf();
+            } catch (error) {
+              db.exec("ROLLBACK");
+              throw error;
+            }
+          }
+        }
+      } finally {
+        await release();
       }
-      return [];
-    },
-    write(file, values) {
-      const xiph = xiphOf(file);
-      if (xiph) xiph.setFieldAsStrings(xiphName, ...values);
-      const appleTag = appleOf(file);
-      if (appleTag) {
-        if (box) appleTag.setQuickTimeStrings(box, values);
-        else appleTag.setItunesStrings(ITUNES_MEAN, apple.name, ...values);
+    }
+    db.exec("PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL");
+    if (version2 !== maxVersion)
+      throw new Error(`Missing migration to classical schema ${maxVersion}`);
+    return { db, filename };
+  } catch (error) {
+    db.close();
+    throw error;
+  }
+}
+var activeTransactions = /* @__PURE__ */ new WeakSet();
+function transaction(db, run) {
+  const nested = activeTransactions.has(db);
+  const savepoint = `nested_${randomUUID().replaceAll("-", "")}`;
+  db.exec(nested ? `SAVEPOINT ${savepoint}` : "BEGIN IMMEDIATE");
+  if (!nested) activeTransactions.add(db);
+  try {
+    const result = run();
+    if (result && typeof result.then === "function")
+      throw new Error("No asynchronous work inside classical transactions");
+    db.exec(nested ? `RELEASE ${savepoint}` : "COMMIT");
+    return result;
+  } catch (error) {
+    db.exec(
+      nested ? `ROLLBACK TO ${savepoint}; RELEASE ${savepoint}` : "ROLLBACK"
+    );
+    throw error;
+  } finally {
+    if (!nested) activeTransactions.delete(db);
+  }
+}
+
+// src/model/catalogue.js
+var kinds = /* @__PURE__ */ new Set([
+  "person",
+  "ensemble",
+  "work",
+  "movement",
+  "collection",
+  "performance",
+  "recording",
+  "release"
+]);
+var CREDIT_ROLES = [
+  "composer",
+  "soloist",
+  "performer",
+  "accompanist",
+  "conductor",
+  "orchestra",
+  "ensemble",
+  "choir",
+  "arranger",
+  "lyricist"
+];
+var roles = new Set(CREDIT_ROLES);
+var CREDIT_SOURCES = /* @__PURE__ */ new Set(["manual", "derived", "provider"]);
+var PERSON_ROLES = /* @__PURE__ */ new Set(["composer", "soloist", "accompanist", "conductor", "arranger", "lyricist"]);
+var ENSEMBLE_ROLES = /* @__PURE__ */ new Set(["orchestra", "ensemble", "choir"]);
+var relations = {
+  movement: [["work"], ["movement"]],
+  collection_member: [["collection"], ["work", "collection"]],
+  performance_work: [["performance"], ["work"]],
+  recording_performance: [["recording"], ["performance"]],
+  work_relation: [["work"], ["work"]],
+  // v0.3: one performance on several releases; a person in an ensemble.
+  same_recording: [["performance"], ["performance"]],
+  member_of: [["person"], ["ensemble"]],
+  recording_relation: [["recording"], ["recording"]]
+};
+var json = (value) => JSON.stringify(value);
+var parse = (row) => row && { ...row, data: JSON.parse(row.data) };
+var positive = (value) => Number.isSafeInteger(value) && value > 0;
+var range = (start, end) => Number.isSafeInteger(start) && start >= 0 && (end === null || Number.isSafeInteger(end) && end > start);
+var Catalogue = class {
+  constructor(db, filename) {
+    this.db = db;
+    this.filename = filename;
+  }
+  close() {
+    this.db.close();
+  }
+  backup(destination) {
+    return backupDatabase(this.db, destination);
+  }
+  audit(action, target, data = {}, actor2 = null) {
+    this.db.prepare(
+      "INSERT INTO audit_event(actor,action,target_id,data,created_at) VALUES (?,?,?,?,?)"
+    ).run(actor2, action, target, json(data), Date.now());
+  }
+  review(kind, target, evidence) {
+    if (kind === "auto_match" && Array.isArray(evidence?.tracks)) {
+      const tracks = JSON.stringify([...evidence.tracks].sort());
+      const settled = this.db.prepare("SELECT evidence FROM review_item WHERE kind=? AND target_id=? AND status='resolved'").all(kind, target).some((row) => {
+        const prior = JSON.parse(row.evidence);
+        return prior.reason === evidence.reason && Array.isArray(prior.tracks) && JSON.stringify([...prior.tracks].sort()) === tracks;
+      });
+      if (settled) return false;
+    }
+    this.db.prepare(
+      `INSERT INTO review_item VALUES (?,?,?,?, 'open',?)
+      ON CONFLICT(kind,target_id) WHERE status='open' DO UPDATE SET evidence=excluded.evidence`
+    ).run(randomUUID2(), kind, target, json(evidence), Date.now());
+  }
+  // One open review per entry can carry several findings (each conflicting
+  // field, each omitted field): add this one under its key instead of
+  // replacing the ones already waiting.
+  reviewEntry(kind, target, key, entry) {
+    const open = this.db.prepare("SELECT evidence FROM review_item WHERE kind=? AND target_id=? AND status='open'").get(kind, target);
+    const prior = open ? JSON.parse(open.evidence) : {};
+    const entries = { ...prior.entries || {}, [key]: entry };
+    this.review(kind, target, { ...entry, entries });
+  }
+  entity(id, expected) {
+    const row = parse(
+      this.db.prepare("SELECT * FROM entity WHERE id=? AND deleted_at IS NULL").get(id)
+    );
+    if (!row || expected && ![].concat(expected).includes(row.kind))
+      throw new Error("Missing entity or wrong entity kind");
+    return row;
+  }
+  createEntity(kind, data = {}) {
+    if (!kinds.has(kind) || !data || Array.isArray(data) || typeof data !== "object")
+      throw new Error("Invalid entity");
+    if (data.durationMs != null && !positive(data.durationMs))
+      throw new Error("Invalid entity duration");
+    if (data.date != null && (typeof data.date !== "string" || !/^\d{4}(-(?:0[1-9]|1[0-2])(-(?:0[1-9]|[12]\d|3[01]))?)?$/.test(
+      data.date
+    )))
+      throw new Error("Use a partial ISO date, without invented precision");
+    return transaction(this.db, () => {
+      const id = randomUUID2(), now = Date.now();
+      this.db.prepare(
+        "INSERT INTO entity(id,kind,data,created_at,updated_at) VALUES (?,?,?,?,?)"
+      ).run(id, kind, json(data), now, now);
+      this.db.prepare("INSERT INTO metadata_target(id,entity_id) VALUES (?,?)").run(id, id);
+      this.audit("entity.create", id, { kind });
+      return id;
+    });
+  }
+  relate(kind, source, target, { position = 1, occurrence = 1, ...data } = {}) {
+    return transaction(this.db, () => {
+      const rule = relations[kind];
+      if (!rule || !positive(position) || !positive(occurrence) || source === target)
+        throw new Error("Invalid relation");
+      this.entity(source, rule[0]);
+      this.entity(target, rule[1]);
+      if (kind === "movement" && this.db.prepare(
+        "SELECT 1 FROM relation WHERE kind='movement' AND target_id=?"
+      ).get(target))
+        throw new Error("Movement already belongs to a work");
+      if (kind === "collection_member" && this.db.prepare(
+        `WITH RECURSIVE descendants(id) AS
+        (SELECT ? UNION SELECT r.target_id FROM relation r JOIN descendants d ON r.source_id=d.id
+         WHERE r.kind='collection_member') SELECT 1 FROM descendants WHERE id=?`
+      ).get(target, source))
+        throw new Error("Collection cycle");
+      const id = randomUUID2();
+      this.db.prepare("INSERT INTO relation VALUES (?,?,?,?,?,?,?)").run(id, kind, source, target, position, occurrence, json(data));
+      this.audit("relation.create", id, { kind, source, target });
+      return id;
+    });
+  }
+  // A credit's source says who made it: an admin (`manual`), a scan from tags
+  // (`derived`) or a provider. A credit removed earlier for the same target,
+  // contributor, role and instrument comes back as this one.
+  credit(target, contributor, role, { instrument = null, position = 1, assertionId = null, source = "manual" } = {}) {
+    return transaction(this.db, () => {
+      this.entity(target);
+      const person = this.entity(contributor, ["person", "ensemble"]);
+      if (!roles.has(role) || !positive(position) || PERSON_ROLES.has(role) && person.kind !== "person" || ENSEMBLE_ROLES.has(role) && person.kind !== "ensemble")
+        throw new Error("Invalid role/contributor");
+      if (!CREDIT_SOURCES.has(source)) throw new Error("Invalid credit source");
+      if (assertionId) {
+        const assertion = this.db.prepare("SELECT target_id FROM assertion WHERE id=?").get(assertionId);
+        if (assertion?.target_id !== target)
+          throw new Error("Credit provenance target mismatch");
       }
-      const id3 = id3Of(file);
-      if (id3) {
-        for (const frame of userTextFrames(id3, id3Description)) id3.removeFrame(frame);
-        if (values.length) {
-          const frame = import_node_taglib_sharp.Id3v2UserTextInformationFrame.fromDescription(id3Description);
-          frame.text = values;
-          id3.addFrame(frame);
+      const removed = this.db.prepare("SELECT id FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ? AND state='removed'").get(target, contributor, role, instrument);
+      if (removed) {
+        this.db.prepare("UPDATE credit SET state='active',source=?,position=?,assertion_id=? WHERE id=?").run(source, position, assertionId, removed.id);
+        return removed.id;
+      }
+      const id = randomUUID2();
+      this.db.prepare("INSERT INTO credit(id,target_id,contributor_id,role,instrument,position,assertion_id,source) VALUES (?,?,?,?,?,?,?,?)").run(id, target, contributor, role, instrument, position, assertionId, source);
+      return id;
+    });
+  }
+  // A derived credit an admin removes stays as removed, so a later scan does
+  // not derive it again; any other credit is deleted.
+  removeCredit(id) {
+    return transaction(this.db, () => {
+      const credit = this.db.prepare("SELECT source,state FROM credit WHERE id=?").get(id);
+      if (!credit || credit.state !== "active") throw new Error("Unknown credit");
+      if (credit.source === "derived") this.db.prepare("UPDATE credit SET state='removed' WHERE id=?").run(id);
+      else this.db.prepare("DELETE FROM credit WHERE id=?").run(id);
+    });
+  }
+  externalIdentity(entity, provider, recordKind, recordId, { confidence = 1, threshold = 0.95, evidence = {} } = {}) {
+    return transaction(this.db, () => {
+      this.entity(entity);
+      if (!provider || !recordKind || !recordId || !Number.isFinite(confidence) || confidence < 0 || confidence > 1 || !Number.isFinite(threshold) || threshold < 0.95 || threshold > 1)
+        throw new Error("Invalid provider identity");
+      const existing = this.db.prepare(
+        `SELECT entity_id FROM external_identity WHERE provider=? AND record_kind=? AND record_id=? AND state='active'`
+      ).get(provider, recordKind, recordId);
+      if (confidence < threshold || existing && existing.entity_id !== entity) {
+        this.review("identity", entity, {
+          provider,
+          recordKind,
+          recordId,
+          confidence,
+          evidence
+        });
+        return false;
+      }
+      this.db.prepare(
+        `INSERT INTO external_identity VALUES (?,?,?,?,'active',?)
+        ON CONFLICT(entity_id,provider,record_kind,record_id) DO UPDATE SET state='active',evidence=excluded.evidence`
+      ).run(entity, provider, recordKind, recordId, json(evidence));
+      return true;
+    });
+  }
+  releaseItem(release, { disc = 1, position }) {
+    this.entity(release, "release");
+    if (!positive(disc) || !positive(position))
+      throw new Error("Invalid release placement");
+    const id = randomUUID2();
+    this.db.prepare("INSERT INTO release_item VALUES (?,?,?,?)").run(id, release, disc, position);
+    return id;
+  }
+  attachRecording(item, recording, { occurrence = 1, startMs = 0, endMs = null } = {}) {
+    this.entity(recording, "recording");
+    if (!positive(occurrence) || !range(startMs, endMs))
+      throw new Error("Invalid recording range");
+    this.db.prepare("INSERT INTO release_item_recording VALUES (?,?,?,?,?)").run(item, recording, occurrence, startMs, endMs);
+  }
+  attachTrack(track, item) {
+    this.db.prepare("INSERT INTO track_release_item VALUES (?,?)").run(track, item);
+  }
+  performanceWork(id) {
+    const row = this.db.prepare("SELECT * FROM relation WHERE id=? AND kind='performance_work'").get(id);
+    if (!row) throw new Error("Missing performance/work");
+    return row;
+  }
+  checkMovement(work, movement) {
+    if (movement !== null && !this.db.prepare(
+      "SELECT 1 FROM relation WHERE kind='movement' AND source_id=? AND target_id=?"
+    ).get(work, movement))
+      throw new Error("Movement belongs to a different work");
+  }
+  recordingContent(recording, performanceWork, { movement = null, position = 1, startMs = 0, endMs = null } = {}) {
+    return transaction(this.db, () => {
+      this.entity(recording, "recording");
+      const pw = this.performanceWork(performanceWork);
+      this.checkMovement(pw.target_id, movement);
+      if (!this.db.prepare(
+        "SELECT 1 FROM relation WHERE kind='recording_performance' AND source_id=? AND target_id=?"
+      ).get(recording, pw.source_id))
+        throw new Error("Recording does not capture this performance");
+      const duration = this.entity(recording).data.durationMs;
+      if (!positive(position) || !range(startMs, endMs) || duration != null && (startMs >= duration || endMs > duration))
+        throw new Error("Invalid content range");
+      const id = randomUUID2();
+      this.db.prepare("INSERT INTO recording_content VALUES (?,?,?,?,?,?,?)").run(
+        id,
+        recording,
+        performanceWork,
+        movement,
+        position,
+        startMs,
+        endMs
+      );
+      return id;
+    });
+  }
+  segment(track, { startMs = 0, endMs = null, kind = "range" } = {}) {
+    return transaction(this.db, () => {
+      const row = this.db.prepare("SELECT evidence FROM track_link WHERE id=?").get(track);
+      if (!row) throw new Error("Missing track link");
+      const duration = JSON.parse(row.evidence).durationMs;
+      if (!range(startMs, endMs) || !["range", "whole"].includes(kind) || kind === "range" && endMs === null || kind === "whole" && startMs !== 0 || duration != null && (startMs >= duration || endMs > duration))
+        throw new Error("Invalid track range");
+      const id = randomUUID2();
+      this.db.prepare("INSERT INTO segment VALUES (?,?,?,?,?)").run(id, track, startMs, endMs, kind);
+      return id;
+    });
+  }
+  segmentContent(segment, content, occurrence = 1) {
+    if (!positive(occurrence)) throw new Error("Invalid occurrence");
+    this.db.prepare("INSERT INTO segment_content VALUES (?,?,?)").run(segment, content, occurrence);
+  }
+  realization(work, performanceWork, label = null) {
+    this.entity(work, "work");
+    if (this.performanceWork(performanceWork).target_id !== work)
+      throw new Error("Work/performance mismatch");
+    const id = randomUUID2();
+    this.db.prepare("INSERT INTO realization VALUES (?,?,?,?)").run(id, work, performanceWork, label);
+    return id;
+  }
+  realizationItem(realization, segment, {
+    movement = null,
+    sequence = 1,
+    occurrence = 1,
+    intentionalOverlap = false
+  } = {}) {
+    return transaction(this.db, () => {
+      const row = this.db.prepare("SELECT * FROM realization WHERE id=?").get(realization);
+      if (!row || !positive(sequence) || !positive(occurrence))
+        throw new Error("Invalid realization item");
+      this.checkMovement(row.work_id, movement);
+      const content = this.db.prepare(
+        `SELECT c.* FROM segment_content s JOIN recording_content c ON c.id=s.content_id
+      WHERE s.segment_id=? AND c.performance_work_id=? AND c.movement_id IS ?`
+      ).all(segment, row.performance_work_id, movement);
+      if (!content.length)
+        throw new Error("Segment belongs to another interpretation/movement");
+      const repeated = this.db.prepare(
+        "SELECT 1 FROM realization_item WHERE realization_id=? AND movement_id IS ? AND occurrence=?"
+      ).get(realization, movement, occurrence);
+      if (repeated)
+        throw new Error("Repeated movement requires explicit new occurrence");
+      const audio = this.db.prepare("SELECT * FROM segment WHERE id=?").get(segment);
+      const overlaps = this.db.prepare(
+        `SELECT s.* FROM realization_item i JOIN segment s ON s.id=i.segment_id
+      WHERE i.realization_id=? AND s.track_link_id=? AND s.start_ms<coalesce(?,9223372036854775807)
+      AND coalesce(s.end_ms,9223372036854775807)>?`
+      ).all(realization, audio.track_link_id, audio.end_ms, audio.start_ms);
+      if (overlaps.length && !intentionalOverlap)
+        throw new Error(
+          "Overlapping playback requires explicit artistic occurrence approval"
+        );
+      const id = randomUUID2();
+      this.db.prepare("INSERT INTO realization_item VALUES (?,?,?,?,?,?)").run(id, realization, movement, segment, sequence, occurrence);
+      return id;
+    });
+  }
+  // Remove one track attachment and everything that existed only for it: the
+  // segment and its content links, an emptied realization (and picks of it)
+  // and, with dropRecording, a per-track recording and its emptied performance.
+  // Leaving any of these behind kept the track "attached" for auto-match and
+  // kept the work and movement "in use".
+  detachItem(itemId, { dropRecording = false } = {}) {
+    return transaction(this.db, () => {
+      const db = this.db;
+      const item = db.prepare("SELECT * FROM realization_item WHERE id=?").get(itemId);
+      if (!item) return false;
+      db.prepare("DELETE FROM realization_item WHERE id=?").run(itemId);
+      const now = Date.now();
+      if (!db.prepare("SELECT 1 FROM realization_item WHERE segment_id=?").get(item.segment_id)) {
+        const contents = db.prepare(
+          `SELECT c.id,c.recording_id,c.performance_work_id FROM segment_content s
+             JOIN recording_content c ON c.id=s.content_id WHERE s.segment_id=?`
+        ).all(item.segment_id);
+        db.prepare("DELETE FROM segment_content WHERE segment_id=?").run(item.segment_id);
+        db.prepare("DELETE FROM segment WHERE id=?").run(item.segment_id);
+        for (const content of contents) {
+          if (db.prepare("SELECT 1 FROM segment_content WHERE content_id=?").get(content.id)) continue;
+          db.prepare("DELETE FROM recording_content WHERE id=?").run(content.id);
+          if (!dropRecording || db.prepare("SELECT 1 FROM recording_content WHERE recording_id=?").get(content.recording_id))
+            continue;
+          db.prepare("DELETE FROM relation WHERE kind='recording_performance' AND source_id=?").run(content.recording_id);
+          db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=? AND deleted_at IS NULL").run(now, now, content.recording_id);
         }
       }
-    }
+      if (!db.prepare("SELECT 1 FROM realization_item WHERE realization_id=?").get(item.realization_id)) {
+        const realization = db.prepare("SELECT * FROM realization WHERE id=?").get(item.realization_id);
+        db.prepare("UPDATE user_work_state SET picked_realization_id=NULL,updated_at=? WHERE picked_realization_id=?").run(now, realization.id);
+        db.prepare("DELETE FROM admin_work_pick WHERE realization_id=?").run(realization.id);
+        db.prepare("DELETE FROM realization WHERE id=?").run(realization.id);
+        const pw = db.prepare("SELECT * FROM relation WHERE id=?").get(realization.performance_work_id);
+        if (dropRecording && pw && !db.prepare("SELECT 1 FROM realization WHERE performance_work_id=?").get(pw.id) && !db.prepare("SELECT 1 FROM recording_content WHERE performance_work_id=?").get(pw.id) && !db.prepare("SELECT 1 FROM relation WHERE kind='recording_performance' AND target_id=?").get(pw.source_id)) {
+          db.prepare("DELETE FROM relation WHERE id=?").run(pw.id);
+          if (!db.prepare("SELECT 1 FROM relation WHERE source_id=? OR target_id=?").get(pw.source_id, pw.source_id)) {
+            db.prepare("DELETE FROM credit WHERE target_id=?").run(pw.source_id);
+            db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=? AND deleted_at IS NULL").run(now, now, pw.source_id);
+          }
+        }
+      }
+      return true;
+    });
+  }
+  alias(entity, text5, { language = null, kind = "alternate", assertionId = null } = {}) {
+    this.entity(entity);
+    if (typeof text5 !== "string" || !text5.trim())
+      throw new Error("Invalid alias");
+    const id = randomUUID2();
+    this.db.prepare("INSERT INTO alias VALUES (?,?,?,?,?,?,?)").run(
+      id,
+      entity,
+      text5,
+      text5.normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase(),
+      language,
+      kind,
+      assertionId
+    );
+    return id;
+  }
+  catalogueNumber(entity, system, display, normalized2) {
+    this.entity(entity, ["work", "collection"]);
+    if (![system, display, normalized2].every(
+      (v) => typeof v === "string" && v.length
+    ))
+      throw new Error("Invalid catalogue number");
+    const id = randomUUID2();
+    this.db.prepare("INSERT INTO catalogue_number VALUES (?,?,?,?,?,NULL)").run(id, entity, system, display, normalized2);
+    return id;
+  }
+  albumTarget(instance, album) {
+    const ref = json([instance, String(album)]);
+    const existing = this.db.prepare("SELECT id FROM metadata_target WHERE album_ref=?").get(ref);
+    if (existing) return existing.id;
+    const id = randomUUID2();
+    this.db.prepare("INSERT INTO metadata_target(id,album_ref) VALUES (?,?)").run(id, ref);
+    return id;
+  }
+  diagnostics() {
+    return {
+      schema: this.db.prepare("PRAGMA user_version").get().user_version,
+      entities: this.db.prepare("SELECT kind,count(*) AS count FROM entity GROUP BY kind").all(),
+      tracks: this.db.prepare(
+        "SELECT state,count(*) AS count FROM track_link GROUP BY state"
+      ).all(),
+      reviews: this.db.prepare(
+        "SELECT kind,count(*) AS count FROM review_item WHERE status='open' GROUP BY kind"
+      ).all()
+    };
+  }
+};
+async function openCatalogue(folder2, options) {
+  const { db, filename } = await openDatabase(folder2, options);
+  return new Catalogue(db, filename);
+}
+
+// src/model/auto-match.js
+import { createHash } from "node:crypto";
+
+// src/model/metadata.js
+import { randomUUID as randomUUID3 } from "node:crypto";
+var providerOrder = { musicbrainz: 0, openopus: 1 };
+var Metadata = class {
+  constructor(catalogue) {
+    this.catalogue = catalogue;
+    this.db = catalogue.db;
+  }
+  validate(target, field, value) {
+    if (!this.db.prepare("SELECT 1 FROM metadata_target WHERE id=?").get(target))
+      throw new Error("Unknown metadata target");
+    const definition = this.db.prepare("SELECT type FROM field_definition WHERE key=?").get(field);
+    const type = Array.isArray(value) ? "array" : typeof value;
+    if (!definition || value === void 0 || value !== null && (type !== definition.type || type === "number" && !Number.isFinite(value)))
+      throw new Error("Invalid metadata field/value");
+    if (JSON.stringify(JSON.parse(json(value))) !== json(value))
+      throw new Error("Invalid JSON value");
+  }
+  append(target, field, value, {
+    source,
+    provider = null,
+    recordId = null,
+    confidence = null,
+    actor: actor2 = null,
+    state = "active"
+  }) {
+    this.validate(target, field, value);
+    const prior = this.db.prepare(
+      `SELECT id FROM assertion WHERE target_id=? AND field=? AND source=?
+      AND provider IS ? AND record_id IS ? AND state!='superseded' ORDER BY rowid DESC LIMIT 1`
+    ).get(target, field, source, provider, recordId);
+    if (prior)
+      this.db.prepare("UPDATE assertion SET state='superseded' WHERE id=?").run(prior.id);
+    const id = randomUUID3();
+    this.db.prepare("INSERT INTO assertion VALUES (?,?,?,?,?,?,?,?,?,?,?,?)").run(
+      id,
+      target,
+      field,
+      json(value),
+      source,
+      provider,
+      recordId,
+      state,
+      confidence,
+      actor2,
+      Date.now(),
+      prior?.id ?? null
+    );
+    return id;
+  }
+  // Editing a provider-filled field pins automatically. Explicit pin=false cannot undo this.
+  manual(target, field, value, { actor: actor2, pin = false } = {}) {
+    if (typeof actor2 !== "string" || !actor2)
+      throw new Error("Manual edits require host actor attribution");
+    return transaction(this.db, () => {
+      const provider = this.db.prepare(
+        "SELECT 1 FROM assertion WHERE target_id=? AND field=? AND source='provider'"
+      ).get(target, field);
+      const existingPin = this.db.prepare("SELECT 1 FROM pinned_override WHERE target_id=? AND field=?").get(target, field);
+      const id = this.append(target, field, value, { source: "manual", actor: actor2 });
+      if (pin || provider || existingPin)
+        this.db.prepare(
+          `INSERT INTO pinned_override VALUES (?,?,?,?,?)
+        ON CONFLICT(target_id,field) DO UPDATE SET assertion_id=excluded.assertion_id,actor=excluded.actor,updated_at=excluded.updated_at`
+        ).run(target, field, id, actor2, Date.now());
+      this.catalogue.audit(
+        "metadata.manual",
+        target,
+        { field, assertionId: id },
+        actor2
+      );
+      return this.resolve(target, field);
+    });
+  }
+  derived(target, field, value) {
+    return transaction(this.db, () => {
+      this.append(target, field, value, { source: "derived" });
+      return this.resolve(target, field);
+    });
+  }
+  refresh(target, provider, recordId, fields, { state = "active", confidence = 1, complete = true, keepManual = false } = {}) {
+    if (!Object.hasOwn(providerOrder, provider) || !recordId || !fields || Array.isArray(fields) || typeof fields !== "object" || !["active", "stale", "deleted", "conflict"].includes(state) || !Number.isFinite(confidence) || confidence < 0 || confidence > 1)
+      throw new Error("Invalid provider refresh");
+    return transaction(this.db, () => {
+      const known = this.db.prepare(
+        "SELECT DISTINCT field FROM assertion WHERE target_id=? AND provider=? AND record_id=?"
+      ).all(target, provider, recordId).map((r) => r.field);
+      const affected = /* @__PURE__ */ new Set([...known, ...Object.keys(fields)]);
+      for (const field of affected) this.resolve(target, field);
+      if (confidence < 0.95) {
+        this.catalogue.review("provider_match", target, {
+          provider,
+          recordId,
+          confidence,
+          fields
+        });
+        return { review: true };
+      }
+      if (state !== "active") {
+        this.db.prepare(
+          "UPDATE assertion SET state=? WHERE target_id=? AND provider=? AND record_id=? AND state!='superseded'"
+        ).run(state, target, provider, recordId);
+        this.catalogue.reviewEntry("provider_state", target, `${provider}:${recordId}`, {
+          provider,
+          recordId,
+          state
+        });
+      } else {
+        if (keepManual)
+          for (const field of Object.keys(fields)) {
+            if (this.db.prepare("SELECT 1 FROM pinned_override WHERE target_id=? AND field=?").get(target, field)) continue;
+            const own = this.db.prepare("SELECT id,actor FROM assertion WHERE target_id=? AND field=? AND source='manual' AND state='active' ORDER BY rowid DESC LIMIT 1").get(target, field);
+            if (own)
+              this.db.prepare("INSERT INTO pinned_override VALUES (?,?,?,?,?)").run(target, field, own.id, own.actor || "manual", Date.now());
+          }
+        for (const [field, value] of Object.entries(fields))
+          this.append(target, field, value, {
+            source: "provider",
+            provider,
+            recordId,
+            confidence
+          });
+        if (complete)
+          for (const field of known.filter((f) => !Object.hasOwn(fields, f))) {
+            this.db.prepare(
+              "UPDATE assertion SET state='stale' WHERE target_id=? AND field=? AND provider=? AND record_id=? AND state!='superseded'"
+            ).run(target, field, provider, recordId);
+            this.catalogue.reviewEntry("provider_omission", target, `${provider}:${recordId}:${field}`, {
+              provider,
+              recordId,
+              field
+            });
+          }
+      }
+      this.db.prepare(
+        `INSERT INTO provider_record VALUES (?,?,?,?,?) ON CONFLICT(provider,record_id,target_id)
+        DO UPDATE SET state=excluded.state,updated_at=excluded.updated_at`
+      ).run(provider, recordId, target, state, Date.now());
+      const result = Object.fromEntries(
+        [...affected].map((field) => [field, this.resolve(target, field)])
+      );
+      this.catalogue.audit("provider.refresh", target, {
+        provider,
+        recordId,
+        state
+      });
+      return result;
+    });
+  }
+  // Settle a provider conflict by pinning one provider's own value, keeping
+  // its provenance rather than copying it into a manual edit.
+  pinAssertion(target, field, assertionId, { actor: actor2 } = {}) {
+    if (!actor2) throw new Error("Pinning requires host actor attribution");
+    return transaction(this.db, () => {
+      const row = this.db.prepare("SELECT 1 FROM assertion WHERE id=? AND target_id=? AND field=? AND state='active'").get(assertionId, target, field);
+      if (!row) throw new Error("That value is no longer current; reload the review");
+      this.db.prepare(
+        `INSERT INTO pinned_override VALUES (?,?,?,?,?)
+        ON CONFLICT(target_id,field) DO UPDATE SET assertion_id=excluded.assertion_id,actor=excluded.actor,updated_at=excluded.updated_at`
+      ).run(target, field, assertionId, actor2, Date.now());
+      this.catalogue.audit("metadata.pin", target, { field, assertionId }, actor2);
+      return this.resolve(target, field);
+    });
+  }
+  useProvider(target, field, { actor: actor2 } = {}) {
+    if (!actor2) throw new Error("Unpin requires host actor attribution");
+    return transaction(this.db, () => {
+      this.db.prepare("DELETE FROM pinned_override WHERE target_id=? AND field=?").run(target, field);
+      this.catalogue.audit("metadata.unpin", target, { field }, actor2);
+      return this.resolve(target, field, { acceptProviderChange: true });
+    });
+  }
+  resolve(target, field, { acceptProviderChange = false } = {}) {
+    return transaction(
+      this.db,
+      () => this.resolveField(target, field, { acceptProviderChange })
+    );
+  }
+  resolveField(target, field, { acceptProviderChange = false } = {}) {
+    const pin = this.db.prepare(
+      "SELECT assertion_id FROM pinned_override WHERE target_id=? AND field=?"
+    ).get(target, field);
+    const rows = this.db.prepare(
+      "SELECT *,rowid AS ordinal FROM assertion WHERE target_id=? AND field=? AND state='active' ORDER BY rowid DESC"
+    ).all(target, field);
+    const providers = rows.filter((r) => r.source === "provider").sort(
+      (a, b) => providerOrder[a.provider] - providerOrder[b.provider] || b.ordinal - a.ordinal
+    );
+    const previous = this.db.prepare(
+      `SELECT a.* FROM field_resolution f JOIN assertion a ON a.id=f.assertion_id
+      WHERE f.target_id=? AND f.field=?`
+    ).get(target, field);
+    let chosen;
+    if (pin)
+      chosen = this.db.prepare("SELECT * FROM assertion WHERE id=?").get(pin.assertion_id);
+    else if (!acceptProviderChange && previous?.source === "provider" && ["stale", "deleted", "conflict"].includes(previous.state))
+      chosen = previous;
+    else
+      chosen = providers[0] || rows.find((r) => r.source === "manual") || rows.find((r) => r.source === "derived");
+    if (!pin && providers.length > 1 && providers.some((r) => r.value !== providers[0].value))
+      this.catalogue.reviewEntry("provider_conflict", target, field, {
+        field,
+        assertions: providers.map((r) => r.id),
+        values: providers.map((r) => ({ provider: r.provider, recordId: r.record_id, value: JSON.parse(r.value) }))
+      });
+    if (!chosen)
+      return {
+        value: void 0,
+        source: "unknown",
+        pinned: false,
+        providerValue: void 0
+      };
+    this.db.prepare(
+      `INSERT INTO field_resolution VALUES (?,?,?) ON CONFLICT(target_id,field)
+      DO UPDATE SET assertion_id=excluded.assertion_id`
+    ).run(target, field, chosen.id);
+    return {
+      value: JSON.parse(chosen.value),
+      source: chosen.source,
+      provider: chosen.provider,
+      recordId: chosen.record_id,
+      pinned: !!pin,
+      updatedAt: chosen.updated_at,
+      confidence: chosen.confidence,
+      state: chosen.state,
+      assertionId: chosen.id,
+      providerValue: providers[0] ? JSON.parse(providers[0].value) : void 0
+    };
+  }
+};
+
+// src/model/credits.js
+var plain = (value) => String(value || "").normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+var clean = (value) => String(value || "").trim().replace(/\s+/g, " ");
+var PARTS = /\s*;\s*|\s+\/\s+|\s+[—–-]\s+/;
+var ENSEMBLE = /\b(orchestr\w*|orchester|orkest\w*|philharmoni\w*|symphon\w*|sinfoni\w*|ensemble\w*|quartet\w*|quartett\w*|quatuor|quintet\w*|trio|choir\w*|chor\w*|coro|chorus|consort\w*|singers|players|soloists|camerata|academy|academie|akademie|band|cappella|capella|kammer\w*|virtuos\w*|musici|baroque|collegium|concerto|concert|staatskapelle|gewandhaus\w*|opera|operas|oper|cellists|brass|strings|voices)\b/i;
+var LIST = /,|&|\s(?:and|und|et|e|y|with|feat\.?|featuring)\s/i;
+var NAME = /^[\p{Lu}][\p{L}'’.-]*(?:\s+(?:[\p{Lu}][\p{L}'’.-]*|van|von|der|den|de|des|da|di|du|del|della|la|le|y|zu|ten|ter|af))*$/u;
+var CATALOGUE_OWNERS = [
+  [/\bBWV\s*\d/i, "bach"],
+  [/\bBuxWV\s*\d/i, "buxtehude"],
+  [/\bSWV\s*\d/i, "schutz"],
+  [/\bTWV\s*\d/i, "telemann"],
+  [/\bHWV\s*\d/i, "handel"],
+  [/\bRV\s*\d/, "vivaldi"],
+  [/\bK(?:V|\.)?\s*\d+[a-z]?\b/, "mozart"],
+  [/\bHob\.?\s*[IVXL]+/i, "haydn"],
+  [/\bWoO\s*\d/i, "beethoven"],
+  [/\bD\.?\s*\d{2,3}[a-z]?\b/, "schubert"],
+  [/\bS\.\s*\d/, "liszt"],
+  [/\b(?:Sz\.?|BB)\s*\d/, "bartok"],
+  [/,\s*(?:L\.|CD)\s*\d/, "debussy"],
+  [/,\s*M\.\s*\d/, "ravel"],
+  [/\bWWV\s*\d/, "wagner"],
+  [/\bFP\s*\d/, "poulenc"],
+  [/\bTrV\s*\d/i, "strauss"],
+  [/\bJB\s*\d/, "smetana"],
+  [/\bTh\.?\s*\d/, "tchaikovsky"],
+  [/,\s*Z\.?\s*\d/, "purcell"]
+];
+var surnameOf = (name) => plain(name).split(" ").filter(Boolean).at(-1) || "";
+var hasWord = (text5, word) => word.length >= 3 && ` ${plain(text5)} `.includes(` ${word} `);
+function performerLike(part, albumArtists) {
+  const words5 = plain(part);
+  if (!words5) return true;
+  if (ENSEMBLE.test(part) || LIST.test(part)) return true;
+  return albumArtists.some((artist) => artist === words5 || ` ${artist} `.includes(` ${words5} `) || ` ${words5} `.includes(` ${artist} `));
+}
+function artistCredits(hints = {}, { knownComposers = null } = {}) {
+  if (Array.isArray(hints.composer) && hints.composer.length) return null;
+  const parts = clean(hints.artist).split(PARTS).map(clean).filter(Boolean);
+  if (parts.length < 2) return null;
+  const albumArtists = clean(hints.albumArtist).split(/\s*(?:;|,|&|\/|\s+(?:and|und|with)\s+)\s*/i).map(plain).filter((name) => name.length >= 3);
+  const candidates2 = parts.filter((part) => !performerLike(part, albumArtists)).filter((name) => {
+    const words5 = name.split(/\s+/);
+    return words5.length <= 5 && !/\d|:/.test(name) && NAME.test(name) && parts.filter((part) => plain(part) === plain(name)).length === 1;
+  }).map((name) => ({ name, evidence: corroboration(name, hints, knownComposers) }));
+  const backed = candidates2.filter((candidate) => candidate.evidence.length);
+  const chosen = candidates2.length === 1 ? candidates2[0] : backed.length === 1 ? backed[0] : null;
+  if (!chosen) return null;
+  return {
+    composers: [chosen.name],
+    performers: parts.filter((part) => part !== chosen.name),
+    confidence: chosen.evidence.length ? "high" : "medium",
+    evidence: chosen.evidence
   };
 }
-var workField = textField("WORK", "WORK", { box: "\xA9wrk" });
-var workIdField = textField("MUSICBRAINZ_WORKID", "MusicBrainz Work Id", { name: "MusicBrainz Work Id" });
-var artistIdsField = textField("MUSICBRAINZ_ARTISTID", "MusicBrainz Artist Id", { name: "MusicBrainz Artist Id" });
-var albumArtistIdsField = textField("MUSICBRAINZ_ALBUMARTISTID", "MusicBrainz Album Artist Id", { name: "MusicBrainz Album Artist Id" });
-var movementNameField = textField("MOVEMENTNAME", "MOVEMENTNAME", { name: "MOVEMENTNAME" });
-var movementNumberField = textField("MOVEMENT", "MOVEMENT", { name: "MOVEMENT" });
-var movementTotalField = textField("MOVEMENTTOTAL", "MOVEMENTTOTAL", { name: "MOVEMENTTOTAL" });
-var catalogueField = textField("CLASSICAL_CATALOGUE", "CLASSICAL_CATALOGUE", { name: "CLASSICAL_CATALOGUE" });
-var performersField = {
-  read: (file) => texts(xiphOf(file)?.getField("PERFORMER") ?? []),
-  write(file, values) {
-    xiphOf(file)?.setFieldAsStrings("PERFORMER", ...values);
-  }
-};
-var WRITERS = {
-  title: {
-    read: (file) => texts(file.tag.title),
-    write: (file, values) => file.tag.title = values[0] ?? void 0
-  },
-  artist: {
-    read: (file) => texts(file.tag.performers),
-    write: (file, values) => file.tag.performers = values
-  },
-  albumArtist: {
-    read: (file) => texts(file.tag.albumArtists),
-    write: (file, values) => file.tag.albumArtists = values
-  },
-  composer: {
-    read: (file) => texts(file.tag.composers),
-    write: (file, values) => file.tag.composers = values
-  },
-  composerSort: {
-    read: (file) => texts(file.tag.composersSort),
-    write: (file, values) => file.tag.composersSort = values
-  },
-  conductor: {
-    read: (file) => texts(file.tag.conductor),
-    write: (file, values) => file.tag.conductor = values[0] ?? void 0
-  },
-  performers: performersField,
-  movementName: movementNameField,
-  movementNumber: movementNumberField,
-  movementTotal: movementTotalField,
-  catalogue: catalogueField,
-  work: { read: (file) => workField.read(file), write: (file, values) => workField.write(file, values) },
-  workId: { read: (file) => workIdField.read(file), write: (file, values) => workIdField.write(file, values) },
-  recordingMbid: {
-    read: (file) => texts(file.tag.musicBrainzTrackId),
-    write: (file, values) => {
-      const id3 = id3Of(file);
-      for (const frame of id3?.getFramesByClassType(import_node_taglib_sharp.Id3v2FrameClassType.UniqueFileIdentifierFrame) || []) {
-        if (frame.owner === MUSICBRAINZ_UFID_OWNER) id3.removeFrame(frame);
-      }
-      file.tag.musicBrainzTrackId = values[0] ?? void 0;
+function corroboration(name, hints, knownComposers) {
+  const surname2 = surnameOf(name);
+  const evidence = [];
+  if (hasWord(hints.album, surname2)) evidence.push("album title");
+  if (hasWord(hints.title, surname2) || hasWord(hints.work, surname2)) evidence.push("track title");
+  const titled = `${hints.title || ""} ${hints.work || ""}`;
+  if (CATALOGUE_OWNERS.some(([pattern, owner]) => owner === surname2 && pattern.test(titled))) evidence.push("catalogue number");
+  if (knownComposers?.has(plain(name))) evidence.push("known composer");
+  return evidence;
+}
+function composersOf(hints = {}, options) {
+  if (Array.isArray(hints.composer) && hints.composer.length) return hints.composer;
+  const credit = artistCredits(hints, options);
+  return credit?.confidence === "high" ? credit.composers : [];
+}
+
+// src/model/contributors.js
+var words = (value) => String(value || "").normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+var text = (value) => typeof value === "string" ? value.trim() : "";
+var list = (value) => (Array.isArray(value) ? value : value ? [value] : []).map(text).filter(Boolean);
+var PERFORMING_ROLES = /* @__PURE__ */ new Set(["soloist", "performer", "accompanist", "conductor", "orchestra", "ensemble", "choir"]);
+function performerNames(hints = {}, composers = list(hints.composer), key = words) {
+  const skip = new Set(composers.map(key));
+  return (text(hints.artist) || text(hints.albumArtist)).split(/\s+[—–]\s+|\s*;\s*/).map((name) => name.trim()).filter((name) => name && !skip.has(key(name)));
+}
+var isEnsemble = (name) => ENSEMBLE.test(name);
+var personName = (name) => new RegExp("^\\p{Lu}", "u").test(name) && name.split(/\s+/).length >= 2;
+function splitList(name) {
+  if (!LIST.test(name)) return [name];
+  const pieces = name.split(/\s*,\s*|\s+(?:&|and|und|et|e|y|with)\s+/i).map((piece) => piece.trim()).filter(Boolean);
+  return pieces.length > 1 && pieces.every((piece) => isEnsemble(piece) || personName(piece)) ? pieces : [name];
+}
+function ensembleRole(name) {
+  if (/\b(orchestr\w*|orchester|orkest\w*|philharmoni\w*|symphon\w*|sinfoni\w*|staatskapelle|gewandhaus\w*)\b/i.test(name)) return "orchestra";
+  if (/\b(choir\w*|chor\w*|coro|chorus|singers|voices)\b/i.test(name)) return "choir";
+  return "ensemble";
+}
+function artistIds(hints) {
+  const ids = list(hints.artistMbids);
+  const names = (text(hints.artist) || text(hints.albumArtist)).split(/\s+[—–]\s+|\s*;\s*/).map((name) => name.trim()).filter(Boolean).flatMap(splitList);
+  return ids.length && ids.length === names.length ? new Map(names.map((name, i) => [words(name), ids[i]])) : /* @__PURE__ */ new Map();
+}
+function trackCredits(hints = {}) {
+  const conductor = text(hints.conductor);
+  const ids = artistIds(hints);
+  const credits2 = [];
+  const add = (name, instrument = null) => {
+    const clean4 = name.trim();
+    if (!clean4 || words(clean4) === words(conductor) || credits2.some((credit) => words(credit.name) === words(clean4))) return;
+    const kind = isEnsemble(clean4) ? "ensemble" : "person";
+    credits2.push({ name: clean4, kind, role: kind === "ensemble" ? ensembleRole(clean4) : "performer", instrument, mbid: ids.get(words(clean4)) || null });
+  };
+  const tagged = list(hints.performers);
+  if (tagged.length)
+    for (const value of tagged) {
+      const [, name, instrument] = value.match(/^(.*?)\s*\(([^()]+)\)\s*$/) || [null, value, null];
+      add(name, instrument?.trim() || null);
+    }
+  else for (const name of performerNames(hints)) for (const piece of splitList(name)) add(piece);
+  if (conductor && !isEnsemble(conductor)) credits2.unshift({ name: conductor, kind: "person", role: "conductor", instrument: null, mbid: ids.get(words(conductor)) || null });
+  return credits2;
+}
+function contributorIndex(c) {
+  const byName = { person: /* @__PURE__ */ new Map(), ensemble: /* @__PURE__ */ new Map() };
+  for (const { id, kind } of c.db.prepare("SELECT id,kind FROM entity WHERE kind IN ('person','ensemble') AND deleted_at IS NULL ORDER BY created_at,id").all()) {
+    const other = resolvedName(c, id, "aliases");
+    const names = [resolvedName(c, id, "name"), ...Array.isArray(other) ? other : [], ...c.db.prepare("SELECT text FROM alias WHERE entity_id=?").all(id).map((row) => row.text)];
+    for (const name of names) {
+      const key = words(String(name ?? ""));
+      if (key) byName[kind].set(key, [.../* @__PURE__ */ new Set([...byName[kind].get(key) || [], id])]);
     }
   }
-};
-var CLASSICAL_FIELDS = ["composer", "composerSort", "work", "movementName", "movementNumber", "movementTotal", "performers", "conductor", "catalogue", "workId"];
-var NOT_ID3 = /* @__PURE__ */ new Set(["movementName", "movementNumber", "movementTotal", "performers"]);
-var FORMAT_FIELDS = {
-  ".flac": CLASSICAL_FIELDS,
-  ".mp3": CLASSICAL_FIELDS.filter((field) => !NOT_ID3.has(field))
-};
-function isFragmentedMp4(filePath) {
-  const fd = openSync(filePath, "r");
-  try {
-    const size = fstatSync(fd).size;
-    const header = Buffer.alloc(16);
-    for (let offset = 0; offset + 8 <= size; ) {
-      readSync(fd, header, 0, 16, offset);
-      const type = header.toString("latin1", 4, 8);
-      if (offset === 0 && type !== "ftyp") return false;
-      if (type === "moof") return true;
-      const boxSize = header.readUInt32BE(0);
-      const length = boxSize === 1 ? Number(header.readBigUInt64BE(8)) : boxSize === 0 ? size - offset : boxSize;
-      if (length < 8) return false;
-      offset += length;
+  return byName;
+}
+function raiseReview(c, kind, target, evidence) {
+  const settled = c.db.prepare("SELECT 1 FROM review_item WHERE kind=? AND target_id=? AND status='resolved' AND json_extract(evidence,'$.key')=? LIMIT 1").get(kind, target, evidence.key);
+  if (settled) return false;
+  c.review(kind, target, evidence);
+  return true;
+}
+var artistIdOf = (c, id) => c.db.prepare("SELECT record_id FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='artist' AND state='active'").get(id)?.record_id || null;
+function contributorFor(c, index, name, { mbid = null, kind = "person", metadata = new Metadata(c) } = {}) {
+  const key = words(name);
+  if (!key) return null;
+  const existing = index[kind].get(key) || [];
+  if (mbid) {
+    const known = c.db.prepare(
+      `SELECT x.entity_id FROM external_identity x JOIN entity e ON e.id=x.entity_id
+         WHERE x.provider='musicbrainz' AND x.record_kind='artist' AND x.record_id=? AND x.state='active' AND e.deleted_at IS NULL AND e.kind=?`
+    ).get(mbid, kind)?.entity_id;
+    if (known) return known;
+    const unidentified = existing.filter((id2) => !artistIdOf(c, id2));
+    if (unidentified.length === 1) {
+      c.externalIdentity(unidentified[0], "musicbrainz", "artist", mbid, { evidence: { source: "tags" } });
+      return unidentified[0];
     }
-    return false;
-  } finally {
-    closeSync(fd);
-  }
+  } else if (existing.length > 1) return null;
+  else if (existing.length === 1) return existing[0];
+  const id = c.createEntity(kind, { unreviewed: true });
+  metadata.derived(id, "name", name);
+  if (mbid) c.externalIdentity(id, "musicbrainz", "artist", mbid, { evidence: { source: "tags" } });
+  if (existing.length)
+    raiseReview(c, "contributor_identity", id, { reason: "same-name-different-id", name, mbid, others: existing, key: `${words(name)}|${mbid}` });
+  index[kind].set(key, [...existing, id]);
+  return id;
 }
-var UnsupportedFormat = class extends Error {
-};
-function openFile(filePath, readStyle = READ_STYLE, asPath = filePath) {
-  if (!isAudioPath(asPath)) throw new UnsupportedFormat(`can't tag ${path.extname(asPath) || "this kind of"} files`);
-  if (isFragmentedMp4(filePath)) throw new UnsupportedFormat("can't tag fragmented MP4 files");
-  try {
-    return import_node_taglib_sharp.File.createFromPath(filePath, `taglib/${path.extname(asPath).slice(1).toLowerCase()}`, readStyle);
-  } catch (error) {
-    if (/unsupported format/i.test(String(error?.message))) throw new UnsupportedFormat("can't tag this kind of file");
-    throw error;
-  }
-}
-function readValues(filePath, fields) {
-  const file = openFile(filePath);
-  try {
-    return Object.fromEntries(fields.map((field) => [field, WRITERS[field].read(file)]));
-  } finally {
-    file.dispose();
-  }
-}
-function readTags(filePath) {
-  const file = openFile(filePath, READ_WITH_PROPERTIES);
-  try {
-    const tag = file.tag;
-    return {
-      title: text(tag.title),
-      artist: text(tag.performers?.[0]),
-      albumArtist: text(tag.albumArtists?.[0]),
-      album: text(tag.album),
-      recordingMbid: text(tag.musicBrainzTrackId),
-      releaseMbid: text(tag.musicBrainzReleaseId),
-      releaseGroupMbid: text(tag.musicBrainzReleaseGroupId),
-      // Every album artist ID: taglib's own property has only the first.
-      albumArtistMbids: [...new Set([...albumArtistIdsField.read(file), text(tag.musicBrainzReleaseArtistId)].flatMap((v) => texts(v.split(/[;/]/))))],
-      artistMbids: artistIdsField.read(file).flatMap((value) => texts(value.split(/[;/]/))),
-      conductor: text(tag.conductor),
-      // Vorbis PERFORMER, one value a performer, often with the instrument
-      // in brackets: "Martha Argerich (piano)".
-      performers: texts(xiphOf(file)?.getField("PERFORMER") ?? []),
-      genres: texts(tag.genres ?? []).flatMap((genre) => texts(genre.split(";"))),
-      composer: texts(tag.composers ?? []),
-      work: workField.read(file)[0] ?? "",
-      // Some taggers put the work here and leave WORK empty.
-      grouping: text(tag.grouping),
-      workId: workIdField.read(file)[0] ?? "",
-      trackNumber: positive(tag.track),
-      discNumber: positive(tag.disc),
-      durationMs: Math.round(file.properties?.durationMilliseconds || 0),
-      year: Number.isSafeInteger(tag.year) && tag.year > 0 ? tag.year : null,
-      label: text(tag.publisher)
-    };
-  } finally {
-    file.dispose();
-  }
-}
-var same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-async function writeTags(filePath, values) {
-  const source = path.resolve(filePath);
-  const preview = openFile(source);
-  let changed;
-  try {
-    changed = Object.keys(values).filter((field) => !same(WRITERS[field].read(preview), texts(values[field])));
-  } finally {
-    preview.dispose();
-  }
-  if (!changed.length) return [];
-  const extension = path.extname(source);
-  const working = path.join(path.dirname(source), `.${path.basename(source, extension)}.${randomUUID()}.tagging`);
-  await fs.copyFile(source, working, fs.constants.COPYFILE_FICLONE);
-  try {
-    const file = openFile(working, READ_STYLE, source);
-    try {
-      file.removeTags(ADDED_TAG_TYPES & ~file.tagTypesOnDisk);
-      const id3 = id3Of(file);
-      if (id3 && !(file.tagTypesOnDisk & import_node_taglib_sharp.TagTypes.Id3v2)) id3.version = 4;
-      for (const field of changed) WRITERS[field].write(file, texts(values[field]));
-      file.save();
-    } finally {
-      file.dispose();
-    }
-    const verified = openFile(working, READ_STYLE, source);
-    try {
-      for (const field of changed) {
-        if (!same(WRITERS[field].read(verified), texts(values[field])))
-          throw new Error(`Tag verification failed for ${field}`);
-      }
-    } finally {
-      verified.dispose();
-    }
-    await fs.rename(working, source);
-  } catch (error) {
-    await fs.rm(working, { force: true }).catch(() => {
+function deriveCredits(c, { albumId = null } = {}) {
+  const performances = c.db.prepare(
+    `SELECT DISTINCT pw.source_id AS performance FROM realization r
+       JOIN relation pw ON pw.id=r.performance_work_id
+       JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
+       JOIN track_link t ON t.id=s.track_link_id AND t.state='active'
+       JOIN entity p ON p.id=pw.source_id AND p.deleted_at IS NULL
+       ${albumId == null ? "" : "WHERE CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?"}`
+  ).all(...albumId == null ? [] : [String(albumId)]).map((row) => row.performance);
+  const credited = c.db.prepare(`SELECT 1 FROM credit WHERE target_id=? AND role IN (${[...PERFORMING_ROLES].map(() => "?").join(",")}) LIMIT 1`);
+  const tracksOf = c.db.prepare(
+    `SELECT DISTINCT t.id,t.evidence FROM relation pw JOIN realization r ON r.performance_work_id=pw.id
+     JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
+     JOIN track_link t ON t.id=s.track_link_id AND t.state='active'
+     WHERE pw.kind='performance_work' AND pw.source_id=? ORDER BY t.id`
+  );
+  let index = null;
+  let metadata = null;
+  let added = 0;
+  for (const performance2 of performances) {
+    if (credited.get(performance2, ...PERFORMING_ROLES)) continue;
+    const perTrack = tracksOf.all(performance2).map((row) => trackCredits(JSON.parse(row.evidence).hints || {}));
+    if (!perTrack.length) continue;
+    const signature = (credit) => `${credit.role}|${credit.kind}|${words(credit.name)}|${credit.instrument || ""}`;
+    const shared = perTrack[0].filter((credit) => perTrack.every((credits2) => credits2.some((other) => signature(other) === signature(credit)))).map((credit) => {
+      const ids = new Set(perTrack.map((credits2) => credits2.find((other) => signature(other) === signature(credit)).mbid));
+      return { ...credit, mbid: ids.size === 1 ? [...ids][0] : null };
     });
-    throw error;
+    if (!shared.length) continue;
+    index ??= contributorIndex(c);
+    metadata ??= new Metadata(c);
+    let position = c.db.prepare("SELECT coalesce(max(position),0) AS n FROM credit WHERE target_id=?").get(performance2).n;
+    for (const credit of shared) {
+      const contributor = contributorFor(c, index, credit.name, { kind: credit.kind, mbid: credit.mbid, metadata });
+      if (!contributor) {
+        const candidates2 = index[credit.kind].get(words(credit.name)) || [];
+        if (candidates2.length > 1)
+          raiseReview(c, "contributor_identity", performance2, {
+            reason: "ambiguous-name",
+            name: credit.name,
+            kind: credit.kind,
+            role: credit.role,
+            instrument: credit.instrument,
+            candidates: candidates2,
+            key: `ambiguous|${words(credit.name)}|${credit.role}`
+          });
+        continue;
+      }
+      c.credit(performance2, contributor, credit.role, { instrument: credit.instrument, position: ++position, source: "derived" });
+      added++;
+    }
   }
-  return changed;
+  return added;
+}
+function conductorConflicts(c, { albumId = null } = {}) {
+  const rows = c.db.prepare(
+    `SELECT DISTINCT k.target_id AS performance FROM credit k
+       JOIN relation pw ON pw.source_id=k.target_id AND pw.kind='performance_work' JOIN realization r ON r.performance_work_id=pw.id
+       JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id AND t.state='active'
+       WHERE k.role='conductor' AND k.source='manual' AND k.state='active'
+       ${albumId == null ? "" : "AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?"}`
+  ).all(...albumId == null ? [] : [String(albumId)]);
+  const tracksOf = c.db.prepare(
+    `SELECT DISTINCT t.evidence FROM relation pw JOIN realization r ON r.performance_work_id=pw.id JOIN realization_item i ON i.realization_id=r.id
+     JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id AND t.state='active' WHERE pw.kind='performance_work' AND pw.source_id=?`
+  );
+  let raised = 0;
+  for (const { performance: performance2 } of rows) {
+    const tagged = [...new Set(tracksOf.all(performance2).map((row) => text(JSON.parse(row.evidence).hints?.conductor)))];
+    if (tagged.length !== 1 || !tagged[0]) continue;
+    const credited = c.db.prepare("SELECT contributor_id AS id FROM credit WHERE target_id=? AND role='conductor' AND state='active' ORDER BY id").all(performance2).map((row) => row.id);
+    const names = credited.flatMap((id) => [resolvedName(c, id, "name"), ...c.db.prepare("SELECT text FROM alias WHERE entity_id=?").all(id).map((row) => row.text)]).map((name) => words(String(name ?? "")));
+    if (names.includes(words(tagged[0]))) continue;
+    if (raiseReview(c, "credit_conflict", performance2, { reason: "conductor", role: "conductor", tagged: tagged[0], credited, key: `conductor|${words(tagged[0])}|${credited.join(",")}` })) raised++;
+  }
+  return raised;
 }
 
 // src/works.js
@@ -35488,30 +36557,39 @@ var CATALOGUES = [
   [new RegExp(`(?<![\\p{L}\\d])M(?:\\.\\s*|\\s+)(\\d+${SUFFIX}(?:\\/\\d+)?)(?![\\d])`, "u"), "M"]
 ];
 var OPUS = /\bop(?:us|\.)?\s*(\d+[a-z]?)(?:\s*,?\s*(?:no\.?|nr\.?|n°)\s*(\d+))?/i;
+var PIECE = /^\s*,?\s*(?:no\.?|nr\.?|n°)\s*(\d+[a-z]{0,3})(?![a-z\d])/i;
 function catalogueMatch(title) {
-  const text2 = String(title || "");
+  const text5 = String(title || "");
   for (const [pattern, prefix] of CATALOGUES) {
-    const match = text2.match(pattern);
-    if (match) return { prefix, number: match[1].replace(/\s+/g, ""), end: match.index + match[0].length, text: text2 };
+    const match2 = text5.match(pattern);
+    if (match2) return { prefix, number: match2[1].replace(/\s+/g, ""), end: match2.index + match2[0].length, text: text5 };
   }
   return null;
 }
 function catalogueNumber(title) {
-  const match = catalogueMatch(title);
-  if (match) return `${match.prefix} ${match.number}`;
+  const match2 = catalogueMatch(title);
+  if (match2) return `${match2.prefix} ${match2.number}`;
   const opus = String(title || "").match(OPUS);
   if (opus) return `op ${opus[1]}${opus[2] ? ` no ${opus[2]}` : ""}`;
   return "";
 }
-function shortWorkTitle(title) {
-  let text2 = String(title || "").split(":")[0];
-  text2 = text2.replace(OPUS, " ");
-  for (const [pattern] of CATALOGUES) text2 = text2.replace(pattern, " ");
-  text2 = text2.replace(/\bin\s+[A-G](?:[- ]?(?:flat|sharp|♭|♯|b|#))?\s*(?:major|minor|maj|min|dur|moll)\b/gi, " ").replace(/\b(?:no|nr|n°)\.?\s*(?=\d)/gi, " ").replace(/[“”"'’,;()[\]]/g, " ");
-  return searchWords(text2);
+function foldedCatalogue(title) {
+  const number = catalogueNumber(title);
+  return number.startsWith("TWV ") ? `twv ${number.slice(4)}` : number.toLowerCase();
 }
-function searchWords(text2) {
-  return String(text2 || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim().split(/\s+/).filter(Boolean).join(" ");
+function cataloguePiece(title) {
+  const match2 = catalogueMatch(title);
+  return match2 ? match2.text.slice(match2.end).match(PIECE)?.[1]?.toLowerCase() || "" : "";
+}
+function shortWorkTitle(title) {
+  let text5 = String(title || "").split(":")[0];
+  text5 = text5.replace(OPUS, " ");
+  for (const [pattern] of CATALOGUES) text5 = text5.replace(pattern, " ");
+  text5 = text5.replace(/\bin\s+[A-G](?:[- ]?(?:flat|sharp|♭|♯|b|#))?\s*(?:major|minor|maj|min|dur|moll)\b/gi, " ").replace(/\b(?:no|nr|n°)\.?\s*(?=\d)/gi, " ").replace(/[“”"'’,;()[\]]/g, " ");
+  return searchWords(text5);
+}
+function searchWords(text5) {
+  return String(text5 || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim().split(/\s+/).filter(Boolean).join(" ");
 }
 function surname(person) {
   if (!person) return "";
@@ -35535,731 +36613,1067 @@ function releaseYear(date) {
   return Number.isInteger(year) && year > 0 ? year : null;
 }
 
-// src/aurral.js
-var Aurral = class {
-  constructor(api, fetchImpl = fetch) {
-    if (!api?.url || !api?.key) throw new Error("Aurral API access is off. Turn it on on the plugin's page.");
-    this.url = api.url.replace(/\/+$/, "");
-    this.key = api.key;
-    this.fetch = fetchImpl;
-  }
-  async request(method, route, body) {
-    const response = await this.fetch(`${this.url}${route}`, {
-      method,
-      headers: { "X-Api-Key": this.key, ...body !== void 0 && { "Content-Type": "application/json" } },
-      body: body === void 0 ? void 0 : JSON.stringify(body),
-      signal: AbortSignal.timeout(3e4)
-    });
-    const data = await response.json().catch(() => null);
-    if (!response.ok) {
-      const detail = data?.message || data?.error || response.statusText;
-      throw new Error(`Aurral answered ${response.status} for ${route}: ${detail}`);
-    }
-    return data;
-  }
-  // Re-reads files whose tags changed, so the Library shows the new ones.
-  refreshLibrary() {
-    return this.request("POST", "/library/refresh", { mode: "quick" });
-  }
+// src/search/normalize.js
+var LETTERS = { \u00F8: "o", \u00E6: "ae", \u0153: "oe", \u00DF: "ss", \u0142: "l", \u0111: "d", \u00F0: "d", \u00FE: "th", \u0131: "i", \u0127: "h", \u014B: "n" };
+var CYRILLIC = {
+  \u0430: "a",
+  \u0431: "b",
+  \u0432: "v",
+  \u0433: "g",
+  \u0434: "d",
+  \u0435: "e",
+  \u0451: "e",
+  \u0436: "zh",
+  \u0437: "z",
+  \u0438: "i",
+  \u0439: "i",
+  \u043A: "k",
+  \u043B: "l",
+  \u043C: "m",
+  \u043D: "n",
+  \u043E: "o",
+  \u043F: "p",
+  \u0440: "r",
+  \u0441: "s",
+  \u0442: "t",
+  \u0443: "u",
+  \u0444: "f",
+  \u0445: "kh",
+  \u0446: "ts",
+  \u0447: "ch",
+  \u0448: "sh",
+  \u0449: "shch",
+  \u044A: "",
+  \u044B: "y",
+  \u044C: "",
+  \u044D: "e",
+  \u044E: "yu",
+  \u044F: "ya",
+  \u0456: "i",
+  \u0457: "i",
+  \u0454: "e",
+  \u0491: "g"
 };
+function fold(value) {
+  return String(value ?? "").toLowerCase().replace(/[^\u0000-\u007f]/g, (ch) => LETTERS[ch] ?? CYRILLIC[ch] ?? ch).normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+}
+var words2 = (value) => fold(value).split(" ").filter(Boolean);
+function skeleton(word) {
+  if (word.length < 4 || /\d/.test(word)) return "";
+  return word.replace(/t?sch|tch|kh|ch|zh|sh/g, "h").replace(/ph/g, "f").replace(/w/g, "v").replace(/v/g, "f").replace(/ck|c|q/g, "k").replace(/x/g, "ks").replace(/[yj]/g, "i").replace(/(.)\1+/g, "$1").replace(/ii$/, "i");
+}
+var SYSTEMS = [
+  ["bwv", "bwv"],
+  ["buxwv", "buxwv"],
+  ["swv", "swv"],
+  ["hwv", "hwv"],
+  ["fp", "fp"],
+  ["jb", "jb"],
+  ["cd", "cd"],
+  ["z", "z"],
+  ["twv", "twv"],
+  ["wwv", "wwv"],
+  ["rv", "rv"],
+  ["hob", "hob"],
+  ["wab", "wab"],
+  ["woo", "woo"],
+  ["kv", "k"],
+  ["k", "k"],
+  ["d", "d"],
+  ["s", "s"],
+  ["sz", "sz"],
+  ["bb", "bb"],
+  ["trv", "trv"],
+  ["fs", "fs"],
+  ["l", "l"],
+  ["kk", "kk"],
+  ["jw", "jw"],
+  ["op", "op"],
+  ["opus", "op"],
+  ["opp", "op"]
+];
+var PREFIX = SYSTEMS.map(([written]) => written).sort((a, b) => b.length - a.length).join("|");
+var ROMAN = "(?:x{0,3})(?:ix|iv|v?i{0,3})";
+var HOBOKEN = new RegExp(`\\bhob\\.?\\s*(${ROMAN}[a-z]?)\\s*[:/.\\s]\\s*(\\d+[a-z]?)`, "giu");
+var NUMBERED = new RegExp(
+  `(?<![\\p{L}\\p{N}])(${PREFIX})\\.?\\s*(\\d+[a-z]?)(?:\\s*(?:,\\s*|\\/|\\s+)(?:(?:no|nr|n\xB0|num|number|#)\\.?\\s*)?(\\d+[a-z]?)(?![\\p{L}\\p{N}]))?`,
+  "giu"
+);
+var SYSTEM = new Map(SYSTEMS);
+var SUBNUMBERED = /* @__PURE__ */ new Set(["op", "hob", "woo", "s", "d", "k"]);
+var NO_BEFORE = /(?:no|nr|n°|num|number|#)\.?\s*$|\/\s*$/i;
+function catalogueKeys(text5) {
+  const source = String(text5 ?? "").normalize("NFC");
+  const found = [];
+  for (const match2 of source.matchAll(HOBOKEN)) {
+    if (!match2[1]) continue;
+    found.push({ key: `hob:${match2[1].toLowerCase()}:${match2[2].toLowerCase()}`, system: "hob", start: match2.index, end: match2.index + match2[0].length });
+  }
+  for (const match2 of source.matchAll(NUMBERED)) {
+    const written = match2[1].toLowerCase();
+    if (written === "hob") continue;
+    const system = SYSTEM.get(written);
+    if (written.length === 1 && !/^[a-z]\.\s*\d|^[a-z]\s*\d{2}/i.test(match2[0])) continue;
+    if (found.some((item) => match2.index < item.end && match2.index + match2[0].length > item.start)) continue;
+    let sub = match2[3]?.toLowerCase() || "";
+    if (sub && !SUBNUMBERED.has(system)) {
+      const between = match2[0].slice(match2[0].indexOf(match2[2]) + match2[2].length, match2[0].lastIndexOf(match2[3]));
+      if (!NO_BEFORE.test(between)) sub = "";
+    }
+    const end = sub ? match2.index + match2[0].length : match2.index + match2[0].indexOf(match2[2]) + match2[2].length;
+    found.push({ key: [system, match2[2].toLowerCase(), sub].filter(Boolean).join(":"), system, start: match2.index, end });
+  }
+  return found.sort((a, b) => a.start - b.start);
+}
 
-// src/store.js
-import { createHash, randomUUID as randomUUID2 } from "node:crypto";
-import fs2 from "node:fs/promises";
-import path2 from "node:path";
-var sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-async function readJson(file, fallback) {
+// src/search/engine.js
+var FIELD = { primary: 0, secondary: 1, skeleton: 2 };
+var KIND_BOOST = { work: 12, recording: 6, composer: 7, performer: 5, release: 3, movement: 1 };
+var FACETS = [
+  ["composer", "Composer"],
+  ["performer", "Performer"],
+  ["conductor", "Conductor"],
+  ["ensemble", "Ensemble"],
+  ["role", "Role"],
+  ["period", "Period"],
+  ["form", "Form"],
+  ["instrument", "Instrument"],
+  ["type", "Recording type"],
+  ["year", "Year"],
+  ["owned", "Library"]
+];
+var FACET_KEYS = new Set(FACETS.map(([key]) => key));
+var PERFORMER_ROLES = PERFORMING_ROLES;
+var ENSEMBLE_ROLES2 = /* @__PURE__ */ new Set(["orchestra", "ensemble", "choir"]);
+var ROLE_LABEL = { soloist: "Soloist", performer: "Performer", accompanist: "Accompanist", conductor: "Conductor", orchestra: "Orchestra", ensemble: "Ensemble", choir: "Choir", composer: "Composer", arranger: "Arranger", lyricist: "Lyricist" };
+var ROLE_RANK = Object.keys(ROLE_LABEL);
+var roleRank = (role) => ROLE_RANK.indexOf(role) + 1 || ROLE_RANK.length + 1;
+var LIVE = /\b(live|concert|recital|broadcast|in concert|konzert)\b/i;
+var text2 = (value) => typeof value === "string" ? value.trim() : Array.isArray(value) ? value.filter((v) => typeof v === "string").join("; ") : "";
+var list2 = (value) => Array.isArray(value) ? value.filter((v) => typeof v === "string" && v.trim()).map((v) => v.trim()) : typeof value === "string" && value.trim() ? [value.trim()] : [];
+var parse2 = (value, fallback) => {
   try {
-    return JSON.parse(await fs2.readFile(file, "utf8"));
+    return JSON.parse(value);
   } catch {
     return fallback;
   }
-}
-async function writeJson(file, value) {
-  await fs2.mkdir(path2.dirname(file), { recursive: true });
-  const temp = `${file}.${process.pid}.${randomUUID2()}.tmp`;
-  await fs2.writeFile(temp, JSON.stringify(value));
-  await fs2.rename(temp, file);
-}
-async function tryLock(dir, staleMs) {
-  try {
-    await fs2.mkdir(dir);
-  } catch (error) {
-    if (error.code !== "EEXIST") throw error;
-    const stat = await fs2.stat(dir).catch(() => null);
-    if (stat && Date.now() - stat.mtimeMs < staleMs) return null;
-    await fs2.rm(dir, { recursive: true, force: true });
-    try {
-      await fs2.mkdir(dir);
-    } catch {
-      return null;
-    }
-  }
-  let released = false;
-  return {
-    async touch() {
-      if (released) return;
-      const now = /* @__PURE__ */ new Date();
-      await fs2.utimes(dir, now, now).catch(() => {
-      });
-    },
-    async release() {
-      released = true;
-      await fs2.rm(dir, { recursive: true, force: true }).catch(() => {
-      });
-    }
-  };
-}
-async function withLock(dir, staleMs, run, { waitMs = 3e4 } = {}) {
-  const until = Date.now() + waitMs;
-  for (; ; ) {
-    const lock = await tryLock(dir, staleMs);
-    if (lock) {
-      try {
-        return await run(lock);
-      } finally {
-        await lock.release();
-      }
-    }
-    if (Date.now() > until) throw new Error(`Timed out waiting for ${path2.basename(dir)}`);
-    await sleep(50 + Math.random() * 100);
-  }
-}
-var Throttle = class {
-  constructor(folder2, intervalMs) {
-    this.lockDir = path2.join(folder2, "mb-throttle.lock");
-    this.stateFile = path2.join(folder2, "mb-throttle.json");
-    this.intervalMs = intervalMs;
-  }
-  async run(dispatch) {
-    if (!this.intervalMs) return dispatch();
-    return withLock(this.lockDir, 12e4, async () => {
-      const state = await readJson(this.stateFile, { next: 0 });
-      const wait = (Number(state.next) || 0) - Date.now();
-      if (wait > 0) await sleep(wait);
-      await writeJson(this.stateFile, { next: Date.now() + this.intervalMs });
-      try {
-        return await dispatch();
-      } finally {
-        await writeJson(this.stateFile, { next: Date.now() + this.intervalMs });
-      }
-    }, { waitMs: 12e4 });
-  }
 };
-var FileCache = class {
-  constructor(folder2) {
-    this.folder = folder2;
+function catalogueStamp(c) {
+  const row = c.db.prepare(
+    `SELECT (SELECT coalesce(max(id),0) FROM audit_event) AS a,
+        (SELECT coalesce(max(rowid),0) FROM assertion) AS b,
+        (SELECT count(*) FROM entity WHERE deleted_at IS NULL) AS c,
+        (SELECT coalesce(max(updated_at),0) FROM entity) AS d,
+        (SELECT count(*)||':'||coalesce(max(rowid),0) FROM realization_item) AS e,
+        (SELECT coalesce(max(updated_at),0)||':'||count(*) FROM classification WHERE state='classical') AS f,
+        (SELECT coalesce(max(updated_at),0)||':'||count(*) FROM track_link WHERE state='active') AS g,
+        (SELECT count(*)||':'||coalesce(max(rowid),0)||':'||coalesce(sum(state='active'),0) FROM credit) AS h,
+        (SELECT count(*)||':'||coalesce(max(rowid),0) FROM relation) AS i`
+  ).get();
+  return `v5|${Object.values(row).join("|")}`;
+}
+function resolvedValues(c) {
+  const values = /* @__PURE__ */ new Map();
+  for (const row of c.db.prepare(
+    `SELECT f.target_id,f.field,a.value FROM field_resolution f JOIN assertion a ON a.id=f.assertion_id
+       WHERE f.field IN ('title','name','sortName','nickname','aliases','catalogue','key','form','period','instrumentation','date')`
+  ).iterate()) {
+    if (!values.has(row.target_id)) values.set(row.target_id, {});
+    values.get(row.target_id)[row.field] = parse2(row.value, null);
   }
-  file(key) {
-    const hash = createHash("sha1").update(key).digest("hex");
-    return path2.join(this.folder, hash.slice(0, 2), `${hash}.json`);
+  return values;
+}
+function classicalTracks(c, { workId = null } = {}) {
+  const tracks = /* @__PURE__ */ new Map();
+  for (const row of c.db.prepare(
+    workId ? `SELECT DISTINCT t.id,t.core_id,t.evidence FROM realization r JOIN realization_item i ON i.realization_id=r.id
+           JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id JOIN classification k ON k.target_id=t.id
+           WHERE r.work_id=? AND t.state='active' AND k.state='classical'` : `SELECT t.id,t.core_id,t.evidence FROM track_link t JOIN classification k ON k.target_id=t.id
+           WHERE t.state='active' AND k.state='classical'`
+  ).iterate(...workId ? [workId] : [])) {
+    const evidence = parse2(row.evidence, {});
+    tracks.set(row.id, { id: row.id, coreId: String(row.core_id), albumId: evidence.albumId == null ? null : String(evidence.albumId), durationMs: Number(evidence.durationMs) || 0, hints: evidence.hints || {} });
   }
-  async get(key, ttlMs) {
-    const entry = await readJson(this.file(key), null);
-    if (!entry || Date.now() - entry.time > ttlMs) return null;
-    return entry.value;
-  }
-  async set(key, value) {
-    await writeJson(this.file(key), { time: Date.now(), key, value }).catch(() => {
-    });
-  }
+  return tracks;
+}
+var yearOf = (value) => {
+  const match2 = String(value || "").match(/\b(1[5-9]\d\d|20\d\d)\b/);
+  return match2 ? Number(match2[1]) : null;
 };
-async function pruneCache(folder2, maxAgeMs) {
-  const stamp = path2.join(folder2, ".pruned");
-  const last = (await fs2.stat(stamp).catch(() => null))?.mtimeMs ?? 0;
-  if (Date.now() - last < 24 * 60 * 6e4) return 0;
-  await fs2.mkdir(folder2, { recursive: true });
-  await fs2.writeFile(stamp, "");
-  let removed = 0;
-  for (const dir of await fs2.readdir(folder2).catch(() => [])) {
-    const sub = path2.join(folder2, dir);
-    for (const name of await fs2.readdir(sub).catch(() => [])) {
-      const file = path2.join(sub, name);
-      const stat = await fs2.stat(file).catch(() => null);
-      if (stat && Date.now() - stat.mtimeMs > maxAgeMs) {
-        await fs2.rm(file, { force: true });
-        removed++;
-      }
-    }
-  }
-  return removed;
-}
-
-// src/tagger.js
-var LOCK_STALE_MS = 2 * 6e4;
-var SAVE_EVERY_MS = 3e4;
-var queueDir = (ctx) => path3.join(ctx.dataFolder, "queue");
-var processedFile = (ctx) => path3.join(ctx.dataFolder, "processed.json");
-var indexFile = (ctx) => path3.join(ctx.dataFolder, "library-index.json");
-var originalsFile = (ctx) => path3.join(ctx.dataFolder, "originals.json");
-var excludedFile = (ctx) => path3.join(ctx.dataFolder, "excluded.json");
-var worksFile = (ctx) => path3.join(ctx.dataFolder, "works.json");
-var TAG_FIELDS = ["artist", "albumArtist", "composer", "work", "workId"];
-var TAGGING_VERSION = 2;
-var outdated = (record) => record && (record.status === "tagged" || record.status === "unchanged") && (record.v ?? 1) < TAGGING_VERSION;
-var lockDir = (ctx) => path3.join(ctx.dataFolder, "tagging.lock");
-var yieldFile = (ctx) => path3.join(ctx.dataFolder, "tagging.yield");
-var YIELD_FRESH_MS = 10 * 6e4;
-var PRIORITY_WAIT_MS = 5 * 6e4;
-var ACTION_CLAIM_MS = 2 * 6e4;
-async function enqueue(ctx, filePaths, { force = false, source = null } = {}) {
-  await fs3.mkdir(queueDir(ctx), { recursive: true });
-  const ids = [];
-  for (const filePath of filePaths) {
-    if (!filePath) continue;
-    const id = `${Date.now().toString().padStart(15, "0")}-${randomUUID3()}`;
-    await writeJson(path3.join(queueDir(ctx), `${id}.json`), { path: filePath, force, source, at: Date.now() });
-    ids.push(id);
-  }
-  return ids;
-}
-async function queuedEntries(ctx) {
-  const names = (await fs3.readdir(queueDir(ctx)).catch(() => [])).filter((n) => n.endsWith(".json")).sort();
-  return names.map((name) => ({ name, file: path3.join(queueDir(ctx), name) }));
-}
-var queueLength = async (ctx) => (await queuedEntries(ctx)).length;
-async function allowedPath(ctx, filePath) {
-  const real = await fs3.realpath(filePath).catch(() => null);
-  if (!real) return null;
-  for (const root of [ctx.libraryFolder, ctx.dataFolder]) {
-    if (!root) continue;
-    const base = await fs3.realpath(root).catch(() => null);
-    if (!base) continue;
-    const relative = path3.relative(base, real);
-    if (relative && !relative.startsWith("..") && !path3.isAbsolute(relative)) return real;
-  }
-  return null;
-}
-var statKey = (stat) => ({ mtimeMs: Math.round(stat.mtimeMs), size: stat.size });
-var sameStat = (record, stat) => record && record.mtimeMs === Math.round(stat.mtimeMs) && record.size === stat.size;
-function indexEntry(tags, stat) {
-  return {
-    ...statKey(stat),
-    title: tags.title,
-    artist: tags.artist,
-    album: tags.album,
-    albumArtist: tags.albumArtist,
-    recordingMbid: tags.recordingMbid,
-    releaseMbid: tags.releaseMbid,
-    releaseGroupMbid: tags.releaseGroupMbid,
-    albumArtistMbids: tags.albumArtistMbids,
-    trackNumber: tags.trackNumber,
-    discNumber: tags.discNumber,
-    durationMs: tags.durationMs,
-    workId: tags.workId
-  };
-}
-var State = class {
-  constructor(ctx, lock) {
-    this.ctx = ctx;
-    this.lock = lock;
-    this.dirty = 0;
-    this.savedAt = Date.now();
-    this.refs = 0;
-    this.admins = 0;
-    this.background = 0;
-    this.claimed = /* @__PURE__ */ new Set();
-    this.busyPaths = /* @__PURE__ */ new Map();
-  }
-  async load() {
-    this.processed = await readJson(processedFile(this.ctx), {});
-    this.index = await readJson(indexFile(this.ctx), {});
-    this.originals = await readJson(originalsFile(this.ctx), {});
-    this.excluded = await readJson(excludedFile(this.ctx), {});
-    this.works = await readJson(worksFile(this.ctx), {});
-  }
-  // Saved every 30 seconds while working, and at the end: the index of a
-  // large Library is several megabytes.
-  async save(force = false) {
-    if (!this.dirty || !force && Date.now() - this.savedAt < SAVE_EVERY_MS) return;
-    this.savedAt = Date.now();
-    this.dirty = 0;
-    await writeJson(processedFile(this.ctx), this.processed);
-    await writeJson(indexFile(this.ctx), this.index);
-    await writeJson(originalsFile(this.ctx), this.originals);
-    await writeJson(excludedFile(this.ctx), this.excluded);
-    await writeJson(worksFile(this.ctx), this.works);
-    await this.lock.touch();
-  }
-  // One call at a time works on a file.
-  async exclusive(file, work) {
-    while (this.busyPaths.has(file)) await this.busyPaths.get(file).catch(() => {
-    });
-    const running = work();
-    this.busyPaths.set(file, running);
-    try {
-      return await running;
-    } finally {
-      this.busyPaths.delete(file);
-    }
-  }
-};
-var Session = class {
-  constructor(ctx, state, priority) {
-    this.ctx = ctx;
-    this.state = state;
-    this.priority = priority;
-    this.changedFiles = 0;
-    this.stats = { tagged: 0, unchanged: 0, skipped: {}, failed: 0, left: 0 };
-  }
-  get processed() {
-    return this.state.processed;
-  }
-  get index() {
-    return this.state.index;
-  }
-  get originals() {
-    return this.state.originals;
-  }
-  get excluded() {
-    return this.state.excluded;
-  }
-  get dirty() {
-    return this.state.dirty;
-  }
-  set dirty(value) {
-    this.state.dirty = value;
-  }
-  save(force = false) {
-    return this.state.save(force);
-  }
-  // True when an admin action wants the lock and this is background work:
-  // one in this process, or one waiting in another.
-  async shouldYield() {
-    if (this.priority) return false;
-    if (this.state.admins > 0) this.yielding = true;
-    else if (!this.yieldCheckedAt || Date.now() - this.yieldCheckedAt >= 500) {
-      this.yieldCheckedAt = Date.now();
-      const stat = await fs3.stat(yieldFile(this.ctx)).catch(() => null);
-      this.yielding = Boolean(stat && Date.now() - stat.mtimeMs < YIELD_FRESH_MS);
-    }
-    if (this.yielding && !this.yieldLogged) {
-      this.yieldLogged = true;
-      this.ctx.log("Pausing background tagging for an admin action");
-    }
-    return this.yielding;
-  }
-  record(filePath, stat, result) {
-    this.processed[filePath] = { ...statKey(stat), ...result, at: Date.now() };
-    this.dirty++;
-    if (result.status === "skipped") this.stats.skipped[result.reason] = (this.stats.skipped[result.reason] || 0) + 1;
-    else this.stats[result.status]++;
-  }
-  // Returns false when MusicBrainz can't be reached, so the caller stops.
-  async processFile(filePath, options = {}) {
-    const real = await allowedPath(this.ctx, filePath);
-    if (!real) {
-      this.ctx.log(`Not tagging ${filePath}: it isn't in the Library folder`);
-      this.stats.skipped["outside the Library"] = (this.stats.skipped["outside the Library"] || 0) + 1;
-      return true;
-    }
-    if (!isAudioPath(real)) return true;
-    return this.state.exclusive(real, () => this.processReal(real, { ...options, asPath: filePath }));
-  }
-  // `queuedAt`: when the request to tag was made. Classical tags an admin
-  // removed after that stay removed.
-  //
-  // `plan` (v0.3 8.7): an array that receives what would be written, with
-  // the file's current values, instead of writing or recording anything.
-  // `values`: write exactly these (a confirmed plan) instead of looking up.
-  // `asPath`: the path Aurral knows the file by, when it isn't `real`.
-  async processReal(real, { force = false, prefilter = false, upgrade = false, queuedAt = null, plan = null, values: planned = null, asPath = null } = {}) {
-    const { ctx } = this;
-    const stat = await fs3.stat(real);
-    const skip = (result) => plan ? plan.push({ file: real, status: "skipped", reason: result.reason }) : this.record(real, stat, result);
-    if (!force && sameStat(this.processed[real], stat) && !(upgrade && outdated(this.processed[real]))) return true;
-    let tags;
-    try {
-      tags = readTags(real);
-    } catch (error) {
-      skip({ status: "skipped", reason: error instanceof UnsupportedFormat ? "unsupported format" : "unreadable" });
-      return true;
-    }
-    if (!plan) this.index[real] = indexEntry(tags, stat);
-    if (!tags.recordingMbid) {
-      skip({ status: "skipped", reason: "no recording ID" });
-      return true;
-    }
-    if (this.excluded[tags.recordingMbid]) {
-      if (!force || queuedAt && (this.excluded[tags.recordingMbid].at ?? 0) > queuedAt) {
-        skip({ status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
-        return true;
-      }
-      if (!plan) delete this.excluded[tags.recordingMbid];
-    }
-    if (prefilter && ctx.resolver.classifyGenres(new Set(tags.genres.map((g) => g.toLowerCase()))) === false) {
-      this.record(real, stat, { status: "skipped", reason: "non-classical", recording: tags.recordingMbid });
-      return true;
-    }
-    let values = planned;
-    let fields = planned && { artist: planned.artist?.[0] || "", workId: planned.workId?.[0] || "" };
-    if (!values) {
-      fields = await ctx.resolver.resolve(tags.recordingMbid, {
-        trackArtistIds: tags.artistMbids,
-        albumArtistIds: tags.albumArtistMbids,
-        releaseGroupId: tags.releaseGroupMbid || null,
-        confirmed: force
-      });
-      if (!fields) {
-        const reason = ctx.resolver.skipReason;
-        if (reason === "unreachable") return false;
-        skip({ status: "skipped", reason, recording: tags.recordingMbid });
-        return true;
-      }
-      await this.rememberWork(real, tags.recordingMbid, fields, asPath);
-      values = { artist: [fields.artist], composer: fields.composers };
-      if (fields.workId) Object.assign(values, { work: [fields.work], workId: [fields.workId] });
-      const albumArtist = await this.englishAlbumArtist(tags);
-      if (albumArtist) values.albumArtist = [albumArtist];
-    }
-    if (plan) {
-      plan.push({ file: real, status: "planned", recording: tags.recordingMbid, values, current: readValues(real, Object.keys(values)) });
-      return true;
-    }
-    let changed;
-    try {
-      if (!this.originals[real]) {
-        this.originals[real] = { ...readValues(real, TAG_FIELDS), recording: tags.recordingMbid };
-        this.dirty++;
-        await writeJson(originalsFile(ctx), this.originals);
-      }
-      changed = await writeTags(real, values);
-    } catch (error) {
-      ctx.log(`Couldn't tag ${real}: ${error.message}`);
-      this.record(real, stat, { status: "skipped", reason: "couldn't write tags", recording: tags.recordingMbid });
-      return true;
-    }
-    const after = await fs3.stat(real);
-    this.index[real] = { ...this.index[real], ...statKey(after), artist: fields.artist, workId: fields.workId || "" };
-    this.record(real, after, {
-      v: TAGGING_VERSION,
-      status: changed.length ? "tagged" : "unchanged",
-      recording: tags.recordingMbid,
-      artist: fields.artist,
-      workId: fields.workId
-    });
-    if (changed.length) {
-      this.changedFiles++;
-      ctx.log(`Tagged ${path3.basename(real)}: ${fields.artist}`);
-    }
-    return true;
-  }
-  // Puts back the tags a file had before the plugin changed them. Files
-  // tagged before the plugin kept backups get the artist MusicBrainz credits
-  // for that track on its release, which is what Aurral writes.
-  async untagFile(filePath, mode = "restore") {
-    const real = await allowedPath(this.ctx, filePath);
-    if (!real || !isAudioPath(real)) return "skipped";
-    return this.state.exclusive(real, () => this.untagReal(real, mode));
-  }
-  // `plan` and `values` as in processReal.
-  async untagReal(real, mode = "restore", { plan = null, values: planned = null } = {}) {
-    const { ctx } = this;
-    const skip = (reason) => plan ? (plan.push({ file: real, status: "skipped", reason }), "skipped") : "skipped";
-    let tags;
-    try {
-      tags = readTags(real);
-    } catch {
-      return skip("unreadable");
-    }
-    if (tags.recordingMbid && !plan) this.excluded[tags.recordingMbid] = { at: Date.now() };
-    const original = this.originals[real];
-    let values = planned;
-    if (!values) {
-      if (mode === "clear") values = { composer: [], work: [], workId: [] };
-      else if (original) values = Object.fromEntries(TAG_FIELDS.map((field) => [field, original[field] ?? []]));
-      else {
-        const credit = await this.trackCredit(tags);
-        values = { composer: [], work: [], workId: [], ...credit && { artist: [credit] } };
-        if (tags.albumArtistMbids.length === 1) {
-          const name = (await ctx.mb.get("artist", tags.albumArtistMbids[0], "aliases+genres"))?.name;
-          if (name) values.albumArtist = [name];
-        }
-      }
-    }
-    if (plan) {
-      plan.push({ file: real, status: "planned", recording: tags.recordingMbid, restore: Boolean(original), values, current: readValues(real, Object.keys(values)) });
-      return "planned";
-    }
-    const changed = await writeTags(real, values);
-    if (mode !== "clear") delete this.originals[real];
-    const after = await fs3.stat(real);
-    this.index[real] = { ...this.index[real] ?? {}, ...indexEntry(readTags(real), after) };
-    this.record(real, after, { status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
-    this.stats.skipped["classical tags removed"]--;
-    if (changed.length) {
-      this.changedFiles++;
-      ctx.log(`Removed classical tags from ${path3.basename(real)}`);
-    }
-    return changed.length ? original && mode !== "clear" ? "restored" : "cleared" : "unchanged";
-  }
-  // Kept under Aurral's path as well, so album headings look tracks up
-  // without touching the disk (box sets run to thousands of tracks).
-  async rememberWork(real, recording, fields, asPath = null) {
-    const work = fields.workId ? await this.ctx.resolver.getWork(fields.workId) : null;
-    const stop = (above, below) => Boolean(catalogueNumber(below.title)) && !catalogueNumber(above.title);
-    const top = work ? await topWork(this.ctx.mb, work, 0, void 0, { stop }) : null;
-    const people = fields.people || {};
-    const performers = [...people.soloists || [], ...people.ensembles || [], ...people.conductors || []].map((p) => p.name);
-    this.state.works[real] = {
-      recording,
-      work: top?.id ? { id: top.id, title: top.title || fields.work || "" } : null,
-      movement: work?.title || fields.work || "",
-      composer: fields.classicalComposers || "",
-      performers: [...new Set(performers)].join(" \xB7 ")
-    };
-    if (asPath && asPath !== real) this.state.works[asPath] = this.state.works[real];
-    this.dirty++;
-  }
-  async englishAlbumArtist(tags) {
-    if (tags.albumArtistMbids.length !== 1) return null;
-    const artist = await this.ctx.resolver.getArtist(tags.albumArtistMbids[0]);
-    if (!artist?.name) return null;
-    const [name] = await this.ctx.resolver.englishNames(artist);
-    return name || null;
-  }
-  // MusicBrainz's artist credit for this recording on the file's release,
-  // else on the recording itself.
-  async trackCredit(tags) {
-    const { mb } = this.ctx;
-    if (tags.releaseMbid) {
-      const release = await mb.get("release", tags.releaseMbid, RELEASE_INC);
-      for (const medium of release?.media || [])
-        for (const track of medium.tracks || [])
-          if (track.recording?.id === tags.recordingMbid) {
-            const credit = creditString(track["artist-credit"] || track.recording["artist-credit"]);
-            if (credit) return credit;
-          }
-    }
-    const recording = await mb.get("recording", tags.recordingMbid, "artist-credits");
-    return creditString(recording?.["artist-credit"]) || null;
-  }
-  async drainQueue(until, onlyIds = null) {
-    for (const entry of await queuedEntries(this.ctx)) {
-      if (Date.now() > until || await this.shouldYield()) return false;
-      if (onlyIds && !onlyIds.has(entry.name.replace(/\.json$/, ""))) continue;
-      if (this.state.claimed.has(entry.name)) continue;
-      this.state.claimed.add(entry.name);
-      try {
-        const job = await readJson(entry.file, null);
-        if (!this.priority && job?.source === "action" && Date.now() - (job.at || 0) < ACTION_CLAIM_MS) continue;
-        if (job?.path) {
-          const reachable = await this.processFile(job.path, { force: job.force, queuedAt: job.at });
-          if (!reachable) return false;
-        }
-        await fs3.rm(entry.file, { force: true });
-      } finally {
-        this.state.claimed.delete(entry.name);
-      }
-      await this.save();
-    }
-    return true;
-  }
-  // Walks the Library, refreshing the index, and returns files that have a
-  // recording ID and were never processed (or changed since). Stops at
-  // `until`; unchanged files cost only a stat, so the next run gets further.
-  async scan(until) {
-    const root = this.ctx.libraryFolder;
-    const pending = [];
-    const seen = /* @__PURE__ */ new Set();
-    let complete = true;
-    const walk = async (dir) => {
-      if (Date.now() > until || await this.shouldYield()) {
-        complete = false;
-        return;
-      }
-      const entries = await fs3.readdir(dir, { withFileTypes: true }).catch(() => []);
-      for (const entry of entries) {
-        if (Date.now() > until || await this.shouldYield()) {
-          complete = false;
-          return;
-        }
-        if (entry.name.startsWith(".")) continue;
-        const full = path3.join(dir, entry.name);
-        if (entry.isDirectory()) await walk(full);
-        else if (entry.isFile() && isAudioPath(full)) {
-          seen.add(full);
-          const stat = await fs3.stat(full).catch(() => null);
-          if (!stat) continue;
-          if (!sameStat(this.index[full], stat)) {
-            try {
-              this.index[full] = indexEntry(readTags(full), stat);
-            } catch {
-              delete this.index[full];
-              continue;
-            }
-            this.dirty++;
-            await this.save();
-          }
-          if (this.index[full].recordingMbid && (!sameStat(this.processed[full], stat) || outdated(this.processed[full]))) pending.push(full);
-        }
-      }
-    };
-    if (root) await walk(root);
-    if (complete) {
-      for (const file of Object.keys(this.index)) if (file.startsWith(root) && !seen.has(file)) delete this.index[file];
-    }
-    this.scanComplete = complete;
-    return pending;
-  }
-};
-var held = /* @__PURE__ */ new Map();
-async function openState(ctx, priority) {
-  let lock = await tryLock(lockDir(ctx), LOCK_STALE_MS);
-  if (!lock && priority) {
-    ctx.log("Waiting for background tagging in another process to pause");
-    const until = Date.now() + PRIORITY_WAIT_MS;
-    while (!lock && Date.now() < until) {
-      await writeJson(yieldFile(ctx), { at: Date.now() });
-      await sleep(500);
-      lock = await tryLock(lockDir(ctx), LOCK_STALE_MS);
-    }
-    await fs3.rm(yieldFile(ctx), { force: true });
-    if (!lock) ctx.log("Tagging in another process didn't pause within 5 minutes");
-  }
-  if (!lock) return null;
-  const state = new State(ctx, lock);
-  try {
-    await state.load();
-  } catch (error) {
-    await lock.release();
-    throw error;
-  }
-  state.heartbeat = setInterval(() => lock.touch(), 3e4);
-  return state;
-}
-async function withTagging(ctx, work, { priority = false } = {}) {
-  const key = path3.resolve(ctx.dataFolder);
-  let entry;
-  for (; ; ) {
-    entry = held.get(key);
-    if (!entry) {
-      entry = { opening: openState(ctx, priority), state: null };
-      held.set(key, entry);
-      try {
-        entry.state = await entry.opening;
-      } catch (error) {
-        held.delete(key);
-        throw error;
-      }
-      if (!entry.state) {
-        held.delete(key);
-        return null;
-      }
-      break;
-    }
-    if (!entry.state) {
-      if (!priority) return null;
-      await entry.opening.catch(() => {
-      });
-      if (held.get(key) === entry && entry.state) break;
-      continue;
-    }
-    if (!priority && entry.state.background > 0) return null;
-    break;
-  }
-  const { state } = entry;
-  const session = new Session(ctx, state, priority);
-  state.refs++;
-  if (priority) state.admins++;
-  else state.background++;
-  try {
-    await work(session);
-    return session.stats;
-  } finally {
-    if (priority) state.admins--;
-    else state.background--;
-    if (--state.refs === 0) {
-      held.delete(key);
-      clearInterval(state.heartbeat);
-      await state.save(true).catch((error) => ctx.log(`Couldn't save progress: ${error.message}`));
-      await state.lock.release();
-    } else {
-      await state.save().catch(() => {
-      });
-    }
-    if (session.changedFiles) await refreshLibrary(ctx);
-  }
-}
-async function refreshLibrary(ctx) {
-  if (!ctx.api?.url || !ctx.api?.key) return;
-  try {
-    await new Aurral(ctx.api, ctx.fetch).refreshLibrary();
-  } catch (error) {
-    ctx.log(`Couldn't ask Aurral to rescan the Library: ${error.message}`);
-  }
-}
-async function runQueue(ctx, budgetMs, onlyIds = null, { priority = false } = {}) {
-  const until = Date.now() + budgetMs;
-  return withTagging(
-    ctx,
-    async (session) => {
-      await session.drainQueue(until, onlyIds);
-      session.stats.left = onlyIds ? (await queuedEntries(ctx)).filter((e) => onlyIds.has(e.name.replace(/\.json$/, ""))).length : await queueLength(ctx);
-    },
-    { priority }
+function lazyValues(c) {
+  const statement = c.db.prepare(
+    `SELECT f.field,a.value FROM field_resolution f JOIN assertion a ON a.id=f.assertion_id
+     WHERE f.target_id=? AND f.field IN ('title','name','aliases')`
   );
-}
-async function runScheduled(ctx, budgetMs) {
-  const until = Date.now() + budgetMs;
-  return withTagging(ctx, async (session) => {
-    if (!await session.drainQueue(until)) return;
-    const pending = await session.scan(until);
-    session.stats.found = pending.length;
-    for (const file of pending) {
-      if (Date.now() > until || await session.shouldYield()) break;
-      if (!await session.processFile(file, { prefilter: true, upgrade: true })) break;
-      await session.save();
+  const seen = /* @__PURE__ */ new Map();
+  return {
+    get(id) {
+      if (!seen.has(id)) seen.set(id, Object.fromEntries(statement.all(id).map((row) => [row.field, parse2(row.value, null)])));
+      return seen.get(id);
     }
-    session.stats.left = await queueLength(ctx) + pending.filter((f) => !session.processed[f]).length;
+  };
+}
+function ownedRecordings(c, tracks = void 0, values = void 0, { workId = null } = {}) {
+  tracks ??= classicalTracks(c, { workId });
+  values ??= workId ? lazyValues(c) : resolvedValues(c);
+  const rows = c.db.prepare(
+    `SELECT r.id AS realization,r.work_id,r.performance_work_id,pw.source_id AS performance_id,r.label,i.movement_id,i.sequence,s.track_link_id,s.start_ms,s.end_ms
+       FROM realization r JOIN relation pw ON pw.id=r.performance_work_id
+       JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
+       JOIN entity w ON w.id=r.work_id AND w.deleted_at IS NULL
+       ${workId ? "WHERE r.work_id=?" : ""}
+       ORDER BY r.id,i.sequence,i.occurrence,i.id`
+  ).all(...workId ? [workId] : []);
+  const credits2 = c.db.prepare(
+    `SELECT k.role,k.instrument,k.contributor_id FROM relation pw JOIN credit k ON k.target_id=pw.source_id
+     JOIN entity e ON e.id=k.contributor_id AND e.deleted_at IS NULL WHERE pw.id=? AND k.state='active' ORDER BY k.position,k.id`
+  );
+  const byRealization = /* @__PURE__ */ new Map();
+  for (const row of rows) {
+    const track = tracks.get(row.track_link_id);
+    if (!track) continue;
+    if (!byRealization.has(row.realization)) byRealization.set(row.realization, { id: row.realization, workId: row.work_id, performanceWorkId: row.performance_work_id, performanceId: row.performance_id, label: row.label, items: [] });
+    byRealization.get(row.realization).items.push({ movementId: row.movement_id, sequence: row.sequence, track, startMs: row.start_ms, endMs: row.end_ms });
+  }
+  const recordings = [];
+  for (const recording of byRealization.values()) {
+    const first = recording.items[0].track;
+    const people = credits2.all(recording.performanceWorkId).map((row) => ({ id: row.contributor_id, role: row.role, instrument: row.instrument, name: text2(values.get(row.contributor_id)?.name) || "Unknown" }));
+    const performers = people.filter((p) => PERFORMER_ROLES.has(p.role));
+    const tagged = performers.length ? [] : performerNames(first.hints, list2(first.hints.composer), fold);
+    const albums = [...new Set(recording.items.map((item) => item.track.albumId).filter(Boolean))];
+    const mbids = [...new Set(recording.items.map((item) => item.track.hints.recordingMbid).filter(Boolean))].sort();
+    const parts = /* @__PURE__ */ new Map();
+    for (const item of recording.items) {
+      const ms = item.endMs != null ? item.endMs - item.startMs : Math.max(0, item.track.durationMs - (item.startMs || 0));
+      const key = item.movementId || `seq:${item.sequence}`;
+      parts.set(key, (parts.get(key) || 0) + ms);
+    }
+    const trackMs = [];
+    for (const item of recording.items) {
+      const last2 = trackMs.at(-1);
+      const ms = item.endMs != null ? item.endMs - item.startMs : Math.max(0, item.track.durationMs - (item.startMs || 0));
+      if (last2 && last2.track === item.track.id && last2.start === item.startMs) continue;
+      trackMs.push({ track: item.track.id, start: item.startMs, ms });
+    }
+    recordings.push({
+      ...recording,
+      trackMs: trackMs.map((entry) => entry.ms),
+      people: performers,
+      taggedPerformers: tagged,
+      performerNames: performers.length ? performers.map((p) => p.name) : tagged,
+      albums,
+      album: text2(recording.label) || text2(first.hints.album),
+      label: text2(first.hints.label),
+      year: yearOf(first.hints.date) ?? yearOf(first.hints.year),
+      mbids,
+      parts,
+      durationMs: [...parts.values()].reduce((sum, ms) => sum + ms, 0),
+      live: LIVE.test(`${first.hints.album || ""} ${recording.label || ""}`)
+    });
+  }
+  return recordings;
+}
+function sameRecording(a, b) {
+  if (a.workId !== b.workId || a.id === b.id) return false;
+  if (a.albums.some((album) => b.albums.includes(album))) return false;
+  if (a.mbids.length && b.mbids.length) return a.mbids.length === b.mbids.length && a.mbids.every((id, i) => id === b.mbids[i]);
+  const names = (r) => r.performerNames.map(fold).filter(Boolean).sort().join("|");
+  if (!names(a) || names(a) !== names(b)) return false;
+  if (a.parts.size !== b.parts.size || a.parts.size === 0) return false;
+  for (const [key, ms] of a.parts) {
+    const other = b.parts.get(key);
+    if (other == null || Math.abs(other - ms) > 2e3) return false;
+  }
+  return a.trackMs.length === b.trackMs.length && a.trackMs.every((ms, i) => Math.abs(ms - b.trackMs[i]) <= 2e3);
+}
+var performancePair = (a, b) => a < b ? `${a}|${b}` : `${b}|${a}`;
+function reissueState(c) {
+  const linked = new Set(c.db.prepare("SELECT source_id,target_id FROM relation WHERE kind='same_recording'").all().map((row) => performancePair(row.source_id, row.target_id)));
+  const unlinked = /* @__PURE__ */ new Set();
+  for (const row of c.db.prepare("SELECT action,data FROM audit_event WHERE action IN ('reissue.link','reissue.unlink') ORDER BY id").iterate()) {
+    const { a, b } = JSON.parse(row.data);
+    if (row.action === "reissue.unlink") unlinked.add(performancePair(a, b));
+    else unlinked.delete(performancePair(a, b));
+  }
+  return { linked, unlinked };
+}
+function groupRecordings(recordings, state = null) {
+  const same3 = (a, b) => {
+    if (state && a.performanceId && b.performanceId && a.performanceId !== b.performanceId) {
+      const key = performancePair(a.performanceId, b.performanceId);
+      if (state.linked.has(key)) return true;
+      if (state.unlinked.has(key)) return false;
+    }
+    return sameRecording(a, b);
+  };
+  const groups = [];
+  for (const recording of recordings) {
+    const group = groups.find((g) => g.realizations.some((other) => same3(recording, other)));
+    if (group) group.realizations.push(recording);
+    else groups.push({ key: recording.id, realizations: [recording] });
+  }
+  return groups;
+}
+function addTerms(terms, doc, value, field) {
+  for (const word of words2(value)) {
+    terms.add(`${word}\0${doc}\0${field}`);
+    const skel = field === FIELD.primary ? skeleton(word) : "";
+    if (skel) terms.add(`${skel}\0${doc}\0${FIELD.skeleton}`);
+  }
+}
+function ensureSearchIndex(c, { force = false } = {}) {
+  const started = performance.now();
+  const stamp = catalogueStamp(c);
+  const state = c.db.prepare("SELECT stamp,docs FROM search_state WHERE id=1").get();
+  if (!force && state?.stamp === stamp) return { rebuilt: false, docs: state.docs, ms: performance.now() - started };
+  const docs = buildDocuments(c);
+  transaction(c.db, () => {
+    for (const table of ["search_term", "search_key", "search_facet", "search_doc"]) c.db.exec(`DELETE FROM ${table}`);
+    const insertDoc = c.db.prepare("INSERT INTO search_doc(id,kind,ref,work_id,title,subtitle,detail,owned,boost,data,sort_title,sort_key,sort_date) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)");
+    const insertTerm = c.db.prepare("INSERT OR IGNORE INTO search_term VALUES (?,?,?)");
+    const insertKey = c.db.prepare("INSERT OR IGNORE INTO search_key VALUES (?,?)");
+    const insertFacet = c.db.prepare("INSERT OR IGNORE INTO search_facet VALUES (?,?,?,?)");
+    docs.forEach((doc, index) => {
+      const id = index + 1;
+      const sort = doc.sort || {};
+      insertDoc.run(id, doc.kind, doc.ref, doc.workId ?? null, doc.title.slice(0, 500), doc.subtitle.slice(0, 500), doc.detail.slice(0, 500), doc.owned ? 1 : 0, doc.boost || 0, JSON.stringify(doc.data || {}), String(sort.title || "").slice(0, 200), String(sort.key || "").slice(0, 200), String(sort.date || "").slice(0, 20));
+      const terms = /* @__PURE__ */ new Set();
+      for (const value of doc.primary) addTerms(terms, id, value, FIELD.primary);
+      for (const value of doc.secondary) addTerms(terms, id, value, FIELD.secondary);
+      for (const entry of terms) {
+        const [term, , field] = entry.split("\0");
+        insertTerm.run(term, id, Number(field));
+      }
+      for (const key of doc.keys) insertKey.run(key, id);
+      for (const [facet, value, label] of doc.facets) insertFacet.run(facet, String(value).slice(0, 200), id, String(label).slice(0, 200));
+    });
+    c.db.prepare("INSERT INTO search_state VALUES (1,?,?,?) ON CONFLICT(id) DO UPDATE SET stamp=excluded.stamp,built_at=excluded.built_at,docs=excluded.docs").run(stamp, Date.now(), docs.length);
   });
+  return { rebuilt: true, docs: docs.length, ms: performance.now() - started };
 }
-async function libraryIndex(ctx, budgetMs, { priority = false } = {}) {
-  let index = null;
-  await withTagging(
-    ctx,
-    async (session) => {
-      await session.scan(Date.now() + budgetMs);
-      index = session.index;
-    },
-    { priority }
-  );
-  return index ?? await readJson(indexFile(ctx), {});
+var keysOf = (...sources) => [...new Set(sources.flat().flatMap((value) => catalogueKeys(value).map((item) => item.key)))];
+function buildDocuments(c) {
+  const values = resolvedValues(c);
+  const tracks = classicalTracks(c);
+  const name = (id) => text2(values.get(id)?.name) || text2(values.get(id)?.title) || "";
+  const entities = c.db.prepare("SELECT id,kind FROM entity WHERE deleted_at IS NULL AND kind IN ('work','movement','person','ensemble','collection')").all();
+  const kindOf = new Map(entities.map((e) => [e.id, e.kind]));
+  const creditsOf = /* @__PURE__ */ new Map();
+  for (const row of c.db.prepare("SELECT target_id,contributor_id,role,instrument FROM credit WHERE state='active' ORDER BY position,id").iterate()) {
+    if (!kindOf.has(row.contributor_id)) continue;
+    if (!creditsOf.has(row.target_id)) creditsOf.set(row.target_id, []);
+    creditsOf.get(row.target_id).push({ id: row.contributor_id, role: row.role, instrument: row.instrument });
+  }
+  const movementsOf = /* @__PURE__ */ new Map();
+  const workOfMovement = /* @__PURE__ */ new Map();
+  for (const row of c.db.prepare("SELECT source_id,target_id FROM relation WHERE kind='movement' ORDER BY position,occurrence,id").iterate()) {
+    if (kindOf.get(row.source_id) !== "work" || !kindOf.has(row.target_id)) continue;
+    if (!movementsOf.has(row.source_id)) movementsOf.set(row.source_id, []);
+    movementsOf.get(row.source_id).push(row.target_id);
+    workOfMovement.set(row.target_id, row.source_id);
+  }
+  const collectionsOf = /* @__PURE__ */ new Map();
+  for (const row of c.db.prepare("SELECT source_id,target_id FROM relation WHERE kind='collection_member'").iterate()) {
+    if (!collectionsOf.has(row.target_id)) collectionsOf.set(row.target_id, []);
+    collectionsOf.get(row.target_id).push(row.source_id);
+  }
+  const recordings = ownedRecordings(c, tracks, values);
+  const groups = groupRecordings(recordings, reissueState(c));
+  const recordingsOf = /* @__PURE__ */ new Map();
+  for (const group of groups) {
+    const workId = group.realizations[0].workId;
+    if (!recordingsOf.has(workId)) recordingsOf.set(workId, []);
+    recordingsOf.get(workId).push(group);
+  }
+  const composersOf2 = (workId) => (creditsOf.get(workId) || []).filter((k) => k.role === "composer");
+  const workTitle = (workId) => text2(values.get(workId)?.title) || "Untitled work";
+  const docs = [];
+  const workFacets = /* @__PURE__ */ new Map();
+  const workKeys = /* @__PURE__ */ new Map();
+  for (const { id } of entities.filter((e) => e.kind === "work")) {
+    const v = values.get(id) || {};
+    const title = workTitle(id);
+    const composers = composersOf2(id);
+    const facets = [];
+    for (const k of composers) facets.push(["composer", k.id, name(k.id)]);
+    if (text2(v.period)) facets.push(["period", fold(v.period), text2(v.period)]);
+    if (text2(v.form)) facets.push(["form", fold(v.form), text2(v.form)]);
+    for (const instrument of list2(v.instrumentation)) facets.push(["instrument", fold(instrument), instrument]);
+    workFacets.set(id, facets);
+    const groupsHere = recordingsOf.get(id) || [];
+    const recordingFacets = groupsHere.flatMap((group) => recordingGroupFacets(group, name));
+    const owned = groupsHere.length > 0;
+    docs.push({
+      kind: "work",
+      ref: id,
+      workId: id,
+      title,
+      subtitle: composers.map((k) => name(k.id)).filter(Boolean).join(", "),
+      detail: [text2(v.nickname) && `\u201C${text2(v.nickname)}\u201D`, owned ? `${groupsHere.length} recording${groupsHere.length === 1 ? "" : "s"}` : "Not in your library"].filter(Boolean).join(" \xB7 "),
+      owned,
+      boost: KIND_BOOST.work,
+      primary: [title, text2(v.nickname), ...list2(v.aliases), ...list2(v.catalogue)],
+      secondary: [...composers.map((k) => name(k.id)), ...composers.flatMap((k) => list2(values.get(k.id)?.aliases)), text2(v.key), text2(v.form), ...(collectionsOf.get(id) || []).map(name)],
+      keys: workKeys.set(id, keysOf(title, list2(v.catalogue), list2(v.aliases), text2(v.nickname))).get(id),
+      facets: [...facets, ...dedupeFacets(recordingFacets.filter(([facet]) => facet !== "year" && facet !== "type")), ["owned", owned ? "owned" : "missing", owned ? "In your library" : "Not in your library"]],
+      data: { nickname: text2(v.nickname), form: text2(v.form), catalogue: list2(v.catalogue)[0] || "", date: text2(v.date), recordings: groupsHere.length },
+      sort: { title: sortTitle(v, title), key: sortKey(workKeys.get(id)), date: sortDate(v.date) }
+    });
+  }
+  for (const [workId, movements] of movementsOf) {
+    const title = workTitle(workId);
+    const composers = composersOf2(workId).map((k) => name(k.id));
+    const owned = (recordingsOf.get(workId) || []).length > 0;
+    movements.forEach((movement, index) => {
+      const v = values.get(movement) || {};
+      const movementTitle2 = text2(v.title) || `Movement ${index + 1}`;
+      docs.push({
+        kind: "movement",
+        ref: movement,
+        workId,
+        title: movementTitle2,
+        subtitle: [title, composers.join(", ")].filter(Boolean).join(" \xB7 "),
+        detail: "",
+        owned,
+        boost: KIND_BOOST.movement,
+        primary: [movementTitle2, ...list2(v.aliases)],
+        secondary: [title, text2(values.get(workId)?.nickname), ...composers],
+        keys: keysOf(title),
+        facets: [...workFacets.get(workId) || [], ["owned", owned ? "owned" : "missing", owned ? "In your library" : "Not in your library"]],
+        data: { position: index + 1 },
+        sort: { title: fold(movementTitle2), key: String(index + 1).padStart(6, "0"), date: "" }
+      });
+    });
+  }
+  for (const group of groups) {
+    const lead = group.realizations[0];
+    const work = values.get(lead.workId) || {};
+    const title = workTitle(lead.workId);
+    const composers = composersOf2(lead.workId).map((k) => name(k.id));
+    const albums2 = [...new Set(group.realizations.map((r) => r.album).filter(Boolean))];
+    const years = group.realizations.map((r) => r.year).filter(Boolean);
+    const movements = movementsOf.get(lead.workId) || [];
+    const have = movements.filter((m) => group.realizations.some((r) => r.parts.has(m))).length;
+    const complete = have === movements.length;
+    const people = group.realizations.flatMap((r) => r.people).filter((p, at, all) => all.findIndex((other) => other.id === p.id) === at).slice(0, 40).map((p) => ({ id: p.id, role: p.role, instrument: p.instrument || null }));
+    docs.push({
+      kind: "recording",
+      ref: group.key,
+      workId: lead.workId,
+      title: lead.performerNames.join(", ") || albums2[0] || "Recording",
+      subtitle: [title, composers.join(", ")].filter(Boolean).join(" \xB7 "),
+      detail: [albums2.join(" / "), years.length ? Math.min(...years) : null, group.realizations.length > 1 ? `${group.realizations.length} releases` : null].filter(Boolean).join(" \xB7 "),
+      owned: true,
+      boost: KIND_BOOST.recording,
+      primary: [...lead.performerNames, ...lead.people.flatMap((p) => list2(values.get(p.id)?.aliases))],
+      secondary: [title, text2(work.nickname), ...list2(work.aliases), ...composers, ...albums2],
+      keys: keysOf(title, list2(work.catalogue), list2(work.aliases)),
+      facets: [...workFacets.get(lead.workId) || [], ...recordingGroupFacets(group, name), ...creditFacets(group.realizations.flatMap((r) => r.people)), ["type", complete ? "complete" : "partial", complete ? "Complete work" : "Excerpt or incomplete"], ["owned", "owned", "In your library"]],
+      sort: { title: fold(title), key: sortKey(workKeys.get(lead.workId)), date: years.length ? String(Math.min(...years)) : "" },
+      data: {
+        realizations: group.realizations.map((r) => r.id),
+        albums: [...new Set(group.realizations.flatMap((r) => r.albums))],
+        roles: Object.fromEntries(lead.people.map((p) => [p.id, p.role])),
+        performance: lead.performanceId,
+        work: title,
+        composers: composersOf2(lead.workId).map((k) => [k.id, name(k.id)]),
+        people,
+        have,
+        of: movements.length,
+        year: years.length ? Math.min(...years) : null
+      }
+    });
+  }
+  const roles2 = /* @__PURE__ */ new Map();
+  for (const [target, list_] of creditsOf)
+    for (const k of list_) {
+      if (!roles2.has(k.id)) roles2.set(k.id, { roles: /* @__PURE__ */ new Set(), credits: [], works: 0, recordings: 0 });
+      const entry = roles2.get(k.id);
+      entry.roles.add(k.role);
+      entry.credits.push(k);
+      if (kindOf.get(target) === "work") entry.works++;
+      else entry.recordings++;
+    }
+  for (const [id, entry] of roles2) {
+    const v = values.get(id) || {};
+    const display = name(id);
+    if (!display) continue;
+    const isComposer2 = entry.roles.has("composer");
+    const performerRoles = [...entry.roles].filter((role) => PERFORMER_ROLES.has(role));
+    const facets = [];
+    if (isComposer2) facets.push(["composer", id, display]);
+    for (const role of performerRoles) {
+      facets.push(["performer", id, display]);
+      if (role === "conductor") facets.push(["conductor", id, display]);
+      if (ENSEMBLE_ROLES2.has(role)) facets.push(["ensemble", id, display]);
+    }
+    if (performerRoles.length) facets.push(...creditFacets(entry.credits.filter((k) => PERFORMER_ROLES.has(k.role))));
+    const common = { ref: id, title: display, owned: true, primary: [display, ...list2(v.aliases)], secondary: [], keys: [], facets: dedupeFacets(facets), sort: { title: sortTitle(v, display), key: "", date: sortDate(v.date) } };
+    const label = [...entry.roles].sort((a, b) => roleRank(a) - roleRank(b) || (a < b ? -1 : 1)).map((role) => ROLE_LABEL[role] || role).join(" \xB7 ");
+    const entity = kindOf.get(id);
+    if (isComposer2) docs.push({ ...common, kind: "composer", subtitle: "Composer", detail: `${entry.works} work${entry.works === 1 ? "" : "s"}`, boost: KIND_BOOST.composer, data: { roles: [...entry.roles], entity } });
+    if (performerRoles.length) docs.push({ ...common, kind: "performer", subtitle: label, detail: "", boost: KIND_BOOST.performer, data: { roles: performerRoles, entity } });
+  }
+  const albums = /* @__PURE__ */ new Map();
+  for (const track of tracks.values()) {
+    if (!track.albumId) continue;
+    if (!albums.has(track.albumId)) albums.set(track.albumId, { title: text2(track.hints.album) || "Unknown album", artist: text2(track.hints.albumArtist || track.hints.artist), year: yearOf(track.hints.date) ?? yearOf(track.hints.year), tracks: 0, works: /* @__PURE__ */ new Set() });
+    albums.get(track.albumId).tracks++;
+  }
+  for (const recording of recordings) for (const album of recording.albums) albums.get(album)?.works.add(recording.workId);
+  for (const [albumId, album] of albums) {
+    const works = [...album.works];
+    docs.push({
+      kind: "release",
+      ref: albumId,
+      title: album.title,
+      subtitle: album.artist,
+      detail: [album.year, `${album.tracks} track${album.tracks === 1 ? "" : "s"}`].filter(Boolean).join(" \xB7 "),
+      owned: true,
+      boost: KIND_BOOST.release,
+      primary: [album.title],
+      secondary: [album.artist, ...works.map(workTitle)],
+      keys: [.../* @__PURE__ */ new Set([...keysOf(album.title), ...works.flatMap((w) => workKeys.get(w) || [])])],
+      facets: dedupeFacets([...works.flatMap((w) => workFacets.get(w) || []), ...album.year ? [["year", String(album.year), String(album.year)]] : [], ["owned", "owned", "In your library"]]),
+      data: { works },
+      sort: { title: fold(album.title), key: "", date: album.year ? String(album.year) : "" }
+    });
+  }
+  return docs;
 }
-var readWorks = (ctx) => readJson(worksFile(ctx), {});
-function describeStats(stats) {
-  if (!stats) return "Another tagging run is in progress";
-  const parts = [`${stats.tagged} tagged`];
-  if (stats.unchanged) parts.push(`${stats.unchanged} already right`);
-  for (const [reason, count] of Object.entries(stats.skipped)) parts.push(`${count} skipped (${reason})`);
-  if (stats.failed) parts.push(`${stats.failed} failed`);
-  if (stats.left) parts.push(`${stats.left} left for the next run`);
-  return parts.join(", ");
+function recordingGroupFacets(group, name) {
+  const facets = [];
+  const credited = group.realizations.some((recording) => recording.people.length);
+  for (const recording of group.realizations) {
+    for (const person of recording.people) {
+      facets.push(["performer", person.id, person.name || name(person.id)]);
+      if (person.role === "conductor") facets.push(["conductor", person.id, person.name]);
+      if (ENSEMBLE_ROLES2.has(person.role)) facets.push(["ensemble", person.id, person.name]);
+    }
+    if (!credited) for (const performer of recording.taggedPerformers) facets.push(["performer", `name:${fold(performer)}`, performer]);
+    if (recording.year) facets.push(["year", String(recording.year), String(recording.year)]);
+    if (recording.live) facets.push(["type", "live", "Live"]);
+  }
+  return dedupeFacets(facets);
+}
+function creditFacets(credits2) {
+  const facets = [];
+  for (const credit of credits2) {
+    if (!PERFORMER_ROLES.has(credit.role)) continue;
+    facets.push(["role", credit.role, ROLE_LABEL[credit.role] || credit.role]);
+    if (text2(credit.instrument)) facets.push(["instrument", fold(credit.instrument), text2(credit.instrument)]);
+  }
+  return facets;
+}
+var sortTitle = (values, title) => fold(text2(values.sortName) || title);
+var sortKey = (keys = []) => keys[0] ? keys[0].replace(/\d+/g, (digits) => digits.padStart(6, "0")) : "";
+var sortDate = (value) => typeof value === "string" && /^\d{4}/.test(value.trim()) ? value.trim().slice(0, 10) : "";
+function dedupeFacets(facets) {
+  const seen = /* @__PURE__ */ new Set();
+  return facets.filter(([facet, value]) => !seen.has(`${facet}\0${value}`) && seen.add(`${facet}\0${value}`));
+}
+var last = (a, b) => a && b ? a.localeCompare(b) : a ? -1 : b ? 1 : 0;
+var natural = new Intl.Collator("en", { numeric: true });
+var byTitle = (a, b) => natural.compare(a.doc.sort_title, b.doc.sort_title) || natural.compare(a.doc.title, b.doc.title) || a.doc.id - b.doc.id;
+var SORTS = {
+  title: byTitle,
+  catalogue: (a, b) => last(a.doc.sort_key, b.doc.sort_key) || byTitle(a, b),
+  date: (a, b) => last(a.doc.sort_date, b.doc.sort_date) || byTitle(a, b),
+  "date-desc": (a, b) => (a.doc.sort_date && b.doc.sort_date ? b.doc.sort_date.localeCompare(a.doc.sort_date) : last(a.doc.sort_date, b.doc.sort_date)) || byTitle(a, b)
+};
+var SORT_ORDERS = Object.keys(SORTS);
+
+// src/model/reissues.js
+var pair = (a, b) => a < b ? `${a}|${b}` : `${b}|${a}`;
+function link(c, a, b) {
+  const [source, target] = a < b ? [a, b] : [b, a];
+  const position = c.db.prepare("SELECT coalesce(max(position),0)+1 AS n FROM relation WHERE kind='same_recording' AND source_id=?").get(source).n;
+  c.relate("same_recording", source, target, { position });
+}
+function linkReissues(c, { albumId = null } = {}) {
+  const works = albumId == null ? null : c.db.prepare(
+    `SELECT DISTINCT r.work_id FROM realization r JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
+             JOIN track_link t ON t.id=s.track_link_id WHERE CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?`
+  ).all(String(albumId)).map((row) => row.work_id);
+  if (works && !works.length) return 0;
+  const tracks = classicalTracks(c);
+  const values = resolvedValues(c);
+  const recordings = works ? works.flatMap((workId) => ownedRecordings(c, tracks, values, { workId })) : ownedRecordings(c, tracks, values);
+  const { linked, unlinked } = reissueState(c);
+  let added = 0;
+  const byWork = /* @__PURE__ */ new Map();
+  for (const recording of recordings) byWork.set(recording.workId, [...byWork.get(recording.workId) || [], recording]);
+  for (const list3 of byWork.values())
+    for (let i = 0; i < list3.length; i++)
+      for (let j = i + 1; j < list3.length; j++) {
+        const [a, b] = [list3[i], list3[j]];
+        const key = pair(a.performanceId, b.performanceId);
+        if (a.performanceId === b.performanceId || linked.has(key) || unlinked.has(key) || !sameRecording(a, b)) continue;
+        link(c, a.performanceId, b.performanceId);
+        linked.add(key);
+        added++;
+      }
+  return added;
 }
 
-// src/titles.js
+// src/model/auto-match.js
 var MULTI_MOVEMENT = /\b(symphon(?:y|ie)|sinfonia|sonata|sonatina|concerto|suite|partita|quartet|quintet|sextet|septet|octet|nonet|trio|serenade|divertimento|cassation|mass|missa|requiem|stabat mater|magnificat|te deum|vespers|cantata|oratorio|passion|variations?|ballet)\b/i;
+var COLLECTION_LIKE = new RegExp("(?<!\\p{L})(etudes?|\xE9tudes?|preludes?|pr\xE9ludes?|songs?|lieder)(?!\\p{L})", "iu");
+var isCollectionLike = (value) => COLLECTION_LIKE.test(clean2(value));
 var MOVEMENT_PREFIX = /^(?:[IVXLCDM]+|\d+)[.)\s:-]/i;
-var clean = (value) => String(value || "").trim().replace(/\s+/g, " ");
-var normalized = (value) => clean(value).normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase();
+var clean2 = (value) => String(value || "").trim().replace(/\s+/g, " ");
+var normalized = (value) => clean2(value).normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase();
+var sameCatalogue = (a, b) => {
+  const number = foldedCatalogue(a);
+  return Boolean(number) && number === foldedCatalogue(b);
+};
+var identity = (...values) => createHash("sha256").update(JSON.stringify(values)).digest("hex");
 var NUMBERED_SET = new RegExp("(?<!\\p{L})(pr[e\xE9]ludes|[e\xE9]tudes|nocturnes|mazurkas|waltzes|valses|impromptus|ballades|polonaises|bagatelles|intermezzi|consolations|po[e\xE8]mes|morceaux|songs without words|lieder ohne worte)(?!\\p{L})", "iu");
+function withoutComposer(title, composers = []) {
+  const text5 = clean2(title);
+  const match2 = text5.match(/^([^:]{2,60}):\s+(\S.*)$/);
+  if (!match2) return text5;
+  const prefix = nameKey(match2[1]);
+  const named = (Array.isArray(composers) ? composers : [composers]).some((name) => {
+    const full = nameKey(name);
+    return Boolean(full) && (prefix === full || prefix === full.split(" ").at(-1));
+  });
+  return named ? clean2(match2[2]) : text5;
+}
+function nameKey(name) {
+  return normalized(name).replace(/[^\p{L}\p{N}]+/gu, " ").trim().replace(/ts?ch/g, "ch").replace(/ff\b/g, "v").replace(/w/g, "v").replace(/[yj]/g, "i").replace(/kh/g, "h");
+}
 var WORK_HEAD = /^(.+?)(?:\s*[:;]\s+|\s+[–—-]\s+|:(?=["“„'‘]))(.+)$/;
+var titleHead = (title) => splitTitle(title).head;
 var COMMA_MOVEMENT = /^(.{4,}?),\s+((?:[IVXLC]+|\d{1,2})\.\s+(?!\d)\S.*)$/;
 function splitTitle(title) {
-  const text2 = clean(title);
-  const match = text2.match(WORK_HEAD);
-  const comma = text2.match(COMMA_MOVEMENT);
-  if (comma && (!match || comma[1].length < match[1].length) && (catalogueNumber(comma[1]) || MULTI_MOVEMENT.test(comma[1])))
-    return { head: clean(comma[1]), tail: clean(comma[2]) };
-  return match ? { head: clean(match[1]), tail: clean(match[2]) } : { head: "", tail: text2 };
+  const text5 = clean2(title);
+  const match2 = text5.match(WORK_HEAD);
+  const comma = text5.match(COMMA_MOVEMENT);
+  if (comma && (!match2 || comma[1].length < match2[1].length) && (catalogueNumber(comma[1]) || MULTI_MOVEMENT.test(comma[1])))
+    return { head: clean2(comma[1]), tail: clean2(comma[2]) };
+  return match2 ? { head: clean2(match2[1]), tail: clean2(match2[2]) } : { head: "", tail: text5 };
 }
-var words = (value) => normalized(value).replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+function standalonePiece(hints, workTitle, tag = hints.work) {
+  const tagged = clean2(tag);
+  const title = clean2(hints.title);
+  if (!tagged || tagged.includes(":") || isCollectionLike(tagged) || title.includes(":")) return false;
+  const head = words3(workTitle);
+  const text5 = words3(title);
+  return text5 === head || text5.startsWith(`${head} `) && splitTitle(title).head === "" && !MOVEMENT_PREFIX.test(stripWorkPrefix(title, workTitle));
+}
+var isCatalogueRange = (text5) => /\d+[a-z]?\s*[-–—]\s*\d+/i.test(text5) || [...String(text5).matchAll(/\b(\d+)\s*\/\s*(\d+)\b(?![a-z])/gi)].some(([, a, b]) => Number(b) > Number(a));
+var catalogued = (text5) => Boolean(catalogueNumber(text5)) && !isCatalogueRange(text5);
+var catalogueSet = (text5) => NUMBERED_SET.test(text5) && catalogued(text5);
+var COUNTED_COLLECTION = new RegExp("(?<!\\p{L})(?:\\d+|zwei|drei|vier|f\xFCnf|sechs|sieben|acht|neun|zehn|elf|zw\xF6lf|dreizehn|vierzehn|deux|trois|quatre|cinq|six|sept|huit|neuf|dix|douze|two|three|four|five|six|seven|eight|nine|ten|twelve)\\s+(?:\\p{L}+\\s+)?(?:lieder|songs?|m\xE9lodies|melodies|chants|ges\xE4nge)(?!\\p{L})", "iu");
+var WITH_FUGUE = new RegExp("(?<!\\p{L})(?:fugue|fuga|fuge|fughetta)(?!\\p{L})", "iu");
+var readsAsWork = (text5) => Boolean(text5) && (!isCollectionLike(text5) && (MULTI_MOVEMENT.test(text5) || catalogued(text5)) || catalogueSet(text5) || (COUNTED_COLLECTION.test(text5) || WITH_FUGUE.test(text5)) && catalogued(text5));
+var BOOK_IN_BRACKETS = /\s*\(([^()]*?(?:book|livre|teil|heft|vol\.?|volume)\s+(?:[ivx]+|\d+))(?:[^()]*)\)/iu;
+function withBook(title) {
+  const book = title.match(BOOK_IN_BRACKETS);
+  return book ? { title: clean2(title.replace(BOOK_IN_BRACKETS, "")), collection: clean2(book[1]) } : { title };
+}
+function numberedPiece(title) {
+  const match2 = String(title).match(/^(.+?)[,\s]+(no\.?\s*\d+\b.*)$/i);
+  if (!match2 || !NUMBERED_SET.test(match2[1]) || /\bin\s+[a-h]\b/i.test(match2[1])) return null;
+  return { set: match2[1].trim(), part: match2[2].charAt(0).toUpperCase() + match2[2].slice(1) };
+}
+var wholePiece = (title) => !splitTitle(title).head && !MOVEMENT_PREFIX.test(title) && !NUMBERED_SET.test(title) && catalogued(title) && !/ no /.test(catalogueNumber(title)) && !/\d+\s*\/\s*\d+/.test(title) && !new RegExp("(?<!\\p{L})(?:from|aus|extrait)(?!\\p{L})", "iu").test(title);
+function groupingWork(grouping, title) {
+  const parent = clean2(clean2(grouping).split(/\s*:\s*/, 1)[0]);
+  if (!readsAsWork(parent)) return null;
+  if (catalogueNumber(parent) && !isCatalogueRange(parent)) return parent;
+  const named = words3(parent);
+  const head = words3(titleHead(title) || title);
+  return head === named || head.startsWith(`${named} `) || named.startsWith(`${head} `) ? parent : null;
+}
+var catalogueText = (number) => number.replace(/^([A-Z])\s/, "$1. ");
+function proposedWork({ work, grouping, title }, allowStructuredTitles) {
+  let tagged = clean2(work);
+  let collection = null;
+  if (tagged && CATALOGUE_RANGE.test(clean2(tagged.split(/\s*:\s*/, 1)[0]))) {
+    const parts = tagged.split(/\s*:\s*/);
+    const at = parts.findIndex((part, i) => i > 0 && i < parts.length - 1 && catalogued(part) && !CATALOGUE_RANGE.test(part));
+    if (at > 0) {
+      tagged = parts.slice(at).join(": ");
+      collection = collectionTitle(parts.slice(0, at).map(collectionTitle).filter(Boolean).join(", ")) || null;
+    }
+  }
+  if (tagged && (!isCollectionLike(tagged) || catalogueSet(clean2(tagged.split(/\s*:\s*/, 1)[0])) || catalogued(clean2(tagged.split(/\s*:\s*/, 1)[0])))) {
+    const parent = clean2(tagged.split(/\s*:\s*/, 1)[0]);
+    if (MULTI_MOVEMENT.test(parent) || catalogueNumber(parent))
+      return { title: parent, evidence: "work-tag", ...collection && { collection } };
+    const head = titleHead(title) || title;
+    const number = catalogueNumber(head);
+    if (number && !isCatalogueRange(head) && !MULTI_MOVEMENT.test(head) && !isCollectionLike(parent))
+      return { title: parent, evidence: "work-tag", catalogue: catalogueText(number) };
+  }
+  if (!tagged && grouping) {
+    const named = groupingWork(grouping, title);
+    if (named) return { title: named, evidence: "grouping-tag" };
+  }
+  if (!allowStructuredTitles) return null;
+  const candidate = titleHead(title);
+  if (readsAsWork(candidate)) {
+    const named = withBook(candidate);
+    return catalogued(named.title) || named.title === candidate ? { ...named, evidence: "structured-title" } : { title: candidate, evidence: "structured-title" };
+  }
+  if (candidate) {
+    const next = titleHead(splitTitle(title).tail) || splitTitle(title).tail;
+    const number = catalogueNumber(next);
+    return number && !catalogueNumber(candidate) && !isCollectionLike(candidate) && !isCatalogueRange(next) && !MULTI_MOVEMENT.test(next) ? { title: candidate, evidence: "structured-title", catalogue: catalogueText(number) } : null;
+  }
+  const set = numberedPiece(clean2(title));
+  if (set) return catalogueSet(set.set) ? { title: set.set, evidence: "structured-title" } : null;
+  return wholePiece(clean2(title)) ? { title: clean2(title), evidence: "structured-title", standalone: true } : null;
+}
+function candidates(catalogue, albumId = null, allowStructuredTitles = false, providerMatches = /* @__PURE__ */ new Map(), explain = null) {
+  const rows = catalogue.db.prepare(
+    `SELECT t.id,t.instance_id,t.evidence,
+        EXISTS(SELECT 1 FROM segment s JOIN realization_item i ON i.segment_id=s.id WHERE s.track_link_id=t.id) AS attached
+       FROM track_link t
+       JOIN classification c ON c.target_id=t.id AND c.state='classical'
+       WHERE t.state='active'
+       ${albumId == null ? "" : "AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?"}`
+  ).all(...albumId == null ? [] : [String(albumId)]).map((row) => ({ ...row, evidence: JSON.parse(row.evidence) })).filter(
+    (row) => row.evidence.albumId != null && (albumId == null || String(row.evidence.albumId) === String(albumId))
+  );
+  const groups = /* @__PURE__ */ new Map();
+  const composerIndex = { people: composerPeople(catalogue) };
+  const knownComposers = rows.length ? knownComposerNames(catalogue) : /* @__PURE__ */ new Set();
+  const numbered = allowStructuredTitles ? numberedRuns(rows) : /* @__PURE__ */ new Set();
+  const workHead = (hints) => clean2(String(hints?.work || "").split(/\s*:\s*/, 1)[0]);
+  const sharedHeads = /* @__PURE__ */ new Map();
+  for (const row of rows) {
+    const head = workHead(row.evidence.hints);
+    if (!head) continue;
+    const key = `${row.evidence.albumId}\0${words3(head)}`;
+    sharedHeads.set(key, (sharedHeads.get(key) || 0) + 1);
+  }
+  const namesComposer = (head, composers) => {
+    const heading = words3(head).split(" ").filter(Boolean);
+    return composers.some((name) => {
+      const own = words3(name).split(" ").filter(Boolean);
+      return heading.length && heading.every((word) => own.includes(word)) || heading.includes(own.at(-1));
+    });
+  };
+  const sharedWorkTag = (row, hints) => {
+    const head = workHead(hints);
+    if (!head || !hints.composer?.length || isCollectionLike(head) || namesComposer(head, hints.composer)) return null;
+    return (sharedHeads.get(`${row.evidence.albumId}\0${words3(head)}`) || 0) >= 2 ? { title: head, evidence: "work-tag" } : null;
+  };
+  for (const row of rows) {
+    const tagged = row.evidence.hints || {};
+    const hints = { ...tagged, title: withoutComposer(tagged.title, tagged.composer) };
+    const offered = providerMatches.get(row.id);
+    const own = offered ? trackSubject(tagged) : "";
+    const heading = splitTitle(withoutComposer(tagged.title, tagged.composer)).head || "";
+    const inCollection = offered && CATALOGUE_RANGE.test(clean2(offered.work)) && catalogueSubject(heading) && !CATALOGUE_RANGE.test(heading);
+    const provider = offered && own && provablyDifferent(own, catalogueSubject(clean2(offered.work))) || inCollection ? null : offered;
+    const local = proposedWork(hints, true);
+    const proposal = provider ? {
+      // The tags' own title wins when it names the same catalogue number.
+      title: local && sameCatalogue(local.title, provider.work) ? local.title : (
+        // No English name on MusicBrainz ("Präludium und Fughetta
+        // G-Dur, BWV 902"): the tags' own heading with the same number.
+        provider.untranslated && splitTitle(clean2(hints.title)).head && sameCatalogue(splitTitle(clean2(hints.title)).head, provider.work) ? clean2(splitTitle(clean2(hints.title)).head) : clean2(provider.work)
+      ),
+      evidence: "musicbrainz-parent",
+      identity: provider.workId,
+      ...provider.standalone && { standalone: true }
+    } : proposedWork(hints, allowStructuredTitles) || numberedRun(hints, numbered) || sharedWorkTag(row, hints);
+    if (proposal && !provider && (proposal.evidence === "work-tag" && standalonePiece(hints, proposal.title) || proposal.evidence === "grouping-tag" && standalonePiece(hints, proposal.title, hints.grouping)))
+      proposal.standalone = true;
+    const credit = hints.composer?.length || provider?.composers?.length ? null : artistCredits(hints, { knownComposers });
+    const rawComposers = [
+      ...new Set(
+        (hints.composer?.length ? hints.composer : provider?.composers?.length ? provider.composers : credit?.composers || []).map(clean2).filter(Boolean)
+      )
+    ];
+    const composers = canonicalComposers(catalogue, composerIndex, rawComposers, provider?.composerIds);
+    const trackNumber = Number(hints.trackNumber);
+    const discNumber = Number(hints.discNumber) || 1;
+    if (!proposal || !composers.length || !Number.isSafeInteger(trackNumber) || trackNumber < 1) {
+      explain?.set(row.id, {
+        work: proposal?.title ?? null,
+        reason: !proposal ? workHead(hints) ? isCollectionLike(workHead(hints)) ? `WORK tag \u201C${workHead(hints)}\u201D not taken: it names a collection, not one work` : `WORK tag \u201C${workHead(hints)}\u201D not taken: it names no form or catalogue number, and no other track of the album shares it` : "no work named: no WORK or GROUPING tag, and the title names no work" : !composers.length ? credit?.confidence === "medium" ? "composer only guessed from the artist field" : "no composer tag" : "no track number"
+      });
+      continue;
+    }
+    const keyWith = (subjectOf, names = composers) => JSON.stringify([
+      row.instance_id,
+      String(row.evidence.albumId),
+      proposal.identity || subjectOf(proposal.title, names),
+      names.map(normalized).sort(),
+      proposal.evidence,
+      // Appended only for whole pieces, so earlier groups keep their keys.
+      ...proposal.standalone ? ["standalone"] : [],
+      // Likewise for composers read from the artist field.
+      ...credit ? [`artist-field:${credit.confidence}`] : [],
+      // And for a set named by WORK with its number in the titles.
+      ...proposal.catalogue ? [`catalogue:${proposal.catalogue}`] : []
+    ]);
+    const key = keyWith(workKey);
+    const legacy = keyWith(legacyWorkKey);
+    if (!groups.has(key))
+      groups.set(key, {
+        key,
+        legacyKey: legacy !== key ? legacy : null,
+        spellingKeys: [],
+        work: proposal.title,
+        titles: /* @__PURE__ */ new Map(),
+        evidence: proposal.evidence,
+        catalogue: proposal.catalogue || null,
+        standalone: !!proposal.standalone,
+        providerWorkId: proposal.identity || null,
+        localTitle: provider && local ? local.title : null,
+        ownSubject: provider ? own : "",
+        providerAliases: provider?.aliases || [],
+        collection: provider?.collection || (proposal.collection ? { id: null, title: proposal.collection } : null),
+        composers,
+        composerIds: Object.fromEntries(rawComposers.map((name, i) => [composers[i], provider?.composerIds?.[name]])),
+        composerSource: credit ? { field: "artist", confidence: credit.confidence, evidence: credit.evidence } : null,
+        albumId: String(row.evidence.albumId),
+        album: clean2(hints.album),
+        tracks: []
+      });
+    const group = groups.get(key);
+    for (const spellingKey of [keyWith(workKey, rawComposers), keyWith(legacyWorkKey, rawComposers)]) {
+      if (spellingKey !== key && spellingKey !== legacy && !group.spellingKeys.includes(spellingKey))
+        group.spellingKeys.push(spellingKey);
+    }
+    group.titles.set(proposal.title, (group.titles.get(proposal.title) || 0) + 1);
+    group.tracks.push({
+      ...row,
+      composers,
+      providerMovement: provider?.movement ? clean2(provider.movement) : null,
+      providerLeaf: provider?.leafWorkId || null,
+      title: clean2(tagged.title),
+      // The title without a "Composer: " prefix, for reading the movement.
+      parsedTitle: clean2(hints.title),
+      discNumber,
+      trackNumber
+    });
+  }
+  return splitScattered(separateRecordings(mergeCompletions([...groups.values()]))).filter((group) => {
+    group.work = [...group.titles].sort((a, b) => b[1] - a[1])[0][0];
+    const positions = group.tracks.map(
+      (track) => `${track.discNumber}:${track.trackNumber}`
+    );
+    group.excerpt = !group.standalone && Boolean(group.providerWorkId) && group.tracks.every((track) => track.providerLeaf) && !(group.tracks.length === 1 && numberedElsewhere(group.tracks[0].title, group.work));
+    const reason = group.tracks.every((track) => track.attached) ? "matched" : (
+      // Whole pieces are one track each; anything else needs two movements.
+      group.standalone && group.tracks.length !== 1 ? "several tracks name the same whole piece" : (
+        // One piece of a set ("Prelude, Op. 11, No. 8" in "24 Preludes,
+        // Op. 11") is a whole piece; one movement of a symphony is not.
+        !group.standalone && group.tracks.length < 2 && !catalogueSet(group.work) && !group.excerpt ? "only one track of a work with movements on this album" : new Set(positions).size !== positions.length ? "two tracks share a disc and track number" : (
+          // MusicBrainz telling four "Promenade"s apart tells them apart.
+          new Set(group.tracks.map(pieceName)).size !== group.tracks.length && !returnsAtEnd(group.tracks) ? "two tracks share a title" : null
+        )
+      )
+    );
+    if (explain)
+      for (const track of group.tracks)
+        explain.set(track.id, { work: group.work, evidence: group.evidence, reason: reason ?? "matches when Auto-match runs" });
+    return !reason;
+  });
+}
+function mergeCompletions(groups) {
+  const subject = (group) => group.providerWorkId ? `mb:${group.providerWorkId}` : catalogueSubject(group.work);
+  const families = /* @__PURE__ */ new Map();
+  for (const group of groups) {
+    const key = subject(group);
+    if (!key || group.standalone || group.composerSource) continue;
+    const family = JSON.stringify([group.tracks[0].instance_id, group.albumId, group.evidence, key]);
+    families.set(family, [...families.get(family) || [], group]);
+  }
+  const merged = /* @__PURE__ */ new Set();
+  const result = [];
+  for (const family of families.values()) {
+    if (family.length < 2) continue;
+    const shared = family[0].composers.filter(
+      (name) => family.every((group2) => group2.composers.some((other) => normalized(other) === normalized(name)))
+    );
+    if (!shared.length) continue;
+    const group = {
+      ...family[0],
+      key: JSON.stringify([...JSON.parse(family[0].key).slice(0, 2), subject(family[0]), shared.map(normalized).sort(), family[0].evidence, "completion"]),
+      composers: shared,
+      titles: /* @__PURE__ */ new Map(),
+      tracks: []
+    };
+    for (const part of family) {
+      merged.add(part);
+      for (const [title, count] of part.titles) group.titles.set(title, (group.titles.get(title) || 0) + count);
+      group.tracks.push(...part.tracks);
+    }
+    result.push(group);
+  }
+  return [...groups.filter((group) => !merged.has(group)), ...result];
+}
+var recordingTitle = (title) => words3(clean2(title).replace(new RegExp("\\s*[([][^()[\\]]*\\p{L}[^()[\\]]*[)\\]]\\s*$", "u"), ""));
+var FIRST_NUMERAL = /(?:^|:\s+)([IVXLC]+)[.)]\s/;
+function numberedRuns(rows) {
+  const heads = /* @__PURE__ */ new Set();
+  const ordered = rows.map((row) => {
+    const hints = row.evidence.hints || {};
+    const { head, tail } = splitTitle(withoutComposer(hints.title, hints.composer));
+    const numeral = tail?.match(FIRST_NUMERAL)?.[1];
+    return { head: head && clean2(head), number: numeral ? romanValue(numeral.toLowerCase()) : null, disc: Number(hints.discNumber) || 1, track: Number(hints.trackNumber) };
+  }).filter((row) => row.head && row.number && Number.isSafeInteger(row.track)).sort((a, b) => a.disc - b.disc || a.track - b.track);
+  let run = [];
+  const close = () => {
+    if (run.length >= 3 && run[0].number === 1 && run.every((row, i) => !i || row.number > run[i - 1].number)) heads.add(run[0].head);
+    run = [];
+  };
+  for (const row of ordered) {
+    const last2 = run.at(-1);
+    if (last2 && (last2.head !== row.head || last2.disc !== row.disc || row.track !== last2.track + 1)) close();
+    run.push(row);
+  }
+  close();
+  return heads;
+}
+var PART_OF = new RegExp("(?<!\\p{L})(?:act|akt|atto|acte|part|pt\\.?|teil|scene|szene|book|livre|heft|disc|cd)\\s*[ivxlc\\d]+", "iu");
+function numberedRun({ title }, heads) {
+  const head = clean2(splitTitle(title).head || "");
+  return head && heads.has(head) && !PART_OF.test(head) ? { title: head, evidence: "structured-title" } : null;
+}
+function numberedElsewhere(title, workTitle) {
+  const own = catalogueSubject(title);
+  if (!own) return false;
+  const numbers = clean2(workTitle).split(/\s*[,·;]\s*|\s+\/\s+/).map(catalogueSubject).concat(catalogueSubject(workTitle)).filter(Boolean);
+  return !numbers.some((number) => own === number || own.startsWith(`${number}:`) || number.startsWith(`${own}:`));
+}
+var returnsAtEnd = (tracks) => {
+  const ordered = [...tracks].sort(albumOrder);
+  const names = ordered.map(pieceName);
+  return ordered.length > 2 && names[0] === names.at(-1) && new Set(names.slice(0, -1)).size === names.length - 1;
+};
+var pieceName = (track) => `${normalized(track.title)}|${normalized(track.providerMovement || "")}`;
+function splitScattered(groups) {
+  return groups.flatMap((group) => {
+    const name = pieceName;
+    if (!group.providerWorkId || !catalogueSet(group.work) || new Set(group.tracks.map(name)).size === group.tracks.length) return [group];
+    const runs = [];
+    for (const track of [...group.tracks].sort(albumOrder)) {
+      const last2 = runs.at(-1)?.at(-1);
+      const next = last2 && (last2.discNumber === track.discNumber ? track.trackNumber - last2.trackNumber === 1 : track.discNumber - last2.discNumber === 1 && track.trackNumber === 1);
+      if (next) runs.at(-1).push(track);
+      else runs.push([track]);
+    }
+    if (runs.length === 1 || runs.some((run) => new Set(run.map(name)).size !== run.length)) return [group];
+    return runs.map((tracks, i) => ({
+      ...group,
+      key: i ? JSON.stringify([...JSON.parse(group.key), `run:${i + 1}`]) : group.key,
+      legacyKey: group.legacyKey && i ? JSON.stringify([...JSON.parse(group.legacyKey), `run:${i + 1}`]) : group.legacyKey,
+      spellingKeys: group.spellingKeys?.map((key) => i ? JSON.stringify([...JSON.parse(key), `run:${i + 1}`]) : key),
+      tracks
+    }));
+  });
+}
+function separateRecordings(groups) {
+  return groups.flatMap((group) => {
+    const titles = group.tracks.map((track) => recordingTitle(track.title) + (track.providerMovement ? `|${normalized(track.providerMovement)}` : ""));
+    if (new Set(titles).size === titles.length) return [group];
+    const ordered = [...group.tracks].sort(albumOrder);
+    const title = (track) => track ? recordingTitle(track.title) + (track.providerMovement ? `|${normalized(track.providerMovement)}` : "") : void 0;
+    const runs = [[]];
+    ordered.forEach((track, i) => {
+      const run = runs.at(-1);
+      const again2 = run.length > 0 && title(run[0]) === title(track) && (group.standalone || run.length > 1 && title(run[1]) === title(ordered[i + 1]));
+      if (again2) runs.push([track]);
+      else run.push(track);
+    });
+    if (runs.length === 1) return [group];
+    return runs.map((tracks, i) => ({
+      ...group,
+      key: i ? JSON.stringify([...JSON.parse(group.key), `recording:${i + 1}`]) : group.key,
+      legacyKey: group.legacyKey && i ? JSON.stringify([...JSON.parse(group.legacyKey), `recording:${i + 1}`]) : group.legacyKey,
+      spellingKeys: group.spellingKeys?.map((key) => i ? JSON.stringify([...JSON.parse(key), `recording:${i + 1}`]) : key),
+      tracks
+    }));
+  });
+}
+function knownComposerNames(catalogue) {
+  const names = /* @__PURE__ */ new Set();
+  for (const { id } of catalogue.db.prepare(
+    `SELECT DISTINCT c.contributor_id AS id FROM credit c JOIN entity e ON e.id=c.contributor_id
+       WHERE c.role='composer' AND c.state='active' AND e.deleted_at IS NULL`
+  ).all()) {
+    const name = resolvedName(catalogue, id, "name");
+    if (typeof name === "string" && words3(name)) names.add(words3(name));
+  }
+  return names;
+}
+function existingIdentity(catalogue, recordKind, recordId) {
+  return catalogue.db.prepare(
+    `SELECT x.entity_id FROM external_identity x JOIN entity e ON e.id=x.entity_id
+       WHERE x.provider='embedded-tags' AND x.record_kind=? AND x.record_id=?
+       AND x.state='active' AND e.deleted_at IS NULL`
+  ).get(recordKind, recordId)?.entity_id;
+}
+var words3 = (value) => normalized(value).replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+var CATALOGUE = /\b(op|opus|bwv|kv|k|d|hob|rv|woo|hwv|sz|twv|bb)\s*((?:[ivxlc]+\s+)?\d+[a-z]?)(?:\s+(?:no|nr|n)\s*(\d+))?\b/;
+var KEY_PHRASE = /\bin\s+[a-h](?:\s*(?:flat|sharp|b|#))?(?:\s+(?:major|minor|dur|moll))?\b/g;
+var TWV = /\b[Tt][Ww][Vv]\s*(\d+)\s*:\s*([A-Za-z]{0,3}\d+[a-z]?)(?![\p{L}\d])/u;
+function catalogueSubject(title) {
+  const twv = String(title || "").match(TWV);
+  if (twv) return `cat:twv:${twv[1]}:${twv[2]}`;
+  const slashed = String(title || "").match(/\bop(?:us|\.)?\s*(\d+[a-z]?)\s*\/\s*(\d+)\b(?![a-z])/i);
+  if (slashed && (Number(slashed[2]) < Number.parseInt(slashed[1], 10) || Number(slashed[2]) <= 12)) return `cat:op:${slashed[1].toLowerCase()}:${slashed[2]}`;
+  const cat = words3(title).match(CATALOGUE);
+  if (cat)
+    return `cat:${cat[1] === "opus" ? "op" : cat[1] === "kv" ? "k" : cat[1]}:${cat[2].replace(/\s+/g, "")}${cat[3] ? `:${cat[3]}` : ""}`;
+  const number = catalogueNumber(title).toLowerCase();
+  const piece = number ? cataloguePiece(title) : "";
+  return number ? `cat:${number.replace(/\s+/g, ":")}${piece ? `:${piece}` : ""}` : "";
+}
+function legacyCatalogueSubject(title) {
+  const twv = String(title || "").match(TWV);
+  if (twv) return `cat:twv:${twv[1]}`;
+  if (words3(title).match(CATALOGUE)) return catalogueSubject(title);
+  const [system, number = ""] = catalogueNumber(title).toLowerCase().split(" ");
+  return system ? `cat:${system}:${number.match(/^\d+/)?.[0] ?? number}` : "";
+}
+var keyOf = (subjectOf) => (title, composers) => JSON.stringify([
+  [...new Set(composers.map(words3))].filter(Boolean).sort(),
+  subjectOf(title) || `title:${words3(title).replace(KEY_PHRASE, " ").replace(/\s+/g, " ").trim()}`
+]);
+var workKey = keyOf(catalogueSubject);
+var distinctKey = (a, b) => `distinct:${[a, b].sort().join("|")}`;
+var keptDistinct = (catalogue, a, b) => Boolean(catalogue.db.prepare("SELECT 1 FROM match_suppression WHERE key=?").get(distinctKey(a, b)));
+var suppressionKeys = (title, composers, providerWorkId = null) => [
+  `work:${workKey(title, composers)}`,
+  ...providerWorkId ? [`musicbrainz:${providerWorkId}`] : []
+];
+var legacyWorkKey = keyOf(legacyCatalogueSubject);
+var ROMAN2 = { i: 1, v: 5, x: 10, l: 50, c: 100 };
+function romanValue(value) {
+  let total = 0;
+  for (let i = 0; i < value.length; i++) {
+    const n = ROMAN2[value[i]], next = ROMAN2[value[i + 1]] || 0;
+    if (!n) return null;
+    total += n < next ? -n : n;
+  }
+  return total || null;
+}
+function movementParts(title) {
+  const text5 = words3(title);
+  const part = clean2(title).match(/^([ivxlc]+|\d+)[a-d][.)]\s+(.*)$/i);
+  const match2 = part ? [part[0], part[1].toLowerCase(), words3(part[2])] : text5.match(/^(no\s+)?((?:[ivxlc]+)|\d+)\s+(.*)$/)?.filter((_, i) => i !== 1);
+  if (!match2) return { index: null, text: text5 };
+  const index = /^\d+$/.test(match2[1]) ? Number(match2[1]) : romanValue(match2[1]);
+  const piece = !part && /^no\s/.test(text5);
+  return index ? { index, text: match2[2], ...piece && { piece: true } } : { index: null, text: text5 };
+}
 function movementTitle(track, workTitle) {
-  const fromTitle = stripWorkPrefix(clean(track.title), workTitle);
-  if (fromTitle !== clean(track.title) || MOVEMENT_PREFIX.test(fromTitle)) return fromTitle;
-  const work = clean(track.work);
+  const fromTitle = stripWorkPrefix(clean2(track.title), workTitle);
+  if (fromTitle !== clean2(track.title) || MOVEMENT_PREFIX.test(fromTitle)) return fromTitle;
+  const work = clean2(track.work);
   if (work.includes(":")) {
-    const tail = clean(work.slice(work.indexOf(":") + 1));
+    const tail = clean2(work.slice(work.indexOf(":") + 1));
     if (tail) return stripWorkPrefix(tail, workTitle);
   }
   return fromTitle;
@@ -36269,201 +37683,2418 @@ var NICKNAME = /^["“„«'‘][^"”»'’]+["”»'’]\s*(?:[:;]|\s[–—-]
 function stripWorkPrefix(title, workTitle, depth = 0) {
   const stripped = stripWorkPrefixOnce(title, workTitle);
   const again2 = stripWorkPrefixOnce(withoutRepeatedComposer(stripped, workTitle), workTitle);
-  return depth < 2 && again2 !== stripped && words(stripped).includes(words(workTitle)) ? stripWorkPrefix(again2, workTitle, depth + 1) : stripped;
+  return depth < 2 && again2 !== stripped && words3(stripped).includes(words3(workTitle)) ? stripWorkPrefix(again2, workTitle, depth + 1) : stripped;
 }
-var withoutRepeatedComposer = (text2, workTitle) => {
-  const match = clean(text2).match(/^([^:]{2,60}):\s+(\S.*)$/);
-  return match && words(match[2]).startsWith(words(workTitle)) && words(match[1]).split(" ").length <= 3 ? match[2] : text2;
+var withoutRepeatedComposer = (text5, workTitle) => {
+  const match2 = clean2(text5).match(/^([^:]{2,60}):\s+(\S.*)$/);
+  return match2 && words3(match2[2]).startsWith(words3(workTitle)) && words3(match2[1]).split(" ").length <= 3 ? match2[2] : text5;
 };
-var insideNumber = (text2, match) => match[0] === ":" && /\b[IVXLCDM]+$/i.test(text2.slice(0, match.index)) && /^\d/.test(text2.slice(match.index + 1));
+var insideNumber = (text5, match2) => match2[0] === ":" && /\b[IVXLCDM]+$/i.test(text5.slice(0, match2.index)) && /^\d/.test(text5.slice(match2.index + 1));
 function stripWorkPrefixOnce(title, workTitle) {
-  const text2 = clean(title);
-  const separators = [...text2.matchAll(SEPARATOR)].filter((match) => !insideNumber(text2, match));
-  const tailAt = (match) => clean(text2.slice(match.index + match[0].length));
-  for (const match of separators) {
-    const tail = tailAt(match);
+  const text5 = clean2(title);
+  const separators = [...text5.matchAll(SEPARATOR)].filter((match2) => !insideNumber(text5, match2));
+  const tailAt = (match2) => clean2(text5.slice(match2.index + match2[0].length));
+  for (const match2 of separators) {
+    const tail = tailAt(match2);
     if (tail && MOVEMENT_PREFIX.test(tail)) return tail;
   }
-  const workWords = words(workTitle);
+  const workWords = words3(workTitle);
   const workCatalogue = catalogueNumber(workTitle).toLowerCase();
-  const comma = splitTitle(text2);
-  if (comma.head && text2.startsWith(`${comma.head},`) && (workWords && words(comma.head) === workWords || workCatalogue && catalogueNumber(comma.head).toLowerCase() === workCatalogue))
+  const comma = splitTitle(text5);
+  if (comma.head && text5.startsWith(`${comma.head},`) && (workWords && words3(comma.head) === workWords || workCatalogue && catalogueNumber(comma.head).toLowerCase() === workCatalogue))
     return comma.tail;
-  const workName = words(String(workTitle).split(",")[0]);
-  for (const match of separators) {
-    const head = text2.slice(0, match.index);
-    const tail = tailAt(match);
-    const headWords = words(head);
-    const namesWork = workWords && (headWords === workWords || headWords.startsWith(`${workWords} `) || workWords.startsWith(`${headWords} `)) || workCatalogue && catalogueNumber(head).toLowerCase() === workCatalogue || workName.length >= 4 && words(head.split(",")[0]) === workName;
+  const workName = words3(String(workTitle).split(",")[0]);
+  for (const match2 of separators) {
+    const head = text5.slice(0, match2.index);
+    const tail = tailAt(match2);
+    const headWords = words3(head);
+    const namesWork = workWords && (headWords === workWords || headWords.startsWith(`${workWords} `) || workWords.startsWith(`${headWords} `)) || workCatalogue && catalogueNumber(head).toLowerCase() === workCatalogue || workName.length >= 4 && words3(head.split(",")[0]) === workName;
     if (!tail || !namesWork) continue;
-    return clean(tail.match(NICKNAME)?.[1] ?? tail);
+    return clean2(tail.match(NICKNAME)?.[1] ?? tail);
   }
-  const set = clean(workTitle);
-  const rest = set && NUMBERED_SET.test(set) && normalized(text2).startsWith(normalized(set)) ? text2.slice(set.length).match(/^[,\s]+(no\.?\s*\d+\b.*)$/i) : null;
+  const set = clean2(workTitle);
+  const rest = set && NUMBERED_SET.test(set) && normalized(text5).startsWith(normalized(set)) ? text5.slice(set.length).match(/^[,\s]+(no\.?\s*\d+\b.*)$/i) : null;
   if (rest) return rest[1].charAt(0).toUpperCase() + rest[1].slice(1);
-  return text2;
+  return text5;
 }
-
-// src/album-works.js
-var cached = /* @__PURE__ */ new Map();
-async function works(ctx) {
-  const file = path4.join(ctx.dataFolder, "works.json");
-  const stat = await fs4.stat(file).catch(() => null);
-  if (!stat) return {};
-  const hit = cached.get(file);
-  if (hit?.mtimeMs === stat.mtimeMs) return hit.works;
-  const value = await readWorks(ctx);
-  cached.set(file, { mtimeMs: stat.mtimeMs, works: value });
-  return value;
+function resolvedName(catalogue, id, field) {
+  const row = catalogue.db.prepare(
+    `SELECT a.value FROM field_resolution f JOIN assertion a ON a.id=f.assertion_id
+       WHERE f.target_id=? AND f.field=?`
+  ).get(id, field);
+  return row ? JSON.parse(row.value) : null;
 }
-async function albumPresentation(ctx, album) {
-  const known = await works(ctx);
-  const byWork = /* @__PURE__ */ new Map();
+function composerNames(catalogue, work) {
+  return catalogue.db.prepare(
+    `SELECT c.contributor_id AS id FROM credit c JOIN entity e ON e.id=c.contributor_id
+       WHERE c.target_id=? AND c.role='composer' AND c.state='active' AND e.deleted_at IS NULL ORDER BY c.position`
+  ).all(work).map((row) => resolvedName(catalogue, row.id, "name")).filter((name) => typeof name === "string" && name.trim());
+}
+function catalogueIndex(catalogue) {
+  const works = /* @__PURE__ */ new Map(), aliases = /* @__PURE__ */ new Map();
+  for (const { id } of catalogue.db.prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL").all()) {
+    const title = resolvedName(catalogue, id, "title");
+    const composers = composerNames(catalogue, id);
+    if (typeof title !== "string" || !composers.length) continue;
+    const key = workKey(title, composers);
+    works.set(key, [...works.get(key) || [], id]);
+    const other = resolvedName(catalogue, id, "aliases");
+    for (const alias of Array.isArray(other) ? other : []) {
+      const aliasKey = workKey(String(alias), composers);
+      if (aliasKey !== key) aliases.set(aliasKey, [.../* @__PURE__ */ new Set([...aliases.get(aliasKey) || [], id])]);
+    }
+  }
+  return { works, aliases, people: composerPeople(catalogue) };
+}
+function composerPeople(catalogue) {
+  const people = /* @__PURE__ */ new Map();
+  for (const { id } of catalogue.db.prepare("SELECT id FROM entity WHERE kind='person' AND deleted_at IS NULL ORDER BY created_at,id").all()) {
+    const name = resolvedName(catalogue, id, "name");
+    if (typeof name !== "string" || !words3(name)) continue;
+    const other = resolvedName(catalogue, id, "aliases");
+    const names = [
+      name,
+      ...Array.isArray(other) ? other : [],
+      ...catalogue.db.prepare("SELECT text FROM alias WHERE entity_id=?").all(id).map((a) => a.text)
+    ];
+    for (const spelling of names) {
+      const key = words3(String(spelling));
+      if (key) people.set(key, [.../* @__PURE__ */ new Set([...people.get(key) || [], id])]);
+    }
+  }
+  return people;
+}
+var artistIdOf2 = (catalogue, person) => catalogue.db.prepare("SELECT record_id FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='artist' AND state='active'").get(person)?.record_id;
+function canonicalComposers(catalogue, index, names, ids = {}) {
+  return names.map((name) => {
+    const mbid = ids?.[name];
+    const known = mbid && catalogue.db.prepare(`SELECT x.entity_id FROM external_identity x
+      JOIN entity e ON e.id=x.entity_id WHERE x.provider='musicbrainz' AND x.record_kind='artist'
+      AND x.record_id=? AND x.state='active' AND e.deleted_at IS NULL`).get(mbid)?.entity_id;
+    const matches = index.people.get(words3(name)) || [];
+    const named = matches.length === 1 ? matches[0] : null;
+    const held2 = named && artistIdOf2(catalogue, named);
+    const person = known || (named && (!mbid || !held2 || held2 === mbid) ? named : null);
+    return person ? resolvedName(catalogue, person, "name") || name : name;
+  });
+}
+function composerEntity(catalogue, metadata, index, name, mbid = null) {
+  const key = words3(name);
+  if (mbid) {
+    const known = catalogue.db.prepare(
+      `SELECT x.entity_id FROM external_identity x JOIN entity e ON e.id=x.entity_id
+         WHERE x.provider='musicbrainz' AND x.record_kind='artist' AND x.record_id=? AND x.state='active' AND e.deleted_at IS NULL`
+    ).get(mbid)?.entity_id;
+    if (known) return known;
+    const sameName = index.people.get(key) || [];
+    const named = sameName.filter((id) => !artistIdOf2(catalogue, id));
+    const person2 = named.length === 1 ? named[0] : catalogue.createEntity("person", { roles: ["composer"] });
+    if (person2 !== named[0]) {
+      metadata.derived(person2, "name", name);
+      index.people.set(key, [...sameName, person2]);
+    }
+    catalogue.externalIdentity(person2, "musicbrainz", "artist", mbid, { evidence: { source: "work-composer" } });
+    return person2;
+  }
+  const existing = index.people.get(key) || [];
+  if (existing.length === 1) return existing[0];
+  if (existing.length > 1) return null;
+  const person = catalogue.createEntity("person", { roles: ["composer"] });
+  metadata.derived(person, "name", name);
+  index.people.set(key, [...existing, person]);
+  return person;
+}
+function workMovements(catalogue, work) {
+  return catalogue.db.prepare(
+    `SELECT r.target_id AS id,r.position FROM relation r JOIN entity e ON e.id=r.target_id
+       WHERE r.kind='movement' AND r.source_id=? AND e.deleted_at IS NULL ORDER BY r.position`
+  ).all(work).map((row) => {
+    const title = resolvedName(catalogue, row.id, "title") || "";
+    return { ...row, title, ...movementParts(title) };
+  });
+}
+function pieceNumber(title, setSubject) {
+  const parts = movementParts(title);
+  if (parts.piece) return parts.index;
+  const trailing = clean2(title).match(/(?:^|[\s,])(?:no\.?|nr\.?|n°)\s*(\d+)\s*$/i);
+  if (trailing) return Number(trailing[1]);
+  const subject = catalogueSubject(title);
+  if (setSubject && subject.startsWith(`${setSubject}:`)) {
+    const rest = subject.slice(setSubject.length + 1);
+    if (/^\d+$/.test(rest)) return Number(rest);
+  }
+  return null;
+}
+var movementPiece = (movement, setSubject) => pieceNumber(movement.title || "", setSubject) ?? movement.index ?? null;
+function abbreviates(short, long) {
+  if (short.length < 2 || short.length >= long.length || short[0] !== long[0] || short.at(-1) !== long.at(-1)) return false;
+  let at = 0;
+  for (const letter of long) if (letter === short[at]) at++;
+  return at === short.length;
+}
+function sameNameAbbreviated(a, b) {
+  const tokens = (text5) => normalized(text5).replace(/^(?:[ivxlc]+|\d+)[.)]\s+/, "").replace(/[^\p{L}\p{N}.]+/gu, " ").trim().split(" ").filter(Boolean);
+  const [x, y] = [tokens(a), tokens(b)];
+  if (!x.length || x.length !== y.length) return false;
+  let abbreviated = 0;
+  for (let i = 0; i < x.length; i++) {
+    const [p, q] = [x[i].replace(/\.$/, ""), y[i].replace(/\.$/, "")];
+    if (p === q) continue;
+    const shortened = x[i].endsWith(".") ? abbreviates(p, q) : y[i].endsWith(".") ? abbreviates(q, p) : false;
+    if (!shortened) return false;
+    abbreviated++;
+  }
+  return abbreviated > 0;
+}
+function namedMovement(movements, title, used, setSubject) {
+  const text5 = movementParts(title).text;
+  const free = movements.filter((m) => !used.has(m.id));
+  let found = free.filter((m) => m.text && m.text === text5);
+  if (found.length !== 1) found = free.filter((m) => m.title && sameNameAbbreviated(m.title, title));
+  if (found.length !== 1) {
+    const wanted = asVariation(title);
+    if (wanted.variation && wanted.number) {
+      found = free.filter((m) => {
+        const own = asVariation(m.title || "");
+        return own.variation && own.number === wanted.number;
+      });
+      if (found.length === 1) return found[0];
+    }
+  }
+  if (found.length !== 1) {
+    const piece = pieceNumber(title, setSubject);
+    found = piece == null ? [] : free.filter((m) => movementPiece(m, setSubject) === piece);
+  }
+  return found.length === 1 ? found[0] : null;
+}
+var SECTION_START = /^(?:(?:[ivxlc]+|\d+)[a-d]?[.)]\s|(?:var(?:iation|iatio|iazione)?\.?|theme|thema|tema|coda|intermezzo|introduction|introduzione)(?![\p{L}]))/iu;
+var VAR_WORD = "var(?:iations|iationen|iation|iatio|iazioni|iazione|s)?\\.?";
+var VAR_NUM = "(?:\\d+|[ivxlc]+)";
+var VAR_RANGE = new RegExp(`^${VAR_WORD}\\s*(?:(?:nos?|nr)\\.?\\s*)?(${VAR_NUM})\\s*[-\u2013\u2014]\\s*(${VAR_NUM})$`, "iu");
+var VAR_ONE = new RegExp(`^${VAR_WORD}\\s*(?:(?:nos?|nr)\\.?\\s*)?(${VAR_NUM})$`, "iu");
+var numberOf = (text5) => /^\d+$/.test(text5) ? Number(text5) : romanValue(text5.toLowerCase());
+function expandSection(part) {
+  const range2 = part.match(VAR_RANGE);
+  if (range2) {
+    const [from, to] = [numberOf(range2[1]), numberOf(range2[2])];
+    if (from && to && to > from && to - from < 40) return Array.from({ length: to - from + 1 }, (_, i) => `Variation ${from + i}`);
+  }
+  const pieces = part.split(/\s*,\s*|\s+(?:&|and|und|et)\s+/i).map(clean2).filter(Boolean);
+  if (pieces.length < 2) return [part];
+  const out = [];
+  let afterVariation = false;
+  for (const piece of pieces) {
+    const one = piece.match(VAR_ONE);
+    if (one && numberOf(one[1])) out.push(`Variation ${numberOf(one[1])}`), afterVariation = true;
+    else if (afterVariation && /^(?:\d+|[ivxlc]+)$/i.test(piece) && numberOf(piece)) out.push(`Variation ${numberOf(piece)}`);
+    else if (SECTION_START.test(piece)) out.push(piece), afterVariation = false;
+    else return [part];
+  }
+  return out;
+}
+var rawSections = (title) => clean2(title).split(/\s+\/\s+|\s+[–—-]\s+(?=var(?:iation|iatio|iazione)?\.?\s|(?:theme|thema|tema|coda)(?![\p{L}]))/iu).flatMap(expandSection);
+function sectionTitles(title) {
+  const parts = rawSections(title);
+  return parts.length > 1 && parts.every((part) => SECTION_START.test(part)) ? parts : [clean2(title)];
+}
+var combined = (movement) => sectionTitles(movement.title || "").length > 1;
+var VARIATION = /^(?:var(?:iation|iatio|iazione)?s?|variazioni|variationen)\s+(?:(?:no|nr|n)\s+)?(?=\d|[ivxlc]+\b)/;
+function sectionParts(section) {
+  let value = words3(section).replace(/\b(?:tema|thema)\b/g, "theme");
+  const variation = VARIATION.test(value);
+  value = value.replace(VARIATION, "");
+  const numbered = value.match(/^(\d+|[ivxlc]+)(?:\s+(.*))?$/);
+  const number = numbered ? /^\d+$/.test(numbered[1]) ? Number(numbered[1]) : romanValue(numbered[1]) : null;
+  return number ? { number, variation, text: (numbered[2] || "").trim() } : { number: null, variation, text: value.trim() };
+}
+var sameSection = (a, b) => a.number != null || b.number != null ? a.number === b.number && (a.variation || b.variation || a.text === b.text) : a.text === b.text;
+var trackSections = (text5) => sectionTitles(text5).map(sectionParts);
+function mapBySections(movements, tracks) {
+  if (!movements.some(combined)) return null;
+  const sections = movements.map((m) => sectionTitles(m.title || "").map(sectionParts));
+  const result = [];
+  let at = 0, offset = 0;
+  for (const track of tracks) {
+    const wanted = trackSections(track.movementTitle);
+    let hit = null;
+    for (let m = at; m < movements.length && !hit; m++)
+      for (let from = m === at ? offset : 0; from + wanted.length <= sections[m].length && !hit; from++)
+        if (wanted.every((section, i) => sameSection(sections[m][from + i], section))) hit = { m, to: from + wanted.length };
+    if (!hit) return null;
+    result.push(movements[hit.m].id);
+    [at, offset] = hit.to === sections[hit.m].length ? [hit.m + 1, 0] : [hit.m, hit.to];
+  }
+  return result;
+}
+function mapToMovements(movements, tracks, { setSubject = "", sections = false } = {}) {
+  if (!sections || !tracks.some((track) => sectionTitles(track.movementTitle).length > 1)) return mapEach(movements, tracks, setSubject);
+  const owners = [], parts = [];
+  tracks.forEach(
+    (track, i) => sectionTitles(track.movementTitle).forEach((movementTitle2) => {
+      owners.push(i);
+      parts.push({ ...track, movementTitle: movementTitle2 });
+    })
+  );
+  const mapped = mapEach(movements, parts, setSubject);
+  if (!mapped) return null;
+  const result = tracks.map(() => []);
+  mapped.forEach((id, i) => result[owners[i]].push(id));
+  return result.map((ids) => ids.length === 1 ? ids[0] : [...new Set(ids)].length === 1 ? ids[0] : ids);
+}
+var VARIATION_TITLE = /^var(?:iation|iatio|iazione)?\.?\s*(?:(?:no|nr|n)\.?\s*)?(\d+|[ivxlc]+)(?![\p{L}\d])[\s:.,]*(.*)$/iu;
+function asVariation(title) {
+  const text5 = clean2(title).replace(/^(?:tema|thema)(?![\p{L}])/iu, "Theme");
+  const variation = text5.match(VARIATION_TITLE);
+  return variation ? { title: `${variation[1]}. ${variation[2]}`, variation: true, number: numberOf(variation[1]) } : { title: text5, variation: false };
+}
+function mapEach(rawMovements, rawTracks, setSubject) {
+  const movements = rawMovements.map((m) => {
+    const { title, variation, number } = asVariation(m.title || "");
+    return variation || title !== clean2(m.title) ? { ...m, ...movementParts(title), ...variation && number && { index: number }, variation } : m;
+  });
+  const tracks = rawTracks.map((track) => {
+    const { title, variation, number } = asVariation(track.movementTitle || "");
+    return { ...track, movementTitle: title, variation, variationNumber: variation ? number : null };
+  });
+  const used = /* @__PURE__ */ new Set(), result = [];
+  const firstWord = (text5) => text5.split(" ")[0];
   let previous = null;
-  let gap = [];
-  const add = (group, track, entry) => {
-    group.trackIds.push(track.id);
-    group.titles.push(movementTitle({ title: track.title || "", work: entry?.movement || "" }, group.title) || track.title || "");
-  };
-  for (const track of album?.tracks || []) {
-    if (!track.path) {
-      if (previous) gap.push(track);
+  for (const track of tracks) {
+    const parts = movementParts(track.movementTitle);
+    if (track.variationNumber) parts.index = track.variationNumber;
+    let found = movements.filter(
+      (m) => !used.has(m.id) && m.text && m.text === parts.text
+    );
+    if (previous && parts.index && parts.index === previous.index && found.length !== 1) {
+      result.push(previous.id);
       continue;
     }
-    const entry = known[track.path];
-    if (!entry?.work?.id) {
-      previous = null;
-      gap = [];
-      continue;
+    if (found.length !== 1) {
+      const named = namedMovement(movements, track.movementTitle, used, setSubject);
+      if (named) found = [named];
     }
-    let group = byWork.get(entry.work.id);
-    if (!group) {
-      group = {
-        title: entry.work.title || "Untitled work",
-        ...entry.composer && { subtitle: entry.composer },
-        trackIds: [],
-        titles: []
-      };
-      byWork.set(entry.work.id, group);
-    }
-    if (previous === entry.work.id) for (const missing of gap) add(group, missing, null);
-    gap = [];
-    add(group, track, entry);
-    previous = entry.work.id;
-  }
-  if (!byWork.size) return null;
-  return { label: "By work", groups: [...byWork.values()] };
-}
-
-// src/mb.js
-import path5 from "node:path";
-
-// src/version.js
-var VERSION = "1.1.6";
-var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
-
-// src/mb.js
-var PUBLIC_MB = "https://musicbrainz.org";
-var DAY = 24 * 60 * 6e4;
-var TTL = { recording: DAY, default: 30 * DAY, search: 7 * DAY };
-var RETRY_STATUSES = /* @__PURE__ */ new Set([500, 502, 503, 504]);
-function mbBaseUrl(settings) {
-  const mirror = String(settings.mbMirror || "").trim().replace(/\/+$/, "");
-  if (!mirror) return PUBLIC_MB;
-  return /^https?:\/\//i.test(mirror) ? mirror.replace(/\/ws\/2$/, "") : `http://${mirror}`;
-}
-var MusicBrainz = class {
-  constructor({ settings, dataFolder, fetchImpl = fetch, log: log2 = () => {
-  }, intervalMs, maxRetries = 4, retryWaitMs = 3e3 }) {
-    this.base = mbBaseUrl(settings);
-    this.userAgent = `AurralClassical/${VERSION} ( ${REPOSITORY} )`;
-    this.fetch = fetchImpl;
-    this.log = log2;
-    this.cache = new FileCache(path5.join(dataFolder, "mb-cache"));
-    const isPublic = this.base === PUBLIC_MB;
-    this.throttle = new Throttle(dataFolder, intervalMs ?? (isPublic ? 1e3 : 0));
-    this.maxRetries = maxRetries;
-    this.retryWaitMs = retryWaitMs;
-    this.failures = 0;
-    this.disabled = false;
-    this.requests = 0;
-  }
-  // An entity lookup: get("recording", id, "artist-rels+work-rels").
-  get(entity, id, inc, { ttl } = {}) {
-    if (!id) return Promise.resolve(null);
-    const query = new URLSearchParams({ fmt: "json", ...inc && { inc } });
-    const ttlMs = ttl ?? (entity === "recording" ? TTL.recording : TTL.default);
-    return this.request(`${entity}/${id}?${query}`, ttlMs);
-  }
-  // A search or browse: query("release", { query: "..." }).
-  query(entity, params, { ttl = TTL.search } = {}) {
-    const query = new URLSearchParams({ fmt: "json", ...params });
-    return this.request(`${entity}?${query}`, ttl);
-  }
-  // True when MusicBrainz answers at all.
-  async ping() {
-    try {
-      const response = await this.throttle.run(() => this.fetch(`${this.base}/ws/2/artist/1f9df192-a621-4f54-8850-2c5373b7eac9?fmt=json`, {
-        headers: { "User-Agent": this.userAgent, Accept: "application/json" },
-        signal: AbortSignal.timeout(15e3)
-      }));
-      return response.status < 500 ? true : `it answered ${response.status}`;
-    } catch (error) {
-      return error.cause?.code || error.message;
-    }
-  }
-  async request(pathAndQuery, ttlMs) {
-    const key = `${this.base}|${pathAndQuery}`;
-    if (ttlMs > 0) {
-      const cached2 = await this.cache.get(key, ttlMs);
-      if (cached2 !== null) {
-        this.lastResult = cached2.missing ? "missing" : "ok";
-        return cached2.missing ? null : cached2;
+    if (found.length !== 1 && !parts.index && parts.text) {
+      const key = (text5) => firstWord(text5).replace(/^fug(?:a|e)$/, "fugue");
+      if (/^(?:theme|introduction|introduzione|coda|finale|aria|fugue|intermezzo)$/.test(key(parts.text))) {
+        const near = movements.filter(
+          (m) => !used.has(m.id) && m.text && !m.index && key(m.text) === key(parts.text) && (m.text === parts.text || firstWord(m.text) !== firstWord(parts.text) || m.text.startsWith(`${parts.text} `) || parts.text.startsWith(`${m.text} `))
+        );
+        if (near.length) found = [near[0]];
       }
     }
-    this.lastResult = "failed";
-    if (this.disabled) return null;
-    const url = `${this.base}/ws/2/${pathAndQuery}`;
-    let lastError = null;
-    for (let attempt = 0; attempt < this.maxRetries; attempt++) {
-      this.requests++;
-      let response;
-      try {
-        response = await this.throttle.run(() => this.fetch(url, {
-          headers: { "User-Agent": this.userAgent, Accept: "application/json" },
-          signal: AbortSignal.timeout(2e4)
-        }));
-      } catch (error) {
-        lastError = error;
-        if (attempt < this.maxRetries - 1) await sleep(this.retryWaitMs * (attempt + 1));
+    const variation = track.variation || movements.some((m) => m.variation);
+    if (found.length !== 1 && parts.index)
+      found = movements.filter(
+        (m) => !used.has(m.id) && Boolean(m.piece) === Boolean(parts.piece) && (parts.piece || variation ? m.index : m.index ?? m.position) === parts.index
+      );
+    if (found.length === 1 && !variation && found[0].text && parts.text && firstWord(found[0].text) !== firstWord(parts.text) && movements.some((m) => m.id !== found[0].id && m.text && firstWord(m.text) === firstWord(parts.text)))
+      found = [];
+    if (found.length !== 1 && parts.index && parts.text) {
+      const shifted = movements.filter(
+        (m) => !used.has(m.id) && m.text && (parts.text === m.text || parts.text.startsWith(`${m.text} `)) && Math.abs((m.index ?? m.position) - parts.index) === 1
+      );
+      if (shifted.length === 1) found = shifted;
+    }
+    if (found.length !== 1) {
+      result.push(null);
+      previous = null;
+      continue;
+    }
+    used.add(found[0].id);
+    result.push(found[0].id);
+    previous = { id: found[0].id, index: parts.index };
+  }
+  const at = new Map(movements.map((m, i) => [m.id, i]));
+  for (let i = 1; i < result.length - 1; i++) {
+    if (result[i] || !result[i - 1] || !result[i + 1]) continue;
+    const [before, after] = [at.get(result[i - 1]), at.get(result[i + 1])];
+    if (after - before === 2 && !used.has(movements[before + 1].id)) {
+      result[i] = movements[before + 1].id;
+      used.add(result[i]);
+    }
+  }
+  if (result.every(Boolean)) return result;
+  if (movements.length === tracks.length && inOrder(movements, tracks)) return movements.map((m) => m.id);
+  return mapBySections(rawMovements, rawTracks);
+}
+function inOrder(movements, tracks) {
+  const variation = tracks.some((track) => track.variation) || movements.some((m) => m.variation);
+  return movements.every((m, i) => {
+    const parts = movementParts(tracks[i].movementTitle);
+    const number = parts.piece || variation ? m.index : m.index ?? m.position;
+    if (parts.index && parts.index !== number) return false;
+    return !parts.text || !movements.some((other) => other.id !== m.id && other.text === parts.text);
+  });
+}
+var albumOrder = (a, b) => a.discNumber - b.discNumber || a.trackNumber - b.trackNumber || a.id.localeCompare(b.id);
+function shiftUp(catalogue, table, column, where, args, from, by = 1) {
+  catalogue.db.prepare(`UPDATE ${table} SET ${column}=${column}+1000000 WHERE ${where} AND ${column}>=?`).run(...args, from);
+  catalogue.db.prepare(`UPDATE ${table} SET ${column}=${column}-${1e6 - by} WHERE ${where} AND ${column}>=1000000`).run(...args);
+}
+function creditMovementComposers(catalogue, metadata, index, recording, track, group) {
+  const work = new Set(group.composers.map(normalized));
+  (track.composers || []).filter((name) => !work.has(normalized(name))).forEach((name, i) => {
+    const person = composerEntity(catalogue, metadata, index, name, group.composerIds?.[name]);
+    if (!person) {
+      raiseReview(catalogue, "contributor_identity", recording, {
+        reason: "ambiguous-name",
+        name,
+        kind: "person",
+        role: "composer",
+        instrument: null,
+        candidates: index.people.get(words3(name)) || [],
+        key: `ambiguous|${words3(name)}|composer`
+      });
+      return;
+    }
+    if (!catalogue.db.prepare("SELECT 1 FROM credit WHERE target_id=? AND contributor_id=? AND role='composer' AND state='active'").get(recording, person))
+      catalogue.credit(recording, person, "composer", { position: i + 1 });
+  });
+}
+function extendRealization(catalogue, group, actor2, people) {
+  const attached = group.tracks.filter((track) => track.attached);
+  const found = catalogue.db.prepare(
+    `SELECT DISTINCT i.realization_id AS id,r.work_id,r.performance_work_id FROM realization_item i
+       JOIN segment s ON s.id=i.segment_id JOIN realization r ON r.id=i.realization_id
+       WHERE s.track_link_id IN (${attached.map(() => "?").join(",")})`
+  ).all(...attached.map((track) => track.id));
+  if (found.length !== 1) return false;
+  const [realization] = found;
+  const metadata = new Metadata(catalogue);
+  return transaction(catalogue.db, () => {
+    const workTitle = resolvedName(catalogue, realization.work_id, "title") || group.work;
+    const performance2 = catalogue.db.prepare("SELECT source_id FROM relation WHERE id=?").get(realization.performance_work_id).source_id;
+    const itemOf = catalogue.db.prepare(
+      `SELECT i.movement_id,i.sequence FROM realization_item i JOIN segment s ON s.id=i.segment_id
+       WHERE i.realization_id=? AND s.track_link_id=? ORDER BY i.sequence DESC`
+    );
+    const ordered = [...group.tracks].sort(albumOrder);
+    let added = 0;
+    const held2 = new Set(
+      catalogue.db.prepare("SELECT movement_id FROM realization_item WHERE realization_id=?").all(realization.id).map((row) => row.movement_id)
+    );
+    const pending = ordered.filter((track) => !track.attached && !trackUnassignedByAdmin(catalogue, track.id));
+    if (!pending.length) return false;
+    const eligible = new Set(pending.map((track) => track.id));
+    const existingMovement = (section, used) => {
+      const parts = movementParts(section);
+      const sameName = workMovements(catalogue, realization.work_id).filter((m) => !used.has(m.id) && parts.text && m.text === parts.text);
+      return sameName.length === 1 ? sameName[0] : sameName.find((m) => parts.index && (m.index ?? m.position) === parts.index);
+    };
+    const workIds = [realization.work_id, ...workMovements(catalogue, realization.work_id).map((m) => m.id)];
+    if (pending.length && (editedInEditor(catalogue, workIds) || hasManualEdits(catalogue, workIds))) {
+      const reserved = new Set(held2);
+      for (const track of pending) {
+        const named = movementTitle({ title: track.parsedTitle, work: track.evidence.hints?.work }, workTitle);
+        for (const section of sectionTitles(named || "")) {
+          const existing = existingMovement(section, reserved);
+          if (!existing) {
+            catalogue.review("auto_match", pending[0].id, {
+              reason: "movement-mismatch",
+              work: realization.work_id,
+              albumId: group.albumId,
+              tracks: pending.map((t) => t.id)
+            });
+            return false;
+          }
+          reserved.add(existing.id);
+        }
+      }
+    }
+    for (const [index, track] of ordered.entries()) {
+      if (!eligible.has(track.id)) continue;
+      const before = ordered.slice(0, index).reverse().map((other) => itemOf.get(realization.id, other.id)).find(Boolean);
+      const named = movementTitle({ title: track.parsedTitle, work: track.evidence.hints?.work }, workTitle);
+      let after = before?.movement_id || null;
+      const movements = sectionTitles(named || "").map((section) => {
+        const existing = existingMovement(section, held2);
+        let movement = existing?.id;
+        if (!movement) {
+          const position = after ? catalogue.db.prepare("SELECT position FROM relation WHERE kind='movement' AND source_id=? AND target_id=?").get(realization.work_id, after).position + 1 : 1;
+          shiftUp(catalogue, "relation", "position", "kind='movement' AND source_id=?", [realization.work_id], position);
+          movement = catalogue.createEntity("movement");
+          metadata.derived(movement, "title", section || `Movement ${position}`);
+          catalogue.relate("movement", realization.work_id, movement, { position });
+        }
+        held2.add(movement);
+        after = movement;
+        return movement;
+      });
+      const recording = catalogue.createEntity("recording", { durationMs: track.evidence.durationMs });
+      metadata.derived(recording, "title", track.title);
+      creditMovementComposers(catalogue, metadata, people, recording, track, group);
+      catalogue.relate("recording_performance", recording, performance2);
+      const segment = catalogue.segment(track.id, { kind: "whole" });
+      let sequence = before?.sequence || 0;
+      shiftUp(catalogue, "realization_item", "sequence", "realization_id=?", [realization.id], sequence + 1, movements.length);
+      movements.forEach((movement, j) => {
+        const content = catalogue.recordingContent(recording, realization.performance_work_id, { movement, position: j + 1 });
+        catalogue.segmentContent(segment, content);
+        catalogue.realizationItem(realization.id, segment, { movement, sequence: ++sequence, intentionalOverlap: j > 0 });
+      });
+      track.attached = 1;
+      added++;
+    }
+    catalogue.audit(
+      "work.auto_match_extend",
+      realization.work_id,
+      { albumId: group.albumId, added, tracks: ordered.map((track) => track.id) },
+      actor2
+    );
+    return added > 0;
+  });
+}
+function trackUnassignedByAdmin(catalogue, track) {
+  return catalogue.db.prepare(`SELECT a.action FROM audit_event a
+    WHERE a.action IN ('editor.unassign-tracks','editor.assign-album')
+      AND EXISTS (SELECT 1 FROM json_each(a.data, '$.values.tracks') t
+        WHERE t.value=? AND (a.action='editor.unassign-tracks'
+          OR coalesce(json_extract(a.data, '$.values.mapping[' || t.key || ']'), '') != ''))
+    ORDER BY a.id DESC LIMIT 1`).get(track)?.action === "editor.unassign-tracks";
+}
+function unassignedByAdmin(catalogue, work, albumId) {
+  return catalogue.db.prepare(
+    `SELECT action FROM audit_event WHERE target_id=? AND action IN ('editor.unassign-album','editor.assign-album')
+         AND CAST(json_extract(data,'$.values.albumId') AS TEXT)=? ORDER BY id DESC LIMIT 1`
+  ).get(work, String(albumId))?.action === "editor.unassign-album";
+}
+function madeBeforeSuffixes(catalogue, group) {
+  if (!group.legacyKey) return false;
+  const made = existingIdentity(catalogue, "album-work", identity("album-work", group.legacyKey));
+  if (!made) return false;
+  const title = resolvedName(catalogue, made, "title");
+  const wanted = group.catalogue ? `${group.work}, ${group.catalogue}` : group.work;
+  return typeof title === "string" && catalogueSubject(title) === catalogueSubject(wanted);
+}
+function createGroup(catalogue, group, actor2, index) {
+  if (group.composerSource?.confidence === "medium") {
+    const tracks = [...group.tracks].sort(albumOrder);
+    catalogue.review("auto_match", tracks[0].id, {
+      reason: "uncertain-composer",
+      composers: group.composers,
+      work: group.work,
+      source: "artist field",
+      albumId: group.albumId,
+      tracks: tracks.map((t) => t.id)
+    });
+    return false;
+  }
+  if (group.tracks.some((track) => track.attached))
+    return extendRealization(catalogue, group, actor2, index);
+  const metadata = new Metadata(catalogue);
+  const recordId = identity("album-work", group.key);
+  const madeHere = existingIdentity(catalogue, "album-work", recordId);
+  const wanted = catalogueSubject(group.catalogue ? `${group.work}, ${group.catalogue}` : group.work);
+  const falseJoin = (work) => Boolean(wanted) && provablyDifferent(wanted, catalogueSubject(String(resolvedName(catalogue, work, "title") || "")));
+  if (madeHere && !falseJoin(madeHere)) return false;
+  if ((group.spellingKeys || []).some((key) => {
+    const made = existingIdentity(catalogue, "album-work", identity("album-work", key));
+    return made && !falseJoin(made);
+  })) return false;
+  if (madeBeforeSuffixes(catalogue, group)) return false;
+  return transaction(catalogue.db, () => {
+    if (madeHere)
+      catalogue.db.prepare("UPDATE external_identity SET state='stale' WHERE entity_id=? AND provider='embedded-tags' AND record_kind='album-work' AND record_id=?").run(madeHere, recordId);
+    const ordered = group.tracks.sort(
+      (a, b) => a.discNumber - b.discNumber || a.trackNumber - b.trackNumber || a.id.localeCompare(b.id)
+    ).map((track) => ({
+      ...track,
+      movementTitle: fullerTitle(
+        movementTitle({ title: track.parsedTitle, work: track.evidence.hints?.work }, group.work),
+        track.providerMovement ? stripWorkPrefix(track.providerMovement, group.work) : null
+      )
+    }));
+    const key = group.providerWorkId ? JSON.stringify(["musicbrainz", group.providerWorkId]) : workKey(group.work, group.composers);
+    let providerWork = group.providerWorkId && catalogue.db.prepare(
+      `SELECT x.entity_id FROM external_identity x JOIN entity e ON e.id=x.entity_id
+           WHERE x.provider='musicbrainz' AND x.record_kind='work' AND x.record_id=?
+           AND x.state='active' AND e.deleted_at IS NULL`
+    ).get(group.providerWorkId)?.entity_id;
+    const heldElsewhere = (id) => {
+      const wanted2 = group.ownSubject || (group.localTitle ? catalogueSubject(group.localTitle) : "");
+      return Boolean(wanted2) && provablyDifferent(wanted2, catalogueSubject(String(resolvedName(catalogue, id, "title") || "")));
+    };
+    if (providerWork && heldElsewhere(providerWork)) providerWork = null;
+    const otherComposer = (id) => catalogue.db.prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer' AND state='active'").all(id).some(({ contributor_id: person }) => {
+      const mbid = group.composerIds?.[resolvedName(catalogue, person, "name")] || Object.entries(group.composerIds || {}).find(([name]) => index.people.get(words3(name))?.includes(person))?.[1];
+      const held2 = artistIdOf2(catalogue, person);
+      return mbid && held2 && held2 !== mbid;
+    });
+    const catalogued2 = group.catalogue && `${group.work}, ${group.catalogue}`;
+    const titles = catalogued2 ? [catalogued2] : [
+      group.work,
+      ...group.providerWorkId ? [group.localTitle, ...group.providerAliases || []] : []
+    ].filter(Boolean);
+    const known = providerWork ? [providerWork] : [
+      ...new Set(
+        titles.flatMap((title) => {
+          const key2 = workKey(title, group.composers);
+          return [...index.works.get(key2) || [], ...index.aliases?.get(key2) || []];
+        })
+      )
+    ].filter(
+      (id) => !otherComposer(id) && !heldElsewhere(id) && // A work already tied to a different MusicBrainz work is another piece.
+      !(group.providerWorkId && catalogue.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='work' AND state='active' AND record_id!=?").get(id, group.providerWorkId))
+    );
+    if (known.length > 1) {
+      catalogue.review("auto_match", ordered[0].id, {
+        reason: "ambiguous-work",
+        candidates: known,
+        albumId: group.albumId,
+        tracks: ordered.map((t) => t.id)
+      });
+      return false;
+    }
+    let work = known.length === 1 ? known[0] : null;
+    let movements = null;
+    if (work && unassignedByAdmin(catalogue, work, group.albumId)) return false;
+    if (work) {
+      let existing = workMovements(catalogue, work);
+      if (existing.some(combined) && splitCombinedMovements(catalogue, work, actor2)) existing = workMovements(catalogue, work);
+      const setSubject = catalogueSubject(String(resolvedName(catalogue, work, "title") || "")) || catalogueSubject(catalogued2 || group.work);
+      const place2 = () => {
+        try {
+          return transaction(catalogue.db, () => {
+            const used = /* @__PURE__ */ new Set();
+            return ordered.map((track) => {
+              const movement = placeExcerpt(catalogue, metadata, work, workMovements(catalogue, work), track, setSubject, used);
+              if (!movement) throw new Error("unplaced");
+              used.add(movement);
+              return movement;
+            });
+          });
+        } catch (error) {
+          if (error.message !== "unplaced") throw error;
+          return null;
+        }
+      };
+      const excerpts = group.excerpt && existing.length && ordered.length <= existing.length;
+      movements = excerpts ? place2() : existing.length ? mapToMovements(existing, ordered, { setSubject, sections: true }) : null;
+      if (!movements && !excerpts && existing.length > 1 && foldRepeatedMovements(catalogue, work, existing, setSubject, actor2)) {
+        existing = workMovements(catalogue, work);
+        movements = mapToMovements(existing, ordered, { setSubject, sections: true });
+      }
+      if (!movements && existing.length) movements = expandIncompleteWork(catalogue, metadata, work, existing, ordered, setSubject, group, actor2);
+      if (!movements && existing.length && group.excerpt && !excerpts) movements = place2();
+      if (!movements && existing.length) {
+        catalogue.review("auto_match", ordered[0].id, {
+          reason: "movement-mismatch",
+          work,
+          albumId: group.albumId,
+          tracks: ordered.map((t) => t.id)
+        });
+        return false;
+      }
+      ordered.forEach((track, i) => typeof movements?.[i] === "string" && recordLeaf(catalogue, movements[i], track.providerLeaf));
+      if (group.providerWorkId) catalogue.externalIdentity(work, "musicbrainz", "work", group.providerWorkId, { evidence: { source: "parent-work" } });
+    } else {
+      const ambiguous = group.composers.filter((name) => {
+        const sameName = index.people.get(words3(name)) || [];
+        const mbid = group.composerIds?.[name];
+        if (!mbid) return sameName.length > 1;
+        if (sameName.some((id) => artistIdOf2(catalogue, id) === mbid)) return false;
+        return sameName.filter((id) => !artistIdOf2(catalogue, id)).length > 1;
+      });
+      if (ambiguous.length) {
+        catalogue.review("auto_match", ordered[0].id, {
+          reason: "ambiguous-composer",
+          composers: ambiguous,
+          candidates: ambiguous.flatMap((name) => index.people.get(words3(name))),
+          albumId: group.albumId,
+          tracks: ordered.map((t) => t.id)
+        });
+        return false;
+      }
+      const suppressed = suppressionKeys(group.work, group.composers, group.providerWorkId).find(
+        (key2) => catalogue.db.prepare("SELECT 1 FROM match_suppression WHERE key=?").get(key2)
+      );
+      if (suppressed) {
+        catalogue.review("auto_match", ordered[0].id, {
+          reason: "deleted-work",
+          suppression: suppressed,
+          work: group.work,
+          albumId: group.albumId,
+          tracks: ordered.map((t) => t.id)
+        });
+        return false;
+      }
+      work = catalogue.createEntity("work");
+      metadata.derived(work, "title", group.work);
+      group.composers.forEach((name, i) => {
+        const person = composerEntity(catalogue, metadata, index, name, group.composerIds?.[name]);
+        if (person) catalogue.credit(work, person, "composer", { position: i + 1 });
+      });
+      if (group.providerAliases?.length)
+        metadata.derived(work, "aliases", group.providerAliases);
+      else if (catalogued2) {
+        metadata.derived(work, "aliases", [catalogued2]);
+        index.aliases.set(workKey(catalogued2, group.composers), [work]);
+      }
+      if (group.providerWorkId)
+        catalogue.externalIdentity(
+          work,
+          "musicbrainz",
+          "work",
+          group.providerWorkId,
+          { evidence: { source: "parent-work" } }
+        );
+      if (!catalogued2) index.works.set(workKey(group.work, group.composers), [work]);
+    }
+    if (group.standalone && !workMovements(catalogue, work).length) movements = [null];
+    if (!movements) {
+      let position = 0;
+      movements = ordered.map((track) => {
+        const sections = sectionTitles(track.movementTitle || `Movement ${position + 1}`);
+        const made = sections.map((title) => {
+          const movement = catalogue.createEntity("movement");
+          position++;
+          metadata.derived(movement, "title", title);
+          metadata.derived(movement, "movementNumber", String(position));
+          catalogue.relate("movement", work, movement, { position });
+          if (sections.length === 1) recordLeaf(catalogue, movement, track.providerLeaf);
+          return movement;
+        });
+        return made.length === 1 ? made[0] : made;
+      });
+    }
+    catalogue.externalIdentity(work, "embedded-tags", "album-work", recordId, {
+      evidence: {
+        albumId: group.albumId,
+        work: group.work,
+        composers: group.composers,
+        providerWorkId: group.providerWorkId,
+        ...group.excerpt && { excerpt: true }
+      }
+    });
+    const performance2 = catalogue.createEntity("performance");
+    const performanceWork = catalogue.relate(
+      "performance_work",
+      performance2,
+      work
+    );
+    const realization = catalogue.realization(
+      work,
+      performanceWork,
+      group.album || null
+    );
+    ordered.forEach((track, i) => {
+      const recording = catalogue.createEntity("recording", {
+        durationMs: track.evidence.durationMs
+      });
+      metadata.derived(recording, "title", track.title || track.movementTitle);
+      creditMovementComposers(catalogue, metadata, index, recording, track, group);
+      catalogue.relate("recording_performance", recording, performance2);
+      const segment = catalogue.segment(track.id, { kind: "whole" });
+      placeTrack(catalogue, realization, performanceWork, recording, segment, movements[i]);
+    });
+    if (group.collection) joinCollection(catalogue, metadata, work, group.collection, actor2);
+    catalogue.audit(
+      "work.auto_match",
+      work,
+      {
+        rule: "classical-grouping-v2",
+        evidence: group.evidence,
+        albumId: group.albumId,
+        reused: known.length === 1,
+        tracks: ordered.map((track) => track.id)
+      },
+      actor2
+    );
+    return true;
+  });
+}
+function placeTrack(catalogue, realization, performanceWork, recording, segment, movement) {
+  const db = catalogue.db;
+  const list3 = Array.isArray(movement) ? movement : [movement];
+  let sequence = db.prepare("SELECT coalesce(max(sequence),0) AS n FROM realization_item WHERE realization_id=?").get(realization).n;
+  let position = db.prepare("SELECT coalesce(max(position),0) AS n FROM recording_content WHERE recording_id=?").get(recording).n;
+  list3.forEach((id, j) => {
+    const content = catalogue.recordingContent(recording, performanceWork, { movement: id, position: ++position });
+    catalogue.segmentContent(segment, content);
+    const occurrence = id ? db.prepare("SELECT count(*) AS n FROM realization_item WHERE realization_id=? AND movement_id=?").get(realization, id).n + 1 : 1;
+    catalogue.realizationItem(realization, segment, { movement: id, sequence: ++sequence, occurrence, intentionalOverlap: j > 0 });
+  });
+}
+var CATALOGUE_RANGE = new RegExp("(?<!\\p{L})(?:BWV|HWV|SV|K|KV|D|Op\\.?|RV|S|Hob\\.?)\\s*\\d+[a-z]?\\s*[-\u2013\u2014]\\s*\\d+", "iu");
+var namesCatalogueRange = (title) => CATALOGUE_RANGE.test(String(title || ""));
+var collectionTitle = (title) => clean2(
+  String(title || "").replace(new RegExp(",?\\s*(?<!\\p{L})(?:BWV|HWV|SV|K|KV|D|Op\\.?|RV|S|Hob\\.?)\\s*\\d+[a-z]?\\s*[-\u2013\u2014]\\s*\\d+[a-z]?", "giu"), "").replace(/[,\s]+$/, "")
+);
+function releaseRangeWorks(catalogue, { actor: actor2 = null } = {}) {
+  const db = catalogue.db;
+  let released = 0;
+  for (const { id } of db.prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL").all()) {
+    const title = resolvedName(catalogue, id, "title");
+    if (typeof title !== "string" || !CATALOGUE_RANGE.test(title)) continue;
+    const stacked = db.prepare(
+      `SELECT 1 FROM realization r JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
+         JOIN track_link t ON t.id=s.track_link_id WHERE r.work_id=?
+         GROUP BY CAST(json_extract(t.evidence,'$.albumId') AS TEXT) HAVING count(DISTINCT r.id)>1 LIMIT 1`
+    ).get(id);
+    const numbers = new Set(
+      db.prepare(
+        `SELECT t.evidence FROM realization r JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
+           JOIN track_link t ON t.id=s.track_link_id WHERE r.work_id=?`
+      ).all(id).map((row) => {
+        const hints = JSON.parse(row.evidence).hints || {};
+        const title2 = withoutComposer(hints.title, hints.composer);
+        return catalogueSubject(splitTitle(title2).head || title2);
+      }).filter((subject) => subject && !CATALOGUE_RANGE.test(subject))
+    );
+    if (!stacked && numbers.size < 2) continue;
+    const again2 = db.prepare(
+      `SELECT DISTINCT t.evidence FROM realization r JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
+         JOIN track_link t ON t.id=s.track_link_id WHERE r.work_id=?`
+    ).all(id).some((row) => {
+      const hints = JSON.parse(row.evidence).hints || {};
+      const proposal = proposedWork({ ...hints, title: withoutComposer(hints.title, hints.composer) }, true);
+      return proposal && CATALOGUE_RANGE.test(proposal.title);
+    });
+    if (again2) continue;
+    const ids = [id, ...workMovements(catalogue, id).map((m) => m.id)];
+    const madeByMatching = db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work'").get(id);
+    if (!madeByMatching || editedInEditor(catalogue, ids) || hasManualEdits(catalogue, ids)) continue;
+    transaction(db, () => {
+      const items = db.prepare("SELECT i.id FROM realization_item i JOIN realization r ON r.id=i.realization_id WHERE r.work_id=?").all(id);
+      for (const item of items) catalogue.detachItem(item.id, { dropRecording: true });
+      db.prepare("UPDATE external_identity SET state='stale' WHERE entity_id IN (" + ids.map(() => "?").join(",") + ") AND state='active'").run(...ids);
+      db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id IN (" + ids.map(() => "?").join(",") + ")").run(Date.now(), Date.now(), ...ids);
+      catalogue.audit("work.release_range", id, { title, tracks: items.length }, actor2);
+    });
+    released++;
+  }
+  return released;
+}
+var bookName = (title) => words3(String(title || "")).replace(/^(?:the|das|der|die|le|la|les|il)\s+/, "");
+function joinCollection(catalogue, metadata, work, { id: mbid, title }, actor2) {
+  const db = catalogue.db;
+  if (!title || db.prepare("SELECT 1 FROM relation WHERE kind='collection_member' AND target_id=?").get(work)) return;
+  let collection = mbid ? db.prepare("SELECT entity_id AS id FROM external_identity WHERE provider='musicbrainz' AND record_kind='collection' AND record_id=? AND state='active'").get(mbid)?.id : null;
+  if (!collection)
+    collection = db.prepare("SELECT id FROM entity WHERE kind='collection' AND deleted_at IS NULL ORDER BY created_at").all().map((row) => row.id).find((id) => bookName(resolvedName(catalogue, id, "title")) === bookName(title));
+  if (!collection) {
+    collection = catalogue.createEntity("collection");
+    metadata.derived(collection, "title", title);
+    if (mbid) catalogue.externalIdentity(collection, "musicbrainz", "collection", mbid, { evidence: { source: "parent-work" } });
+  } else if (mbid && !db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='collection'").get(collection))
+    catalogue.externalIdentity(collection, "musicbrainz", "collection", mbid, { evidence: { source: "parent-work" } });
+  const position = (db.prepare("SELECT max(position) AS n FROM relation WHERE kind='collection_member' AND source_id=?").get(collection).n || 0) + 1;
+  catalogue.relate("collection_member", collection, work, { position });
+  catalogue.audit("work.join_collection", work, { collection, title }, actor2);
+}
+function fileCollectionsFromTags(catalogue, { actor: actor2 = null } = {}) {
+  const metadata = new Metadata(catalogue);
+  let filed = 0;
+  const rows = catalogue.db.prepare(
+    `SELECT DISTINCT r.work_id AS work,json_extract(t.evidence,'$.hints.work') AS tag FROM realization r
+       JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id
+       WHERE coalesce(json_extract(t.evidence,'$.hints.work'),'')!=''
+       AND NOT EXISTS(SELECT 1 FROM relation c WHERE c.kind='collection_member' AND c.target_id=r.work_id)`
+  ).all();
+  for (const { work, tag } of rows) {
+    if (catalogue.db.prepare("SELECT 1 FROM relation WHERE kind='collection_member' AND target_id=?").get(work)) continue;
+    const proposal = proposedWork({ work: tag, title: "" }, false);
+    const title = resolvedName(catalogue, work, "title");
+    if (!proposal?.collection || typeof title !== "string" || !catalogueSubject(title) || catalogueSubject(proposal.title) !== catalogueSubject(title)) continue;
+    joinCollection(catalogue, metadata, work, { id: null, title: proposal.collection }, actor2);
+    filed++;
+  }
+  return filed;
+}
+var LEAF = "movement-work";
+function movementWithLeaf(catalogue, work, leaf) {
+  if (!leaf) return null;
+  return catalogue.db.prepare(
+    `SELECT x.entity_id AS id FROM external_identity x JOIN relation r ON r.kind='movement' AND r.target_id=x.entity_id AND r.source_id=?
+         WHERE x.provider='musicbrainz' AND x.record_kind='${LEAF}' AND x.record_id=? AND x.state='active'`
+  ).get(work, leaf)?.id ?? null;
+}
+function recordLeaf(catalogue, movement, leaf, source = "recording") {
+  if (!movement || !leaf) return false;
+  const held2 = catalogue.db.prepare(`SELECT entity_id FROM external_identity WHERE provider='musicbrainz' AND record_kind='${LEAF}' AND record_id=? AND state='active'`).get(leaf);
+  const own = catalogue.db.prepare(`SELECT 1 FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='${LEAF}' AND state='active'`).get(movement);
+  if (held2 || own) return false;
+  catalogue.externalIdentity(movement, "musicbrainz", LEAF, leaf, { evidence: { source } });
+  return true;
+}
+function recordTaggedLeaves(catalogue, { albumId = null } = {}) {
+  const rows = catalogue.db.prepare(
+    `SELECT i.movement_id AS movement,r.work_id AS work,json_extract(t.evidence,'$.hints.workId') AS leaf
+       FROM realization_item i JOIN realization r ON r.id=i.realization_id JOIN segment s ON s.id=i.segment_id
+       JOIN track_link t ON t.id=s.track_link_id AND t.state='active'
+       WHERE i.movement_id IS NOT NULL AND coalesce(json_extract(t.evidence,'$.hints.workId'),'')!=''
+       ${albumId == null ? "" : "AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?"}
+       AND NOT EXISTS(SELECT 1 FROM realization_item o WHERE o.segment_id=i.segment_id AND o.id!=i.id)
+       AND NOT EXISTS(SELECT 1 FROM external_identity x WHERE x.entity_id=i.movement_id AND x.provider='musicbrainz' AND x.record_kind='${LEAF}' AND x.state='active')
+       AND NOT EXISTS(SELECT 1 FROM external_identity x WHERE x.entity_id=r.work_id AND x.provider='musicbrainz' AND x.record_kind='work' AND x.record_id=json_extract(t.evidence,'$.hints.workId'))`
+  ).all(...albumId == null ? [] : [String(albumId)]);
+  let recorded = 0;
+  for (const { movement, leaf } of rows) if (recordLeaf(catalogue, movement, String(leaf), "work-id-tag")) recorded++;
+  return recorded;
+}
+function excerptsOnly(catalogue, work) {
+  const records = catalogue.db.prepare("SELECT evidence FROM external_identity WHERE entity_id=? AND record_kind='album-work' AND state='active'").all(work);
+  if (records.length > 0 && records.every((row) => JSON.parse(row.evidence).excerpt === true)) return true;
+  const movements = workMovements(catalogue, work);
+  return movements.length > 0 && movements.every(
+    (m) => catalogue.db.prepare(`SELECT 1 FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='${LEAF}' AND state='active'`).get(m.id)
+  );
+}
+var ACT_WORD = /^(?:act|atto|akt|acte|aufzug|scene|scena|szene|prologue|prolog|prologo)$/;
+function namesWithin(a, b, workTitle) {
+  const strip = (text5) => {
+    const list3 = words3(text5).split(" ").filter(Boolean).filter((word, i, all) => !ACT_WORD.test(word) && !(i > 0 && ACT_WORD.test(all[i - 1]) && romanValue(word)));
+    for (const word of words3(workTitle).split(" ")) if (list3.includes(word) && list3.length > 1) list3.splice(list3.indexOf(word), 1);
+    return list3;
+  };
+  const [x, y] = [strip(a), strip(b)];
+  const [short, long] = x.length <= y.length ? [x, y] : [y, x];
+  return short.length > 0 && short.every((word) => long.includes(word));
+}
+function placeExcerpt(catalogue, metadata, work, existing, track, setSubject, used = /* @__PURE__ */ new Set()) {
+  const byLeaf = movementWithLeaf(catalogue, work, track.providerLeaf);
+  if (byLeaf) return used.has(byLeaf) ? null : byLeaf;
+  const named = namedMovement(existing, track.movementTitle, used, setSubject);
+  const workTitle = resolvedName(catalogue, work, "title") || "";
+  const within = existing.filter((m) => !used.has(m.id) && namesWithin(m.title, track.movementTitle, workTitle));
+  const found = named || (within.length === 1 ? within[0] : null);
+  if (found) {
+    recordLeaf(catalogue, found.id, track.providerLeaf);
+    return found.id;
+  }
+  if (within.length || !excerptsOnly(catalogue, work)) return null;
+  const position = (catalogue.db.prepare("SELECT max(position) AS n FROM relation WHERE kind='movement' AND source_id=?").get(work).n || 0) + 1;
+  const movement = catalogue.createEntity("movement");
+  metadata.derived(movement, "title", track.movementTitle || track.title);
+  metadata.derived(movement, "movementNumber", String(position));
+  catalogue.relate("movement", work, movement, { position });
+  recordLeaf(catalogue, movement, track.providerLeaf);
+  return movement;
+}
+function expandIncompleteWork(catalogue, metadata, work, existing, ordered, setSubject, group, actor2) {
+  if (ordered.length <= existing.length || ordered.some((track) => sectionTitles(track.movementTitle).length > 1)) return null;
+  const ids = [work, ...existing.map((m) => m.id)];
+  const madeByMatching = catalogue.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work'").get(work);
+  if (!madeByMatching || editedInEditor(catalogue, ids) || hasManualEdits(catalogue, ids)) return null;
+  const used = /* @__PURE__ */ new Set();
+  const mapped = ordered.map((track) => {
+    const leaf = movementWithLeaf(catalogue, work, track.providerLeaf);
+    const movement = leaf && !used.has(leaf) && existing.find((m) => m.id === leaf) || namedMovement(existing, track.movementTitle, used, setSubject);
+    if (movement) used.add(movement.id);
+    return movement;
+  });
+  const loose = excerptsOnly(catalogue, work);
+  if (loose) {
+    const workTitle = resolvedName(catalogue, work, "title") || "";
+    for (const movement of existing) {
+      if (used.has(movement.id)) continue;
+      const named = ordered.map((track, i) => i).filter((i) => !mapped[i] && namesWithin(movement.title, ordered[i].movementTitle, workTitle));
+      if (named.length !== 1) continue;
+      mapped[named[0]] = movement;
+      used.add(movement.id);
+    }
+  }
+  const workWords = words3(resolvedName(catalogue, work, "title") || "").split(" ");
+  for (const movement of existing) {
+    if (used.has(movement.id)) continue;
+    const rest = words3(movement.title).split(" ").filter(Boolean);
+    for (const word of workWords) if (rest.includes(word)) rest.splice(rest.indexOf(word), 1);
+    if (rest.length < 2) continue;
+    const named = ordered.map((track, i) => [i, words3(movementParts(track.movementTitle).text).split(" ")]).filter(([i, text5]) => !mapped[i] && rest.every((word) => text5.includes(word)));
+    if (named.length !== 1) continue;
+    mapped[named[0][0]] = movement;
+    used.add(movement.id);
+  }
+  if (used.size !== existing.length) return null;
+  const positions = mapped.filter(Boolean).map((m) => m.position);
+  if (!loose && positions.some((position, i) => i && position < positions[i - 1])) return null;
+  const held2 = new Set(existing.map((m) => movementPiece(m, setSubject)).filter((n) => n != null));
+  for (const [i, track] of ordered.entries()) {
+    if (mapped[i]) continue;
+    const name = movementParts(track.movementTitle).text;
+    const piece = pieceNumber(track.movementTitle, setSubject);
+    if (!name || piece != null && held2.has(piece)) return null;
+    if (existing.some((m) => m.text && ` ${m.text} `.includes(` ${name} `))) return null;
+  }
+  catalogue.db.prepare("UPDATE relation SET position=position+1000000 WHERE kind='movement' AND source_id=?").run(work);
+  const result = ordered.map((track, i) => {
+    const position = i + 1;
+    let movement = mapped[i]?.id;
+    if (movement) catalogue.db.prepare("UPDATE relation SET position=? WHERE kind='movement' AND source_id=? AND target_id=?").run(position, work, movement);
+    else {
+      movement = catalogue.createEntity("movement");
+      metadata.derived(movement, "title", track.movementTitle);
+      catalogue.relate("movement", work, movement, { position });
+    }
+    metadata.derived(movement, "movementNumber", String(position));
+    recordLeaf(catalogue, movement, track.providerLeaf);
+    return movement;
+  });
+  catalogue.audit("work.auto_match_expand", work, { albumId: group.albumId, from: existing.length, to: result.length, tracks: ordered.map((t) => t.id) }, actor2);
+  return result;
+}
+function splitCombinedMovements(catalogue, work, actor2 = null) {
+  const db = catalogue.db;
+  const existing = workMovements(catalogue, work);
+  if (!existing.some(combined)) return false;
+  const ids = [work, ...existing.map((m) => m.id)];
+  const madeByMatching = db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work'").get(work);
+  if (!madeByMatching || editedInEditor(catalogue, ids) || hasManualEdits(catalogue, ids)) return false;
+  const workTitle = resolvedName(catalogue, work, "title") || "";
+  const setSubject = catalogueSubject(workTitle);
+  const realizations = db.prepare("SELECT id,performance_work_id FROM realization WHERE work_id=? ORDER BY rowid").all(work);
+  const placed = realizations.map((realization) => {
+    const tracks = [];
+    for (const item of db.prepare(
+      `SELECT i.id,i.segment_id,i.movement_id,s.track_link_id,t.evidence FROM realization_item i JOIN segment s ON s.id=i.segment_id
+         JOIN track_link t ON t.id=s.track_link_id WHERE i.realization_id=? ORDER BY i.sequence`
+    ).all(realization.id)) {
+      if (tracks.at(-1)?.segment === item.segment_id) continue;
+      const hints = JSON.parse(item.evidence).hints || {};
+      const recording = db.prepare(
+        `SELECT c.recording_id AS id FROM segment_content x JOIN recording_content c ON c.id=x.content_id
+           WHERE x.segment_id=? AND c.performance_work_id=? LIMIT 1`
+      ).get(item.segment_id, realization.performance_work_id)?.id;
+      tracks.push({
+        segment: item.segment_id,
+        recording,
+        movement: item.movement_id,
+        movementTitle: movementTitle({ title: withoutComposer(hints.title || "", composersOf(hints)), work: hints.work }, workTitle)
+      });
+    }
+    return { realization, tracks };
+  });
+  if (placed.some(({ tracks }) => tracks.some((track) => !track.recording))) return false;
+  const metadata = new Metadata(catalogue);
+  try {
+    transaction(db, () => {
+      db.prepare("UPDATE relation SET position=position+1000000 WHERE kind='movement' AND source_id=?").run(work);
+      let position = 0;
+      for (const movement of existing) {
+        const titles = sectionTitles(movement.title);
+        titles.forEach((title, j) => {
+          const id = j ? catalogue.createEntity("movement") : movement.id;
+          position++;
+          if (j) catalogue.relate("movement", work, id, { position });
+          else db.prepare("UPDATE relation SET position=? WHERE kind='movement' AND source_id=? AND target_id=?").run(position, work, id);
+          if (titles.length > 1) metadata.derived(id, "title", title);
+          metadata.derived(id, "movementNumber", String(position));
+        });
+      }
+      const fine = workMovements(catalogue, work);
+      for (const { realization, tracks } of placed) {
+        const mapped = mapToMovements(fine, tracks, { setSubject, sections: true });
+        if (!mapped) throw new Error("unplaced");
+        const items = db.prepare("SELECT id,segment_id FROM realization_item WHERE realization_id=?").all(realization.id);
+        for (const item of items) {
+          db.prepare("DELETE FROM realization_item WHERE id=?").run(item.id);
+          for (const { content_id: content } of db.prepare("SELECT content_id FROM segment_content WHERE segment_id=?").all(item.segment_id)) {
+            db.prepare("DELETE FROM segment_content WHERE segment_id=? AND content_id=?").run(item.segment_id, content);
+            db.prepare("DELETE FROM recording_content WHERE id=? AND performance_work_id=?").run(content, realization.performance_work_id);
+          }
+        }
+        tracks.forEach((track, i) => placeTrack(catalogue, realization.id, realization.performance_work_id, track.recording, track.segment, mapped[i]));
+      }
+      catalogue.audit("work.split_sections", work, { from: existing.length, to: fine.length }, actor2);
+    });
+  } catch (error) {
+    if (error.message === "unplaced") return false;
+    throw error;
+  }
+  return true;
+}
+function foldRepeatedMovements(catalogue, work, existing, setSubject, actor2) {
+  const ids = [work, ...existing.map((m) => m.id)];
+  const madeByMatching = catalogue.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work'").get(work);
+  if (!madeByMatching || editedInEditor(catalogue, ids) || hasManualEdits(catalogue, ids)) return false;
+  const tokens = (text5) => words3(text5).split(" ").filter(Boolean);
+  const within = (short, long) => {
+    const rest = [...long];
+    return short.length > 1 && short.every((token) => {
+      const at = rest.indexOf(token);
+      return at >= 0 && rest.splice(at, 1);
+    });
+  };
+  const trackNumber = new Map(
+    existing.map((m) => [
+      m.id,
+      catalogue.db.prepare(
+        `SELECT t.evidence FROM realization_item i JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id
+           WHERE i.movement_id=? LIMIT 1`
+      ).all(m.id).map((row) => {
+        const hints = JSON.parse(row.evidence).hints || {};
+        const title = withoutComposer(hints.title, hints.composer);
+        return catalogueSubject(splitTitle(title).head || "");
+      })[0] || ""
+    ])
+  );
+  const same3 = (a, b) => {
+    if (trackNumber.get(a.id) && trackNumber.get(b.id) && trackNumber.get(a.id) !== trackNumber.get(b.id)) return false;
+    const [pa, pb] = [pieceNumber(a.title, setSubject), pieceNumber(b.title, setSubject)];
+    if (pa != null && pb != null && pa !== pb) return false;
+    const [ca, cb] = [catalogueSubject(a.title), catalogueSubject(b.title)];
+    if (ca && cb && ca !== cb) return false;
+    if (a.index && b.index) return a.index === b.index && a.text.split(" ")[0] === b.text.split(" ")[0];
+    if (a.index || b.index) return false;
+    const [ta, tb] = [tokens(a.title), tokens(b.title)];
+    return a.text === b.text || (ta.length <= tb.length ? within(ta, tb) : within(tb, ta));
+  };
+  const db = catalogue.db;
+  const realizedBy = (movement) => db.prepare("SELECT DISTINCT realization_id AS id FROM realization_item WHERE movement_id=? ORDER BY 1").all(movement).map((row) => row.id);
+  let runs = [];
+  for (const movement of existing) {
+    const by = realizedBy(movement.id);
+    if (!by.length) return false;
+    const key = by.join(" ");
+    if (runs.at(-1)?.key === key) runs.at(-1).movements.push(movement);
+    else runs.push({ key, by, movements: [movement] });
+  }
+  let split = null;
+  if (runs.length === 1 && runs[0].by.length === 1) {
+    const restart = existing.findIndex((m, i) => i > 0 && same3(existing[0], m));
+    if (restart < 1 || existing.length % restart) return false;
+    split = runs[0].by[0];
+    runs = [];
+    for (let i = 0; i < existing.length; i += restart) runs.push({ by: [], movements: existing.slice(i, i + restart) });
+    const order = db.prepare("SELECT movement_id FROM realization_item WHERE realization_id=? ORDER BY sequence").all(split).map((row) => row.movement_id);
+    if (order.join(" ") !== existing.map((m) => m.id).join(" ")) return false;
+  }
+  if (runs.length < 2) return false;
+  if (!split) {
+    const seen = /* @__PURE__ */ new Set();
+    for (const run of runs) for (const id of run.by) {
+      if (seen.has(id)) return false;
+      seen.add(id);
+    }
+  }
+  const [first, ...later] = runs;
+  const pairs = [];
+  for (const run of later) {
+    if (split && run.movements.length !== first.movements.length) return false;
+    let from = 0;
+    for (const movement of run.movements) {
+      const match2 = first.movements.findIndex((m, i) => i >= from && same3(m, movement));
+      if (match2 < 0) return false;
+      pairs.push([movement.id, first.movements[match2].id]);
+      from = match2 + 1;
+    }
+  }
+  transaction(db, () => {
+    if (split) {
+      const original = db.prepare("SELECT * FROM realization WHERE id=?").get(split);
+      const performance2 = db.prepare("SELECT source_id FROM relation WHERE id=?").get(original.performance_work_id).source_id;
+      for (const run of later) {
+        const own = catalogue.createEntity("performance");
+        const performanceWork = catalogue.relate("performance_work", own, work);
+        const realization = catalogue.realization(work, performanceWork, original.label);
+        const items = db.prepare(`SELECT * FROM realization_item WHERE realization_id=? AND movement_id IN (${run.movements.map(() => "?").join(",")}) ORDER BY sequence`).all(split, ...run.movements.map((m) => m.id));
+        items.forEach((item, i) => {
+          db.prepare("UPDATE realization_item SET realization_id=?,sequence=? WHERE id=?").run(realization, i + 1, item.id);
+          for (const { id, recording_id: recording } of db.prepare(
+            `SELECT c.id,c.recording_id FROM segment_content x JOIN recording_content c ON c.id=x.content_id
+               WHERE x.segment_id=? AND c.performance_work_id=?`
+          ).all(item.segment_id, original.performance_work_id)) {
+            db.prepare("UPDATE recording_content SET performance_work_id=? WHERE id=?").run(performanceWork, id);
+            db.prepare("UPDATE relation SET target_id=? WHERE kind='recording_performance' AND source_id=? AND target_id=?").run(own, recording, performance2);
+          }
+        });
+      }
+    }
+    for (const [drop, keep] of pairs) {
+      db.prepare("UPDATE realization_item SET movement_id=? WHERE movement_id=?").run(keep, drop);
+      db.prepare("UPDATE recording_content SET movement_id=? WHERE movement_id=?").run(keep, drop);
+      db.prepare("DELETE FROM relation WHERE kind='movement' AND source_id=? AND target_id=?").run(work, drop);
+      transferIdentities(db, keep, drop);
+      db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), drop);
+    }
+    catalogue.audit("work.fold_movements", work, { from: existing.length, to: existing.length - pairs.length, split: Boolean(split) }, actor2);
+  });
+  return true;
+}
+var PLACEMENT_ACTIONS = ["open", "choose-album-work", "assign-album", "unassign-album", "resolve-review", "classification", "set-classification"].map((a) => `editor.${a}`);
+function editedInEditor(catalogue, ids) {
+  return Boolean(
+    catalogue.db.prepare(
+      `SELECT 1 FROM audit_event WHERE action LIKE 'editor.%' AND action NOT IN (${PLACEMENT_ACTIONS.map(() => "?").join(",")})
+         AND target_id IN (${ids.map(() => "?").join(",")}) LIMIT 1`
+    ).get(...PLACEMENT_ACTIONS, ...ids)
+  );
+}
+var hasManualEdits = (catalogue, ids) => ids.some(
+  (id) => catalogue.db.prepare(
+    "SELECT 1 FROM assertion WHERE target_id=? AND source='manual' LIMIT 1"
+  ).get(id)
+);
+function transferIdentities(db, keep, drop) {
+  for (const row of db.prepare("SELECT * FROM external_identity WHERE entity_id=?").all(drop)) {
+    const same3 = db.prepare("SELECT state FROM external_identity WHERE entity_id=? AND provider=? AND record_kind=? AND record_id=?").get(keep, row.provider, row.record_kind, row.record_id);
+    if (same3) {
+      if (row.state === "active" && same3.state !== "active")
+        db.prepare("UPDATE external_identity SET state='active' WHERE entity_id=? AND provider=? AND record_kind=? AND record_id=?").run(keep, row.provider, row.record_kind, row.record_id);
+      db.prepare("DELETE FROM external_identity WHERE entity_id=? AND provider=? AND record_kind=? AND record_id=?").run(drop, row.provider, row.record_kind, row.record_id);
+    } else
+      db.prepare("UPDATE external_identity SET entity_id=? WHERE entity_id=? AND provider=? AND record_kind=? AND record_id=?").run(keep, drop, row.provider, row.record_kind, row.record_id);
+  }
+}
+function repairMergedIdentities(catalogue) {
+  const db = catalogue.db;
+  const intoOf = db.prepare(
+    `SELECT json_extract(data,'$.into') AS into_id FROM audit_event
+     WHERE action IN ('work.merge','person.merge') AND target_id=? ORDER BY id DESC LIMIT 1`
+  );
+  const live = db.prepare("SELECT deleted_at FROM entity WHERE id=?");
+  let repaired = 0;
+  for (const { entity_id: drop } of db.prepare(
+    `SELECT DISTINCT x.entity_id FROM external_identity x JOIN entity e ON e.id=x.entity_id
+       WHERE e.deleted_at IS NOT NULL`
+  ).all()) {
+    let keep = drop;
+    for (let hops = 0; hops < 20 && keep && live.get(keep)?.deleted_at != null; hops++) keep = intoOf.get(keep)?.into_id;
+    if (!keep || keep === drop || !live.get(keep) || live.get(keep).deleted_at != null) continue;
+    transaction(db, () => transferIdentities(db, keep, drop));
+    repaired++;
+  }
+  return repaired;
+}
+function mergeContributor(catalogue, keep, drop, actor2) {
+  const name = resolvedName(catalogue, drop, "name");
+  if (typeof name === "string" && name.trim()) catalogue.alias(keep, name);
+  const aliases = resolvedName(catalogue, drop, "aliases");
+  for (const alias of Array.isArray(aliases) ? aliases : []) catalogue.alias(keep, alias);
+  catalogue.db.prepare("UPDATE alias SET entity_id=? WHERE entity_id=?").run(keep, drop);
+  for (const credit of catalogue.db.prepare("SELECT * FROM credit WHERE contributor_id=?").all(drop)) {
+    const duplicate = catalogue.db.prepare(
+      "SELECT id,state FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?"
+    ).get(credit.target_id, keep, credit.role, credit.instrument);
+    if (duplicate) {
+      keepActiveCredit(catalogue.db, duplicate, credit);
+      catalogue.db.prepare("DELETE FROM credit WHERE id=?").run(credit.id);
+    } else
+      catalogue.db.prepare("UPDATE credit SET contributor_id=? WHERE id=?").run(keep, credit.id);
+  }
+  transferIdentities(catalogue.db, keep, drop);
+  for (const relation of catalogue.db.prepare("SELECT * FROM relation WHERE kind='member_of' AND (source_id=? OR target_id=?)").all(drop, drop)) {
+    const [source, target] = [relation.source_id === drop ? keep : relation.source_id, relation.target_id === drop ? keep : relation.target_id];
+    const exists = source === target || catalogue.db.prepare("SELECT 1 FROM relation WHERE kind='member_of' AND source_id=? AND target_id=?").get(source, target);
+    if (exists) catalogue.db.prepare("DELETE FROM relation WHERE id=?").run(relation.id);
+    else {
+      const position = catalogue.db.prepare("SELECT coalesce(max(position),0)+1 AS n FROM relation WHERE kind='member_of' AND source_id=?").get(source).n;
+      catalogue.db.prepare("UPDATE relation SET source_id=?,target_id=?,position=? WHERE id=?").run(source, target, position, relation.id);
+    }
+  }
+  catalogue.db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), drop);
+  catalogue.audit("person.merge", drop, { into: keep }, actor2);
+  catalogue.audit("person.merge-into", keep, { from: drop }, actor2);
+}
+var isComposer = (catalogue, id) => catalogue.db.prepare(
+  `SELECT 1 FROM entity WHERE id=? AND deleted_at IS NULL AND (json_extract(data,'$.roles') LIKE '%composer%'
+         OR EXISTS(SELECT 1 FROM credit WHERE contributor_id=entity.id AND role='composer' AND state='active'))`
+).get(id);
+function mergeDuplicateComposers(catalogue, index, actor2) {
+  let merged = 0;
+  for (const [name, candidates2] of index.people) {
+    const ids = candidates2.filter((id) => words3(resolvedName(catalogue, id, "name") || "") === name && isComposer(catalogue, id));
+    if (ids.length < 2) continue;
+    const auto = ids.filter(
+      (id) => !hasManualEdits(catalogue, [id]) && !catalogue.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND provider!='embedded-tags'").get(id)
+    );
+    const keep = ids.find((id) => !auto.includes(id)) || auto[0];
+    const drop = auto.filter((id) => id !== keep);
+    if (ids.filter((id) => !auto.includes(id)).length > 1) continue;
+    for (const id of drop) {
+      mergeContributor(catalogue, keep, id, actor2);
+      merged++;
+    }
+    index.people.set(name, [keep]);
+  }
+  return merged;
+}
+function keepActiveCredit(db, kept, moving) {
+  if (kept.state === "removed" && moving.state === "active")
+    db.prepare("UPDATE credit SET state='active',source=? WHERE id=?").run(moving.source, kept.id);
+}
+function mergeMapping(catalogue, keep, drop, addMissing) {
+  const keepMovements = workMovements(catalogue, keep), dropMovements = workMovements(catalogue, drop);
+  if (!dropMovements.length) return { dropMovements, mapped: [] };
+  const full = mapToMovements(
+    keepMovements,
+    dropMovements.map((m) => ({ movementTitle: resolvedName(catalogue, m.id, "title") || "" }))
+  );
+  if (full && (!addMissing || full.every((id) => typeof id === "string"))) return { dropMovements, mapped: full };
+  if (!addMissing) return null;
+  const used = /* @__PURE__ */ new Set();
+  const mapped = dropMovements.map((d) => {
+    const found = keepMovements.find((k) => !used.has(k.id) && k.text && k.text === d.text && (k.index == null || d.index == null || k.index === d.index)) || keepMovements.find((k) => !used.has(k.id) && k.index != null && k.index === d.index && (!k.text || !d.text));
+    if (!found) return null;
+    used.add(found.id);
+    return found.id;
+  });
+  return { dropMovements, mapped };
+}
+function mergeWork(catalogue, keep, drop, actor2, { addMissing = false } = {}) {
+  const mapping = mergeMapping(catalogue, keep, drop, addMissing);
+  if (!mapping) return false;
+  const map = new Map(mapping.dropMovements.map((m, i) => [m.id, mapping.mapped[i]]));
+  const added = [];
+  const db = catalogue.db;
+  db.prepare("UPDATE relation SET target_id=? WHERE kind='performance_work' AND target_id=?").run(keep, drop);
+  db.prepare("UPDATE OR IGNORE relation SET target_id=? WHERE kind='collection_member' AND target_id=?").run(keep, drop);
+  db.prepare("DELETE FROM relation WHERE kind='collection_member' AND target_id=?").run(drop);
+  db.prepare("UPDATE realization SET work_id=? WHERE work_id=?").run(keep, drop);
+  for (const [from, to] of map) {
+    if (!to) {
+      const position = db.prepare("SELECT coalesce(max(position),0)+1 AS n FROM relation WHERE kind='movement' AND source_id=?").get(keep).n;
+      db.prepare("UPDATE relation SET source_id=?,position=? WHERE kind='movement' AND source_id=? AND target_id=?").run(keep, position, drop, from);
+      added.push(from);
+      continue;
+    }
+    db.prepare("UPDATE realization_item SET movement_id=? WHERE movement_id=?").run(to, from);
+    db.prepare("UPDATE recording_content SET movement_id=? WHERE movement_id=?").run(to, from);
+    transferIdentities(db, to, from);
+    db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), from);
+  }
+  db.prepare("DELETE FROM relation WHERE kind='movement' AND source_id=?").run(drop);
+  const keepComposers = addMissing && db.prepare("SELECT 1 FROM credit WHERE target_id=? AND role='composer' AND state='active' LIMIT 1").get(keep);
+  for (const credit of db.prepare("SELECT * FROM credit WHERE target_id=?").all(drop)) {
+    if (keepComposers && credit.role === "composer") {
+      db.prepare("DELETE FROM credit WHERE id=?").run(credit.id);
+      continue;
+    }
+    const duplicate = db.prepare("SELECT id,state FROM credit WHERE target_id=? AND contributor_id=? AND role=? AND instrument IS ?").get(keep, credit.contributor_id, credit.role, credit.instrument);
+    if (duplicate) {
+      keepActiveCredit(db, duplicate, credit);
+      db.prepare("DELETE FROM credit WHERE id=?").run(credit.id);
+    } else db.prepare("UPDATE credit SET target_id=? WHERE id=?").run(keep, credit.id);
+  }
+  for (const state of db.prepare("SELECT * FROM user_work_state WHERE work_id=?").all(drop)) {
+    const kept = db.prepare("SELECT * FROM user_work_state WHERE user_id=? AND work_id=?").get(state.user_id, keep);
+    if (!kept) db.prepare("UPDATE user_work_state SET work_id=? WHERE user_id=? AND work_id=?").run(keep, state.user_id, drop);
+    else {
+      db.prepare("UPDATE user_work_state SET favourite=?,picked_realization_id=?,updated_at=? WHERE user_id=? AND work_id=?").run(
+        kept.favourite || state.favourite ? 1 : 0,
+        kept.picked_realization_id || state.picked_realization_id,
+        Math.max(kept.updated_at, state.updated_at),
+        state.user_id,
+        keep
+      );
+      db.prepare("DELETE FROM user_work_state WHERE user_id=? AND work_id=?").run(state.user_id, drop);
+    }
+  }
+  db.prepare("UPDATE OR IGNORE admin_work_pick SET work_id=? WHERE work_id=?").run(keep, drop);
+  db.prepare("DELETE FROM admin_work_pick WHERE work_id=?").run(drop);
+  transferIdentities(db, keep, drop);
+  db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), drop);
+  catalogue.audit("work.merge", drop, { into: keep, ...added.length && { addedMovements: added } }, actor2);
+  catalogue.audit("work.merge-into", keep, { from: drop }, actor2);
+  return addMissing ? { added } : true;
+}
+function verifiedIdentities(catalogue, entity, kind) {
+  return new Set(
+    catalogue.db.prepare("SELECT provider,record_id FROM external_identity WHERE entity_id=? AND record_kind=? AND provider!='embedded-tags' AND state='active'").all(entity, kind).map((row) => JSON.stringify([row.provider, row.record_id]))
+  );
+}
+var distinctIdentities = (a, b) => a.size > 0 && b.size > 0 && ![...a].some((id) => b.has(id));
+function compatibleAutoWorks(catalogue, a, b) {
+  if (distinctIdentities(verifiedIdentities(catalogue, a, "work"), verifiedIdentities(catalogue, b, "work"))) return false;
+  const composers = (work) => {
+    const identities = /* @__PURE__ */ new Map();
+    for (const { contributor_id: person } of catalogue.db.prepare("SELECT contributor_id FROM credit WHERE target_id=? AND role='composer' AND state='active'").all(work)) {
+      const name = words3(resolvedName(catalogue, person, "name"));
+      identities.set(name, /* @__PURE__ */ new Set([...identities.get(name) || [], ...verifiedIdentities(catalogue, person, "artist")]));
+    }
+    return identities;
+  };
+  const other = composers(b);
+  return ![...composers(a)].some(([name, ids]) => distinctIdentities(ids, other.get(name) || /* @__PURE__ */ new Set()));
+}
+function mergeDuplicateAutoWorks(catalogue, { actor: actor2 = null } = {}) {
+  return transaction(catalogue.db, () => {
+    let index = catalogueIndex(catalogue);
+    const people = mergeDuplicateComposers(catalogue, index, actor2);
+    if (people) index = catalogueIndex(catalogue);
+    let works = 0;
+    for (const [key, ids] of index.works) {
+      if (ids.length < 2) continue;
+      if (!/\d/.test(JSON.parse(key)[1])) {
+        for (const id of ids.slice(1))
+          if (!keptDistinct(catalogue, ids[0], id)) catalogue.review("identity", id, { reason: "duplicate-work", keep: ids[0], evidence: "same title, no number" });
         continue;
       }
-      if (response.ok) {
-        const data = await response.json();
-        this.failures = 0;
-        this.lastResult = "ok";
-        if (ttlMs > 0) await this.cache.set(key, data);
-        return data;
-      }
-      if (response.status === 404) {
-        this.failures = 0;
-        this.lastResult = "missing";
-        if (ttlMs > 0) await this.cache.set(key, { missing: true });
-        return null;
-      }
-      lastError = new Error(`MusicBrainz answered ${response.status}`);
-      if (!RETRY_STATUSES.has(response.status) || attempt === this.maxRetries - 1) break;
-      const retryAfter = Number(response.headers.get("retry-after")) * 1e3 || 0;
-      await sleep(Math.max(retryAfter, this.retryWaitMs * (attempt + 1)));
+      const hasAlbumWork = (id) => catalogue.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work'").get(id);
+      const auto = (id) => hasAlbumWork(id) && !hasManualEdits(catalogue, [id, ...workMovements(catalogue, id).map((m) => m.id)]);
+      const keep = ids.find((id) => !auto(id)) || ids[0];
+      const severalEdited = ids.filter((id) => !auto(id)).length > 1;
+      for (const id of ids.filter((id2) => id2 !== keep))
+        if (keptDistinct(catalogue, keep, id)) continue;
+        else if (!hasAlbumWork(keep) || !hasAlbumWork(id))
+          catalogue.review("identity", id, { reason: "duplicate-work", keep, evidence: "work not created by automatic matching" });
+        else if (severalEdited) continue;
+        else if (!compatibleAutoWorks(catalogue, keep, id)) catalogue.review("identity", id, { reason: "duplicate-work", keep, evidence: "different MusicBrainz identities" });
+        else if (mergeWork(catalogue, keep, id, actor2)) works++;
+        else catalogue.review("identity", id, { reason: "duplicate-work", keep });
     }
-    this.log(`MusicBrainz request failed for ${pathAndQuery}: ${lastError?.message}`);
-    if (++this.failures >= 5) {
-      this.disabled = true;
-      this.log("5 MusicBrainz lookups failed in a row; skipping lookups for the rest of this run");
+    return { people, works };
+  });
+}
+var ROMAN_SUFFIX = /^(?:i{1,3}|iv|v|vi{1,3}|ix|x)$/;
+function catalogueReadings(subject) {
+  const match2 = subject.match(/^cat:([a-z]+):(\d+)([a-z]*)(?:\/([0-9a-z]+))?(?::([0-9A-Za-z/]+))?$/);
+  if (!match2) return null;
+  const [, system, base, suffix, slash, piece] = match2;
+  const sub = piece || (slash && /^\d/.test(slash) ? slash : "") || "";
+  const readings = [];
+  const add = (letters, number) => readings.push({ system, base, letters, sub: number });
+  if (ROMAN_SUFFIX.test(suffix) && !sub) {
+    add("", String(romanValue(suffix)));
+    if (suffix.length === 1) add(suffix, "");
+  } else add(suffix, sub.replace(/[a-z]+$/, ""));
+  return readings;
+}
+function provablyDifferent(a, b) {
+  const x = catalogueReadings(a), y = catalogueReadings(b);
+  if (!x || !y || x[0].system !== y[0].system) return false;
+  const differ = (p, q) => p.base !== q.base || p.letters !== q.letters || p.sub && q.sub && p.sub !== q.sub;
+  return x.every((p) => y.every((q) => differ(p, q)));
+}
+function trackSubject(hints) {
+  const title = withoutComposer(hints.title, hints.composer);
+  const proposal = proposedWork({ ...hints, title }, true);
+  if (proposal) return catalogueSubject(proposal.catalogue ? `${proposal.title}, ${proposal.catalogue}` : proposal.title);
+  return splitTitle(title).head || MOVEMENT_PREFIX.test(title) ? "" : catalogueSubject(title);
+}
+function repairSiblingJoins(catalogue, albumId, actor2) {
+  const db = catalogue.db;
+  const works = db.prepare(
+    `SELECT DISTINCT r.work_id AS id FROM realization r
+       ${albumId == null ? "" : `JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
+         JOIN track_link t ON t.id=s.track_link_id AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?`}
+       JOIN entity e ON e.id=r.work_id AND e.deleted_at IS NULL
+       WHERE EXISTS(SELECT 1 FROM external_identity x WHERE x.entity_id=r.work_id AND x.record_kind='album-work')
+       -- A merge leaves its work two recordings or more, a joined album two tracks.
+       AND (SELECT count(*) FROM realization_item i2 JOIN realization r2 ON r2.id=i2.realization_id WHERE r2.work_id=r.work_id)>1`
+  ).all(...albumId == null ? [] : [String(albumId)]);
+  let repaired = 0;
+  for (const { id: work } of works) {
+    const subject = catalogueSubject(String(resolvedName(catalogue, work, "title") || ""));
+    if (!subject) continue;
+    const ids = [work, ...workMovements(catalogue, work).map((m) => m.id)];
+    if (hasManualEdits(catalogue, ids) || editedInEditor(catalogue, ids)) continue;
+    const items = db.prepare(
+      `SELECT i.id,i.movement_id,t.evidence FROM realization_item i JOIN realization r ON r.id=i.realization_id
+         JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id WHERE r.work_id=?`
+    ).all(work).map((item) => ({ ...item, evidence: JSON.parse(item.evidence) })).map((item) => ({ ...item, own: trackSubject(item.evidence.hints || {}) })).filter((item) => item.own && provablyDifferent(item.own, subject)).filter(
+      (item) => !db.prepare(`SELECT 1 FROM audit_event WHERE target_id=? AND action='editor.assign-album' AND CAST(json_extract(data,'$.values.albumId') AS TEXT)=?`).get(work, String(item.evidence.albumId))
+    );
+    if (!items.length) continue;
+    transaction(db, () => {
+      for (const item of items) catalogue.detachItem(item.id, { dropRecording: true });
+      const now = Date.now();
+      for (const movement of new Set(items.map((item) => item.movement_id).filter(Boolean)))
+        if (!db.prepare("SELECT 1 FROM realization_item WHERE movement_id=?").get(movement)) {
+          db.prepare("DELETE FROM relation WHERE kind='movement' AND source_id=? AND target_id=?").run(work, movement);
+          db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(now, now, movement);
+        }
+      for (const item of items)
+        for (const record of db.prepare("SELECT record_id,evidence FROM external_identity WHERE entity_id=? AND record_kind='album-work' AND state='active' AND CAST(json_extract(evidence,'$.albumId') AS TEXT)=?").all(work, String(item.evidence.albumId)))
+          if (catalogueSubject(String(JSON.parse(record.evidence).work || "")) === item.own)
+            db.prepare("UPDATE external_identity SET state='stale' WHERE entity_id=? AND record_kind='album-work' AND record_id=?").run(work, record.record_id);
+      for (const own of new Set(items.map((item) => item.own)))
+        catalogue.audit("work.split_sibling", work, { albumId: String(items.find((item) => item.own === own).evidence.albumId), subject, tracks: own }, actor2);
+    });
+    repaired += items.length;
+  }
+  return repaired;
+}
+function repairCompletionSplits(catalogue, albumId, actor2) {
+  const db = catalogue.db;
+  const families = /* @__PURE__ */ new Map();
+  for (const { entity_id: work, album } of db.prepare(
+    `SELECT x.entity_id,CAST(json_extract(x.evidence,'$.albumId') AS TEXT) AS album FROM external_identity x
+       JOIN entity e ON e.id=x.entity_id AND e.deleted_at IS NULL
+       WHERE x.provider='embedded-tags' AND x.record_kind='album-work' AND x.state='active'
+       ${albumId == null ? "" : "AND CAST(json_extract(x.evidence,'$.albumId') AS TEXT)=?"}`
+  ).all(...albumId == null ? [] : [String(albumId)])) {
+    const subject = catalogueSubject(String(resolvedName(catalogue, work, "title") || ""));
+    if (!subject) continue;
+    const key = JSON.stringify([album, subject]);
+    families.set(key, [.../* @__PURE__ */ new Set([...families.get(key) || [], work])]);
+  }
+  let repaired = 0;
+  for (const [key, works] of families) {
+    if (works.length < 2) continue;
+    const [album] = JSON.parse(key);
+    const realizations = works.map(
+      (work) => db.prepare(
+        `SELECT r.id,MIN(COALESCE(CAST(json_extract(t.evidence,'$.hints.discNumber') AS INTEGER),1)*10000+CAST(json_extract(t.evidence,'$.hints.trackNumber') AS INTEGER)) AS first,
+             SUM(CAST(json_extract(t.evidence,'$.albumId') AS TEXT)!=?) AS elsewhere
+           FROM realization r JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
+           JOIN track_link t ON t.id=s.track_link_id WHERE r.work_id=? GROUP BY r.id`
+      ).all(album, work)
+    );
+    const names = (work) => composerNames(catalogue, work).map(words3);
+    const shared = names(works[0]).filter((name) => works.every((work) => names(work).includes(name)));
+    if (!shared.length || realizations.some((list3) => list3.length !== 1 || list3[0].elsewhere > 0) || works.some((work) => hasManualEdits(catalogue, [work, ...workMovements(catalogue, work).map((m) => m.id)])))
+      continue;
+    const order = works.map((work, i) => ({ work, realization: realizations[i][0] })).sort((a, b) => a.realization.first - b.realization.first);
+    const [keep, ...drops] = order;
+    if (drops.some(({ work }) => !compatibleAutoWorks(catalogue, keep.work, work))) continue;
+    transaction(db, () => {
+      const now = Date.now();
+      for (const drop of drops) {
+        for (const state of db.prepare("SELECT * FROM user_work_state WHERE work_id=?").all(drop.work)) {
+          const picked = state.picked_realization_id === drop.realization.id ? keep.realization.id : state.picked_realization_id;
+          const kept = db.prepare("SELECT * FROM user_work_state WHERE user_id=? AND work_id=?").get(state.user_id, keep.work);
+          if (kept)
+            db.prepare("UPDATE user_work_state SET favourite=?,picked_realization_id=?,updated_at=? WHERE user_id=? AND work_id=?").run(
+              kept.favourite || state.favourite ? 1 : 0,
+              kept.picked_realization_id || picked,
+              now,
+              state.user_id,
+              keep.work
+            );
+          else
+            db.prepare("INSERT INTO user_work_state VALUES (?,?,?,?,?)").run(state.user_id, keep.work, state.favourite, picked, now);
+          db.prepare("DELETE FROM user_work_state WHERE user_id=? AND work_id=?").run(state.user_id, drop.work);
+        }
+        const pick = db.prepare("SELECT * FROM admin_work_pick WHERE work_id=?").get(drop.work);
+        if (pick && !db.prepare("SELECT 1 FROM admin_work_pick WHERE work_id=?").get(keep.work))
+          db.prepare("INSERT INTO admin_work_pick VALUES (?,?,?,?)").run(
+            keep.work,
+            pick.realization_id === drop.realization.id ? keep.realization.id : pick.realization_id,
+            pick.actor_id,
+            now
+          );
+        db.prepare("DELETE FROM admin_work_pick WHERE work_id=?").run(drop.work);
+        for (const { id } of db.prepare("SELECT id FROM realization_item WHERE realization_id=?").all(drop.realization.id))
+          catalogue.detachItem(id, { dropRecording: true });
+        for (const movement of workMovements(catalogue, drop.work))
+          db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(now, now, movement.id);
+        db.prepare("DELETE FROM relation WHERE kind='movement' AND source_id=?").run(drop.work);
+        db.prepare("DELETE FROM credit WHERE target_id=?").run(drop.work);
+        transferIdentities(db, keep.work, drop.work);
+        db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(now, now, drop.work);
+        catalogue.audit("work.merge", drop.work, { into: keep.work, reason: "completion-split" }, actor2);
+        catalogue.audit("work.merge-into", keep.work, { from: drop.work, reason: "completion-split" }, actor2);
+      }
+      const metadata = new Metadata(catalogue);
+      const index = catalogueIndex(catalogue);
+      const group = { composers: [], composerIds: {} };
+      for (const credit of db.prepare("SELECT id,contributor_id FROM credit WHERE target_id=? AND role='composer' AND state='active'").all(keep.work)) {
+        const name = resolvedName(catalogue, credit.contributor_id, "name");
+        if (shared.includes(words3(name))) group.composers.push(name);
+        else db.prepare("DELETE FROM credit WHERE id=?").run(credit.id);
+      }
+      for (const row of db.prepare(
+        `SELECT DISTINCT c.recording_id,t.evidence FROM realization_item i JOIN segment s ON s.id=i.segment_id
+           JOIN segment_content sc ON sc.segment_id=s.id JOIN recording_content c ON c.id=sc.content_id
+           JOIN track_link t ON t.id=s.track_link_id WHERE i.realization_id=?`
+      ).all(keep.realization.id))
+        creditMovementComposers(catalogue, metadata, index, row.recording_id, { composers: JSON.parse(row.evidence).hints?.composer || [] }, group);
+      repaired += drops.length;
+    });
+  }
+  return repaired;
+}
+var INSTRUMENT = /\b(piano|violin|viola|cello|violoncello|double bass|flute|oboe|clarinet|bassoon|horn|trumpet|trombone|organ|harpsichord|guitar|harp|string|wind|piano and violin|violin and piano|cello and piano)\s+(?=(?:sonata|sonatina|concerto|quartet|quintet|trio|sextet|octet|suite|partita)\b)/i;
+var KEY = /\bin\s+([a-h])(?:[\s-]?(flat|sharp|♭|♯))?\s+(major|minor)\b/i;
+var CATALOGUE_TEXT = /\b(?:op(?:us|\.)?\s*\d+[a-z]?(?:\s*,?\s*no\.?\s*\d+)?|TWV\s*\d+(?:\s*:\s*[a-z]{0,3}\d+[a-z]?)?|(?:BWV|HWV|RV|WoO|K(?:V|\.)?|D\.?|Hob\.?\s*[IVXL]+[a-z]?:?)\s*\d+[a-z]?)/gi;
+var tidyCatalogue = (value) => clean2(value).replace(/^op(?:us|\.)?\s*/i, "Op. ").replace(/\s*,?\s*no\.?\s*(\d)/i, " No. $1");
+function workFieldsFromTitle(title) {
+  const text5 = clean2(title);
+  const fields = {};
+  const key = text5.match(KEY);
+  if (key)
+    fields.key = `${key[1].toUpperCase()}${key[2] ? `-${key[2].toLowerCase().replace("\u266D", "flat").replace("\u266F", "sharp")}` : ""} ${key[3].toLowerCase()}`;
+  const catalogue = [...new Set((text5.match(CATALOGUE_TEXT) || []).map(tidyCatalogue))];
+  if (catalogue.length) fields.catalogue = catalogue;
+  const form = text5.match(MULTI_MOVEMENT);
+  if (form) fields.form = form[1].toLowerCase();
+  const nickname = text5.match(/["“„«]([^"”»]+)["”»]/);
+  if (nickname) fields.nickname = clean2(nickname[1]);
+  const instrument = text5.match(INSTRUMENT);
+  if (instrument)
+    fields.instrumentation = instrument[1].toLowerCase().split(/\s+and\s+/).map((name) => name[0].toUpperCase() + name.slice(1));
+  return fields;
+}
+function deriveWorkFields(catalogue, work, metadata = new Metadata(catalogue)) {
+  const title = resolvedName(catalogue, work, "title");
+  if (typeof title !== "string") return 0;
+  const known = catalogue.db.prepare("SELECT 1 FROM field_resolution WHERE target_id=? AND field=?");
+  let filled = 0;
+  for (const [field, value] of Object.entries(workFieldsFromTitle(title)))
+    if (!known.get(work, field)) {
+      metadata.derived(work, field, value);
+      filled++;
     }
-    return null;
+  return filled;
+}
+function fullerTitle(fromTitle, shorter) {
+  if (!shorter) return fromTitle;
+  const long = words3(fromTitle);
+  const short = words3(shorter);
+  return short && long !== short && long.endsWith(` ${short}`) ? fromTitle : shorter;
+}
+function repairMovementTitles(catalogue, { albumId = null } = {}) {
+  const metadata = new Metadata(catalogue);
+  const rows = catalogue.db.prepare(
+    `SELECT r.source_id AS work,r.target_id AS movement,a.value,a.source
+       FROM relation r JOIN field_resolution f ON f.target_id=r.target_id AND f.field='title'
+       JOIN assertion a ON a.id=f.assertion_id
+       WHERE r.kind='movement' AND a.source='derived'
+       ${albumId == null ? "" : `AND r.source_id IN (SELECT re.work_id FROM realization re JOIN realization_item i ON i.realization_id=re.id
+              JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id
+              WHERE CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?)`}`
+  ).all(...albumId == null ? [] : [String(albumId)]);
+  const titles = /* @__PURE__ */ new Map();
+  let repaired = 0;
+  for (const row of rows) {
+    if (!titles.has(row.work)) titles.set(row.work, resolvedName(catalogue, row.work, "title"));
+    const workTitle = titles.get(row.work);
+    const current = JSON.parse(row.value);
+    if (typeof workTitle !== "string" || typeof current !== "string") continue;
+    const cut = current.match(/^(\d+):\s*(\S.*)$/);
+    if (cut && new RegExp(`\\b[IVXLCDM]+:${cut[1]}\\b`, "i").test(workTitle) && MOVEMENT_PREFIX.test(cut[2])) {
+      metadata.derived(row.movement, "title", cut[2]);
+      repaired++;
+      continue;
+    }
+    if (!words3(current).includes(words3(workTitle))) continue;
+    const stripped = stripWorkPrefix(current, workTitle);
+    if (stripped && stripped !== current) {
+      metadata.derived(row.movement, "title", stripped);
+      repaired++;
+    }
+  }
+  if (albumId != null)
+    for (const row of catalogue.db.prepare(
+      `SELECT DISTINCT i.movement_id AS movement,re.work_id AS work,t.evidence,a.value FROM realization_item i
+         JOIN realization re ON re.id=i.realization_id JOIN segment s ON s.id=i.segment_id
+         JOIN track_link t ON t.id=s.track_link_id
+         JOIN field_resolution f ON f.target_id=i.movement_id AND f.field='title'
+         JOIN assertion a ON a.id=f.assertion_id AND a.source='derived'
+         WHERE CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?
+         -- A track holding several sections names none of them alone.
+         AND NOT EXISTS(SELECT 1 FROM realization_item o WHERE o.segment_id=i.segment_id AND o.id!=i.id)`
+    ).all(String(albumId))) {
+      const workTitle = resolvedName(catalogue, row.work, "title");
+      const current = JSON.parse(row.value);
+      if (typeof workTitle !== "string" || typeof current !== "string") continue;
+      const hints = JSON.parse(row.evidence).hints || {};
+      const fromTitle = movementTitle({ title: withoutComposer(hints.title, hints.composer), work: hints.work }, workTitle);
+      const better = fullerTitle(fromTitle, current);
+      if (better !== current) {
+        metadata.derived(row.movement, "title", better);
+        repaired++;
+      }
+    }
+  return repaired;
+}
+var FORM_ONLY = /^((?:[ivxlc]+|\d+)[.)]\s+)?(prelude|praeludium|präludium|prélude|preludio|fugue|fuga|fuge|fughetta|fantasia|fantasie|fantaisie|toccata)$/iu;
+var KEY_NAME = new RegExp("(?<!\\p{L})in\\s+([a-g](?:[-\u2010 ](?:flat|sharp))?\\s+(?:major|minor))(?!\\p{L})", "iu");
+function keyMovementTitles(catalogue, { albumId = null } = {}) {
+  const metadata = new Metadata(catalogue);
+  const rows = catalogue.db.prepare(
+    `SELECT r.source_id AS work,r.target_id AS movement,a.value FROM relation r
+       JOIN metadata_target m ON m.entity_id=r.target_id JOIN field_resolution f ON f.target_id=m.id AND f.field='title'
+       JOIN assertion a ON a.id=f.assertion_id AND a.source='derived'
+       WHERE r.kind='movement'
+       ${albumId == null ? "" : `AND r.source_id IN (SELECT re.work_id FROM realization re JOIN realization_item i ON i.realization_id=re.id
+              JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id
+              WHERE CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?)`}`
+  ).all(...albumId == null ? [] : [String(albumId)]);
+  let keyed = 0;
+  for (const row of rows) {
+    const current = JSON.parse(row.value);
+    const form = typeof current === "string" && clean2(current).match(FORM_ONLY);
+    if (!form) continue;
+    const workTitle = String(resolvedName(catalogue, row.work, "title") || "");
+    const key = WITH_FUGUE.test(workTitle) && workTitle.match(KEY_NAME);
+    if (!key) continue;
+    metadata.derived(row.movement, "title", `${form[1] || ""}${form[2]} in ${clean2(key[1])}`);
+    keyed++;
+  }
+  return keyed;
+}
+function repairWorkTitles(catalogue) {
+  const metadata = new Metadata(catalogue);
+  const works = catalogue.db.prepare(
+    `SELECT DISTINCT r.work_id AS id,a.value FROM realization r
+       JOIN field_resolution f ON f.target_id=r.work_id AND f.field='title'
+       JOIN assertion a ON a.id=f.assertion_id WHERE a.source='derived'`
+  ).all();
+  const tracks = catalogue.db.prepare(
+    `SELECT t.evidence FROM realization r JOIN realization_item i ON i.realization_id=r.id
+     JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id
+     WHERE r.work_id=?`
+  );
+  let repaired = 0;
+  for (const work of works) {
+    const current = JSON.parse(work.value);
+    const heads = new Set(
+      tracks.all(work.id).map((row) => {
+        const hints = JSON.parse(row.evidence).hints || {};
+        return proposedWork(hints, true)?.title || "";
+      })
+    );
+    const [head] = heads;
+    if (heads.size === 1 && head && head !== current && sameCatalogue(head, current)) {
+      metadata.derived(work.id, "title", head);
+      repaired++;
+    }
+  }
+  return repaired;
+}
+function resolveSettledReviews(catalogue, albumId, actor2) {
+  const db = catalogue.db;
+  const attached = db.prepare("SELECT 1 FROM segment s JOIN realization_item i ON i.segment_id=s.id WHERE s.track_link_id=? LIMIT 1");
+  let resolved = 0;
+  for (const review of db.prepare(
+    `SELECT id,target_id,evidence FROM review_item WHERE kind='auto_match' AND status='open'
+       ${albumId == null ? "" : "AND CAST(json_extract(evidence,'$.albumId') AS TEXT)=?"}`
+  ).all(...albumId == null ? [] : [String(albumId)])) {
+    const evidence = JSON.parse(review.evidence);
+    const tracks = Array.isArray(evidence.tracks) && evidence.tracks.length ? evidence.tracks : [review.target_id];
+    if (!tracks.every((track) => attached.get(track))) continue;
+    db.prepare("UPDATE review_item SET status='resolved' WHERE id=?").run(review.id);
+    catalogue.audit("review.auto_resolve", review.target_id, { review: review.id, reason: evidence.reason || null }, actor2);
+    resolved++;
+  }
+  return resolved;
+}
+function repairDuplicateRealizations(catalogue, { actor: actor2 = null } = {}) {
+  return transaction(catalogue.db, () => {
+    const db = catalogue.db, seen = /* @__PURE__ */ new Map();
+    let repaired = 0;
+    const items = db.prepare(`SELECT i.id,i.movement_id,i.occurrence,s.track_link_id,s.kind,s.start_ms,s.end_ms
+      FROM realization_item i JOIN segment s ON s.id=i.segment_id
+      WHERE i.realization_id=? ORDER BY i.sequence`);
+    const realizations = db.prepare(`SELECT r.* FROM realization r
+      JOIN entity w ON w.id=r.work_id AND w.deleted_at IS NULL
+      JOIN relation pw ON pw.id=r.performance_work_id JOIN entity p ON p.id=pw.source_id
+      ORDER BY p.created_at,r.rowid`).all();
+    for (const realization of realizations) {
+      const rows = items.all(realization.id);
+      if (!rows.length) continue;
+      const key = JSON.stringify([realization.work_id, rows.map(({ id, ...mapping }) => mapping)]);
+      const keep = seen.get(key);
+      if (!keep) {
+        seen.set(key, realization.id);
+        continue;
+      }
+      db.prepare("UPDATE user_work_state SET picked_realization_id=? WHERE picked_realization_id=?").run(keep, realization.id);
+      db.prepare("UPDATE admin_work_pick SET realization_id=? WHERE realization_id=?").run(keep, realization.id);
+      for (const row of rows) catalogue.detachItem(row.id, { dropRecording: true });
+      catalogue.audit("work.repair_duplicate_realization", realization.work_id, { keep, removed: realization.id }, actor2);
+      repaired++;
+    }
+    return repaired;
+  });
+}
+function autoMatchTaggedWorks(catalogue, {
+  albumId = null,
+  actor: actor2 = null,
+  allowStructuredTitles = false,
+  providerMatches = /* @__PURE__ */ new Map()
+} = {}) {
+  repairCompletionSplits(catalogue, albumId, actor2);
+  repairSiblingJoins(catalogue, albumId, actor2);
+  const groups = candidates(
+    catalogue,
+    albumId,
+    allowStructuredTitles,
+    providerMatches
+  );
+  repairMergedIdentities(catalogue);
+  mergeDuplicateAutoWorks(catalogue, { actor: actor2 });
+  if (albumId == null) repairDuplicateRealizations(catalogue, { actor: actor2 });
+  if (albumId != null) repairMovementTitles(catalogue, { albumId });
+  if (albumId == null) {
+    releaseRangeWorks(catalogue, { actor: actor2 });
+    fileCollectionsFromTags(catalogue, { actor: actor2 });
+    repairWorkTitles(catalogue);
+    repairMovementTitles(catalogue);
+    const combinedWorks = /* @__PURE__ */ new Set();
+    for (const { work, value } of catalogue.db.prepare(
+      `SELECT r.source_id AS work,a.value FROM relation r JOIN metadata_target m ON m.entity_id=r.target_id
+         JOIN field_resolution f ON f.target_id=m.id AND f.field='title' JOIN assertion a ON a.id=f.assertion_id
+         WHERE r.kind='movement'`
+    ).all())
+      if (!combinedWorks.has(work) && sectionTitles(String(JSON.parse(value) ?? "")).length > 1) combinedWorks.add(work);
+    for (const work of combinedWorks) splitCombinedMovements(catalogue, work, actor2);
+    const metadata = new Metadata(catalogue);
+    for (const { id } of catalogue.db.prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL").all())
+      deriveWorkFields(catalogue, id, metadata);
+  }
+  recordTaggedLeaves(catalogue, { albumId });
+  const index = catalogueIndex(catalogue);
+  let created = 0;
+  for (const group of groups)
+    if (createGroup(catalogue, group, actor2, index)) created++;
+  keyMovementTitles(catalogue, { albumId });
+  deriveCredits(catalogue, { albumId });
+  conductorConflicts(catalogue, { albumId });
+  linkReissues(catalogue, { albumId });
+  resolveSettledReviews(catalogue, albumId, actor2);
+  return { created, candidates: groups.length };
+}
+
+// src/model/presentation.js
+var text3 = (value, fallback) => typeof value === "string" && value.trim() ? value.trim() : fallback;
+var DisplayValues = class {
+  constructor(c) {
+    this.statement = c.db.prepare(
+      `SELECT a.value FROM field_resolution f JOIN assertion a ON a.id=f.assertion_id
+       WHERE f.target_id=? AND f.field=?`
+    );
+  }
+  resolve(id, field) {
+    const row = this.statement.get(id, field);
+    return { value: row ? JSON.parse(row.value) : void 0 };
   }
 };
+var entityValue = (metadata, id, field, fallback) => text3(metadata.resolve(id, field).value, fallback);
+var evidenceOf = (row) => JSON.parse(row.evidence);
+var TEXT_LIMIT = 500;
+var MOVEMENT_LIMIT = 200;
+function clip(value, max = TEXT_LIMIT) {
+  if (typeof value !== "string" || value.length <= max) return value;
+  const cut = value.slice(0, max - 1).replace(/[\uD800-\uDBFF]$/, "");
+  return `${cut.trimEnd()}\u2026`;
+}
+var fitMovement = (movement) => ({ ...movement, title: clip(movement.title) });
+var fitMovements = (movements) => movements.slice(0, MOVEMENT_LIMIT).map(fitMovement);
+var fitItem = (item) => ({
+  ...item,
+  title: clip(item.title),
+  artist: clip(item.artist),
+  performer: clip(item.performer),
+  album: clip(item.album)
+});
+var fitGroup = (group) => ({
+  ...group,
+  title: clip(group.title),
+  composer: clip(group.composer),
+  items: group.items.map(fitItem),
+  missing: fitMovements(group.missing)
+});
+var trackTitle = (evidence) => text3(evidence.hints?.title, path2.basename(evidence.path || "Track"));
+function actor(input) {
+  const user = input?.user;
+  if (!Number.isSafeInteger(user?.id) || user.id <= 0)
+    throw new Error("A real user account is required");
+  return user;
+}
+function realizationRows(c, realizationId = null, workId = null, albumId = null) {
+  const filters = [
+    [realizationId, "r.id=?"],
+    [workId, "r.work_id=?"],
+    [albumId, "CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?"]
+  ].filter(([value]) => value !== null);
+  return c.db.prepare(
+    `SELECT r.id AS realization_id,r.work_id,r.performance_work_id,r.label AS realization_label,
+        i.id AS item_id,i.movement_id,i.sequence,i.occurrence,i.segment_id,s.start_ms,s.end_ms,s.kind AS segment_kind,
+        t.id AS track_link_id,t.core_id,t.file_id,t.evidence
+      FROM realization r
+      JOIN realization_item i ON i.realization_id=r.id
+      JOIN segment s ON s.id=i.segment_id
+      JOIN track_link t ON t.id=s.track_link_id AND t.state='active'
+      JOIN classification c ON c.target_id=t.id AND c.state='classical'
+      ${filters.length ? `WHERE ${filters.map(([, sql]) => sql).join(" AND ")}` : ""}
+      ORDER BY r.id,i.sequence,i.occurrence,i.id`
+  ).all(...filters.map(([value]) => value)).reduce((rows, row) => {
+    const last2 = rows.at(-1);
+    if (last2 && last2.realization_id === row.realization_id && last2.segment_id === row.segment_id) last2.movement_ids.push(row.movement_id);
+    else rows.push({ ...row, movement_ids: [row.movement_id] });
+    return rows;
+  }, []);
+}
+var words4 = (value) => String(value || "").normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+function performerOf(hints) {
+  const artist = text3(hints?.artist, text3(hints?.albumArtist, ""));
+  const performers = performerNames(hints || {}, composersOf(hints || {}), words4);
+  return performers.length ? performers.join(", ") : artist;
+}
+function queueItem(metadata, row, workTitle = null, links = null) {
+  const evidence = evidenceOf(row);
+  return {
+    id: row.item_id,
+    trackId: String(row.core_id),
+    fileId: String(row.file_id),
+    albumId: String(evidence.albumId ?? ""),
+    title: workTitle ? movementTitle({ title: withoutComposer(trackTitle(evidence), composersOf(evidence.hints || {})), work: evidence.hints?.work }, workTitle) : row.movement_ids?.length > 1 ? row.movement_ids.map((id) => entityValue(metadata, id, "title", "")).filter(Boolean).join(" / ") : row.movement_id ? entityValue(metadata, row.movement_id, "title", trackTitle(evidence)) : trackTitle(evidence),
+    artist: text3(evidence.hints?.artist, text3(evidence.hints?.albumArtist, "")),
+    performer: performerOf(evidence.hints),
+    album: text3(evidence.hints?.album, ""),
+    durationMs: Number(evidence.durationMs) || null,
+    startMs: row.start_ms,
+    endMs: row.end_ms,
+    ...links?.length && { links }
+  };
+}
+var CLASSICAL_PAGE = "classical";
+var LINK_ROLES = ["soloist", "performer", "accompanist", "conductor", "orchestra", "ensemble", "choir"];
+var place = (resourceId) => ({ type: "resource", pageId: CLASSICAL_PAGE, resourceId });
+var goTo = (name) => clip(`Go to ${name}`, 80);
+function itemLinks(c, metadata, { workId, realizationId, performanceId }, workLabel = "Go to Work") {
+  const links = [
+    { label: workLabel, link: place(`work:${workId}`) },
+    { label: "Go to Recording", link: place(`recording:${realizationId}`) }
+  ];
+  const kindOf = c.db.prepare("SELECT kind FROM entity WHERE id=? AND deleted_at IS NULL");
+  for (const credit of credits(c, metadata, workId).filter((entry) => entry.role === "composer").slice(0, 2))
+    links.push({ label: goTo(credit.name), link: place(`composer:${credit.id}`) });
+  const seen = /* @__PURE__ */ new Set();
+  const rank = (role) => LINK_ROLES.indexOf(role) + 1 || LINK_ROLES.length + 1;
+  const performers = (performanceId ? credits(c, metadata, performanceId) : []).sort((a, b) => rank(a.role) - rank(b.role) || a.name.localeCompare(b.name) || (a.id < b.id ? -1 : 1));
+  for (const credit of performers) {
+    if (links.length >= 6) break;
+    const kind = credit.role === "composer" || seen.has(credit.id) ? null : kindOf.get(credit.id)?.kind;
+    if (kind !== "person" && kind !== "ensemble") continue;
+    seen.add(credit.id);
+    links.push({ label: goTo(credit.name), link: place(`${kind}:${credit.id}`) });
+  }
+  return links.filter((entry) => entry.link.resourceId.length <= 200);
+}
+var performanceOf = (c, performanceWorkId) => c.db.prepare("SELECT source_id FROM relation WHERE id=?").get(performanceWorkId)?.source_id ?? null;
+function workMovements2(c, metadata, workId) {
+  return c.db.prepare(
+    `SELECT target_id,position FROM relation
+       WHERE kind='movement' AND source_id=? ORDER BY position,occurrence,id`
+  ).all(workId).map((row) => ({
+    id: row.target_id,
+    title: entityValue(metadata, row.target_id, "title", "Untitled movement"),
+    position: row.position
+  }));
+}
+function credits(c, metadata, targetId) {
+  return c.db.prepare(
+    `SELECT role,instrument,contributor_id FROM credit
+       WHERE target_id=? AND state='active' ORDER BY position,id`
+  ).all(targetId).map((row) => ({
+    role: row.role,
+    instrument: row.instrument,
+    id: row.contributor_id,
+    name: entityValue(
+      metadata,
+      row.contributor_id,
+      "name",
+      "Unknown contributor"
+    )
+  }));
+}
+var albumPosition = (row) => {
+  const hints = evidenceOf(row).hints || {};
+  return (Number(hints.discNumber) || 1) * 1e4 + (Number(hints.trackNumber) || 9999);
+};
+var ACT = /,\s*(?:act|akt|atto|acte|part|pt\.?|teil|scene|szene)\s*[ivxlc\d]+\b.*$/i;
+var nameBeforeComma = (title) => words4(String(title).split(",")[0]);
+function sameNamedWork(a, b) {
+  if (a === b) return true;
+  const catalogueA = foldedCatalogue(a);
+  const catalogueB = foldedCatalogue(b);
+  if (catalogueA && catalogueB) return catalogueA === catalogueB;
+  const [short, long] = a.length <= b.length ? [a, b] : [b, a];
+  const name = nameBeforeComma(long);
+  return name.length >= 4 && words4(short) === name && long.includes(",");
+}
+function sameCredits(last2, heading, names) {
+  const these = new Set(names.map(words4));
+  if (last2.names.length === these.size && last2.names.every((name) => these.has(name))) return true;
+  const shared = last2.names.filter((name) => these.has(name));
+  const same3 = shared.length > 0 && Boolean(catalogueNumber(last2.title)) && catalogueNumber(last2.title) === catalogueNumber(heading);
+  if (same3) {
+    last2.composer = last2.credited.filter((name) => shared.includes(words4(name))).join(", ");
+    last2.names = shared;
+  }
+  return same3;
+}
+function pieceGroups(c, album, following) {
+  const rows = c.db.prepare(
+    `SELECT t.id AS track_link_id,t.core_id,t.file_id,t.evidence FROM track_link t
+       JOIN classification c ON c.target_id=t.id AND c.state='classical'
+       WHERE t.state='active' AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?
+       AND NOT EXISTS(SELECT 1 FROM segment s WHERE s.track_link_id=t.id)`
+  ).all(album).sort((a, b) => albumPosition(a) - albumPosition(b));
+  const pieces = [];
+  for (const row of rows) {
+    const evidence = evidenceOf(row);
+    const workTag = text3(evidence.hints?.work, "");
+    const work = workTag.split(/\s*:\s*/)[0];
+    const title = withoutComposer(trackTitle(evidence), composersOf(evidence.hints || {}));
+    const split = splitTitle(title);
+    const fullHead = work || split.head;
+    const ownTail = work ? movementTitle({ title }, work) : split.tail;
+    const taggedTail = work ? movementTitle({ title, work: workTag }, work) : ownTail;
+    const fullTail = words4(ownTail).endsWith(` ${words4(taggedTail)}`) ? taggedTail : ownTail;
+    const numbered = fullHead ? null : numberedPiece(fullTail);
+    const tail = numbered?.part ?? fullTail;
+    const names = composersOf(evidence.hints || {});
+    const head = numbered?.set ?? fullHead.replace(ACT, "");
+    const heading = head || tail;
+    const composer = names.join(", ");
+    const last2 = pieces.at(-1);
+    const item = {
+      id: `piece:${row.track_link_id}`,
+      trackId: String(row.core_id),
+      fileId: String(row.file_id),
+      albumId: String(evidence.albumId ?? ""),
+      title: tail,
+      artist: text3(evidence.hints?.artist, text3(evidence.hints?.albumArtist, "")),
+      performer: performerOf(evidence.hints),
+      album: text3(evidence.hints?.album, ""),
+      durationMs: Number(evidence.durationMs) || null,
+      startMs: 0,
+      endMs: null,
+      position: albumPosition(row)
+    };
+    const sameWork = last2 && sameNamedWork(last2.title, heading);
+    if (head && sameWork && sameCredits(last2, heading, names) && following.get(last2.next) === item.position)
+      last2.items.push(item);
+    else
+      pieces.push({ id: item.id, workId: null, title: heading, composer, names: names.map(words4), credited: names, items: [item], missing: [] });
+    pieces.at(-1).next = item.position;
+  }
+  return pieces.map(({ next, names, credited, items, ...piece }) => ({
+    ...piece,
+    first: items[0].position,
+    items: items.map(({ position, ...item }) => item),
+    movementCount: items.length,
+    // Several tracks under one heading look like a work; say when they are
+    // not one yet. Sets such as "Études" are never made into works.
+    ...items.length > 1 && !isCollectionLike(piece.title) && !NUMBERED_SET.test(piece.title) && { detail: "Not matched to a work" }
+  }));
+}
+function compareAlbumGroups(a, b) {
+  return a.first - b.first || b.items.length - a.items.length || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
+}
+function renderAlbumPresentation(c, albumId, capabilities = {}) {
+  const metadata = new DisplayValues(c);
+  const album = String(albumId);
+  const allRows = realizationRows(c, null, null, album);
+  const grouped = /* @__PURE__ */ new Map();
+  for (const row of allRows) {
+    const group = grouped.get(row.realization_id) || [];
+    group.push(row);
+    grouped.set(row.realization_id, group);
+  }
+  const positions = c.db.prepare(
+    `SELECT evidence FROM track_link WHERE state='active'
+       AND CAST(json_extract(evidence,'$.albumId') AS TEXT)=?`
+  ).all(album).map(albumPosition).sort((a, b) => a - b).filter((position, index, all) => position !== all[index - 1]);
+  const following = new Map(positions.map((position, index) => [position, positions[index + 1]]));
+  const works = [...grouped.entries()].flatMap(([realizationId, rows]) => {
+    const workId = rows[0].work_id;
+    const movements = workMovements2(c, metadata, workId);
+    const present = new Set(rows.flatMap((row) => row.movement_ids).filter(Boolean));
+    const runs = [];
+    for (const row of [...rows].sort((a, b) => albumPosition(a) - albumPosition(b))) {
+      const run = runs.at(-1);
+      const last2 = run && albumPosition(run.at(-1));
+      if (run && (last2 === albumPosition(row) || following.get(last2) === albumPosition(row))) run.push(row);
+      else runs.push([row]);
+    }
+    const name = entityValue(metadata, workId, "title", "Untitled work");
+    const collections = c.db.prepare("SELECT source_id FROM relation WHERE kind='collection_member' AND target_id=?").all(workId);
+    const book = collections.length === 1 ? entityValue(metadata, collections[0].source_id, "title", "") : "";
+    const title = book && !` ${words4(name)} `.includes(` ${words4(book)} `) ? `${name} \xB7 \u201C${book}\u201D` : name;
+    const links = capabilities?.itemLinks >= 1 ? itemLinks(c, metadata, { workId, realizationId, performanceId: performanceOf(c, rows[0].performance_work_id) }) : null;
+    const excerpts = NUMBERED_SET.test(name) && present.size * 2 < movements.length || Boolean(
+      c.db.prepare("SELECT 1 FROM external_identity WHERE entity_id=? AND record_kind='album-work' AND json_extract(evidence,'$.albumId')=? AND json_extract(evidence,'$.excerpt')=1").get(workId, album)
+    );
+    return runs.map((run, index) => ({
+      id: index ? `${realizationId}:${index}` : realizationId,
+      workId,
+      title,
+      composer: credits(c, metadata, workId).find(
+        (credit) => credit.role === "composer"
+      )?.name || "",
+      items: run.map(
+        (row) => queueItem(
+          metadata,
+          row,
+          row.movement_id && rows.filter((other) => other.movement_id === row.movement_id).length > 1 ? entityValue(metadata, workId, "title", "") : null,
+          links
+        )
+      ),
+      ...links && { links },
+      missing: index || excerpts ? [] : movements.filter((movement) => !present.has(movement.id)),
+      movementCount: Math.max(1, movements.length),
+      first: albumPosition(run[0])
+    }));
+  });
+  const groups = [...works, ...pieceGroups(c, album, following)].sort(compareAlbumGroups).map(({ first, ...group }) => group);
+  if (!groups.some((group) => group.workId || group.items.length > 1)) return null;
+  return { version: 1, albumId: album, supportsToggle: true, groups: groups.map(fitGroup) };
+}
+async function albumPresentation(input) {
+  actor(input);
+  const c = await openCatalogue(path2.join(input.dataFolder, "model"));
+  try {
+    return renderAlbumPresentation(c, input.album.id, input.capabilities);
+  } finally {
+    c.close();
+  }
+}
+
+// src/model/runtime.js
+import { createHash as createHash3, randomUUID as randomUUID7 } from "node:crypto";
+import fs4 from "node:fs/promises";
+import path4 from "node:path";
+
+// src/model/jobs.js
+import { randomUUID as randomUUID4 } from "node:crypto";
+var ModelJobs = class _ModelJobs {
+  constructor(catalogue) {
+    this.db = catalogue.db;
+  }
+  enqueue(type, key, input, { maxAttempts = 3 } = {}) {
+    if (!type || !key || !Number.isSafeInteger(maxAttempts) || maxAttempts < 1)
+      throw new Error("Invalid job");
+    return transaction(this.db, () => {
+      const existing = this.db.prepare(
+        "SELECT id FROM model_job WHERE key=? AND state IN ('queued','running','retry')"
+      ).get(key);
+      if (existing) return existing.id;
+      const id = randomUUID4();
+      this.db.prepare(
+        `INSERT INTO model_job(id,type,key,input,state,max_attempts,created_at)
+        VALUES (?,?,?,?,'queued',?,?)`
+      ).run(id, type, key, JSON.stringify(input), maxAttempts, Date.now());
+      return id;
+    });
+  }
+  // A scan goes before background identification; `type` claims only that kind.
+  // Tag writes (v0.3 8.4) are claimed only by name: a scan, the schedule or
+  // any other run of model jobs never picks one up.
+  claim(owner, { now = Date.now(), leaseMs = 3e4, type = null } = {}) {
+    if (!owner || !Number.isFinite(leaseMs) || leaseMs <= 0)
+      throw new Error("Invalid job lease");
+    return transaction(this.db, () => {
+      this.db.prepare(
+        "UPDATE model_job SET state='cancelled' WHERE cancel_requested=1 AND (state!='running' OR lease_until<=?)"
+      ).run(now);
+      this.db.prepare(
+        "UPDATE model_job SET state='failed',error='ATTEMPTS_EXHAUSTED' WHERE attempt>=max_attempts AND state='running' AND lease_until<=?"
+      ).run(now);
+      const row = this.db.prepare(
+        `SELECT * FROM model_job WHERE cancel_requested=0 AND attempt<max_attempts AND
+        ((state IN ('queued','retry') AND next_run_at<=?) OR (state='running' AND lease_until<=?))
+        ${type ? "AND type=?" : "AND type!='tag_write'"} ORDER BY type='library_scan' DESC,created_at LIMIT 1`
+      ).get(now, now, ...type ? [type] : []);
+      if (!row) return null;
+      this.db.prepare(
+        "UPDATE model_job SET state='running',owner=?,lease_until=?,generation=generation+1,attempt=attempt+1,error=NULL WHERE id=?"
+      ).run(owner, now + leaseMs, row.id);
+      return this.get(row.id);
+    });
+  }
+  get(id) {
+    const row = this.db.prepare("SELECT * FROM model_job WHERE id=?").get(id);
+    return row && {
+      ...row,
+      input: JSON.parse(row.input),
+      progress: JSON.parse(row.progress)
+    };
+  }
+  // Evidence a scan has read, saved a chunk at a time with each checkpoint
+  // so a checkpoint never rewrites everything read so far. Chunks are
+  // model_job rows of their own (no schema change), never claimed: they are
+  // born 'done'.
+  static chunkKey = (id) => `scan-chunk:${id}`;
+  chunks(id, count) {
+    return this.db.prepare("SELECT input FROM model_job WHERE key=? ORDER BY id LIMIT ?").all(_ModelJobs.chunkKey(id), count).flatMap((row) => JSON.parse(row.input));
+  }
+  // A finished or cancelled scan keeps only its summary: the file list and
+  // the evidence it read are already in the catalogue, and keeping them made
+  // every scan add tens of megabytes that integrity checks then had to read.
+  compactFinished() {
+    for (const row of this.db.prepare(
+      `SELECT id,state FROM model_job WHERE type='library_scan' AND state IN ('done','cancelled')
+         AND (length(input)>4096 OR length(progress)>65536 OR EXISTS(SELECT 1 FROM model_job c WHERE c.key='scan-chunk:'||model_job.id))`
+    ).all())
+      transaction(this.db, () => this.#compact(row.id));
+  }
+  #compact(id) {
+    this.db.prepare("DELETE FROM model_job WHERE key=?").run(_ModelJobs.chunkKey(id));
+    this.db.prepare(
+      `UPDATE model_job SET
+          input=json_object('instanceId',json_extract(input,'$.instanceId'),'epoch',json_extract(input,'$.epoch'),
+            'generation',json_extract(input,'$.generation'),'total',coalesce(json_extract(input,'$.total'),json_array_length(input,'$.files'))),
+          progress=json_object('cursor',coalesce(json_extract(progress,'$.cursor'),0),'errorCount',coalesce(json_extract(progress,'$.errorCount'),0),
+            'reused',coalesce(json_extract(progress,'$.reused'),0),
+            'errors',json(coalesce(json_extract(progress,'$.errors'),'[]')))
+         WHERE id=?`
+    ).run(id);
+  }
+  checkpoint(job, progress, { done = false, now = Date.now(), leaseMs = 3e4, commit, chunk = null } = {}) {
+    return transaction(this.db, () => {
+      const row = this.db.prepare(
+        "SELECT state,owner,generation,lease_until,cancel_requested FROM model_job WHERE id=?"
+      ).get(job.id);
+      if (!row || row.state !== "running" || row.owner !== job.owner || row.generation !== job.generation || row.lease_until <= now)
+        throw new Error("Stale job lease");
+      if (row.cancel_requested) {
+        this.db.prepare("UPDATE model_job SET state='cancelled' WHERE id=?").run(job.id);
+        if (job.type === "library_scan") this.#compact(job.id);
+        return false;
+      }
+      if (commit) commit();
+      if (chunk?.items.length && !done)
+        this.db.prepare(
+          `INSERT INTO model_job(id,type,key,input,state,max_attempts,created_at)
+             VALUES (?,'scan_chunk',?,?,'done',1,?)`
+        ).run(`${job.id}#${String(chunk.seq).padStart(6, "0")}`, _ModelJobs.chunkKey(job.id), JSON.stringify(chunk.items), now);
+      this.db.prepare(
+        "UPDATE model_job SET progress=?,state=?,lease_until=?,error=NULL WHERE id=?"
+      ).run(
+        JSON.stringify(progress),
+        done ? "done" : "running",
+        now + leaseMs,
+        job.id
+      );
+      if (done && job.type === "library_scan") this.#compact(job.id);
+      return true;
+    });
+  }
+  yield(job) {
+    this.db.prepare(
+      `UPDATE model_job SET state='queued',owner=NULL,lease_until=0,attempt=attempt-1
+      WHERE id=? AND owner=? AND generation=? AND state='running'`
+    ).run(job.id, job.owner, job.generation);
+  }
+  fail(job, error, { now = Date.now() } = {}) {
+    this.db.prepare(
+      `UPDATE model_job SET state=CASE WHEN attempt>=max_attempts THEN 'failed' ELSE 'retry' END,
+      error=?,next_run_at=?,lease_until=0 WHERE id=? AND owner=? AND generation=? AND state='running' AND lease_until>?`
+    ).run(
+      String(error).slice(0, 500),
+      now + 1e3 * 2 ** job.attempt,
+      job.id,
+      job.owner,
+      job.generation,
+      now
+    );
+  }
+  cancel(id) {
+    this.db.prepare(
+      "UPDATE model_job SET cancel_requested=1 WHERE id=? AND state IN ('queued','running','retry')"
+    ).run(id);
+  }
+};
+
+// src/model/reconcile.js
+import { randomUUID as randomUUID5 } from "node:crypto";
+
+// src/model/fingerprint.js
+import { createHash as createHash2 } from "node:crypto";
+import { createReadStream } from "node:fs";
+import fs2 from "node:fs/promises";
+var AUDIO_PREFIX = "audio-sha256-v2:";
+var CONTAINER_PREFIX = "file-sha256-v1:";
+var tagSensitive = (fingerprint2) => typeof fingerprint2 === "string" && fingerprint2.startsWith(CONTAINER_PREFIX);
+async function readAt(handle, position, length) {
+  const buffer = Buffer.alloc(length);
+  const { bytesRead } = await handle.read(buffer, 0, length, position);
+  return buffer.subarray(0, bytesRead);
+}
+var synchsafe = (b, offset) => (b[offset] & 127) << 21 | (b[offset + 1] & 127) << 14 | (b[offset + 2] & 127) << 7 | b[offset + 3] & 127;
+async function skipId3v2(handle, start, size) {
+  let position = start;
+  while (position + 10 <= size) {
+    const header = await readAt(handle, position, 10);
+    if (header.length < 10 || header.toString("latin1", 0, 3) !== "ID3") break;
+    const footer = header[5] & 16 ? 10 : 0;
+    position += 10 + synchsafe(header, 6) + footer;
+  }
+  return position;
+}
+async function trailingTagStart(handle, start, size) {
+  let end = size;
+  for (let changed = true; changed && end > start; ) {
+    changed = false;
+    if (end - start >= 128) {
+      const tail = await readAt(handle, end - 128, 3);
+      if (tail.toString("latin1") === "TAG") {
+        end -= 128;
+        changed = true;
+        continue;
+      }
+    }
+    if (end - start >= 32) {
+      const footer = await readAt(handle, end - 32, 32);
+      if (footer.toString("latin1", 0, 8) === "APETAGEX") {
+        const tagSize = footer.readUInt32LE(12);
+        const hasHeader = (footer.readUInt32LE(20) & 2147483648) !== 0;
+        const total = tagSize + (hasHeader ? 32 : 0);
+        if (total > 0 && total <= end - start) {
+          end -= total;
+          changed = true;
+        }
+      }
+    }
+  }
+  return end;
+}
+async function flacAudioStart(handle, start, size) {
+  let position = start + 4;
+  for (; ; ) {
+    const header = await readAt(handle, position, 4);
+    if (header.length < 4) return null;
+    const last2 = (header[0] & 128) !== 0;
+    const length = header.readUIntBE(1, 3);
+    position += 4 + length;
+    if (position > size) return null;
+    if (last2) return position;
+  }
+}
+async function wavRanges(handle, size) {
+  const ranges = [];
+  let position = 12;
+  while (position + 8 <= size) {
+    const header = await readAt(handle, position, 8);
+    if (header.length < 8) break;
+    const id = header.toString("latin1", 0, 4);
+    const length = header.readUInt32LE(4);
+    const body = position + 8;
+    if (id === "fmt " || id === "data")
+      ranges.push([body, Math.min(size, body + length)]);
+    position = body + length + length % 2;
+  }
+  return ranges.some(([s, e]) => e > s) ? ranges : null;
+}
+async function audioRanges(file) {
+  const handle = await fs2.open(file, "r");
+  try {
+    const { size } = await handle.stat();
+    const magic = await readAt(handle, 0, 12);
+    if (magic.toString("latin1", 0, 4) === "RIFF" && magic.toString("latin1", 8, 12) === "WAVE")
+      return await wavRanges(handle, size);
+    const start = await skipId3v2(handle, 0, size);
+    const head = await readAt(handle, start, 4);
+    if (head.toString("latin1") === "fLaC") {
+      const audio = await flacAudioStart(handle, start, size);
+      return audio == null ? null : [[audio, size]];
+    }
+    if (head.length >= 2 && head[0] === 255 && (head[1] & 224) === 224) {
+      const end = await trailingTagStart(handle, start, size);
+      return end > start ? [[start, end]] : null;
+    }
+    return null;
+  } finally {
+    await handle.close();
+  }
+}
+async function hashRanges(file, ranges) {
+  const hash = createHash2("sha256");
+  for (const [start, end] of ranges) {
+    if (end <= start) continue;
+    for await (const bytes of createReadStream(file, { start, end: end - 1 }))
+      hash.update(bytes);
+  }
+  return hash.digest("hex");
+}
+async function fingerprint(file) {
+  let ranges = null;
+  try {
+    ranges = await audioRanges(file);
+  } catch {
+    ranges = null;
+  }
+  if (ranges) return `${AUDIO_PREFIX}${await hashRanges(file, ranges)}`;
+  const { size } = await fs2.stat(file);
+  return `${CONTAINER_PREFIX}${await hashRanges(file, [[0, size]])}`;
+}
+
+// src/model/retag-repair.js
+var sameRetaggedFile = (old, fileId, item) => (tagSensitive(old.fingerprint) || tagSensitive(item.fingerprint)) && fileId === item.fileId && old.path === item.path && old.durationMs != null && old.durationMs === item.durationMs;
+function repairRetaggedLinks(c, snapshot) {
+  const db = c.db, resolved = /* @__PURE__ */ new Set(), blocked = /* @__PURE__ */ new Set(), proposals = [];
+  const reviews = db.prepare(`SELECT v.id AS review_id,v.evidence AS review_evidence,t.*
+    FROM review_item v JOIN track_link t ON t.id=v.target_id
+    WHERE v.kind='track_link' AND v.status='open' AND t.instance_id=? AND t.state!='active'`).all(snapshot.instanceId);
+  if (!reviews.length) return { resolved, blocked };
+  const files = /* @__PURE__ */ new Map();
+  for (const item of snapshot.tracks) {
+    const key = JSON.stringify([item.fileId, item.path]);
+    files.set(key, [...files.get(key) || [], item]);
+  }
+  for (const old of reviews) {
+    const review = JSON.parse(old.review_evidence), evidence = JSON.parse(old.evidence);
+    if (review.epochChanged || review.reused?.length !== 1) continue;
+    if (!sameRetaggedFile(evidence, old.file_id, review.reused[0])) continue;
+    const current = (files.get(JSON.stringify([old.file_id, evidence.path])) || []).filter((item) => sameRetaggedFile(evidence, old.file_id, item));
+    if (current.length !== 1) {
+      blocked.add(old.id);
+      continue;
+    }
+    proposals.push({ old, item: current[0] });
+  }
+  const claims = /* @__PURE__ */ new Map();
+  for (const p of proposals) claims.set(p.item, (claims.get(p.item) || 0) + 1);
+  const dirty = (ids) => {
+    const marks = ids.map(() => "?").join(",");
+    return db.prepare(`SELECT 1 FROM assertion WHERE target_id IN (${marks}) AND source='manual' LIMIT 1`).get(...ids) || db.prepare(`SELECT 1 FROM pinned_override WHERE target_id IN (${marks}) LIMIT 1`).get(...ids) || db.prepare(`SELECT 1 FROM classification WHERE target_id IN (${marks}) AND pinned=1 LIMIT 1`).get(...ids) || db.prepare(`SELECT 1 FROM audit_event WHERE target_id IN (${marks}) AND action LIKE 'editor.%'
+        AND action NOT IN ('editor.open','editor.move-tracks-open','editor.choose-album-work','editor.bulk-edit-open','editor.new-album-work') LIMIT 1`).get(...ids);
+  };
+  for (const { old, item } of proposals) {
+    blocked.add(old.id);
+    if (claims.get(item) !== 1) continue;
+    const siblings = db.prepare(`SELECT * FROM track_link WHERE instance_id=? AND file_id=?
+      AND json_extract(evidence,'$.path')=? AND id!=?`).all(snapshot.instanceId, item.fileId, item.path, old.id);
+    if (siblings.length > 1 || siblings.length === 1 && siblings[0].state !== "active") continue;
+    const newer = siblings[0];
+    if (newer) {
+      const next = JSON.parse(newer.evidence);
+      if (newer.core_id !== item.coreId || next.durationMs !== item.durationMs) continue;
+      const oldItems = db.prepare(`SELECT i.realization_id,i.movement_id,r.work_id,p.source_id AS performance_id FROM realization_item i
+        JOIN segment s ON s.id=i.segment_id JOIN realization r ON r.id=i.realization_id
+        JOIN relation p ON p.id=r.performance_work_id WHERE s.track_link_id=?`).all(old.id);
+      const newItems = db.prepare(`SELECT i.id,i.realization_id,i.movement_id,r.work_id,p.source_id AS performance_id,
+        rc.recording_id FROM realization_item i JOIN segment s ON s.id=i.segment_id
+        JOIN realization r ON r.id=i.realization_id JOIN relation p ON p.id=r.performance_work_id
+        LEFT JOIN segment_content sc ON sc.segment_id=s.id LEFT JOIN recording_content rc ON rc.id=sc.content_id
+        WHERE s.track_link_id=?`).all(newer.id);
+      const originals = new Set(oldItems.flatMap((i) => [i.movement_id, i.performance_id]).filter(Boolean));
+      const ids = [.../* @__PURE__ */ new Set([newer.id, ...newItems.flatMap((i) => [i.movement_id, i.performance_id, i.recording_id]).filter((id) => id && !originals.has(id))])];
+      if (dirty(ids)) continue;
+      if (newItems.some((i) => db.prepare(`SELECT 1 FROM audit_event WHERE target_id=? AND created_at>=?
+        AND action IN ('editor.move-movement','editor.set-movement-order','editor.reorder-movements','editor.add-movement','editor.delete-movement') LIMIT 1`).get(i.work_id, newer.created_at))) continue;
+      if (db.prepare(`SELECT 1 FROM audit_event a,json_each(a.data,'$.values.tracks') t
+        WHERE a.action IN ('editor.assign-album','editor.unassign-tracks','editor.create-work-from-album') AND t.value=? LIMIT 1`).get(newer.id)) continue;
+      if (newItems.some((i) => !oldItems.some((o) => o.work_id === i.work_id))) continue;
+      const oldRealizations = new Set(oldItems.map((i) => i.realization_id));
+      if (newItems.some((i) => !oldRealizations.has(i.realization_id) && (db.prepare("SELECT 1 FROM user_work_state WHERE picked_realization_id=?").get(i.realization_id) || db.prepare("SELECT 1 FROM admin_work_pick WHERE realization_id=?").get(i.realization_id)))) continue;
+      if (db.prepare(`SELECT 1 FROM segment s WHERE s.track_link_id=? AND NOT EXISTS
+        (SELECT 1 FROM realization_item i WHERE i.segment_id=s.id) LIMIT 1`).get(newer.id)) continue;
+      for (const id of new Set(newItems.map((i) => i.id))) c.detachItem(id, { dropRecording: true });
+      const originalMovements = new Set(oldItems.map((i) => i.movement_id)), prunedWorks = /* @__PURE__ */ new Set();
+      for (const movement of new Set(newItems.map((i) => i.movement_id).filter(Boolean))) {
+        if (originalMovements.has(movement) || db.prepare(`SELECT 1 FROM realization_item WHERE movement_id=?
+          UNION SELECT 1 FROM recording_content WHERE movement_id=?`).get(movement, movement)) continue;
+        for (const row of db.prepare("SELECT source_id FROM relation WHERE kind='movement' AND target_id=?").all(movement)) prunedWorks.add(row.source_id);
+        db.prepare("DELETE FROM relation WHERE kind='movement' AND target_id=?").run(movement);
+        db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(Date.now(), Date.now(), movement);
+      }
+      for (const work of prunedWorks) {
+        const parts = db.prepare("SELECT id,position FROM relation WHERE kind='movement' AND source_id=? ORDER BY position,id").all(work);
+        const bump = parts.reduce((max, p) => Math.max(max, p.position), 0) + parts.length + 1;
+        db.prepare("UPDATE relation SET position=position+? WHERE kind='movement' AND source_id=?").run(bump, work);
+        parts.forEach((part, i) => db.prepare("UPDATE relation SET position=? WHERE id=?").run(i + 1, part.id));
+      }
+      for (const work of new Set(newItems.map((i) => i.work_id))) c.audit("work.repair_retag", work, { keep: old.id, removed: newer.id });
+      for (const table of ["field_resolution", "pinned_override", "provider_record", "classification"]) db.prepare(`DELETE FROM ${table} WHERE target_id=?`).run(newer.id);
+      db.prepare("DELETE FROM assertion WHERE target_id=?").run(newer.id);
+      db.prepare("DELETE FROM metadata_target WHERE track_link_id=?").run(newer.id);
+      db.prepare("DELETE FROM track_evidence WHERE track_link_id=?").run(newer.id);
+      db.prepare("UPDATE review_item SET status='resolved' WHERE target_id=? AND status='open'").run(newer.id);
+      db.prepare("DELETE FROM track_link WHERE id=?").run(newer.id);
+      c.audit("track.repair_retag", old.id, { removed: newer.id, generation: snapshot.generation });
+    }
+    blocked.delete(old.id);
+    resolved.add(old.id);
+  }
+  return { resolved, blocked };
+}
 
 // src/resolver.js
 var DEFAULT_KNOWN_NAMES = {
@@ -36664,11 +40295,11 @@ function isSoloistRelation(rel) {
 }
 var unique = (values) => [...new Set(values.filter(Boolean))];
 function isPlaceholder(name) {
-  const text2 = String(name || "").trim();
-  return text2.startsWith("[") && text2.endsWith("]");
+  const text5 = String(name || "").trim();
+  return text5.startsWith("[") && text5.endsWith("]");
 }
-function isLatin(text2) {
-  for (const ch of String(text2 || "")) {
+function isLatin(text5) {
+  for (const ch of String(text5 || "")) {
     if (new RegExp("\\p{L}", "u").test(ch) && !new RegExp("\\p{Script=Latin}", "u").test(ch)) return false;
   }
   return true;
@@ -36682,7 +40313,7 @@ function genreNames(entity) {
   names.delete("");
   return names;
 }
-var escapeRegex = (text2) => text2.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+var escapeRegex = (text5) => text5.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 function addPerson(people, person) {
   if (person && people.every((p) => p.id !== person.id)) people.push(person);
 }
@@ -36771,10 +40402,10 @@ var ClassicalResolver = class _ClassicalResolver {
   // classical genre wins over "pop" or "rock" on the same entity, but not
   // over Christmas, soundtrack or crossover genres.
   classifyGenres(genres) {
-    const list = [...genres];
-    if (list.some((g) => this.isHardNonClassicalGenre(g))) return false;
-    if (list.some((g) => this.isClassicalGenre(g))) return true;
-    if (list.some((g) => this.isNonClassicalGenre(g))) return false;
+    const list3 = [...genres];
+    if (list3.some((g) => this.isHardNonClassicalGenre(g))) return false;
+    if (list3.some((g) => this.isClassicalGenre(g))) return true;
+    if (list3.some((g) => this.isNonClassicalGenre(g))) return false;
     return null;
   }
   async isNonClassicalArtist(artist) {
@@ -36791,12 +40422,12 @@ var ClassicalResolver = class _ClassicalResolver {
   }
   // -- names --------------------------------------------------------------
   static bestEnglishAlias(aliases) {
-    const candidates = (aliases || []).filter(
+    const candidates2 = (aliases || []).filter(
       (a) => String(a.locale || "").replaceAll("-", "_").split("_")[0] === "en" && a.name && a.type !== "Search hint" && !a.ended
     );
-    if (!candidates.length) return null;
+    if (!candidates2.length) return null;
     const key = (a) => [a.primary ? 0 : 1, a.type == null || a.type === "Artist name" ? 0 : 1];
-    return [...candidates].sort((x, y) => {
+    return [...candidates2].sort((x, y) => {
       const [a, b] = [key(x), key(y)];
       return a[0] - b[0] || a[1] - b[1];
     })[0];
@@ -36834,12 +40465,12 @@ var ClassicalResolver = class _ClassicalResolver {
     return { id: artist.id || name, name, sortName: sortName || name };
   }
   // -- credits ------------------------------------------------------------
-  async collectWorkCredits(workId, credits, depth = 0, seen = /* @__PURE__ */ new Set()) {
+  async collectWorkCredits(workId, credits2, depth = 0, seen = /* @__PURE__ */ new Set()) {
     if (!workId || seen.has(workId)) return;
     seen.add(workId);
     const work = await this.getWork(workId);
     if (!work) return;
-    if (credits.work == null) credits.work = work;
+    if (credits2.work == null) credits2.work = work;
     let foundComposer = false;
     const parents = [];
     for (const rel of work.relations || []) {
@@ -36851,25 +40482,25 @@ var ClassicalResolver = class _ClassicalResolver {
       const artist = rel.artist;
       if (!artist) continue;
       if (this.composerRelations.has(type)) {
-        addPerson(credits.composers, await this.person(artist));
+        addPerson(credits2.composers, await this.person(artist));
         foundComposer = true;
       } else if (LYRICIST_RELATIONS.has(type)) {
-        addPerson(credits.lyricists, await this.person(artist));
+        addPerson(credits2.lyricists, await this.person(artist));
       } else if (ARRANGER_RELATIONS.has(type)) {
-        addPerson(credits.arrangers, await this.person(artist));
+        addPerson(credits2.arrangers, await this.person(artist));
       }
     }
     if (!foundComposer && depth < MAX_PARENT_WORK_DEPTH) {
-      for (const parentId of parents) await this.collectWorkCredits(parentId, credits, depth + 1, seen);
+      for (const parentId of parents) await this.collectWorkCredits(parentId, credits2, depth + 1, seen);
     }
   }
   async workCredits(recording) {
-    const credits = emptyCredits();
+    const credits2 = emptyCredits();
     for (const rel of recording.relations || []) {
       if (rel.type !== "performance") continue;
-      await this.collectWorkCredits(rel.work?.id, credits);
+      await this.collectWorkCredits(rel.work?.id, credits2);
     }
-    return credits;
+    return credits2;
   }
   async isMemberOf(artistId, ensembleIds) {
     const data = await this.mb.get("artist", artistId, _ClassicalResolver.MEMBERSHIP_INC) || {};
@@ -36882,7 +40513,7 @@ var ClassicalResolver = class _ClassicalResolver {
     if (type == null && artist?.id) type = (await this.getArtist(artist.id) || {}).type;
     return String(type || "").toLowerCase();
   }
-  async addPerformers(recording, credits) {
+  async addPerformers(recording, credits2) {
     const markedSoloists = [];
     const individuals = [];
     const voiceOnly = /* @__PURE__ */ new Set();
@@ -36892,10 +40523,10 @@ var ClassicalResolver = class _ClassicalResolver {
       const artist = rel.artist;
       if (!artist || !wanted.has(type)) continue;
       const person = await this.person(artist);
-      if (type === "conductor") addPerson(credits.conductors, person);
-      else if (ARRANGER_RELATIONS.has(type)) addPerson(credits.arrangers, person);
+      if (type === "conductor") addPerson(credits2.conductors, person);
+      else if (ARRANGER_RELATIONS.has(type)) addPerson(credits2.arrangers, person);
       else if (type === "performing orchestra" || ENSEMBLE_ARTIST_TYPES.has(await this.artistType(artist)))
-        addPerson(credits.ensembles, person);
+        addPerson(credits2.ensembles, person);
       else if (isSoloistRelation(rel)) {
         addPerson(markedSoloists, person);
         if (person && !lowerSet(rel.attributes).has("solo")) voiceOnly.add(person.id);
@@ -36906,9 +40537,9 @@ var ClassicalResolver = class _ClassicalResolver {
       const artist = credit.artist || {};
       creditedIds.add(artist.id);
       if (ENSEMBLE_ARTIST_TYPES.has(await this.artistType(artist)))
-        addPerson(credits.ensembles, await this.person(artist));
+        addPerson(credits2.ensembles, await this.person(artist));
     }
-    const ensembleIds = new Set(credits.ensembles.map((p) => p.id));
+    const ensembleIds = new Set(credits2.ensembles.map((p) => p.id));
     const isMember = async (person) => ensembleIds.size > 0 && await this.isMemberOf(person.id, ensembleIds);
     const keptSoloists = [];
     for (const p of markedSoloists) if (!voiceOnly.has(p.id) || !await isMember(p)) keptSoloists.push(p);
@@ -36918,26 +40549,26 @@ var ClassicalResolver = class _ClassicalResolver {
     if (creditedMembers.size < _ClassicalResolver.MIN_CREDITED_LINEUP) creditedMembers = /* @__PURE__ */ new Set();
     for (const p of creditedIndividuals) if (!creditedMembers.has(p.id)) addPerson(keptSoloists, p);
     const others = individuals.filter((p) => !creditedIds.has(p.id));
-    for (const p of keptSoloists) addPerson(credits.soloists, p);
-    if (!credits.ensembles.length && others.length <= this.maxSoloists) {
-      for (const p of others) addPerson(credits.soloists, p);
+    for (const p of keptSoloists) addPerson(credits2.soloists, p);
+    if (!credits2.ensembles.length && others.length <= this.maxSoloists) {
+      for (const p of others) addPerson(credits2.soloists, p);
     } else if (others.length) {
       this.log(`left out ${others.length} individual performer(s) as ensemble members`);
     }
     const sparse = !(recording.relations || []).some((rel) => PERFORMER_ROLE_RELATIONS.has(rel.type));
     const placed = new Set(
-      [credits.composers, credits.arrangers, credits.soloists, credits.ensembles, credits.conductors].flat().map((p) => p.id)
+      [credits2.composers, credits2.arrangers, credits2.soloists, credits2.ensembles, credits2.conductors].flat().map((p) => p.id)
     );
     for (const credit of recording["artist-credit"] || []) {
       const artist = credit.artist || {};
       const person = await this.person(artist);
       if (person && creditedMembers.has(person.id)) continue;
-      addPerson(credits.credited, person);
-      if (sparse && !credits.ensembles.length && person && !placed.has(person.id) && await this.artistType(artist) === "person")
-        addPerson(credits.soloists, person);
+      addPerson(credits2.credited, person);
+      if (sparse && !credits2.ensembles.length && person && !placed.has(person.id) && await this.artistType(artist) === "person")
+        addPerson(credits2.soloists, person);
     }
   }
-  async composersFromTrackArtist(recording, trackArtistIds, credits) {
+  async composersFromTrackArtist(recording, trackArtistIds, credits2) {
     const recordingIds = new Set((recording["artist-credit"] || []).map((c) => c.artist?.id));
     for (const id of unique(trackArtistIds || [])) {
       if (recordingIds.has(id) || this.nonClassicalArtists.has(id)) continue;
@@ -36945,19 +40576,19 @@ var ClassicalResolver = class _ClassicalResolver {
       if (!artist || String(artist.type || "").toLowerCase() !== "person") continue;
       if (await this.isNonClassicalArtist({ id })) continue;
       const person = await this.person(artist);
-      if (person) addPerson(credits.composers, person);
+      if (person) addPerson(credits2.composers, person);
     }
   }
-  static orderByBilling(recording, albumArtistIds, credits) {
+  static orderByBilling(recording, albumArtistIds, credits2) {
     const billing = [...albumArtistIds || [], ...(recording["artist-credit"] || []).map((c) => c.artist?.id)];
     const rank = /* @__PURE__ */ new Map();
     billing.forEach((id, position) => {
       if (!rank.has(id)) rank.set(id, position);
     });
     for (const role of ["soloists", "ensembles", "conductors"]) {
-      const people = credits[role];
+      const people = credits2[role];
       const sorted = people.map((p, i) => [rank.has(p.id) ? rank.get(p.id) : billing.length, i, p]).sort((a, b) => a[0] - b[0] || a[1] - b[1]).map(([, , p]) => p);
-      credits[role] = sorted;
+      credits2[role] = sorted;
     }
   }
   // -- evidence -----------------------------------------------------------
@@ -36976,8 +40607,8 @@ var ClassicalResolver = class _ClassicalResolver {
     return year > 0 && year < EARLY_COMPOSER_YEAR;
   }
   // The types of the recorded Work and the Work it belongs to.
-  async workTypes(credits) {
-    const work = credits.work;
+  async workTypes(credits2) {
+    const work = credits2.work;
     if (!work) return [];
     const types = [work.type];
     const parent = (work.relations || []).find((rel) => rel.type === "parts" && rel.direction === "backward" && rel.work?.id);
@@ -36985,9 +40616,9 @@ var ClassicalResolver = class _ClassicalResolver {
     return types.filter(Boolean).map((t) => String(t).toLowerCase());
   }
   // Why this recording is classical, or null when nothing says so.
-  async classicalEvidence(recording, credits, workTypes) {
+  async classicalEvidence(recording, credits2, workTypes) {
     if (workTypes.some((t) => CLASSICAL_WORK_TYPES.includes(t))) return "work type";
-    for (const p of credits.composers) {
+    for (const p of credits2.composers) {
       if (p.id === p.name) continue;
       if (await this.isEarlyComposer(p.id)) return "composer's dates";
       if (await this.isClassicalArtist(p.id)) return "composer's genres";
@@ -37032,16 +40663,16 @@ var ClassicalResolver = class _ClassicalResolver {
       this.skipReason = "non-classical";
       return null;
     }
-    const credits = await this.workCredits(recording);
-    if (!credits.composers.length && this.trackArtistFallback)
-      await this.composersFromTrackArtist(recording, trackArtistIds, credits);
-    if (!credits.composers.length) {
+    const credits2 = await this.workCredits(recording);
+    if (!credits2.composers.length && this.trackArtistFallback)
+      await this.composersFromTrackArtist(recording, trackArtistIds, credits2);
+    if (!credits2.composers.length) {
       this.skipReason = "no composer";
       return null;
     }
     if (verdict == null) {
       const performers = (recording["artist-credit"] || []).map((c) => c.artist || {});
-      const composers = credits.composers.filter((p) => p.id !== p.name).map((p) => ({ id: p.id, name: p.name }));
+      const composers = credits2.composers.filter((p) => p.id !== p.name).map((p) => ({ id: p.id, name: p.name }));
       for (const artist of [...performers, ...composers]) {
         if (await this.isNonClassicalArtist(artist)) {
           this.skipReason = "non-classical";
@@ -37050,19 +40681,19 @@ var ClassicalResolver = class _ClassicalResolver {
       }
     }
     if (this.requireEvidence) {
-      const types = await this.workTypes(credits);
+      const types = await this.workTypes(credits2);
       if (types.some((t) => NON_CLASSICAL_WORK_TYPES.includes(t))) {
         this.skipReason = "non-classical";
         return null;
       }
-      if (!confirmed && verdict !== true && !await this.classicalEvidence(recording, credits, types)) {
+      if (!confirmed && verdict !== true && !await this.classicalEvidence(recording, credits2, types)) {
         this.skipReason = "not clearly classical";
         return null;
       }
     }
-    await this.addPerformers(recording, credits);
-    _ClassicalResolver.orderByBilling(recording, albumArtistIds, credits);
-    const fields = this.buildFields(credits);
+    await this.addPerformers(recording, credits2);
+    _ClassicalResolver.orderByBilling(recording, albumArtistIds, credits2);
+    const fields = this.buildFields(credits2);
     fields.recording = recording;
     return fields;
   }
@@ -37070,56 +40701,2654 @@ var ClassicalResolver = class _ClassicalResolver {
     const real = people.filter((p) => !isPlaceholder(p.name));
     return real.length || !keepIfAlone ? real : people;
   }
-  buildFields(credits) {
-    credits.composers = _ClassicalResolver.dropPlaceholders(credits.composers, true);
-    credits.arrangers = _ClassicalResolver.dropPlaceholders(credits.arrangers, false);
-    const roles = {
-      composers: credits.composers,
-      arrangers: credits.arrangers,
-      soloists: credits.soloists,
-      ensembles: credits.ensembles,
-      conductors: credits.conductors,
-      credited: credits.credited
+  buildFields(credits2) {
+    credits2.composers = _ClassicalResolver.dropPlaceholders(credits2.composers, true);
+    credits2.arrangers = _ClassicalResolver.dropPlaceholders(credits2.arrangers, false);
+    const roles2 = {
+      composers: credits2.composers,
+      arrangers: credits2.arrangers,
+      soloists: credits2.soloists,
+      ensembles: credits2.ensembles,
+      conductors: credits2.conductors,
+      credited: credits2.credited
     };
     let hidden = /* @__PURE__ */ new Set();
-    if (this.maxArtistSoloists && credits.ensembles.length && credits.soloists.length > this.maxArtistSoloists) {
-      const creditedIds = new Set(credits.credited.map((p) => p.id));
-      let headline = credits.soloists.filter((p) => creditedIds.has(p.id));
+    if (this.maxArtistSoloists && credits2.ensembles.length && credits2.soloists.length > this.maxArtistSoloists) {
+      const creditedIds = new Set(credits2.credited.map((p) => p.id));
+      let headline = credits2.soloists.filter((p) => creditedIds.has(p.id));
       if (!(headline.length > 0 && headline.length <= this.maxArtistSoloists)) headline = [];
       const keep = new Set(headline.map((p) => p.id));
-      hidden = new Set(credits.soloists.map((p) => p.id).filter((id) => !keep.has(id)));
+      hidden = new Set(credits2.soloists.map((p) => p.id).filter((id) => !keep.has(id)));
     }
     const parts = [];
-    for (const role of this.order) for (const p of roles[role] || []) if (!hidden.has(p.id)) addPerson(parts, p);
+    for (const role of this.order) for (const p of roles2[role] || []) if (!hidden.has(p.id)) addPerson(parts, p);
     const names = unique(parts.map((p) => p.name));
     const sortNames = unique(parts.map((p) => p.sortName));
     const joined = (people) => people.map((p) => p.name).join(this.listSeparator) || null;
-    const work = credits.work || null;
+    const work = credits2.work || null;
     return {
       artist: names.join(this.separator),
       artists: names,
       artistSort: sortNames.join(this.separator),
       artistsSort: sortNames,
-      composers: credits.composers.map((p) => p.name),
-      composersIds: credits.composers.map((p) => p.id),
-      composerSort: credits.composers.map((p) => p.sortName).join(", "),
-      lyricists: credits.lyricists.map((p) => p.name),
-      arrangers: credits.arrangers.map((p) => p.name),
-      classicalComposers: joined(credits.composers),
-      classicalArrangers: joined(credits.arrangers),
-      classicalSoloists: joined(credits.soloists),
-      classicalEnsembles: joined(credits.ensembles),
-      classicalConductors: joined(credits.conductors),
+      composers: credits2.composers.map((p) => p.name),
+      composersIds: credits2.composers.map((p) => p.id),
+      composerSort: credits2.composers.map((p) => p.sortName).join(", "),
+      lyricists: credits2.lyricists.map((p) => p.name),
+      arrangers: credits2.arrangers.map((p) => p.name),
+      classicalComposers: joined(credits2.composers),
+      classicalArrangers: joined(credits2.arrangers),
+      classicalSoloists: joined(credits2.soloists),
+      classicalEnsembles: joined(credits2.ensembles),
+      classicalConductors: joined(credits2.conductors),
       people: {
-        composers: credits.composers,
-        arrangers: credits.arrangers,
-        soloists: credits.soloists,
-        ensembles: credits.ensembles,
-        conductors: credits.conductors
+        composers: credits2.composers,
+        arrangers: credits2.arrangers,
+        soloists: credits2.soloists,
+        ensembles: credits2.ensembles,
+        conductors: credits2.conductors
       },
       work: work ? work.title : null,
       workId: work ? work.id : null
     };
+  }
+};
+
+// src/model/classify-evidence.js
+var escape = (text5) => text5.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+var wordList = (terms) => new RegExp(
+  `(?<![\\p{L}\\p{N}_])(?:${[...new Set(terms.map(normGenre))].sort((a, b) => b.length - a.length).map(escape).join("|")})(?![\\p{L}\\p{N}_])`,
+  "u"
+);
+var ORDINARY = wordList([
+  ...DEFAULT_NON_CLASSICAL_GENRES,
+  "new romantic",
+  "new wave",
+  "synthpop",
+  "electronica",
+  "alternative",
+  "k pop"
+]);
+var CONTEXT = wordList([...HARD_NON_CLASSICAL_GENRES, "score", "game", "anime"]);
+var AMBIGUOUS_NAMES = new Set(["romantic", "contemporary", "avant garde", "modern composition", "orchestral", "symphony", "minimalism"].map(normGenre));
+var CLASSICAL_NAMES = new Set(
+  [...DEFAULT_CLASSICAL_GENRES, "classical period", "early romantic", "late romantic"].map(normGenre).filter((genre) => !AMBIGUOUS_NAMES.has(genre))
+);
+var CLASSICAL_WORD2 = /(^|\s)classical(\s|$)/;
+var SOUNDTRACK_ALBUM = new RegExp("(?<!\\p{L})(?:(?:original\\s+)?(?:motion\\s+picture|film|movie|television|tv|series|game|video\\s+game)\\s+(?:soundtrack|score)|original\\s+(?:soundtrack|score)|music\\s+from\\s+(?:and\\s+inspired\\s+by\\s+)?the\\s+(?:motion\\s+picture|film|movie|series)|soundtrack|o\\.?s\\.?t\\.?)(?!\\p{L})", "iu");
+function genreKinds(genres = []) {
+  const kinds2 = { classical: [], ambiguous: [], ordinary: [], context: [] };
+  for (const raw of genres) {
+    const genre = normGenre(raw);
+    if (!genre) continue;
+    if (ORDINARY.test(genre)) kinds2.ordinary.push(raw);
+    else if (CONTEXT.test(genre)) kinds2.context.push(raw);
+    else if (CLASSICAL_NAMES.has(genre) || CLASSICAL_WORD2.test(genre)) kinds2.classical.push(raw);
+    else if (AMBIGUOUS_NAMES.has(genre)) kinds2.ambiguous.push(raw);
+  }
+  return kinds2;
+}
+var TEMPO = /\b(allegr(?:o|etto)|adagi(?:o|etto)|andant(?:e|ino)|larghetto|largo|lento|grave|prestissimo|presto|vivace|moderato|scherzo|menuetto|minuet|menuet|rondo|finale|maestoso|sostenuto|cantabile)\b/i;
+var NUMBERED_TEMPO = new RegExp(`(?:^|[:;\\-\u2013\u2014]\\s*)[IVXL]{1,6}\\.\\s*${TEMPO.source.replace(/^\\b/, "")}`, "i");
+var CATALOGUE_NUMBER = /\b(op(?:us)?\.?|bwv|buxwv|swv|wwv|kv?\.?|d\.|hob\.?|rv|woo|hwv|sz\.?|twv|trv)\s*\d|,\s*(?:L\.|M\.|S\.|FP)\s*\d/i;
+var FORM = /\b(symphon(?:y|ie)|sinfonia|sonata|concerto|suite|partita|string quartet|piano trio|quintet|nocturne|mazurka|polonaise|etude|prelude|fugue|toccata|cantata|oratorio|requiem|mass in|missa|motet|madrigal|lieder|impromptu|ballade|rhapsody|overture)(?:s|es)?\b/i;
+var NAME_WORD = "\\p{Lu}[\\p{L}'\u2019.\\-]+";
+var COMPOSER_ALBUM = new RegExp(`^(?!The\\s)${NAME_WORD}(?:\\s+(?:van|von|de|da|di|du|del|der|le|la|${NAME_WORD})){0,3}:\\s`, "u");
+var RELEASE_SUFFIX = /^\s*(?:[([]\s*[^)\]]*?|[-–—]\s*(?:\d{4}\s+)?)?\b(?:live|remaster(?:ed)?|version|mix|remix|edit|demo|acoustic|mono|stereo|single|radio|bonus|take|session|unplugged|reprise|mtv|bbc)\b/i;
+function releaseOf(work, title) {
+  const words5 = plain2(work).split(" ").filter(Boolean);
+  if (!words5.length) return false;
+  const text5 = String(title || "").normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "");
+  const start = new RegExp(`^[^\\p{L}\\p{N}]*${words5.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("[^\\p{L}\\p{N}]+")}(?![\\p{L}\\p{N}])`, "iu");
+  const head = text5.match(start);
+  return Boolean(head) && RELEASE_SUFFIX.test(text5.slice(head[0].length));
+}
+var plain2 = (value) => String(value || "").normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+var clean3 = (value) => String(value || "").normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "");
+var STRONG = /* @__PURE__ */ new Set(["classical genre", "catalogue number", "movement tag", "classical composer relation"]);
+function classificationEvidence(hints = {}) {
+  const title = clean3(hints.title);
+  const work = clean3(hints.work);
+  const album = clean3(hints.album);
+  const ownText = [title, work].filter(Boolean).join(" \n ");
+  const kinds2 = genreKinds(hints.genres);
+  const soundtrackAlbum = album.match(SOUNDTRACK_ALBUM)?.[0];
+  if (soundtrackAlbum && !kinds2.context.length) kinds2.context.push(`album: ${soundtrackAlbum}`);
+  const signals = [];
+  const add = (points, signal, value) => signals.push({ points, signal, kind: STRONG.has(signal) ? "strong" : "supporting", ...value != null && { value: String(value) } });
+  if (kinds2.classical.length) add(4, "classical genre", kinds2.classical.join("; "));
+  else if (kinds2.ambiguous.length) add(2, "ambiguous classical genre", kinds2.ambiguous.join("; "));
+  if (hints.movement) add(4, "movement tag", hints.movement);
+  if (hints.classicalComposerRelation) add(4, "classical composer relation");
+  const catalogue = hints.catalogueNumber || (ownText + " \n " + album).match(CATALOGUE_NUMBER)?.[0];
+  if (catalogue) add(3, "catalogue number", catalogue);
+  if (work && plain2(work) !== plain2(title) && !releaseOf(work, title)) add(3, "WORK tag", hints.work);
+  const tempo = ownText.match(TEMPO)?.[0];
+  if (!hints.movement && tempo) add(2, "tempo word in title", tempo);
+  const numbered = !hints.movement && ownText.match(NUMBERED_TEMPO)?.[0];
+  if (numbered) add(2, "numbered movement", numbered.replace(/^[:;\-–—]\s*/, ""));
+  const form = ownText.match(FORM)?.[0];
+  if (form) add(2, "form word in title", form);
+  else {
+    const albumForm = album.match(FORM)?.[0] || album.match(TEMPO)?.[0];
+    if (albumForm) add(1, "form word in album title", albumForm);
+  }
+  const albumComposer = album.trim().match(COMPOSER_ALBUM)?.[0];
+  if (albumComposer) add(2, "album named after a composer", albumComposer.replace(/:\s*$/, ""));
+  if (hints.composerDistinct) add(1, "composer differs from artist", (hints.composer || []).join("; "));
+  const credit = artistCredits(hints);
+  if (credit?.confidence === "high") add(2, "composer named in artist field", `${credit.composers.join("; ")} (${credit.evidence.join(", ")})`);
+  else if (credit) add(1, "possible composer in artist field", credit.composers.join("; "));
+  const score = signals.reduce((sum, s) => sum + s.points, 0);
+  const strong = signals.filter((s) => s.kind === "strong");
+  const verified2 = strong.filter((s) => s.signal !== "classical genre");
+  const supporting = signals.filter((s) => s.kind === "supporting" && s.points > 1);
+  const hasComposer = Array.isArray(hints.composer) && hints.composer.length > 0 || !!credit;
+  const credited = !!hints.composerDistinct || credit?.confidence === "high";
+  let decision;
+  let reason;
+  if (kinds2.ordinary.length) {
+    if (strong.length) {
+      decision = "unsure";
+      reason = `${kinds2.ordinary.join("; ")} genre conflicts with ${strong.map((s) => s.signal).join(", ")}`;
+    } else {
+      decision = "not_classical";
+      reason = `${kinds2.ordinary.join("; ")} genre and no verifiable classical evidence`;
+    }
+  } else if (kinds2.context.length) {
+    const supportingNonGenre = supporting.length;
+    if (credited && (verified2.length || supportingNonGenre >= 2) && score - (kinds2.classical.length ? 4 : 0) >= 4) {
+      decision = "classical";
+      reason = `verified classical work in a ${kinds2.context.join("; ")} release`;
+    } else if (!verified2.length && !credited && hasComposer) {
+      decision = "not_classical";
+      reason = `${kinds2.context.join("; ")}: nothing verifiably classical, credited to its own composer`;
+    } else if (credited || score > 1) {
+      decision = "unsure";
+      reason = `${kinds2.context.join("; ")} genre with some classical evidence`;
+    } else {
+      decision = "not_classical";
+      reason = `${kinds2.context.join("; ")} genre and no classical evidence`;
+    }
+  } else if (kinds2.classical.length) {
+    decision = "classical";
+    reason = "classical genre";
+  } else if (score >= 4 && (strong.length || supporting.length >= 2)) {
+    decision = "classical";
+    reason = "corroborated classical evidence";
+  } else if (score > 0 || hasComposer) {
+    decision = "unsure";
+    reason = score > 0 ? "uncorroborated classical evidence" : "composer credit only";
+  } else {
+    decision = "not_classical";
+    reason = "no classical evidence";
+  }
+  return { signals, score, kinds: kinds2, decision, reason };
+}
+function albumMajority(tracks) {
+  const classical = tracks.filter((track) => track.state === "classical").length;
+  if (!classical || classical === tracks.length || classical * 3 < tracks.length * 2) return false;
+  return tracks.every((track) => {
+    const { kinds: kinds2 } = classificationEvidence(track.hints || {});
+    return !kinds2.ordinary.length && !kinds2.context.length;
+  });
+}
+
+// src/model/reconcile.js
+var sameAudio = (a, b) => a.size != null && a.size === b.size && a.durationMs != null && a.durationMs === b.durationMs;
+var sameDuration = (a, b) => a.durationMs != null && a.durationMs === b.durationMs;
+function match(previous, candidate) {
+  const old = JSON.parse(previous.evidence);
+  const decisive = old.fingerprint && candidate.fingerprint && !tagSensitive(old.fingerprint) && !tagSensitive(candidate.fingerprint);
+  if (decisive && old.fingerprint !== candidate.fingerprint || old.durationMs != null && candidate.durationMs != null && old.durationMs !== candidate.durationMs)
+    return false;
+  if (old.fingerprint && old.fingerprint === candidate.fingerprint) return true;
+  if (old.stableFileId && old.stableFileId === candidate.stableFileId && sameAudio(old, candidate))
+    return true;
+  if (sameRetaggedFile(old, previous.file_id, candidate)) return true;
+  return previous.core_id === candidate.coreId && previous.file_id === candidate.fileId && old.path === candidate.path && sameDuration(old, candidate);
+}
+function reconcile(catalogue, snapshot) {
+  if (snapshot?.version !== 1 || snapshot.complete !== true || !snapshot.instanceId || !snapshot.epoch || !Number.isSafeInteger(snapshot.generation) || snapshot.generation < 1 || !Array.isArray(snapshot.tracks))
+    throw new Error(
+      "A complete, versioned installation/epoch snapshot is required"
+    );
+  const tracks = snapshot.tracks;
+  const keys = /* @__PURE__ */ new Set();
+  for (const item of tracks) {
+    if (typeof item.coreId !== "string" || !item.coreId || typeof item.fileId !== "string" || !item.fileId || typeof item.path !== "string" || !item.path || !Number.isSafeInteger(item.size) || item.size < 0 || !Number.isSafeInteger(item.durationMs) || item.durationMs <= 0 || item.fingerprint != null && typeof item.fingerprint !== "string" || item.stableFileId != null && typeof item.stableFileId !== "string")
+      throw new Error("Invalid track evidence");
+    const key = json([item.coreId, item.fileId]);
+    if (keys.has(key))
+      throw new Error("Duplicate snapshot track/file identity");
+    keys.add(key);
+  }
+  return transaction(catalogue.db, () => {
+    const db = catalogue.db;
+    const instance = db.prepare("SELECT * FROM core_instance WHERE id=?").get(snapshot.instanceId);
+    if (instance && snapshot.generation <= instance.generation)
+      throw new Error("Stale or repeated scan generation");
+    const changedEpoch = instance && instance.epoch !== snapshot.epoch;
+    db.prepare(
+      `INSERT INTO core_instance VALUES (?,?,?) ON CONFLICT(id) DO UPDATE SET epoch=excluded.epoch,generation=excluded.generation`
+    ).run(snapshot.instanceId, snapshot.epoch, snapshot.generation);
+    const repair = changedEpoch ? { resolved: /* @__PURE__ */ new Set(), blocked: /* @__PURE__ */ new Set() } : repairRetaggedLinks(catalogue, snapshot);
+    const previous = db.prepare("SELECT * FROM track_link WHERE instance_id=?").all(snapshot.instanceId);
+    const index = /* @__PURE__ */ new Map();
+    for (const item of tracks) {
+      for (const key of [
+        json(["core", item.coreId, item.fileId]),
+        json(["file", item.fileId, item.path]),
+        ...item.fingerprint ? [json(["hash", item.fingerprint])] : [],
+        ...item.stableFileId ? [json(["stable", item.stableFileId])] : []
+      ]) {
+        if (!index.has(key)) index.set(key, []);
+        index.get(key).push(item);
+      }
+    }
+    const candidates2 = previous.map((old) => {
+      const evidence = JSON.parse(old.evidence);
+      const pool = /* @__PURE__ */ new Set([
+        ...index.get(json(["core", old.core_id, old.file_id])) || [],
+        ...index.get(json(["file", old.file_id, evidence.path])) || [],
+        ...index.get(json(["hash", evidence.fingerprint])) || [],
+        ...index.get(json(["stable", evidence.stableFileId])) || []
+      ]);
+      const exact = [...pool].find(
+        (item) => item.coreId === old.core_id && item.fileId === old.file_id && item.path === evidence.path && match(old, item)
+      );
+      const sameFile = [...pool].filter((item) => item.fileId === old.file_id && item.path === evidence.path && match(old, item));
+      return {
+        old,
+        exact: changedEpoch ? null : exact,
+        sameFile: !changedEpoch && sameFile.length === 1 ? sameFile[0] : null,
+        items: changedEpoch ? [] : exact ? [exact] : [...pool].filter((item) => match(old, item))
+      };
+    });
+    const claimed = /* @__PURE__ */ new Set(), owners = /* @__PURE__ */ new Set();
+    for (const key of ["exact", "sameFile"]) {
+      const demand2 = /* @__PURE__ */ new Map();
+      for (const c of candidates2)
+        if (!owners.has(c) && c[key] && !claimed.has(c[key])) demand2.set(c[key], (demand2.get(c[key]) || 0) + 1);
+      for (const c of candidates2)
+        if (!owners.has(c) && c[key] && !claimed.has(c[key]) && demand2.get(c[key]) === 1) {
+          c.items = [c[key]];
+          claimed.add(c[key]);
+          owners.add(c);
+        }
+    }
+    const exactClaims = new Set(claimed);
+    for (const c of candidates2)
+      if (!owners.has(c))
+        c.items = c.items.filter((item) => !claimed.has(item));
+    const demand = /* @__PURE__ */ new Map();
+    for (const c of candidates2)
+      for (const item of c.items) demand.set(item, (demand.get(item) || 0) + 1);
+    const rows = [], now = Date.now();
+    db.prepare("UPDATE track_link SET state='missing' WHERE instance_id=?").run(
+      snapshot.instanceId
+    );
+    for (const { old, items } of candidates2) {
+      if (items.length === 1 && demand.get(items[0]) === 1) {
+        const item = items[0];
+        claimed.add(item);
+        if (repair.resolved.has(old.id)) db.prepare("UPDATE review_item SET status='resolved' WHERE kind='track_link' AND target_id=? AND status='open'").run(old.id);
+        if (old.state === "active" && old.core_id === item.coreId && old.file_id === item.fileId && withoutCtime(old.evidence) === withoutCtime(json(item))) {
+          db.prepare("UPDATE track_link SET state='active',evidence=? WHERE id=?").run(json(item), old.id);
+          rows.push({ ...item, id: old.id });
+          continue;
+        }
+        db.prepare(
+          "UPDATE track_link SET core_id=?,file_id=?,state='active',evidence=?,revision=revision+1,updated_at=? WHERE id=?"
+        ).run(item.coreId, item.fileId, json(item), now, old.id);
+        db.prepare(
+          "INSERT INTO track_evidence(track_link_id,generation,evidence,observed_at) VALUES (?,?,?,?)"
+        ).run(old.id, snapshot.generation, json(item), now);
+        catalogue.audit("track.reconcile", old.id, {
+          previous: JSON.parse(old.evidence),
+          next: item,
+          generation: snapshot.generation
+        });
+        rows.push({ ...item, id: old.id });
+      } else {
+        const reused = tracks.filter(
+          (t) => !exactClaims.has(t) && (t.coreId === old.core_id || t.path === JSON.parse(old.evidence).path)
+        );
+        if (repair.blocked.has(old.id) && !items.length && !reused.length) {
+          db.prepare("UPDATE track_link SET state='review' WHERE id=?").run(old.id);
+          continue;
+        }
+        if (changedEpoch || items.length || reused.length) {
+          db.prepare(
+            "UPDATE track_link SET state='review',updated_at=? WHERE id=?"
+          ).run(now, old.id);
+          catalogue.review("track_link", old.id, {
+            epochChanged: !!changedEpoch,
+            candidates: items,
+            reused
+          });
+        }
+      }
+    }
+    for (const item of tracks.filter((t) => !claimed.has(t))) {
+      if (demand.has(item)) continue;
+      const id = randomUUID5();
+      db.prepare(
+        "INSERT INTO track_link VALUES (?,?,?,?,'active',?,1,?,?)"
+      ).run(
+        id,
+        snapshot.instanceId,
+        item.coreId,
+        item.fileId,
+        json(item),
+        now,
+        now
+      );
+      db.prepare(
+        "INSERT INTO metadata_target(id,track_link_id) VALUES (?,?)"
+      ).run(id, id);
+      db.prepare(
+        "INSERT INTO track_evidence(track_link_id,generation,evidence,observed_at) VALUES (?,?,?,?)"
+      ).run(id, snapshot.generation, json(item), now);
+      catalogue.audit("track.create", id, { generation: snapshot.generation });
+      rows.push({ ...item, id });
+    }
+    return rows;
+  });
+}
+function withoutCtime(evidence) {
+  const { ctimeMs, ino, ...rest } = JSON.parse(evidence);
+  return JSON.stringify(rest);
+}
+function classify(catalogue, target, hints, { manual = null, actor: actor2 = null, inherited = null } = {}) {
+  return transaction(catalogue.db, () => {
+    const prior = catalogue.db.prepare("SELECT * FROM classification WHERE target_id=?").get(target);
+    if (!manual && prior?.pinned) return prior.state;
+    if (inherited && !["classical", "not_classical", "unsure"].includes(inherited))
+      throw new Error("Invalid inherited classification");
+    if (manual && (!actor2 || !["classical", "not_classical", "unsure"].includes(manual)))
+      throw new Error("Invalid classification override");
+    const { score, decision, reason } = classificationEvidence(hints);
+    const state = manual || inherited || decision;
+    const ask = state === "unsure" && (manual || inherited || reason !== "composer credit only");
+    catalogue.db.prepare(
+      `INSERT INTO classification VALUES (?,?,?,?,?,1,?) ON CONFLICT(target_id)
+      DO UPDATE SET state=excluded.state,pinned=excluded.pinned,score=excluded.score,evidence=excluded.evidence,updated_at=excluded.updated_at`
+    ).run(target, state, manual ? 1 : 0, score, json(hints), Date.now());
+    if (ask)
+      catalogue.review("classification", target, { hints, score });
+    else
+      catalogue.db.prepare(
+        "UPDATE review_item SET status='resolved' WHERE kind='classification' AND target_id=? AND status='open'"
+      ).run(target);
+    if (manual) catalogue.audit("classification.pin", target, { state }, actor2);
+    return state;
+  });
+}
+function liftAlbumMajority(catalogue, tracks) {
+  if (!albumMajority(tracks)) return tracks.map((track) => track.state);
+  return tracks.map(
+    (track) => track.state === "classical" ? track.state : classify(catalogue, track.id, { ...track.hints, inheritedFrom: "album majority" }, { inherited: "classical" })
+  );
+}
+
+// src/user-operations.js
+var UserOperations = class {
+  constructor(api, fetchImpl = fetch) {
+    if (api?.version !== 1 || !api.url || !api.token)
+      throw new Error("Local comparison requires the fork's user-operations v1 capability. Update the host; no playlist was changed.");
+    this.api = api;
+    this.fetch = fetchImpl;
+  }
+  async request(method, route, body) {
+    const response = await this.fetch(`${this.api.url}${route}`, {
+      method,
+      headers: { "X-Action-Grant": this.api.token, "Content-Type": "application/json" },
+      ...body !== void 0 && { body: JSON.stringify(body) },
+      signal: AbortSignal.timeout(3e4)
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || `Action failed: ${response.status}`);
+    return data;
+  }
+  async library() {
+    const snapshot = await this.request("GET", "/library");
+    if (snapshot.version !== 1 || snapshot.complete !== true) throw new Error("Incomplete library snapshot; comparison cancelled");
+    return snapshot.library;
+  }
+  async playlist(key, name, tracks) {
+    const queued = await this.request("POST", "/playlists", {
+      key,
+      name,
+      tracks: tracks.map((t) => ({ path: t.path, artistName: t.artist || "Local", trackName: t.title || "Local track" }))
+    });
+    const until = Date.now() + 20 * 6e4;
+    while (Date.now() < until) {
+      const status = await this.request("GET", `/jobs/${queued.operationId}`);
+      if (status.state === "done") return queued.playlistId;
+      if (["failed", "cancelled"].includes(status.state)) throw new Error(status.error || "Playlist operation failed");
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+    throw new Error(`Playlist operation ${queued.operationId} is still pending; completion was not confirmed`);
+  }
+};
+
+// src/tags.js
+var import_node_taglib_sharp = __toESM(require_dist(), 1);
+import { randomUUID as randomUUID6 } from "node:crypto";
+import { closeSync, fstatSync, openSync, readSync } from "node:fs";
+import fs3 from "node:fs/promises";
+import path3 from "node:path";
+import_node_taglib_sharp.Id3v2Settings.useNumericGenres = false;
+var READ_STYLE = import_node_taglib_sharp.ReadStyle.None | import_node_taglib_sharp.ReadStyle.PictureLazy;
+var READ_WITH_PROPERTIES = import_node_taglib_sharp.ReadStyle.Average | import_node_taglib_sharp.ReadStyle.PictureLazy;
+var ADDED_TAG_TYPES = import_node_taglib_sharp.TagTypes.Id3v1 | import_node_taglib_sharp.TagTypes.Ape | import_node_taglib_sharp.TagTypes.MovieId | import_node_taglib_sharp.TagTypes.DivX;
+var ITUNES_MEAN = "com.apple.iTunes";
+var MUSICBRAINZ_UFID_OWNER = "http://musicbrainz.org";
+var AUDIO_EXTENSIONS = /* @__PURE__ */ new Set([".flac", ".mp3", ".m4a", ".mp4", ".ogg", ".oga", ".opus"]);
+var isAudioPath = (file) => AUDIO_EXTENSIONS.has(path3.extname(file).toLowerCase());
+var text4 = (value) => value == null ? "" : String(value).trim();
+var texts = (value) => (Array.isArray(value) ? value : [value]).map(text4).filter(Boolean);
+var positive2 = (value) => {
+  const number = Number(value);
+  return Number.isSafeInteger(number) && number > 0 ? number : 0;
+};
+var xiphOf = (file) => file.getTag(import_node_taglib_sharp.TagTypes.Xiph, false);
+var id3Of = (file) => file.getTag(import_node_taglib_sharp.TagTypes.Id3v2, false);
+var appleOf = (file) => file.getTag(import_node_taglib_sharp.TagTypes.Apple, false);
+function userTextFrames(id3, description) {
+  const wanted = description.toLowerCase();
+  return id3.getFramesByClassType(import_node_taglib_sharp.Id3v2FrameClassType.UserTextInformationFrame).filter((frame) => frame.description.toLowerCase() === wanted);
+}
+function textField(xiphName, id3Description, apple) {
+  const box = apple.box ? import_node_taglib_sharp.ByteVector.fromString(apple.box, import_node_taglib_sharp.StringType.Latin1) : null;
+  return {
+    read(file) {
+      const xiph = xiphOf(file);
+      const id3 = id3Of(file);
+      const appleTag = appleOf(file);
+      for (const values of [
+        xiph?.getField(xiphName),
+        id3 && userTextFrames(id3, id3Description).flatMap((frame) => frame.text || []),
+        appleTag && (box ? appleTag.getQuickTimeStrings(box) : appleTag.getItunesStrings(ITUNES_MEAN, apple.name))
+      ]) {
+        const found = texts(values ?? []);
+        if (found.length) return found;
+      }
+      return [];
+    },
+    write(file, values) {
+      const xiph = xiphOf(file);
+      if (xiph) xiph.setFieldAsStrings(xiphName, ...values);
+      const appleTag = appleOf(file);
+      if (appleTag) {
+        if (box) appleTag.setQuickTimeStrings(box, values);
+        else appleTag.setItunesStrings(ITUNES_MEAN, apple.name, ...values);
+      }
+      const id3 = id3Of(file);
+      if (id3) {
+        for (const frame of userTextFrames(id3, id3Description)) id3.removeFrame(frame);
+        if (values.length) {
+          const frame = import_node_taglib_sharp.Id3v2UserTextInformationFrame.fromDescription(id3Description);
+          frame.text = values;
+          id3.addFrame(frame);
+        }
+      }
+    }
+  };
+}
+var workField = textField("WORK", "WORK", { box: "\xA9wrk" });
+var workIdField = textField("MUSICBRAINZ_WORKID", "MusicBrainz Work Id", { name: "MusicBrainz Work Id" });
+var artistIdsField = textField("MUSICBRAINZ_ARTISTID", "MusicBrainz Artist Id", { name: "MusicBrainz Artist Id" });
+var albumArtistIdsField = textField("MUSICBRAINZ_ALBUMARTISTID", "MusicBrainz Album Artist Id", { name: "MusicBrainz Album Artist Id" });
+var movementNameField = textField("MOVEMENTNAME", "MOVEMENTNAME", { name: "MOVEMENTNAME" });
+var movementNumberField = textField("MOVEMENT", "MOVEMENT", { name: "MOVEMENT" });
+var movementTotalField = textField("MOVEMENTTOTAL", "MOVEMENTTOTAL", { name: "MOVEMENTTOTAL" });
+var catalogueField = textField("CLASSICAL_CATALOGUE", "CLASSICAL_CATALOGUE", { name: "CLASSICAL_CATALOGUE" });
+var performersField = {
+  read: (file) => texts(xiphOf(file)?.getField("PERFORMER") ?? []),
+  write(file, values) {
+    xiphOf(file)?.setFieldAsStrings("PERFORMER", ...values);
+  }
+};
+var WRITERS = {
+  title: {
+    read: (file) => texts(file.tag.title),
+    write: (file, values) => file.tag.title = values[0] ?? void 0
+  },
+  artist: {
+    read: (file) => texts(file.tag.performers),
+    write: (file, values) => file.tag.performers = values
+  },
+  albumArtist: {
+    read: (file) => texts(file.tag.albumArtists),
+    write: (file, values) => file.tag.albumArtists = values
+  },
+  composer: {
+    read: (file) => texts(file.tag.composers),
+    write: (file, values) => file.tag.composers = values
+  },
+  composerSort: {
+    read: (file) => texts(file.tag.composersSort),
+    write: (file, values) => file.tag.composersSort = values
+  },
+  conductor: {
+    read: (file) => texts(file.tag.conductor),
+    write: (file, values) => file.tag.conductor = values[0] ?? void 0
+  },
+  performers: performersField,
+  movementName: movementNameField,
+  movementNumber: movementNumberField,
+  movementTotal: movementTotalField,
+  catalogue: catalogueField,
+  work: { read: (file) => workField.read(file), write: (file, values) => workField.write(file, values) },
+  workId: { read: (file) => workIdField.read(file), write: (file, values) => workIdField.write(file, values) },
+  recordingMbid: {
+    read: (file) => texts(file.tag.musicBrainzTrackId),
+    write: (file, values) => {
+      const id3 = id3Of(file);
+      for (const frame of id3?.getFramesByClassType(import_node_taglib_sharp.Id3v2FrameClassType.UniqueFileIdentifierFrame) || []) {
+        if (frame.owner === MUSICBRAINZ_UFID_OWNER) id3.removeFrame(frame);
+      }
+      file.tag.musicBrainzTrackId = values[0] ?? void 0;
+    }
+  }
+};
+var CLASSICAL_FIELDS = ["composer", "composerSort", "work", "movementName", "movementNumber", "movementTotal", "performers", "conductor", "catalogue", "workId"];
+var NOT_ID3 = /* @__PURE__ */ new Set(["movementName", "movementNumber", "movementTotal", "performers"]);
+var FORMAT_FIELDS = {
+  ".flac": CLASSICAL_FIELDS,
+  ".mp3": CLASSICAL_FIELDS.filter((field) => !NOT_ID3.has(field))
+};
+function isFragmentedMp4(filePath) {
+  const fd = openSync(filePath, "r");
+  try {
+    const size = fstatSync(fd).size;
+    const header = Buffer.alloc(16);
+    for (let offset = 0; offset + 8 <= size; ) {
+      readSync(fd, header, 0, 16, offset);
+      const type = header.toString("latin1", 4, 8);
+      if (offset === 0 && type !== "ftyp") return false;
+      if (type === "moof") return true;
+      const boxSize = header.readUInt32BE(0);
+      const length = boxSize === 1 ? Number(header.readBigUInt64BE(8)) : boxSize === 0 ? size - offset : boxSize;
+      if (length < 8) return false;
+      offset += length;
+    }
+    return false;
+  } finally {
+    closeSync(fd);
+  }
+}
+var UnsupportedFormat = class extends Error {
+};
+function openFile(filePath, readStyle = READ_STYLE, asPath = filePath) {
+  if (!isAudioPath(asPath)) throw new UnsupportedFormat(`can't tag ${path3.extname(asPath) || "this kind of"} files`);
+  if (isFragmentedMp4(filePath)) throw new UnsupportedFormat("can't tag fragmented MP4 files");
+  try {
+    return import_node_taglib_sharp.File.createFromPath(filePath, `taglib/${path3.extname(asPath).slice(1).toLowerCase()}`, readStyle);
+  } catch (error) {
+    if (/unsupported format/i.test(String(error?.message))) throw new UnsupportedFormat("can't tag this kind of file");
+    throw error;
+  }
+}
+function readValues(filePath, fields) {
+  const file = openFile(filePath);
+  try {
+    return Object.fromEntries(fields.map((field) => [field, WRITERS[field].read(file)]));
+  } finally {
+    file.dispose();
+  }
+}
+function readTags(filePath) {
+  const file = openFile(filePath, READ_WITH_PROPERTIES);
+  try {
+    const tag = file.tag;
+    return {
+      title: text4(tag.title),
+      artist: text4(tag.performers?.[0]),
+      albumArtist: text4(tag.albumArtists?.[0]),
+      album: text4(tag.album),
+      recordingMbid: text4(tag.musicBrainzTrackId),
+      releaseMbid: text4(tag.musicBrainzReleaseId),
+      releaseGroupMbid: text4(tag.musicBrainzReleaseGroupId),
+      // Every album artist ID: taglib's own property has only the first.
+      albumArtistMbids: [...new Set([...albumArtistIdsField.read(file), text4(tag.musicBrainzReleaseArtistId)].flatMap((v) => texts(v.split(/[;/]/))))],
+      artistMbids: artistIdsField.read(file).flatMap((value) => texts(value.split(/[;/]/))),
+      conductor: text4(tag.conductor),
+      // Vorbis PERFORMER, one value a performer, often with the instrument
+      // in brackets: "Martha Argerich (piano)".
+      performers: texts(xiphOf(file)?.getField("PERFORMER") ?? []),
+      genres: texts(tag.genres ?? []).flatMap((genre) => texts(genre.split(";"))),
+      composer: texts(tag.composers ?? []),
+      work: workField.read(file)[0] ?? "",
+      // Some taggers put the work here and leave WORK empty.
+      grouping: text4(tag.grouping),
+      workId: workIdField.read(file)[0] ?? "",
+      trackNumber: positive2(tag.track),
+      discNumber: positive2(tag.disc),
+      durationMs: Math.round(file.properties?.durationMilliseconds || 0),
+      year: Number.isSafeInteger(tag.year) && tag.year > 0 ? tag.year : null,
+      label: text4(tag.publisher)
+    };
+  } finally {
+    file.dispose();
+  }
+}
+var same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+async function writeTags(filePath, values) {
+  const source = path3.resolve(filePath);
+  const preview = openFile(source);
+  let changed;
+  try {
+    changed = Object.keys(values).filter((field) => !same(WRITERS[field].read(preview), texts(values[field])));
+  } finally {
+    preview.dispose();
+  }
+  if (!changed.length) return [];
+  const extension = path3.extname(source);
+  const working = path3.join(path3.dirname(source), `.${path3.basename(source, extension)}.${randomUUID6()}.tagging`);
+  await fs3.copyFile(source, working, fs3.constants.COPYFILE_FICLONE);
+  try {
+    const file = openFile(working, READ_STYLE, source);
+    try {
+      file.removeTags(ADDED_TAG_TYPES & ~file.tagTypesOnDisk);
+      const id3 = id3Of(file);
+      if (id3 && !(file.tagTypesOnDisk & import_node_taglib_sharp.TagTypes.Id3v2)) id3.version = 4;
+      for (const field of changed) WRITERS[field].write(file, texts(values[field]));
+      file.save();
+    } finally {
+      file.dispose();
+    }
+    const verified2 = openFile(working, READ_STYLE, source);
+    try {
+      for (const field of changed) {
+        if (!same(WRITERS[field].read(verified2), texts(values[field])))
+          throw new Error(`Tag verification failed for ${field}`);
+      }
+    } finally {
+      verified2.dispose();
+    }
+    await fs3.rename(working, source);
+  } catch (error) {
+    await fs3.rm(working, { force: true }).catch(() => {
+    });
+    throw error;
+  }
+  return changed;
+}
+
+// src/model/runtime.js
+function englishTitle(work, fallback = work.title) {
+  return ClassicalResolver.bestEnglishAlias(work.aliases)?.name ?? fallback;
+}
+var modelFolder = (ctx) => path4.join(ctx.dataFolder, "model");
+var emptyTags = () => ({
+  title: "",
+  artist: "",
+  albumArtist: "",
+  album: "",
+  recordingMbid: "",
+  releaseMbid: "",
+  releaseGroupMbid: "",
+  albumArtistMbids: [],
+  artistMbids: [],
+  conductor: "",
+  performers: [],
+  genres: [],
+  composer: [],
+  work: "",
+  grouping: "",
+  workId: "",
+  trackNumber: 0,
+  discNumber: 0,
+  durationMs: 0
+});
+var readModelTags = (file) => {
+  try {
+    return readTags(file);
+  } catch {
+    return null;
+  }
+};
+var sameAudio2 = (prior, hash) => prior.fingerprint === hash || tagSensitive(prior.fingerprint) && tagSensitive(hash);
+async function modelStatus(ctx) {
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  try {
+    return {
+      ...catalogue.diagnostics(),
+      scan: catalogue.db.prepare(
+        `SELECT id,state,CASE WHEN state IN ('retry','failed') THEN error ELSE NULL END AS error,
+          coalesce(json_extract(input,'$.total'),json_array_length(input,'$.files')) AS total,
+          coalesce(json_extract(progress,'$.cursor'),0) AS processed,
+          coalesce(json_extract(progress,'$.errorCount'),0) AS skipped,
+          lease_until AS leaseUntil
+          FROM model_job WHERE type='library_scan' ORDER BY created_at DESC,rowid DESC LIMIT 1`
+      ).get() || null,
+      now: Date.now(),
+      jobs: catalogue.db.prepare(
+        `SELECT state,count(*) AS count FROM model_job WHERE type NOT IN ('scan_chunk','album_identify_baseline')
+           AND NOT (type='album_identify' AND json_extract(progress,'$.baseline')=1) GROUP BY state`
+      ).all(),
+      identification: identificationStatus(catalogue)
+    };
+  } finally {
+    catalogue.close();
+  }
+}
+var PLUGIN_ID = "aurral-classical";
+var SYNC_INTERVAL_MS = 6 * 60 * 6e4;
+var syncFlag = (ctx) => path4.join(modelFolder(ctx), "sync-requested");
+async function hostLibrary(ctx) {
+  if (ctx.userOperations)
+    return new UserOperations(ctx.userOperations, ctx.fetch).library();
+  if (ctx.api?.url && ctx.api?.key) {
+    const response = await (ctx.fetch || fetch)(
+      `${ctx.api.url}/plugins/${PLUGIN_ID}/user-operations/library`,
+      {
+        headers: { "X-Api-Key": ctx.api.key },
+        signal: AbortSignal.timeout(6e4)
+      }
+    );
+    const data = await response.json();
+    if (!response.ok)
+      throw new Error(data.error || `Library snapshot failed: ${response.status}`);
+    if (data.version !== 1 || data.complete !== true)
+      throw new Error("Incomplete library snapshot; scan cancelled");
+    return data.library;
+  }
+  throw new Error(
+    "Classical model scans require the host's user-operations capability or plugin API access"
+  );
+}
+var canReadHostLibrary = (ctx) => !!(ctx.userOperations || ctx.api?.url && ctx.api?.key);
+async function requestModelSync(ctx) {
+  await fs4.mkdir(modelFolder(ctx), { recursive: true });
+  await fs4.writeFile(syncFlag(ctx), `${Date.now()}:${randomUUID7()}`);
+}
+var readSyncFlag = (ctx) => fs4.readFile(syncFlag(ctx), "utf8").catch(() => null);
+async function clearSyncFlag(ctx, seen) {
+  if (seen != null && await readSyncFlag(ctx) === seen) await fs4.rm(syncFlag(ctx), { force: true });
+}
+async function modelSyncDue(ctx, { now = Date.now() } = {}) {
+  const requested = await fs4.access(syncFlag(ctx)).then(() => true, () => false);
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  try {
+    if (catalogue.db.prepare(
+      "SELECT 1 FROM model_job WHERE key='library_scan' AND state IN ('queued','running','retry')"
+    ).get())
+      return false;
+    const last2 = catalogue.db.prepare(
+      "SELECT max(created_at) AS at FROM model_job WHERE key='library_scan' AND state='done'"
+    ).get().at;
+    return requested || !last2 || now - last2 >= SYNC_INTERVAL_MS;
+  } finally {
+    catalogue.close();
+  }
+}
+async function enqueueModelScan(ctx, actor2, { system = false } = {}) {
+  if (!system && actor2?.role !== "admin")
+    throw new Error("Classical model scans require a current host admin");
+  if (!canReadHostLibrary(ctx))
+    throw new Error(
+      "Classical model scans require the host's user-operations capability or plugin API access"
+    );
+  const requested = await readSyncFlag(ctx);
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  try {
+    const pending = catalogue.db.prepare(
+      "SELECT id FROM model_job WHERE key='library_scan' AND state IN ('queued','running','retry') LIMIT 1"
+    ).get();
+    if (pending) return pending.id;
+    new ModelJobs(catalogue).compactFinished();
+    const latest = catalogue.db.prepare(
+      "SELECT id,state,created_at FROM model_job WHERE key='library_scan' ORDER BY created_at DESC,rowid DESC LIMIT 1"
+    ).get();
+    const requestedAt = Number(String(requested ?? "").split(":")[0]) || 0;
+    if (latest?.state === "failed" && !(requestedAt > latest.created_at)) {
+      catalogue.db.prepare(
+        `UPDATE model_job SET state='queued',owner=NULL,lease_until=0,attempt=0,
+          next_run_at=0,cancel_requested=0,error=NULL WHERE id=? AND state='failed'`
+      ).run(latest.id);
+      return latest.id;
+    }
+    const library = await hostLibrary(ctx);
+    let instance = catalogue.db.prepare("SELECT * FROM core_instance LIMIT 1").get();
+    if (!instance) {
+      const id2 = randomUUID7();
+      catalogue.db.prepare("INSERT INTO core_instance VALUES (?,?,0)").run(id2, ctx.settings.libraryEpoch || "initial");
+      instance = { id: id2, generation: 0 };
+    }
+    const albums = new Map(
+      (library.albums || []).map((album) => [String(album.id), album])
+    );
+    const files = library.tracks.flatMap(
+      (track) => track.files.filter((f) => f.available && f.source !== "flow").map((file) => {
+        const placement = (track.albums || []).find(
+          (album2) => String(album2.albumId ?? album2.id) === String(file.albumId)
+        );
+        const album = albums.get(String(file.albumId));
+        return {
+          coreId: String(track.id),
+          fileId: String(file.id ?? file.path),
+          path: file.path,
+          readPath: file.readPath || file.path,
+          durationMs: file.durationMs ?? track.durationMs,
+          albumId: file.albumId,
+          title: track.title || "",
+          artist: track.artistName || "",
+          recordingMbid: track.mbid || "",
+          album: album?.title || track.albumTitle || "",
+          trackNumber: file.trackNumber ?? placement?.trackNumber ?? 0,
+          discNumber: file.discNumber ?? placement?.discNumber ?? 0
+        };
+      })
+    );
+    const jobs = new ModelJobs(catalogue);
+    const id = jobs.enqueue("library_scan", "library_scan", {
+      actor: system ? "system" : String(actor2.id),
+      instanceId: instance.id,
+      epoch: ctx.settings.libraryEpoch || "initial",
+      generation: instance.generation + 1,
+      files
+    });
+    await clearSyncFlag(ctx, requested);
+    return id;
+  } finally {
+    catalogue.close();
+  }
+}
+var REUSED = Symbol("reused");
+async function scanFile(file, root, prior) {
+  const real = await fs4.realpath(file.readPath);
+  const relative = path4.relative(root, real);
+  if (!relative || relative === ".." || relative.startsWith(`..${path4.sep}`) || path4.isAbsolute(relative))
+    throw new Error("Indexed model file is outside the configured library");
+  const before = await fs4.stat(real);
+  const unchanged = prior?.fingerprint && prior.observedRealPath === real && prior.size === before.size && prior.mtimeMs === before.mtimeMs && (prior.ctimeMs != null ? prior.ctimeMs === before.ctimeMs : prior.ino === before.ino);
+  if (unchanged && prior.hints && !prior.hints.tagsUnreadable && prior.ctimeMs != null && ["title", "album", "artist", "albumId", "trackNumber", "discNumber", "recordingMbid"].every((key) => prior[key] === file[key]))
+    return { ...prior, ...file, ino: before.ino, durationMs: prior.durationMs, [REUSED]: true };
+  const hash = unchanged ? prior.fingerprint : await fingerprint(real);
+  const parsed = readModelTags(real);
+  const tags = parsed || emptyTags();
+  const after = await fs4.stat(real);
+  if (before.size !== after.size || before.mtimeMs !== after.mtimeMs || before.ino !== after.ino)
+    throw new Error("Library file changed during model scan; retry required");
+  const kept = !parsed && prior?.hints && sameAudio2(prior, hash) ? prior : null;
+  const durationMs = tags.durationMs || file.durationMs || kept?.durationMs;
+  if (!Number.isSafeInteger(durationMs) || durationMs <= 0)
+    throw new Error("Missing track duration");
+  if (kept)
+    return {
+      ...file,
+      observedRealPath: real,
+      size: after.size,
+      mtimeMs: after.mtimeMs,
+      ino: after.ino,
+      ctimeMs: after.ctimeMs,
+      durationMs,
+      fingerprint: hash,
+      hints: {
+        ...kept.hints,
+        title: kept.hints.title || file.title || "",
+        album: kept.hints.album || file.album || "",
+        artist: kept.hints.artist || file.artist || "",
+        tagsUnreadable: true
+      }
+    };
+  return {
+    ...file,
+    observedRealPath: real,
+    size: after.size,
+    mtimeMs: after.mtimeMs,
+    ino: after.ino,
+    ctimeMs: after.ctimeMs,
+    durationMs,
+    fingerprint: hash,
+    hints: {
+      title: tags.title || file.title || "",
+      album: tags.album || file.album || "",
+      artist: tags.artist || file.artist || "",
+      albumArtist: tags.albumArtist,
+      composer: tags.composer,
+      trackNumber: tags.trackNumber || file.trackNumber || 0,
+      discNumber: tags.discNumber || file.discNumber || 0,
+      genres: tags.genres,
+      work: tags.work,
+      // Only when set, so files without it keep their stored evidence.
+      ...tags.grouping && { grouping: tags.grouping },
+      ...tags.year && { year: tags.year },
+      ...tags.label && { label: tags.label },
+      ...tags.conductor && { conductor: tags.conductor },
+      ...tags.performers.length && { performers: tags.performers },
+      ...tags.artistMbids.length && { artistMbids: tags.artistMbids },
+      workId: tags.workId,
+      recordingMbid: tags.recordingMbid || file.recordingMbid || "",
+      composerDistinct: tags.composer.length > 0 && !tags.composer.includes(tags.artist)
+    }
+  };
+}
+var IDENTIFY = "album_identify";
+var RULES = "r3";
+var BASELINE_KEY = `album-identify-baseline:${RULES}`;
+function pendingIdentification(catalogue) {
+  const albums = /* @__PURE__ */ new Map();
+  for (const row of catalogue.db.prepare(
+    `SELECT t.id,CAST(json_extract(t.evidence,'$.albumId') AS TEXT) AS album,
+         json_extract(t.evidence,'$.hints.recordingMbid') AS recording,json_extract(t.evidence,'$.hints.workId') AS work
+       FROM track_link t JOIN classification c ON c.target_id=t.id AND c.state='classical'
+       WHERE t.state='active' AND json_extract(t.evidence,'$.albumId') IS NOT NULL
+       AND (coalesce(json_extract(t.evidence,'$.hints.recordingMbid'),'')!='' OR coalesce(json_extract(t.evidence,'$.hints.workId'),'')!='')
+       AND NOT EXISTS(SELECT 1 FROM segment s JOIN realization_item i ON i.segment_id=s.id WHERE s.track_link_id=t.id)
+       ORDER BY t.id`
+  ).all()) {
+    if (!albums.has(row.album)) albums.set(row.album, []);
+    albums.get(row.album).push(`${row.id}|${row.recording || ""}|${row.work || ""}`);
+  }
+  return [...albums].map(([albumId, tracks]) => ({
+    albumId,
+    tracks: tracks.length,
+    key: `${IDENTIFY}:${RULES}:${albumId}:${createHash3("sha256").update(tracks.join("\n")).digest("hex").slice(0, 32)}`
+  }));
+}
+var keyRan = (catalogue, key) => Boolean(catalogue.db.prepare("SELECT 1 FROM model_job WHERE key=? LIMIT 1").get(key));
+function markSeen(catalogue, album, progress) {
+  catalogue.db.prepare(
+    `INSERT INTO model_job(id,type,key,input,state,progress,max_attempts,created_at)
+       VALUES (?,?,?,?,'done',?,1,?)`
+  ).run(randomUUID7(), IDENTIFY, album.key, JSON.stringify({ albumId: album.albumId }), JSON.stringify(progress), Date.now());
+}
+function queueAlbumIdentification(catalogue, { now = Date.now() } = {}) {
+  return transaction(catalogue.db, () => {
+    const pending = pendingIdentification(catalogue);
+    if (!keyRan(catalogue, BASELINE_KEY)) {
+      for (const album of pending) if (!keyRan(catalogue, album.key)) markSeen(catalogue, album, { baseline: true, tracks: album.tracks });
+      catalogue.db.prepare(`INSERT INTO model_job(id,type,key,input,state,max_attempts,created_at) VALUES (?,?,?,'{}','done',1,?)`).run(randomUUID7(), `${IDENTIFY}_baseline`, BASELINE_KEY, now);
+      return 0;
+    }
+    const jobs = new ModelJobs(catalogue);
+    let queued = 0;
+    for (const album of pending)
+      if (!keyRan(catalogue, album.key)) {
+        jobs.enqueue(IDENTIFY, album.key, { albumId: album.albumId }, { maxAttempts: 5 });
+        queued++;
+      }
+    return queued;
+  });
+}
+async function identifyBacklog(ctx, actor2) {
+  if (actor2?.role !== "admin")
+    throw new Error("MusicBrainz identification requires a current host admin");
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  try {
+    return transaction(catalogue.db, () => {
+      const jobs = new ModelJobs(catalogue);
+      let queued = 0, tracks = 0;
+      for (const album of pendingIdentification(catalogue)) {
+        const prior = catalogue.db.prepare("SELECT json_extract(progress,'$.baseline') AS baseline FROM model_job WHERE key=? ORDER BY created_at DESC LIMIT 1").get(album.key);
+        if (prior && !prior.baseline) continue;
+        catalogue.db.prepare("DELETE FROM model_job WHERE key=? AND state='done' AND json_extract(progress,'$.baseline')=1").run(album.key);
+        jobs.enqueue(IDENTIFY, album.key, { albumId: album.albumId, backfill: true }, { maxAttempts: 5 });
+        catalogue.audit("work.identify_backlog", album.albumId, { tracks: album.tracks }, String(actor2.id));
+        queued++;
+        tracks += album.tracks;
+      }
+      return { albums: queued, tracks };
+    });
+  } finally {
+    catalogue.close();
+  }
+}
+async function queueAlbumMatch(ctx, actor2, albumId) {
+  if (actor2?.role !== "admin")
+    throw new Error("Automatic work matching requires a current host admin");
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  try {
+    const key = `${IDENTIFY}:${RULES}:manual:${albumId}:${randomUUID7()}`;
+    new ModelJobs(catalogue).enqueue(IDENTIFY, key, { albumId: String(albumId) }, { maxAttempts: 5 });
+    return key;
+  } finally {
+    catalogue.close();
+  }
+}
+async function albumMatchResult(ctx, key) {
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  try {
+    const row = catalogue.db.prepare("SELECT state,progress FROM model_job WHERE key=?").get(key);
+    return row ? { state: row.state, ...JSON.parse(row.progress || "{}") } : null;
+  } finally {
+    catalogue.close();
+  }
+}
+function identificationStatus(catalogue) {
+  const rows = catalogue.db.prepare(
+    `SELECT state,json_extract(progress,'$.baseline') AS baseline,count(*) AS albums,
+         coalesce(sum(json_extract(progress,'$.matched')),0) AS matched,coalesce(sum(json_extract(progress,'$.errors')),0) AS errors
+       FROM model_job WHERE type=? AND key LIKE ? GROUP BY state,baseline`
+  ).all(IDENTIFY, `${IDENTIFY}:${RULES}:%`);
+  const sum = (test, field = "albums") => rows.filter(test).reduce((total, row) => total + row[field], 0);
+  return {
+    queued: sum((row) => ["queued", "running", "retry"].includes(row.state)),
+    done: sum((row) => row.state === "done" && !row.baseline),
+    backlog: sum((row) => row.state === "done" && row.baseline),
+    failed: sum((row) => row.state === "failed"),
+    matched: sum(() => true, "matched"),
+    errors: sum(() => true, "errors")
+  };
+}
+async function englishWorkTitles(ctx, catalogue, albumId) {
+  const rows = catalogue.db.prepare(
+    `SELECT DISTINCT r.work_id AS work,x.record_id AS mbid FROM realization r
+       JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id
+       JOIN external_identity x ON x.entity_id=r.work_id AND x.provider='musicbrainz' AND x.record_kind='work' AND x.state='active'
+       WHERE CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?`
+  ).all(String(albumId));
+  const metadata = new Metadata(catalogue);
+  for (const { work, mbid } of rows) {
+    const current = catalogue.db.prepare("SELECT a.value,a.source FROM field_resolution f JOIN assertion a ON a.id=f.assertion_id JOIN metadata_target m ON m.id=f.target_id WHERE m.entity_id=? AND f.field='title'").get(work);
+    if (!current || current.source !== "derived") continue;
+    try {
+      const data = await ctx.mb.get("work", mbid, "aliases+artist-rels+work-rels");
+      const english = data && ClassicalResolver.bestEnglishAlias(data.aliases)?.name || headingFor(catalogue, work, albumId, JSON.parse(current.value));
+      if (english && english !== JSON.parse(current.value)) metadata.derived(work, "title", english);
+    } catch (error) {
+      ctx.log(`English work title skipped: ${error.message}`);
+    }
+  }
+}
+function headingFor(catalogue, work, albumId, title) {
+  const subject = catalogueSubject(title);
+  if (!subject) return null;
+  const counts = /* @__PURE__ */ new Map();
+  for (const { evidence } of catalogue.db.prepare(
+    `SELECT t.evidence FROM realization r JOIN realization_item i ON i.realization_id=r.id JOIN segment s ON s.id=i.segment_id
+       JOIN track_link t ON t.id=s.track_link_id WHERE r.work_id=?${albumId == null ? "" : " AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?"}`
+  ).all(work, ...albumId == null ? [] : [String(albumId)])) {
+    const hints = JSON.parse(evidence).hints || {};
+    const head = splitTitle(withoutComposer(hints.title, hints.composer)).head;
+    if (head && catalogueSubject(head) === subject) counts.set(head, (counts.get(head) || 0) + 1);
+  }
+  return [...counts].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+}
+var ENGLISH = "work_english";
+var ENGLISH_KEY = `${ENGLISH}:v3`;
+async function queueEnglishNames(ctx, actor2) {
+  if (actor2?.role !== "admin") throw new Error("English work names require a current host admin");
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  try {
+    const prior = catalogue.db.prepare("SELECT state,progress FROM model_job WHERE key=?").get(ENGLISH_KEY);
+    if (prior) return { queued: false, state: prior.state, ...JSON.parse(prior.progress || "{}") };
+    new ModelJobs(catalogue).enqueue(ENGLISH, ENGLISH_KEY, {}, { maxAttempts: 5 });
+    return { queued: true };
+  } finally {
+    catalogue.close();
+  }
+}
+async function englishNamesStatus(ctx) {
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  try {
+    const row = catalogue.db.prepare("SELECT state,progress FROM model_job WHERE key=?").get(ENGLISH_KEY);
+    return row ? { state: row.state, ...JSON.parse(row.progress || "{}") } : null;
+  } finally {
+    catalogue.close();
+  }
+}
+async function englishEntryFor(ctx, catalogue, work) {
+  const inc = "aliases+artist-rels+work-rels";
+  const known = catalogue.db.prepare("SELECT record_id FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='work' AND state='active'").get(work)?.record_id;
+  if (known) return { entry: await ctx.mb.get("work", known, inc), verified: true };
+  const tracks = catalogue.db.prepare(
+    `SELECT i.movement_id AS movement,json_extract(t.evidence,'$.hints.workId') AS tag FROM realization r JOIN realization_item i ON i.realization_id=r.id
+       JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id
+       WHERE r.work_id=? AND coalesce(json_extract(t.evidence,'$.hints.workId'),'')!='' LIMIT 5`
+  ).all(work);
+  for (const { movement, tag } of tracks) {
+    const leaf = await ctx.mb.get("work", tag, inc);
+    if (!leaf) continue;
+    if (!movement) return { entry: leaf, verified: false };
+    const parent = (leaf.relations || []).find((rel) => rel.type === "parts" && rel.direction === "backward" && rel.work?.id);
+    if (parent) return { entry: await ctx.mb.get("work", parent.work.id, inc), verified: false };
+  }
+  return { entry: null, verified: false };
+}
+var ENRICH = "mb_enrich";
+function enrichmentCandidates(catalogue, after = "") {
+  return catalogue.db.prepare(
+    `SELECT e.id,e.kind,min(x.record_id) AS mbid FROM entity e
+       JOIN external_identity x ON x.entity_id=e.id AND x.provider='musicbrainz' AND x.state='active'
+         AND x.record_kind=(CASE e.kind WHEN 'work' THEN 'work' ELSE 'artist' END)
+       WHERE e.deleted_at IS NULL AND e.kind IN ('person','ensemble','work') AND e.id>?
+       AND NOT EXISTS(SELECT 1 FROM provider_record p WHERE p.provider='musicbrainz' AND p.target_id=e.id)
+       GROUP BY e.id ORDER BY e.id`
+  ).all(after);
+}
+var ISO_DATE = /^\d{4}(?:-\d{2}(?:-\d{2})?)?$/;
+function enrichmentFields(kind, entry) {
+  const name = (kind === "work" ? entry.title : entry.name) || "";
+  const fold2 = (value) => String(value || "").normalize("NFKC").toLowerCase().trim();
+  const aliases = [...new Set((entry.aliases || []).map((alias) => typeof alias?.name === "string" ? alias.name.trim() : "").filter((alias) => alias && fold2(alias) !== fold2(name)))].slice(0, 50);
+  const fields = {};
+  if (aliases.length) fields.aliases = aliases;
+  if (kind !== "work") {
+    const sortName = typeof entry["sort-name"] === "string" ? entry["sort-name"].trim() : "";
+    if (sortName) fields.sortName = sortName;
+    const begin = typeof entry["life-span"]?.begin === "string" ? entry["life-span"].begin.trim() : "";
+    if (ISO_DATE.test(begin)) fields.date = begin;
+  }
+  return fields;
+}
+async function runEnrichment(ctx, catalogue, jobs, job, deadline) {
+  try {
+    const progress = { after: "", stored: 0, missing: 0, failed: 0, ...job.progress };
+    const metadata = new Metadata(catalogue);
+    for (; ; ) {
+      if (Date.now() >= deadline) {
+        jobs.checkpoint(job, progress, { leaseMs: 6e4 });
+        jobs.yield(job);
+        return;
+      }
+      const next = enrichmentCandidates(catalogue, progress.after)[0];
+      if (!next) break;
+      try {
+        const entry = await ctx.mb.get(next.kind === "work" ? "work" : "artist", next.mbid, "aliases");
+        if (entry) {
+          metadata.refresh(next.id, "musicbrainz", next.mbid, enrichmentFields(next.kind, entry), { complete: false, keepManual: true });
+          progress.stored++;
+        } else if (ctx.mb.lastResult === "missing") progress.missing++;
+        else progress.failed++;
+      } catch (error) {
+        progress.failed++;
+        ctx.log(`MusicBrainz enrichment skipped ${next.id}: ${error.message}`);
+      }
+      progress.after = next.id;
+      jobs.checkpoint(job, progress, { leaseMs: 6e4 });
+    }
+    jobs.checkpoint(job, progress, { done: true, leaseMs: 6e4 });
+  } catch (error) {
+    jobs.fail(job, error.message);
+    ctx.log(`MusicBrainz enrichment failed: ${error.message}`);
+  }
+}
+async function runEnglishNames(ctx, catalogue, jobs, job, deadline) {
+  try {
+    const works = catalogue.db.prepare(
+      `SELECT e.id FROM entity e JOIN metadata_target m ON m.entity_id=e.id JOIN field_resolution f ON f.target_id=m.id AND f.field='title'
+         JOIN assertion a ON a.id=f.assertion_id AND a.source='derived'
+         WHERE e.kind='work' AND e.deleted_at IS NULL ORDER BY e.id`
+    ).all().map((row) => row.id);
+    const progress = { cursor: 0, renamed: 0, total: works.length, ...job.progress };
+    const metadata = new Metadata(catalogue);
+    while (progress.cursor < works.length) {
+      if (Date.now() >= deadline) {
+        jobs.checkpoint(job, progress, { leaseMs: 6e4 });
+        jobs.yield(job);
+        return;
+      }
+      const work = works[progress.cursor];
+      try {
+        const current = catalogue.db.prepare("SELECT a.value,a.source FROM field_resolution f JOIN assertion a ON a.id=f.assertion_id JOIN metadata_target m ON m.id=f.target_id WHERE m.entity_id=? AND f.field='title'").get(work);
+        const title = current?.source === "derived" ? JSON.parse(current.value) : null;
+        if (typeof title === "string") {
+          const { entry, verified: verified2 } = await englishEntryFor(ctx, catalogue, work);
+          const english = entry && ClassicalResolver.bestEnglishAlias(entry.aliases)?.name || entry && headingFor(catalogue, work, null, title);
+          const same3 = verified2 || catalogueSubject(title) && [entry?.title, english].some((name) => catalogueSubject(name || "") === catalogueSubject(title));
+          if (english && same3 && english !== title) {
+            metadata.derived(work, "title", english);
+            progress.renamed++;
+          }
+          const above = entry && (verified2 || same3) && (entry.relations || []).find((rel) => rel.type === "parts" && rel.direction === "backward" && rel.work?.id);
+          const hasParts = (entry?.relations || []).some((rel) => rel.type === "parts" && rel.direction === "forward");
+          if (above && hasParts && (isCollectionLike(above.work.title || "") || namesCatalogueRange(above.work.title || ""))) {
+            const filed = catalogue.db.prepare("SELECT 1 FROM relation WHERE kind='collection_member' AND target_id=?").get(work);
+            if (!filed) {
+              const book = await ctx.mb.get("work", above.work.id, "aliases+artist-rels+work-rels");
+              if (book) {
+                joinCollection(catalogue, metadata, work, { id: book.id, title: collectionTitle(englishTitle(book)) }, "model-english");
+                progress.filed = (progress.filed || 0) + 1;
+              }
+            }
+          }
+        }
+      } catch (error) {
+        ctx.log(`English work name skipped: ${error.message}`);
+      }
+      progress.cursor++;
+      jobs.checkpoint(job, progress, { leaseMs: 6e4 });
+    }
+    jobs.checkpoint(job, progress, { done: true, leaseMs: 6e4 });
+  } catch (error) {
+    jobs.fail(job, error.message);
+    ctx.log(`English work names failed: ${error.message}`);
+  }
+}
+async function runIdentification(ctx, catalogue, jobs, first, owner, deadline) {
+  for (let job = first; job; job = Date.now() < deadline ? jobs.claim(owner, { leaseMs: 6e4, type: IDENTIFY }) : null) {
+    try {
+      const { albumId } = job.input;
+      const rows = catalogue.db.prepare(
+        `SELECT t.id,t.evidence FROM track_link t JOIN classification c ON c.target_id=t.id AND c.state='classical'
+           WHERE t.state='active' AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?
+           AND NOT EXISTS(SELECT 1 FROM segment s JOIN realization_item i ON i.segment_id=s.id WHERE s.track_link_id=t.id)
+           ORDER BY t.id`
+      ).all(String(albumId));
+      const progress = { cursor: 0, matches: [], failed: [], errors: 0, ...job.progress };
+      const lookUp = async (row) => {
+        const match2 = await identifyTrack(ctx, JSON.parse(row.evidence).hints || {});
+        if (match2) progress.matches.push([row.id, match2]);
+      };
+      let streak = [];
+      while (progress.cursor < rows.length) {
+        if (Date.now() >= deadline) break;
+        const row = rows[progress.cursor];
+        try {
+          await lookUp(row);
+          streak = [];
+        } catch (error) {
+          streak.push(row.id);
+          if (streak.length >= 3) {
+            progress.cursor -= streak.length - 1;
+            progress.failed = progress.failed.filter((id) => !streak.includes(id));
+            jobs.checkpoint(job, progress, { leaseMs: 6e4 });
+            throw new Error(`MusicBrainz unavailable: ${error.message}`);
+          }
+          progress.failed.push(row.id);
+          ctx.log(`Classical work identification of one track failed: ${error.message}`);
+        }
+        progress.cursor++;
+        jobs.checkpoint(job, progress, { leaseMs: 6e4 });
+      }
+      if (progress.cursor < rows.length) {
+        jobs.yield(job);
+        return;
+      }
+      for (const id of progress.failed.splice(0)) {
+        const row = rows.find((candidate) => candidate.id === id);
+        if (!row) continue;
+        try {
+          await lookUp(row);
+        } catch (error) {
+          progress.errors++;
+          ctx.log(`Classical work identification skipped: ${error.message}`);
+        }
+      }
+      const result = autoMatchTaggedWorks(catalogue, {
+        albumId,
+        actor: "model-identify",
+        allowStructuredTitles: true,
+        providerMatches: new Map(progress.matches)
+      });
+      await englishWorkTitles(ctx, catalogue, albumId);
+      jobs.checkpoint(job, { cursor: progress.cursor, identified: progress.matches.length, matched: result.created, errors: progress.errors }, { done: true, leaseMs: 6e4 });
+    } catch (error) {
+      jobs.fail(job, error.message);
+      ctx.log(`Classical identification of album ${job.input.albumId} failed: ${error.message}`);
+      return;
+    }
+  }
+}
+async function runModelJobs(ctx, { budgetMs = 5e3, batchSize = 200, checkpointMs = 1e4 } = {}) {
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  catalogue.db.exec("PRAGMA busy_timeout=60000");
+  const jobs = new ModelJobs(catalogue), owner = randomUUID7(), deadline = Date.now() + budgetMs;
+  try {
+    const job = jobs.claim(owner, { leaseMs: 6e4 });
+    if (!job) return;
+    if (job.type === IDENTIFY) return await runIdentification(ctx, catalogue, jobs, job, owner, deadline);
+    if (job.type === ENGLISH) return await runEnglishNames(ctx, catalogue, jobs, job, deadline);
+    if (job.type === ENRICH) return await runEnrichment(ctx, catalogue, jobs, job, deadline);
+    try {
+      if (job.type !== "library_scan")
+        throw new Error("Unknown model job type");
+      verifyOnce(catalogue.db, catalogue.filename);
+      const input = job.input;
+      let cursor = job.progress.cursor || 0;
+      let chunks = job.progress.chunks || 0;
+      const legacy = job.progress.collected || [];
+      const collected = [...legacy, ...jobs.chunks(job.id, chunks)];
+      let saved = legacy.length ? 0 : collected.length;
+      const save2 = (extra = {}) => {
+        const items = collected.slice(saved);
+        const ok = jobs.checkpoint(
+          job,
+          { cursor, chunks: chunks + (items.length && !extra.done ? 1 : 0), errors, errorCount, reused, total: input.files.length },
+          { leaseMs: 6e4, chunk: { seq: chunks, items }, ...extra }
+        );
+        if (ok && items.length && !extra.done) {
+          chunks++;
+          saved = collected.length;
+        }
+        return ok;
+      };
+      const errors = job.progress.errors || [];
+      let errorCount = job.progress.errorCount || 0;
+      let reused = job.progress.reused || 0;
+      const root = await fs4.realpath(ctx.libraryFolder);
+      const previous = new Map(
+        catalogue.db.prepare(
+          "SELECT core_id,file_id,evidence FROM track_link WHERE instance_id=? AND state='active'"
+        ).all(input.instanceId).map((row) => [
+          JSON.stringify([row.core_id, row.file_id]),
+          JSON.parse(row.evidence)
+        ])
+      );
+      const skip = (file, error, prior) => {
+        errorCount++;
+        if (errors.length < 50)
+          errors.push({ path: file.path, error: String(error).slice(0, 200) });
+        if (prior && error?.code !== "ENOENT")
+          collected.push({
+            ...file,
+            observedRealPath: prior.observedRealPath,
+            size: prior.size,
+            durationMs: prior.durationMs,
+            fingerprint: prior.fingerprint,
+            ...prior.mtimeMs != null && { mtimeMs: prior.mtimeMs, ino: prior.ino },
+            hints: prior.hints
+          });
+      };
+      while (cursor < input.files.length && Date.now() < deadline) {
+        const stop = Math.min(cursor + batchSize, input.files.length);
+        const checkpointAt = Date.now() + checkpointMs;
+        let cancelled = false;
+        for (; cursor < stop && Date.now() < deadline && Date.now() < checkpointAt; cursor++) {
+          if (catalogue.db.prepare("SELECT cancel_requested FROM model_job WHERE id=?").get(job.id).cancel_requested) {
+            cancelled = true;
+            break;
+          }
+          const file = input.files[cursor];
+          const prior = previous.get(JSON.stringify([file.coreId, file.fileId]));
+          try {
+            const evidence = await scanFile(file, root, prior);
+            if (evidence[REUSED]) reused++;
+            collected.push(evidence);
+          } catch (error) {
+            skip(file, error, prior);
+          }
+          await new Promise((resolve) => setImmediate(resolve));
+        }
+        if (!save2()) return;
+        if (cancelled) break;
+      }
+      const done = cursor === input.files.length;
+      const committed = save2({
+        done,
+        commit: done ? () => {
+          const rows = reconcile(catalogue, {
+            version: 1,
+            complete: true,
+            instanceId: input.instanceId,
+            epoch: input.epoch,
+            generation: input.generation,
+            tracks: collected
+          });
+          const albums = /* @__PURE__ */ new Map();
+          for (const row of rows) {
+            const albumTarget = row.albumId == null ? null : catalogue.albumTarget(input.instanceId, row.albumId);
+            const albumPin = albumTarget && catalogue.db.prepare(
+              "SELECT state,pinned FROM classification WHERE target_id=?"
+            ).get(albumTarget);
+            const inherited = albumPin?.pinned ? albumPin.state : null;
+            const state = classify(
+              catalogue,
+              row.id,
+              {
+                ...row.hints,
+                ...inherited && { albumOverride: inherited }
+              },
+              { inherited }
+            );
+            if (row.albumId != null) {
+              if (!albums.has(row.albumId)) albums.set(row.albumId, { pinned: Boolean(inherited), tracks: [] });
+              albums.get(row.albumId).tracks.push({ id: row.id, hints: row.hints, state });
+            }
+          }
+          for (const [albumId, album] of albums) {
+            const states = album.pinned ? album.tracks.map((track) => track.state) : liftAlbumMajority(catalogue, album.tracks);
+            const target = catalogue.albumTarget(
+              input.instanceId,
+              albumId
+            );
+            const state = states.every((s) => s === "classical") ? "classical" : states.every((s) => s === "not_classical") ? "not_classical" : "unsure";
+            const prior = catalogue.db.prepare(
+              "SELECT pinned FROM classification WHERE target_id=?"
+            ).get(target);
+            if (!prior?.pinned)
+              catalogue.db.prepare(
+                `INSERT INTO classification VALUES (?,?,0,0,?,1,?)
+            ON CONFLICT(target_id) DO UPDATE SET state=excluded.state,evidence=excluded.evidence,updated_at=excluded.updated_at`
+              ).run(
+                target,
+                state,
+                JSON.stringify({ trackStates: states }),
+                Date.now()
+              );
+          }
+          autoMatchTaggedWorks(catalogue, { actor: "model-scan", allowStructuredTitles: true });
+          queueAlbumIdentification(catalogue);
+        } : void 0
+      });
+      if (committed && !done) jobs.yield(job);
+    } catch (error) {
+      jobs.fail(job, error.message);
+      throw error;
+    }
+  } finally {
+    try {
+      ensureSearchIndex(catalogue);
+    } catch (error) {
+      ctx.log?.(`Classical search index not rebuilt: ${error.message}`);
+    }
+    catalogue.close();
+  }
+}
+async function arrangedWork(mb, work, inc) {
+  const relations2 = work?.relations || [];
+  if (relations2.some((rel) => rel.type === "parts" && rel.direction === "backward")) return work;
+  const originals = relations2.filter(
+    (rel) => rel.type === "arrangement" && rel.direction === "backward" && rel.work?.id
+  );
+  if (originals.length !== 1) return work;
+  return await mb.get("work", originals[0].work.id, inc) || work;
+}
+async function identifyTrack(ctx, hints) {
+  let workId = hints.workId;
+  let composers = hints.composer || [];
+  if (!workId && hints.recordingMbid) {
+    const fields = await ctx.resolver.resolve(hints.recordingMbid, {
+      confirmed: true
+    });
+    workId = fields?.workId;
+    if (!composers.length) composers = fields?.composers || [];
+  }
+  if (!workId) return null;
+  const inc = "aliases+artist-rels+work-rels";
+  const leaf = await arrangedWork(ctx.mb, await ctx.mb.get("work", workId, inc), inc);
+  const hasParts = (work) => (work.relations || []).some((rel) => rel.type === "parts" && rel.direction === "forward");
+  let book = null;
+  const parent = leaf && await topWork(ctx.mb, leaf, 0, inc, {
+    stop: (above, below) => {
+      const stops = (isCollectionLike(above.title) || namesCatalogueRange(above.title)) && hasParts(below);
+      if (stops) book = above;
+      return stops;
+    }
+  });
+  const title = withoutComposer(hints.title, hints.composer);
+  const headSubject = catalogueSubject(titleHead(title) || "");
+  const namesThisWork = Boolean(headSubject) && headSubject === catalogueSubject(leaf?.title || "");
+  const standalone = parent?.id === leaf.id && !(leaf.relations || []).some((rel) => rel.type === "parts" && rel.direction === "backward") && !isCollectionLike(leaf.title) && (!String(title).includes(":") || namesThisWork && !hasParts(leaf)) && !/^(?:[IVXLCDM]+|\d+)[.)]\s/i.test(String(title).trim());
+  if (!parent?.id || parent.id === leaf.id && !standalone) return null;
+  return {
+    workId: parent.id,
+    work: englishTitle(parent),
+    ...book && book.id !== parent.id && { collection: { id: book.id, title: collectionTitle(englishTitle(book)) } },
+    ...!ClassicalResolver.bestEnglishAlias(parent.aliases) && { untranslated: true },
+    movement: standalone ? null : englishTitle(leaf, null),
+    ...standalone && { standalone: true },
+    // The movement's own MusicBrainz work ("Nessun dorma" in Turandot), so
+    // every album of it finds the same movement whatever its title says.
+    ...!standalone && leaf.id !== parent.id && { leafWorkId: leaf.id },
+    aliases: [
+      ...new Set(
+        (parent.aliases || []).filter((alias) => alias.name && alias.type !== "Search hint").map((alias) => alias.name).filter((name) => name !== englishTitle(parent))
+      )
+    ].slice(0, 20),
+    composers,
+    // MusicBrainz's own composer IDs tell same-named people apart.
+    composerIds: Object.fromEntries(
+      [...parent.relations || [], ...leaf.relations || []].filter((rel) => rel.type === "composer" && rel.artist?.id && rel.artist?.name).map((rel) => [rel.artist.name, rel.artist.id])
+    )
+  };
+}
+async function autoMatchLibrary(ctx, actor2) {
+  if (actor2?.role !== "admin")
+    throw new Error("Automatic work matching requires a current host admin");
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  try {
+    const albums = catalogue.db.prepare(
+      `SELECT DISTINCT CAST(json_extract(t.evidence,'$.albumId') AS TEXT) AS id FROM track_link t
+         JOIN classification c ON c.target_id=t.id AND c.state='classical'
+         WHERE t.state='active' AND json_extract(t.evidence,'$.albumId') IS NOT NULL
+         AND NOT EXISTS(SELECT 1 FROM segment s JOIN realization_item i ON i.segment_id=s.id WHERE s.track_link_id=t.id)`
+    ).all().map((row) => row.id);
+    let created = 0;
+    for (const albumId of albums)
+      created += autoMatchTaggedWorks(catalogue, { albumId, actor: String(actor2.id), allowStructuredTitles: true }).created;
+    return { albums: albums.length, created };
+  } finally {
+    catalogue.close();
+  }
+}
+async function cancelModelScan(ctx, actor2) {
+  if (actor2?.role !== "admin")
+    throw new Error("Cancelling model scans requires a current host admin");
+  const catalogue = await openCatalogue(modelFolder(ctx));
+  try {
+    const jobs = new ModelJobs(catalogue);
+    for (const row of catalogue.db.prepare(
+      "SELECT id FROM model_job WHERE state IN ('queued','running','retry')"
+    ).all())
+      jobs.cancel(row.id);
+  } finally {
+    catalogue.close();
+  }
+}
+
+// src/model/classification-report.js
+import path5 from "node:path";
+async function openModelReadOnly(folder2) {
+  const { DatabaseSync } = await import("node:sqlite");
+  return new DatabaseSync(path5.join(folder2, "classical.sqlite"), { readOnly: true });
+}
+var describe = (signal) => `${signal.signal}${signal.value ? ` "${signal.value}"` : ""} +${signal.points}`;
+function classificationReport(db, { albumId = null, all = false } = {}) {
+  const albumPins = new Map(
+    db.prepare(
+      `SELECT m.album_ref,c.state FROM metadata_target m JOIN classification c ON c.target_id=m.id
+         WHERE m.album_ref IS NOT NULL AND c.pinned=1`
+    ).all().map((row) => [JSON.parse(row.album_ref)[1], row.state])
+  );
+  const rows = db.prepare(
+    `SELECT t.id,t.core_id,t.instance_id,t.evidence,c.state,c.pinned,c.score
+       FROM track_link t LEFT JOIN classification c ON c.target_id=t.id
+       WHERE t.state='active' ${albumId == null ? "" : "AND CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?"}
+       ORDER BY json_extract(t.evidence,'$.albumId'),json_extract(t.evidence,'$.hints.discNumber'),json_extract(t.evidence,'$.hints.trackNumber'),t.id`
+  ).all(...albumId == null ? [] : [String(albumId)]);
+  const entries = [];
+  for (const row of rows) {
+    const evidence = JSON.parse(row.evidence);
+    const { albumOverride, inheritedFrom, ...hints } = evidence.hints || {};
+    const album = evidence.albumId == null ? null : String(evidence.albumId);
+    const albumPin = album == null ? null : albumPins.get(album) ?? null;
+    const automatic = classificationEvidence(hints);
+    const source = row.pinned ? "track pin" : albumPin ? "album pin" : "automatic";
+    const next = row.pinned ? row.state : albumPin || automatic.decision;
+    const stored = row.state || "unclassified";
+    const entry = {
+      trackId: String(row.core_id),
+      albumId: album,
+      album: hints.album || "",
+      title: hints.title || path5.basename(evidence.path || ""),
+      artist: hints.artist || "",
+      genres: hints.genres || [],
+      composer: hints.composer || [],
+      work: hints.work || "",
+      stored,
+      source,
+      storedScore: row.score,
+      score: automatic.score,
+      automatic: automatic.decision,
+      reason: automatic.reason,
+      evidence: automatic.signals.map(describe),
+      next,
+      changes: next !== stored
+    };
+    entries.push({ entry, hints });
+  }
+  const byAlbum = /* @__PURE__ */ new Map();
+  for (const item of entries) {
+    if (item.entry.albumId == null) continue;
+    if (!byAlbum.has(item.entry.albumId)) byAlbum.set(item.entry.albumId, []);
+    byAlbum.get(item.entry.albumId).push(item);
+  }
+  for (const album of byAlbum.values()) {
+    if (album.some(({ entry }) => entry.source === "album pin")) continue;
+    if (!albumMajority(album.map(({ entry, hints }) => ({ hints, state: entry.next })))) continue;
+    for (const { entry } of album)
+      if (entry.source === "automatic" && entry.next !== "classical") {
+        entry.next = "classical";
+        entry.source = "album majority";
+        entry.reason = "two thirds of the album is classical";
+        entry.changes = entry.next !== entry.stored;
+      }
+  }
+  const tracks = [];
+  const summary = { tracks: 0, stored: {}, next: {}, changes: 0, pinned: 0, albumPinned: 0 };
+  for (const { entry } of entries) {
+    const { stored, next, source } = entry;
+    summary.tracks++;
+    summary.stored[stored] = (summary.stored[stored] || 0) + 1;
+    summary.next[next] = (summary.next[next] || 0) + 1;
+    if (entry.changes) summary.changes++;
+    if (source === "track pin") summary.pinned++;
+    if (source === "album pin") summary.albumPinned++;
+    if (all || stored !== "not_classical" || next !== "not_classical" || source !== "automatic") tracks.push(entry);
+  }
+  return { tracks, summary };
+}
+async function albumClassificationSummary(ctx, albumId) {
+  const folder2 = path5.join(ctx.dataFolder, "model");
+  let db;
+  try {
+    db = await openModelReadOnly(folder2);
+  } catch {
+    return "No classical model yet. Run Scan classical model (read only) first.";
+  }
+  try {
+    const { tracks, summary } = classificationReport(db, { albumId, all: true });
+    if (!summary.tracks) return "This album has no indexed tracks. Run Scan classical model (read only) first.";
+    const counts = Object.entries(summary.stored).map(([state, n]) => `${n} ${state.replace("_", " ")}`).join(", ");
+    const flagged = tracks.filter((t) => t.stored !== "not_classical" || t.changes || t.source !== "automatic").map((t) => `${t.title.slice(0, 40)}: ${t.stored}${t.source === "automatic" ? "" : ` (${t.source})`}${t.changes ? ` \u2192 ${t.next}` : ""}, score ${t.score}`);
+    const message = `Read only. ${summary.tracks} tracks: ${counts}.${summary.changes ? ` ${summary.changes} change on the next scan.` : ""} ${flagged.join("; ")}`;
+    return message.length > 500 ? `${message.slice(0, 440)}\u2026 Full report: node scripts/model-admin.mjs classification` : message;
+  } finally {
+    db.close();
+  }
+}
+
+// src/tag-requests.js
+import { randomUUID as randomUUID10 } from "node:crypto";
+import fs8 from "node:fs";
+import fsp from "node:fs/promises";
+import path9 from "node:path";
+
+// src/tagger.js
+import { randomUUID as randomUUID9 } from "node:crypto";
+
+// src/model/write-guard.js
+import fs5 from "node:fs/promises";
+import path6 from "node:path";
+async function modelAllowsTagging(ctx, realPath) {
+  const filename = path6.join(ctx.dataFolder, "model", "classical.sqlite");
+  try {
+    await fs5.access(filename);
+  } catch (error) {
+    if (error.code === "ENOENT") return true;
+    throw error;
+  }
+  let db;
+  try {
+    const { DatabaseSync } = await import("node:sqlite");
+    db = new DatabaseSync(filename, { readOnly: true });
+    const rows = db.prepare(
+      `SELECT t.state AS link_state,c.state FROM track_link t
+      LEFT JOIN classification c ON c.target_id=t.id
+      WHERE json_extract(t.evidence,'$.observedRealPath')=? OR json_extract(t.evidence,'$.path')=? OR json_extract(t.evidence,'$.readPath')=?`
+    ).all(realPath, realPath, realPath);
+    return !rows.length || rows.every(
+      (row) => row.link_state === "active" && row.state === "classical"
+    );
+  } catch (error) {
+    ctx.log?.(`Classical model cannot authorize tagging: ${error.message}`);
+    return false;
+  } finally {
+    db?.close();
+  }
+}
+
+// src/tagger.js
+import fs7 from "node:fs/promises";
+import path8 from "node:path";
+
+// src/aurral.js
+var Aurral = class {
+  constructor(api, fetchImpl = fetch) {
+    if (!api?.url || !api?.key) throw new Error("Aurral API access is off. Turn it on on the plugin's page.");
+    this.url = api.url.replace(/\/+$/, "");
+    this.key = api.key;
+    this.fetch = fetchImpl;
+  }
+  async request(method, route, body) {
+    const response = await this.fetch(`${this.url}${route}`, {
+      method,
+      headers: { "X-Api-Key": this.key, ...body !== void 0 && { "Content-Type": "application/json" } },
+      body: body === void 0 ? void 0 : JSON.stringify(body),
+      signal: AbortSignal.timeout(3e4)
+    });
+    const data = await response.json().catch(() => null);
+    if (!response.ok) {
+      const detail = data?.message || data?.error || response.statusText;
+      throw new Error(`Aurral answered ${response.status} for ${route}: ${detail}`);
+    }
+    return data;
+  }
+  // Re-reads files whose tags changed, so the Library shows the new ones.
+  refreshLibrary() {
+    return this.request("POST", "/library/refresh", { mode: "quick" });
+  }
+};
+
+// src/store.js
+import { createHash as createHash4, randomUUID as randomUUID8 } from "node:crypto";
+import fs6 from "node:fs/promises";
+import path7 from "node:path";
+var sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+async function readJson(file, fallback) {
+  try {
+    return JSON.parse(await fs6.readFile(file, "utf8"));
+  } catch {
+    return fallback;
+  }
+}
+async function writeJson(file, value) {
+  await fs6.mkdir(path7.dirname(file), { recursive: true });
+  const temp = `${file}.${process.pid}.${randomUUID8()}.tmp`;
+  await fs6.writeFile(temp, JSON.stringify(value));
+  await fs6.rename(temp, file);
+}
+async function tryLock(dir, staleMs) {
+  try {
+    await fs6.mkdir(dir);
+  } catch (error) {
+    if (error.code !== "EEXIST") throw error;
+    const stat = await fs6.stat(dir).catch(() => null);
+    if (stat && Date.now() - stat.mtimeMs < staleMs) return null;
+    await fs6.rm(dir, { recursive: true, force: true });
+    try {
+      await fs6.mkdir(dir);
+    } catch {
+      return null;
+    }
+  }
+  let released = false;
+  return {
+    async touch() {
+      if (released) return;
+      const now = /* @__PURE__ */ new Date();
+      await fs6.utimes(dir, now, now).catch(() => {
+      });
+    },
+    async release() {
+      released = true;
+      await fs6.rm(dir, { recursive: true, force: true }).catch(() => {
+      });
+    }
+  };
+}
+async function withLock(dir, staleMs, run, { waitMs = 3e4 } = {}) {
+  const until = Date.now() + waitMs;
+  for (; ; ) {
+    const lock = await tryLock(dir, staleMs);
+    if (lock) {
+      try {
+        return await run(lock);
+      } finally {
+        await lock.release();
+      }
+    }
+    if (Date.now() > until) throw new Error(`Timed out waiting for ${path7.basename(dir)}`);
+    await sleep(50 + Math.random() * 100);
+  }
+}
+var Throttle = class {
+  constructor(folder2, intervalMs) {
+    this.lockDir = path7.join(folder2, "mb-throttle.lock");
+    this.stateFile = path7.join(folder2, "mb-throttle.json");
+    this.intervalMs = intervalMs;
+  }
+  async run(dispatch) {
+    if (!this.intervalMs) return dispatch();
+    return withLock(this.lockDir, 12e4, async () => {
+      const state = await readJson(this.stateFile, { next: 0 });
+      const wait = (Number(state.next) || 0) - Date.now();
+      if (wait > 0) await sleep(wait);
+      await writeJson(this.stateFile, { next: Date.now() + this.intervalMs });
+      try {
+        return await dispatch();
+      } finally {
+        await writeJson(this.stateFile, { next: Date.now() + this.intervalMs });
+      }
+    }, { waitMs: 12e4 });
+  }
+};
+var FileCache = class {
+  constructor(folder2) {
+    this.folder = folder2;
+  }
+  file(key) {
+    const hash = createHash4("sha1").update(key).digest("hex");
+    return path7.join(this.folder, hash.slice(0, 2), `${hash}.json`);
+  }
+  async get(key, ttlMs) {
+    const entry = await readJson(this.file(key), null);
+    if (!entry || Date.now() - entry.time > ttlMs) return null;
+    return entry.value;
+  }
+  async set(key, value) {
+    await writeJson(this.file(key), { time: Date.now(), key, value }).catch(() => {
+    });
+  }
+};
+async function pruneCache(folder2, maxAgeMs) {
+  const stamp = path7.join(folder2, ".pruned");
+  const last2 = (await fs6.stat(stamp).catch(() => null))?.mtimeMs ?? 0;
+  if (Date.now() - last2 < 24 * 60 * 6e4) return 0;
+  await fs6.mkdir(folder2, { recursive: true });
+  await fs6.writeFile(stamp, "");
+  let removed = 0;
+  for (const dir of await fs6.readdir(folder2).catch(() => [])) {
+    const sub = path7.join(folder2, dir);
+    for (const name of await fs6.readdir(sub).catch(() => [])) {
+      const file = path7.join(sub, name);
+      const stat = await fs6.stat(file).catch(() => null);
+      if (stat && Date.now() - stat.mtimeMs > maxAgeMs) {
+        await fs6.rm(file, { force: true });
+        removed++;
+      }
+    }
+  }
+  return removed;
+}
+
+// src/tagger.js
+var LOCK_STALE_MS2 = 2 * 6e4;
+var SAVE_EVERY_MS = 3e4;
+var queueDir = (ctx) => path8.join(ctx.dataFolder, "queue");
+var processedFile = (ctx) => path8.join(ctx.dataFolder, "processed.json");
+var indexFile = (ctx) => path8.join(ctx.dataFolder, "library-index.json");
+var originalsFile = (ctx) => path8.join(ctx.dataFolder, "originals.json");
+var excludedFile = (ctx) => path8.join(ctx.dataFolder, "excluded.json");
+var TAG_FIELDS = ["artist", "albumArtist", "composer", "work", "workId"];
+var TAGGING_VERSION = 2;
+var outdated = (record) => record && (record.status === "tagged" || record.status === "unchanged") && (record.v ?? 1) < TAGGING_VERSION;
+var lockDir = (ctx) => path8.join(ctx.dataFolder, "tagging.lock");
+var yieldFile = (ctx) => path8.join(ctx.dataFolder, "tagging.yield");
+var YIELD_FRESH_MS = 10 * 6e4;
+var PRIORITY_WAIT_MS = 5 * 6e4;
+var ACTION_CLAIM_MS = 2 * 6e4;
+async function enqueue(ctx, filePaths, { force = false, source = null } = {}) {
+  await fs7.mkdir(queueDir(ctx), { recursive: true });
+  const ids = [];
+  for (const filePath of filePaths) {
+    if (!filePath) continue;
+    const id = `${Date.now().toString().padStart(15, "0")}-${randomUUID9()}`;
+    await writeJson(path8.join(queueDir(ctx), `${id}.json`), { path: filePath, force, source, at: Date.now() });
+    ids.push(id);
+  }
+  return ids;
+}
+async function queuedEntries(ctx) {
+  const names = (await fs7.readdir(queueDir(ctx)).catch(() => [])).filter((n) => n.endsWith(".json")).sort();
+  return names.map((name) => ({ name, file: path8.join(queueDir(ctx), name) }));
+}
+var queueLength = async (ctx) => (await queuedEntries(ctx)).length;
+async function allowedPath(ctx, filePath) {
+  const real = await fs7.realpath(filePath).catch(() => null);
+  if (!real) return null;
+  for (const root of [ctx.libraryFolder, ctx.dataFolder]) {
+    if (!root) continue;
+    const base = await fs7.realpath(root).catch(() => null);
+    if (!base) continue;
+    const relative = path8.relative(base, real);
+    if (relative && !relative.startsWith("..") && !path8.isAbsolute(relative)) return real;
+  }
+  return null;
+}
+var statKey = (stat) => ({ mtimeMs: Math.round(stat.mtimeMs), size: stat.size });
+var sameStat = (record, stat) => record && record.mtimeMs === Math.round(stat.mtimeMs) && record.size === stat.size;
+function indexEntry(tags, stat) {
+  return {
+    ...statKey(stat),
+    title: tags.title,
+    artist: tags.artist,
+    album: tags.album,
+    albumArtist: tags.albumArtist,
+    recordingMbid: tags.recordingMbid,
+    releaseMbid: tags.releaseMbid,
+    releaseGroupMbid: tags.releaseGroupMbid,
+    albumArtistMbids: tags.albumArtistMbids,
+    trackNumber: tags.trackNumber,
+    discNumber: tags.discNumber,
+    durationMs: tags.durationMs,
+    workId: tags.workId
+  };
+}
+var State = class {
+  constructor(ctx, lock) {
+    this.ctx = ctx;
+    this.lock = lock;
+    this.dirty = 0;
+    this.savedAt = Date.now();
+    this.refs = 0;
+    this.admins = 0;
+    this.background = 0;
+    this.claimed = /* @__PURE__ */ new Set();
+    this.busyPaths = /* @__PURE__ */ new Map();
+  }
+  async load() {
+    this.processed = await readJson(processedFile(this.ctx), {});
+    this.index = await readJson(indexFile(this.ctx), {});
+    this.originals = await readJson(originalsFile(this.ctx), {});
+    this.excluded = await readJson(excludedFile(this.ctx), {});
+  }
+  // Saved every 30 seconds while working, and at the end: the index of a
+  // large Library is several megabytes.
+  async save(force = false) {
+    if (!this.dirty || !force && Date.now() - this.savedAt < SAVE_EVERY_MS) return;
+    this.savedAt = Date.now();
+    this.dirty = 0;
+    await writeJson(processedFile(this.ctx), this.processed);
+    await writeJson(indexFile(this.ctx), this.index);
+    await writeJson(originalsFile(this.ctx), this.originals);
+    await writeJson(excludedFile(this.ctx), this.excluded);
+    await this.lock.touch();
+  }
+  // One call at a time works on a file.
+  async exclusive(file, work) {
+    while (this.busyPaths.has(file)) await this.busyPaths.get(file).catch(() => {
+    });
+    const running = work();
+    this.busyPaths.set(file, running);
+    try {
+      return await running;
+    } finally {
+      this.busyPaths.delete(file);
+    }
+  }
+};
+var Session = class {
+  constructor(ctx, state, priority) {
+    this.ctx = ctx;
+    this.state = state;
+    this.priority = priority;
+    this.changedFiles = 0;
+    this.stats = { tagged: 0, unchanged: 0, skipped: {}, failed: 0, left: 0 };
+  }
+  get processed() {
+    return this.state.processed;
+  }
+  get index() {
+    return this.state.index;
+  }
+  get originals() {
+    return this.state.originals;
+  }
+  get excluded() {
+    return this.state.excluded;
+  }
+  get dirty() {
+    return this.state.dirty;
+  }
+  set dirty(value) {
+    this.state.dirty = value;
+  }
+  save(force = false) {
+    return this.state.save(force);
+  }
+  // True when an admin action wants the lock and this is background work:
+  // one in this process, or one waiting in another.
+  async shouldYield() {
+    if (this.priority) return false;
+    if (this.state.admins > 0) this.yielding = true;
+    else if (!this.yieldCheckedAt || Date.now() - this.yieldCheckedAt >= 500) {
+      this.yieldCheckedAt = Date.now();
+      const stat = await fs7.stat(yieldFile(this.ctx)).catch(() => null);
+      this.yielding = Boolean(stat && Date.now() - stat.mtimeMs < YIELD_FRESH_MS);
+    }
+    if (this.yielding && !this.yieldLogged) {
+      this.yieldLogged = true;
+      this.ctx.log("Pausing background tagging for an admin action");
+    }
+    return this.yielding;
+  }
+  record(filePath, stat, result) {
+    this.processed[filePath] = { ...statKey(stat), ...result, at: Date.now() };
+    this.dirty++;
+    if (result.status === "skipped") this.stats.skipped[result.reason] = (this.stats.skipped[result.reason] || 0) + 1;
+    else this.stats[result.status]++;
+  }
+  // Returns false when MusicBrainz can't be reached, so the caller stops.
+  async processFile(filePath, options = {}) {
+    const real = await allowedPath(this.ctx, filePath);
+    if (!real) {
+      this.ctx.log(`Not tagging ${filePath}: it isn't in the Library folder`);
+      this.stats.skipped["outside the Library"] = (this.stats.skipped["outside the Library"] || 0) + 1;
+      return true;
+    }
+    if (!isAudioPath(real)) return true;
+    return this.state.exclusive(real, () => this.processReal(real, options));
+  }
+  // `queuedAt`: when the request to tag was made. Classical tags an admin
+  // removed after that stay removed.
+  //
+  // `plan` (v0.3 8.7): an array that receives what would be written, with
+  // the file's current values, instead of writing or recording anything.
+  // `values`: write exactly these (a confirmed plan) instead of looking up.
+  async processReal(real, { force = false, prefilter = false, upgrade = false, queuedAt = null, plan = null, values: planned = null } = {}) {
+    const { ctx } = this;
+    const stat = await fs7.stat(real);
+    const skip = (result) => plan ? plan.push({ file: real, status: "skipped", reason: result.reason }) : this.record(real, stat, result);
+    if (!await modelAllowsTagging(ctx, real)) {
+      skip({ status: "skipped", reason: "model classification or link requires review" });
+      return true;
+    }
+    if (!force && sameStat(this.processed[real], stat) && !(upgrade && outdated(this.processed[real]))) return true;
+    let tags;
+    try {
+      tags = readTags(real);
+    } catch (error) {
+      skip({ status: "skipped", reason: error instanceof UnsupportedFormat ? "unsupported format" : "unreadable" });
+      return true;
+    }
+    if (!plan) this.index[real] = indexEntry(tags, stat);
+    if (!tags.recordingMbid) {
+      skip({ status: "skipped", reason: "no recording ID" });
+      return true;
+    }
+    if (this.excluded[tags.recordingMbid]) {
+      if (!force || queuedAt && (this.excluded[tags.recordingMbid].at ?? 0) > queuedAt) {
+        skip({ status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
+        return true;
+      }
+      if (!plan) delete this.excluded[tags.recordingMbid];
+    }
+    if (prefilter && ctx.resolver.classifyGenres(new Set(tags.genres.map((g) => g.toLowerCase()))) === false) {
+      this.record(real, stat, { status: "skipped", reason: "non-classical", recording: tags.recordingMbid });
+      return true;
+    }
+    let values = planned;
+    let fields = planned && { artist: planned.artist?.[0] || "", workId: planned.workId?.[0] || "" };
+    if (!values) {
+      fields = await ctx.resolver.resolve(tags.recordingMbid, {
+        trackArtistIds: tags.artistMbids,
+        albumArtistIds: tags.albumArtistMbids,
+        releaseGroupId: tags.releaseGroupMbid || null,
+        confirmed: force
+      });
+      if (!fields) {
+        const reason = ctx.resolver.skipReason;
+        if (reason === "unreachable") return false;
+        skip({ status: "skipped", reason, recording: tags.recordingMbid });
+        return true;
+      }
+      values = { artist: [fields.artist], composer: fields.composers };
+      if (fields.workId) Object.assign(values, { work: [fields.work], workId: [fields.workId] });
+      const albumArtist = await this.englishAlbumArtist(tags);
+      if (albumArtist) values.albumArtist = [albumArtist];
+    }
+    if (plan) {
+      plan.push({ file: real, status: "planned", recording: tags.recordingMbid, values, current: readValues(real, Object.keys(values)) });
+      return true;
+    }
+    let changed;
+    try {
+      if (!this.originals[real]) {
+        this.originals[real] = { ...readValues(real, TAG_FIELDS), recording: tags.recordingMbid };
+        this.dirty++;
+        await writeJson(originalsFile(ctx), this.originals);
+      }
+      changed = await writeTags(real, values);
+    } catch (error) {
+      ctx.log(`Couldn't tag ${real}: ${error.message}`);
+      this.record(real, stat, { status: "skipped", reason: "couldn't write tags", recording: tags.recordingMbid });
+      return true;
+    }
+    const after = await fs7.stat(real);
+    this.index[real] = { ...this.index[real], ...statKey(after), artist: fields.artist, workId: fields.workId || "" };
+    this.record(real, after, {
+      v: TAGGING_VERSION,
+      status: changed.length ? "tagged" : "unchanged",
+      recording: tags.recordingMbid,
+      artist: fields.artist,
+      workId: fields.workId
+    });
+    if (changed.length) {
+      this.changedFiles++;
+      ctx.log(`Tagged ${path8.basename(real)}: ${fields.artist}`);
+    }
+    return true;
+  }
+  // Puts back the tags a file had before the plugin changed them. Files
+  // tagged before the plugin kept backups get the artist MusicBrainz credits
+  // for that track on its release, which is what Aurral writes.
+  async untagFile(filePath, mode = "restore") {
+    const real = await allowedPath(this.ctx, filePath);
+    if (!real || !isAudioPath(real)) return "skipped";
+    return this.state.exclusive(real, () => this.untagReal(real, mode));
+  }
+  // `plan` and `values` as in processReal.
+  async untagReal(real, mode = "restore", { plan = null, values: planned = null } = {}) {
+    const { ctx } = this;
+    const skip = (reason) => plan ? (plan.push({ file: real, status: "skipped", reason }), "skipped") : "skipped";
+    if (!await modelAllowsTagging(ctx, real)) return skip("model classification or link requires review");
+    let tags;
+    try {
+      tags = readTags(real);
+    } catch {
+      return skip("unreadable");
+    }
+    if (tags.recordingMbid && !plan) this.excluded[tags.recordingMbid] = { at: Date.now() };
+    const original = this.originals[real];
+    let values = planned;
+    if (!values) {
+      if (mode === "clear") values = { composer: [], work: [], workId: [] };
+      else if (original) values = Object.fromEntries(TAG_FIELDS.map((field) => [field, original[field] ?? []]));
+      else {
+        const credit = await this.trackCredit(tags);
+        values = { composer: [], work: [], workId: [], ...credit && { artist: [credit] } };
+        if (tags.albumArtistMbids.length === 1) {
+          const name = (await ctx.mb.get("artist", tags.albumArtistMbids[0], "aliases+genres"))?.name;
+          if (name) values.albumArtist = [name];
+        }
+      }
+    }
+    if (plan) {
+      plan.push({ file: real, status: "planned", recording: tags.recordingMbid, restore: Boolean(original), values, current: readValues(real, Object.keys(values)) });
+      return "planned";
+    }
+    const changed = await writeTags(real, values);
+    if (mode !== "clear") delete this.originals[real];
+    const after = await fs7.stat(real);
+    this.index[real] = { ...this.index[real] ?? {}, ...indexEntry(readTags(real), after) };
+    this.record(real, after, { status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
+    this.stats.skipped["classical tags removed"]--;
+    if (changed.length) {
+      this.changedFiles++;
+      ctx.log(`Removed classical tags from ${path8.basename(real)}`);
+    }
+    return changed.length ? original && mode !== "clear" ? "restored" : "cleared" : "unchanged";
+  }
+  async englishAlbumArtist(tags) {
+    if (tags.albumArtistMbids.length !== 1) return null;
+    const artist = await this.ctx.resolver.getArtist(tags.albumArtistMbids[0]);
+    if (!artist?.name) return null;
+    const [name] = await this.ctx.resolver.englishNames(artist);
+    return name || null;
+  }
+  // MusicBrainz's artist credit for this recording on the file's release,
+  // else on the recording itself.
+  async trackCredit(tags) {
+    const { mb } = this.ctx;
+    if (tags.releaseMbid) {
+      const release = await mb.get("release", tags.releaseMbid, RELEASE_INC);
+      for (const medium of release?.media || [])
+        for (const track of medium.tracks || [])
+          if (track.recording?.id === tags.recordingMbid) {
+            const credit = creditString(track["artist-credit"] || track.recording["artist-credit"]);
+            if (credit) return credit;
+          }
+    }
+    const recording = await mb.get("recording", tags.recordingMbid, "artist-credits");
+    return creditString(recording?.["artist-credit"]) || null;
+  }
+  async drainQueue(until, onlyIds = null) {
+    for (const entry of await queuedEntries(this.ctx)) {
+      if (Date.now() > until || await this.shouldYield()) return false;
+      if (onlyIds && !onlyIds.has(entry.name.replace(/\.json$/, ""))) continue;
+      if (this.state.claimed.has(entry.name)) continue;
+      this.state.claimed.add(entry.name);
+      try {
+        const job = await readJson(entry.file, null);
+        if (!this.priority && job?.source === "action" && Date.now() - (job.at || 0) < ACTION_CLAIM_MS) continue;
+        if (job?.path) {
+          const reachable = await this.processFile(job.path, { force: job.force, queuedAt: job.at });
+          if (!reachable) return false;
+        }
+        await fs7.rm(entry.file, { force: true });
+      } finally {
+        this.state.claimed.delete(entry.name);
+      }
+      await this.save();
+    }
+    return true;
+  }
+  // Walks the Library, refreshing the index, and returns files that have a
+  // recording ID and were never processed (or changed since). Stops at
+  // `until`; unchanged files cost only a stat, so the next run gets further.
+  async scan(until) {
+    const root = this.ctx.libraryFolder;
+    const pending = [];
+    const seen = /* @__PURE__ */ new Set();
+    let complete = true;
+    const walk = async (dir) => {
+      if (Date.now() > until || await this.shouldYield()) {
+        complete = false;
+        return;
+      }
+      const entries = await fs7.readdir(dir, { withFileTypes: true }).catch(() => []);
+      for (const entry of entries) {
+        if (Date.now() > until || await this.shouldYield()) {
+          complete = false;
+          return;
+        }
+        if (entry.name.startsWith(".")) continue;
+        const full = path8.join(dir, entry.name);
+        if (entry.isDirectory()) await walk(full);
+        else if (entry.isFile() && isAudioPath(full)) {
+          seen.add(full);
+          const stat = await fs7.stat(full).catch(() => null);
+          if (!stat) continue;
+          if (!sameStat(this.index[full], stat)) {
+            try {
+              this.index[full] = indexEntry(readTags(full), stat);
+            } catch {
+              delete this.index[full];
+              continue;
+            }
+            this.dirty++;
+            await this.save();
+          }
+          if (this.index[full].recordingMbid && (!sameStat(this.processed[full], stat) || outdated(this.processed[full]))) pending.push(full);
+        }
+      }
+    };
+    if (root) await walk(root);
+    if (complete) {
+      for (const file of Object.keys(this.index)) if (file.startsWith(root) && !seen.has(file)) delete this.index[file];
+    }
+    this.scanComplete = complete;
+    return pending;
+  }
+};
+var held = /* @__PURE__ */ new Map();
+async function openState(ctx, priority) {
+  let lock = await tryLock(lockDir(ctx), LOCK_STALE_MS2);
+  if (!lock && priority) {
+    ctx.log("Waiting for background tagging in another process to pause");
+    const until = Date.now() + PRIORITY_WAIT_MS;
+    while (!lock && Date.now() < until) {
+      await writeJson(yieldFile(ctx), { at: Date.now() });
+      await sleep(500);
+      lock = await tryLock(lockDir(ctx), LOCK_STALE_MS2);
+    }
+    await fs7.rm(yieldFile(ctx), { force: true });
+    if (!lock) ctx.log("Tagging in another process didn't pause within 5 minutes");
+  }
+  if (!lock) return null;
+  const state = new State(ctx, lock);
+  try {
+    await state.load();
+  } catch (error) {
+    await lock.release();
+    throw error;
+  }
+  state.heartbeat = setInterval(() => lock.touch(), 3e4);
+  return state;
+}
+async function withTagging(ctx, work, { priority = false } = {}) {
+  const key = path8.resolve(ctx.dataFolder);
+  let entry;
+  for (; ; ) {
+    entry = held.get(key);
+    if (!entry) {
+      entry = { opening: openState(ctx, priority), state: null };
+      held.set(key, entry);
+      try {
+        entry.state = await entry.opening;
+      } catch (error) {
+        held.delete(key);
+        throw error;
+      }
+      if (!entry.state) {
+        held.delete(key);
+        return null;
+      }
+      break;
+    }
+    if (!entry.state) {
+      if (!priority) return null;
+      await entry.opening.catch(() => {
+      });
+      if (held.get(key) === entry && entry.state) break;
+      continue;
+    }
+    if (!priority && entry.state.background > 0) return null;
+    break;
+  }
+  const { state } = entry;
+  const session = new Session(ctx, state, priority);
+  state.refs++;
+  if (priority) state.admins++;
+  else state.background++;
+  try {
+    await work(session);
+    return session.stats;
+  } finally {
+    if (priority) state.admins--;
+    else state.background--;
+    if (--state.refs === 0) {
+      held.delete(key);
+      clearInterval(state.heartbeat);
+      await state.save(true).catch((error) => ctx.log(`Couldn't save progress: ${error.message}`));
+      await state.lock.release();
+    } else {
+      await state.save().catch(() => {
+      });
+    }
+    if (session.changedFiles) await refreshLibrary(ctx);
+  }
+}
+async function refreshLibrary(ctx) {
+  if (!ctx.api?.url || !ctx.api?.key) return;
+  try {
+    await new Aurral(ctx.api, ctx.fetch).refreshLibrary();
+  } catch (error) {
+    ctx.log(`Couldn't ask Aurral to rescan the Library: ${error.message}`);
+  }
+}
+async function runQueue(ctx, budgetMs, onlyIds = null, { priority = false } = {}) {
+  const until = Date.now() + budgetMs;
+  return withTagging(
+    ctx,
+    async (session) => {
+      await session.drainQueue(until, onlyIds);
+      session.stats.left = onlyIds ? (await queuedEntries(ctx)).filter((e) => onlyIds.has(e.name.replace(/\.json$/, ""))).length : await queueLength(ctx);
+    },
+    { priority }
+  );
+}
+async function runScheduled(ctx, budgetMs) {
+  const until = Date.now() + budgetMs;
+  return withTagging(ctx, async (session) => {
+    if (!await session.drainQueue(until)) return;
+    const pending = await session.scan(until);
+    session.stats.found = pending.length;
+    for (const file of pending) {
+      if (Date.now() > until || await session.shouldYield()) break;
+      if (!await session.processFile(file, { prefilter: true, upgrade: true })) break;
+      await session.save();
+    }
+    session.stats.left = await queueLength(ctx) + pending.filter((f) => !session.processed[f]).length;
+  });
+}
+async function libraryIndex(ctx, budgetMs, { priority = false } = {}) {
+  let index = null;
+  await withTagging(
+    ctx,
+    async (session) => {
+      await session.scan(Date.now() + budgetMs);
+      index = session.index;
+    },
+    { priority }
+  );
+  return index ?? await readJson(indexFile(ctx), {});
+}
+function describeStats(stats) {
+  if (!stats) return "Another tagging run is in progress";
+  const parts = [`${stats.tagged} tagged`];
+  if (stats.unchanged) parts.push(`${stats.unchanged} already right`);
+  for (const [reason, count] of Object.entries(stats.skipped)) parts.push(`${count} skipped (${reason})`);
+  if (stats.failed) parts.push(`${stats.failed} failed`);
+  if (stats.left) parts.push(`${stats.left} left for the next run`);
+  return parts.join(", ");
+}
+
+// src/tag-requests.js
+var MODES = { tag: "Tag as classical", restore: "Remove classical tags", clear: "Clear classical tags" };
+var KEEP_MS = 7 * 864e5;
+var ID = /^[0-9a-f-]{36}$/;
+var folder = (ctx) => path9.join(ctx.dataFolder, "tag-requests");
+var fileOf = (ctx, id) => path9.join(folder(ctx), `${id}.json`);
+var same2 = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+function untagMessage(counts, what, mode) {
+  const parts = [`${counts.restored} restored`];
+  if (counts.cleared) parts.push(`${counts.cleared} cleared${mode === "clear" ? " (existing backups retained)" : " (original tags unavailable)"}`);
+  if (counts.unchanged) parts.push(`${counts.unchanged} already had no classical tags`);
+  if (counts["no backup"]) parts.push(`${counts["no backup"]} couldn't be restored (no backup, and MusicBrainz has no credit)`);
+  if (counts.skipped) parts.push(`${counts.skipped} skipped`);
+  if (counts.changed) parts.push(`${counts.changed} skipped (changed since the request)`);
+  if (counts.left) parts.push(`${counts.left} left: run it again`);
+  return `${what}: ${parts.join(", ")}. The plugin won't tag these recordings again unless you tag them as classical.`.slice(0, 500);
+}
+function save(ctx, request) {
+  fs8.mkdirSync(folder(ctx), { recursive: true });
+  const target = fileOf(ctx, request.id);
+  fs8.writeFileSync(`${target}.tmp`, JSON.stringify(request));
+  fs8.renameSync(`${target}.tmp`, target);
+}
+function readRequest(ctx, id) {
+  if (!ID.test(String(id || ""))) return null;
+  try {
+    return JSON.parse(fs8.readFileSync(fileOf(ctx, id), "utf8"));
+  } catch {
+    return null;
+  }
+}
+function listRequests(ctx) {
+  let names = [];
+  try {
+    names = fs8.readdirSync(folder(ctx)).filter((name) => name.endsWith(".json"));
+  } catch {
+    return [];
+  }
+  const out = [];
+  for (const name of names) {
+    const request = readRequest(ctx, name.slice(0, -5));
+    if (!request) continue;
+    if (Date.now() - request.createdAt > KEEP_MS) fs8.rmSync(fileOf(ctx, request.id), { force: true });
+    else out.push(request);
+  }
+  return out.sort((a, b) => b.createdAt - a.createdAt).slice(0, 50);
+}
+var writable = (file) => fsp.access(path9.dirname(file), fs8.constants.W_OK).then(
+  () => fsp.access(file, fs8.constants.W_OK).then(() => true)
+).catch(() => false);
+function commonValue(files, field) {
+  const counts = /* @__PURE__ */ new Map();
+  for (const entry of files) {
+    if (entry.status !== "change") continue;
+    const value = (entry.values?.[field] || []).join("; ");
+    if (value) counts.set(value, (counts.get(value) || 0) + 1);
+  }
+  return [...counts].sort((a, b) => b[1] - a[1])[0] || null;
+}
+function waitingRequest(ctx, target) {
+  return listRequests(ctx).find((request) => request.target === target && request.state === "waiting") || null;
+}
+async function requestTags(ctx, paths, { mode, what, actor: actor2, target = null }) {
+  if (!MODES[mode]) throw new Error("Unknown tag request");
+  if (!paths.length) return { message: mode === "tag" ? `No files to tag in ${what}` : `No files in ${what}` };
+  const plan = [];
+  const outside = /* @__PURE__ */ new Set();
+  let unreachable = false;
+  const stats = await withTagging(
+    ctx,
+    async (session) => {
+      for (const file of paths) {
+        const inside = await allowedPath(ctx, file);
+        const real = inside || await fsp.realpath(file).catch(() => null);
+        if (!real || !isAudioPath(real)) {
+          plan.push({ file, status: "skipped", reason: real ? "not an audio file" : "file not found" });
+          continue;
+        }
+        if (!inside) outside.add(real);
+        if (mode === "tag") {
+          if (!await session.processReal(real, { force: true, plan, asPath: file })) {
+            unreachable = true;
+            break;
+          }
+        } else await session.untagReal(real, mode, { plan });
+      }
+    },
+    { priority: true }
+  );
+  if (!stats) return { message: "Tagging is busy. Try again in a few minutes." };
+  const files = plan.map((entry) => entry.status === "planned" ? { ...entry, status: same2(entry.current, entry.values) ? "unchanged" : "change" } : entry);
+  let readOnly = 0;
+  for (const entry of files) if (entry.status === "change" && (outside.has(entry.file) || !await writable(entry.file))) readOnly++;
+  const count = (status) => files.filter((entry) => entry.status === status).length;
+  const changing = count("change");
+  const reasons = {};
+  for (const entry of files) if (entry.status === "skipped") reasons[entry.reason] = (reasons[entry.reason] || 0) + 1;
+  const notes = [
+    count("unchanged") && `${count("unchanged")} already right`,
+    ...Object.entries(reasons).map(([reason, n]) => `${n} skipped (${reason})`),
+    unreachable && "MusicBrainz couldn't be reached, so the rest wait"
+  ].filter(Boolean);
+  if (!changing) return { message: `${what}: nothing to write${notes.length ? ` (${notes.join(", ")})` : ""}.`.slice(0, 500) };
+  const request = { id: randomUUID10(), mode, what, target, actor: String(actor2?.id ?? ""), createdAt: Date.now(), state: "waiting", files };
+  save(ctx, request);
+  const shown = [
+    ["artist", "Artist"],
+    ["work", "Work"],
+    ["albumArtist", "Album artist"]
+  ].flatMap(([field, label]) => {
+    const common = commonValue(files, field);
+    return common ? [`${label}: ${common[0]}${common[1] < changing ? ` (${common[1]} files)` : ""}`] : [];
+  });
+  const end = readOnly === changing ? "These files are read-only, so they can't be written." : `Choose Write planned tags to write them${readOnly ? `; ${readOnly} are read-only and will be skipped` : ""}.`;
+  return {
+    id: request.id,
+    message: `${what}: nothing written yet. ${changing} file${changing === 1 ? "" : "s"} would change. ${shown.join(". ")}${shown.length ? ". " : ""}${end}${notes.length ? ` Also ${notes.join(", ")}.` : ""}`.slice(0, 500)
+  };
+}
+async function applyRequest(ctx, id, actor2) {
+  const request = readRequest(ctx, id);
+  if (!request) throw new Error("This tag request is gone. Choose the action again.");
+  if (request.state !== "waiting") return { message: request.message || "This tag request was written already." };
+  request.state = "writing";
+  save(ctx, request);
+  const counts = { restored: 0, cleared: 0, unchanged: 0, "no backup": 0, skipped: 0, changed: 0, left: 0 };
+  let session;
+  const stats = await withTagging(
+    ctx,
+    async (current) => {
+      session = current;
+      for (const entry of request.files) {
+        if (entry.status !== "change") continue;
+        const real = await allowedPath(ctx, entry.file);
+        if (!real) {
+          entry.result = { status: "skipped", reason: "read-only folder" };
+          counts.skipped++;
+          session.stats.skipped["read-only folder"] = (session.stats.skipped["read-only folder"] || 0) + 1;
+          continue;
+        }
+        entry.result = await session.state.exclusive(real, async () => {
+          let now;
+          try {
+            now = readValues(real, Object.keys(entry.values));
+          } catch {
+            return { status: "skipped", reason: "unreadable" };
+          }
+          if (!same2(now, entry.current)) return { status: "skipped", reason: "changed since the request", changed: true };
+          if (request.mode === "tag") {
+            await session.processReal(real, { force: true, values: entry.values });
+            const record = session.processed[real];
+            return { status: record?.status || "failed", reason: record?.reason };
+          }
+          return { status: await session.untagReal(real, request.mode, { values: entry.values }) };
+        }).catch((error) => {
+          ctx.log(`Couldn't write tags to ${real}: ${error.message}`);
+          if (request.mode === "tag") session.stats.failed++;
+          return { status: "skipped", reason: String(error.message || error).slice(0, 200) };
+        });
+        if (entry.result.changed) {
+          counts.changed++;
+          session.stats.skipped["changed since the request"] = (session.stats.skipped["changed since the request"] || 0) + 1;
+        } else if (request.mode !== "tag") counts[entry.result.status] = (counts[entry.result.status] || 0) + 1;
+      }
+    },
+    { priority: true }
+  );
+  if (!stats) {
+    request.state = "waiting";
+    save(ctx, request);
+    return { message: "Tagging is busy. Try again in a few minutes." };
+  }
+  request.state = "done";
+  request.writtenAt = Date.now();
+  request.writtenBy = String(actor2?.id ?? "");
+  request.message = request.mode === "tag" ? `${request.what}: ${describeStats(stats)}`.slice(0, 500) : untagMessage(counts, request.what, request.mode);
+  save(ctx, request);
+  return { message: request.message };
+}
+
+// src/mb.js
+import path10 from "node:path";
+
+// src/version.js
+var VERSION = "1.2.0";
+var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
+
+// src/mb.js
+var PUBLIC_MB = "https://musicbrainz.org";
+var DAY = 24 * 60 * 6e4;
+var TTL = { recording: DAY, default: 30 * DAY, search: 7 * DAY };
+var RETRY_STATUSES = /* @__PURE__ */ new Set([500, 502, 503, 504]);
+function mbBaseUrl(settings) {
+  const mirror = String(settings.mbMirror || "").trim().replace(/\/+$/, "");
+  if (!mirror) return PUBLIC_MB;
+  return /^https?:\/\//i.test(mirror) ? mirror.replace(/\/ws\/2$/, "") : `http://${mirror}`;
+}
+var MusicBrainz = class {
+  constructor({ settings, dataFolder, fetchImpl = fetch, log: log2 = () => {
+  }, intervalMs, maxRetries = 4, retryWaitMs = 3e3 }) {
+    this.base = mbBaseUrl(settings);
+    this.userAgent = `AurralClassical/${VERSION} ( ${REPOSITORY} )`;
+    this.fetch = fetchImpl;
+    this.log = log2;
+    this.cache = new FileCache(path10.join(dataFolder, "mb-cache"));
+    const isPublic = this.base === PUBLIC_MB;
+    this.throttle = new Throttle(dataFolder, intervalMs ?? (isPublic ? 1e3 : 0));
+    this.maxRetries = maxRetries;
+    this.retryWaitMs = retryWaitMs;
+    this.failures = 0;
+    this.disabled = false;
+    this.requests = 0;
+  }
+  // An entity lookup: get("recording", id, "artist-rels+work-rels").
+  get(entity, id, inc, { ttl } = {}) {
+    if (!id) return Promise.resolve(null);
+    const query = new URLSearchParams({ fmt: "json", ...inc && { inc } });
+    const ttlMs = ttl ?? (entity === "recording" ? TTL.recording : TTL.default);
+    return this.request(`${entity}/${id}?${query}`, ttlMs);
+  }
+  // A search or browse: query("release", { query: "..." }).
+  query(entity, params, { ttl = TTL.search } = {}) {
+    const query = new URLSearchParams({ fmt: "json", ...params });
+    return this.request(`${entity}?${query}`, ttl);
+  }
+  // True when MusicBrainz answers at all.
+  async ping() {
+    try {
+      const response = await this.throttle.run(() => this.fetch(`${this.base}/ws/2/artist/1f9df192-a621-4f54-8850-2c5373b7eac9?fmt=json`, {
+        headers: { "User-Agent": this.userAgent, Accept: "application/json" },
+        signal: AbortSignal.timeout(15e3)
+      }));
+      return response.status < 500 ? true : `it answered ${response.status}`;
+    } catch (error) {
+      return error.cause?.code || error.message;
+    }
+  }
+  async request(pathAndQuery, ttlMs) {
+    const key = `${this.base}|${pathAndQuery}`;
+    if (ttlMs > 0) {
+      const cached = await this.cache.get(key, ttlMs);
+      if (cached !== null) {
+        this.lastResult = cached.missing ? "missing" : "ok";
+        return cached.missing ? null : cached;
+      }
+    }
+    this.lastResult = "failed";
+    if (this.disabled) return null;
+    const url = `${this.base}/ws/2/${pathAndQuery}`;
+    let lastError = null;
+    for (let attempt = 0; attempt < this.maxRetries; attempt++) {
+      this.requests++;
+      let response;
+      try {
+        response = await this.throttle.run(() => this.fetch(url, {
+          headers: { "User-Agent": this.userAgent, Accept: "application/json" },
+          signal: AbortSignal.timeout(2e4)
+        }));
+      } catch (error) {
+        lastError = error;
+        if (attempt < this.maxRetries - 1) await sleep(this.retryWaitMs * (attempt + 1));
+        continue;
+      }
+      if (response.ok) {
+        const data = await response.json();
+        this.failures = 0;
+        this.lastResult = "ok";
+        if (ttlMs > 0) await this.cache.set(key, data);
+        return data;
+      }
+      if (response.status === 404) {
+        this.failures = 0;
+        this.lastResult = "missing";
+        if (ttlMs > 0) await this.cache.set(key, { missing: true });
+        return null;
+      }
+      lastError = new Error(`MusicBrainz answered ${response.status}`);
+      if (!RETRY_STATUSES.has(response.status) || attempt === this.maxRetries - 1) break;
+      const retryAfter = Number(response.headers.get("retry-after")) * 1e3 || 0;
+      await sleep(Math.max(retryAfter, this.retryWaitMs * (attempt + 1)));
+    }
+    this.log(`MusicBrainz request failed for ${pathAndQuery}: ${lastError?.message}`);
+    if (++this.failures >= 5) {
+      this.disabled = true;
+      this.log("5 MusicBrainz lookups failed in a row; skipping lookups for the rest of this run");
+    }
+    return null;
   }
 };
 
@@ -37143,14 +43372,14 @@ var ROLE_ALIASES = {
 function parseOrder(value) {
   const raw = String(value ?? "").trim();
   if (!raw) return [...DEFAULT_ORDER];
-  const roles = [];
+  const roles2 = [];
   for (const word of raw.toLowerCase().split(/[\s,;>|/]+/).filter(Boolean)) {
     const role = ROLE_ALIASES[word];
     if (!role) throw new Error(`Name order: "${word}" isn't a role. Use ${ROLES.slice(0, 5).join(", ")}.`);
-    if (!roles.includes(role)) roles.push(role);
+    if (!roles2.includes(role)) roles2.push(role);
   }
-  if (!roles.includes("credited")) roles.push("credited");
-  return roles;
+  if (!roles2.includes("credited")) roles2.push("credited");
+  return roles2;
 }
 function parseSeparator(value) {
   const raw = String(value ?? "");
@@ -37166,7 +43395,7 @@ function slskdSettings(settings) {
 }
 
 // src/slskd.js
-import { randomUUID as randomUUID4 } from "node:crypto";
+import { randomUUID as randomUUID11 } from "node:crypto";
 var Slskd = class {
   constructor({ url, apiKey }, fetchImpl = fetch) {
     if (!url || !apiKey) throw new Error("Set the slskd URL and API key on the plugin's page");
@@ -37211,7 +43440,7 @@ var Slskd = class {
   }
   // Starts a search and returns its id.
   async startSearch(searchText, searchTimeoutMs) {
-    const id = randomUUID4();
+    const id = randomUUID11();
     const body = { id, searchText, searchTimeout: searchTimeoutMs, filterResponses: true, minimumResponseFileCount: 1, responseLimit: 200, fileLimit: 2e4 };
     await this.request("POST", "/searches", body, { timeoutMs: searchTimeoutMs + 15e3 });
     return id;
@@ -37253,93 +43482,9 @@ var FAILED_STATES = /Errored|Rejected|Cancelled|TimedOut|Aborted|Failed/i;
 var isSucceeded = (state) => /Completed/i.test(state) && /Succeeded/i.test(state);
 
 // src/source.js
-import { randomUUID as randomUUID5 } from "node:crypto";
-import fs5 from "node:fs/promises";
-import path6 from "node:path";
-
-// src/search/normalize.js
-var LETTERS = { \u00F8: "o", \u00E6: "ae", \u0153: "oe", \u00DF: "ss", \u0142: "l", \u0111: "d", \u00F0: "d", \u00FE: "th", \u0131: "i", \u0127: "h", \u014B: "n" };
-var CYRILLIC = {
-  \u0430: "a",
-  \u0431: "b",
-  \u0432: "v",
-  \u0433: "g",
-  \u0434: "d",
-  \u0435: "e",
-  \u0451: "e",
-  \u0436: "zh",
-  \u0437: "z",
-  \u0438: "i",
-  \u0439: "i",
-  \u043A: "k",
-  \u043B: "l",
-  \u043C: "m",
-  \u043D: "n",
-  \u043E: "o",
-  \u043F: "p",
-  \u0440: "r",
-  \u0441: "s",
-  \u0442: "t",
-  \u0443: "u",
-  \u0444: "f",
-  \u0445: "kh",
-  \u0446: "ts",
-  \u0447: "ch",
-  \u0448: "sh",
-  \u0449: "shch",
-  \u044A: "",
-  \u044B: "y",
-  \u044C: "",
-  \u044D: "e",
-  \u044E: "yu",
-  \u044F: "ya",
-  \u0456: "i",
-  \u0457: "i",
-  \u0454: "e",
-  \u0491: "g"
-};
-function fold(value) {
-  return String(value ?? "").toLowerCase().replace(/[^\u0000-\u007f]/g, (ch) => LETTERS[ch] ?? CYRILLIC[ch] ?? ch).normalize("NFKD").replace(new RegExp("\\p{M}", "gu"), "").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
-}
-var words2 = (value) => fold(value).split(" ").filter(Boolean);
-var SYSTEMS = [
-  ["bwv", "bwv"],
-  ["buxwv", "buxwv"],
-  ["swv", "swv"],
-  ["hwv", "hwv"],
-  ["fp", "fp"],
-  ["jb", "jb"],
-  ["cd", "cd"],
-  ["z", "z"],
-  ["twv", "twv"],
-  ["wwv", "wwv"],
-  ["rv", "rv"],
-  ["hob", "hob"],
-  ["wab", "wab"],
-  ["woo", "woo"],
-  ["kv", "k"],
-  ["k", "k"],
-  ["d", "d"],
-  ["s", "s"],
-  ["sz", "sz"],
-  ["bb", "bb"],
-  ["trv", "trv"],
-  ["fs", "fs"],
-  ["l", "l"],
-  ["kk", "kk"],
-  ["jw", "jw"],
-  ["op", "op"],
-  ["opus", "op"],
-  ["opp", "op"]
-];
-var PREFIX = SYSTEMS.map(([written]) => written).sort((a, b) => b.length - a.length).join("|");
-var ROMAN = "(?:x{0,3})(?:ix|iv|v?i{0,3})";
-var HOBOKEN = new RegExp(`\\bhob\\.?\\s*(${ROMAN}[a-z]?)\\s*[:/.\\s]\\s*(\\d+[a-z]?)`, "giu");
-var NUMBERED = new RegExp(
-  `(?<![\\p{L}\\p{N}])(${PREFIX})\\.?\\s*(\\d+[a-z]?)(?:\\s*(?:,\\s*|\\/|\\s+)(?:(?:no|nr|n\xB0|num|number|#)\\.?\\s*)?(\\d+[a-z]?)(?![\\p{L}\\p{N}]))?`,
-  "giu"
-);
-var SYSTEM = new Map(SYSTEMS);
+import { randomUUID as randomUUID12 } from "node:crypto";
+import fs9 from "node:fs/promises";
+import path11 from "node:path";
 
 // src/slskd-ranking.js
 var GOOD_SCORE = 60;
@@ -37376,8 +43521,8 @@ var has = (haystack, name) => {
   const wanted = words2(name);
   return wanted.length > 0 && wanted.every((word) => haystack.includes(` ${word} `));
 };
-var coverage = (haystack, text2) => {
-  const wanted = words2(text2).filter((word) => word.length > 1);
+var coverage = (haystack, text5) => {
+  const wanted = words2(text5).filter((word) => word.length > 1);
   return wanted.length ? wanted.filter((word) => haystack.includes(` ${word} `)).length / wanted.length : 0;
 };
 function scoreFolder(folder2, info, { albumTitle = "", movements = [] } = {}) {
@@ -37413,8 +43558,8 @@ function scoreFolder(folder2, info, { albumTitle = "", movements = [] } = {}) {
   return { score: Math.min(score, 100), rejected: null, reasons };
 }
 var folderKey = (folder2) => `${fold(folder2.directory.split(/[\\/]/).pop())}|${folder2.files.map((f) => f.size).join(",")}`;
-function rankCandidates(candidates) {
-  const sorted = [...candidates].sort((a, b) => b.match.score - a.match.score || a.availability - b.availability);
+function rankCandidates(candidates2) {
+  const sorted = [...candidates2].sort((a, b) => b.match.score - a.match.score || a.availability - b.availability);
   const firstOf = /* @__PURE__ */ new Map();
   for (const candidate of sorted) {
     const key = candidate.folders.map(folderKey).join("||");
@@ -37425,11 +43570,11 @@ function rankCandidates(candidates) {
   return unique2.flatMap((c) => [c, ...sorted.filter((d) => d.duplicateOf === `${c.username}:${c.folders[0].directory}`)]);
 }
 var isAmbiguous = (candidate) => candidate.match.score < REVIEW_SCORE;
-function withLineUp(match, { whole }) {
+function withLineUp(match2, { whole }) {
   return {
-    ...match,
-    score: Math.min(100, match.score + (whole ? 25 : 20)),
-    reasons: [...match.reasons, whole ? "every track lines up with the release" : "the track lines up with an edition of the release"]
+    ...match2,
+    score: Math.min(100, match2.score + (whole ? 25 : 20)),
+    reasons: [...match2.reasons, whole ? "every track lines up with the release" : "the track lines up with an edition of the release"]
   };
 }
 
@@ -37558,22 +43703,22 @@ function albumCandidates(folders, release) {
     byUser.get(folder2.username).push({ folder: folder2, discs });
   }
   const wanted = release.discs.map((d) => d.position);
-  const candidates = [];
+  const candidates2 = [];
   for (const [username, matches] of byUser) {
     matches.sort((a, b) => b.discs.length - a.discs.length || folderScore(a.folder) - folderScore(b.folder));
     const chosen = [];
     const covered = /* @__PURE__ */ new Set();
-    for (const match of matches) {
-      if (match.discs.some((d) => covered.has(d))) continue;
-      chosen.push(match);
-      match.discs.forEach((d) => covered.add(d));
+    for (const match2 of matches) {
+      if (match2.discs.some((d) => covered.has(d))) continue;
+      chosen.push(match2);
+      match2.discs.forEach((d) => covered.add(d));
     }
     if (!wanted.every((d) => covered.has(d))) continue;
     const files = chosen.flatMap(({ folder: folder2, discs }) => mapFiles(folder2, release, discs));
     const first = chosen[0].folder;
-    candidates.push({ username, folders: chosen.map((c) => c.folder), files, score: Math.max(...chosen.map((c) => folderScore(c.folder))), format: first.format, bitRate: first.files[0]?.bitRate ?? null });
+    candidates2.push({ username, folders: chosen.map((c) => c.folder), files, score: Math.max(...chosen.map((c) => folderScore(c.folder))), format: first.format, bitRate: first.files[0]?.bitRate ?? null });
   }
-  return candidates.sort((a, b) => a.score - b.score);
+  return candidates2.sort((a, b) => a.score - b.score);
 }
 function trackCandidates(folders, release, discPosition, trackIndexInDisc) {
   const out = [];
@@ -37626,6 +43771,12 @@ async function classicalInfo(ctx, recordingId, { albumArtistIds = [], releaseGro
     movementTitle: fields.work || ""
   };
 }
+async function acquisitionIdentity(ctx, track) {
+  const info = await classicalInfo(ctx, track.trackMbid);
+  if (!info) return null;
+  if (!info.performer) return { blocked: true };
+  return { artist: [info.performer.name, info.performer !== info.ensemble && info.ensemble?.name].filter(Boolean).join(" "), aliases: [], requiredTerms: [surname(info.performer)] };
+}
 async function searchFolders(ctx, slskd, ladder, { info, albumTitle, movements, accept }, started) {
   const deadline = started + SEARCH_BUDGET_MS;
   const kept = /* @__PURE__ */ new Map();
@@ -37653,13 +43804,13 @@ async function searchFolders(ctx, slskd, ladder, { info, albumTitle, movements, 
     for (const folder2 of found) {
       const key = `${folder2.username}\0${folder2.directory}`;
       if (kept.has(key)) continue;
-      const match = scoreFolder(folder2, info, { albumTitle, movements });
-      if (match.rejected) {
-        if (rejected.length < 200) rejected.push({ username: folder2.username, directory: folder2.directory, reason: match.rejected, step });
+      const match2 = scoreFolder(folder2, info, { albumTitle, movements });
+      if (match2.rejected) {
+        if (rejected.length < 200) rejected.push({ username: folder2.username, directory: folder2.directory, reason: match2.rejected, step });
         continue;
       }
       qualified++;
-      kept.set(key, Object.assign(folder2, { match, step }));
+      kept.set(key, Object.assign(folder2, { match: match2, step }));
     }
     const done = accept([...kept.values()]);
     steps.push({ step, label, query, folders: found.length, qualified, stopped: done });
@@ -37670,11 +43821,11 @@ async function searchFolders(ctx, slskd, ladder, { info, albumTitle, movements, 
 var DIAGNOSTICS = "slskd-searches.json";
 var KEEP_DIAGNOSTICS = 25;
 async function recordSearch(ctx, record) {
-  const file = path6.join(ctx.dataFolder, DIAGNOSTICS);
+  const file = path11.join(ctx.dataFolder, DIAGNOSTICS);
   const previous = await readJson(file, []);
   await writeJson(file, [{ at: Date.now(), ...record }, ...Array.isArray(previous) ? previous : []].slice(0, KEEP_DIAGNOSTICS)).catch((error) => ctx.log(`Couldn't save slskd diagnostics: ${error.message}`));
 }
-var describe = (candidate) => ({
+var describe2 = (candidate) => ({
   username: candidate.username,
   directory: candidate.folders?.[0]?.directory ?? candidate.folder?.directory,
   score: candidate.match.score,
@@ -37683,8 +43834,8 @@ var describe = (candidate) => ({
   ...candidate.duplicateOf && { duplicateOf: candidate.duplicateOf },
   ...isAmbiguous(candidate) && { review: true }
 });
-function chooseCandidates(candidates, { manual }) {
-  const ranked = rankCandidates(candidates);
+function chooseCandidates(candidates2, { manual }) {
+  const ranked = rankCandidates(candidates2);
   return { ranked, offered: manual ? ranked : ranked.filter((candidate) => !isAmbiguous(candidate)) };
 }
 function slskdFor(ctx) {
@@ -37726,7 +43877,7 @@ async function searchTrack(ctx, track, { manual = false } = {}) {
   const seen = /* @__PURE__ */ new Set();
   const unique2 = withScore(folders).filter((c) => !seen.has(`${c.folder.username}\0${c.file.filename}`) && seen.add(`${c.folder.username}\0${c.file.filename}`));
   const { ranked, offered } = chooseCandidates(unique2, { manual });
-  await recordSearch(ctx, { kind: "track", manual, release: { id: release.id, title: release.title }, track: target.title, performer: info.performer?.name || null, steps, candidates: ranked.slice(0, 30).map(describe), rejected: rejected.slice(0, 30), offered: offered.length });
+  await recordSearch(ctx, { kind: "track", manual, release: { id: release.id, title: release.title }, track: target.title, performer: info.performer?.name || null, steps, candidates: ranked.slice(0, 30).map(describe2), rejected: rejected.slice(0, 30), offered: offered.length });
   return offered.slice(0, MAX_RESULTS).map((c) => ({
     id: `${c.folder.username}:${c.file.filename}`.slice(0, 500),
     title: track.title || target.title,
@@ -37770,7 +43921,7 @@ async function searchAlbum(ctx, album, { manual = false } = {}) {
   );
   ctx.log(`Release ${release.id}: ${describeMisses(folders, release)}`);
   const { ranked, offered } = chooseCandidates(withScore(folders), { manual });
-  await recordSearch(ctx, { kind: "album", manual, release: { id: release.id, title: release.title }, performer: info.performer?.name || null, steps, candidates: ranked.slice(0, 30).map(describe), rejected: rejected.slice(0, 30), offered: offered.length });
+  await recordSearch(ctx, { kind: "album", manual, release: { id: release.id, title: release.title }, performer: info.performer?.name || null, steps, candidates: ranked.slice(0, 30).map(describe2), rejected: rejected.slice(0, 30), offered: offered.length });
   return offered.slice(0, MAX_RESULTS).map((c) => ({
     id: `${c.username}:${c.folders.map((f) => f.directory).join("|")}`.slice(0, 500),
     title: album.title || release.title,
@@ -37794,7 +43945,7 @@ async function searchAlbum(ctx, album, { manual = false } = {}) {
     }
   }));
 }
-var downloadsDir = (ctx) => path6.join(ctx.dataFolder, "downloads");
+var downloadsDir = (ctx) => path11.join(ctx.dataFolder, "downloads");
 async function startDownload(ctx, result, kind) {
   const data = result?.data;
   if (!data?.username || !Array.isArray(data.files) || !data.files.length) throw new Error("The result has no files to download");
@@ -37808,8 +43959,8 @@ async function startDownload(ctx, result, kind) {
   }
   const slskd = slskdFor(ctx);
   await slskd.enqueue(data.username, data.files.map((f) => ({ filename: f.filename, size: f.size })));
-  const id = randomUUID5();
-  await writeJson(path6.join(downloadsDir(ctx), `${id}.json`), { kind, key, username: data.username, files: data.files, startedAt: Date.now() });
+  const id = randomUUID12();
+  await writeJson(path11.join(downloadsDir(ctx), `${id}.json`), { kind, key, username: data.username, files: data.files, startedAt: Date.now() });
   return { pending: id };
 }
 var downloadKey = (username, files) => `${username}\0${files.map((f) => f.filename).sort().join("\0")}`;
@@ -37817,11 +43968,11 @@ var KEEP_DOWNLOADS_MS = 2 * 24 * 60 * 6e4;
 var MISSING_GRACE_MS = 2 * 6e4;
 async function findDownload(ctx, key) {
   const dir = downloadsDir(ctx);
-  for (const name of await fs5.readdir(dir).catch(() => [])) {
+  for (const name of await fs9.readdir(dir).catch(() => [])) {
     if (!name.endsWith(".json")) continue;
-    const record = await readJson(path6.join(dir, name), null);
+    const record = await readJson(path11.join(dir, name), null);
     if (!record || Date.now() - (record.startedAt || 0) > KEEP_DOWNLOADS_MS) {
-      await fs5.rm(path6.join(dir, name), { force: true });
+      await fs9.rm(path11.join(dir, name), { force: true });
       continue;
     }
     if (record.key === key && !record.failed) return name.replace(/\.json$/, "");
@@ -37830,20 +43981,20 @@ async function findDownload(ctx, key) {
 }
 async function locate(downloadFolder, file) {
   const base = remoteBase(file.filename);
-  const direct = path6.join(downloadFolder, remoteBase(remoteDir(file.filename)), base);
-  const stat = await fs5.stat(direct).catch(() => null);
+  const direct = path11.join(downloadFolder, remoteBase(remoteDir(file.filename)), base);
+  const stat = await fs9.stat(direct).catch(() => null);
   if (stat?.isFile()) return direct;
   let seen = 0;
   const walk = async (dir, depth) => {
     if (depth > 4) return null;
-    for (const entry of await fs5.readdir(dir, { withFileTypes: true }).catch(() => [])) {
+    for (const entry of await fs9.readdir(dir, { withFileTypes: true }).catch(() => [])) {
       if (++seen > 5e4) return null;
-      const full = path6.join(dir, entry.name);
+      const full = path11.join(dir, entry.name);
       if (entry.isDirectory()) {
         const found = await walk(full, depth + 1);
         if (found) return found;
       } else if (entry.isFile() && (entry.name === base || entry.name.replace(/_\d{15,}(?=\.[^.]+$)/, "") === base)) {
-        const s = await fs5.stat(full).catch(() => null);
+        const s = await fs9.stat(full).catch(() => null);
         if (s && (!file.size || s.size === file.size)) return full;
       }
     }
@@ -37852,7 +44003,7 @@ async function locate(downloadFolder, file) {
   return walk(downloadFolder, 0);
 }
 async function downloadStatus(ctx, id, directory) {
-  const record = await readJson(path6.join(downloadsDir(ctx), `${id}.json`), null);
+  const record = await readJson(path11.join(downloadsDir(ctx), `${id}.json`), null);
   if (!record) throw new Error("This download is unknown to the plugin");
   const slskd = slskdFor(ctx);
   const transfers = await slskd.downloads(record.username);
@@ -37871,7 +44022,7 @@ async function downloadStatus(ctx, id, directory) {
     }
   }
   const failed = states.find((state) => FAILED_STATES.test(state));
-  if (failed) await writeJson(path6.join(downloadsDir(ctx), `${id}.json`), { ...record, failed: true });
+  if (failed) await writeJson(path11.join(downloadsDir(ctx), `${id}.json`), { ...record, failed: true });
   if (failed) throw new Error(`slskd: ${remoteBase(record.files[states.indexOf(failed)].filename)} ${failed.replace(/^Completed,\s*/, "").toLowerCase()}`);
   if (!states.every(isSucceeded)) return { done: false };
   return finishDownload(ctx, id, record, directory);
@@ -37903,20 +44054,20 @@ async function finishDownload(ctx, id, record, directory) {
 var formatBytes = (bytes) => bytes >= 1024 ** 3 ? `${(bytes / 1024 ** 3).toFixed(1)} GB` : `${Math.max(1, Math.round(bytes / 1024 ** 2))} MB`;
 async function freeBytes(ctx, dir) {
   if (ctx.freeBytes) return ctx.freeBytes(dir);
-  for (let at = dir; ; at = path6.dirname(at)) {
-    const stats = await fs5.statfs(at).catch(() => null);
+  for (let at = dir; ; at = path11.dirname(at)) {
+    const stats = await fs9.statfs(at).catch(() => null);
     if (stats) return stats.bavail * stats.bsize;
-    if (path6.dirname(at) === at) return Infinity;
+    if (path11.dirname(at) === at) return Infinity;
   }
 }
-var link = (ctx, local, target) => (ctx.linkFile ?? fs5.link)(local, target);
+var link2 = (ctx, local, target) => (ctx.linkFile ?? fs9.link)(local, target);
 async function copyInto(local, target) {
-  const temp = `${target}.${randomUUID5()}.part`;
+  const temp = `${target}.${randomUUID12()}.part`;
   try {
-    await fs5.copyFile(local, temp);
-    await fs5.rename(temp, target);
+    await fs9.copyFile(local, temp);
+    await fs9.rename(temp, target);
   } catch (error) {
-    await fs5.rm(temp, { force: true }).catch(() => {
+    await fs9.rm(temp, { force: true }).catch(() => {
     });
     throw error;
   }
@@ -37928,21 +44079,21 @@ async function moveIntoPlace(ctx, id, record, directory) {
     const local = await locate(downloadFolder, file);
     if (!local) throw new Error(`Couldn't find ${remoteBase(file.filename)} in slskd's download folder`);
     const name = `${String(file.disc || 1).padStart(2, "0")}-${String(i + 1).padStart(3, "0")} ${remoteBase(file.filename)}`.replace(/[\\/]/g, "_");
-    const target = path6.join(directory, record.kind === "album" ? name : remoteBase(file.filename));
-    files.push({ local, target, file, size: (await fs5.stat(local)).size });
+    const target = path11.join(directory, record.kind === "album" ? name : remoteBase(file.filename));
+    files.push({ local, target, file, size: (await fs9.stat(local)).size });
   }
-  await fs5.mkdir(directory, { recursive: true });
+  await fs9.mkdir(directory, { recursive: true });
   const todo = [];
   for (const entry of files) {
-    const there = await fs5.stat(entry.target).catch(() => null);
+    const there = await fs9.stat(entry.target).catch(() => null);
     if (!there || there.size !== entry.size) {
-      await fs5.rm(entry.target, { force: true });
+      await fs9.rm(entry.target, { force: true });
       todo.push(entry);
     }
   }
   let linked = false;
   if (todo.length) {
-    linked = await link(ctx, todo[0].local, todo[0].target).then(
+    linked = await link2(ctx, todo[0].local, todo[0].target).then(
       () => true,
       () => false
     );
@@ -37957,7 +44108,7 @@ async function moveIntoPlace(ctx, id, record, directory) {
     }
   }
   for (const entry of linked ? todo.slice(1) : todo) {
-    if (linked) await link(ctx, entry.local, entry.target).catch(() => copyInto(entry.local, entry.target));
+    if (linked) await link2(ctx, entry.local, entry.target).catch(() => copyInto(entry.local, entry.target));
     else await copyInto(entry.local, entry.target);
   }
   let tagged = 0;
@@ -37974,204 +44125,26 @@ async function moveIntoPlace(ctx, id, record, directory) {
       await writeTags(target, { title: [file.title], artist: [file.artist].filter(Boolean), recordingMbid: [file.recordingId] });
       tagged++;
     } catch (error) {
-      ctx.log(`Couldn't tag ${path6.basename(target)}: ${error.message}`);
+      ctx.log(`Couldn't tag ${path11.basename(target)}: ${error.message}`);
     }
   }
   ctx.log(`Download ${id}: ${files.length} file(s) ${linked ? "linked" : "copied"}, ${tagged} identified and tagged`);
-  return record.kind === "album" ? { done: true } : { done: true, path: path6.basename(files[0].target) };
-}
-
-// src/tag-requests.js
-import { randomUUID as randomUUID6 } from "node:crypto";
-import fs6 from "node:fs";
-import fsp from "node:fs/promises";
-import path7 from "node:path";
-var MODES = { tag: "Tag as classical", restore: "Remove classical tags", clear: "Clear classical tags" };
-var KEEP_MS = 7 * 864e5;
-var ID = /^[0-9a-f-]{36}$/;
-var folder = (ctx) => path7.join(ctx.dataFolder, "tag-requests");
-var fileOf = (ctx, id) => path7.join(folder(ctx), `${id}.json`);
-var same2 = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-function untagMessage(counts, what, mode) {
-  const parts = [`${counts.restored} restored`];
-  if (counts.cleared) parts.push(`${counts.cleared} cleared${mode === "clear" ? " (existing backups retained)" : " (original tags unavailable)"}`);
-  if (counts.unchanged) parts.push(`${counts.unchanged} already had no classical tags`);
-  if (counts["no backup"]) parts.push(`${counts["no backup"]} couldn't be restored (no backup, and MusicBrainz has no credit)`);
-  if (counts.skipped) parts.push(`${counts.skipped} skipped`);
-  if (counts.changed) parts.push(`${counts.changed} skipped (changed since the request)`);
-  if (counts.left) parts.push(`${counts.left} left: run it again`);
-  return `${what}: ${parts.join(", ")}. The plugin won't tag these recordings again unless you tag them as classical.`.slice(0, 500);
-}
-function save(ctx, request) {
-  fs6.mkdirSync(folder(ctx), { recursive: true });
-  const target = fileOf(ctx, request.id);
-  fs6.writeFileSync(`${target}.tmp`, JSON.stringify(request));
-  fs6.renameSync(`${target}.tmp`, target);
-}
-function readRequest(ctx, id) {
-  if (!ID.test(String(id || ""))) return null;
-  try {
-    return JSON.parse(fs6.readFileSync(fileOf(ctx, id), "utf8"));
-  } catch {
-    return null;
-  }
-}
-function listRequests(ctx) {
-  let names = [];
-  try {
-    names = fs6.readdirSync(folder(ctx)).filter((name) => name.endsWith(".json"));
-  } catch {
-    return [];
-  }
-  const out = [];
-  for (const name of names) {
-    const request = readRequest(ctx, name.slice(0, -5));
-    if (!request) continue;
-    if (Date.now() - request.createdAt > KEEP_MS) fs6.rmSync(fileOf(ctx, request.id), { force: true });
-    else out.push(request);
-  }
-  return out.sort((a, b) => b.createdAt - a.createdAt).slice(0, 50);
-}
-var writable = (file) => fsp.access(path7.dirname(file), fs6.constants.W_OK).then(
-  () => fsp.access(file, fs6.constants.W_OK).then(() => true)
-).catch(() => false);
-function commonValue(files, field) {
-  const counts = /* @__PURE__ */ new Map();
-  for (const entry of files) {
-    if (entry.status !== "change") continue;
-    const value = (entry.values?.[field] || []).join("; ");
-    if (value) counts.set(value, (counts.get(value) || 0) + 1);
-  }
-  return [...counts].sort((a, b) => b[1] - a[1])[0] || null;
-}
-function waitingRequest(ctx, target) {
-  return listRequests(ctx).find((request) => request.target === target && request.state === "waiting") || null;
-}
-async function requestTags(ctx, paths, { mode, what, actor, target = null }) {
-  if (!MODES[mode]) throw new Error("Unknown tag request");
-  if (!paths.length) return { message: mode === "tag" ? `No files to tag in ${what}` : `No files in ${what}` };
-  const plan = [];
-  const outside = /* @__PURE__ */ new Set();
-  let unreachable = false;
-  const stats = await withTagging(
-    ctx,
-    async (session) => {
-      for (const file of paths) {
-        const inside = await allowedPath(ctx, file);
-        const real = inside || await fsp.realpath(file).catch(() => null);
-        if (!real || !isAudioPath(real)) {
-          plan.push({ file, status: "skipped", reason: real ? "not an audio file" : "file not found" });
-          continue;
-        }
-        if (!inside) outside.add(real);
-        if (mode === "tag") {
-          if (!await session.processReal(real, { force: true, plan, asPath: file })) {
-            unreachable = true;
-            break;
-          }
-        } else await session.untagReal(real, mode, { plan });
-      }
-    },
-    { priority: true }
-  );
-  if (!stats) return { message: "Tagging is busy. Try again in a few minutes." };
-  const files = plan.map((entry) => entry.status === "planned" ? { ...entry, status: same2(entry.current, entry.values) ? "unchanged" : "change" } : entry);
-  let readOnly = 0;
-  for (const entry of files) if (entry.status === "change" && (outside.has(entry.file) || !await writable(entry.file))) readOnly++;
-  const count = (status) => files.filter((entry) => entry.status === status).length;
-  const changing = count("change");
-  const reasons = {};
-  for (const entry of files) if (entry.status === "skipped") reasons[entry.reason] = (reasons[entry.reason] || 0) + 1;
-  const notes = [
-    count("unchanged") && `${count("unchanged")} already right`,
-    ...Object.entries(reasons).map(([reason, n]) => `${n} skipped (${reason})`),
-    unreachable && "MusicBrainz couldn't be reached, so the rest wait"
-  ].filter(Boolean);
-  if (!changing) return { message: `${what}: nothing to write${notes.length ? ` (${notes.join(", ")})` : ""}.`.slice(0, 500) };
-  const request = { id: randomUUID6(), mode, what, target, actor: String(actor?.id ?? ""), createdAt: Date.now(), state: "waiting", files };
-  save(ctx, request);
-  const shown = [
-    ["artist", "Artist"],
-    ["work", "Work"],
-    ["albumArtist", "Album artist"]
-  ].flatMap(([field, label]) => {
-    const common = commonValue(files, field);
-    return common ? [`${label}: ${common[0]}${common[1] < changing ? ` (${common[1]} files)` : ""}`] : [];
-  });
-  const end = readOnly === changing ? "These files are read-only, so they can't be written." : `Choose Write planned tags to write them${readOnly ? `; ${readOnly} are read-only and will be skipped` : ""}.`;
-  return {
-    id: request.id,
-    message: `${what}: nothing written yet. ${changing} file${changing === 1 ? "" : "s"} would change. ${shown.join(". ")}${shown.length ? ". " : ""}${end}${notes.length ? ` Also ${notes.join(", ")}.` : ""}`.slice(0, 500)
-  };
-}
-async function applyRequest(ctx, id, actor) {
-  const request = readRequest(ctx, id);
-  if (!request) throw new Error("This tag request is gone. Choose the action again.");
-  if (request.state !== "waiting") return { message: request.message || "This tag request was written already." };
-  request.state = "writing";
-  save(ctx, request);
-  const counts = { restored: 0, cleared: 0, unchanged: 0, "no backup": 0, skipped: 0, changed: 0, left: 0 };
-  let session;
-  const stats = await withTagging(
-    ctx,
-    async (current) => {
-      session = current;
-      for (const entry of request.files) {
-        if (entry.status !== "change") continue;
-        const real = await allowedPath(ctx, entry.file);
-        if (!real) {
-          entry.result = { status: "skipped", reason: "read-only folder" };
-          counts.skipped++;
-          session.stats.skipped["read-only folder"] = (session.stats.skipped["read-only folder"] || 0) + 1;
-          continue;
-        }
-        entry.result = await session.state.exclusive(real, async () => {
-          let now;
-          try {
-            now = readValues(real, Object.keys(entry.values));
-          } catch {
-            return { status: "skipped", reason: "unreadable" };
-          }
-          if (!same2(now, entry.current)) return { status: "skipped", reason: "changed since the request", changed: true };
-          if (request.mode === "tag") {
-            await session.processReal(real, { force: true, values: entry.values });
-            const record = session.processed[real];
-            return { status: record?.status || "failed", reason: record?.reason };
-          }
-          return { status: await session.untagReal(real, request.mode, { values: entry.values }) };
-        }).catch((error) => {
-          ctx.log(`Couldn't write tags to ${real}: ${error.message}`);
-          if (request.mode === "tag") session.stats.failed++;
-          return { status: "skipped", reason: String(error.message || error).slice(0, 200) };
-        });
-        if (entry.result.changed) {
-          counts.changed++;
-          session.stats.skipped["changed since the request"] = (session.stats.skipped["changed since the request"] || 0) + 1;
-        } else if (request.mode !== "tag") counts[entry.result.status] = (counts[entry.result.status] || 0) + 1;
-      }
-    },
-    { priority: true }
-  );
-  if (!stats) {
-    request.state = "waiting";
-    save(ctx, request);
-    return { message: "Tagging is busy. Try again in a few minutes." };
-  }
-  request.state = "done";
-  request.writtenAt = Date.now();
-  request.writtenBy = String(actor?.id ?? "");
-  request.message = request.mode === "tag" ? `${request.what}: ${describeStats(stats)}`.slice(0, 500) : untagMessage(counts, request.what, request.mode);
-  save(ctx, request);
-  return { message: request.message };
+  return record.kind === "album" ? { done: true } : { done: true, path: path11.basename(files[0].target) };
 }
 
 // src/index.js
 var BACKGROUND_BUDGET_MS = 4 * 6e4;
 var SCHEDULE_BUDGET_MS = 8.5 * 6e4;
+var ACTION_BUDGET_MS = 25 * 6e4;
 var log = (...args) => console.log(...args);
 function makeContext(input, { fetchImpl = fetch } = {}) {
   const settings = input.settings || {};
-  const mb = new MusicBrainz({ settings, dataFolder: input.dataFolder, fetchImpl, log });
+  const mb = new MusicBrainz({
+    settings,
+    dataFolder: input.dataFolder,
+    fetchImpl,
+    log
+  });
   const resolver = new ClassicalResolver(mb, {
     log,
     separator: parseSeparator(settings.separator),
@@ -38182,6 +44155,7 @@ function makeContext(input, { fetchImpl = fetch } = {}) {
     libraryFolder: input.libraryFolder,
     dataFolder: input.dataFolder,
     api: input.api,
+    userOperations: input.userOperations,
     fetch: fetchImpl,
     log,
     mb,
@@ -38202,95 +44176,239 @@ function tagInBackground(ctx) {
     do {
       again = false;
       const stats = await runQueue(ctx, BACKGROUND_BUDGET_MS);
-      if (stats && (stats.tagged || stats.failed)) log(`Tagging: ${describeStats(stats)}`);
+      if (stats && (stats.tagged || stats.failed))
+        log(`Tagging: ${describeStats(stats)}`);
     } while (again);
   })().catch((error) => console.warn(`Tagging stopped: ${error.message}`)).finally(() => {
     background = null;
   });
 }
 function artistFiles(index, artist) {
-  const albumIds = new Set(artist.albums.flatMap((a) => [a.mbid]).filter(Boolean));
+  const albumIds = new Set(
+    artist.albums.flatMap((a) => [a.mbid]).filter(Boolean)
+  );
   const name = String(artist.name || "").toLowerCase();
   return Object.entries(index).filter(
     ([, entry]) => artist.mbid && entry.albumArtistMbids?.includes(artist.mbid) || albumIds.has(entry.releaseGroupMbid) || albumIds.has(entry.releaseMbid) || name && String(entry.albumArtist || "").toLowerCase() === name
   ).map(([file]) => file);
 }
-var albumPaths = (album) => album.tracks.map((t) => t.path).filter(Boolean);
 async function writePlanned(ctx, target, what, user) {
   const request = waitingRequest(ctx, target);
   if (!request) return `${what}: nothing is planned. Choose Tag as classical or Remove classical tags first.`;
   return (await applyRequest(ctx, request.id, user)).message;
 }
 var index_default = {
+  albumPresentation,
   async test(input) {
     const ctx = makeContext(input);
     const parts = [];
     const host = new URL(mbBaseUrl(ctx.settings)).host;
     const reached = await ctx.mb.ping();
-    if (reached !== true) throw new Error(`Couldn't reach MusicBrainz at ${host}: ${reached}`);
+    if (reached !== true)
+      throw new Error(`Couldn't reach MusicBrainz at ${host}: ${reached}`);
     parts.push(`MusicBrainz answers at ${host}`);
     const slskd = slskdSettings(ctx.settings);
     if (slskd.configured) {
       const app = await new Slskd(slskd).application();
       const version2 = app?.version?.full || app?.version?.current || app?.version || "";
-      parts.push(`slskd ${typeof version2 === "string" ? version2 : ""} answers`.replace(/\s+/g, " "));
-      if (!slskd.downloadFolder) parts.push("set slskd's download folder to download");
+      parts.push(
+        `slskd ${typeof version2 === "string" ? version2 : ""} answers`.replace(
+          /\s+/g,
+          " "
+        )
+      );
+      if (!slskd.downloadFolder)
+        parts.push("set slskd's download folder to download");
     } else parts.push("slskd isn't set up, so the download source is off");
-    parts.push(`Artists read like ${ctx.resolver.order.filter((r) => r !== "credited").join(ctx.resolver.separator)}`);
-    parts.push(ctx.settings.enableFileWrites === true ? "new downloads are tagged automatically" : "new downloads aren't tagged automatically");
+    parts.push(
+      `Artists read like ${ctx.resolver.order.filter((r) => r !== "credited").join(ctx.resolver.separator)}`
+    );
     return { message: parts.join(". ").slice(0, 500) };
   },
   actions: {
-    async "tag-album"(input) {
+    async "classical-model-status"(input) {
+      if (input.user?.role !== "admin")
+        throw new Error("Classical diagnostics require a host admin");
+      const status = await modelStatus(makeContext(input));
+      const indexed = status.tracks.reduce((sum, row) => sum + row.count, 0);
+      const id = status.identification;
+      const identification = id ? ` MusicBrainz identification: ${id.queued} album${id.queued === 1 ? "" : "s"} queued, ${id.done} done (${id.matched} work group${id.matched === 1 ? "" : "s"} made${id.errors ? `, ${id.errors} lookup${id.errors === 1 ? "" : "s"} failed` : ""})${id.failed ? `, ${id.failed} stopped after retries` : ""}${id.backlog ? `; ${id.backlog} earlier album${id.backlog === 1 ? "" : "s"} wait for the one-time lookup` : ""}.` : "";
+      const scan = status.scan && {
+        ...status.scan,
+        // A running scan whose lease lapsed lost its process; say so.
+        state: status.scan.state === "running" && status.scan.leaseUntil <= status.now ? "interrupted (run Scan again to resume)" : status.scan.state
+      };
+      return {
+        message: `Classical model schema ${status.schema}; indexed tracks: ${indexed}. ${scan ? `Scan ${scan.id}: ${scan.state}; processed ${scan.processed}/${scan.total} files.${scan.skipped ? ` ${scan.skipped} unreadable file${scan.skipped === 1 ? "" : "s"} skipped.` : ""}${scan.error ? ` Error: ${scan.error}` : ""}` : "No scan has been queued."}${identification}`.slice(
+          0,
+          500
+        )
+      };
+    },
+    async "classical-model-scan"(input) {
       const ctx = makeContext(input);
-      const what = `"${input.album.title}"`;
-      return { message: (await requestTags(ctx, albumPaths(input.album), { mode: "tag", what, actor: input.user, target: `album:${input.album.id}` })).message };
+      const id = await enqueueModelScan(ctx, input.user);
+      await modelJobs(ctx, { budgetMs: ACTION_BUDGET_MS });
+      const { scan } = await modelStatus(ctx);
+      return {
+        message: `Classical model scan ${id}: ${scan?.state || "saved"}; processed ${scan?.processed ?? 0}/${scan?.total ?? 0} files.${scan?.skipped ? ` ${scan.skipped} unreadable file${scan.skipped === 1 ? "" : "s"} skipped.` : ""} ${scan?.state === "done" ? "Reload the editor to search indexed tracks." : "Existing progress is saved. Run Scan again to resume immediately, or enable the plugin schedule for automatic continuation."}`.slice(
+          0,
+          500
+        )
+      };
+    },
+    async "classical-classification-report"(input) {
+      if (input.user?.role !== "admin")
+        throw new Error("Classical diagnostics require a host admin");
+      return { message: await albumClassificationSummary(makeContext(input), input.album?.id) };
+    },
+    async "classical-model-cancel"(input) {
+      await cancelModelScan(makeContext(input), input.user);
+      return {
+        message: "Model scan cancellation requested; catalogue data is retained."
+      };
+    },
+    async "classical-auto-match-library"(input) {
+      const result = await autoMatchLibrary(makeContext(input), input.user);
+      return {
+        message: `Checked ${result.albums} album${result.albums === 1 ? "" : "s"} with unmatched classical tracks; created ${result.created} work group${result.created === 1 ? "" : "s"} from WORK and GROUPING tags and titles. Scans now do this by themselves, and look up new or changed albums on MusicBrainz in the background.`
+      };
+    },
+    async "classical-identify-backlog"(input) {
+      const ctx = makeContext(input);
+      const result = await identifyBacklog(ctx, input.user);
+      await modelJobs(ctx, { budgetMs: ACTION_BUDGET_MS });
+      const { identification: id } = await modelStatus(ctx);
+      const progress = `${id.done} album${id.done === 1 ? "" : "s"} looked up, ${id.matched} work group${id.matched === 1 ? "" : "s"} made${id.queued ? `; ${id.queued} still queued: run this again, or enable the plugin schedule, to continue` : ""}.`;
+      return {
+        message: result.albums ? `Queued ${result.albums} album${result.albums === 1 ? "" : "s"} (${result.tracks} track${result.tracks === 1 ? "" : "s"}) for a one-time MusicBrainz lookup, one request a second on public MusicBrainz. ${progress}` : id.queued ? `Continuing the MusicBrainz lookup. ${progress}` : "No album is waiting for its one-time MusicBrainz lookup: each was looked up already, or has no track with a recording ID outside a work."
+      };
+    },
+    async "classical-english-names"(input) {
+      const ctx = makeContext(input);
+      const queued = await queueEnglishNames(ctx, input.user);
+      if (!queued.queued && queued.state === "done")
+        return { message: `Work names and books were looked up already: ${queued.renamed} of ${queued.total} works renamed, ${queued.filed || 0} filed under their book.` };
+      await modelJobs(ctx, { budgetMs: ACTION_BUDGET_MS });
+      const status = await englishNamesStatus(ctx);
+      return {
+        message: status?.state === "done" ? `Looked up ${status.total} works on MusicBrainz: ${status.renamed} renamed to their English names, ${status.filed || 0} filed under their book (such as The Well-Tempered Clavier, Book I). Titles you set yourself were left alone.` : `Looked up ${status?.cursor ?? 0} of ${status?.total ?? "?"} works so far (${status?.renamed ?? 0} renamed): run this again, or enable the plugin schedule, to continue.`
+      };
+    },
+    async "classical-auto-match"(input) {
+      const ctx = makeContext(input);
+      const key = await queueAlbumMatch(ctx, input.user, input.album?.id);
+      await modelJobs(ctx, { budgetMs: ACTION_BUDGET_MS });
+      const result = await albumMatchResult(ctx, key);
+      if (result?.state !== "done")
+        return { message: "Still looking this album up on MusicBrainz in the background (one request a second). Reload the album in a few minutes, or run this again to continue." };
+      return {
+        message: result.matched > 0 ? `Created ${result.matched} work group${result.matched === 1 ? "" : "s"} from classical WORK/title, composer and MusicBrainz evidence. Reload the album to use Works view.` : "No new groups matched this album's WORK tags, structured titles or MusicBrainz parent-work evidence. Tracks remain available in the metadata editor."
+      };
+    },
+    // These only plan what they would write (v0.3 8.7); Write planned tags
+    // on the same album or artist writes the plan (the editor's Activity →
+    // Tag requests isn't part of this plugin).
+    async "tag-album"(input) {
+      const paths = input.album.tracks.map((t) => t.path).filter(Boolean);
+      return { message: (await requestTags(makeContext(input), paths, { mode: "tag", what: `"${input.album.title}"`, actor: input.user, target: `album:${input.album.id}` })).message };
     },
     async "untag-album"(input) {
-      const ctx = makeContext(input);
-      const what = `"${input.album.title}"`;
-      return { message: (await requestTags(ctx, albumPaths(input.album), { mode: "restore", what, actor: input.user, target: `album:${input.album.id}` })).message };
+      const paths = input.album.tracks.map((t) => t.path).filter(Boolean);
+      return { message: (await requestTags(makeContext(input), paths, { mode: "restore", what: `"${input.album.title}"`, actor: input.user, target: `album:${input.album.id}` })).message };
     },
     async "write-album"(input) {
-      const ctx = makeContext(input);
-      return { message: await writePlanned(ctx, `album:${input.album.id}`, `"${input.album.title}"`, input.user) };
+      return { message: await writePlanned(makeContext(input), `album:${input.album.id}`, `"${input.album.title}"`, input.user) };
+    },
+    async "write-artist"(input) {
+      return { message: await writePlanned(makeContext(input), `artist:${input.artist.id}`, input.artist.name, input.user) };
     },
     async "tag-artist"(input) {
       const ctx = makeContext(input);
       const index = await libraryIndex(ctx, 10 * 6e4, { priority: true });
       return { message: (await requestTags(ctx, artistFiles(index, input.artist), { mode: "tag", what: input.artist.name, actor: input.user, target: `artist:${input.artist.id}` })).message };
-    },
-    async "write-artist"(input) {
-      const ctx = makeContext(input);
-      return { message: await writePlanned(ctx, `artist:${input.artist.id}`, input.artist.name, input.user) };
     }
   },
   events: {
     async "download.finished"(input) {
       const ctx = makeContext(input);
-      if (ctx.settings.enableFileWrites !== true || !input.track?.path) return;
+      await requestModelSync(ctx).catch(
+        (error) => log(`Classical model sync request failed: ${error.message}`)
+      );
+      if (ctx.settings.enableFileWrites !== true) return;
+      if (!input.track?.path) return;
       await enqueue(ctx, [input.track.path], { source: input.source });
       tagInBackground(ctx);
     }
   },
   async scheduled(input) {
     const ctx = makeContext(input);
-    if (ctx.settings.enableFileWrites === true) {
-      const stats = await runScheduled(ctx, SCHEDULE_BUDGET_MS);
-      if (stats) log(`Scheduled tagging: ${describeStats(stats)}`);
+    const deadline = Date.now() + SCHEDULE_BUDGET_MS;
+    try {
+      if (modelRun) throw Object.assign(new Error("busy"), { skip: true });
+      await modelJobs(ctx, { budgetMs: SCHEDULE_BUDGET_MS });
+      if (canReadHostLibrary(ctx) && await modelSyncDue(ctx)) {
+        await enqueueModelScan(ctx, null, { system: true });
+        const left2 = deadline - Date.now();
+        if (left2 > 0) await modelJobs(ctx, { budgetMs: left2 });
+      }
+      const left = deadline - Date.now();
+      if (left > 0) await modelJobs(ctx, { budgetMs: left });
+    } catch (error) {
+      if (!error.skip) log(`Classical model unavailable: ${error.message}`);
     }
-    await pruneCache(path8.join(ctx.dataFolder, "mb-cache"), TTL.default).catch(() => {
-    });
+    if (ctx.settings.enableFileWrites !== true) return;
+    const remainingMs = deadline - Date.now();
+    if (remainingMs <= 0) return;
+    const stats = await runScheduled(ctx, remainingMs);
+    if (stats) log(`Scheduled tagging: ${describeStats(stats)}`);
+    await pruneCache(path12.join(ctx.dataFolder, "mb-cache"), TTL.default).catch(
+      () => {
+      }
+    );
   },
-  albumPresentation: (input) => albumPresentation(makeContext(input), input.album),
   downloadSource: {
+    acquisitionIdentity: (input) => acquisitionIdentity(makeContext(input), input.track),
     search: (input) => searchTrack(makeContext(input), input.track, { manual: input.manual === true }),
+    // `manual` (fork): a person is choosing, so ambiguous results are offered.
     searchAlbum: (input) => searchAlbum(makeContext(input), input.album, { manual: input.manual === true }),
     download: (input) => startDownload(makeContext(input), input.result, "track"),
     downloadAlbum: (input) => startDownload(makeContext(input), input.result, "album"),
     status: (input) => downloadStatus(makeContext(input), input.id, input.directory)
   }
 };
+var modelRun = null;
+function modelJobs(ctx, options) {
+  const run = (modelRun || Promise.resolve()).catch(() => {
+  }).then(() => modelJobsWorker(ctx, options));
+  const tracked = run.finally(() => {
+    if (modelRun === tracked) modelRun = null;
+  });
+  modelRun = tracked;
+  return run;
+}
+function modelJobsWorker(ctx, options) {
+  const input = {
+    settings: ctx.settings,
+    dataFolder: ctx.dataFolder,
+    libraryFolder: ctx.libraryFolder,
+    api: ctx.api,
+    userOperations: ctx.userOperations
+  };
+  return new Promise((resolve, reject) => {
+    const worker = new Worker(new URL(import.meta.url), { workerData: { classicalModelJobs: { input, options } } });
+    worker.once("message", (message) => message?.error ? reject(new Error(message.error)) : resolve());
+    worker.once("error", reject);
+    worker.once("exit", (code) => code ? reject(new Error(`Classical model worker stopped (${code})`)) : resolve());
+  });
+}
+if (!isMainThread && workerData?.classicalModelJobs) {
+  const { input, options } = workerData.classicalModelJobs;
+  runModelJobs(makeContext(input), options).then(
+    () => parentPort.postMessage({}),
+    (error) => parentPort.postMessage({ error: error?.message || String(error) })
+  );
+}
 export {
   index_default as default,
   makeContext,

@@ -1,0 +1,120 @@
+{
+ "id": "1452196841",
+ "category": "chamber",
+ "title": "Mozart & Brahms: Clarinet Quintets",
+ "artist": "David Shifrin & Emerson String Quartet",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Clarinet Quintet in A, K. 581: I. Allegro",
+   "durationMs": 558000,
+   "artist": "Emerson String Quartet & David Shifrin",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Clarinet Quintet in A Major, K. 581, KV 581 · “Stadler”",
+    "part": "I. Allegro",
+    "performers": "Emerson String Quartet, David Shifrin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Clarinet Quintet in A, K. 581: II. Larghetto",
+   "durationMs": 401000,
+   "artist": "Emerson String Quartet & David Shifrin",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Clarinet Quintet in A Major, K. 581, KV 581 · “Stadler”",
+    "part": "II. Larghetto",
+    "performers": "Emerson String Quartet, David Shifrin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Clarinet Quintet in A, K. 581: III. Menuetto",
+   "durationMs": 405000,
+   "artist": "Emerson String Quartet & David Shifrin",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Clarinet Quintet in A Major, K. 581, KV 581 · “Stadler”",
+    "part": "III. Menuetto",
+    "performers": "David Shifrin, Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Clarinet Quintet in A, K. 581: IV. Allegretto con variazioni",
+   "durationMs": 541000,
+   "artist": "Emerson String Quartet & David Shifrin",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Clarinet Quintet in A Major, K. 581, KV 581 · “Stadler”",
+    "part": "IV. Allegretto con variazioni",
+    "performers": "Emerson String Quartet, David Shifrin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Clarinet Quintet in B Minor, Op. 115: I. Allegro",
+   "durationMs": 783000,
+   "artist": "Emerson String Quartet & David Shifrin",
+   "apple": {
+    "block": 2,
+    "composer": "Johannes Brahms",
+    "work": "Clarinet Quintet in B Minor, Op. 115",
+    "part": "I. Allegro",
+    "performers": "Emerson String Quartet, David Shifrin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Clarinet Quintet in B Minor, Op. 115: II. Adagio",
+   "durationMs": 668000,
+   "artist": "Emerson String Quartet & David Shifrin",
+   "apple": {
+    "block": 2,
+    "composer": "Johannes Brahms",
+    "work": "Clarinet Quintet in B Minor, Op. 115",
+    "part": "II. Adagio",
+    "performers": "David Shifrin, Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Clarinet Quintet in B Minor, Op. 115: III. Andantino - Presto non assai, ma con sentimento",
+   "durationMs": 289000,
+   "artist": "Emerson String Quartet & David Shifrin",
+   "apple": {
+    "block": 2,
+    "composer": "Johannes Brahms",
+    "work": "Clarinet Quintet in B Minor, Op. 115",
+    "part": "III. Andantino - Presto non assai, ma con sentimento",
+    "performers": "Emerson String Quartet, David Shifrin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Clarinet Quintet in B Minor, Op. 115: IV. Con moto",
+   "durationMs": 531000,
+   "artist": "Emerson String Quartet & David Shifrin",
+   "apple": {
+    "block": 2,
+    "composer": "Johannes Brahms",
+    "work": "Clarinet Quintet in B Minor, Op. 115",
+    "part": "IV. Con moto",
+    "performers": "David Shifrin, Emerson String Quartet"
+   }
+  }
+ ]
+}

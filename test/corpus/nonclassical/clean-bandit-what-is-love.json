@@ -1,0 +1,86 @@
+{
+ "id": "clean-bandit-what-is-love",
+ "family": "pop",
+ "title": "What Is Love?",
+ "artist": "Clean Bandit",
+ "source": "store download; a pop single titled Symphony",
+ "expect": {
+  "album": "not_classical"
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Symphony (feat. Zara Larsson)",
+   "durationMs": 212000,
+   "artist": "Clean Bandit",
+   "composer": [
+    "Jack Patterson",
+    "Ammar Malik",
+    "Steve Mac"
+   ],
+   "genres": [
+    "Dance"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [
+    "misleading-title"
+   ],
+   "note": "Pop single; 'Symphony' is a song title."
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Solo (feat. Demi Lovato)",
+   "durationMs": 222000,
+   "artist": "Clean Bandit",
+   "composer": [
+    "Jack Patterson",
+    "Grace Chatto",
+    "Emily Warren"
+   ],
+   "genres": [
+    "Dance"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Rockabye (feat. Sean Paul & Anne-Marie)",
+   "durationMs": 251000,
+   "artist": "Clean Bandit",
+   "composer": [
+    "Jack Patterson",
+    "Ammar Malik",
+    "Steve Mac"
+   ],
+   "genres": [
+    "Dance"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "I Miss You (feat. Julia Michaels)",
+   "durationMs": 205000,
+   "artist": "Clean Bandit",
+   "composer": [
+    "Jack Patterson",
+    "Julia Michaels"
+   ],
+   "genres": [
+    "Dance"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  }
+ ]
+}

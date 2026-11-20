@@ -1,0 +1,134 @@
+{
+ "id": "1513030530",
+ "category": "twentieth century contemporary",
+ "title": "Philip Glass: Piano Works",
+ "artist": "Jenny Lin",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Opening",
+   "durationMs": 383267,
+   "artist": "Jenny Lin",
+   "apple": {
+    "block": 1,
+    "composer": "Philip Glass",
+    "work": "Glassworks",
+    "part": "Opening",
+    "performers": "Jenny Lin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Metamorphosis No. 1",
+   "durationMs": 321720,
+   "artist": "Jenny Lin",
+   "apple": {
+    "block": 2,
+    "composer": "Philip Glass",
+    "work": "Metamorphosis",
+    "part": "Metamorphosis No. 1",
+    "performers": "Jenny Lin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Metamorphosis No. 2",
+   "durationMs": 392387,
+   "artist": "Jenny Lin",
+   "apple": {
+    "block": 2,
+    "composer": "Philip Glass",
+    "work": "Metamorphosis",
+    "part": "Metamorphosis No. 2",
+    "performers": "Jenny Lin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Metamorphosis No. 3",
+   "durationMs": 215267,
+   "artist": "Jenny Lin",
+   "apple": {
+    "block": 2,
+    "composer": "Philip Glass",
+    "work": "Metamorphosis",
+    "part": "Metamorphosis No. 3",
+    "performers": "Jenny Lin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Metamorphosis No. 4",
+   "durationMs": 361693,
+   "artist": "Jenny Lin",
+   "apple": {
+    "block": 2,
+    "composer": "Philip Glass",
+    "work": "Metamorphosis",
+    "part": "Metamorphosis No. 4",
+    "performers": "Jenny Lin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Metamorphosis No. 5",
+   "durationMs": 327307,
+   "artist": "Jenny Lin",
+   "apple": {
+    "block": 2,
+    "composer": "Philip Glass",
+    "work": "Metamorphosis",
+    "part": "Metamorphosis No. 5",
+    "performers": "Jenny Lin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Modern Love Waltz",
+   "durationMs": 208147,
+   "artist": "Jenny Lin",
+   "apple": {
+    "block": 3,
+    "composer": "Philip Glass",
+    "work": "Modern Love Waltz",
+    "part": "Modern Love Waltz",
+    "performers": "Jenny Lin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Passacaglia for Solo Piano \"Distant Figure\"",
+   "durationMs": 693160,
+   "artist": "Jenny Lin",
+   "apple": {
+    "block": 4,
+    "composer": "Philip Glass",
+    "work": "Passacaglia for Solo Piano",
+    "part": "Passacaglia for Solo Piano \"Distant Figure\"",
+    "performers": "Jenny Lin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Mad Rush (Version for Piano)",
+   "durationMs": 839480,
+   "artist": "Jenny Lin",
+   "apple": {
+    "block": 5,
+    "composer": "Philip Glass",
+    "work": "Mad Rush",
+    "part": "Mad Rush (Version for Piano)",
+    "performers": "Jenny Lin"
+   }
+  }
+ ]
+}

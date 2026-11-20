@@ -1,0 +1,218 @@
+{
+ "id": "1399372548",
+ "category": "opera",
+ "title": "Diva - The Very Best of Anna Netrebko",
+ "artist": "Anna Netrebko",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Gianni Schicchi: O mio babbino caro",
+   "durationMs": 160200,
+   "artist": "Anna Netrebko, Royal Philharmonic Orchestra & Jader Bignamini",
+   "apple": {
+    "block": 1,
+    "composer": "Giacomo Puccini",
+    "work": "Gianni Schicchi, SC 88",
+    "part": "O mio babbino caro",
+    "performers": "Anna Netrebko, Jader Bignamini, Royal Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Non ti scordar di me (Arr. for Soprano, Tenor and Orchestra by Giancarlo Chiaramello)",
+   "durationMs": 223493,
+   "artist": "Anna Netrebko, Yusif Eyvazov, Royal Philharmonic Orchestra & Jader Bignamini",
+   "apple": {
+    "block": 2,
+    "composer": "Ernesto De Curtis",
+    "work": "Non ti scordar di me",
+    "part": "Non ti scordar di me (Arr. for Soprano, Tenor and Orchestra by Giancarlo Chiaramello)",
+    "performers": "Anna Netrebko, Yusif Eyvazov, Royal Philharmonic Orchestra, Jader Bignamini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "La traviata: Libiamo ne'lieti calici",
+   "durationMs": 183800,
+   "artist": "Anna Netrebko, Yusif Eyvazov, The City of Prague Philharmonic Chorus, Miriam Nemcova, Royal Philharmonic Orchestra & Jader Bignamini",
+   "apple": {
+    "block": 3,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "Libiamo ne'lieti calici",
+    "performers": "Yusif Eyvazov, Royal Philharmonic Orchestra, Miriam Nemcova, Jader Bignamini, Anna Netrebko, The City of Prague Philharmonic Chorus"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Tosca: Vissi d'arte, vissi d'amore",
+   "durationMs": 208227,
+   "artist": "Anna Netrebko, Orchestra dell'Accademia Nazionale di Santa Cecilia & Antonio Pappano",
+   "apple": {
+    "block": 4,
+    "composer": "Giacomo Puccini",
+    "work": "Tosca, S. 69, SC 69",
+    "part": "Vissi d'arte, vissi d'amore",
+    "performers": "Orchestra dell'Accademia Nazionale di Santa Cecilia, Anna Netrebko, Antonio Pappano"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Madama Butterfly: Un bel dì vedremo",
+   "durationMs": 273000,
+   "artist": "Anna Netrebko, Orchestra dell'Accademia Nazionale di Santa Cecilia & Antonio Pappano",
+   "apple": {
+    "block": 5,
+    "composer": "Giacomo Puccini",
+    "work": "Madama Butterfly, SC 74 · “Madame Butterfly”",
+    "part": "Un bel dì vedremo",
+    "performers": "Anna Netrebko, Antonio Pappano, Orchestra dell'Accademia Nazionale di Santa Cecilia"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Andrea Chénier: La mamma morta",
+   "durationMs": 299453,
+   "artist": "Anna Netrebko, Orchestra dell'Accademia Nazionale di Santa Cecilia & Antonio Pappano",
+   "apple": {
+    "block": 6,
+    "composer": "Umberto Giordano",
+    "work": "Andrea Chénier",
+    "part": "La mamma morta",
+    "performers": "Anna Netrebko, Antonio Pappano, Orchestra dell'Accademia Nazionale di Santa Cecilia"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "La Bohème: O soave fanciulla",
+   "durationMs": 252200,
+   "artist": "Anna Netrebko, Rolando Villazón, Boaz Daniel, Bavarian Radio Symphony Orchestra & Bertrand De Billy",
+   "apple": {
+    "block": 7,
+    "composer": "Giacomo Puccini",
+    "work": "La Bohème, SC 67",
+    "part": "O soave fanciulla",
+    "performers": "Anna Netrebko, Bavarian Radio Symphony Orchestra, Boaz Daniel, Rolando Villazón, Bertrand De Billy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Mefistofele: L'altra notte in fondo al mare",
+   "durationMs": 415160,
+   "artist": "Anna Netrebko, Orchestra dell'Accademia Nazionale di Santa Cecilia & Antonio Pappano",
+   "apple": {
+    "block": 8,
+    "composer": "Arrigo Boito",
+    "work": "Mefistofele",
+    "part": "L'altra notte in fondo al mare",
+    "performers": "Antonio Pappano, Anna Netrebko, Orchestra dell'Accademia Nazionale di Santa Cecilia"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "12 Songs, Op. 21: 7. Zdes′ khorosho (Arr. by Michael Rot)",
+   "durationMs": 147240,
+   "artist": "Anna Netrebko, Mariinsky Orchestra & Valery Gergiev",
+   "apple": {
+    "block": 9,
+    "composer": "Sergei Rachmaninoff",
+    "work": "How fair this spot, Op. 21/7 · “Zdes′ khorosho”",
+    "part": "7. Zdes′ khorosho (Arr. by Michael Rot)",
+    "performers": "Mariinsky Orchestra, Anna Netrebko, Valery Gergiev"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Cantami",
+   "durationMs": 224200,
+   "artist": "Anna Netrebko, Yusif Eyvazov, London Session Orchestra & Ben Foster",
+   "apple": {
+    "block": 10,
+    "composer": "Krutoy",
+    "work": "Krutoy",
+    "part": "Cantami",
+    "performers": "London Session Orchestra, Yusif Eyvazov, Ben Foster, Anna Netrebko"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Peer Gynt, Op. 23: Solveig's Song",
+   "durationMs": 303733,
+   "artist": "Anna Netrebko, PKF - Prague Philharmonia & Emmanuel Villaume",
+   "apple": {
+    "block": 11,
+    "composer": "Edvard Grieg",
+    "work": "Peer Gynt, Op. 23",
+    "part": "Solveig's Song",
+    "performers": "Emmanuel Villaume, PKF - Prague Philharmonia, Anna Netrebko"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Idomeneo, re di Creta, K.366: Quando avran fine omai - Padre, germani, addio!",
+   "durationMs": 442573,
+   "artist": "Anna Netrebko, Vienna Philharmonic, Gianandrea Noseda & David Aronson",
+   "apple": {
+    "block": 12,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Idomeneo, K. 366, KV 366",
+    "part": "Quando avran fine omai - Padre, germani, addio!",
+    "performers": "Gianandrea Noseda, David Aronson, Vienna Philharmonic, Anna Netrebko"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Lakmé: Viens, Mallika, ... Dôme épais (Flower Duet) [Excerpt]",
+   "durationMs": 310987,
+   "artist": "Anna Netrebko, Elīna Garanča, SWR Sinfonieorchester Baden-Baden und Freiburg & Marco Armiliato",
+   "apple": {
+    "block": 13,
+    "composer": "Léo Delibes",
+    "work": "Lakmé",
+    "part": "Viens, Mallika, ... Dôme épais (Flower Duet) [Excerpt]",
+    "performers": "Elīna Garanča, Anna Netrebko, SWR Sinfonieorchester Baden-Baden und Freiburg, Marco Armiliato"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Norma: Casta Diva (Excerpt)",
+   "durationMs": 351853,
+   "artist": "Anna Netrebko, SWR Sinfonieorchester Baden-Baden und Freiburg & Marco Armiliato",
+   "apple": {
+    "block": 14,
+    "composer": "Vincenzo Bellini",
+    "work": "Norma",
+    "part": "Casta Diva (Excerpt)",
+    "performers": "Marco Armiliato, Anna Netrebko, SWR Sinfonieorchester Baden-Baden und Freiburg"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Les Contes d'Hoffmann: Offenbach: Les Contes d'Hoffmann: Barcarolle (Excerpt)",
+   "durationMs": 157253,
+   "artist": "Anna Netrebko, Elīna Garanča, PKF - Prague Philharmonia, Emmanuel Villaume, Prague Philharmonic Choir & Lukas Vasilek",
+   "apple": {
+    "block": 15,
+    "composer": "Jacques Offenbach",
+    "work": "Les contes d'Hoffmann, Op. 67 · “The Tales of Hoffmann”",
+    "part": "Offenbach: Les Contes d'Hoffmann: Barcarolle (Excerpt)",
+    "performers": "Emmanuel Villaume, Prague Philharmonic Choir, Anna Netrebko, Lukas Vasilek, Elīna Garanča, PKF - Prague Philharmonia"
+   }
+  }
+ ]
+}

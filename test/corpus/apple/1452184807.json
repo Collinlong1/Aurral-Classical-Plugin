@@ -1,0 +1,78 @@
+{
+ "id": "1452184807",
+ "category": "symphony",
+ "title": "Mahler: Symphony No. 5",
+ "artist": "Berlin Philharmonic Orchestra & Claudio Abbado",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Symphony No. 5 in C-Sharp Minor: I. Trauermarsch (In Gemessenem Schritt. Streng. Wie ein Kondukt - Plötzlich Schneller. Leidenschaftlich. Wild - Tempo I)",
+   "durationMs": 756000,
+   "artist": "Berlin Philharmonic Orchestra & Claudio Abbado",
+   "apple": {
+    "block": 1,
+    "composer": "Gustav Mahler",
+    "work": "Symphony No. 5 in C-Sharp Minor",
+    "part": "I. Trauermarsch (In Gemessenem Schritt. Streng. Wie ein Kondukt - Plötzlich Schneller. Leidenschaftlich. Wild - Tempo I)",
+    "performers": "Claudio Abbado, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Symphony No. 5 in C-Sharp Minor: II. Stürmisch Bewegt. Mit Größter Vehemenz - Bedeutend Langsamer - Tempo I Subito",
+   "durationMs": 886000,
+   "artist": "Berlin Philharmonic Orchestra & Claudio Abbado",
+   "apple": {
+    "block": 1,
+    "composer": "Gustav Mahler",
+    "work": "Symphony No. 5 in C-Sharp Minor",
+    "part": "II. Stürmisch Bewegt. Mit Größter Vehemenz - Bedeutend Langsamer - Tempo I Subito",
+    "performers": "Claudio Abbado, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Symphony No. 5 in C-Sharp Minor: III. Scherzo (Kräftig, Nicht Zu Schnell)",
+   "durationMs": 1046000,
+   "artist": "Gerd Seifert, Claudio Abbado & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Gustav Mahler",
+    "work": "Symphony No. 5 in C-Sharp Minor",
+    "part": "III. Scherzo (Kräftig, Nicht Zu Schnell)",
+    "performers": "Berlin Philharmonic Orchestra, Gerd Seifert, Claudio Abbado"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Symphony No. 5 in C-Sharp Minor: IV. Adagietto (Sehr Langsam)",
+   "durationMs": 540667,
+   "artist": "Berlin Philharmonic Orchestra & Claudio Abbado",
+   "apple": {
+    "block": 1,
+    "composer": "Gustav Mahler",
+    "work": "Symphony No. 5 in C-Sharp Minor",
+    "part": "IV. Adagietto (Sehr Langsam)",
+    "performers": "Claudio Abbado, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Symphony No. 5 in C-Sharp Minor: V. Rondo-Finale (Allegro)",
+   "durationMs": 940333,
+   "artist": "Berlin Philharmonic Orchestra & Claudio Abbado",
+   "apple": {
+    "block": 1,
+    "composer": "Gustav Mahler",
+    "work": "Symphony No. 5 in C-Sharp Minor",
+    "part": "V. Rondo-Finale (Allegro)",
+    "performers": "Berlin Philharmonic Orchestra, Claudio Abbado"
+   }
+  }
+ ]
+}

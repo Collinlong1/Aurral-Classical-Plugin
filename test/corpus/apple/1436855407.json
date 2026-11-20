@@ -1,0 +1,64 @@
+{
+ "id": "1436855407",
+ "category": "piano recital",
+ "title": "The Berlin Recital – Encores - EP",
+ "artist": "Yuja Wang",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Eight Concert Studies for Piano, Op. 40: III. Toccatina",
+   "durationMs": 127112,
+   "artist": "Yuja Wang",
+   "apple": {
+    "block": 1,
+    "composer": "Nikolai Kapustin",
+    "work": "Eight Concert Etudes, Op. 40 · “8 kontsertnïkh ėtyudov”",
+    "part": "III. Toccatina",
+    "performers": "Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Spanish Romance, Op. 74: The Smuggler (Transcr. for Concert Performance by Carl Tausig)",
+   "durationMs": 120357,
+   "artist": "Yuja Wang",
+   "apple": {
+    "block": 2,
+    "composer": "R. Schumann: Spanish Romance, Op. 74",
+    "work": "R. Schumann: Spanish Romance, Op. 74",
+    "part": "The Smuggler (Transcr. for Concert Performance by Carl Tausig)",
+    "performers": "Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Swan Lake, Op. 20, TH. 12: XIIId. Dance of the Four Swans (Arr. for Piano by Earl Wild)",
+   "durationMs": 89654,
+   "artist": "Yuja Wang",
+   "apple": {
+    "block": 3,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Swan Lake, Op. 20, TH 12",
+    "part": "XIIId. Dance of the Four Swans (Arr. for Piano by Earl Wild)",
+    "performers": "Yuja Wang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Piano Sonata No. 7 in B-Flat Major, Op. 83: III. Precipitato",
+   "durationMs": 204009,
+   "artist": "Yuja Wang",
+   "apple": {
+    "block": 4,
+    "composer": "Sergei Prokofiev",
+    "work": "Piano Sonata No. 7 in B-Flat Major, Op. 83 · “Stalingrad Sonata”",
+    "part": "III. Precipitato",
+    "performers": "Yuja Wang"
+   }
+  }
+ ]
+}

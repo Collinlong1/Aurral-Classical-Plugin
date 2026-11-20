@@ -1,0 +1,330 @@
+{
+ "id": "476956688",
+ "category": "guitar harp other",
+ "title": "Spanish Guitar Music",
+ "artist": "John Williams",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Asturias",
+   "durationMs": 376400,
+   "artist": "John Williams",
+   "apple": {
+    "block": 1,
+    "composer": "Isaac Albéniz",
+    "work": "Suite española, B. 7, Op. 47",
+    "part": "Asturias",
+    "performers": "John Williams"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Tango",
+   "durationMs": 166240,
+   "artist": "John Williams",
+   "apple": {
+    "block": 2,
+    "composer": "Isaac Albéniz",
+    "work": "España: 6 hojas de album, B. 37, Op. 165 · “España: 6 Album Leaves for Piano”",
+    "part": "Tango",
+    "performers": "John Williams"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Canarios",
+   "durationMs": 79733,
+   "artist": "John Williams",
+   "apple": {
+    "block": 3,
+    "composer": "G. Sanz",
+    "work": "G. Sanz",
+    "part": "Canarios",
+    "performers": "John Williams"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Tres Piezas Españolas for Guitar: Fandango",
+   "durationMs": 221733,
+   "artist": "John Williams",
+   "apple": {
+    "block": 4,
+    "composer": "Joaquín Rodrigo",
+    "work": "Soleriana",
+    "part": "Fandango",
+    "performers": "John Williams"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Nocturno",
+   "durationMs": 209240,
+   "artist": "John Williams",
+   "apple": {
+    "block": 5,
+    "composer": "Federico Moreno-Torroba",
+    "work": "Nocturno No. 2",
+    "part": "Nocturno",
+    "performers": "John Williams"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "El Colibri",
+   "durationMs": 71240,
+   "artist": "John Williams",
+   "apple": {
+    "block": 6,
+    "composer": "J. Sagreras",
+    "work": "J. Sagreras",
+    "part": "El Colibri",
+    "performers": "John Williams"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Sonata in D",
+   "durationMs": 190240,
+   "artist": "John Williams",
+   "apple": {
+    "block": 7,
+    "composer": "Mateo Albéniz",
+    "work": "Keyboard Sonata in D Major, “Sonata en Ré”",
+    "part": "Sonata in D",
+    "performers": "John Williams"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "The Corregidor's Dance",
+   "durationMs": 105240,
+   "artist": "John Williams",
+   "apple": {
+    "block": 8,
+    "composer": "Manuel de Falla",
+    "work": "El sombrero de tres picos, G. 53 · “The Three-Cornered Hat”",
+    "part": "The Corregidor's Dance",
+    "performers": "John Williams"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Fisherman's Song",
+   "durationMs": 147467,
+   "artist": "John Williams",
+   "apple": {
+    "block": 8,
+    "composer": "Manuel de Falla",
+    "work": "El sombrero de tres picos, G. 53 · “The Three-Cornered Hat”",
+    "part": "Fisherman's Song",
+    "performers": "John Williams"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "The Miller's Dance",
+   "durationMs": 138240,
+   "artist": "John Williams",
+   "apple": {
+    "block": 8,
+    "composer": "Manuel de Falla",
+    "work": "El sombrero de tres picos, G. 53 · “The Three-Cornered Hat”",
+    "part": "The Miller's Dance",
+    "performers": "John Williams"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Madroños",
+   "durationMs": 163240,
+   "artist": "John Williams",
+   "apple": {
+    "block": 9,
+    "composer": "Federico Moreno-Torroba",
+    "work": "Madroños",
+    "part": "Madroños",
+    "performers": "John Williams"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "La Nit de Nadal",
+   "durationMs": 68973,
+   "artist": "John Williams",
+   "apple": {
+    "block": 10,
+    "composer": "Miguel Llobet",
+    "work": "La Nit de Nadal, “Christmas Eve”",
+    "part": "La Nit de Nadal",
+    "performers": "John Williams"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "El Noy de La Mare",
+   "durationMs": 143240,
+   "artist": "John Williams",
+   "apple": {
+    "block": 11,
+    "composer": "Miguel Llobet",
+    "work": "El Noi de la Mare, “The Mother's Child; Our Lady's Child”",
+    "part": "El Noy de La Mare",
+    "performers": "John Williams"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "La Maja de Goya",
+   "durationMs": 220240,
+   "artist": "John Williams",
+   "apple": {
+    "block": 12,
+    "composer": "Enrique Granados",
+    "work": "Tonadillas al estilo antiguo, H 136",
+    "part": "La Maja de Goya",
+    "performers": "John Williams"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Cordoba",
+   "durationMs": 400240,
+   "artist": "John Williams",
+   "apple": {
+    "block": 13,
+    "composer": "Isaac Albéniz",
+    "work": "Cantos de España, B. 44, Op. 232 · “Songs of Spain”",
+    "part": "Cordoba",
+    "performers": "John Williams"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Recuerdos de la Alhambra",
+   "durationMs": 212240,
+   "artist": "John Williams",
+   "apple": {
+    "block": 14,
+    "composer": "Francisco Tárrega",
+    "work": "Recuerdos de la Alhambra, “Memories of the Alhambra”",
+    "part": "Recuerdos de la Alhambra",
+    "performers": "John Williams"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Spanish Dance No. 5",
+   "durationMs": 257733,
+   "artist": "John Williams",
+   "apple": {
+    "block": 15,
+    "composer": "Enrique Granados",
+    "work": "12 Spanish Dances, DLRI 2, H 142, Op. 37 · “12 Danzas Españolas”",
+    "part": "Spanish Dance No. 5",
+    "performers": "John Williams"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "El Testamen de Amelia",
+   "durationMs": 131040,
+   "artist": "John Williams",
+   "apple": {
+    "block": 16,
+    "composer": "El Testamen de Amelia",
+    "work": "El Testamen de Amelia",
+    "part": "El Testamen de Amelia",
+    "performers": "John Williams"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "Prelude No. 4 in E Minor (Lento)",
+   "durationMs": 204973,
+   "artist": "John Williams",
+   "apple": {
+    "block": 17,
+    "composer": "Villa-Lobos",
+    "work": "Villa-Lobos",
+    "part": "Prelude No. 4 in E Minor (Lento)",
+    "performers": "John Williams"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "Suite Española, Op. 47: Sevilla",
+   "durationMs": 269640,
+   "artist": "John Williams",
+   "apple": {
+    "block": 18,
+    "composer": "Isaac Albéniz",
+    "work": "Suite española, B. 7, Op. 47",
+    "part": "Sevilla",
+    "performers": "John Williams"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "Homenaje a Debussy",
+   "durationMs": 209600,
+   "artist": "John Williams",
+   "apple": {
+    "block": 19,
+    "composer": "Manuel de Falla",
+    "work": "Homenaje 'Le Tombeau de Claude Debussy', G. 56, G. 57",
+    "part": "Homenaje a Debussy",
+    "performers": "John Williams"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "Fantasía",
+   "durationMs": 100773,
+   "artist": "John Williams",
+   "apple": {
+    "block": 20,
+    "composer": "Alonso Mudarra",
+    "work": "Fantasia No. 10, “Que contrahaze la harpa, en la manera de Ludovico”",
+    "part": "Fantasía",
+    "performers": "John Williams"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 23,
+   "title": "Fandanguillo, Op. 36",
+   "durationMs": 280240,
+   "artist": "John Williams",
+   "apple": {
+    "block": 21,
+    "composer": "Heitor Villa-Lobos",
+    "work": "Fandanguillo, Op. 36",
+    "part": "Fandanguillo, Op. 36",
+    "performers": "John Williams"
+   }
+  }
+ ]
+}

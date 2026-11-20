@@ -1,0 +1,246 @@
+{
+ "id": "1452627720",
+ "category": "piano recital",
+ "title": "Bach",
+ "artist": "Hélène Grimaud",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Das Wohltemperierte Klavier: Book 1, BWV 846-869: 1. Prelude in C Minor BWV 847",
+   "durationMs": 91040,
+   "artist": "Hélène Grimaud",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Prelude No. 2 in C Minor, BWV 934",
+    "part": "Book 1, BWV 846-869: 1. Prelude in C Minor BWV 847",
+    "performers": "Hélène Grimaud"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Das Wohltemperierte Klavier: Book 1, BWV 846-869: 2. Fugue in C Minor BWV 847",
+   "durationMs": 102080,
+   "artist": "Hélène Grimaud",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Prelude & Fugue No. 2 in C Minor, BWV 847 · “The Well-tempered Clavier, Book 1”",
+    "part": "Book 1, BWV 846-869: 2. Fugue in C Minor BWV 847",
+    "performers": "Hélène Grimaud"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Das Wohltemperierte Klavier: Book 1, BWV 846-869: 1. Prelude in C-Sharp Minor BWV 849",
+   "durationMs": 196080,
+   "artist": "Hélène Grimaud",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Prelude & Fugue No. 4 in C-Sharp Minor, BWV 849 · “The Well-tempered Clavier, Book 1”",
+    "part": "Book 1, BWV 846-869: 1. Prelude in C-Sharp Minor BWV 849",
+    "performers": "Hélène Grimaud"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Das Wohltemperierte Klavier: Book 1, BWV 846-869: 2. Fugue in C-Sharp Minor BWV 849",
+   "durationMs": 260293,
+   "artist": "Hélène Grimaud",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Prelude & Fugue No. 4 in C-Sharp Minor, BWV 849 · “The Well-tempered Clavier, Book 1”",
+    "part": "Book 1, BWV 846-869: 2. Fugue in C-Sharp Minor BWV 849",
+    "performers": "Hélène Grimaud"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Concerto For Piano No. 1 in D Minor, BWV 1052: 1. Allegro",
+   "durationMs": 456627,
+   "artist": "Florian Donderer, The Deutsche Kammerphilharmonie Bremen & Hélène Grimaud",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "Keyboard Concerto No. 1 in D Minor, BWV 1052",
+    "part": "1. Allegro",
+    "performers": "The Deutsche Kammerphilharmonie Bremen, Florian Donderer, Hélène Grimaud"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Concerto For Piano No. 1 in D Minor, BWV 1052: 2. Adagio",
+   "durationMs": 429453,
+   "artist": "Hélène Grimaud & The Deutsche Kammerphilharmonie Bremen",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "Keyboard Concerto No. 1 in D Minor, BWV 1052",
+    "part": "2. Adagio",
+    "performers": "Hélène Grimaud, The Deutsche Kammerphilharmonie Bremen"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Concerto For Piano No. 1 in D Minor, BWV 1052: 3. Allegro",
+   "durationMs": 446840,
+   "artist": "Hélène Grimaud & The Deutsche Kammerphilharmonie Bremen",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "Keyboard Concerto No. 1 in D Minor, BWV 1052",
+    "part": "3. Allegro",
+    "performers": "The Deutsche Kammerphilharmonie Bremen, Hélène Grimaud"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Das Wohltemperierte Klavier: Book 2, BWV 870-893: 1. Prelude in D Minor BWV 875",
+   "durationMs": 88533,
+   "artist": "Hélène Grimaud",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 2 in D Minor, BWV 1008",
+    "part": "Book 2, BWV 870-893: 1. Prelude in D Minor BWV 875",
+    "performers": "Hélène Grimaud"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Das Wohltemperierte Klavier: Book 2, BWV 870-893: 2. Fugue in D Minor BWV 875",
+   "durationMs": 107693,
+   "artist": "Hélène Grimaud",
+   "apple": {
+    "block": 6,
+    "composer": "Johann Sebastian Bach",
+    "work": "Prelude & Fugue No. 6 in D Minor, BWV 875 · “The Well-tempered Clavier, Book 2”",
+    "part": "Book 2, BWV 870-893: 2. Fugue in D Minor BWV 875",
+    "performers": "Hélène Grimaud"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Partita For Violin Solo No. 2 in D Minor, BWV 1004 - Transcribed For Piano Ferruccio Busoni (1866-1924): Chaconne in D Minor",
+   "durationMs": 873493,
+   "artist": "Hélène Grimaud",
+   "apple": {
+    "block": 7,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 2 for Solo Violin in D Minor, BWV 1004",
+    "part": "Chaconne in D Minor",
+    "performers": "Hélène Grimaud"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Das Wohltemperierte Klavier: Book 2, BWV 870-893: 1. Prelude in A Minor BWV 889",
+   "durationMs": 218307,
+   "artist": "Hélène Grimaud",
+   "apple": {
+    "block": 8,
+    "composer": "Johann Sebastian Bach",
+    "work": "Prelude No. 8 in A Minor, BWV 931",
+    "part": "Book 2, BWV 870-893: 1. Prelude in A Minor BWV 889",
+    "performers": "Hélène Grimaud"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Das Wohltemperierte Klavier: Book 2, BWV 870-893: 2. Fugue in A Minor BWV 889",
+   "durationMs": 103920,
+   "artist": "Hélène Grimaud",
+   "apple": {
+    "block": 9,
+    "composer": "Johann Sebastian Bach",
+    "work": "Prelude & Fugue No. 20 in A Minor, BWV 865 · “The Well-tempered Clavier, Book 1”",
+    "part": "Book 2, BWV 870-893: 2. Fugue in A Minor BWV 889",
+    "performers": "Hélène Grimaud"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Prelude And Fugue in A Minor, BWV 543 - Transcribed For Piano By Franz Liszt: Prelude And Fugue",
+   "durationMs": 569013,
+   "artist": "Hélène Grimaud",
+   "apple": {
+    "block": 10,
+    "composer": "Johann Sebastian Bach",
+    "work": "Prelude & Fugue in A Minor, BWV 543",
+    "part": "Prelude And Fugue",
+    "performers": "Hélène Grimaud"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Das Wohltemperierte Klavier: Book 2, BWV 870-893: 1. Prelude in E Major BWV 878",
+   "durationMs": 247787,
+   "artist": "Hélène Grimaud",
+   "apple": {
+    "block": 11,
+    "composer": "Johann Sebastian Bach",
+    "work": "Prelude No. 5 in E Major, BWV 937",
+    "part": "Book 2, BWV 870-893: 1. Prelude in E Major BWV 878",
+    "performers": "Hélène Grimaud"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Das Wohltemperierte Klavier: Book 2, BWV 870-893: 2. Fugue in E Major BWV 878",
+   "durationMs": 153880,
+   "artist": "Hélène Grimaud",
+   "apple": {
+    "block": 12,
+    "composer": "Johann Sebastian Bach",
+    "work": "Prelude & Fugue No. 9 in E Major, BWV 878 · “The Well-tempered Clavier, Book 2”",
+    "part": "Book 2, BWV 870-893: 2. Fugue in E Major BWV 878",
+    "performers": "Hélène Grimaud"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Partita For Violin Solo No. 3 in E, BWV 1006 - Arr. For Piano By Rachmaninov: 1. Preludio",
+   "durationMs": 221307,
+   "artist": "Hélène Grimaud",
+   "apple": {
+    "block": 13,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 3 for Solo Violin in E Major, BWV 1006",
+    "part": "1. Preludio",
+    "performers": "Hélène Grimaud"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Das Wohltemperierte Klavier: Book 2, BWV 870-893: Prelude in C-Sharp Major BWV 872",
+   "durationMs": 111627,
+   "artist": "Hélène Grimaud",
+   "apple": {
+    "block": 14,
+    "composer": "Johann Sebastian Bach",
+    "work": "Prelude & Fugue No. 3 in C-Sharp Major, BWV 848 · “The Well-tempered Clavier, Book 1”",
+    "part": "Book 2, BWV 870-893: Prelude in C-Sharp Major BWV 872",
+    "performers": "Hélène Grimaud"
+   }
+  }
+ ]
+}

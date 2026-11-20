@@ -1,0 +1,232 @@
+{
+ "id": "3320129",
+ "category": "solo instrument",
+ "title": "Bach: Sonatas and Partitas for Solo Violin, Vol. 1",
+ "artist": "Lucy van Dael",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Violin Sonata No. 1 in G Minor, BWV1001, I. Adagio",
+   "durationMs": 204921,
+   "artist": "Lucy van Dael",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Sonata for Solo Violin No. 1 in G Minor, BWV 1001",
+    "part": "Violin Sonata No. 1 in G Minor, BWV1001, I. Adagio",
+    "performers": "Lucy van Dael"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Violin Sonata No. 1 in G Minor, BWV1001, II. Fuga: Allegro",
+   "durationMs": 334982,
+   "artist": "Lucy van Dael",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Sonata for Solo Violin No. 1 in G Minor, BWV 1001",
+    "part": "Allegro",
+    "performers": "Lucy van Dael"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Violin Sonata No. 1 in G Minor, BWV1001, III. Siciliana",
+   "durationMs": 173140,
+   "artist": "Lucy van Dael",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Sonata for Solo Violin No. 1 in G Minor, BWV 1001",
+    "part": "Violin Sonata No. 1 in G Minor, BWV1001, III. Siciliana",
+    "performers": "Lucy van Dael"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Violin Sonata No. 1 in G Minor, BWV1001, IV. Presto",
+   "durationMs": 178123,
+   "artist": "Lucy van Dael",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Sonata for Solo Violin No. 1 in G Minor, BWV 1001",
+    "part": "Violin Sonata No. 1 in G Minor, BWV1001, IV. Presto",
+    "performers": "Lucy van Dael"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Violin Partita No. 1 in B Minor, BWV1002, I. Allemanda",
+   "durationMs": 320352,
+   "artist": "Lucy van Dael",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 1 for Solo Violin in B Minor, BWV 1002",
+    "part": "Violin Partita No. 1 in B Minor, BWV1002, I. Allemanda",
+    "performers": "Lucy van Dael"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Violin Partita No. 1 in B Minor, BWV1002, II. Double",
+   "durationMs": 159111,
+   "artist": "Lucy van Dael",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 1 for Solo Violin in B Minor, BWV 1002",
+    "part": "Violin Partita No. 1 in B Minor, BWV1002, II. Double",
+    "performers": "Lucy van Dael"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Violin Partita No. 1 in B Minor, BWV1002, III. Correnta",
+   "durationMs": 222714,
+   "artist": "Lucy van Dael",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 1 for Solo Violin in B Minor, BWV 1002",
+    "part": "Violin Partita No. 1 in B Minor, BWV1002, III. Correnta",
+    "performers": "Lucy van Dael"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Violin Partita No. 1 in B Minor, BWV1002, IV. Double",
+   "durationMs": 248762,
+   "artist": "Lucy van Dael",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 1 for Solo Violin in B Minor, BWV 1002",
+    "part": "Violin Partita No. 1 in B Minor, BWV1002, IV. Double",
+    "performers": "Lucy van Dael"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Violin Partita No. 1 in B Minor, BWV1002, V. Sarabande",
+   "durationMs": 190169,
+   "artist": "Lucy van Dael",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 1 for Solo Violin in B Minor, BWV 1002",
+    "part": "Violin Partita No. 1 in B Minor, BWV1002, V. Sarabande",
+    "performers": "Lucy van Dael"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Violin Partita No. 1 in B Minor, BWV1002, VI. Double",
+   "durationMs": 147400,
+   "artist": "Lucy van Dael",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 1 for Solo Violin in B Minor, BWV 1002",
+    "part": "Violin Partita No. 1 in B Minor, BWV1002, VI. Double",
+    "performers": "Lucy van Dael"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Violin Partita No. 1 in B Minor, BWV1002, VII. Tempo di Borea",
+   "durationMs": 138490,
+   "artist": "Lucy van Dael",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 1 for Solo Violin in B Minor, BWV 1002",
+    "part": "Violin Partita No. 1 in B Minor, BWV1002, VII. Tempo di Borea",
+    "performers": "Lucy van Dael"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Violin Partita No. 1 in B Minor, BWV1002, VIII. Double",
+   "durationMs": 147226,
+   "artist": "Lucy van Dael",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 1 for Solo Violin in B Minor, BWV 1002",
+    "part": "Violin Partita No. 1 in B Minor, BWV1002, VIII. Double",
+    "performers": "Lucy van Dael"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Violin Sonata No. 2 in A Minor, BWV1003, I. Grave",
+   "durationMs": 240763,
+   "artist": "Lucy van Dael",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Sonata No. 2 for Solo Violin in A Minor, BWV 1003",
+    "part": "Violin Sonata No. 2 in A Minor, BWV1003, I. Grave",
+    "performers": "Lucy van Dael"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Violin Sonata No. 2 in A Minor, BWV1003, II. Fuga",
+   "durationMs": 509395,
+   "artist": "Lucy van Dael",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Sonata No. 2 for Solo Violin in A Minor, BWV 1003",
+    "part": "Violin Sonata No. 2 in A Minor, BWV1003, II. Fuga",
+    "performers": "Lucy van Dael"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Violin Sonata No. 2 in A Minor, BWV1003, III. Andante",
+   "durationMs": 307837,
+   "artist": "Lucy van Dael",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Sonata No. 2 for Solo Violin in A Minor, BWV 1003",
+    "part": "Violin Sonata No. 2 in A Minor, BWV1003, III. Andante",
+    "performers": "Lucy van Dael"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Violin Sonata No. 2 in A Minor, BWV1003, IV. Allegro",
+   "durationMs": 250651,
+   "artist": "Lucy van Dael",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Sonata No. 2 for Solo Violin in A Minor, BWV 1003",
+    "part": "Violin Sonata No. 2 in A Minor, BWV1003, IV. Allegro",
+    "performers": "Lucy van Dael"
+   }
+  }
+ ]
+}

@@ -1,0 +1,92 @@
+{
+ "id": "jeremy-soule-skyrim",
+ "family": "game-score",
+ "title": "The Elder Scrolls V: Skyrim (Original Game Soundtrack)",
+ "artist": "Jeremy Soule",
+ "source": "store download with a genre the classifier does not know",
+ "expect": {
+  "album": "not_classical"
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Dragonborn",
+   "durationMs": 239000,
+   "artist": "Jeremy Soule",
+   "composer": [
+    "Jeremy Soule"
+   ],
+   "genres": [
+    "Video Game Music"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Awake",
+   "durationMs": 102000,
+   "artist": "Jeremy Soule",
+   "composer": [
+    "Jeremy Soule"
+   ],
+   "genres": [
+    "Video Game Music"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "From Past to Present",
+   "durationMs": 224000,
+   "artist": "Jeremy Soule",
+   "composer": [
+    "Jeremy Soule"
+   ],
+   "genres": [
+    "Video Game Music"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Unbroken Road",
+   "durationMs": 397000,
+   "artist": "Jeremy Soule",
+   "composer": [
+    "Jeremy Soule"
+   ],
+   "genres": [
+    "Video Game Music"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Far Horizons",
+   "durationMs": 232000,
+   "artist": "Jeremy Soule",
+   "composer": [
+    "Jeremy Soule"
+   ],
+   "genres": [
+    "Video Game Music"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  }
+ ]
+}

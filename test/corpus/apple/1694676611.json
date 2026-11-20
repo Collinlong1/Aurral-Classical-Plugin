@@ -1,0 +1,456 @@
+{
+ "id": "1694676611",
+ "category": "solo instrument",
+ "title": "J. S. Bach: Goldberg Variations",
+ "artist": "Víkingur Ólafsson",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Goldberg Variations, BWV 988: Aria",
+   "durationMs": 245380,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Aria",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Goldberg Variations, BWV 988: Var. 1",
+   "durationMs": 90090,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Var. 1",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Goldberg Variations, BWV 988: Var. 2",
+   "durationMs": 85749,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Var. 2",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Goldberg Variations, BWV 988: Var. 3",
+   "durationMs": 110827,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Var. 3",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Goldberg Variations, BWV 988: Var. 4",
+   "durationMs": 56060,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Var. 4",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Goldberg Variations, BWV 988: Var. 5",
+   "durationMs": 71740,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Var. 5",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Goldberg Variations, BWV 988: Var. 6",
+   "durationMs": 68955,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Var. 6",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Goldberg Variations, BWV 988: Var. 7",
+   "durationMs": 132130,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Var. 7",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Goldberg Variations, BWV 988: Var. 8",
+   "durationMs": 97252,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Var. 8",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Goldberg Variations, BWV 988: Var. 9",
+   "durationMs": 96347,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Var. 9",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Goldberg Variations, BWV 988: Var. 10",
+   "durationMs": 92672,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Var. 10",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Goldberg Variations, BWV 988: Var. 11",
+   "durationMs": 100038,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Var. 11",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Goldberg Variations, BWV 988: Var. 12",
+   "durationMs": 112938,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Var. 12",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Goldberg Variations, BWV 988: Var. 13",
+   "durationMs": 246154,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Var. 13",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Goldberg Variations, BWV 988: Var. 14",
+   "durationMs": 122373,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Var. 14",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Goldberg Variations, BWV 988: Var. 15",
+   "durationMs": 337371,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Var. 15",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Goldberg Variations, BWV 988: Var. 16",
+   "durationMs": 160781,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Var. 16",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Goldberg Variations, BWV 988: Var. 17",
+   "durationMs": 115564,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Var. 17",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "Goldberg Variations, BWV 988: Var. 18",
+   "durationMs": 87842,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Var. 18",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "Goldberg Variations, BWV 988: Var. 19",
+   "durationMs": 67146,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Var. 19",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "Goldberg Variations, BWV 988: Var. 20",
+   "durationMs": 109035,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Var. 20",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "Goldberg Variations, BWV 988: Var. 21",
+   "durationMs": 195243,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Var. 21",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 23,
+   "title": "Goldberg Variations, BWV 988: Var. 22",
+   "durationMs": 76104,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Var. 22",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 24,
+   "title": "Goldberg Variations, BWV 988: Var. 23",
+   "durationMs": 114367,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Var. 23",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 25,
+   "title": "Goldberg Variations, BWV 988: Var. 24",
+   "durationMs": 168041,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Var. 24",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 26,
+   "title": "Goldberg Variations, BWV 988: Var. 25",
+   "durationMs": 588024,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Var. 25",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 27,
+   "title": "Goldberg Variations, BWV 988: Var. 26",
+   "durationMs": 103721,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Var. 26",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 28,
+   "title": "Goldberg Variations, BWV 988: Var. 27",
+   "durationMs": 91818,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Var. 27",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 29,
+   "title": "Goldberg Variations, BWV 988: Var. 28",
+   "durationMs": 124096,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Var. 28",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 30,
+   "title": "Goldberg Variations, BWV 988: Var. 29",
+   "durationMs": 107129,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Var. 29",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 31,
+   "title": "Goldberg Variations, BWV 988: Var. 30",
+   "durationMs": 116128,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Var. 30",
+    "performers": "Víkingur Ólafsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 32,
+   "title": "Goldberg Variations, BWV 988: Aria da Capo",
+   "durationMs": 155976,
+   "artist": "Víkingur Ólafsson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Aria da Capo",
+    "performers": "Víkingur Ólafsson"
+   }
+  }
+ ]
+}

@@ -1,0 +1,106 @@
+{
+ "id": "platoon-soundtrack",
+ "family": "soundtrack-mixed",
+ "title": "Platoon (Original Motion Picture Soundtrack)",
+ "artist": "Various Artists",
+ "source": "compilation soundtrack: one orchestral Barber recording among 1960s songs",
+ "expect": {
+  "album": "unsure",
+  "note": "Mixed: the album as a whole stays unsure; its Barber track opts in."
+ },
+ "pins": {
+  "album": "not_classical",
+  "tracks": {
+   "1": "classical"
+  },
+  "note": "Admin removes the soundtrack but keeps the Barber; the track pin must win."
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Adagio for Strings",
+   "durationMs": 409000,
+   "artist": "Vancouver Symphony Orchestra & Georges Delerue",
+   "composer": [
+    "Samuel Barber"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "classical",
+   "scenarios": [
+    "classical-in-mixed",
+    "classical-nonclassical-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Okie from Muskogee",
+   "durationMs": 167000,
+   "artist": "Merle Haggard",
+   "composer": [
+    "Merle Haggard",
+    "Roy Edward Burris"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "The Tracks of My Tears",
+   "durationMs": 175000,
+   "artist": "Smokey Robinson & The Miracles",
+   "composer": [
+    "Smokey Robinson",
+    "Pete Moore",
+    "Marv Tarplin"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "White Rabbit",
+   "durationMs": 151000,
+   "artist": "Jefferson Airplane",
+   "composer": [
+    "Grace Slick"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Hello, I Love You",
+   "durationMs": 142000,
+   "artist": "The Doors",
+   "composer": [
+    "The Doors"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  }
+ ]
+}

@@ -1,0 +1,260 @@
+{
+ "id": "968866036",
+ "category": "piano recital",
+ "title": "Debut Recital",
+ "artist": "Martha Argerich",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Scherzo No. 3 in C-Sharp Minor, Op. 39",
+   "durationMs": 390045,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 1,
+    "composer": "Frédéric Chopin",
+    "work": "Scherzo No. 3 in C-Sharp Minor, B. 125, Op. 39",
+    "part": "Scherzo No. 3 in C-Sharp Minor, Op. 39",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Rhapsody in B Minor, Op. 79 No. 1",
+   "durationMs": 509511,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 2,
+    "composer": "Johannes Brahms",
+    "work": "2 Rhapsodies, Op. 79",
+    "part": "Rhapsody in B Minor, Op. 79 No. 1",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Rhapsody in G Minor, Op. 79 No. 2",
+   "durationMs": 391931,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 2,
+    "composer": "Johannes Brahms",
+    "work": "2 Rhapsodies, Op. 79",
+    "part": "Rhapsody in G Minor, Op. 79 No. 2",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Toccata, Op. 11",
+   "durationMs": 248278,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 3,
+    "composer": "Sergei Prokofiev",
+    "work": "Toccata in D Minor, Op. 11",
+    "part": "Toccata, Op. 11",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Jeux d'eau, M. 30",
+   "durationMs": 326616,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 4,
+    "composer": "Maurice Ravel",
+    "work": "Jeux d'eau in E Major, M. 30 · “Fountains”",
+    "part": "Jeux d'eau, M. 30",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Barcarolle in F-Sharp Major, Op. 60",
+   "durationMs": 486139,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 5,
+    "composer": "Frédéric Chopin",
+    "work": "Barcarolle in F-Sharp Major, B. 158, Op. 60",
+    "part": "Barcarolle in F-Sharp Major, Op. 60",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Hungarian Rhapsody in D-Flat Major, S. 244 No. 6",
+   "durationMs": 382837,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 6,
+    "composer": "Franz Liszt",
+    "work": "19 Hungarian Rhapsodies, S. 244",
+    "part": "Hungarian Rhapsody in D-Flat Major, S. 244 No. 6",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Piano Sonata in B Minor, S. 178: Lento assai - Allegro energico",
+   "durationMs": 181172,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 7,
+    "composer": "Franz Liszt",
+    "work": "Piano Sonata in B Minor, S. 178",
+    "part": "Lento assai - Allegro energico",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Piano Sonata in B Minor, S. 178: Grandioso",
+   "durationMs": 118827,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 7,
+    "composer": "Franz Liszt",
+    "work": "Piano Sonata in B Minor, S. 178",
+    "part": "Grandioso",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Piano Sonata in B Minor, S. 178: Cantando espressivo",
+   "durationMs": 220507,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 7,
+    "composer": "Franz Liszt",
+    "work": "Piano Sonata in B Minor, S. 178",
+    "part": "Cantando espressivo",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Piano Sonata in B Minor, S. 178: Pesante - Recitativo",
+   "durationMs": 125057,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 7,
+    "composer": "Franz Liszt",
+    "work": "Piano Sonata in B Minor, S. 178",
+    "part": "Pesante - Recitativo",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Piano Sonata in B Minor, S. 178: Andante sostenuto",
+   "durationMs": 46601,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 7,
+    "composer": "Franz Liszt",
+    "work": "Piano Sonata in B Minor, S. 178",
+    "part": "Andante sostenuto",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Piano Sonata in B Minor, S. 178: Quasi adagio",
+   "durationMs": 288742,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 7,
+    "composer": "Franz Liszt",
+    "work": "Piano Sonata in B Minor, S. 178",
+    "part": "Quasi adagio",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Piano Sonata in B Minor, S. 178: Allegro energico",
+   "durationMs": 133947,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 7,
+    "composer": "Franz Liszt",
+    "work": "Piano Sonata in B Minor, S. 178",
+    "part": "Allegro energico",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Piano Sonata in B Minor, S. 178: Più mosso",
+   "durationMs": 112434,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 7,
+    "composer": "Franz Liszt",
+    "work": "Piano Sonata in B Minor, S. 178",
+    "part": "Più mosso",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Piano Sonata in B Minor, S. 178: Cantando espressivo senza slentare",
+   "durationMs": 74353,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 7,
+    "composer": "Franz Liszt",
+    "work": "Piano Sonata in B Minor, S. 178",
+    "part": "Cantando espressivo senza slentare",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Piano Sonata in B Minor, S. 178: Stretta quasi presto - Presto - Prestissimo",
+   "durationMs": 73053,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 7,
+    "composer": "Franz Liszt",
+    "work": "Piano Sonata in B Minor, S. 178",
+    "part": "Stretta quasi presto - Presto - Prestissimo",
+    "performers": "Martha Argerich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Piano Sonata in B Minor, S. 178: Andante sostenuto - Allegro moderato - Lento assai",
+   "durationMs": 178573,
+   "artist": "Martha Argerich",
+   "apple": {
+    "block": 7,
+    "composer": "Franz Liszt",
+    "work": "Piano Sonata in B Minor, S. 178",
+    "part": "Andante sostenuto - Allegro moderato - Lento assai",
+    "performers": "Martha Argerich"
+   }
+  }
+ ]
+}

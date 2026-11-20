@@ -1,0 +1,120 @@
+{
+ "id": "1452515343",
+ "category": "symphony",
+ "title": "Mozart: Symphonies No. 40 & No. 41 \"Jupiter\"",
+ "artist": "Vienna Philharmonic & Leonard Bernstein",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Symphony No. 41 in C, K. 551 \"Jupiter\": 1. Allegro Vivace",
+   "durationMs": 723427,
+   "artist": "Vienna Philharmonic & Leonard Bernstein",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Symphony No. 41 in C Major, K. 551, KV 551 · “Jupiter Symphony”",
+    "part": "1. Allegro Vivace",
+    "performers": "Vienna Philharmonic, Leonard Bernstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Symphony No. 41 in C, K. 551 \"Jupiter\": 2. Andante Cantabile",
+   "durationMs": 551000,
+   "artist": "Vienna Philharmonic & Leonard Bernstein",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Symphony No. 41 in C Major, K. 551, KV 551 · “Jupiter Symphony”",
+    "part": "2. Andante Cantabile",
+    "performers": "Vienna Philharmonic, Leonard Bernstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Symphony No. 41 in C, K. 551 \"Jupiter\": 3. Menuetto (Allegretto)",
+   "durationMs": 315000,
+   "artist": "Vienna Philharmonic & Leonard Bernstein",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Symphony No. 41 in C Major, K. 551, KV 551 · “Jupiter Symphony”",
+    "part": "3. Menuetto (Allegretto)",
+    "performers": "Leonard Bernstein, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Symphony No. 41 in C, K. 551 \"Jupiter\": 4. Molto Allegro",
+   "durationMs": 699000,
+   "artist": "Vienna Philharmonic & Leonard Bernstein",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Symphony No. 41 in C Major, K. 551, KV 551 · “Jupiter Symphony”",
+    "part": "4. Molto Allegro",
+    "performers": "Vienna Philharmonic, Leonard Bernstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Symphony No. 40 in G Minor, K. 550: 1. Molto Allegro",
+   "durationMs": 523000,
+   "artist": "Vienna Philharmonic & Leonard Bernstein",
+   "apple": {
+    "block": 2,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Symphony No. 40 in G Minor, K. 550, KV 550",
+    "part": "1. Molto Allegro",
+    "performers": "Vienna Philharmonic, Leonard Bernstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Symphony No. 40 in G Minor, K. 550: 2. Andante",
+   "durationMs": 497000,
+   "artist": "Vienna Philharmonic & Leonard Bernstein",
+   "apple": {
+    "block": 2,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Symphony No. 40 in G Minor, K. 550, KV 550",
+    "part": "2. Andante",
+    "performers": "Vienna Philharmonic, Leonard Bernstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Symphony No. 40 in G Minor, K. 550: 3. Menuetto (Allegretto)",
+   "durationMs": 291000,
+   "artist": "Vienna Philharmonic & Leonard Bernstein",
+   "apple": {
+    "block": 2,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Symphony No. 40 in G Minor, K. 550, KV 550",
+    "part": "3. Menuetto (Allegretto)",
+    "performers": "Leonard Bernstein, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Symphony No. 40 in G Minor, K. 550: 4. Finale (Allegro Assai)",
+   "durationMs": 553000,
+   "artist": "Vienna Philharmonic & Leonard Bernstein",
+   "apple": {
+    "block": 2,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Symphony No. 40 in G Minor, K. 550, KV 550",
+    "part": "4. Finale (Allegro Assai)",
+    "performers": "Vienna Philharmonic, Leonard Bernstein"
+   }
+  }
+ ]
+}

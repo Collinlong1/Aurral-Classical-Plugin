@@ -1,0 +1,470 @@
+{
+ "id": "1779059876",
+ "category": "piano recital",
+ "title": "Ravel: The Complete Solo Piano Works",
+ "artist": "Seong-Jin Cho",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Sérénade grotesque, M. 5",
+   "durationMs": 205253,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 1,
+    "composer": "Maurice Ravel",
+    "work": "Sérénade grotesque, M. 5",
+    "part": "Sérénade grotesque, M. 5",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Menuet antique, M. 7",
+   "durationMs": 358027,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 2,
+    "composer": "Maurice Ravel",
+    "work": "Menuet antique, M. 7",
+    "part": "Menuet antique, M. 7",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Pavane pour une infante défunte, M. 19",
+   "durationMs": 398613,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 3,
+    "composer": "Maurice Ravel",
+    "work": "Pavane pour une infante défunte, M. 19, M. 19a · “Pavane for a Dead Princess”",
+    "part": "Pavane pour une infante défunte, M. 19",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Jeux d'eau, M. 30",
+   "durationMs": 333133,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 4,
+    "composer": "Maurice Ravel",
+    "work": "Jeux d'eau in E Major, M. 30 · “Fountains”",
+    "part": "Jeux d'eau, M. 30",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Sonatine, M. 40: I. Modéré",
+   "durationMs": 280333,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 5,
+    "composer": "Maurice Ravel",
+    "work": "Sonatine in F-Sharp Minor, M. 40",
+    "part": "I. Modéré",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Sonatine, M. 40: II. Mouvement de menuet",
+   "durationMs": 195613,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 5,
+    "composer": "Maurice Ravel",
+    "work": "Sonatine in F-Sharp Minor, M. 40",
+    "part": "II. Mouvement de menuet",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Sonatine, M. 40: III. Animé",
+   "durationMs": 236720,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 5,
+    "composer": "Maurice Ravel",
+    "work": "Sonatine in F-Sharp Minor, M. 40",
+    "part": "III. Animé",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Miroirs, M. 43: No. 1, Noctuelles",
+   "durationMs": 273360,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 6,
+    "composer": "Maurice Ravel",
+    "work": "Miroirs, M. 43 · “Mirrors”",
+    "part": "No. 1, Noctuelles",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Miroirs, M. 43: No. 2, Oiseaux tristes",
+   "durationMs": 250080,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 6,
+    "composer": "Maurice Ravel",
+    "work": "Miroirs, M. 43 · “Mirrors”",
+    "part": "No. 2, Oiseaux tristes",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Miroirs, M. 43: No. 3, Une barque sur l'océan",
+   "durationMs": 408960,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 6,
+    "composer": "Maurice Ravel",
+    "work": "Miroirs, M. 43 · “Mirrors”",
+    "part": "No. 3, Une barque sur l'océan",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Miroirs, M. 43: No. 4, Alborada del gracioso",
+   "durationMs": 403000,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 6,
+    "composer": "Maurice Ravel",
+    "work": "Miroirs, M. 43 · “Mirrors”",
+    "part": "No. 4, Alborada del gracioso",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Miroirs, M. 43: No. 5, La vallée des cloches",
+   "durationMs": 361067,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 6,
+    "composer": "Maurice Ravel",
+    "work": "Miroirs, M. 43 · “Mirrors”",
+    "part": "No. 5, La vallée des cloches",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Gaspard de la nuit, M. 55: No. 1, Ondine",
+   "durationMs": 383360,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 7,
+    "composer": "Maurice Ravel",
+    "work": "Gaspard de la nuit, M. 55",
+    "part": "No. 1, Ondine",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Gaspard de la nuit, M. 55: No. 2, Le Gibet",
+   "durationMs": 348333,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 7,
+    "composer": "Maurice Ravel",
+    "work": "Gaspard de la nuit, M. 55",
+    "part": "No. 2, Le Gibet",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Gaspard de la nuit, M. 55: No. 3, Scarbo",
+   "durationMs": 555747,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 7,
+    "composer": "Maurice Ravel",
+    "work": "Gaspard de la nuit, M. 55",
+    "part": "No. 3, Scarbo",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Menuet sur le nom d'Haydn, M. 58",
+   "durationMs": 114947,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 8,
+    "composer": "Maurice Ravel",
+    "work": "Menuet sur le nom d'Haydn, M. 58",
+    "part": "Menuet sur le nom d'Haydn, M. 58",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Valses nobles et sentimentales, M. 61: No. 1, Modéré, très franc",
+   "durationMs": 86040,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 9,
+    "composer": "Maurice Ravel",
+    "work": "Valses nobles et sentimentales, M. 61, M. 61a · “Noble and Sentimental Waltzes”",
+    "part": "No. 1, Modéré, très franc",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Valses nobles et sentimentales, M. 61: No. 2, Assez lent, avec une expression intense",
+   "durationMs": 139280,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 9,
+    "composer": "Maurice Ravel",
+    "work": "Valses nobles et sentimentales, M. 61, M. 61a · “Noble and Sentimental Waltzes”",
+    "part": "No. 2, Assez lent, avec une expression intense",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "Valses nobles et sentimentales, M. 61: No. 3, Modéré",
+   "durationMs": 83787,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 9,
+    "composer": "Maurice Ravel",
+    "work": "Valses nobles et sentimentales, M. 61, M. 61a · “Noble and Sentimental Waltzes”",
+    "part": "No. 3, Modéré",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "Valses nobles et sentimentales, M. 61: No. 4, Assez animé",
+   "durationMs": 70813,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 9,
+    "composer": "Maurice Ravel",
+    "work": "Valses nobles et sentimentales, M. 61, M. 61a · “Noble and Sentimental Waltzes”",
+    "part": "No. 4, Assez animé",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "Valses nobles et sentimentales, M. 61: No. 5, Presque lent, dans un sentiment intime",
+   "durationMs": 78507,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 9,
+    "composer": "Maurice Ravel",
+    "work": "Valses nobles et sentimentales, M. 61, M. 61a · “Noble and Sentimental Waltzes”",
+    "part": "No. 5, Presque lent, dans un sentiment intime",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "Valses nobles et sentimentales, M. 61: No. 6, Vif",
+   "durationMs": 39827,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 9,
+    "composer": "Maurice Ravel",
+    "work": "Valses nobles et sentimentales, M. 61, M. 61a · “Noble and Sentimental Waltzes”",
+    "part": "No. 6, Vif",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 23,
+   "title": "Valses nobles et sentimentales, M. 61: No. 7, Moins vif",
+   "durationMs": 171973,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 9,
+    "composer": "Maurice Ravel",
+    "work": "Valses nobles et sentimentales, M. 61, M. 61a · “Noble and Sentimental Waltzes”",
+    "part": "No. 7, Moins vif",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 24,
+   "title": "Valses nobles et sentimentales, M. 61: No. 8, Epilogue. Lent",
+   "durationMs": 281307,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 9,
+    "composer": "Maurice Ravel",
+    "work": "Valses nobles et sentimentales, M. 61, M. 61a · “Noble and Sentimental Waltzes”",
+    "part": "No. 8, Epilogue. Lent",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 25,
+   "title": "Prélude in A Minor, M. 65",
+   "durationMs": 91827,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 10,
+    "composer": "Maurice Ravel",
+    "work": "Prélude, M. 65",
+    "part": "Prélude in A Minor, M. 65",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 26,
+   "title": "À la manière de Borodine, M. 63/1",
+   "durationMs": 97187,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 11,
+    "composer": "Maurice Ravel",
+    "work": "À la manière de Borodine, M. 63/1",
+    "part": "À la manière de Borodine, M. 63/1",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 27,
+   "title": "À la manière de Chabrier, M. 63/2",
+   "durationMs": 119627,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 12,
+    "composer": "Maurice Ravel",
+    "work": "À la manière de Chabrier, M. 63/2",
+    "part": "À la manière de Chabrier, M. 63/2",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 28,
+   "title": "Le tombeau de Couperin, M. 68: I. Prélude",
+   "durationMs": 194440,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 13,
+    "composer": "Maurice Ravel",
+    "work": "Le tombeau de Couperin, M. 68",
+    "part": "I. Prélude",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 29,
+   "title": "Le tombeau de Couperin, M. 68: II. Fugue",
+   "durationMs": 209947,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 13,
+    "composer": "Maurice Ravel",
+    "work": "Le tombeau de Couperin, M. 68",
+    "part": "II. Fugue",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 30,
+   "title": "Le tombeau de Couperin, M. 68: III. Forlane",
+   "durationMs": 386093,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 13,
+    "composer": "Maurice Ravel",
+    "work": "Le tombeau de Couperin, M. 68",
+    "part": "III. Forlane",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 31,
+   "title": "Le tombeau de Couperin, M. 68: IV. Rigaudon",
+   "durationMs": 201080,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 13,
+    "composer": "Maurice Ravel",
+    "work": "Le tombeau de Couperin, M. 68",
+    "part": "IV. Rigaudon",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 32,
+   "title": "Le tombeau de Couperin, M. 68: V. Menuet",
+   "durationMs": 299760,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 13,
+    "composer": "Maurice Ravel",
+    "work": "Le tombeau de Couperin, M. 68",
+    "part": "V. Menuet",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 33,
+   "title": "Le tombeau de Couperin, M. 68: VI. Toccata",
+   "durationMs": 231293,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 13,
+    "composer": "Maurice Ravel",
+    "work": "Le tombeau de Couperin, M. 68",
+    "part": "VI. Toccata",
+    "performers": "Seong-Jin Cho"
+   }
+  }
+ ]
+}

@@ -1,0 +1,316 @@
+{
+ "id": "1452521804",
+ "category": "baroque early",
+ "title": "Purcell: Dido and Aeneas",
+ "artist": "The English Concert, Trevor Pinnock & The English Concert Choir",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Dido and Aeneas: Overture",
+   "durationMs": 139267,
+   "artist": "Trevor Pinnock & The English Concert",
+   "apple": {
+    "block": 1,
+    "composer": "Henry Purcell",
+    "work": "Overture in D Minor, Z. 771",
+    "part": "Overture",
+    "performers": "Trevor Pinnock, The English Concert"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Dido and Aeneas: \"Shake the Cloud from Off Your Brow\" - \"Banish Sorrow, Banish Care\"",
+   "durationMs": 62467,
+   "artist": "The English Concert, Trevor Pinnock, Lynne Dawson & The English Concert Choir",
+   "apple": {
+    "block": 2,
+    "composer": "Henry Purcell",
+    "work": "Dido and Aeneas, Z. 626",
+    "part": "\"Shake the Cloud from Off Your Brow\" - \"Banish Sorrow, Banish Care\"",
+    "performers": "The English Concert, Trevor Pinnock, The English Concert Choir, Lynne Dawson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Dido and Aeneas: \"Ah! Belinda, I Am Press'd\" . \"When Monarchs Unite, How Happy\"",
+   "durationMs": 283693,
+   "artist": "The English Concert, Trevor Pinnock, Anne Sofie von Otter, Lynne Dawson & The English Concert Choir",
+   "apple": {
+    "block": 2,
+    "composer": "Henry Purcell",
+    "work": "Dido and Aeneas, Z. 626",
+    "part": "\"Ah! Belinda, I Am Press'd\" . \"When Monarchs Unite, How Happy\"",
+    "performers": "Anne Sofie von Otter, The English Concert Choir, Lynne Dawson, Trevor Pinnock, The English Concert"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Dido and Aeneas: \"Whence Could So Much Virtue Spring?\" - \"Fear No. Danger\"",
+   "durationMs": 212040,
+   "artist": "The English Concert, Trevor Pinnock, Anne Sofie von Otter, Lynne Dawson, The English Concert Choir & Sarah Leonard",
+   "apple": {
+    "block": 2,
+    "composer": "Henry Purcell",
+    "work": "Dido and Aeneas, Z. 626",
+    "part": "\"Whence Could So Much Virtue Spring?\" - \"Fear No. Danger\"",
+    "performers": "The English Concert Choir, The English Concert, Lynne Dawson, Anne Sofie von Otter, Trevor Pinnock, Sarah Leonard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Dido and Aeneas: \"See, Your Royal Guest Appears\" - \"Cupid Only Throws the Dart\"",
+   "durationMs": 86533,
+   "artist": "The English Concert, Trevor Pinnock, Lynne Dawson, Stephen Varcoe, The English Concert Choir & Anne Sofie von Otter",
+   "apple": {
+    "block": 2,
+    "composer": "Henry Purcell",
+    "work": "Dido and Aeneas, Z. 626",
+    "part": "\"See, Your Royal Guest Appears\" - \"Cupid Only Throws the Dart\"",
+    "performers": "Stephen Varcoe, Lynne Dawson, The English Concert, The English Concert Choir, Trevor Pinnock, Anne Sofie von Otter"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Dido and Aeneas: \"If Not for Mine, for Empire's Sake\" . \"To the Hills and the Vales\"",
+   "durationMs": 138667,
+   "artist": "The English Concert, Trevor Pinnock, Stephen Varcoe, The English Concert Choir & Lynne Dawson",
+   "apple": {
+    "block": 2,
+    "composer": "Henry Purcell",
+    "work": "Dido and Aeneas, Z. 626",
+    "part": "\"If Not for Mine, for Empire's Sake\" . \"To the Hills and the Vales\"",
+    "performers": "Trevor Pinnock, The English Concert Choir, Lynne Dawson, The English Concert, Stephen Varcoe"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Dido and Aeneas: The Triumphing Dance",
+   "durationMs": 70960,
+   "artist": "Trevor Pinnock & The English Concert",
+   "apple": {
+    "block": 2,
+    "composer": "Henry Purcell",
+    "work": "Dido and Aeneas, Z. 626",
+    "part": "The Triumphing Dance",
+    "performers": "The English Concert, Trevor Pinnock"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Dido and Aeneas: Prelude for the Witches \"Wayward Sisters\" . \"Ho, Ho, Ho\"",
+   "durationMs": 153333,
+   "artist": "The English Concert, Trevor Pinnock, Nigel Rogers, The English Concert Choir & Elisabeth Priday",
+   "apple": {
+    "block": 2,
+    "composer": "Henry Purcell",
+    "work": "Dido and Aeneas, Z. 626",
+    "part": "Prelude for the Witches \"Wayward Sisters\" . \"Ho, Ho, Ho\"",
+    "performers": "Nigel Rogers, The English Concert Choir, The English Concert, Trevor Pinnock, Elisabeth Priday"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Dido and Aeneas: \"Ruin'd Ere the Set of Sun\" . \"But Ere We This Perform\"",
+   "durationMs": 141667,
+   "artist": "The English Concert, Trevor Pinnock, Elisabeth Priday, Carol Hall, The English Concert Choir & Nigel Rogers",
+   "apple": {
+    "block": 2,
+    "composer": "Henry Purcell",
+    "work": "Dido and Aeneas, Z. 626",
+    "part": "\"Ruin'd Ere the Set of Sun\" . \"But Ere We This Perform\"",
+    "performers": "Trevor Pinnock, Nigel Rogers, The English Concert Choir, Elisabeth Priday, Carol Hall, The English Concert"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Dido and Aeneas: \"In Our Deep Vaulted Cell\"",
+   "durationMs": 101000,
+   "artist": "The English Concert, Trevor Pinnock & The English Concert Choir",
+   "apple": {
+    "block": 2,
+    "composer": "Henry Purcell",
+    "work": "Dido and Aeneas, Z. 626",
+    "part": "\"In Our Deep Vaulted Cell\"",
+    "performers": "The English Concert Choir, Trevor Pinnock, The English Concert"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Dido and Aeneas: Echo Dance of Furies",
+   "durationMs": 54333,
+   "artist": "The English Concert & Trevor Pinnock",
+   "apple": {
+    "block": 2,
+    "composer": "Henry Purcell",
+    "work": "Dido and Aeneas, Z. 626",
+    "part": "Echo Dance of Furies",
+    "performers": "Trevor Pinnock, The English Concert"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Dido and Aeneas: Ritornelle - \"Thanks to These Lonesome Vales\"",
+   "durationMs": 199133,
+   "artist": "The English Concert, Trevor Pinnock, Lynne Dawson & The English Concert Choir",
+   "apple": {
+    "block": 2,
+    "composer": "Henry Purcell",
+    "work": "Dido and Aeneas, Z. 626",
+    "part": "Ritornelle - \"Thanks to These Lonesome Vales\"",
+    "performers": "Lynne Dawson, Trevor Pinnock, The English Concert, The English Concert Choir"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Dido and Aeneas: \"Oft She Visits\"",
+   "durationMs": 136667,
+   "artist": "The English Concert, Trevor Pinnock & Sarah Leonard",
+   "apple": {
+    "block": 2,
+    "composer": "Henry Purcell",
+    "work": "Dido and Aeneas, Z. 626",
+    "part": "\"Oft She Visits\"",
+    "performers": "The English Concert, Trevor Pinnock, Sarah Leonard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Dido and Aeneas: \"Behold, Upon My Bending Spear\" - \"Haste, Haste to Town\"",
+   "durationMs": 82493,
+   "artist": "The English Concert, Trevor Pinnock, Stephen Varcoe, The English Concert Choir, Anne Sofie von Otter & Lynne Dawson",
+   "apple": {
+    "block": 2,
+    "composer": "Henry Purcell",
+    "work": "Dido and Aeneas, Z. 626",
+    "part": "\"Behold, Upon My Bending Spear\" - \"Haste, Haste to Town\"",
+    "performers": "Anne Sofie von Otter, The English Concert, Stephen Varcoe, The English Concert Choir, Trevor Pinnock, Lynne Dawson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Dido and Aeneas: \"Stay, Prince\"",
+   "durationMs": 160440,
+   "artist": "The English Concert, Trevor Pinnock, Kym Amps & Stephen Varcoe",
+   "apple": {
+    "block": 2,
+    "composer": "Henry Purcell",
+    "work": "Dido and Aeneas, Z. 626",
+    "part": "\"Stay, Prince\"",
+    "performers": "Kym Amps, Stephen Varcoe, Trevor Pinnock, The English Concert"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Dido and Aeneas: Prelude - \"Come Away, Fellow Sailors\"",
+   "durationMs": 92760,
+   "artist": "The English Concert, Trevor Pinnock, Nigel Rogers & The English Concert Choir",
+   "apple": {
+    "block": 3,
+    "composer": "Henry Purcell",
+    "work": "Prelude in A Minor, Z. 652",
+    "part": "Prelude - \"Come Away, Fellow Sailors\"",
+    "performers": "The English Concert, Nigel Rogers, The English Concert Choir, Trevor Pinnock"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Dido and Aeneas: The Sailors' Dance \"See the Flags and Streamers Curling\"",
+   "durationMs": 102600,
+   "artist": "The English Concert, Trevor Pinnock, Nigel Rogers, Elisabeth Priday & Carol Hall",
+   "apple": {
+    "block": 4,
+    "composer": "Henry Purcell",
+    "work": "Dido and Aeneas, Z. 626",
+    "part": "The Sailors' Dance \"See the Flags and Streamers Curling\"",
+    "performers": "Carol Hall, The English Concert, Trevor Pinnock, Elisabeth Priday, Nigel Rogers"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Dido and Aeneas: \"Our Next Motion\" - \"Destructions's Our Delight\"",
+   "durationMs": 73333,
+   "artist": "The English Concert, Trevor Pinnock, Nigel Rogers & The English Concert Choir",
+   "apple": {
+    "block": 4,
+    "composer": "Henry Purcell",
+    "work": "Dido and Aeneas, Z. 626",
+    "part": "\"Our Next Motion\" - \"Destructions's Our Delight\"",
+    "performers": "The English Concert, Nigel Rogers, Trevor Pinnock, The English Concert Choir"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "Dido and Aeneas: The Witches' Dance",
+   "durationMs": 72067,
+   "artist": "The English Concert & Trevor Pinnock",
+   "apple": {
+    "block": 4,
+    "composer": "Henry Purcell",
+    "work": "Dido and Aeneas, Z. 626",
+    "part": "The Witches' Dance",
+    "performers": "Trevor Pinnock, The English Concert"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "Dido and Aeneas: \"Your Counsel All Is Urg'd in Vain\" - \"Great Minds Against Themselves Conspire\"",
+   "durationMs": 301907,
+   "artist": "The English Concert, Trevor Pinnock, Anne Sofie von Otter, Lynne Dawson, The English Concert Choir & Stephen Varcoe",
+   "apple": {
+    "block": 4,
+    "composer": "Henry Purcell",
+    "work": "Dido and Aeneas, Z. 626",
+    "part": "\"Your Counsel All Is Urg'd in Vain\" - \"Great Minds Against Themselves Conspire\"",
+    "performers": "Trevor Pinnock, Stephen Varcoe, Anne Sofie von Otter, The English Concert Choir, Lynne Dawson, The English Concert"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "Dido and Aeneas: \"Thy Hand, Belinda.When I Am Laid in Earth\"",
+   "durationMs": 261867,
+   "artist": "Trevor Pinnock, The English Concert & Anne Sofie von Otter",
+   "apple": {
+    "block": 4,
+    "composer": "Henry Purcell",
+    "work": "Dido and Aeneas, Z. 626",
+    "part": "\"Thy Hand, Belinda.When I Am Laid in Earth\"",
+    "performers": "Trevor Pinnock, Anne Sofie von Otter, The English Concert"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "Dido and Aeneas: \"With Drooping Wings\"",
+   "durationMs": 293800,
+   "artist": "The English Concert, Trevor Pinnock & The English Concert Choir",
+   "apple": {
+    "block": 4,
+    "composer": "Henry Purcell",
+    "work": "Dido and Aeneas, Z. 626",
+    "part": "\"With Drooping Wings\"",
+    "performers": "The English Concert, The English Concert Choir, Trevor Pinnock"
+   }
+  }
+ ]
+}

@@ -1,0 +1,344 @@
+{
+ "id": "1639252048",
+ "category": "solo instrument",
+ "title": "Chopin: Etudes",
+ "artist": "Vladimir Ashkenazy",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "12 Études, Op. 10: No. 1 in C Major \"Waterfall\"",
+   "durationMs": 122267,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 1,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 10",
+    "part": "No. 1 in C Major \"Waterfall\"",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "12 Études, Op. 10: No. 2 in A Minor \"Chromatique\"",
+   "durationMs": 82853,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 1,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 10",
+    "part": "No. 2 in A Minor \"Chromatique\"",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "12 Études, Op. 10: No. 3 in E Major \"Tristesse\"",
+   "durationMs": 263373,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 1,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 10",
+    "part": "No. 3 in E Major \"Tristesse\"",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "12 Études, Op. 10: No. 4 in C-Sharp Minor",
+   "durationMs": 127213,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 1,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 10",
+    "part": "No. 4 in C-Sharp Minor",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "12 Études, Op. 10: No. 5 in G-Flat Major \"Black Keys\"",
+   "durationMs": 103013,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 1,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 10",
+    "part": "No. 5 in G-Flat Major \"Black Keys\"",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "12 Études, Op. 10: No. 6 in E-Flat Minor",
+   "durationMs": 247707,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 1,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 10",
+    "part": "No. 6 in E-Flat Minor",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "12 Études, Op. 10: No. 7 in C Major",
+   "durationMs": 91493,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 1,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 10",
+    "part": "No. 7 in C Major",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "12 Études, Op. 10: No. 8 in F Major",
+   "durationMs": 142893,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 1,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 10",
+    "part": "No. 8 in F Major",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "12 Études, Op. 10: No. 9 in F Minor",
+   "durationMs": 144667,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 1,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 10",
+    "part": "No. 9 in F Minor",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "12 Études, Op. 10: No. 10 in A-Flat Major",
+   "durationMs": 137427,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 1,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 10",
+    "part": "No. 10 in A-Flat Major",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "12 Études, Op. 10: No. 11 in E-Flat Major",
+   "durationMs": 150533,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 1,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 10",
+    "part": "No. 11 in E-Flat Major",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "12 Études, Op. 10: No. 12 in C Minor \"Revolutionary\"",
+   "durationMs": 168733,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 1,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 10",
+    "part": "No. 12 in C Minor \"Revolutionary\"",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "12 Études, Op. 25: No. 1 in A-Flat Major \"Harp Study\"",
+   "durationMs": 176693,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 2,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 25",
+    "part": "No. 1 in A-Flat Major \"Harp Study\"",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "12 Études, Op. 25: No. 2 in F Minor",
+   "durationMs": 113453,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 2,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 25",
+    "part": "No. 2 in F Minor",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "12 Études, Op. 25: No. 3 in F Major",
+   "durationMs": 113147,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 2,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 25",
+    "part": "No. 3 in F Major",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "12 Études, Op. 25: No. 4 in A Minor",
+   "durationMs": 95973,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 2,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 25",
+    "part": "No. 4 in A Minor",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "12 Études, Op. 25: No. 5 in E Minor",
+   "durationMs": 217587,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 2,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 25",
+    "part": "No. 5 in E Minor",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "12 Études, Op. 25: No. 6 in G-Sharp Minor",
+   "durationMs": 128653,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 2,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 25",
+    "part": "No. 6 in G-Sharp Minor",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "12 Études, Op. 25: No. 7 in C-Sharp Minor",
+   "durationMs": 347187,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 2,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 25",
+    "part": "No. 7 in C-Sharp Minor",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "12 Études, Op. 25: No. 8 in D-Flat Major",
+   "durationMs": 69680,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 2,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 25",
+    "part": "No. 8 in D-Flat Major",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "12 Études, Op. 25: No. 9 in G-Flat Major \"Butterfly Wings\"",
+   "durationMs": 58600,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 2,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 25",
+    "part": "No. 9 in G-Flat Major \"Butterfly Wings\"",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "12 Études, Op. 25: No. 10 in B Minor",
+   "durationMs": 287627,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 2,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 25",
+    "part": "No. 10 in B Minor",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 23,
+   "title": "12 Études, Op. 25: No. 11 in A Minor \"Winter Wind\"",
+   "durationMs": 229640,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 2,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 25",
+    "part": "No. 11 in A Minor \"Winter Wind\"",
+    "performers": "Vladimir Ashkenazy"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 24,
+   "title": "12 Études, Op. 25: No. 12 in C Minor",
+   "durationMs": 168747,
+   "artist": "Vladimir Ashkenazy",
+   "apple": {
+    "block": 2,
+    "composer": "Frédéric Chopin",
+    "work": "12 Études, Op. 25",
+    "part": "No. 12 in C Minor",
+    "performers": "Vladimir Ashkenazy"
+   }
+  }
+ ]
+}

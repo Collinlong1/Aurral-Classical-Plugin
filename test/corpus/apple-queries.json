@@ -1,0 +1,522 @@
+[
+ {
+  "category": "piano recital",
+  "terms": "yuja wang recital",
+  "take": 2
+ },
+ {
+  "category": "piano recital",
+  "terms": "martha argerich live recital",
+  "take": 2
+ },
+ {
+  "category": "piano recital",
+  "terms": "daniil trifonov recital",
+  "take": 2
+ },
+ {
+  "category": "piano recital",
+  "terms": "grigory sokolov recital",
+  "take": 2
+ },
+ {
+  "category": "piano recital",
+  "terms": "khatia buniatishvili",
+  "take": 2
+ },
+ {
+  "category": "piano recital",
+  "terms": "seong-jin cho",
+  "take": 2
+ },
+ {
+  "category": "piano recital",
+  "terms": "lang lang piano book",
+  "take": 2
+ },
+ {
+  "category": "piano recital",
+  "terms": "hélène grimaud",
+  "take": 2
+ },
+ {
+  "category": "piano recital",
+  "terms": "víkingur ólafsson",
+  "take": 2
+ },
+ {
+  "category": "piano recital",
+  "terms": "evgeny kissin recital",
+  "take": 2
+ },
+ {
+  "category": "beethoven sonatas",
+  "terms": "beethoven piano sonatas levit",
+  "take": 2
+ },
+ {
+  "category": "beethoven sonatas",
+  "terms": "beethoven piano sonatas barenboim",
+  "take": 2
+ },
+ {
+  "category": "beethoven sonatas",
+  "terms": "beethoven complete piano sonatas schiff",
+  "take": 2
+ },
+ {
+  "category": "symphony",
+  "terms": "beethoven symphonies karajan",
+  "take": 2
+ },
+ {
+  "category": "symphony",
+  "terms": "mahler symphony 5",
+  "take": 2
+ },
+ {
+  "category": "symphony",
+  "terms": "brahms symphonies",
+  "take": 2
+ },
+ {
+  "category": "symphony",
+  "terms": "tchaikovsky symphony 6",
+  "take": 2
+ },
+ {
+  "category": "symphony",
+  "terms": "bruckner symphony 7",
+  "take": 2
+ },
+ {
+  "category": "symphony",
+  "terms": "dvorak symphony 9",
+  "take": 2
+ },
+ {
+  "category": "symphony",
+  "terms": "shostakovich symphony 5",
+  "take": 2
+ },
+ {
+  "category": "symphony",
+  "terms": "sibelius symphonies",
+  "take": 2
+ },
+ {
+  "category": "symphony",
+  "terms": "mozart symphonies 40 41",
+  "take": 2
+ },
+ {
+  "category": "symphony",
+  "terms": "haydn symphonies",
+  "take": 2
+ },
+ {
+  "category": "concerto",
+  "terms": "rachmaninoff piano concerto 2",
+  "take": 2
+ },
+ {
+  "category": "concerto",
+  "terms": "tchaikovsky violin concerto",
+  "take": 2
+ },
+ {
+  "category": "concerto",
+  "terms": "beethoven violin concerto",
+  "take": 2
+ },
+ {
+  "category": "concerto",
+  "terms": "mozart piano concertos",
+  "take": 2
+ },
+ {
+  "category": "concerto",
+  "terms": "brahms piano concerto",
+  "take": 2
+ },
+ {
+  "category": "concerto",
+  "terms": "elgar cello concerto",
+  "take": 2
+ },
+ {
+  "category": "concerto",
+  "terms": "bach violin concertos",
+  "take": 2
+ },
+ {
+  "category": "concerto",
+  "terms": "vivaldi four seasons",
+  "take": 2
+ },
+ {
+  "category": "concerto",
+  "terms": "grieg schumann piano concertos",
+  "take": 2
+ },
+ {
+  "category": "concerto",
+  "terms": "prokofiev piano concertos",
+  "take": 2
+ },
+ {
+  "category": "chamber",
+  "terms": "beethoven string quartets",
+  "take": 2
+ },
+ {
+  "category": "chamber",
+  "terms": "schubert string quintet",
+  "take": 2
+ },
+ {
+  "category": "chamber",
+  "terms": "brahms piano trios",
+  "take": 2
+ },
+ {
+  "category": "chamber",
+  "terms": "shostakovich string quartets",
+  "take": 2
+ },
+ {
+  "category": "chamber",
+  "terms": "mozart clarinet quintet",
+  "take": 2
+ },
+ {
+  "category": "chamber",
+  "terms": "dvorak american quartet",
+  "take": 2
+ },
+ {
+  "category": "solo instrument",
+  "terms": "bach cello suites",
+  "take": 2
+ },
+ {
+  "category": "solo instrument",
+  "terms": "bach goldberg variations",
+  "take": 2
+ },
+ {
+  "category": "solo instrument",
+  "terms": "bach sonatas and partitas violin",
+  "take": 2
+ },
+ {
+  "category": "solo instrument",
+  "terms": "chopin nocturnes",
+  "take": 2
+ },
+ {
+  "category": "solo instrument",
+  "terms": "chopin etudes",
+  "take": 2
+ },
+ {
+  "category": "solo instrument",
+  "terms": "debussy preludes",
+  "take": 2
+ },
+ {
+  "category": "solo instrument",
+  "terms": "liszt transcendental etudes",
+  "take": 2
+ },
+ {
+  "category": "solo instrument",
+  "terms": "rachmaninoff preludes",
+  "take": 2
+ },
+ {
+  "category": "solo instrument",
+  "terms": "satie gymnopedies",
+  "take": 2
+ },
+ {
+  "category": "solo instrument",
+  "terms": "scarlatti sonatas",
+  "take": 2
+ },
+ {
+  "category": "variations",
+  "terms": "rachmaninoff corelli variations",
+  "take": 2
+ },
+ {
+  "category": "variations",
+  "terms": "rachmaninoff paganini rhapsody",
+  "take": 2
+ },
+ {
+  "category": "variations",
+  "terms": "brahms handel variations",
+  "take": 2
+ },
+ {
+  "category": "variations",
+  "terms": "beethoven diabelli variations",
+  "take": 2
+ },
+ {
+  "category": "opera",
+  "terms": "puccini la boheme",
+  "take": 2
+ },
+ {
+  "category": "opera",
+  "terms": "verdi la traviata",
+  "take": 2
+ },
+ {
+  "category": "opera",
+  "terms": "mozart don giovanni",
+  "take": 2
+ },
+ {
+  "category": "opera",
+  "terms": "wagner tristan und isolde",
+  "take": 2
+ },
+ {
+  "category": "opera",
+  "terms": "bizet carmen",
+  "take": 2
+ },
+ {
+  "category": "opera",
+  "terms": "opera arias anna netrebko",
+  "take": 2
+ },
+ {
+  "category": "opera",
+  "terms": "handel arias",
+  "take": 2
+ },
+ {
+  "category": "choral sacred",
+  "terms": "mozart requiem",
+  "take": 2
+ },
+ {
+  "category": "choral sacred",
+  "terms": "bach st matthew passion",
+  "take": 2
+ },
+ {
+  "category": "choral sacred",
+  "terms": "handel messiah",
+  "take": 2
+ },
+ {
+  "category": "choral sacred",
+  "terms": "bach mass in b minor",
+  "take": 2
+ },
+ {
+  "category": "choral sacred",
+  "terms": "faure requiem",
+  "take": 2
+ },
+ {
+  "category": "choral sacred",
+  "terms": "monteverdi vespers",
+  "take": 2
+ },
+ {
+  "category": "choral sacred",
+  "terms": "arvo part tabula rasa",
+  "take": 2
+ },
+ {
+  "category": "song",
+  "terms": "schubert winterreise",
+  "take": 2
+ },
+ {
+  "category": "song",
+  "terms": "schumann dichterliebe",
+  "take": 2
+ },
+ {
+  "category": "song",
+  "terms": "mahler lieder",
+  "take": 2
+ },
+ {
+  "category": "song",
+  "terms": "strauss four last songs",
+  "take": 2
+ },
+ {
+  "category": "baroque early",
+  "terms": "bach brandenburg concertos",
+  "take": 2
+ },
+ {
+  "category": "baroque early",
+  "terms": "handel water music",
+  "take": 2
+ },
+ {
+  "category": "baroque early",
+  "terms": "purcell dido and aeneas",
+  "take": 2
+ },
+ {
+  "category": "baroque early",
+  "terms": "josquin masses",
+  "take": 2
+ },
+ {
+  "category": "baroque early",
+  "terms": "hildegard von bingen",
+  "take": 2
+ },
+ {
+  "category": "baroque early",
+  "terms": "monteverdi madrigals",
+  "take": 2
+ },
+ {
+  "category": "twentieth century contemporary",
+  "terms": "stravinsky rite of spring",
+  "take": 2
+ },
+ {
+  "category": "twentieth century contemporary",
+  "terms": "philip glass piano works",
+  "take": 2
+ },
+ {
+  "category": "twentieth century contemporary",
+  "terms": "steve reich music for 18 musicians",
+  "take": 2
+ },
+ {
+  "category": "twentieth century contemporary",
+  "terms": "ligeti etudes",
+  "take": 2
+ },
+ {
+  "category": "twentieth century contemporary",
+  "terms": "max richter recomposed",
+  "take": 2
+ },
+ {
+  "category": "twentieth century contemporary",
+  "terms": "john adams harmonielehre",
+  "take": 2
+ },
+ {
+  "category": "twentieth century contemporary",
+  "terms": "messiaen quartet for the end of time",
+  "take": 2
+ },
+ {
+  "category": "orchestral",
+  "terms": "ravel bolero",
+  "take": 2
+ },
+ {
+  "category": "orchestral",
+  "terms": "holst the planets",
+  "take": 2
+ },
+ {
+  "category": "orchestral",
+  "terms": "mussorgsky pictures at an exhibition",
+  "take": 2
+ },
+ {
+  "category": "orchestral",
+  "terms": "smetana ma vlast",
+  "take": 2
+ },
+ {
+  "category": "orchestral",
+  "terms": "debussy la mer",
+  "take": 2
+ },
+ {
+  "category": "orchestral",
+  "terms": "rimsky-korsakov scheherazade",
+  "take": 2
+ },
+ {
+  "category": "orchestral",
+  "terms": "tchaikovsky nutcracker",
+  "take": 2
+ },
+ {
+  "category": "compilation",
+  "terms": "classical music for studying",
+  "take": 2
+ },
+ {
+  "category": "compilation",
+  "terms": "most beautiful classical music",
+  "take": 2
+ },
+ {
+  "category": "compilation",
+  "terms": "classical piano favorites",
+  "take": 2
+ },
+ {
+  "category": "compilation",
+  "terms": "relaxing classical",
+  "take": 2
+ },
+ {
+  "category": "compilation",
+  "terms": "best of mozart",
+  "take": 2
+ },
+ {
+  "category": "box set",
+  "terms": "complete edition box set",
+  "take": 2
+ },
+ {
+  "category": "box set",
+  "terms": "the complete recordings",
+  "take": 2
+ },
+ {
+  "category": "box set",
+  "terms": "bach complete cantatas",
+  "take": 2
+ },
+ {
+  "category": "guitar harp other",
+  "terms": "segovia guitar",
+  "take": 2
+ },
+ {
+  "category": "guitar harp other",
+  "terms": "spanish guitar music",
+  "take": 2
+ },
+ {
+  "category": "guitar harp other",
+  "terms": "harp music",
+  "take": 2
+ },
+ {
+  "category": "guitar harp other",
+  "terms": "organ music bach toccata",
+  "take": 2
+ },
+ {
+  "category": "guitar harp other",
+  "terms": "saxophone classical",
+  "take": 2
+ }
+]

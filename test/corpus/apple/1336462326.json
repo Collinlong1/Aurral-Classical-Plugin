@@ -1,0 +1,344 @@
+{
+ "id": "1336462326",
+ "category": "solo instrument",
+ "title": "Rachmaninov: 24 Preludes",
+ "artist": "Nikolai Lugansky",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Morceaux de fantaisie, Op. 3: No. 2, Prelude in C-Sharp Minor",
+   "durationMs": 287707,
+   "artist": "Nikolai Lugansky",
+   "apple": {
+    "block": 1,
+    "composer": "Sergei Rachmaninoff",
+    "work": "5 Morceaux de fantaisie, Op. 3 · “5 Fantasy Pieces”",
+    "part": "No. 2, Prelude in C-Sharp Minor",
+    "performers": "Nikolai Lugansky"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "10 Preludes, Op. 23: No. 1 in F-Sharp Minor. Largo",
+   "durationMs": 220613,
+   "artist": "Nikolai Lugansky",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 9 in E-Flat Minor, Op. 23/9",
+    "part": "No. 1 in F-Sharp Minor. Largo",
+    "performers": "Nikolai Lugansky"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "10 Preludes, Op. 23: No. 2 in B-Flat Major. Maestoso",
+   "durationMs": 217627,
+   "artist": "Nikolai Lugansky",
+   "apple": {
+    "block": 3,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 2 in B-Flat Major, Op. 23/2",
+    "part": "No. 2 in B-Flat Major. Maestoso",
+    "performers": "Nikolai Lugansky"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "10 Preludes, Op. 23: No. 3 in D Minor. Tempo di minuetto",
+   "durationMs": 233667,
+   "artist": "Nikolai Lugansky",
+   "apple": {
+    "block": 4,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 3 in D Minor, Op. 23/3",
+    "part": "No. 3 in D Minor. Tempo di minuetto",
+    "performers": "Nikolai Lugansky"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "10 Preludes, Op. 23: No. 4 in D Major. Andante cantabile",
+   "durationMs": 298773,
+   "artist": "Nikolai Lugansky",
+   "apple": {
+    "block": 5,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 9 in E-Flat Minor, Op. 23/9",
+    "part": "No. 4 in D Major. Andante cantabile",
+    "performers": "Nikolai Lugansky"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "10 Preludes, Op. 23: No. 5 in G Minor. Alla marcia",
+   "durationMs": 245333,
+   "artist": "Nikolai Lugansky",
+   "apple": {
+    "block": 6,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 5 in G Minor, Op. 23/5",
+    "part": "No. 5 in G Minor. Alla marcia",
+    "performers": "Nikolai Lugansky"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "10 Preludes, Op. 23: No. 6 in E-Flat Major. Andante",
+   "durationMs": 183293,
+   "artist": "Nikolai Lugansky",
+   "apple": {
+    "block": 7,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 6 in E-Flat Major, Op. 23/6",
+    "part": "No. 6 in E-Flat Major. Andante",
+    "performers": "Nikolai Lugansky"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "10 Preludes, Op. 23: No. 7 in C Minor. Allegro",
+   "durationMs": 149107,
+   "artist": "Nikolai Lugansky",
+   "apple": {
+    "block": 8,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 7 in C Minor, Op. 23/7",
+    "part": "No. 7 in C Minor. Allegro",
+    "performers": "Nikolai Lugansky"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "10 Preludes, Op. 23: No. 8 in A-Flat Major. Allegro vivace",
+   "durationMs": 208333,
+   "artist": "Nikolai Lugansky",
+   "apple": {
+    "block": 9,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 8 in A-Flat Major, Op. 23/8",
+    "part": "No. 8 in A-Flat Major. Allegro vivace",
+    "performers": "Nikolai Lugansky"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "10 Preludes, Op. 23: No. 9 in E-Flat Minor. Presto",
+   "durationMs": 118600,
+   "artist": "Nikolai Lugansky",
+   "apple": {
+    "block": 10,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 9 in E-Flat Minor, Op. 23/9",
+    "part": "No. 9 in E-Flat Minor. Presto",
+    "performers": "Nikolai Lugansky"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "10 Preludes, Op. 23: No. 10 in G-Flat Major. Largo",
+   "durationMs": 245867,
+   "artist": "Nikolai Lugansky",
+   "apple": {
+    "block": 11,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 10 in G-Flat Major, Op. 23/10",
+    "part": "No. 10 in G-Flat Major. Largo",
+    "performers": "Nikolai Lugansky"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "13 Preludes, Op. 32: No. 1 in C Major. Allegro vivace",
+   "durationMs": 74973,
+   "artist": "Nikolai Lugansky",
+   "apple": {
+    "block": 12,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 1 in C Major, Op. 32/1",
+    "part": "No. 1 in C Major. Allegro vivace",
+    "performers": "Nikolai Lugansky"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "13 Preludes, Op. 32: No. 2 in B-Flat Minor. Allegretto",
+   "durationMs": 185773,
+   "artist": "Nikolai Lugansky",
+   "apple": {
+    "block": 13,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 2 in B-Flat Minor, Op. 32/2",
+    "part": "No. 2 in B-Flat Minor. Allegretto",
+    "performers": "Nikolai Lugansky"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "13 Preludes, Op. 32: No. 3 in E Major. Allegro vivace",
+   "durationMs": 144907,
+   "artist": "Nikolai Lugansky",
+   "apple": {
+    "block": 14,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 3 in E Major, Op. 32/3",
+    "part": "No. 3 in E Major. Allegro vivace",
+    "performers": "Nikolai Lugansky"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "13 Preludes, Op. 32: No. 4 in E Minor. Allegro con brio",
+   "durationMs": 356280,
+   "artist": "Nikolai Lugansky",
+   "apple": {
+    "block": 15,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 4 in E Minor, Op. 32/4",
+    "part": "No. 4 in E Minor. Allegro con brio",
+    "performers": "Nikolai Lugansky"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "13 Preludes, Op. 32: No. 5 in G Major. Moderato",
+   "durationMs": 201947,
+   "artist": "Nikolai Lugansky",
+   "apple": {
+    "block": 16,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 5 in G Major, Op. 32/5",
+    "part": "No. 5 in G Major. Moderato",
+    "performers": "Nikolai Lugansky"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "13 Preludes, Op. 32: No. 6 in F Minor. Allegro appassionato",
+   "durationMs": 81587,
+   "artist": "Nikolai Lugansky",
+   "apple": {
+    "block": 17,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 6 in F Minor, Op. 32/6",
+    "part": "No. 6 in F Minor. Allegro appassionato",
+    "performers": "Nikolai Lugansky"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "13 Preludes, Op. 32: No. 7 in F Major. Moderato",
+   "durationMs": 145960,
+   "artist": "Nikolai Lugansky",
+   "apple": {
+    "block": 18,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 7 in F Major, Op. 32/7",
+    "part": "No. 7 in F Major. Moderato",
+    "performers": "Nikolai Lugansky"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "13 Preludes, Op. 32: No. 8 in A Minor. Vivo",
+   "durationMs": 108747,
+   "artist": "Nikolai Lugansky",
+   "apple": {
+    "block": 19,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 8 in A Minor, Op. 32/8",
+    "part": "No. 8 in A Minor. Vivo",
+    "performers": "Nikolai Lugansky"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "13 Preludes, Op. 32: No. 9 in A Major. Allegro",
+   "durationMs": 182493,
+   "artist": "Nikolai Lugansky",
+   "apple": {
+    "block": 20,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 9 in A Major, Op. 32/9",
+    "part": "No. 9 in A Major. Allegro",
+    "performers": "Nikolai Lugansky"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "13 Preludes, Op. 32: No. 10 in B Minor. Lento",
+   "durationMs": 367013,
+   "artist": "Nikolai Lugansky",
+   "apple": {
+    "block": 21,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 10 in B Minor, Op. 32/10",
+    "part": "No. 10 in B Minor. Lento",
+    "performers": "Nikolai Lugansky"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "13 Preludes, Op. 32: No. 11 in B Major. Allegretto",
+   "durationMs": 153160,
+   "artist": "Nikolai Lugansky",
+   "apple": {
+    "block": 22,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 11 in B Major, Op. 32/11",
+    "part": "No. 11 in B Major. Allegretto",
+    "performers": "Nikolai Lugansky"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 23,
+   "title": "13 Preludes, Op. 32: No. 12 in G-Sharp Minor. Allegro",
+   "durationMs": 155907,
+   "artist": "Nikolai Lugansky",
+   "apple": {
+    "block": 23,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 12 in G-Sharp Minor, Op. 32/12",
+    "part": "No. 12 in G-Sharp Minor. Allegro",
+    "performers": "Nikolai Lugansky"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 24,
+   "title": "13 Preludes, Op. 32: No. 13 in D-Flat Major. Grave",
+   "durationMs": 359933,
+   "artist": "Nikolai Lugansky",
+   "apple": {
+    "block": 24,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 13 in D-Flat Major, Op. 32/13",
+    "part": "No. 13 in D-Flat Major. Grave",
+    "performers": "Nikolai Lugansky"
+   }
+  }
+ ]
+}

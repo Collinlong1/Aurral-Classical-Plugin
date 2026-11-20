@@ -1,0 +1,666 @@
+{
+ "id": "1481992380",
+ "category": "piano recital",
+ "title": "Piano Book (Encore Edition)",
+ "artist": "Lang Lang",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "The Well-Tempered Clavier I, Prelude & Fugue No. 1 in C Major, BWV 846: No. 1, Prelude",
+   "durationMs": 139307,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Prelude & Fugue No. 1 in C Major, BWV 846 · “The Well-tempered Clavier, Book 1”",
+    "part": "No. 1, Prelude",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Für Elise, WoO 59 \"Bagatelle in A Minor\"",
+   "durationMs": 206373,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 2,
+    "composer": "Ludwig van Beethoven",
+    "work": "Bagatelle in A Minor, WoO 59 · “Für Elise”",
+    "part": "Für Elise, WoO 59 \"Bagatelle in A Minor\"",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "The Departure",
+   "durationMs": 151280,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 3,
+    "composer": "Max Richter",
+    "work": "The Leftovers - Season 2",
+    "part": "The Departure",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Lieder ohne Worte, Op. 67: No. 4, The Bee's Wedding. Presto, MWV U 182 \"Spinning Song\"",
+   "durationMs": 109440,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 4,
+    "composer": "Felix Mendelssohn",
+    "work": "Songs without Words, Book VI, Op. 67",
+    "part": "No. 4, The Bee's Wedding. Presto, MWV U 182 \"Spinning Song\"",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Suite Bergamasque, CD 82: III. Clair de lune",
+   "durationMs": 407067,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 5,
+    "composer": "Claude Debussy",
+    "work": "Suite bergamasque, CD 82, L. 75",
+    "part": "III. Clair de lune",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Children's Corner, CD 119: I. Doctor Gradus ad Parnassum",
+   "durationMs": 167880,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 6,
+    "composer": "Claude Debussy",
+    "work": "Children's Corner, CD 119, L. 113",
+    "part": "I. Doctor Gradus ad Parnassum",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "24 Préludes, Op. 28: No. 15 in D-Flat Major. Sostenuto \"Raindrop\"",
+   "durationMs": 394613,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 7,
+    "composer": "Frédéric Chopin",
+    "work": "24 Préludes, C. 166-189, Op. 28",
+    "part": "No. 15 in D-Flat Major. Sostenuto \"Raindrop\"",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Piano Sonata No. 16 in C Major, K. 545 \"Sonata facile\": I. Allegro",
+   "durationMs": 294467,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 8,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Sonata No. 16 in C Major, K. 545, KV 545 · “Sonata facile”",
+    "part": "I. Allegro",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "6 Piano Sonatinas, Op. 36: No. 1, Sonatina in C Major: II. Andante",
+   "durationMs": 91600,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 9,
+    "composer": "Muzio Clementi",
+    "work": "Sonatina in C Major, Op. 36/1",
+    "part": "No. 1, Sonatina in C Major: II. Andante",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "The School of Velocity, Op. 299: No. 1 in C Major. Presto",
+   "durationMs": 34840,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 10,
+    "composer": "Carl Czerny",
+    "work": "School of Velocity, Op. 299",
+    "part": "No. 1 in C Major. Presto",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "6 Pieces for Piano, Vol. 2: No. 4, La Valse d'Amélie",
+   "durationMs": 170360,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 11,
+    "composer": "Yann Tiersen",
+    "work": "La Valse d'Amélie",
+    "part": "No. 4, La Valse d'Amélie",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Rêverie, CD 76",
+   "durationMs": 329627,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 12,
+    "composer": "Claude Debussy",
+    "work": "Rêverie, CD 76, L. 68",
+    "part": "Rêverie, CD 76",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "6 Moments musicaux, D. 780: III.Allegro moderato",
+   "durationMs": 122493,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 13,
+    "composer": "Franz Schubert",
+    "work": "6 Moments musicaux, D 780, Op. 94",
+    "part": "III.Allegro moderato",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Lyric Pieces, Book III, Op. 43: No. 6, To Spring",
+   "durationMs": 239360,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 14,
+    "composer": "Edvard Grieg",
+    "work": "Lyric Pieces, Book III, Op. 43",
+    "part": "No. 6, To Spring",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Album für die Jugend, Op. 68: No. 8, Wilder Reiter",
+   "durationMs": 35520,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 15,
+    "composer": "Robert Schumann",
+    "work": "Album für die Jugend, Op. 68 · “Album for the Young”",
+    "part": "No. 8, Wilder Reiter",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Villageoises, FP 65 \"6 petites pièces enfantines pour piano\": II. Staccato. Pas vite",
+   "durationMs": 44253,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 16,
+    "composer": "Francis Poulenc",
+    "work": "Villageoises, FP 65 · “6 petites pièces enfantines”",
+    "part": "II. Staccato. Pas vite",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "The Merry Shepherd Boy",
+   "durationMs": 93253,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 17,
+    "composer": "H. W. Huang",
+    "work": "H. W. Huang",
+    "part": "The Merry Shepherd Boy",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Merry Christmas Mr. Lawrence (Version for Piano)",
+   "durationMs": 336200,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 18,
+    "composer": "Ryuichi Sakamoto",
+    "work": "Merry Christmas, Mr. Lawrence",
+    "part": "Merry Christmas Mr. Lawrence (Version for Piano)",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "The Maiden's Prayer, Op. 4",
+   "durationMs": 266173,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 19,
+    "composer": "Tekla Badarzewska Baranowska",
+    "work": "The Maiden's Prayer, Op. 4",
+    "part": "The Maiden's Prayer, Op. 4",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "12 Variations on \"Ah, vous dirai-je maman\", K. 265 \"Twinkle, Twinkle, Little Star\": Tema",
+   "durationMs": 35720,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 20,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "12 Variations on French song 'Ah, vous dirai-je, Maman' in C Major, K. 265, K. 300e, KV 265, KV 300e",
+    "part": "Tema",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "12 Variations on \"Ah, vous dirai-je maman\", K. 265 \"Twinkle, Twinkle, Little Star\": Var. 1",
+   "durationMs": 31493,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 20,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "12 Variations on French song 'Ah, vous dirai-je, Maman' in C Major, K. 265, K. 300e, KV 265, KV 300e",
+    "part": "Var. 1",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "12 Variations on \"Ah, vous dirai-je maman\", K. 265 \"Twinkle, Twinkle, Little Star\": Var. 2",
+   "durationMs": 32133,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 20,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "12 Variations on French song 'Ah, vous dirai-je, Maman' in C Major, K. 265, K. 300e, KV 265, KV 300e",
+    "part": "Var. 2",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 23,
+   "title": "12 Variations on \"Ah, vous dirai-je maman\", K. 265 \"Twinkle, Twinkle, Little Star\": Var. 3",
+   "durationMs": 35827,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 20,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "12 Variations on French song 'Ah, vous dirai-je, Maman' in C Major, K. 265, K. 300e, KV 265, KV 300e",
+    "part": "Var. 3",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 24,
+   "title": "12 Variations on \"Ah, vous dirai-je maman\", K. 265 \"Twinkle, Twinkle, Little Star\": Var. 4",
+   "durationMs": 34187,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 20,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "12 Variations on French song 'Ah, vous dirai-je, Maman' in C Major, K. 265, K. 300e, KV 265, KV 300e",
+    "part": "Var. 4",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 25,
+   "title": "12 Variations on \"Ah, vous dirai-je maman\", K. 265 \"Twinkle, Twinkle, Little Star\": Var. 5",
+   "durationMs": 33347,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 20,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "12 Variations on French song 'Ah, vous dirai-je, Maman' in C Major, K. 265, K. 300e, KV 265, KV 300e",
+    "part": "Var. 5",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 26,
+   "title": "12 Variations on \"Ah, vous dirai-je maman\", K. 265 \"Twinkle, Twinkle, Little Star\": Var. 6",
+   "durationMs": 30027,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 20,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "12 Variations on French song 'Ah, vous dirai-je, Maman' in C Major, K. 265, K. 300e, KV 265, KV 300e",
+    "part": "Var. 6",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 27,
+   "title": "12 Variations on \"Ah, vous dirai-je maman\", K. 265 \"Twinkle, Twinkle, Little Star\": Var. 7",
+   "durationMs": 33453,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 21,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Adagio in C Major, App 94, K. 580a, K. Anh.94, KV 580a",
+    "part": "Var. 7",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 28,
+   "title": "12 Variations on \"Ah, vous dirai-je maman\", K. 265 \"Twinkle, Twinkle, Little Star\": Var. 8",
+   "durationMs": 44027,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 21,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Adagio in C Major, App 94, K. 580a, K. Anh.94, KV 580a",
+    "part": "Var. 8",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 29,
+   "title": "12 Variations on \"Ah, vous dirai-je maman\", K. 265 \"Twinkle, Twinkle, Little Star\": Var. 9",
+   "durationMs": 35160,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 22,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "12 Variations on French song 'Ah, vous dirai-je, Maman' in C Major, K. 265, K. 300e, KV 265, KV 300e",
+    "part": "Var. 9",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 30,
+   "title": "12 Variations on \"Ah, vous dirai-je maman\", K. 265 \"Twinkle, Twinkle, Little Star\": Var. 10",
+   "durationMs": 32747,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 22,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "12 Variations on French song 'Ah, vous dirai-je, Maman' in C Major, K. 265, K. 300e, KV 265, KV 300e",
+    "part": "Var. 10",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 31,
+   "title": "12 Variations on \"Ah, vous dirai-je maman\", K. 265 \"Twinkle, Twinkle, Little Star\": Var. 11",
+   "durationMs": 149973,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 23,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Adagio in C Major, App 94, K. 580a, K. Anh.94, KV 580a",
+    "part": "Var. 11",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 32,
+   "title": "12 Variations on \"Ah, vous dirai-je maman\", K. 265 \"Twinkle, Twinkle, Little Star\": Var. 12",
+   "durationMs": 87040,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 23,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Adagio in C Major, App 94, K. 580a, K. Anh.94, KV 580a",
+    "part": "Var. 12",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 33,
+   "title": "Minuet in G Major (Prev. Attrib. J.S. Bach as BWV Anh. 114)",
+   "durationMs": 104040,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 24,
+    "composer": "Christian Petzold",
+    "work": "Minuet in G Major, “Formerly attributed to J.S. Bach as BWV Anh 114”",
+    "part": "Minuet in G Major (Prev. Attrib. J.S. Bach as BWV Anh. 114)",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 34,
+   "title": "Wild Swans Suite: II. Eliza Aria (Version for Piano)",
+   "durationMs": 189573,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 25,
+    "composer": "Kats-Chernin: Wild Swans Suite",
+    "work": "Kats-Chernin: Wild Swans Suite",
+    "part": "II. Eliza Aria (Version for Piano)",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 35,
+   "title": "The Celebrated Chop Waltz \"Chopsticks\"",
+   "durationMs": 129667,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 26,
+    "composer": "E. Allen",
+    "work": "E. Allen",
+    "part": "The Celebrated Chop Waltz \"Chopsticks\"",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 36,
+   "title": "Jasmine Flower (Arr. Schindler for Piano)",
+   "durationMs": 404427,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 27,
+    "composer": "Kenny G",
+    "work": "Kenny G",
+    "part": "Jasmine Flower (Arr. Schindler for Piano)",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 37,
+   "title": "Danzas Argentinas, Op. 2: II. Danza de la moza donosa",
+   "durationMs": 240467,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 28,
+    "composer": "Alberto Ginastera",
+    "work": "Danzas Argentinas, Op. 2 · “Argentine Dances”",
+    "part": "II. Danza de la moza donosa",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 38,
+   "title": "Limu, limu, lima (Arr. P. Schindler for Piano)",
+   "durationMs": 335360,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 29,
+    "composer": "Limu, limu, lima (Arr. P. Schindler for Piano)",
+    "work": "Limu, limu, lima (Arr. P. Schindler for Piano)",
+    "part": "Limu, limu, lima (Arr. P. Schindler for Piano)",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 39,
+   "title": "Enigma Variations, Op. 36: Var. 9. Adagio \"Nimrod\" (Version for Solo Piano)",
+   "durationMs": 258667,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 30,
+    "composer": "Sir Edward Elgar",
+    "work": "Enigma Variations, Op. 36",
+    "part": "Var. 9. Adagio \"Nimrod\" (Version for Solo Piano)",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 40,
+   "title": "Arirang (Arr. P. Schindler for Piano)",
+   "durationMs": 239987,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 31,
+    "composer": "Arirang (Arr. P. Schindler for Piano)",
+    "work": "Arirang (Arr. P. Schindler for Piano)",
+    "part": "Arirang (Arr. P. Schindler for Piano)",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 41,
+   "title": "Maple Leaf Rag",
+   "durationMs": 207680,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 32,
+    "composer": "Scott Joplin",
+    "work": "Maple Leaf Rag",
+    "part": "Maple Leaf Rag",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 42,
+   "title": "Children's Album, Op. 39: No. 21, Sweet Dreams",
+   "durationMs": 159120,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 33,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "Children's Album, Op. 39, TH 141",
+    "part": "No. 21, Sweet Dreams",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 43,
+   "title": "Children's Album for Piano, Book I: I. Andantino \"Ivan Sings\"",
+   "durationMs": 95800,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 34,
+    "composer": "Aram Khachaturian",
+    "work": "Children's Album No. 1",
+    "part": "I. Andantino \"Ivan Sings\"",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 44,
+   "title": "Minuet in G Minor (Prev. Attrib. J.S. Bach as BWV Anh. 115)",
+   "durationMs": 116720,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 35,
+    "composer": "Johann Sebastian Bach",
+    "work": "Minuet in G Minor, “Formerly attributed to J.S. Bach as BWV Anh 115”",
+    "part": "Minuet in G Minor (Prev. Attrib. J.S. Bach as BWV Anh. 115)",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 45,
+   "title": "Piano Sonatina in C Major, Op. 20 No. 1: I. Allegro",
+   "durationMs": 184613,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 36,
+    "composer": "Friedrich Kuhlau",
+    "work": "Piano Sonatina No. 1 in C Major, Op. 20",
+    "part": "I. Allegro",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 46,
+   "title": "Piano Sonatina in C Major, Op. 20 No. 1: II. Andante",
+   "durationMs": 183147,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 36,
+    "composer": "Friedrich Kuhlau",
+    "work": "Piano Sonatina No. 1 in C Major, Op. 20",
+    "part": "II. Andante",
+    "performers": "Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 47,
+   "title": "Piano Sonatina in C Major, Op. 20 No. 1: III. Rondo. Allegro",
+   "durationMs": 167960,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 36,
+    "composer": "Friedrich Kuhlau",
+    "work": "Piano Sonatina No. 1 in C Major, Op. 20",
+    "part": "III. Rondo. Allegro",
+    "performers": "Lang Lang"
+   }
+  }
+ ]
+}

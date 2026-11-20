@@ -1,0 +1,234 @@
+// All SQL runs against classical.sqlite in the plugin's own dataFolder.
+export const migrations = [
+  {
+    version: 1,
+    sql: `
+CREATE TABLE entity (
+ id TEXT PRIMARY KEY, kind TEXT NOT NULL CHECK(kind IN
+ ('person','ensemble','work','movement','collection','performance','recording','release')),
+ data TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(data)), revision INTEGER NOT NULL DEFAULT 1,
+ created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL, deleted_at INTEGER
+);
+CREATE TABLE relation (
+ id TEXT PRIMARY KEY, kind TEXT NOT NULL, source_id TEXT NOT NULL REFERENCES entity(id),
+ target_id TEXT NOT NULL REFERENCES entity(id), position INTEGER NOT NULL DEFAULT 1 CHECK(position>0),
+ occurrence INTEGER NOT NULL DEFAULT 1 CHECK(occurrence>0), data TEXT NOT NULL CHECK(json_valid(data)),
+ UNIQUE(kind,source_id,target_id,occurrence), UNIQUE(kind,source_id,position)
+);
+CREATE TABLE credit (
+ id TEXT PRIMARY KEY, target_id TEXT NOT NULL REFERENCES entity(id),
+ contributor_id TEXT NOT NULL REFERENCES entity(id), role TEXT NOT NULL,
+ instrument TEXT, position INTEGER NOT NULL CHECK(position>0), assertion_id TEXT REFERENCES assertion(id),
+ UNIQUE(target_id,contributor_id,role,instrument)
+);
+CREATE TABLE external_identity (
+ entity_id TEXT NOT NULL REFERENCES entity(id), provider TEXT NOT NULL, record_kind TEXT NOT NULL,
+ record_id TEXT NOT NULL, state TEXT NOT NULL CHECK(state IN ('active','stale','deleted','conflict')),
+ evidence TEXT NOT NULL CHECK(json_valid(evidence)), PRIMARY KEY(entity_id,provider,record_kind,record_id)
+);
+CREATE UNIQUE INDEX external_identity_active ON external_identity(provider,record_kind,record_id) WHERE state='active';
+CREATE TABLE alias (
+ id TEXT PRIMARY KEY, entity_id TEXT NOT NULL REFERENCES entity(id), text TEXT NOT NULL,
+ normalized TEXT NOT NULL, language TEXT, kind TEXT NOT NULL, assertion_id TEXT REFERENCES assertion(id)
+);
+CREATE TABLE catalogue_number (
+ id TEXT PRIMARY KEY, entity_id TEXT NOT NULL REFERENCES entity(id), system TEXT NOT NULL,
+ display TEXT NOT NULL, normalized TEXT NOT NULL, assertion_id TEXT REFERENCES assertion(id)
+);
+CREATE TABLE core_instance (id TEXT PRIMARY KEY, epoch TEXT NOT NULL, generation INTEGER NOT NULL DEFAULT 0);
+CREATE TABLE track_link (
+ id TEXT PRIMARY KEY, instance_id TEXT NOT NULL REFERENCES core_instance(id), core_id TEXT NOT NULL,
+ file_id TEXT NOT NULL, state TEXT NOT NULL CHECK(state IN ('active','missing','review')),
+ evidence TEXT NOT NULL CHECK(json_valid(evidence)), revision INTEGER NOT NULL DEFAULT 1,
+ created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL
+);
+CREATE INDEX track_instance ON track_link(instance_id);
+CREATE INDEX track_path ON track_link(json_extract(evidence,'$.path'));
+CREATE INDEX track_read_path ON track_link(json_extract(evidence,'$.readPath'));
+CREATE INDEX track_real_path ON track_link(json_extract(evidence,'$.observedRealPath'));
+CREATE UNIQUE INDEX track_active ON track_link(instance_id,core_id,file_id) WHERE state='active';
+CREATE TABLE track_evidence (
+ id INTEGER PRIMARY KEY, track_link_id TEXT NOT NULL REFERENCES track_link(id), generation INTEGER NOT NULL,
+ evidence TEXT NOT NULL CHECK(json_valid(evidence)), observed_at INTEGER NOT NULL
+);
+CREATE TABLE release_item (
+ id TEXT PRIMARY KEY, release_id TEXT NOT NULL REFERENCES entity(id), disc INTEGER NOT NULL CHECK(disc>0),
+ position INTEGER NOT NULL CHECK(position>0), UNIQUE(release_id,disc,position)
+);
+CREATE TABLE release_item_recording (
+ item_id TEXT NOT NULL REFERENCES release_item(id), recording_id TEXT NOT NULL REFERENCES entity(id),
+ occurrence INTEGER NOT NULL CHECK(occurrence>0), start_ms INTEGER NOT NULL CHECK(start_ms>=0),
+ end_ms INTEGER CHECK(end_ms>start_ms), PRIMARY KEY(item_id,recording_id,occurrence)
+);
+CREATE TABLE track_release_item (
+ track_link_id TEXT NOT NULL REFERENCES track_link(id), item_id TEXT NOT NULL REFERENCES release_item(id),
+ PRIMARY KEY(track_link_id,item_id)
+);
+CREATE TABLE recording_content (
+ id TEXT PRIMARY KEY, recording_id TEXT NOT NULL REFERENCES entity(id),
+ performance_work_id TEXT NOT NULL REFERENCES relation(id), movement_id TEXT REFERENCES entity(id),
+ position INTEGER NOT NULL CHECK(position>0), start_ms INTEGER NOT NULL CHECK(start_ms>=0),
+ end_ms INTEGER CHECK(end_ms>start_ms), UNIQUE(recording_id,position)
+);
+CREATE TABLE segment (
+ id TEXT PRIMARY KEY, track_link_id TEXT NOT NULL REFERENCES track_link(id), start_ms INTEGER NOT NULL CHECK(start_ms>=0),
+ end_ms INTEGER CHECK(end_ms>start_ms), kind TEXT NOT NULL CHECK(kind IN ('whole','range')),
+ CHECK(kind='whole' OR end_ms IS NOT NULL)
+);
+CREATE TABLE segment_content (
+ segment_id TEXT NOT NULL REFERENCES segment(id), content_id TEXT NOT NULL REFERENCES recording_content(id),
+ occurrence INTEGER NOT NULL CHECK(occurrence>0), PRIMARY KEY(segment_id,content_id,occurrence)
+);
+CREATE TABLE realization (
+ id TEXT PRIMARY KEY, work_id TEXT NOT NULL REFERENCES entity(id), performance_work_id TEXT NOT NULL REFERENCES relation(id),
+ label TEXT
+);
+CREATE TABLE realization_item (
+ id TEXT PRIMARY KEY, realization_id TEXT NOT NULL REFERENCES realization(id), movement_id TEXT REFERENCES entity(id),
+ segment_id TEXT NOT NULL REFERENCES segment(id), sequence INTEGER NOT NULL CHECK(sequence>0),
+ occurrence INTEGER NOT NULL CHECK(occurrence>0), UNIQUE(realization_id,sequence)
+);
+CREATE TABLE metadata_target (
+ id TEXT PRIMARY KEY, entity_id TEXT UNIQUE REFERENCES entity(id), track_link_id TEXT UNIQUE REFERENCES track_link(id),
+ album_ref TEXT UNIQUE, CHECK((entity_id IS NOT NULL)+(track_link_id IS NOT NULL)+(album_ref IS NOT NULL)=1)
+);
+CREATE TABLE field_definition (key TEXT PRIMARY KEY, type TEXT NOT NULL CHECK(type IN ('string','number','array','object','boolean')));
+INSERT INTO field_definition VALUES
+ ('title','string'),('name','string'),('nickname','string'),('description','string'),('date','string'),
+ ('period','string'),('form','string'),('key','string'),('catalogue','array'),('instrumentation','array'),
+ ('artistDisplay','string'),('movementNumber','string'),('tempo','string'),('aliases','array');
+CREATE TABLE assertion (
+ id TEXT PRIMARY KEY, target_id TEXT NOT NULL REFERENCES metadata_target(id), field TEXT NOT NULL REFERENCES field_definition(key),
+ value TEXT NOT NULL CHECK(json_valid(value)), source TEXT NOT NULL CHECK(source IN ('manual','provider','derived')),
+ provider TEXT, record_id TEXT, state TEXT NOT NULL CHECK(state IN ('active','stale','deleted','conflict','superseded')),
+ confidence REAL CHECK(confidence BETWEEN 0 AND 1), actor TEXT, updated_at INTEGER NOT NULL,
+ prior_id TEXT REFERENCES assertion(id), CHECK(source!='provider' OR (provider IS NOT NULL AND record_id IS NOT NULL))
+);
+CREATE INDEX assertion_field ON assertion(target_id,field,updated_at);
+CREATE TABLE pinned_override (
+ target_id TEXT NOT NULL REFERENCES metadata_target(id), field TEXT NOT NULL REFERENCES field_definition(key),
+ assertion_id TEXT NOT NULL REFERENCES assertion(id), actor TEXT NOT NULL, updated_at INTEGER NOT NULL,
+ PRIMARY KEY(target_id,field)
+);
+CREATE TABLE field_resolution (
+ target_id TEXT NOT NULL REFERENCES metadata_target(id), field TEXT NOT NULL REFERENCES field_definition(key),
+ assertion_id TEXT NOT NULL REFERENCES assertion(id), PRIMARY KEY(target_id,field)
+);
+CREATE TABLE provider_record (
+ provider TEXT NOT NULL, record_id TEXT NOT NULL, target_id TEXT NOT NULL REFERENCES metadata_target(id),
+ state TEXT NOT NULL, updated_at INTEGER NOT NULL, PRIMARY KEY(provider,record_id,target_id)
+);
+CREATE TABLE classification (
+ target_id TEXT PRIMARY KEY REFERENCES metadata_target(id), state TEXT NOT NULL CHECK(state IN ('classical','not_classical','unsure')),
+ pinned INTEGER NOT NULL CHECK(pinned IN (0,1)), score INTEGER NOT NULL, evidence TEXT NOT NULL CHECK(json_valid(evidence)),
+ rule_version INTEGER NOT NULL, updated_at INTEGER NOT NULL
+);
+CREATE TABLE review_item (
+ id TEXT PRIMARY KEY, kind TEXT NOT NULL, target_id TEXT NOT NULL, evidence TEXT NOT NULL CHECK(json_valid(evidence)),
+ status TEXT NOT NULL DEFAULT 'open' CHECK(status IN ('open','resolved')), created_at INTEGER NOT NULL
+);
+CREATE UNIQUE INDEX review_open ON review_item(kind,target_id) WHERE status='open';
+CREATE TABLE audit_event (
+ id INTEGER PRIMARY KEY, actor TEXT, action TEXT NOT NULL, target_id TEXT NOT NULL,
+ data TEXT NOT NULL CHECK(json_valid(data)), created_at INTEGER NOT NULL
+);
+CREATE TABLE model_job (
+ id TEXT PRIMARY KEY, type TEXT NOT NULL, key TEXT NOT NULL, input TEXT NOT NULL CHECK(json_valid(input)),
+ state TEXT NOT NULL CHECK(state IN ('queued','running','retry','done','failed','cancelled')),
+ progress TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(progress)), owner TEXT, lease_until INTEGER NOT NULL DEFAULT 0,
+ generation INTEGER NOT NULL DEFAULT 0, attempt INTEGER NOT NULL DEFAULT 0, max_attempts INTEGER NOT NULL,
+ next_run_at INTEGER NOT NULL DEFAULT 0, cancel_requested INTEGER NOT NULL DEFAULT 0, error TEXT, created_at INTEGER NOT NULL
+);
+CREATE UNIQUE INDEX job_active ON model_job(key) WHERE state IN ('queued','running','retry');
+`,
+  },
+  {
+    version: 2,
+    sql: `
+CREATE TABLE user_work_state (
+ user_id INTEGER NOT NULL CHECK(user_id>0), work_id TEXT NOT NULL REFERENCES entity(id),
+ favourite INTEGER NOT NULL DEFAULT 0 CHECK(favourite IN (0,1)), picked_realization_id TEXT REFERENCES realization(id),
+ updated_at INTEGER NOT NULL, PRIMARY KEY(user_id,work_id)
+);
+CREATE TABLE admin_work_pick (
+ work_id TEXT PRIMARY KEY REFERENCES entity(id), realization_id TEXT NOT NULL REFERENCES realization(id),
+ actor_id INTEGER NOT NULL CHECK(actor_id>0), updated_at INTEGER NOT NULL
+);
+`,
+  },
+  {
+    // Album and work pages look up one album's tracks and walk from tracks
+    // to realizations; without these each view scans the whole catalogue.
+    version: 3,
+    sql: `
+CREATE INDEX track_album ON track_link(CAST(json_extract(evidence,'$.albumId') AS TEXT));
+CREATE INDEX segment_track ON segment(track_link_id);
+CREATE INDEX realization_item_segment ON realization_item(segment_id);
+CREATE INDEX relation_target ON relation(kind,target_id);
+CREATE INDEX realization_work ON realization(work_id);
+`,
+  },
+  {
+    // v0.2. The search index is derived from the catalogue and rebuilt when
+    // the catalogue changes; dropping its tables loses nothing. change_set
+    // keeps what a merge or deletion removed, so it can be undone, and
+    // match_suppression keeps background matching from making a deleted
+    // work again before an admin says so.
+    version: 4,
+    sql: `
+CREATE TABLE search_doc (
+ id INTEGER PRIMARY KEY, kind TEXT NOT NULL, ref TEXT NOT NULL, work_id TEXT, title TEXT NOT NULL,
+ subtitle TEXT NOT NULL DEFAULT '', detail TEXT NOT NULL DEFAULT '', owned INTEGER NOT NULL DEFAULT 0,
+ boost REAL NOT NULL DEFAULT 0, data TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(data)), UNIQUE(kind,ref)
+);
+CREATE TABLE search_term (
+ term TEXT NOT NULL, doc INTEGER NOT NULL, field INTEGER NOT NULL, PRIMARY KEY(term,doc,field)
+) WITHOUT ROWID;
+CREATE TABLE search_key (key TEXT NOT NULL, doc INTEGER NOT NULL, PRIMARY KEY(key,doc)) WITHOUT ROWID;
+CREATE TABLE search_facet (
+ facet TEXT NOT NULL, value TEXT NOT NULL, doc INTEGER NOT NULL, label TEXT NOT NULL, PRIMARY KEY(facet,value,doc)
+) WITHOUT ROWID;
+CREATE INDEX search_facet_doc ON search_facet(doc);
+CREATE TABLE search_state (id INTEGER PRIMARY KEY CHECK(id=1), stamp TEXT NOT NULL, built_at INTEGER NOT NULL, docs INTEGER NOT NULL);
+CREATE TABLE change_set (
+ id TEXT PRIMARY KEY, kind TEXT NOT NULL, actor TEXT, summary TEXT NOT NULL,
+ data TEXT NOT NULL CHECK(json_valid(data)), created_at INTEGER NOT NULL, undone_at INTEGER
+);
+CREATE TABLE match_suppression (
+ key TEXT PRIMARY KEY, title TEXT NOT NULL, reason TEXT NOT NULL, actor TEXT, created_at INTEGER NOT NULL
+);
+`,
+  },
+  {
+    // v0.3: contributor identity. Additive only; existing credits read as
+    // manual and active, and nothing existing is rewritten.
+    version: 5,
+    sql: `
+ALTER TABLE credit ADD COLUMN source TEXT NOT NULL DEFAULT 'manual' CHECK(source IN ('manual','derived','provider'));
+ALTER TABLE credit ADD COLUMN state TEXT NOT NULL DEFAULT 'active' CHECK(state IN ('active','removed'));
+CREATE INDEX credit_contributor ON credit(contributor_id);
+CREATE INDEX credit_target ON credit(target_id);
+INSERT INTO field_definition VALUES ('sortName','string'),('location','string'),('instruments','array'),('recordingDate','string');
+CREATE TABLE user_recording_state (
+ user_id INTEGER NOT NULL CHECK(user_id>0), performance_id TEXT NOT NULL REFERENCES entity(id),
+ favourite INTEGER NOT NULL DEFAULT 0 CHECK(favourite IN (0,1)), updated_at INTEGER NOT NULL,
+ PRIMARY KEY(user_id,performance_id)
+);
+CREATE TABLE saved_queue (
+ id TEXT PRIMARY KEY, user_id INTEGER NOT NULL CHECK(user_id>0), name TEXT NOT NULL,
+ work_id TEXT REFERENCES entity(id), items TEXT NOT NULL CHECK(json_valid(items)), created_at INTEGER NOT NULL
+);
+CREATE INDEX saved_queue_user ON saved_queue(user_id);
+CREATE TABLE tag_backup (
+ id TEXT PRIMARY KEY, track_link_id TEXT NOT NULL REFERENCES track_link(id), path TEXT NOT NULL, fingerprint TEXT,
+ tags TEXT NOT NULL CHECK(json_valid(tags)), written TEXT NOT NULL CHECK(json_valid(written)), run_id TEXT NOT NULL,
+ actor TEXT NOT NULL, created_at INTEGER NOT NULL, restored_at INTEGER
+);
+CREATE INDEX tag_backup_track ON tag_backup(track_link_id);
+ALTER TABLE search_doc ADD COLUMN sort_title TEXT NOT NULL DEFAULT '';
+ALTER TABLE search_doc ADD COLUMN sort_key TEXT NOT NULL DEFAULT '';
+ALTER TABLE search_doc ADD COLUMN sort_date TEXT NOT NULL DEFAULT '';
+CREATE INDEX search_doc_sort_title ON search_doc(kind,sort_title);
+`,
+  },
+];

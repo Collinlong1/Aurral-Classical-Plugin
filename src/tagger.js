@@ -2,10 +2,11 @@
 // process holds the lock, plus a scan of the Library for classical files no
 // one queued (Lidarr imports, files added by hand).
 import { randomUUID } from "node:crypto";
+import { modelAllowsTagging } from "./model/write-guard.js";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { isAudioPath, readTags, readValues, UnsupportedFormat, writeTags } from "./tags.js";
-import { catalogueNumber, creditString, RELEASE_INC, topWork } from "./works.js";
+import { creditString, RELEASE_INC } from "./works.js";
 import { Aurral } from "./aurral.js";
 import { readJson, sleep, tryLock, writeJson } from "./store.js";
 
@@ -20,9 +21,6 @@ const originalsFile = (ctx) => path.join(ctx.dataFolder, "originals.json");
 // Recordings whose classical tags an admin removed: never tagged again
 // unless an admin tags them as classical.
 const excludedFile = (ctx) => path.join(ctx.dataFolder, "excluded.json");
-// The work each file belongs to, for the album page's headings. Kept when a
-// file is planned or tagged, so read-only Libraries get headings too.
-const worksFile = (ctx) => path.join(ctx.dataFolder, "works.json");
 export const TAG_FIELDS = ["artist", "albumArtist", "composer", "work", "workId"];
 // Raised when the plugin writes more than before, so files it already
 // tagged are tagged once more by the schedule (2: the album artist).
@@ -111,7 +109,6 @@ class State {
     this.index = await readJson(indexFile(this.ctx), {});
     this.originals = await readJson(originalsFile(this.ctx), {});
     this.excluded = await readJson(excludedFile(this.ctx), {});
-    this.works = await readJson(worksFile(this.ctx), {});
   }
 
   // Saved every 30 seconds while working, and at the end: the index of a
@@ -124,7 +121,6 @@ class State {
     await writeJson(indexFile(this.ctx), this.index);
     await writeJson(originalsFile(this.ctx), this.originals);
     await writeJson(excludedFile(this.ctx), this.excluded);
-    await writeJson(worksFile(this.ctx), this.works);
     await this.lock.touch();
   }
 
@@ -206,7 +202,7 @@ class Session {
       return true;
     }
     if (!isAudioPath(real)) return true;
-    return this.state.exclusive(real, () => this.processReal(real, { ...options, asPath: filePath }));
+    return this.state.exclusive(real, () => this.processReal(real, options));
   }
 
   // `queuedAt`: when the request to tag was made. Classical tags an admin
@@ -215,11 +211,14 @@ class Session {
   // `plan` (v0.3 8.7): an array that receives what would be written, with
   // the file's current values, instead of writing or recording anything.
   // `values`: write exactly these (a confirmed plan) instead of looking up.
-  // `asPath`: the path Aurral knows the file by, when it isn't `real`.
-  async processReal(real, { force = false, prefilter = false, upgrade = false, queuedAt = null, plan = null, values: planned = null, asPath = null } = {}) {
+  async processReal(real, { force = false, prefilter = false, upgrade = false, queuedAt = null, plan = null, values: planned = null } = {}) {
     const { ctx } = this;
     const stat = await fs.stat(real);
     const skip = (result) => (plan ? plan.push({ file: real, status: "skipped", reason: result.reason }) : this.record(real, stat, result));
+    if (!(await modelAllowsTagging(ctx, real))) {
+      skip({ status: "skipped", reason: "model classification or link requires review" });
+      return true;
+    }
     if (!force && sameStat(this.processed[real], stat) && !(upgrade && outdated(this.processed[real]))) return true;
     let tags;
     try {
@@ -261,7 +260,6 @@ class Session {
         skip({ status: "skipped", reason, recording: tags.recordingMbid });
         return true;
       }
-      await this.rememberWork(real, tags.recordingMbid, fields, asPath);
       values = { artist: [fields.artist], composer: fields.composers };
       if (fields.workId) Object.assign(values, { work: [fields.work], workId: [fields.workId] });
       // Aurral files an album under one album artist and names it after the
@@ -316,6 +314,7 @@ class Session {
   async untagReal(real, mode = "restore", { plan = null, values: planned = null } = {}) {
     const { ctx } = this;
     const skip = (reason) => (plan ? (plan.push({ file: real, status: "skipped", reason }), "skipped") : "skipped");
+    if (!(await modelAllowsTagging(ctx, real))) return skip("model classification or link requires review");
     let tags;
     try {
       tags = readTags(real);
@@ -352,27 +351,6 @@ class Session {
       ctx.log(`Removed classical tags from ${path.basename(real)}`);
     }
     return changed.length ? (original && mode !== "clear" ? "restored" : "cleared") : "unchanged";
-  }
-
-  // Kept under Aurral's path as well, so album headings look tracks up
-  // without touching the disk (box sets run to thousands of tracks).
-  async rememberWork(real, recording, fields, asPath = null) {
-    const work = fields.workId ? await this.ctx.resolver.getWork(fields.workId) : null;
-    // A catalogued piece doesn't climb into an uncatalogued collection:
-    // "Ballade No. 1, op. 23" is its own work, not a part of "Ballades".
-    const stop = (above, below) => Boolean(catalogueNumber(below.title)) && !catalogueNumber(above.title);
-    const top = work ? await topWork(this.ctx.mb, work, 0, undefined, { stop }) : null;
-    const people = fields.people || {};
-    const performers = [...(people.soloists || []), ...(people.ensembles || []), ...(people.conductors || [])].map((p) => p.name);
-    this.state.works[real] = {
-      recording,
-      work: top?.id ? { id: top.id, title: top.title || fields.work || "" } : null,
-      movement: work?.title || fields.work || "",
-      composer: fields.classicalComposers || "",
-      performers: [...new Set(performers)].join(" · "),
-    };
-    if (asPath && asPath !== real) this.state.works[asPath] = this.state.works[real];
-    this.dirty++;
   }
 
   async englishAlbumArtist(tags) {
@@ -641,7 +619,6 @@ export async function untagFiles(ctx, paths, budgetMs, { priority = false, mode 
 
 export const readProcessed = (ctx) => readJson(processedFile(ctx), {});
 export const readIndex = (ctx) => readJson(indexFile(ctx), {});
-export const readWorks = (ctx) => readJson(worksFile(ctx), {});
 
 export function describeStats(stats) {
   if (!stats) return "Another tagging run is in progress";

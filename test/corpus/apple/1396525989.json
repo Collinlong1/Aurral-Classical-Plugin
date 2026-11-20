@@ -1,0 +1,92 @@
+{
+ "id": "1396525989",
+ "category": "concerto",
+ "title": "Elgar: Cello Concerto - Vaughan Williams: Fantasias",
+ "artist": "London Symphony Orchestra, Rafael Frühbeck de Burgos & Felix Schmidt",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Cello Concerto in E minor, Op. 85: I. Adagio - Moderato",
+   "durationMs": 483133,
+   "artist": "Felix Schmidt, Rafael Frühbeck de Burgos & London Symphony Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Sir Edward Elgar",
+    "work": "Cello Concerto in E Minor, Op. 85",
+    "part": "I. Adagio - Moderato",
+    "performers": "Felix Schmidt, London Symphony Orchestra, Rafael Frühbeck de Burgos"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Cello Concerto in E minor, Op. 85: II. Allegro molto",
+   "durationMs": 284360,
+   "artist": "Felix Schmidt, London Symphony Orchestra & Rafael Frühbeck de Burgos",
+   "apple": {
+    "block": 1,
+    "composer": "Sir Edward Elgar",
+    "work": "Cello Concerto in E Minor, Op. 85",
+    "part": "II. Allegro molto",
+    "performers": "Rafael Frühbeck de Burgos, Felix Schmidt, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Cello Concerto in E minor, Op. 85: III. Adagio",
+   "durationMs": 293267,
+   "artist": "Felix Schmidt, London Symphony Orchestra & Rafael Frühbeck de Burgos",
+   "apple": {
+    "block": 1,
+    "composer": "Sir Edward Elgar",
+    "work": "Cello Concerto in E Minor, Op. 85",
+    "part": "III. Adagio",
+    "performers": "Felix Schmidt, Rafael Frühbeck de Burgos, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Cello Concerto in E minor, Op. 85: IV. Finale. Allegro",
+   "durationMs": 740533,
+   "artist": "Felix Schmidt, London Symphony Orchestra & Rafael Frühbeck de Burgos",
+   "apple": {
+    "block": 1,
+    "composer": "Sir Edward Elgar",
+    "work": "Cello Concerto in E Minor, Op. 85",
+    "part": "IV. Finale. Allegro",
+    "performers": "Felix Schmidt, London Symphony Orchestra, Rafael Frühbeck de Burgos"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Fantasia on a Theme by Thomas Tallis",
+   "durationMs": 858000,
+   "artist": "London Symphony Orchestra & Rafael Frühbeck de Burgos",
+   "apple": {
+    "block": 2,
+    "composer": "Ralph Vaughan Williams",
+    "work": "Fantasia on a Theme by Thomas Tallis",
+    "part": "Fantasia on a Theme by Thomas Tallis",
+    "performers": "London Symphony Orchestra, Rafael Frühbeck de Burgos"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Fantasia on \"Greensleeves\"",
+   "durationMs": 249853,
+   "artist": "London Symphony Orchestra & Rafael Frühbeck de Burgos",
+   "apple": {
+    "block": 3,
+    "composer": "Ralph Vaughan Williams",
+    "work": "Fantasia on \"Greensleeves\"",
+    "part": "Fantasia on \"Greensleeves\"",
+    "performers": "Rafael Frühbeck de Burgos, London Symphony Orchestra"
+   }
+  }
+ ]
+}

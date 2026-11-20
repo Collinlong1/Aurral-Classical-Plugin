@@ -1,0 +1,64 @@
+{
+ "id": "1258232804",
+ "category": "orchestral",
+ "title": "Rimsky-Korsakov: Scheherazade (Live)",
+ "artist": "New York Philharmonic & Alan Gilbert",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Scheherazade, Op. 35: I. Largo e maestoso - Allegro non troppo \"The Sea and Sinbad's Ship\" (Live)",
+   "durationMs": 593737,
+   "artist": "New York Philharmonic & Alan Gilbert",
+   "apple": {
+    "block": 1,
+    "composer": "Nikolai Rimsky-Korsakov",
+    "work": "Scheherazade, Op. 35",
+    "part": "I. Largo e maestoso - Allegro non troppo \"The Sea and Sinbad's Ship\" (Live)",
+    "performers": "New York Philharmonic, Alan Gilbert"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Scheherazade, Op. 35: II. Lento - Andantino \"The Legend of the Kalendar Prince\" (Live)",
+   "durationMs": 732079,
+   "artist": "New York Philharmonic & Alan Gilbert",
+   "apple": {
+    "block": 1,
+    "composer": "Nikolai Rimsky-Korsakov",
+    "work": "Scheherazade, Op. 35",
+    "part": "II. Lento - Andantino \"The Legend of the Kalendar Prince\" (Live)",
+    "performers": "New York Philharmonic, Alan Gilbert"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Scheherazade, Op. 35: III. Andantino quasi allegretto \"The Young Prince and The Young Princess\" (Live)",
+   "durationMs": 639779,
+   "artist": "New York Philharmonic & Alan Gilbert",
+   "apple": {
+    "block": 1,
+    "composer": "Nikolai Rimsky-Korsakov",
+    "work": "Scheherazade, Op. 35",
+    "part": "III. Andantino quasi allegretto \"The Young Prince and The Young Princess\" (Live)",
+    "performers": "Alan Gilbert, New York Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Scheherazade, Op. 35: IV. Allegro molto \"Festival at Baghdad\" (Live)",
+   "durationMs": 791172,
+   "artist": "New York Philharmonic & Alan Gilbert",
+   "apple": {
+    "block": 1,
+    "composer": "Nikolai Rimsky-Korsakov",
+    "work": "Scheherazade, Op. 35",
+    "part": "IV. Allegro molto \"Festival at Baghdad\" (Live)",
+    "performers": "New York Philharmonic, Alan Gilbert"
+   }
+  }
+ ]
+}

@@ -1,0 +1,94 @@
+{
+ "id": "nobuo-uematsu-final-fantasy-vii",
+ "family": "game-score",
+ "title": "Final Fantasy VII Original Soundtrack",
+ "artist": "Nobuo Uematsu",
+ "source": "rip with a 'Game' genre",
+ "expect": {
+  "album": "not_classical"
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Prelude",
+   "durationMs": 171000,
+   "artist": "Nobuo Uematsu",
+   "composer": [
+    "Nobuo Uematsu"
+   ],
+   "genres": [
+    "Game"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [
+    "misleading-title"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Opening ~ Bombing Mission",
+   "durationMs": 240000,
+   "artist": "Nobuo Uematsu",
+   "composer": [
+    "Nobuo Uematsu"
+   ],
+   "genres": [
+    "Game"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Mako Reactor",
+   "durationMs": 199000,
+   "artist": "Nobuo Uematsu",
+   "composer": [
+    "Nobuo Uematsu"
+   ],
+   "genres": [
+    "Game"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Tifa's Theme",
+   "durationMs": 306000,
+   "artist": "Nobuo Uematsu",
+   "composer": [
+    "Nobuo Uematsu"
+   ],
+   "genres": [
+    "Game"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 4,
+   "number": 83,
+   "title": "One-Winged Angel",
+   "durationMs": 437000,
+   "artist": "Nobuo Uematsu",
+   "composer": [
+    "Nobuo Uematsu"
+   ],
+   "genres": [
+    "Game"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  }
+ ]
+}

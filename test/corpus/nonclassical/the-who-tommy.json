@@ -1,0 +1,108 @@
+{
+ "id": "the-who-tommy",
+ "family": "rock",
+ "title": "Tommy",
+ "artist": "The Who",
+ "source": "rip with the MusicBrainz genre 'rock opera'",
+ "expect": {
+  "album": "not_classical",
+  "note": "A rock opera is rock music."
+ },
+ "pins": {
+  "album": "not_classical",
+  "note": "Admin removes the album from Classical; every track should inherit it."
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Overture",
+   "durationMs": 230000,
+   "artist": "The Who",
+   "composer": [
+    "Pete Townshend"
+   ],
+   "genres": [
+    "Rock Opera"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [
+    "misleading-title",
+    "misleading-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "It's a Boy",
+   "durationMs": 38000,
+   "artist": "The Who",
+   "composer": [
+    "Pete Townshend"
+   ],
+   "genres": [
+    "Rock Opera"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [
+    "misleading-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Amazing Journey",
+   "durationMs": 205000,
+   "artist": "The Who",
+   "composer": [
+    "Pete Townshend"
+   ],
+   "genres": [
+    "Rock Opera"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [
+    "misleading-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Pinball Wizard",
+   "durationMs": 181000,
+   "artist": "The Who",
+   "composer": [
+    "Pete Townshend"
+   ],
+   "genres": [
+    "Rock Opera"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [
+    "misleading-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 24,
+   "title": "We're Not Gonna Take It",
+   "durationMs": 428000,
+   "artist": "The Who",
+   "composer": [
+    "Pete Townshend"
+   ],
+   "genres": [
+    "Rock Opera"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [
+    "misleading-genre"
+   ]
+  }
+ ]
+}

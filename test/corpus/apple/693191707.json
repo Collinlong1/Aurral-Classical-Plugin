@@ -1,0 +1,596 @@
+{
+ "id": "693191707",
+ "category": "solo instrument",
+ "title": "Bach: Cello Suites",
+ "artist": "Mstislav Rostropovich",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Cello Suite No. 1 in G Major, BWV 1007: I. Prélude",
+   "durationMs": 124413,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 1 in G Major, BWV 1007",
+    "part": "I. Prélude",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Cello Suite No. 1 in G Major, BWV 1007: Allemande",
+   "durationMs": 200213,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 1 in G Major, BWV 1007",
+    "part": "Allemande",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Cello Suite No. 1 in G Major, BWV 1007: Courante",
+   "durationMs": 154560,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 1 in G Major, BWV 1007",
+    "part": "Courante",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Cello Suite No. 1 in G Major, BWV 1007: Sarabande",
+   "durationMs": 201067,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 1 in G Major, BWV 1007",
+    "part": "Sarabande",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Cello Suite No. 1 in G Major, BWV 1007: Menuett I",
+   "durationMs": 77253,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 1 in G Major, BWV 1007",
+    "part": "Menuett I",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Cello Suite No. 1 in G Major, BWV 1007: Menuett II",
+   "durationMs": 123107,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 1 in G Major, BWV 1007",
+    "part": "Menuett II",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Cello Suite No. 1 in G Major, BWV 1007: Gigue",
+   "durationMs": 96827,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 1 in G Major, BWV 1007",
+    "part": "Gigue",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Cello Suite No. 4 in E-Flat Major, BWV 1010: Prélude",
+   "durationMs": 265933,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 4 in E-Flat Major, BWV 1010",
+    "part": "Prélude",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Cello Suite No. 4 in E-Flat Major, BWV 1010: Allemande",
+   "durationMs": 212733,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 4 in E-Flat Major, BWV 1010",
+    "part": "Allemande",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Cello Suite No. 4 in E-Flat Major, BWV 1010: Courante",
+   "durationMs": 219267,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 4 in E-Flat Major, BWV 1010",
+    "part": "Courante",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Cello Suite No. 4 in E-Flat Major, BWV 1010: Sarabande",
+   "durationMs": 309667,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 4 in E-Flat Major, BWV 1010",
+    "part": "Sarabande",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Cello Suite No. 4 in E-Flat Major, BWV 1010: Bourrée I",
+   "durationMs": 204507,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 4 in E-Flat Major, BWV 1010",
+    "part": "Bourrée I",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Cello Suite No. 4 in E-Flat Major, BWV 1010: Bourrée II",
+   "durationMs": 165733,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 4 in E-Flat Major, BWV 1010",
+    "part": "Bourrée II",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Cello Suite No. 4 in E-Flat Major, BWV 1010: Gigue",
+   "durationMs": 159160,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 4 in E-Flat Major, BWV 1010",
+    "part": "Gigue",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Cello Suite No. 5 in C Minor, BWV 1011: Prélude",
+   "durationMs": 443373,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 5 in C Minor, BWV 1011",
+    "part": "Prélude",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Cello Suite No. 5 in C Minor, BWV 1011: Allemande",
+   "durationMs": 311227,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 5 in C Minor, BWV 1011",
+    "part": "Allemande",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Cello Suite No. 5 in C Minor, BWV 1011: Courante",
+   "durationMs": 146000,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 5 in C Minor, BWV 1011",
+    "part": "Courante",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Cello Suite No. 5 in C Minor, BWV 1011: Sarabande",
+   "durationMs": 231467,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 5 in C Minor, BWV 1011",
+    "part": "Sarabande",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "Cello Suite No. 5 in C Minor, BWV 1011: Gavotte I",
+   "durationMs": 166773,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 5 in C Minor, BWV 1011",
+    "part": "Gavotte I",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "Cello Suite No. 5 in C Minor, BWV 1011: Gavotte II",
+   "durationMs": 175693,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 5 in C Minor, BWV 1011",
+    "part": "Gavotte II",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "Cello Suite No. 5 in C Minor, BWV 1011: Gigue",
+   "durationMs": 145307,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 5 in C Minor, BWV 1011",
+    "part": "Gigue",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 1,
+   "title": "Cello Suite No. 2 in D Minor, BWV 1008: Prélude",
+   "durationMs": 248507,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 2 in D Minor, BWV 1008",
+    "part": "Prélude",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 2,
+   "title": "Cello Suite No. 2 in D Minor, BWV 1008: Allemande",
+   "durationMs": 169000,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 2 in D Minor, BWV 1008",
+    "part": "Allemande",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 3,
+   "title": "Cello Suite No. 2 in D Minor, BWV 1008: Courante",
+   "durationMs": 129827,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 2 in D Minor, BWV 1008",
+    "part": "Courante",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 4,
+   "title": "Cello Suite No. 2 in D Minor, BWV 1008: Sarabande",
+   "durationMs": 366933,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 2 in D Minor, BWV 1008",
+    "part": "Sarabande",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 5,
+   "title": "Cello Suite No. 2 in D Minor, BWV 1008: Menuett I",
+   "durationMs": 80333,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 2 in D Minor, BWV 1008",
+    "part": "Menuett I",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 6,
+   "title": "Cello Suite No. 2 in D Minor, BWV 1008: Menuett II",
+   "durationMs": 118400,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 2 in D Minor, BWV 1008",
+    "part": "Menuett II",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 7,
+   "title": "Cello Suite No. 2 in D Minor, BWV 1008: Gigue",
+   "durationMs": 173000,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 2 in D Minor, BWV 1008",
+    "part": "Gigue",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 8,
+   "title": "Cello Suite No. 3 in C Major, BWV 1009: Prélude",
+   "durationMs": 203933,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 3 in C Major, BWV 1009",
+    "part": "Prélude",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 9,
+   "title": "Cello Suite No. 3 in C Major, BWV 1009: Allemande",
+   "durationMs": 227533,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 3 in C Major, BWV 1009",
+    "part": "Allemande",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 10,
+   "title": "Cello Suite No. 3 in C Major, BWV 1009: Courante",
+   "durationMs": 227973,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 3 in C Major, BWV 1009",
+    "part": "Courante",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 11,
+   "title": "Cello Suite No. 3 in C Major, BWV 1009: Sarbande",
+   "durationMs": 318333,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 3 in C Major, BWV 1009",
+    "part": "Sarbande",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 12,
+   "title": "Cello Suite No. 3 in C Major, BWV 1009: Bourrée I",
+   "durationMs": 116800,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 3 in C Major, BWV 1009",
+    "part": "Bourrée I",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 13,
+   "title": "Cello Suite No. 3 in C Major, BWV 1009: Bourrée II",
+   "durationMs": 162560,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 3 in C Major, BWV 1009",
+    "part": "Bourrée II",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 14,
+   "title": "Cello Suite No. 3 in C Major, BWV 1009: Gigue",
+   "durationMs": 179867,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 3 in C Major, BWV 1009",
+    "part": "Gigue",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 15,
+   "title": "Cello Suite No. 6 in D Major, BWV 1012: Prélude",
+   "durationMs": 316973,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 6,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 6 in D Major, BWV 1012",
+    "part": "Prélude",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 16,
+   "title": "Cello Suite No. 6 in D Major, BWV 1012: Allemande",
+   "durationMs": 631293,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 6,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 6 in D Major, BWV 1012",
+    "part": "Allemande",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 17,
+   "title": "Cello Suite No. 6 in D Major, BWV 1012: Courante",
+   "durationMs": 212067,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 6,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 6 in D Major, BWV 1012",
+    "part": "Courante",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 18,
+   "title": "Cello Suite No. 6 in D Major, BWV 1012: Sarabande",
+   "durationMs": 291973,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 6,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 6 in D Major, BWV 1012",
+    "part": "Sarabande",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 19,
+   "title": "Cello Suite No. 6 in D Major, BWV 1012: Gavotte I",
+   "durationMs": 137200,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 6,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 6 in D Major, BWV 1012",
+    "part": "Gavotte I",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 20,
+   "title": "Cello Suite No. 6 in D Major, BWV 1012: Gavotte II",
+   "durationMs": 173693,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 6,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 6 in D Major, BWV 1012",
+    "part": "Gavotte II",
+    "performers": "Mstislav Rostropovich"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 21,
+   "title": "Cello Suite No. 6 in D Major, BWV 1012: Gigue",
+   "durationMs": 248867,
+   "artist": "Mstislav Rostropovich",
+   "apple": {
+    "block": 6,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 6 in D Major, BWV 1012",
+    "part": "Gigue",
+    "performers": "Mstislav Rostropovich"
+   }
+  }
+ ]
+}

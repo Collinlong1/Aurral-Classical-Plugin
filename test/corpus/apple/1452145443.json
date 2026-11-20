@@ -1,0 +1,876 @@
+{
+ "id": "1452145443",
+ "category": "chamber",
+ "title": "Shostakovich: The String Quartets",
+ "artist": "Emerson String Quartet",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "String Quartet No. 1 in C Major, Op. 49: I. Moderato",
+   "durationMs": 235947,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 1,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 1 in C Major, Op. 49 · “Springtime”",
+    "part": "I. Moderato",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "String Quartet No. 1 in C Major, Op. 49: II. Moderato",
+   "durationMs": 239040,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 1,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 1 in C Major, Op. 49 · “Springtime”",
+    "part": "II. Moderato",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "String Quartet No. 1 in C Major, Op. 49: III. Allegro Molto",
+   "durationMs": 143440,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 1,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 1 in C Major, Op. 49 · “Springtime”",
+    "part": "III. Allegro Molto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "String Quartet No. 1 in C Major, Op. 49: IV. Allegro",
+   "durationMs": 224240,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 1,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 1 in C Major, Op. 49 · “Springtime”",
+    "part": "IV. Allegro",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "String Quartet No. 2 in A Major, Op. 68: I. Overture (Moderato con moto)",
+   "durationMs": 477867,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 2,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 2 in A Major, Op. 68",
+    "part": "I. Overture (Moderato con moto)",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "String Quartet No. 2 in A Major, Op. 68: II. Recitative & Romance (Adagio)",
+   "durationMs": 545453,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 2,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 2 in A Major, Op. 68",
+    "part": "II. Recitative & Romance (Adagio)",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "String Quartet No. 2 in A Major, Op. 68: III. Valse (Allegro)",
+   "durationMs": 328920,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 2,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 2 in A Major, Op. 68",
+    "part": "III. Valse (Allegro)",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "String Quartet No. 2 in A Major, Op. 68: IV. Theme & Variations",
+   "durationMs": 643547,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 2,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 2 in A Major, Op. 68",
+    "part": "IV. Theme & Variations",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "String Quartet No. 3 in F Major, Op. 73: I. Allegretto",
+   "durationMs": 412360,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 3,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 3 in F Major, Op. 73",
+    "part": "I. Allegretto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "String Quartet No. 3 in F Major, Op. 73: II. Moderato con moto",
+   "durationMs": 262267,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 3,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 3 in F Major, Op. 73",
+    "part": "II. Moderato con moto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "String Quartet No. 3 in F Major, Op. 73: III. Allegro non troppo",
+   "durationMs": 230147,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 3,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 3 in F Major, Op. 73",
+    "part": "III. Allegro non troppo",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "String Quartet No. 3 in F Major, Op. 73: IV. Adagio",
+   "durationMs": 284120,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 3,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 3 in F Major, Op. 73",
+    "part": "IV. Adagio",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "String Quartet No. 3 in F Major, Op. 73: V. Moderato",
+   "durationMs": 498880,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 3,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 3 in F Major, Op. 73",
+    "part": "V. Moderato",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 1,
+   "title": "String Quartet No. 4 in D Major, Op. 83: I. Allegretto",
+   "durationMs": 230627,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 4,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 4 in D Major, Op. 83",
+    "part": "I. Allegretto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 2,
+   "title": "String Quartet No. 4 in D Major, Op. 83: II. Andantino",
+   "durationMs": 383387,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 4,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 4 in D Major, Op. 83",
+    "part": "II. Andantino",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 3,
+   "title": "String Quartet No. 4 in D Major, Op. 83: III. Allegretto",
+   "durationMs": 275067,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 4,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 4 in D Major, Op. 83",
+    "part": "III. Allegretto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 4,
+   "title": "String Quartet No. 4 in D Major, Op. 83: IV. Allegretto",
+   "durationMs": 570613,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 4,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 4 in D Major, Op. 83",
+    "part": "IV. Allegretto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 5,
+   "title": "String Quartet No. 5 in B-Flat Major, Op. 92: I. Allegro non troppo",
+   "durationMs": 678893,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 5,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 5 in B-Flat Major, Op. 92",
+    "part": "I. Allegro non troppo",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 6,
+   "title": "String Quartet No. 5 in B-Flat Major, Op. 92: II. Andante",
+   "durationMs": 509080,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 5,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 5 in B-Flat Major, Op. 92",
+    "part": "II. Andante",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 7,
+   "title": "String Quartet No. 5 in B-Flat Major, Op. 92: III. Moderato",
+   "durationMs": 622307,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 5,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 5 in B-Flat Major, Op. 92",
+    "part": "III. Moderato",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 8,
+   "title": "String Quartet No. 6 in G Major, Op. 101: I. Allegretto",
+   "durationMs": 404240,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 6,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 6 in G Major, Op. 101",
+    "part": "I. Allegretto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 9,
+   "title": "String Quartet No. 6 in G Major, Op. 101: II. Moderato Con Moto",
+   "durationMs": 299373,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 6,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 6 in G Major, Op. 101",
+    "part": "II. Moderato Con Moto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 10,
+   "title": "String Quartet No. 6 in G Major, Op. 101: III. Lento - Attacca:",
+   "durationMs": 237693,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 6,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 6 in G Major, Op. 101",
+    "part": "III. Lento - Attacca:",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 11,
+   "title": "String Quartet No. 6 in G Major, Op. 101: IV. Lento - Allegretto - Andante - Lento",
+   "durationMs": 393173,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 6,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 6 in G Major, Op. 101",
+    "part": "IV. Lento - Allegretto - Andante - Lento",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 1,
+   "title": "String Quartet No. 7 in F-Sharp Minor, Op. 108: I. Allegretto",
+   "durationMs": 221800,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 7,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 7 in F-Sharp Minor, Op. 108",
+    "part": "I. Allegretto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 2,
+   "title": "String Quartet No. 7 in F-Sharp Minor, Op. 108: II. Lento",
+   "durationMs": 168693,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 7,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 7 in F-Sharp Minor, Op. 108",
+    "part": "II. Lento",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 3,
+   "title": "String Quartet No. 7 in F-Sharp Minor, Op. 108: III. Allegro",
+   "durationMs": 305507,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 7,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 7 in F-Sharp Minor, Op. 108",
+    "part": "III. Allegro",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 4,
+   "title": "String Quartet No. 8 in C Minor, Op. 110: I. Largo",
+   "durationMs": 273640,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 8,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 8 in C Minor, Op. 110",
+    "part": "I. Largo",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 5,
+   "title": "String Quartet No. 8 in C Minor, Op. 110: II. Allegro molto",
+   "durationMs": 157880,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 8,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 8 in C Minor, Op. 110",
+    "part": "II. Allegro molto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 6,
+   "title": "String Quartet No. 8 in C Minor, Op. 110: III. Allegretto",
+   "durationMs": 245493,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 8,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 8 in C Minor, Op. 110",
+    "part": "III. Allegretto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 7,
+   "title": "String Quartet No. 8 in C Minor, Op. 110: IV. Largo",
+   "durationMs": 285640,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 8,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 8 in C Minor, Op. 110",
+    "part": "IV. Largo",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 8,
+   "title": "String Quartet No. 8 in C Minor, Op. 110: V. Largo",
+   "durationMs": 214347,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 8,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 8 in C Minor, Op. 110",
+    "part": "V. Largo",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 9,
+   "title": "String Quartet No. 9 in E-Flat Major, Op. 117: I. Moderato con moto",
+   "durationMs": 264120,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 9,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 9 in E-Flat Major, Op. 117",
+    "part": "I. Moderato con moto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 10,
+   "title": "String Quartet No. 9 in E-Flat Major, Op. 117: II. Adagio",
+   "durationMs": 227267,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 9,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 9 in E-Flat Major, Op. 117",
+    "part": "II. Adagio",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 11,
+   "title": "String Quartet No. 9 in E-Flat Major, Op. 117: III. Allegretto",
+   "durationMs": 242427,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 9,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 9 in E-Flat Major, Op. 117",
+    "part": "III. Allegretto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 12,
+   "title": "String Quartet No. 9 in E-Flat Major, Op. 117: IV. Adagio",
+   "durationMs": 180133,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 9,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 9 in E-Flat Major, Op. 117",
+    "part": "IV. Adagio",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 13,
+   "title": "String Quartet No. 9 in E-Flat Major, Op. 117: V. Allegro",
+   "durationMs": 569347,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 9,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 9 in E-Flat Major, Op. 117",
+    "part": "V. Allegro",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 14,
+   "title": "String Quartet No. 10 in A-Flat Major, Op. 118: I. Andante con moto",
+   "durationMs": 252613,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 10,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 10 in A-Flat Major, Op. 118",
+    "part": "I. Andante con moto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 15,
+   "title": "String Quartet No. 10 in A-Flat Major, Op. 118: II. Allegretto furioso",
+   "durationMs": 237533,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 10,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 10 in A-Flat Major, Op. 118",
+    "part": "II. Allegretto furioso",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 16,
+   "title": "String Quartet No. 10 in A-Flat Major, Op. 118: III. Adagio",
+   "durationMs": 288720,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 10,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 10 in A-Flat Major, Op. 118",
+    "part": "III. Adagio",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 17,
+   "title": "String Quartet No. 10 in A-Flat Major, Op. 118: IV. Allegretto - Andante",
+   "durationMs": 520947,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 10,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 10 in A-Flat Major, Op. 118",
+    "part": "IV. Allegretto - Andante",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 1,
+   "title": "Adagio (Elegy) For String Quartet",
+   "durationMs": 274800,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 11,
+    "composer": "Dmitri Shostakovich",
+    "work": "Lady Macbeth of the Mtsensk District, Op. 29",
+    "part": "Adagio (Elegy) For String Quartet",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 2,
+   "title": "Allegretto (Polka) For String Quartet",
+   "durationMs": 167213,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 12,
+    "composer": "Dmitri Shostakovich",
+    "work": "Polka",
+    "part": "Allegretto (Polka) For String Quartet",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 3,
+   "title": "String Quartet No. 11 in F Minor, Op. 122: I. Introduction: Andantino",
+   "durationMs": 131653,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 13,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 11 in F Minor, Op. 122",
+    "part": "I. Introduction: Andantino",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 4,
+   "title": "String Quartet No. 11 in F Minor, Op. 122: II. Scherzo: Allegretto",
+   "durationMs": 161827,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 13,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 11 in F Minor, Op. 122",
+    "part": "II. Scherzo: Allegretto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 5,
+   "title": "String Quartet No. 11 in F Minor, Op. 122: III. Recitative: Adagio",
+   "durationMs": 68427,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 13,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 11 in F Minor, Op. 122",
+    "part": "III. Recitative: Adagio",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 6,
+   "title": "String Quartet No. 11 in F Minor, Op. 122: IV. Etude: Allegro",
+   "durationMs": 74827,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 13,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 11 in F Minor, Op. 122",
+    "part": "IV. Etude: Allegro",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 7,
+   "title": "String Quartet No. 11 in F Minor, Op. 122: V. Humoresque: Allegro",
+   "durationMs": 61653,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 13,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 11 in F Minor, Op. 122",
+    "part": "V. Humoresque: Allegro",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 8,
+   "title": "String Quartet No. 11 in F Minor, Op. 122: VI. Elegy: Adagio",
+   "durationMs": 252160,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 13,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 11 in F Minor, Op. 122",
+    "part": "VI. Elegy: Adagio",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 9,
+   "title": "String Quartet No. 11 in F Minor, Op. 122: VII. Finale: Moderato",
+   "durationMs": 218960,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 13,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 11 in F Minor, Op. 122",
+    "part": "VII. Finale: Moderato",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 10,
+   "title": "String Quartet No. 12 in D-Flat Major, Op. 133: I. Moderato - Allegretto",
+   "durationMs": 389133,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 14,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 12 in D-Flat Major, Op. 133",
+    "part": "I. Moderato - Allegretto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 11,
+   "title": "String Quartet No. 12 in D-Flat Major, Op. 133: II. Allegretto - Adagio - Moderato - Allegretto",
+   "durationMs": 1163600,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 14,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 12 in D-Flat Major, Op. 133",
+    "part": "II. Allegretto - Adagio - Moderato - Allegretto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 12,
+   "title": "String Quartet No. 13 in B-Flat Minor, Op. 138",
+   "durationMs": 1148933,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 15,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 13 in B-Flat Minor, Op. 138",
+    "part": "String Quartet No. 13 in B-Flat Minor, Op. 138",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 1,
+   "title": "String Quartet No. 14 in F-Sharp Major, Op. 142: I. Allegretto",
+   "durationMs": 493787,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 16,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 14 in F-Sharp Major, Op. 142",
+    "part": "I. Allegretto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 2,
+   "title": "String Quartet No. 14 in F-Sharp Major, Op. 142: II. Adagio",
+   "durationMs": 532320,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 16,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 14 in F-Sharp Major, Op. 142",
+    "part": "II. Adagio",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 3,
+   "title": "String Quartet No. 14 in F-Sharp Major, Op. 142: III. Allegretto",
+   "durationMs": 478907,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 16,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 14 in F-Sharp Major, Op. 142",
+    "part": "III. Allegretto",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 4,
+   "title": "String Quartet No. 15 in E-Flat Minor, Op. 144: I. Elegy",
+   "durationMs": 756627,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 17,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 15 in E-Flat Minor, Op. 144",
+    "part": "I. Elegy",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 5,
+   "title": "String Quartet No. 15 in E-Flat Minor, Op. 144: II. Serenade",
+   "durationMs": 347387,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 17,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 15 in E-Flat Minor, Op. 144",
+    "part": "II. Serenade",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 6,
+   "title": "String Quartet No. 15 in E-Flat Minor, Op. 144: III. Intermezzo",
+   "durationMs": 98280,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 17,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 15 in E-Flat Minor, Op. 144",
+    "part": "III. Intermezzo",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 7,
+   "title": "String Quartet No. 15 in E-Flat Minor, Op. 144: IV. Nocturne",
+   "durationMs": 270213,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 17,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 15 in E-Flat Minor, Op. 144",
+    "part": "IV. Nocturne",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 8,
+   "title": "String Quartet No. 15 in E-Flat Minor, Op. 144: V. Funeral March",
+   "durationMs": 275733,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 17,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 15 in E-Flat Minor, Op. 144",
+    "part": "V. Funeral March",
+    "performers": "Emerson String Quartet"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 9,
+   "title": "String Quartet No. 15 in E-Flat Minor, Op. 144: VI. Epilogue",
+   "durationMs": 378440,
+   "artist": "Emerson String Quartet",
+   "apple": {
+    "block": 17,
+    "composer": "Dmitri Shostakovich",
+    "work": "String Quartet No. 15 in E-Flat Minor, Op. 144",
+    "part": "VI. Epilogue",
+    "performers": "Emerson String Quartet"
+   }
+  }
+ ]
+}

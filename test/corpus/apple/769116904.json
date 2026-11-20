@@ -1,0 +1,176 @@
+{
+ "id": "769116904",
+ "category": "orchestral",
+ "title": "Holst: The Planets",
+ "artist": "Berlin Philharmonic Orchestra, Rundfunkchor, Berlin & Sir Simon Rattle",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "The Planets, Op. 32: I. Mars, the Bringer of War",
+   "durationMs": 445280,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Gustav Holst",
+    "work": "The Planets, H 125, Op. 32",
+    "part": "I. Mars, the Bringer of War",
+    "performers": "Sir Simon Rattle, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "The Planets, Op. 32: II. Venus, the Bringer of Peace",
+   "durationMs": 539240,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Gustav Holst",
+    "work": "The Planets, H 125, Op. 32",
+    "part": "II. Venus, the Bringer of Peace",
+    "performers": "Berlin Philharmonic Orchestra, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "The Planets, Op. 32: III. Mercury, the Winged Messenger",
+   "durationMs": 242093,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Gustav Holst",
+    "work": "The Planets, H 125, Op. 32",
+    "part": "III. Mercury, the Winged Messenger",
+    "performers": "Sir Simon Rattle, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "The Planets, Op. 32: IV. Jupiter, the Bringer of Jollity",
+   "durationMs": 482667,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Gustav Holst",
+    "work": "The Planets, H 125, Op. 32",
+    "part": "IV. Jupiter, the Bringer of Jollity",
+    "performers": "Sir Simon Rattle, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "The Planets, Op. 32: V. Saturn, the Bringer of Old Age",
+   "durationMs": 575587,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Gustav Holst",
+    "work": "The Planets, H 125, Op. 32",
+    "part": "V. Saturn, the Bringer of Old Age",
+    "performers": "Sir Simon Rattle, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "The Planets, Op. 32: VI. Uranus, the Magician",
+   "durationMs": 364013,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Gustav Holst",
+    "work": "The Planets, H 125, Op. 32",
+    "part": "VI. Uranus, the Magician",
+    "performers": "Sir Simon Rattle, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "The Planets, Op. 32: VII. Neptune, the Mystic",
+   "durationMs": 421541,
+   "artist": "Berlin Philharmonic Orchestra, Rundfunkchor, Berlin & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Gustav Holst",
+    "work": "The Planets, H 125, Op. 32",
+    "part": "VII. Neptune, the Mystic",
+    "performers": "Berlin Philharmonic Orchestra, Sir Simon Rattle, Berliner Rundfunkchor"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Pluto, the Renewer",
+   "durationMs": 375588,
+   "artist": "Berlin Philharmonic Orchestra, Rundfunkchor, Berlin & Sir Simon Rattle",
+   "apple": {
+    "block": 2,
+    "composer": "Colin Matthews",
+    "work": "Pluto, the renewer",
+    "part": "Pluto, the Renewer",
+    "performers": "Sir Simon Rattle, Berlin Philharmonic Orchestra, Berliner Rundfunkchor"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Asteroid 4179 - Toutatis",
+   "durationMs": 276320,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 3,
+    "composer": "Kaija Saariaho",
+    "work": "Asteroid 4179 - Toutatis",
+    "part": "Asteroid 4179 - Toutatis",
+    "performers": "Sir Simon Rattle, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Towards Osiris",
+   "durationMs": 475520,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 4,
+    "composer": "M. Pintscher: Towards Osiris",
+    "work": "M. Pintscher: Towards Osiris",
+    "part": "Towards Osiris",
+    "performers": "Sir Simon Rattle, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Ceres",
+   "durationMs": 400173,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 5,
+    "composer": "Mark-Anthony Turnage",
+    "work": "Ceres",
+    "part": "Ceres",
+    "performers": "Sir Simon Rattle, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Komarov's Fall",
+   "durationMs": 469320,
+   "artist": "Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 6,
+    "composer": "Brett Dean",
+    "work": "Komarov's Fall",
+    "part": "Komarov's Fall",
+    "performers": "Berlin Philharmonic Orchestra, Sir Simon Rattle"
+   }
+  }
+ ]
+}

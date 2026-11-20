@@ -1,0 +1,428 @@
+{
+ "id": "1592763567",
+ "category": "symphony",
+ "title": "Sibelius: Symphonies Nos. 1-7, Kullervo, Pohjola's Daughter & The Oceanides",
+ "artist": "London Symphony Orchestra, London Symphony Chorus & Sir Colin Davis",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Symphony No. 1 in E Minor, Op. 39: I. Andante, ma non troppo - Allegro energico",
+   "durationMs": 714320,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "Jean Sibelius",
+    "work": "Symphony No. 1 in E Minor, Op. 39",
+    "part": "I. Andante, ma non troppo - Allegro energico",
+    "performers": "London Symphony Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Symphony No. 1 in E Minor, Op. 39: II. Andante (ma non troppo lento)",
+   "durationMs": 567800,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "Jean Sibelius",
+    "work": "Symphony No. 1 in E Minor, Op. 39",
+    "part": "II. Andante (ma non troppo lento)",
+    "performers": "London Symphony Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Symphony No. 1 in E Minor, Op. 39: III. Scherzo. Allegro",
+   "durationMs": 315800,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "Jean Sibelius",
+    "work": "Symphony No. 1 in E Minor, Op. 39",
+    "part": "III. Scherzo. Allegro",
+    "performers": "London Symphony Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Symphony No. 1 in E Minor, Op. 39: IV. Finale (Quasi una fantasia). Andante",
+   "durationMs": 779440,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "Jean Sibelius",
+    "work": "Symphony No. 1 in E Minor, Op. 39",
+    "part": "IV. Finale (Quasi una fantasia). Andante",
+    "performers": "Sir Colin Davis, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Symphony No. 4 in A Minor, Op. 63: I. Tempo molto moderato, quasi adagio",
+   "durationMs": 702000,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 2,
+    "composer": "Jean Sibelius",
+    "work": "Symphony No. 4 in A Minor, Op. 63",
+    "part": "I. Tempo molto moderato, quasi adagio",
+    "performers": "London Symphony Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Symphony No. 4 in A Minor, Op. 63: II. Allegro molto vivace",
+   "durationMs": 298000,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 2,
+    "composer": "Jean Sibelius",
+    "work": "Symphony No. 4 in A Minor, Op. 63",
+    "part": "II. Allegro molto vivace",
+    "performers": "London Symphony Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Symphony No. 4 in A Minor, Op. 63: III. Il tempo largo",
+   "durationMs": 761600,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 2,
+    "composer": "Jean Sibelius",
+    "work": "Symphony No. 4 in A Minor, Op. 63",
+    "part": "III. Il tempo largo",
+    "performers": "Sir Colin Davis, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Symphony No. 4 in A Minor, Op. 63: IV. Allegro",
+   "durationMs": 561176,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 2,
+    "composer": "Jean Sibelius",
+    "work": "Symphony No. 4 in A Minor, Op. 63",
+    "part": "IV. Allegro",
+    "performers": "Sir Colin Davis, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Pohjola's Daughter, Op. 49",
+   "durationMs": 864467,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 3,
+    "composer": "Jean Sibelius",
+    "work": "Pohjolan tytär, Op. 49 · “Pohjola's Daughter”",
+    "part": "Pohjola's Daughter, Op. 49",
+    "performers": "Sir Colin Davis, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Symphony No. 2 in D Major, Op. 43: I. Allegretto",
+   "durationMs": 579093,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 4,
+    "composer": "Jean Sibelius",
+    "work": "Symphony No. 2 in D Major, Op. 43",
+    "part": "I. Allegretto",
+    "performers": "Sir Colin Davis, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Symphony No. 2 in D Major, Op. 43: II. Tempo andante, ma rubato",
+   "durationMs": 889747,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 4,
+    "composer": "Jean Sibelius",
+    "work": "Symphony No. 2 in D Major, Op. 43",
+    "part": "II. Tempo andante, ma rubato",
+    "performers": "Sir Colin Davis, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Symphony No. 2 in D Major, Op. 43: III. Vivacissimo",
+   "durationMs": 366440,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 4,
+    "composer": "Jean Sibelius",
+    "work": "Symphony No. 2 in D Major, Op. 43",
+    "part": "III. Vivacissimo",
+    "performers": "Sir Colin Davis, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Symphony No. 2 in D Major, Op. 43: IV. Finale. Allegro moderato",
+   "durationMs": 840042,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 4,
+    "composer": "Jean Sibelius",
+    "work": "Symphony No. 2 in D Major, Op. 43",
+    "part": "IV. Finale. Allegro moderato",
+    "performers": "Sir Colin Davis, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Symphony No. 3 in C Major, Op. 52: I. Allegro moderato",
+   "durationMs": 686360,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 5,
+    "composer": "Jean Sibelius",
+    "work": "Symphony No. 3 in C Major, Op. 52 · “Northern Pastoral”",
+    "part": "I. Allegro moderato",
+    "performers": "London Symphony Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Symphony No. 3 in C Major, Op. 52: II. Andantino con moto, quasi allegretto",
+   "durationMs": 665147,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 5,
+    "composer": "Jean Sibelius",
+    "work": "Symphony No. 3 in C Major, Op. 52 · “Northern Pastoral”",
+    "part": "II. Andantino con moto, quasi allegretto",
+    "performers": "Sir Colin Davis, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Symphony No. 3 in C Major, Op. 52: III. Moderato - Allegro ma non tanto",
+   "durationMs": 506360,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 5,
+    "composer": "Jean Sibelius",
+    "work": "Symphony No. 3 in C Major, Op. 52 · “Northern Pastoral”",
+    "part": "III. Moderato - Allegro ma non tanto",
+    "performers": "Sir Colin Davis, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 1,
+   "title": "Symphony No. 7 in C Major, Op. 105",
+   "durationMs": 1346853,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 6,
+    "composer": "Jean Sibelius",
+    "work": "Symphony No. 7 in C Major, Op. 105",
+    "part": "Symphony No. 7 in C Major, Op. 105",
+    "performers": "Sir Colin Davis, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 2,
+   "title": "The Oceanides, Op. 73",
+   "durationMs": 718848,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 7,
+    "composer": "Jean Sibelius",
+    "work": "The Oceanides, Op. 73",
+    "part": "The Oceanides, Op. 73",
+    "performers": "Sir Colin Davis, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 3,
+   "title": "Symphony No. 5 in E-Flat Major, Op. 82: I. Tempo molto moderato - Allegro moderato",
+   "durationMs": 816840,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 8,
+    "composer": "Jean Sibelius",
+    "work": "Symphony No. 5 in E-Flat Major, Op. 82",
+    "part": "I. Tempo molto moderato - Allegro moderato",
+    "performers": "Sir Colin Davis, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 4,
+   "title": "Symphony No. 5 in E-Flat Major, Op. 82: II. Andante mosso, quasi allegretto",
+   "durationMs": 487853,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 8,
+    "composer": "Jean Sibelius",
+    "work": "Symphony No. 5 in E-Flat Major, Op. 82",
+    "part": "II. Andante mosso, quasi allegretto",
+    "performers": "Sir Colin Davis, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 5,
+   "title": "Symphony No. 5 in E-Flat Major, Op. 82: III. Allegro molto",
+   "durationMs": 553333,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 8,
+    "composer": "Jean Sibelius",
+    "work": "Symphony No. 5 in E-Flat Major, Op. 82",
+    "part": "III. Allegro molto",
+    "performers": "Sir Colin Davis, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 6,
+   "title": "Symphony No. 6 in D Minor, Op. 104: I. Allegro molto moderato",
+   "durationMs": 507733,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 9,
+    "composer": "Jean Sibelius",
+    "work": "Symphony No. 6 in D Minor, Op. 104",
+    "part": "I. Allegro molto moderato",
+    "performers": "Sir Colin Davis, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 7,
+   "title": "Symphony No. 6 in D Minor, Op. 104: II. Allegro moderato",
+   "durationMs": 290013,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 9,
+    "composer": "Jean Sibelius",
+    "work": "Symphony No. 6 in D Minor, Op. 104",
+    "part": "II. Allegretto moderato",
+    "performers": "London Symphony Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 8,
+   "title": "Symphony No. 6 in D Minor, Op. 104: III. Poco vivace",
+   "durationMs": 221533,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 9,
+    "composer": "Jean Sibelius",
+    "work": "Symphony No. 6 in D Minor, Op. 104",
+    "part": "III. Poco vivace",
+    "performers": "Sir Colin Davis, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 9,
+   "title": "Symphony No. 6 in D Minor, Op. 104: IV. Allegro molto",
+   "durationMs": 529896,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 9,
+    "composer": "Jean Sibelius",
+    "work": "Symphony No. 6 in D Minor, Op. 104",
+    "part": "IV. Allegro molto",
+    "performers": "London Symphony Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 10,
+   "title": "Kullervo, Op. 7: I. Introduction",
+   "durationMs": 860933,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 10,
+    "composer": "Jean Sibelius",
+    "work": "Kullervo, Op. 7",
+    "part": "I. Introduction",
+    "performers": "Sir Colin Davis, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 11,
+   "title": "Kullervo, Op. 7: II. Kullervo's Youth",
+   "durationMs": 844133,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 10,
+    "composer": "Jean Sibelius",
+    "work": "Kullervo, Op. 7",
+    "part": "II. Kullervo’s Youth",
+    "performers": "London Symphony Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 12,
+   "title": "Kullervo, Op. 7: III. Kullervo And His Sister",
+   "durationMs": 1402867,
+   "artist": "London Symphony Orchestra, London Symphony Chorus, Sir Colin Davis, Monica Groop & Peter Mattei",
+   "apple": {
+    "block": 10,
+    "composer": "Jean Sibelius",
+    "work": "Kullervo, Op. 7",
+    "part": "III. Kullervo And His Sister",
+    "performers": "London Symphony Orchestra, Sir Colin Davis, Peter Mattei, Monica Groop, London Symphony Chorus"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 13,
+   "title": "Kullervo, Op. 7: IV. Kullervo Goes to Battle",
+   "durationMs": 617520,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 10,
+    "composer": "Jean Sibelius",
+    "work": "Kullervo, Op. 7",
+    "part": "IV. Kullervo Goes to Battle",
+    "performers": "London Symphony Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 14,
+   "title": "Kullervo, Op. 7: V. Kullervo's Death",
+   "durationMs": 586631,
+   "artist": "London Symphony Orchestra, London Symphony Chorus & Sir Colin Davis",
+   "apple": {
+    "block": 10,
+    "composer": "Jean Sibelius",
+    "work": "Kullervo, Op. 7",
+    "part": "V. Kullervo's Death",
+    "performers": "Sir Colin Davis, London Symphony Orchestra, London Symphony Chorus"
+   }
+  }
+ ]
+}

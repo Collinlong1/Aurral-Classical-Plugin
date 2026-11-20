@@ -1,0 +1,386 @@
+{
+ "id": "1452556367",
+ "category": "choral sacred",
+ "title": "Bach: Mass in B Minor, BWV 232",
+ "artist": "English Baroque Soloists, Monteverdi Choir & John Eliot Gardiner",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Mass in B Minor, BWV 232: Kyrie eleison",
+   "durationMs": 568960,
+   "artist": "Nancy Argenta, English Baroque Soloists, John Eliot Gardiner, Monteverdi Choir, Mary Nichols, Ashley Stafford & Wynford Evans",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Kyrie eleison",
+    "performers": "Mary Nichols, Nancy Argenta, John Eliot Gardiner, Ashley Stafford, Wynford Evans, Monteverdi Choir, English Baroque Soloists"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Mass in B Minor, BWV 232: Christe eleison",
+   "durationMs": 292333,
+   "artist": "Lynne Dawson, John Eliot Gardiner, English Baroque Soloists & Carol Hall",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Christe eleison",
+    "performers": "Lynne Dawson, John Eliot Gardiner, Carol Hall, English Baroque Soloists"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Mass in B Minor, BWV 232: Kyrie eleison",
+   "durationMs": 209533,
+   "artist": "English Baroque Soloists, John Eliot Gardiner & Monteverdi Choir",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Kyrie eleison",
+    "performers": "Monteverdi Choir, English Baroque Soloists, John Eliot Gardiner"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Mass in B Minor, BWV 232: Gloria in excelsis Deo",
+   "durationMs": 103173,
+   "artist": "English Baroque Soloists, John Eliot Gardiner & Monteverdi Choir",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Gloria in excelsis Deo",
+    "performers": "John Eliot Gardiner, English Baroque Soloists, Monteverdi Choir"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Mass in B Minor, BWV 232: Et in terra pax",
+   "durationMs": 240560,
+   "artist": "Nancy Argenta, John Eliot Gardiner, English Baroque Soloists, Jane Fairfield, Monteverdi Choir, Jean Knibbs, Collin Patrick, Ashley Stafford, Andrew Murgatroyd, Lloyd Morgan & Stephen Varcoe",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Et in terra pax",
+    "performers": "Ashley Stafford, Stephen Varcoe, English Baroque Soloists, Monteverdi Choir, Andrew Murgatroyd, Nancy Argenta, Lloyd Morgan, John Eliot Gardiner, Jean Knibbs, Jane Fairfield, Collin Patrick"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Mass in B Minor, BWV 232: Laudamus te",
+   "durationMs": 232853,
+   "artist": "Nancy Argenta, John Eliot Gardiner, English Baroque Soloists & Elizabeth Wilcock",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Laudamus te",
+    "performers": "Nancy Argenta, John Eliot Gardiner, Elizabeth Wilcock, English Baroque Soloists"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Mass in B Minor, BWV 232: Gratias agimus tibi",
+   "durationMs": 180907,
+   "artist": "English Baroque Soloists, John Eliot Gardiner & Monteverdi Choir",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Gratias agimus tibi",
+    "performers": "English Baroque Soloists, Monteverdi Choir, John Eliot Gardiner"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Mass in B Minor, BWV 232: Domine Deus",
+   "durationMs": 317933,
+   "artist": "Nancy Argenta, John Eliot Gardiner, English Baroque Soloists, Howard Milner & Lisa Beznosiuk",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Domine Deus",
+    "performers": "Howard Milner, Nancy Argenta, Lisa Beznosiuk, John Eliot Gardiner, English Baroque Soloists"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Mass in B Minor, BWV 232: Qui tollis peccata mundi",
+   "durationMs": 199200,
+   "artist": "English Baroque Soloists, John Eliot Gardiner & Monteverdi Choir",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Qui tollis peccata mundi",
+    "performers": "English Baroque Soloists, Monteverdi Choir, John Eliot Gardiner"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Mass in B Minor, BWV 232: Qui sedes ad dexteram Patris",
+   "durationMs": 263533,
+   "artist": "John Eliot Gardiner, English Baroque Soloists, Michael Chance & Sophia McKenna",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Qui sedes ad dexteram Patris",
+    "performers": "John Eliot Gardiner, Sophia McKenna, Michael Chance, English Baroque Soloists"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Mass in B Minor, BWV 232: Quoniam tu solus sanctus",
+   "durationMs": 263893,
+   "artist": "Stephen Varcoe, John Eliot Gardiner, English Baroque Soloists & Michael Thompson",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Quoniam tu solus sanctus",
+    "performers": "Stephen Varcoe, John Eliot Gardiner, English Baroque Soloists, Michael Thompson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Mass in B Minor, BWV 232: Cum Sancto Spiritu",
+   "durationMs": 227667,
+   "artist": "English Baroque Soloists, Stephen Varcoe, John Eliot Gardiner & Monteverdi Choir",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Cum Sancto Spiritu",
+    "performers": "Stephen Varcoe, Monteverdi Choir, English Baroque Soloists, John Eliot Gardiner"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 1,
+   "title": "Mass in B Minor, BWV 232: Credo in unum Deum",
+   "durationMs": 115227,
+   "artist": "English Baroque Soloists, John Eliot Gardiner & Monteverdi Choir",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Credo in unum Deum",
+    "performers": "Monteverdi Choir, John Eliot Gardiner, English Baroque Soloists"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 2,
+   "title": "Mass in B Minor, BWV 232: Patrem omnipotentem",
+   "durationMs": 112907,
+   "artist": "English Baroque Soloists, John Eliot Gardiner & Monteverdi Choir",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Patrem omnipotentem",
+    "performers": "English Baroque Soloists, Monteverdi Choir, John Eliot Gardiner"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 3,
+   "title": "Mass in B Minor, BWV 232: Et in unum Dominum",
+   "durationMs": 250720,
+   "artist": "Patrizia Kwella, John Eliot Gardiner, English Baroque Soloists & Mary Nichols",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Et in unum Dominum",
+    "performers": "English Baroque Soloists, Mary Nichols, John Eliot Gardiner, Patrizia Kwella"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 4,
+   "title": "Mass in B Minor, BWV 232: Et incarnatus est",
+   "durationMs": 205333,
+   "artist": "English Baroque Soloists, John Eliot Gardiner & Monteverdi Choir",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Et incarnatus est",
+    "performers": "John Eliot Gardiner, English Baroque Soloists, Monteverdi Choir"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 5,
+   "title": "Mass in B Minor, BWV 232: Crucifixus",
+   "durationMs": 186533,
+   "artist": "Carol Hall, John Eliot Gardiner, English Baroque Soloists, Michael Chance, Monteverdi Choir, Wynford Evans & Stephen Varcoe",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Crucifixus",
+    "performers": "John Eliot Gardiner, Carol Hall, English Baroque Soloists, Monteverdi Choir, Stephen Varcoe, Wynford Evans, Michael Chance"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 6,
+   "title": "Mass in B Minor, BWV 232: Et resurrexit",
+   "durationMs": 227160,
+   "artist": "English Baroque Soloists, John Eliot Gardiner & Monteverdi Choir",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Et resurrexit",
+    "performers": "Monteverdi Choir, John Eliot Gardiner, English Baroque Soloists"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 7,
+   "title": "Mass in B Minor, BWV 232: Et in Spiritum Sanctum",
+   "durationMs": 328827,
+   "artist": "Lloyd Morgan, John Eliot Gardiner, English Baroque Soloists, Sophia McKenna & Valerie Darke",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Et in Spiritum Sanctum",
+    "performers": "Lloyd Morgan, John Eliot Gardiner, Sophia McKenna, Valerie Darke, English Baroque Soloists"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 8,
+   "title": "Mass in B Minor, BWV 232: Confiteor unum baptisma",
+   "durationMs": 151760,
+   "artist": "English Baroque Soloists, John Eliot Gardiner & Monteverdi Choir",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Confiteor unum baptisma",
+    "performers": "Monteverdi Choir, English Baroque Soloists, John Eliot Gardiner"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 9,
+   "title": "Mass in B Minor, BWV 232: Et expecto resurrectionem",
+   "durationMs": 213800,
+   "artist": "English Baroque Soloists, John Eliot Gardiner & Monteverdi Choir",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Et expecto resurrectionem",
+    "performers": "Monteverdi Choir, English Baroque Soloists, John Eliot Gardiner"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 10,
+   "title": "Mass in B Minor, BWV 232: Sanctus",
+   "durationMs": 324227,
+   "artist": "English Baroque Soloists, John Eliot Gardiner & Monteverdi Choir",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Sanctus",
+    "performers": "John Eliot Gardiner, English Baroque Soloists, Monteverdi Choir"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 11,
+   "title": "Mass in B Minor, BWV 232: Osanna in excelsis",
+   "durationMs": 150827,
+   "artist": "English Baroque Soloists, John Eliot Gardiner & Monteverdi Choir",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Osanna in excelsis",
+    "performers": "English Baroque Soloists, Monteverdi Choir, John Eliot Gardiner"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 12,
+   "title": "Mass in B Minor, BWV 232: Benedictus",
+   "durationMs": 287360,
+   "artist": "John Eliot Gardiner, English Baroque Soloists, Wynford Evans & Lisa Beznosiuk",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Benedictus",
+    "performers": "John Eliot Gardiner, Wynford Evans, Lisa Beznosiuk, English Baroque Soloists"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 13,
+   "title": "Mass in B Minor, BWV 232: Osanna in excelsis II",
+   "durationMs": 153000,
+   "artist": "English Baroque Soloists, John Eliot Gardiner & Monteverdi Choir",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Osanna in excelsis II",
+    "performers": "John Eliot Gardiner, English Baroque Soloists, Monteverdi Choir"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 14,
+   "title": "Mass in B Minor, BWV 232: Agnus Dei",
+   "durationMs": 345800,
+   "artist": "Michael Chance, John Eliot Gardiner & English Baroque Soloists",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Agnus Dei",
+    "performers": "Michael Chance, John Eliot Gardiner, English Baroque Soloists"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 15,
+   "title": "Mass in B Minor, BWV 232: Dona nobis pacem",
+   "durationMs": 199640,
+   "artist": "English Baroque Soloists, John Eliot Gardiner & Monteverdi Choir",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Dona nobis pacem",
+    "performers": "John Eliot Gardiner, Monteverdi Choir, English Baroque Soloists"
+   }
+  }
+ ]
+}

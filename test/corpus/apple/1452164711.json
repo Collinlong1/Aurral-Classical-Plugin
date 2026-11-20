@@ -1,0 +1,92 @@
+{
+ "id": "1452164711",
+ "category": "orchestral",
+ "title": "Smetana: Má Vlast",
+ "artist": "Vienna Philharmonic & James Levine",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Má Vlast (My Country): 1. Vysehrad (The High Castle)",
+   "durationMs": 939107,
+   "artist": "Vienna Philharmonic & James Levine",
+   "apple": {
+    "block": 1,
+    "composer": "Bedřich Smetana",
+    "work": "Má Vlast, JB 1:112, T 110, T 111, T 113, T 114, T 120, T 121 · “My Homeland”",
+    "part": "1. Vysehrad (The High Castle)",
+    "performers": "Vienna Philharmonic, James Levine"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Má Vlast (My Country): 2. Vltava (The Moldau)",
+   "durationMs": 727000,
+   "artist": "Vienna Philharmonic & James Levine",
+   "apple": {
+    "block": 1,
+    "composer": "Bedřich Smetana",
+    "work": "Má Vlast, JB 1:112, T 110, T 111, T 113, T 114, T 120, T 121 · “My Homeland”",
+    "part": "2. Vltava (The Moldau)",
+    "performers": "James Levine, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Má Vlast (My Country): 3. Sarka",
+   "durationMs": 573000,
+   "artist": "James Levine & Vienna Philharmonic",
+   "apple": {
+    "block": 1,
+    "composer": "Bedřich Smetana",
+    "work": "Má Vlast, JB 1:112, T 110, T 111, T 113, T 114, T 120, T 121 · “My Homeland”",
+    "part": "3. Sarka",
+    "performers": "Vienna Philharmonic, James Levine"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Má Vlast (My Country): 4. Z Ceskych Luhu a Haju (From Bohemia's Meadows and Forests)",
+   "durationMs": 735493,
+   "artist": "Vienna Philharmonic & James Levine",
+   "apple": {
+    "block": 1,
+    "composer": "Bedřich Smetana",
+    "work": "Má Vlast, JB 1:112, T 110, T 111, T 113, T 114, T 120, T 121 · “My Homeland”",
+    "part": "4. Z Ceskych Luhu a Haju (From Bohemia's Meadows and Forests)",
+    "performers": "Vienna Philharmonic, James Levine"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Má Vlast (My Country): 5. Tábor",
+   "durationMs": 749840,
+   "artist": "James Levine & Vienna Philharmonic",
+   "apple": {
+    "block": 1,
+    "composer": "Bedřich Smetana",
+    "work": "Má Vlast, JB 1:112, T 110, T 111, T 113, T 114, T 120, T 121 · “My Homeland”",
+    "part": "5. Tábor",
+    "performers": "James Levine, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Má Vlast (My Country): 6. Blanik",
+   "durationMs": 864000,
+   "artist": "James Levine & Vienna Philharmonic",
+   "apple": {
+    "block": 1,
+    "composer": "Bedřich Smetana",
+    "work": "Má Vlast, JB 1:112, T 110, T 111, T 113, T 114, T 120, T 121 · “My Homeland”",
+    "part": "6. Blanik",
+    "performers": "Vienna Philharmonic, James Levine"
+   }
+  }
+ ]
+}

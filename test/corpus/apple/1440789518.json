@@ -1,0 +1,134 @@
+{
+ "id": "1440789518",
+ "category": "orchestral",
+ "title": "Ravel: Bolero",
+ "artist": "Boston Symphony Orchestra & Seiji Ozawa",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Boléro",
+   "durationMs": 901453,
+   "artist": "Boston Symphony Orchestra & Seiji Ozawa",
+   "apple": {
+    "block": 1,
+    "composer": "Maurice Ravel",
+    "work": "Boléro, M. 81",
+    "part": "Boléro",
+    "performers": "Boston Symphony Orchestra, Seiji Ozawa"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Pavane pour une infante défunte",
+   "durationMs": 374973,
+   "artist": "Boston Symphony Orchestra, Seiji Ozawa & Charles Kavaloski",
+   "apple": {
+    "block": 2,
+    "composer": "Maurice Ravel",
+    "work": "Pavane pour une infante défunte, M. 19, M. 19a · “Pavane for a Dead Princess”",
+    "part": "Pavane pour une infante défunte",
+    "performers": "Seiji Ozawa, Charles Kavaloski, Boston Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Une barque sur l'océan",
+   "durationMs": 461867,
+   "artist": "Boston Symphony Orchestra & Seiji Ozawa",
+   "apple": {
+    "block": 3,
+    "composer": "Maurice Ravel",
+    "work": "Miroirs, M. 43 · “Mirrors”",
+    "part": "Une barque sur l'océan",
+    "performers": "Seiji Ozawa, Boston Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Menuet Antique - for Orchestra",
+   "durationMs": 381200,
+   "artist": "Boston Symphony Orchestra & Seiji Ozawa",
+   "apple": {
+    "block": 4,
+    "composer": "Maurice Ravel",
+    "work": "Menuet antique, M. 7",
+    "part": "Menuet Antique - for Orchestra",
+    "performers": "Boston Symphony Orchestra, Seiji Ozawa"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Rapsodie espagnole: I. Prélude à a nuit",
+   "durationMs": 234067,
+   "artist": "Boston Symphony Orchestra & Seiji Ozawa",
+   "apple": {
+    "block": 5,
+    "composer": "Maurice Ravel",
+    "work": "Rapsodie Espagnole, M. 54",
+    "part": "I. Prélude à a nuit",
+    "performers": "Seiji Ozawa, Boston Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Rapsodie espagnole: II. Malagueña",
+   "durationMs": 125000,
+   "artist": "Boston Symphony Orchestra & Seiji Ozawa",
+   "apple": {
+    "block": 5,
+    "composer": "Maurice Ravel",
+    "work": "Rapsodie Espagnole, M. 54",
+    "part": "II. Malagueña",
+    "performers": "Seiji Ozawa, Boston Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Rapsodie espagnole: III. Habanera",
+   "durationMs": 154000,
+   "artist": "Boston Symphony Orchestra & Seiji Ozawa",
+   "apple": {
+    "block": 5,
+    "composer": "Maurice Ravel",
+    "work": "Rapsodie Espagnole, M. 54",
+    "part": "III. Habanera",
+    "performers": "Boston Symphony Orchestra, Seiji Ozawa"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Rapsodie espagnole: IV. Feria",
+   "durationMs": 373533,
+   "artist": "Boston Symphony Orchestra & Seiji Ozawa",
+   "apple": {
+    "block": 5,
+    "composer": "Maurice Ravel",
+    "work": "Rapsodie Espagnole, M. 54",
+    "part": "IV. Feria",
+    "performers": "Boston Symphony Orchestra, Seiji Ozawa"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "La Valse",
+   "durationMs": 720253,
+   "artist": "Boston Symphony Orchestra & Seiji Ozawa",
+   "apple": {
+    "block": 6,
+    "composer": "Maurice Ravel",
+    "work": "La valse, M. 72",
+    "part": "La Valse",
+    "performers": "Seiji Ozawa, Boston Symphony Orchestra"
+   }
+  }
+ ]
+}

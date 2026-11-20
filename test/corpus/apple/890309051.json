@@ -1,0 +1,554 @@
+{
+ "id": "890309051",
+ "category": "opera",
+ "title": "Bizet: Carmen (Remastered 2014)",
+ "artist": "Maria Callas, Robert Massard, Choeurs René Duclos, Nicolai Gedda, Paris Opera Orchestra, Andréa Guiot & Georges Prêtre",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Carmen: Prelude (Remastered 2014)",
+   "durationMs": 135933,
+   "artist": "Georges Prêtre & Paris Opera Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Prelude (Remastered 2014)",
+    "performers": "Georges Prêtre, Paris Opera Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Carmen, Act I: Sur la place (Chorus, Moralès, Micaela) [Remastered 2014]",
+   "durationMs": 442960,
+   "artist": "Claude Cales, Choeurs René Duclos, Georges Prêtre, Paris Opera Orchestra & Andréa Guiot",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Sur la place (Chorus, Moralès, Micaela) [Remastered 2014]",
+    "performers": "Andréa Guiot, Claude Cales, Choeurs René Duclos, Georges Prêtre, Paris Opera Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Carmen, Act I: Avec la garde montante (Children's Chorus, Moralès, José) [Remastered 2014]",
+   "durationMs": 234453,
+   "artist": "Claude Cales, Choeurs d'enfants Jean Pesneaud, Georges Prêtre, Paris Opera Orchestra & Nicolai Gedda",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Avec la garde montante (Children's Chorus, Moralès, José) [Remastered 2014]",
+    "performers": "Georges Prêtre, Paris Opera Orchestra, Choeurs d'enfants Jean Pesneaud, Nicolai Gedda, Claude Cales"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Carmen, Act I: C'est bien là, n'est-ce pas? (José, Zuñiga) [Remastered 2014]",
+   "durationMs": 73800,
+   "artist": "Jacques Mars, Georges Prêtre, Paris Opera Orchestra & Nicolai Gedda",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "C'est bien là, n'est-ce pas? (José, Zuñiga) [Remastered 2014]",
+    "performers": "Jacques Mars, Georges Prêtre, Paris Opera Orchestra, Nicolai Gedda"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Carmen, Act I: La cloche a sonné - Dans l'air (Chorus) [Remastered 2014]",
+   "durationMs": 274240,
+   "artist": "Choeurs René Duclos, Choeurs d'enfants Jean Pesneaud, Georges Prêtre & Paris Opera Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "La cloche a sonné....Dans l'air (Chorus) [Remastered 2014]",
+    "performers": "Choeurs d'enfants Jean Pesneaud, Choeurs René Duclos, Georges Prêtre, Paris Opera Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Carmen, Act I: L'amour est un oiseau rebelle (Carmen, Chorus) [Habanera] [Remastered 2014]",
+   "durationMs": 258160,
+   "artist": "Choeurs René Duclos, Georges Prêtre, Paris Opera Orchestra & Maria Callas",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "L'amour est un oiseau rebelle (Carmen, Chorus) [Habanera] [Remastered 2014]",
+    "performers": "Maria Callas, Choeurs René Duclos, Georges Prêtre, Paris Opera Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Carmen, Act I: Carmen! sur tes pas (Chorus, Carmen, José) [Remastered 2014]",
+   "durationMs": 89400,
+   "artist": "Choeurs René Duclos, Choeurs d'enfants Jean Pesneaud, Georges Prêtre, Paris Opera Orchestra, Maria Callas & Nicolai Gedda",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Carmen! sur tes pas (Chorus, Carmen, José) [Remastered 2014]",
+    "performers": "Georges Prêtre, Paris Opera Orchestra, Maria Callas"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Carmen, Act I: Quels regards! Quelle effronterie! (Carmen, José) [Remastered 2014]",
+   "durationMs": 55560,
+   "artist": "Georges Prêtre, Paris Opera Orchestra, Maria Callas & Nicolai Gedda",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Quels regardes! Quelle effronterie! (Carmen, José) [Remastered 2014]",
+    "performers": "Nicolai Gedda, Maria Callas, Georges Prêtre, Paris Opera Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Carmen, Act I: Parle-moi de ma mère! (José, Micaela) [Remastered 2014]",
+   "durationMs": 536920,
+   "artist": "Georges Prêtre, Paris Opera Orchestra, Andréa Guiot & Nicolai Gedda",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Parle-moi de ma mère!\" (José, Micaela) [Remastered 2014]",
+    "performers": "Georges Prêtre, Paris Opera Orchestra, Andréa Guiot, Nicolai Gedda"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Carmen, Act I: Reste là, maintenant, pendant que je lirai (José, Micaela) [Remastered 2014]",
+   "durationMs": 91813,
+   "artist": "Georges Prêtre, Paris Opera Orchestra, Andréa Guiot & Nicolai Gedda",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Reste là, maintenant, pendant que je lirai (José, Micaela) [Remastered 2014]",
+    "performers": "Georges Prêtre, Paris Opera Orchestra, Andréa Guiot, Nicolai Gedda"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Carmen, Act I: Que se passe-t-il donc là-bas?... Au secours! (Zuñiga, Chorus) [Remastered 2014]",
+   "durationMs": 180373,
+   "artist": "Jacques Mars, Choeurs René Duclos, Georges Prêtre & Paris Opera Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Que se passe-t-il donc là-bas?...Au secours! (Zuñiga, Chorus) [Remastered 2014]",
+    "performers": "Choeurs René Duclos, Jacques Mars, Georges Prêtre, Paris Opera Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Carmen, Act I: Mon officier, c'était une querelle (José, Zuñiga, Carmen) [Remastered 2014]",
+   "durationMs": 224453,
+   "artist": "Jacques Mars, Georges Prêtre, Paris Opera Orchestra, Maria Callas & Nicolai Gedda",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Mon officier, c'était une querelle (José, Zuñiga, Carmen) [Remastered 2014]",
+    "performers": "Jacques Mars, Nicolai Gedda, Maria Callas, Georges Prêtre, Paris Opera Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Carmen, Act I: Près des remparts de Séville (Carmen, José) [Remastered 2014]",
+   "durationMs": 272027,
+   "artist": "Georges Prêtre, Paris Opera Orchestra, Maria Callas & Nicolai Gedda",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Près des ramparts de Séville (Carmen, José) [Remastered 2014]",
+    "performers": "Georges Prêtre, Paris Opera Orchestra, Nicolai Gedda, Maria Callas"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Carmen, Act I: Voici l'ordre; partez (Zuñiga, Carmen) [Remastered 2014]",
+   "durationMs": 126133,
+   "artist": "Jacques Mars, Georges Prêtre, Paris Opera Orchestra & Maria Callas",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Voici l'ordre; partez (Zuñiga, Carmen) [Remastered 2014]",
+    "performers": "Jacques Mars, Georges Prêtre, Paris Opera Orchestra, Maria Callas"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Carmen, Act I: Entr'acte (Remastered 2014)",
+   "durationMs": 101893,
+   "artist": "Georges Prêtre & Paris Opera Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Entr'acte (Remastered 2014)",
+    "performers": "Georges Prêtre, Paris Opera Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Carmen, Act II: Les tringles des sistres tintaient (Carmen, Frasquita, Mercédès) [Remastered 2014]",
+   "durationMs": 257920,
+   "artist": "Georges Prêtre, Jane Berbie, Paris Opera Orchestra, Maria Callas & Nadine Sautereau",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Les tringles des sistres tintaient (Camen, Frasquita, Mercédès) [Remastered 2014]",
+    "performers": "Maria Callas, Nadine Sautereau, Georges Prêtre, Paris Opera Orchestra, Jane Berbié"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Carmen, Act II: Messieurs, Pastia me dit (Frasquita, Zuñiga, Camen, Mercédès) [Remastered 2014]",
+   "durationMs": 57027,
+   "artist": "Georges Prêtre, Jane Berbie, Paris Opera Orchestra, Maria Callas & Nadine Sautereau",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Messieurs, Pastia me dit (Frasquita, Zuñiga, Camen, Mercédès) [Remastered 2014]",
+    "performers": "Georges Prêtre, Paris Opera Orchestra, Maria Callas, Nadine Sautereau, Jane Berbié"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Carmen, Act II: Vivat! vivat le Toréro! (Chorus, Zuñiga) [Remastered 2014]",
+   "durationMs": 69880,
+   "artist": "Choeurs René Duclos, Georges Prêtre & Paris Opera Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Vivat! vivat le Toréro! (Chorus, Zuñiga) [Remastered 2014]",
+    "performers": "Georges Prêtre, Paris Opera Orchestra, Choeurs René Duclos"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "Carmen, Act II: Votre toast, je peux vous le rendre (Escamillo, Chorus) [Remastered 2014]",
+   "durationMs": 288693,
+   "artist": "Choeurs René Duclos, Georges Prêtre & Paris Opera Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Votre toast, je peux vous le rendre (Escamillo, Chorus) [Remastered 2014]",
+    "performers": "Choeurs René Duclos, Georges Prêtre, Paris Opera Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "Carmen, Act II: La belle, un mot (Escamillo, Carmen, Zuñiga) [Remastered 2014]",
+   "durationMs": 94133,
+   "artist": "Robert Massard, Jacques Mars, Georges Prêtre, Paris Opera Orchestra & Maria Callas",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "La belle, un mot (Escamillo, Carmen, Zuñiga) [Remastered 2014]",
+    "performers": "Robert Massard, Georges Prêtre, Paris Opera Orchestra, Maria Callas, Jacques Mars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "Carmen, Act II: Eh bien! vite, quelles nouvelles? - Nous avons en tête un affaire (Carmen, Frasquita, Mercédès, Dancaïre, Remendado, Chorus) [Remastered 2014]",
+   "durationMs": 284116,
+   "artist": "Jean-Paul Vauquelin, Choeurs René Duclos, Georges Prêtre, Jane Berbie, Paris Opera Orchestra, Maria Callas, Nadine Sautereau & Jacques Pruvost",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Eh bien! vite, quelles nouvelles?.....Nous avons en tête un affaire (Carmen, Frasquita, Mercédès, Dancaïre, Remendado, Chorus) [Remastered 2014]",
+    "performers": "Georges Prêtre, Paris Opera Orchestra, Choeurs René Duclos, Nadine Sautereau, Maria Callas, Jean-Paul Vauquelin, Jacques Pruvost, Jane Berbié"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "Carmen, Act II: Mais qui donc attends-tu? (Dancaïre, Carmen, Remendado) [Remastered 2014]",
+   "durationMs": 24885,
+   "artist": "Jean-Paul Vauquelin, Georges Prêtre, Paris Opera Orchestra, Maria Callas & Jacques Pruvost",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Mais qui donc attends-tu? (Dancaïre, Carmen, Remendado) [Remastered 2014]",
+    "performers": "Georges Prêtre, Paris Opera Orchestra, Jean-Paul Vauquelin, Maria Callas, Jacques Pruvost"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 23,
+   "title": "Carmen, Act II: Halte là! (José, Carmen, Frasquita, Mercédès, Dancaïre, Remendado) [Remastered 2014]",
+   "durationMs": 92413,
+   "artist": "Jean-Paul Vauquelin, Georges Prêtre, Jane Berbie, Paris Opera Orchestra, Maria Callas, Nadine Sautereau & Nicolai Gedda",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Halte là! (José, Carmen, Frasquita, Mercédès, Dancaïre, Remendado) [Remastered 2014]",
+    "performers": "Georges Prêtre, Paris Opera Orchestra, Jean-Paul Vauquelin, Nicolai Gedda, Maria Callas, Nadine Sautereau, Jacques Pruvost, Jane Berbié"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 24,
+   "title": "Carmen, Act II: Enfin c'est toi! - Tout doux, Monsieur (Carmen, José) [Remastered 2014]",
+   "durationMs": 351973,
+   "artist": "Georges Prêtre, Paris Opera Orchestra, Maria Callas & Nicolai Gedda",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Enfin c'est toi!...Tout doux, Monsieur (Carmen, José) [Remastered 2014]",
+    "performers": "Georges Prêtre, Paris Opera Orchestra, Nicolai Gedda, Maria Callas"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 25,
+   "title": "Carmen, Act II: La fleur que tu m'avais jetée - Non, tu ne m'aimes pas (Carmen, José) [Remastered 2014]",
+   "durationMs": 468453,
+   "artist": "Georges Prêtre, Paris Opera Orchestra, Maria Callas & Nicolai Gedda",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "La fleur que tu m'avais jetée...Non, tu ne m'aimes pas (Carmen, José)",
+    "performers": "Nicolai Gedda, Maria Callas, Georges Prêtre, Paris Opera Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 26,
+   "title": "Carmen, Act II: Holà Carmen! (Zuñiga, José, Carmen, Dancaïre, Remendado) [Remastered 2014]",
+   "durationMs": 298853,
+   "artist": "Jean-Paul Vauquelin, Maurice Maievski, Jacques Mars, Georges Prêtre, Paris Opera Orchestra, Maria Callas & Nicolai Gedda",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Holà Carmen! (Zuñiga, José, Carmen, Dancaïre, Remendado) [Remastered 2014]",
+    "performers": "Maurice Maievski, Jacques Mars, Georges Prêtre, Paris Opera Orchestra, Nicolai Gedda, Maria Callas, Jean-Paul Vauquelin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 27,
+   "title": "Carmen, Act II: Entr'acte (Remastered 2014)",
+   "durationMs": 179987,
+   "artist": "Georges Prêtre & Paris Opera Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Entr'acte (Remastered 2014)",
+    "performers": "Georges Prêtre, Paris Opera Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 28,
+   "title": "Carmen, Act III: Ecoute, écoute, compagnon, écoute (Chorus, Dancaïre, Remendado, José, Carmen, Mercédès, Frasquita) [Remastered 2014]",
+   "durationMs": 241840,
+   "artist": "Jean-Paul Vauquelin, Choeurs René Duclos, Georges Prêtre, Jane Berbie, Paris Opera Orchestra, Maria Callas, Nadine Sautereau, Maurice Maievski & Nicolai Gedda",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Ecoute, écoute, compagnon, écoute (Chorus, Dancaïre, Remendado, José, Carmen, Mercédès, Frasquita) [Remastered 2014]",
+    "performers": "Maurice Maievski, Jean-Paul Vauquelin, Nadine Sautereau, Choeurs René Duclos, Nicolai Gedda, Maria Callas, Georges Prêtre, Paris Opera Orchestra, Jane Berbié"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 29,
+   "title": "Carmen, Act III: Reposons-nous une heure ici, mes camarades (Dancaïre, Carmen, José) [Remastered 2014]",
+   "durationMs": 135800,
+   "artist": "Jean-Paul Vauquelin, Georges Prêtre, Paris Opera Orchestra, Maria Callas & Nicolai Gedda",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Reposons-nous une heure ici, mes camarades (Dancaïre, Carmen, José) [Remastered 2014]",
+    "performers": "Jean-Paul Vauquelin, Nicolai Gedda, Maria Callas, Georges Prêtre, Paris Opera Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 30,
+   "title": "Carmen, Act III: Mêlons! Coupons! (Frasquita, Mercédès, Carmen) [Remastered 2014]",
+   "durationMs": 411027,
+   "artist": "Georges Prêtre, Jane Berbie, Paris Opera Orchestra, Maria Callas & Nadine Sautereau",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Mêlons! Coupons! (Frasquita, Mercédès, Carmen) [Remastered 2014]",
+    "performers": "Nadine Sautereau, Georges Prêtre, Paris Opera Orchestra, Maria Callas, Jane Berbié"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 31,
+   "title": "Carmen, Act III: Eh bien? (Carmen,  Dancaïre, Frasquita) [Remastered 2014]",
+   "durationMs": 37827,
+   "artist": "Jean-Paul Vauquelin, Georges Prêtre, Paris Opera Orchestra, Maria Callas & Nadine Sautereau",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "\"Eh bien?\" (Carmen, Dancaïre, Frasquita) [Remastered 2014]",
+    "performers": "Jean-Paul Vauquelin, Georges Prêtre, Paris Opera Orchestra, Nadine Sautereau, Maria Callas"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 32,
+   "title": "Carmen, Act III: Quant au douanier, c'est notre affaire (Carmen, Mercédès, Frasquita) [Remastered 2014]",
+   "durationMs": 169347,
+   "artist": "Georges Prêtre, Jane Berbie, Paris Opera Orchestra, Maria Callas & Nadine Sautereau",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Quant au douanier, c'est notre affaire (Carmen, Mercédès, Frasquita) [Remastered 2014]",
+    "performers": "Georges Prêtre, Paris Opera Orchestra, Maria Callas, Nadine Sautereau, Jane Berbié"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 33,
+   "title": "Carmen, Act III: C'est des contrebandiers - Je dis, que rien ne m'épouvante (Micaëla) [Remastered 2014]",
+   "durationMs": 349573,
+   "artist": "Georges Prêtre, Paris Opera Orchestra & Andréa Guiot",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "C'est des contrebandiers....Je dis, que rien ne m'épouvante (Micaëla) [Remastered 2014]",
+    "performers": "Andréa Guiot, Georges Prêtre, Paris Opera Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 34,
+   "title": "Carmen, Act III: Je ne me trompe pas (Micaëla) [Remastered 2014]",
+   "durationMs": 28293,
+   "artist": "Georges Prêtre, Paris Opera Orchestra & Andréa Guiot",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Je ne me trompe pas (Micaëla) [Remastered 2014]",
+    "performers": "Andréa Guiot, Georges Prêtre, Paris Opera Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 35,
+   "title": "Carmen, Act III: Quelques lignes plus bas (Escamillo, José, Carmen, Dancaïre, Micaëla, Frasquita, Mercédès, Remendado, Chorus) [Remastered 2014]",
+   "durationMs": 691960,
+   "artist": "Jean-Paul Vauquelin, Robert Massard, Choeurs René Duclos, Georges Prêtre, Jane Berbie, Paris Opera Orchestra, Andréa Guiot, Maria Callas, Nadine Sautereau, Jacques Pruvost & Nicolai Gedda",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Quelques lignes plus bas (Escamillo, José, Carmen, Dancaïre, Micaëla, Frasquita, Mercédès, Remendado, Chorus) [Remastered 2014]",
+    "performers": "Jacques Pruvost, Jean-Paul Vauquelin, Robert Massard, Georges Prêtre, Paris Opera Orchestra, Nadine Sautereau, Nicolai Gedda, Maria Callas, Choeurs René Duclos, Andréa Guiot, Jane Berbié"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 36,
+   "title": "Carmen, Act III: Entr'acte (Remastered 2014)",
+   "durationMs": 123653,
+   "artist": "Georges Prêtre & Paris Opera Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Entr'acte (Remastered 2014)",
+    "performers": "Georges Prêtre, Paris Opera Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 37,
+   "title": "Carmen, Act IV: A deux cuartos! (Chorus, Zuñiga) [Remastered 2014]",
+   "durationMs": 115880,
+   "artist": "Jacques Mars, Choeurs René Duclos, Choeurs d'enfants Jean Pesneaud, Georges Prêtre & Paris Opera Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "A deux cuartos! (Chorus, Zuñiga) [Remastered 2014]",
+    "performers": "Georges Prêtre, Paris Opera Orchestra, Choeurs René Duclos, Choeurs d'enfants Jean Pesneaud, Jacques Mars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 38,
+   "title": "Carmen, Act IV: Les voici! voici la quadrille! (Chorus, Escamillo, Carmen, Frasquita) [Remastered 2014]",
+   "durationMs": 411733,
+   "artist": "Robert Massard, Choeurs René Duclos, Choeurs d'enfants Jean Pesneaud, Georges Prêtre, Paris Opera Orchestra, Maria Callas & Nadine Sautereau",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "Les voici! voici la quadrille! (Chorus, Escamillo, Carmen, Frasquita) [Remastered 2014]",
+    "performers": "Georges Prêtre, Paris Opera Orchestra, Nadine Sautereau, Maria Callas, Choeurs d'enfants Jean Pesneaud, Choeurs René Duclos, Robert Massard"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 39,
+   "title": "Carmen, Act IV: C'est toi! - Viva! viva! la course est belle! (Carmen, José, Chorus) [Remastered 2014]",
+   "durationMs": 528317,
+   "artist": "Choeurs René Duclos, Choeurs d'enfants Jean Pesneaud, Georges Prêtre, Paris Opera Orchestra, Maria Callas & Nicolai Gedda",
+   "apple": {
+    "block": 1,
+    "composer": "Georges Bizet",
+    "work": "Carmen, GB 9, WD 31",
+    "part": "C'est toi!...Viva! viva! la course est belle! (Carmen, José, Chorus) [Remastered 2014]",
+    "performers": "Georges Prêtre, Paris Opera Orchestra, Nicolai Gedda, Maria Callas, Choeurs René Duclos, Choeurs d'enfants Jean Pesneaud"
+   }
+  }
+ ]
+}

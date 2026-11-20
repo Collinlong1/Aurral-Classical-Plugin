@@ -1,0 +1,93 @@
+{
+ "id": "glenn-gould-goldberg-1981-rip",
+ "family": "classical-mistagged",
+ "title": "Bach: The Goldberg Variations",
+ "artist": "Glenn Gould",
+ "source": "early CD rip from a public disc database: no composer, genre 'Other'",
+ "expect": {
+  "album": "classical",
+  "note": "Pure classical album with poor tags; a miss here is a false negative."
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Aria",
+   "durationMs": 185000,
+   "artist": "Glenn Gould",
+   "composer": [],
+   "genres": [
+    "Other"
+   ],
+   "work": "",
+   "expect": "classical",
+   "scenarios": [
+    "classical-nonclassical-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Variatio 1 a 1 Clav.",
+   "durationMs": 73000,
+   "artist": "Glenn Gould",
+   "composer": [],
+   "genres": [
+    "Other"
+   ],
+   "work": "",
+   "expect": "classical",
+   "scenarios": [
+    "classical-nonclassical-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Variatio 2 a 1 Clav.",
+   "durationMs": 51000,
+   "artist": "Glenn Gould",
+   "composer": [],
+   "genres": [
+    "Other"
+   ],
+   "work": "",
+   "expect": "classical",
+   "scenarios": [
+    "classical-nonclassical-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Variatio 3 a 1 Clav. Canone all'Unisono",
+   "durationMs": 101000,
+   "artist": "Glenn Gould",
+   "composer": [],
+   "genres": [
+    "Other"
+   ],
+   "work": "",
+   "expect": "classical",
+   "scenarios": [
+    "classical-nonclassical-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 32,
+   "title": "Aria da capo",
+   "durationMs": 227000,
+   "artist": "Glenn Gould",
+   "composer": [],
+   "genres": [
+    "Other"
+   ],
+   "work": "",
+   "expect": "classical",
+   "scenarios": [
+    "classical-nonclassical-genre"
+   ]
+  }
+ ]
+}

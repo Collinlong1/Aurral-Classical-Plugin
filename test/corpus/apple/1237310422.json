@@ -1,0 +1,148 @@
+{
+ "id": "1237310422",
+ "category": "guitar harp other",
+ "title": "Harp Music ",
+ "artist": "Nicanor Zabaleta",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Fantasy, op. 35",
+   "durationMs": 498107,
+   "artist": "Nicanor Zabaleta",
+   "apple": {
+    "block": 1,
+    "composer": "Louis Spohr",
+    "work": "Fantasie in C Minor, Op. 35",
+    "part": "Fantasy, op. 35",
+    "performers": "Nicanor Zabaleta"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Three Romances",
+   "durationMs": 364333,
+   "artist": "Nicanor Zabaleta",
+   "apple": {
+    "block": 2,
+    "composer": "Parish Alvars",
+    "work": "Parish Alvars",
+    "part": "Three Romances",
+    "performers": "Nicanor Zabaleta"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Two Etudes",
+   "durationMs": 197067,
+   "artist": "Nicanor Zabaleta",
+   "apple": {
+    "block": 3,
+    "composer": "Dizi",
+    "work": "Dizi",
+    "part": "Two Etudes",
+    "performers": "Nicanor Zabaleta"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Nocturne",
+   "durationMs": 197067,
+   "artist": "Nicanor Zabaleta",
+   "apple": {
+    "block": 4,
+    "composer": "Mikhail Glinka",
+    "work": "Nocturne in E-Flat Major",
+    "part": "Nocturne",
+    "performers": "Nicanor Zabaleta"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Hachas & Pavane",
+   "durationMs": 189333,
+   "artist": "Nicanor Zabaleta",
+   "apple": {
+    "block": 5,
+    "composer": "Ruiz de Ribayaz",
+    "work": "Ruiz de Ribayaz",
+    "part": "Hachas & Pavane",
+    "performers": "Nicanor Zabaleta"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Seguidillas",
+   "durationMs": 100800,
+   "artist": "Nicanor Zabaleta",
+   "apple": {
+    "block": 6,
+    "composer": "Seguidillas",
+    "work": "Seguidillas",
+    "part": "Seguidillas",
+    "performers": "Nicanor Zabaleta"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Italian Song with Variations",
+   "durationMs": 173827,
+   "artist": "Nicanor Zabaleta",
+   "apple": {
+    "block": 7,
+    "composer": "de Huete",
+    "work": "de Huete",
+    "part": "Italian Song with Variations",
+    "performers": "Nicanor Zabaleta"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Tento",
+   "durationMs": 171107,
+   "artist": "Nicanor Zabaleta",
+   "apple": {
+    "block": 8,
+    "composer": "Rodrigues Coelho",
+    "work": "Rodrigues Coelho",
+    "part": "Tento",
+    "performers": "Nicanor Zabaleta"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Sonatina",
+   "durationMs": 407467,
+   "artist": "Nicanor Zabaleta",
+   "apple": {
+    "block": 9,
+    "composer": "F. J. Naderman",
+    "work": "F. J. Naderman",
+    "part": "Sonatina",
+    "performers": "Nicanor Zabaleta"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Caprice",
+   "durationMs": 181627,
+   "artist": "Nicanor Zabaleta",
+   "apple": {
+    "block": 10,
+    "composer": "Theodore Labarre",
+    "work": "Theodore Labarre",
+    "part": "Caprice",
+    "performers": "Nicanor Zabaleta"
+   }
+  }
+ ]
+}

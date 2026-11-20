@@ -1,0 +1,666 @@
+{
+ "id": "1525560577",
+ "category": "baroque early",
+ "title": "Josquin Masses: Missa Hercules Dux Ferrarie, Missa D'ung aultre amer & Missa Faysant regretz",
+ "artist": "The Tallis Scholars & Peter Phillips",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Missa Hercules Dux Ferrarie: 1a. Kyrie I",
+   "durationMs": 66276,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 1,
+    "composer": "des Prez: Missa Hercules Dux Ferrarie",
+    "work": "des Prez: Missa Hercules Dux Ferrarie",
+    "part": "I. a. Kyrie I",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Missa Hercules Dux Ferrarie: 1b. Christe",
+   "durationMs": 45256,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 2,
+    "composer": "Josquin des Prez",
+    "work": "Missa Hercules dux Ferrariae, NJE 11.1",
+    "part": "I. b. Christe",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Missa Hercules Dux Ferrarie: 1c. Kyrie II",
+   "durationMs": 54836,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 2,
+    "composer": "Josquin des Prez",
+    "work": "Missa Hercules dux Ferrariae, NJE 11.1",
+    "part": "I. c. Kyrie II",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Missa Hercules Dux Ferrarie: 2a. Gloria in excelsis Deo",
+   "durationMs": 114548,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 3,
+    "composer": "des Prez: Missa Hercules Dux Ferrarie",
+    "work": "des Prez: Missa Hercules Dux Ferrarie",
+    "part": "II. a. Gloria in excelsis Deo",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Missa Hercules Dux Ferrarie: 2b. Qui tollis peccata mundi, miserere",
+   "durationMs": 124904,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 3,
+    "composer": "des Prez: Missa Hercules Dux Ferrarie",
+    "work": "des Prez: Missa Hercules Dux Ferrarie",
+    "part": "II. b. Qui tollis peccata mundi, miserere",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Missa Hercules Dux Ferrarie: 3a. Credo in unum Deum",
+   "durationMs": 173866,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 3,
+    "composer": "des Prez: Missa Hercules Dux Ferrarie",
+    "work": "des Prez: Missa Hercules Dux Ferrarie",
+    "part": "III. a. Credo in unum Deum",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Missa Hercules Dux Ferrarie: 3b. Et incarnatus est de Spiritu Sancto",
+   "durationMs": 106019,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 3,
+    "composer": "des Prez: Missa Hercules Dux Ferrarie",
+    "work": "des Prez: Missa Hercules Dux Ferrarie",
+    "part": "III. b. Et incarnatus est de Spiritu Sancto",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Missa Hercules Dux Ferrarie: 3c. Et in Spiritum Sanctum",
+   "durationMs": 141256,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 4,
+    "composer": "Josquin des Prez",
+    "work": "Missa Hercules dux Ferrariae, NJE 11.1",
+    "part": "III. c. Et in Spiritum Sanctum",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Missa Hercules Dux Ferrarie: 4a. Sanctus",
+   "durationMs": 84216,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 5,
+    "composer": "des Prez: Missa Hercules Dux Ferrarie",
+    "work": "des Prez: Missa Hercules Dux Ferrarie",
+    "part": "IV. a. Sanctus",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Missa Hercules Dux Ferrarie: 4b. Pleni sunt caeli",
+   "durationMs": 88200,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 5,
+    "composer": "des Prez: Missa Hercules Dux Ferrarie",
+    "work": "des Prez: Missa Hercules Dux Ferrarie",
+    "part": "IV. b. Pleni sunt caeli",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Missa Hercules Dux Ferrarie: 4c. Hosanna I",
+   "durationMs": 65692,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 6,
+    "composer": "Josquin des Prez",
+    "work": "Missa Faisant regretz, NJE 8.1",
+    "part": "IV. c. Hosanna I",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Missa Hercules Dux Ferrarie: 4d. Benedictus",
+   "durationMs": 64205,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 7,
+    "composer": "Josquin des Prez",
+    "work": "Missa Hercules dux Ferrariae, NJE 11.1",
+    "part": "IV. d. Benedictus",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Missa Hercules Dux Ferrarie: 4e. Hosanna II",
+   "durationMs": 69043,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 8,
+    "composer": "des Prez: Missa Hercules Dux Ferrarie",
+    "work": "des Prez: Missa Hercules Dux Ferrarie",
+    "part": "IV. e. Hosanna II",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Missa Hercules Dux Ferrarie: 5a. Agnus Dei I",
+   "durationMs": 145718,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 8,
+    "composer": "des Prez: Missa Hercules Dux Ferrarie",
+    "work": "des Prez: Missa Hercules Dux Ferrarie",
+    "part": "V. a. Agnus Dei I",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Missa Hercules Dux Ferrarie: 5b. Agnus Dei II",
+   "durationMs": 125872,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 8,
+    "composer": "des Prez: Missa Hercules Dux Ferrarie",
+    "work": "des Prez: Missa Hercules Dux Ferrarie",
+    "part": "V. b. Agnus Dei II",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Missa Hercules Dux Ferrarie: 5c. Agnus Dei III",
+   "durationMs": 178069,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 9,
+    "composer": "Josquin des Prez",
+    "work": "Missa Hercules dux Ferrariae, NJE 11.1",
+    "part": "V. c. Agnus Dei III",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Missa D'ung aultre amer: 1a. Kyrie I",
+   "durationMs": 56161,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 10,
+    "composer": "Josquin des Prez",
+    "work": "Missa Pange lingua, NJE 4.3",
+    "part": "I. a. Kyrie I",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Missa D'ung aultre amer: 1b. Christe",
+   "durationMs": 38584,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 11,
+    "composer": "Josquin des Prez",
+    "work": "Missa D'ung aultre amer, NJE 7.3",
+    "part": "I. b. Christe",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "Missa D'ung aultre amer: 1c. Kyrie II",
+   "durationMs": 39263,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 11,
+    "composer": "Josquin des Prez",
+    "work": "Missa D'ung aultre amer, NJE 7.3",
+    "part": "I. c. Kyrie II",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "Missa D'ung aultre amer: 2. Gloria in excelsis Deo",
+   "durationMs": 118583,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 12,
+    "composer": "Josquin des Prez",
+    "work": "Missa Ave maris stella, NJE 3.1",
+    "part": "II. Gloria in excelsis Deo",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "Missa D'ung aultre amer: 3a. Credo in unum Deum",
+   "durationMs": 144764,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 13,
+    "composer": "Josquin des Prez",
+    "work": "Missa Pange lingua, NJE 4.3",
+    "part": "III. a. Credo in unum Deum",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "Missa D'ung aultre amer: 3b. Et resurrexit tertia die",
+   "durationMs": 112723,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 14,
+    "composer": "Josquin des Prez",
+    "work": "Missa D'ung aultre amer, NJE 7.3",
+    "part": "III. b. Et resurrexit tertia die",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 23,
+   "title": "Missa D'ung aultre amer: 4. Sanctus",
+   "durationMs": 106979,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 14,
+    "composer": "Josquin des Prez",
+    "work": "Missa D'ung aultre amer, NJE 7.3",
+    "part": "IV. Sanctus",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 24,
+   "title": "Missa D'ung aultre amer: 5a. Tu solus qui facis mirabilia",
+   "durationMs": 106668,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 14,
+    "composer": "Josquin des Prez",
+    "work": "Missa D'ung aultre amer, NJE 7.3",
+    "part": "V. a. Tu solus qui facis mirabilia",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 25,
+   "title": "Missa D'ung aultre amer: 5b. Ad te solum confugimus",
+   "durationMs": 39574,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 14,
+    "composer": "Josquin des Prez",
+    "work": "Missa D'ung aultre amer, NJE 7.3",
+    "part": "V. b. Ad te solum confugimus",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 26,
+   "title": "Missa D'ung aultre amer: 5c. Ad te preces effundimus",
+   "durationMs": 37254,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 14,
+    "composer": "Josquin des Prez",
+    "work": "Missa D'ung aultre amer, NJE 7.3",
+    "part": "V. c. Ad te preces effundimus",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 27,
+   "title": "Missa D'ung aultre amer: 5d. D'ung aultre amer",
+   "durationMs": 44604,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 14,
+    "composer": "Josquin des Prez",
+    "work": "Missa D'ung aultre amer, NJE 7.3",
+    "part": "V. d. D'ung aultre amer",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 28,
+   "title": "Missa D'ung aultre amer: 5e. Audi nostra suspiria",
+   "durationMs": 59566,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 14,
+    "composer": "Josquin des Prez",
+    "work": "Missa D'ung aultre amer, NJE 7.3",
+    "part": "V. e. Audi nostra suspiria",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 29,
+   "title": "Missa D'ung aultre amer: 6a. Agnus Dei I",
+   "durationMs": 57684,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 14,
+    "composer": "Josquin des Prez",
+    "work": "Missa D'ung aultre amer, NJE 7.3",
+    "part": "VI. a. Agnus Dei I",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 30,
+   "title": "Missa D'ung aultre amer: 6b. Agnus Dei II",
+   "durationMs": 46021,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 14,
+    "composer": "Josquin des Prez",
+    "work": "Missa D'ung aultre amer, NJE 7.3",
+    "part": "VI. b. Agnus Dei II",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 31,
+   "title": "Missa D'ung aultre amer: 6c. Agnus Dei III",
+   "durationMs": 64307,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 14,
+    "composer": "Josquin des Prez",
+    "work": "Missa D'ung aultre amer, NJE 7.3",
+    "part": "VI. c. Agnus Dei III",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 32,
+   "title": "Missa Faysant regretz: 1a. Kyrie I",
+   "durationMs": 52778,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 15,
+    "composer": "Josquin des Prez",
+    "work": "Missa Malheur me bat, NJE 9.1",
+    "part": "I. a. Kyrie I",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 33,
+   "title": "Missa Faysant regretz: 1b. Christe",
+   "durationMs": 62835,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 15,
+    "composer": "Josquin des Prez",
+    "work": "Missa Malheur me bat, NJE 9.1",
+    "part": "I. b. Christe",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 34,
+   "title": "Missa Faysant regretz: 1c. Kyrie II",
+   "durationMs": 50162,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 16,
+    "composer": "Josquin des Prez",
+    "work": "Missa Hercules dux Ferrariae, NJE 11.1",
+    "part": "I. c. Kyrie II",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 35,
+   "title": "Missa Faysant regretz: 2a. Gloria in excelsis Deo",
+   "durationMs": 130831,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 17,
+    "composer": "Josquin des Prez",
+    "work": "Missa Malheur me bat, NJE 9.1",
+    "part": "II. a. Gloria in excelsis Deo",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 36,
+   "title": "Missa Faysant regretz: 2b. Qui tollis peccata mundi, miserere",
+   "durationMs": 127756,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 17,
+    "composer": "Josquin des Prez",
+    "work": "Missa Malheur me bat, NJE 9.1",
+    "part": "II. b. Qui tollis peccata mundi, miserere",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 37,
+   "title": "Missa Faysant regretz: 3a. Credo in unum Deum",
+   "durationMs": 127909,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 17,
+    "composer": "Josquin des Prez",
+    "work": "Missa Malheur me bat, NJE 9.1",
+    "part": "III. a. Credo in unum Deum",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 38,
+   "title": "Missa Faysant regretz: 3b. Et incarnatus est de Spiritu Sancto",
+   "durationMs": 95443,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 18,
+    "composer": "des Prez: Missa Faysant regretz",
+    "work": "des Prez: Missa Faysant regretz",
+    "part": "III. b. Et incarnatus est de Spiritu Sancto",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 39,
+   "title": "Missa Faysant regretz: 3c. Et in Spiritum Sanctum",
+   "durationMs": 147312,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 19,
+    "composer": "Josquin des Prez",
+    "work": "Missa Faisant regretz, NJE 8.1",
+    "part": "III. c. Et in Spiritum Sanctum",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 40,
+   "title": "Missa Faysant regretz: 4a. Sanctus",
+   "durationMs": 105810,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 20,
+    "composer": "Josquin des Prez",
+    "work": "Missa Malheur me bat, NJE 9.1",
+    "part": "IV. a. Sanctus",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 41,
+   "title": "Missa Faysant regretz: 4b. Pleni sunt caeli",
+   "durationMs": 87412,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 20,
+    "composer": "Josquin des Prez",
+    "work": "Missa Malheur me bat, NJE 9.1",
+    "part": "IV. b. Pleni sunt caeli",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 42,
+   "title": "Missa Faysant regretz: 4c. Hosanna I",
+   "durationMs": 61632,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 21,
+    "composer": "Josquin des Prez",
+    "work": "Missa Faisant regretz, NJE 8.1",
+    "part": "IV. c. Hosanna I",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 43,
+   "title": "Missa Faysant regretz: 4d. Benedictus",
+   "durationMs": 111280,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 21,
+    "composer": "Josquin des Prez",
+    "work": "Missa Faisant regretz, NJE 8.1",
+    "part": "IV. d. Benedictus",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 44,
+   "title": "Missa Faysant regretz: 4e. Hosanna II",
+   "durationMs": 65202,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 22,
+    "composer": "Josquin des Prez",
+    "work": "Missa Malheur me bat, NJE 9.1",
+    "part": "IV. e. Hosanna II",
+    "performers": "The Tallis Scholars, Peter Phillips"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 45,
+   "title": "Missa Faysant regretz: 5a. Agnus Dei I",
+   "durationMs": 70309,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 22,
+    "composer": "Josquin des Prez",
+    "work": "Missa Malheur me bat, NJE 9.1",
+    "part": "V. a. Agnus Dei I",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 46,
+   "title": "Missa Faysant regretz: 5b. Agnus Dei II",
+   "durationMs": 89400,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 22,
+    "composer": "Josquin des Prez",
+    "work": "Missa Malheur me bat, NJE 9.1",
+    "part": "V. b. Agnus Dei II",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 47,
+   "title": "Missa Faysant regretz: 5c. Agnus Dei III",
+   "durationMs": 190204,
+   "artist": "The Tallis Scholars & Peter Phillips",
+   "apple": {
+    "block": 23,
+    "composer": "Josquin des Prez",
+    "work": "Missa Faisant regretz, NJE 8.1",
+    "part": "V. c. Agnus Dei III",
+    "performers": "Peter Phillips, The Tallis Scholars"
+   }
+  }
+ ]
+}

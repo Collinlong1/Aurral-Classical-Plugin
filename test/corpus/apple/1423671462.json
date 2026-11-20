@@ -1,0 +1,246 @@
+{
+ "id": "1423671462",
+ "category": "orchestral",
+ "title": "Mussorgsky: Pictures at an Exhibition",
+ "artist": "Vienna Philharmonic & Gustavo Dudamel",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Pictures at an Exhibition: Promenade I",
+   "durationMs": 95400,
+   "artist": "Vienna Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 1,
+    "composer": "Modest Mussorgsky",
+    "work": "Pictures at an Exhibition",
+    "part": "Promenade I",
+    "performers": "Vienna Philharmonic, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Pictures at an Exhibition: I. Gnomus",
+   "durationMs": 132480,
+   "artist": "Vienna Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 1,
+    "composer": "Modest Mussorgsky",
+    "work": "Pictures at an Exhibition",
+    "part": "I. Gnomus",
+    "performers": "Gustavo Dudamel, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Pictures at an Exhibition: Promenade II",
+   "durationMs": 55200,
+   "artist": "Vienna Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 1,
+    "composer": "Modest Mussorgsky",
+    "work": "Pictures at an Exhibition",
+    "part": "Promenade II",
+    "performers": "Gustavo Dudamel, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Pictures at an Exhibition: II. The Old Castle",
+   "durationMs": 263267,
+   "artist": "Vienna Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 1,
+    "composer": "Modest Mussorgsky",
+    "work": "Pictures at an Exhibition",
+    "part": "II. The Old Castle",
+    "performers": "Vienna Philharmonic, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Pictures at an Exhibition: Promenade III",
+   "durationMs": 29760,
+   "artist": "Vienna Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 1,
+    "composer": "Modest Mussorgsky",
+    "work": "Pictures at an Exhibition",
+    "part": "Promenade III",
+    "performers": "Vienna Philharmonic, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Pictures at an Exhibition: III. Tuileries Gardens",
+   "durationMs": 65120,
+   "artist": "Vienna Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 1,
+    "composer": "Modest Mussorgsky",
+    "work": "Pictures at an Exhibition",
+    "part": "III. Tuileries Gardens",
+    "performers": "Vienna Philharmonic, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Pictures at an Exhibition: IV. Bydlo",
+   "durationMs": 175947,
+   "artist": "Vienna Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 1,
+    "composer": "Modest Mussorgsky",
+    "work": "Pictures at an Exhibition",
+    "part": "IV. Bydlo",
+    "performers": "Gustavo Dudamel, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Pictures at an Exhibition: Promenade IV",
+   "durationMs": 42680,
+   "artist": "Vienna Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 1,
+    "composer": "Modest Mussorgsky",
+    "work": "Pictures at an Exhibition",
+    "part": "Promenade IV",
+    "performers": "Vienna Philharmonic, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Pictures at an Exhibition: V. Ballet of the Unhatched Chicks",
+   "durationMs": 68960,
+   "artist": "Vienna Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 1,
+    "composer": "Modest Mussorgsky",
+    "work": "Pictures at an Exhibition",
+    "part": "V. Ballet of the Unhatched Chicks",
+    "performers": "Vienna Philharmonic, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Pictures at an Exhibition: VI. Samuel Goldenberg und Schmuÿle",
+   "durationMs": 141040,
+   "artist": "Vienna Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 1,
+    "composer": "Modest Mussorgsky",
+    "work": "Pictures at an Exhibition",
+    "part": "VI. Samuel Goldenberg und Schmuÿle",
+    "performers": "Vienna Philharmonic, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Pictures at an Exhibition: VII. The Market at Limoges",
+   "durationMs": 78760,
+   "artist": "Vienna Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 1,
+    "composer": "Modest Mussorgsky",
+    "work": "Pictures at an Exhibition",
+    "part": "VII. The Market at Limoges",
+    "performers": "Gustavo Dudamel, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Pictures at an Exhibition: VIIIa. Catacombae (Sepulchrum Romanum)",
+   "durationMs": 116973,
+   "artist": "Vienna Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 1,
+    "composer": "Modest Mussorgsky",
+    "work": "Pictures at an Exhibition",
+    "part": "VIIIa. Catacombae (Sepulchrum Romanum)",
+    "performers": "Gustavo Dudamel, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Pictures at an Exhibition: VIIIb. Cum Mortuis in Lingua Mortua",
+   "durationMs": 123707,
+   "artist": "Vienna Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 1,
+    "composer": "Modest Mussorgsky",
+    "work": "Pictures at an Exhibition",
+    "part": "VIIIb. Cum Mortuis in Lingua Mortua",
+    "performers": "Vienna Philharmonic, Gustavo Dudamel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Pictures at an Exhibition: IX. The Hut on Chicken's Legs",
+   "durationMs": 212280,
+   "artist": "Vienna Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 1,
+    "composer": "Modest Mussorgsky",
+    "work": "Pictures at an Exhibition",
+    "part": "IX. The Hut on Chicken's Legs",
+    "performers": "Gustavo Dudamel, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Pictures at an Exhibition: X. The Great Gate of Kiev",
+   "durationMs": 340200,
+   "artist": "Vienna Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 1,
+    "composer": "Modest Mussorgsky",
+    "work": "Pictures at an Exhibition",
+    "part": "X. The Great Gate of Kiev",
+    "performers": "Gustavo Dudamel, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Night on Bald Mountain",
+   "durationMs": 687720,
+   "artist": "Vienna Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 2,
+    "composer": "Modest Mussorgsky",
+    "work": "A Night on the Bare Mountain",
+    "part": "Night on Bald Mountain",
+    "performers": "Gustavo Dudamel, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Swan Lake, Op. 20: Waltz",
+   "durationMs": 419533,
+   "artist": "Vienna Philharmonic & Gustavo Dudamel",
+   "apple": {
+    "block": 3,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "The Swan Lake, Op. 20, TH 12",
+    "part": "Waltz",
+    "performers": "Vienna Philharmonic, Gustavo Dudamel"
+   }
+  }
+ ]
+}

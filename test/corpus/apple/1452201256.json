@@ -1,0 +1,78 @@
+{
+ "id": "1452201256",
+ "category": "orchestral",
+ "title": "Rimsky-Korsakov: Scheherazade",
+ "artist": "Lorin Maazel & Berlin Philharmonic Orchestra",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Scheherazade, Op. 35: I. Largo e maestoso",
+   "durationMs": 635000,
+   "artist": "Berlin Philharmonic Orchestra, Lorin Maazel & Leon Spierer",
+   "apple": {
+    "block": 1,
+    "composer": "Nikolai Rimsky-Korsakov",
+    "work": "Scheherazade, Op. 35",
+    "part": "I. Largo e maestoso",
+    "performers": "Berlin Philharmonic Orchestra, Lorin Maazel, Leon Spierer"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Scheherazade, Op. 35: II. Lento",
+   "durationMs": 699000,
+   "artist": "Leon Spierer, Berlin Philharmonic Orchestra & Lorin Maazel",
+   "apple": {
+    "block": 1,
+    "composer": "Nikolai Rimsky-Korsakov",
+    "work": "Scheherazade, Op. 35",
+    "part": "II. Lento",
+    "performers": "Berlin Philharmonic Orchestra, Leon Spierer, Lorin Maazel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Scheherazade, Op. 35: III. Andantino quasi allegretto",
+   "durationMs": 622000,
+   "artist": "Leon Spierer, Berlin Philharmonic Orchestra & Lorin Maazel",
+   "apple": {
+    "block": 1,
+    "composer": "Nikolai Rimsky-Korsakov",
+    "work": "Scheherazade, Op. 35",
+    "part": "III. Andantino quasi allegretto",
+    "performers": "Leon Spierer, Berlin Philharmonic Orchestra, Lorin Maazel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Scheherazade, Op. 35: 4. Allegro molto",
+   "durationMs": 768000,
+   "artist": "Leon Spierer, Berlin Philharmonic Orchestra & Lorin Maazel",
+   "apple": {
+    "block": 1,
+    "composer": "Nikolai Rimsky-Korsakov",
+    "work": "Scheherazade, Op. 35",
+    "part": "4. Allegro molto",
+    "performers": "Leon Spierer, Berlin Philharmonic Orchestra, Lorin Maazel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "The Isle of the Dead, Op. 29: Lento - Tranquillo - Largo - Allegro Molto - Largo - Tempo I",
+   "durationMs": 1180000,
+   "artist": "Berlin Philharmonic Orchestra & Lorin Maazel",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "The Isle of the Dead in A Minor, Op. 29",
+    "part": "Lento - Tranquillo - Largo - Allegro Molto - Largo - Tempo I",
+    "performers": "Berlin Philharmonic Orchestra, Lorin Maazel"
+   }
+  }
+ ]
+}

@@ -1,0 +1,750 @@
+{
+ "id": "1387816964",
+ "category": "choral sacred",
+ "title": "Handel: Messiah",
+ "artist": "London Symphony Orchestra & Sir Colin Davis",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Messiah: Part I, No 1. Sinfonia",
+   "durationMs": 225768,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part I, No 1. Sinfonia",
+    "performers": "Sir Colin Davis, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Messiah: Part I, No 2. Comfort Ye My People",
+   "durationMs": 180000,
+   "artist": "London Symphony Orchestra, Sir Colin Davis & Mark Padmore",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part I, No 2. Comfort Ye My People",
+    "performers": "Sir Colin Davis, Mark Padmore, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Messiah: Part I, No 3. Ev'ry Valley Shall Be Exalted",
+   "durationMs": 214000,
+   "artist": "London Symphony Orchestra, Mark Padmore & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part I, No 3. Ev'ry Valley Shall Be Exalted",
+    "performers": "Mark Padmore, London Symphony Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Messiah: Part I, No 4. And the Glory of the Lord",
+   "durationMs": 166000,
+   "artist": "London Symphony Orchestra, Sir Colin Davis & Tenebrae",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part I, No 4. And the Glory of the Lord",
+    "performers": "Tenebrae, London Symphony Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Messiah: Part I, No 5. Thus Saith the Lord",
+   "durationMs": 90899,
+   "artist": "Alastair Miles, London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part I, No 5. Thus Saith the Lord",
+    "performers": "Alastair Miles, Sir Colin Davis, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Messiah: Part I, No 6. But Who May Abide the Day of His Coming?",
+   "durationMs": 256978,
+   "artist": "London Symphony Orchestra, Sara Mingardo & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part I, No 6. But Who May Abide the Day of His Coming?",
+    "performers": "Sir Colin Davis, Sara Mingardo, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Messiah: Part I, No 7. And He Shall Purify",
+   "durationMs": 141037,
+   "artist": "London Symphony Orchestra, Tenebrae & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part I, No 7. And He Shall Purify",
+    "performers": "Tenebrae, Sir Colin Davis, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Messiah: Part I, No 8. Behold, a Virgin Shall Conceive",
+   "durationMs": 23086,
+   "artist": "London Symphony Orchestra, Sara Mingardo & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part I, No 8. Behold, a Virgin Shall Conceive",
+    "performers": "Sir Colin Davis, London Symphony Orchestra, Sara Mingardo"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Messiah: Part I, No 9. O Thou That Tellest Good Tidings to Zion",
+   "durationMs": 236093,
+   "artist": "London Symphony Orchestra, Sir Colin Davis & Sara Mingardo",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part I, No 9. O Thou That Tellest Good Tidings to Zion",
+    "performers": "Sir Colin Davis, London Symphony Orchestra, Sara Mingardo"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Messiah: Part I, No 9a. O Thou That Tellest Good Tidings to Zion",
+   "durationMs": 103907,
+   "artist": "London Symphony Orchestra, Tenebrae & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part I, No 9a. O Thou That Tellest Good Tidings to Zion",
+    "performers": "Tenebrae, London Symphony Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Messiah: Part I, No 10. For, Behold, Darkness Shall Cover the Earth",
+   "durationMs": 146000,
+   "artist": "Alastair Miles, Sir Colin Davis & London Symphony Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part I, No 10. For, Behold, Darkness Shall Cover the Earth",
+    "performers": "Sir Colin Davis, Alastair Miles, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Messiah: Part I, No 11. The People That Walked In Darkness",
+   "durationMs": 191000,
+   "artist": "Alastair Miles, London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part I, No 11. The People That Walked In Darkness",
+    "performers": "Sir Colin Davis, Alastair Miles, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Messiah: Part I, No 12. For Unto Us a Child Is Born",
+   "durationMs": 246000,
+   "artist": "London Symphony Orchestra, Tenebrae & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part I, No 12. For Unto Us a Child Is Born",
+    "performers": "Tenebrae, London Symphony Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Messiah: Part I, No 13. Pifa",
+   "durationMs": 188772,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part I, No 13. Pifa",
+    "performers": "Sir Colin Davis, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Messiah: Part I, Nos 14a-16. There Were Shepherds Abiding In the Field",
+   "durationMs": 114228,
+   "artist": "London Symphony Orchestra, Susan Gritton & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part I, Nos 14a-16. There Were Shepherds Abiding In the Field",
+    "performers": "Sir Colin Davis, London Symphony Orchestra, Susan Gritton"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Messiah: Part I, No 17. Glory to God",
+   "durationMs": 99000,
+   "artist": "London Symphony Orchestra, Sir Colin Davis & Tenebrae",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part I, No 17. Glory to God",
+    "performers": "Sir Colin Davis, London Symphony Orchestra, Tenebrae"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Messiah: Part I, No 18. Rejoice Greatly, O Daughter of Zion",
+   "durationMs": 279000,
+   "artist": "London Symphony Orchestra, Sir Colin Davis & Susan Gritton",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part I, No 18. Rejoice Greatly, O Daughter of Zion",
+    "performers": "London Symphony Orchestra, Susan Gritton, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Messiah: Part I, No 19. Then Shall the Eyes of the Blind",
+   "durationMs": 27000,
+   "artist": "London Symphony Orchestra, Sara Mingardo & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part I, No 19. Then Shall the Eyes of the Blind",
+    "performers": "London Symphony Orchestra, Sara Mingardo, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "Messiah: Part I, No 20. He Shall Feed His Flock Like a Shepherd",
+   "durationMs": 298862,
+   "artist": "London Symphony Orchestra, Susan Gritton, Sir Colin Davis & Sara Mingardo",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part I, No 20. He Shall Feed His Flock Like a Shepherd",
+    "performers": "London Symphony Orchestra, Susan Gritton, Sara Mingardo, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "Messiah: Part I, No 21. His Yoke Is Easy",
+   "durationMs": 131138,
+   "artist": "London Symphony Orchestra, Sir Colin Davis & Tenebrae",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part I, No 21. His Yoke Is Easy",
+    "performers": "Tenebrae, Sir Colin Davis, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "Messiah: Part II, No 22. Behold the Lamb of God",
+   "durationMs": 213325,
+   "artist": "London Symphony Orchestra, Sir Colin Davis & Tenebrae",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part II, No 22. Behold the Lamb of God",
+    "performers": "Sir Colin Davis, Tenebrae, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "Messiah: Part II, No 23. He Was Despised",
+   "durationMs": 596675,
+   "artist": "London Symphony Orchestra, Sir Colin Davis & Sara Mingardo",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part II, No 23. He Was Despised",
+    "performers": "London Symphony Orchestra, Sir Colin Davis, Sara Mingardo"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 23,
+   "title": "Messiah: Part II, No 24. Surely He Hath Borne Our Griefs",
+   "durationMs": 140000,
+   "artist": "London Symphony Orchestra, Tenebrae & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part II, No 24. Surely He Hath Borne Our Griefs",
+    "performers": "Sir Colin Davis, Tenebrae, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 24,
+   "title": "Messiah: Part II, No 25. And With His Stripes We Are Healed",
+   "durationMs": 161081,
+   "artist": "London Symphony Orchestra, Sir Colin Davis & Tenebrae",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part II, No 25. And With His Stripes We Are Healed",
+    "performers": "Tenebrae, London Symphony Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 25,
+   "title": "Messiah: Part II, No 26. All We Like Sheep Have Gone Astray",
+   "durationMs": 249903,
+   "artist": "London Symphony Orchestra, Tenebrae & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part II, No 26. All We Like Sheep Have Gone Astray",
+    "performers": "Sir Colin Davis, Tenebrae, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 1,
+   "title": "Messiah: Part II, No 27. All They That See Him Laugh Him to Scorn",
+   "durationMs": 49000,
+   "artist": "London Symphony Orchestra, Sir Colin Davis & Mark Padmore",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part II, No 27. All They That See Him Laugh Him to Scorn",
+    "performers": "London Symphony Orchestra, Sir Colin Davis, Mark Padmore"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 2,
+   "title": "Messiah: Part II, No 28. He Trusted In God",
+   "durationMs": 148000,
+   "artist": "London Symphony Orchestra, Tenebrae & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part II, No 28. He Trusted In God",
+    "performers": "London Symphony Orchestra, Tenebrae, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 3,
+   "title": "Messiah: Part II, No 29. Thy Rebuke Hath Broken His Heart",
+   "durationMs": 147000,
+   "artist": "London Symphony Orchestra, Sir Colin Davis & Mark Padmore",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part II, No 29. Thy Rebuke Hath Broken His Heart",
+    "performers": "Sir Colin Davis, Mark Padmore, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 4,
+   "title": "Messiah: Part II, No 30. Behold, and See If There Be Any Sorrow",
+   "durationMs": 87000,
+   "artist": "London Symphony Orchestra, Mark Padmore & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part II, No 30. Behold, and See If There Be Any Sorrow",
+    "performers": "London Symphony Orchestra, Mark Padmore, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 5,
+   "title": "Messiah: Part II, No 31. He Was Cut Off Out of the Land of the Living",
+   "durationMs": 22000,
+   "artist": "London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part II, No 31. He Was Cut Off Out of the Land of the Living",
+    "performers": "Sir Colin Davis, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 6,
+   "title": "Messiah: Part II, No 32. But Thou Didst Not Leave His Soul In Hell",
+   "durationMs": 149000,
+   "artist": "London Symphony Orchestra, Mark Padmore & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part II, No 32. But Thou Didst Not Leave His Soul In Hell",
+    "performers": "Sir Colin Davis, London Symphony Orchestra, Mark Padmore"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 7,
+   "title": "Messiah: Part II, No 33. Lift Up Your Heads, O Ye Gates",
+   "durationMs": 192000,
+   "artist": "London Symphony Orchestra, Tenebrae & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part II, No 33. Lift Up Your Heads, O Ye Gates",
+    "performers": "Tenebrae, London Symphony Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 8,
+   "title": "Messiah: Part II, No 34. Unto Which of the Angels Said He At Any Time",
+   "durationMs": 15000,
+   "artist": "London Symphony Orchestra, Mark Padmore & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part II, No 34. Unto Which of the Angels Said He At Any Time",
+    "performers": "Sir Colin Davis, London Symphony Orchestra, Mark Padmore"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 9,
+   "title": "Messiah: Part II, No 35. Let All the Angels of God Worship Him",
+   "durationMs": 87000,
+   "artist": "London Symphony Orchestra, Sir Colin Davis & Tenebrae",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part II, No 35. Let All the Angels of God Worship Him",
+    "performers": "Sir Colin Davis, Tenebrae, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 10,
+   "title": "Messiah: Part II, No 36. Thou Art Gone Up On High",
+   "durationMs": 202000,
+   "artist": "Alastair Miles, London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part II, No 36. Thou Art Gone Up On High",
+    "performers": "Alastair Miles, London Symphony Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 11,
+   "title": "Messiah: Part II, No 37. The Lord Gave the Word",
+   "durationMs": 71000,
+   "artist": "London Symphony Orchestra, Sir Colin Davis & Tenebrae",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part II, No 37. The Lord Gave the Word",
+    "performers": "Tenebrae, London Symphony Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 12,
+   "title": "Messiah: Part II, No 38. How Beautiful Are the Feet",
+   "durationMs": 146000,
+   "artist": "London Symphony Orchestra, Sir Colin Davis & Susan Gritton",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part II, No 38. How Beautiful Are the Feet",
+    "performers": "Sir Colin Davis, Susan Gritton, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 13,
+   "title": "Messiah: Part II, No 39. Their Sound Is Gone Out",
+   "durationMs": 96000,
+   "artist": "London Symphony Orchestra, Sir Colin Davis & Tenebrae",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part II, No 39. Their Sound Is Gone Out",
+    "performers": "London Symphony Orchestra, Sir Colin Davis, Tenebrae"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 14,
+   "title": "Messiah: Part II, No 40. Why Do the Nations So Furiously Rage Together?",
+   "durationMs": 161106,
+   "artist": "Alastair Miles, London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part II, No 40. Why Do the Nations So Furiously Rage Together?",
+    "performers": "Alastair Miles, Sir Colin Davis, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 15,
+   "title": "Messiah: Part II, No 41. Let Us Break Their Bonds Asunder",
+   "durationMs": 103894,
+   "artist": "London Symphony Orchestra, Sir Colin Davis & Tenebrae",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part II, No 41. Let Us Break Their Bonds Asunder",
+    "performers": "London Symphony Orchestra, Sir Colin Davis, Tenebrae"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 16,
+   "title": "Messiah: Part II, No 42. He That Dwelleth In Heaven",
+   "durationMs": 16000,
+   "artist": "London Symphony Orchestra, Mark Padmore & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part II, No 42. He That Dwelleth In Heaven",
+    "performers": "London Symphony Orchestra, Sir Colin Davis, Mark Padmore"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 17,
+   "title": "Messiah: Part II, No 43. Thou Shalt Break Them",
+   "durationMs": 126000,
+   "artist": "London Symphony Orchestra, Sir Colin Davis & Mark Padmore",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part II, No 43. Thou Shalt Break Them",
+    "performers": "London Symphony Orchestra, Sir Colin Davis, Mark Padmore"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 18,
+   "title": "Messiah: Part II, No 44. Hallelujah",
+   "durationMs": 223000,
+   "artist": "London Symphony Orchestra, Tenebrae & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part II, No 44. Hallelujah",
+    "performers": "Sir Colin Davis, Tenebrae, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 19,
+   "title": "Messiah: Part III, No 45. I Know That My Redeemer Liveth",
+   "durationMs": 361000,
+   "artist": "London Symphony Orchestra, Susan Gritton & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part III, No 45. I Know That My Redeemer Liveth",
+    "performers": "Susan Gritton, London Symphony Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 20,
+   "title": "Messiah: Part III, No 46. Since By Man Came Death",
+   "durationMs": 139000,
+   "artist": "London Symphony Orchestra, Tenebrae & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part III, No 46. Since By Man Came Death",
+    "performers": "Tenebrae, London Symphony Orchestra, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 21,
+   "title": "Messiah: Part III, No 47. Behold, I Tell You a Mystery",
+   "durationMs": 36000,
+   "artist": "Alastair Miles, London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part III, No 47. Behold, I Tell You a Mystery",
+    "performers": "Alastair Miles, Sir Colin Davis, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 22,
+   "title": "Messiah: Part III, No 48. The Trumpet Shall Sound",
+   "durationMs": 518000,
+   "artist": "Alastair Miles, London Symphony Orchestra & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part III, No 48. The Trumpet Shall Sound",
+    "performers": "London Symphony Orchestra, Sir Colin Davis, Alastair Miles"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 23,
+   "title": "Messiah: Part III, No 49. Then Shall Be Brought to Pass",
+   "durationMs": 19000,
+   "artist": "London Symphony Orchestra, Sara Mingardo & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part III, No 49. Then Shall Be Brought to Pass",
+    "performers": "London Symphony Orchestra, Sara Mingardo, Sir Colin Davis"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 24,
+   "title": "Messiah: Part III, No 50. O Death, Where Is Thy Sting?",
+   "durationMs": 70015,
+   "artist": "London Symphony Orchestra, Sara Mingardo, Mark Padmore & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part III, No 50. O Death, Where Is Thy Sting?",
+    "performers": "Sir Colin Davis, Mark Padmore, London Symphony Orchestra, Sara Mingardo"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 25,
+   "title": "Messiah: Part III, No 51. But Thanks Be to God",
+   "durationMs": 124985,
+   "artist": "London Symphony Orchestra, Sir Colin Davis & Tenebrae",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part III, No 51. But Thanks Be to God",
+    "performers": "Sir Colin Davis, Tenebrae, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 26,
+   "title": "Messiah: Part III, No 52. If God Be for Us",
+   "durationMs": 290000,
+   "artist": "London Symphony Orchestra, Susan Gritton & Sir Colin Davis",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part III, No 52. If God Be for Us",
+    "performers": "Sir Colin Davis, Susan Gritton, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 27,
+   "title": "Messiah: Part III, No 53a. Worthy Is the Lamb That Was Slain",
+   "durationMs": 208882,
+   "artist": "London Symphony Orchestra, Sir Colin Davis & Tenebrae",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part III, No 53a. Worthy Is the Lamb That Was Slain",
+    "performers": "London Symphony Orchestra, Sir Colin Davis, Tenebrae"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 28,
+   "title": "Messiah: Part III, No 53b. Amen",
+   "durationMs": 252230,
+   "artist": "London Symphony Orchestra, Sir Colin Davis & Tenebrae",
+   "apple": {
+    "block": 1,
+    "composer": "George Frideric Handel",
+    "work": "Messiah, HWV 56",
+    "part": "Part III, No 53b. Amen",
+    "performers": "London Symphony Orchestra, Sir Colin Davis, Tenebrae"
+   }
+  }
+ ]
+}

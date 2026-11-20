@@ -1,0 +1,64 @@
+{
+ "id": "1276358812",
+ "category": "symphony",
+ "title": "Shostakovich: Symphony No. 5 in D Minor, Op. 47 ((Remastered))",
+ "artist": "Leonard Bernstein & New York Philharmonic",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Symphony No. 5 in D Minor, Op. 47: I. Moderato (2017 Remastered Version)",
+   "durationMs": 979720,
+   "artist": "Leonard Bernstein & New York Philharmonic",
+   "apple": {
+    "block": 1,
+    "composer": "Dmitri Shostakovich",
+    "work": "Symphony No. 5 in D Minor, Op. 47",
+    "part": "I. Moderato (2017 Remastered Version)",
+    "performers": "New York Philharmonic, Leonard Bernstein"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Symphony No. 5 in D Minor, Op. 47: II. Allegretto (2017 Remastered Version)",
+   "durationMs": 297547,
+   "artist": "Leonard Bernstein & New York Philharmonic",
+   "apple": {
+    "block": 1,
+    "composer": "Dmitri Shostakovich",
+    "work": "Symphony No. 5 in D Minor, Op. 47",
+    "part": "II. Allegretto (2017 Remastered Version)",
+    "performers": "Leonard Bernstein, New York Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Symphony No. 5 in D Minor, Op. 47: III. Largo (2017 Remastered Version)",
+   "durationMs": 939947,
+   "artist": "Leonard Bernstein & New York Philharmonic",
+   "apple": {
+    "block": 1,
+    "composer": "Dmitri Shostakovich",
+    "work": "Symphony No. 5 in D Minor, Op. 47",
+    "part": "III. Largo (2017 Remastered Version)",
+    "performers": "Leonard Bernstein, New York Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Symphony No. 5 in D Minor, Op. 47: IV. Allegro non troppo (2017 Remastered Version)",
+   "durationMs": 539120,
+   "artist": "Leonard Bernstein & New York Philharmonic",
+   "apple": {
+    "block": 1,
+    "composer": "Dmitri Shostakovich",
+    "work": "Symphony No. 5 in D Minor, Op. 47",
+    "part": "IV. Allegro non troppo (2017 Remastered Version)",
+    "performers": "New York Philharmonic, Leonard Bernstein"
+   }
+  }
+ ]
+}

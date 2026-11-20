@@ -1,0 +1,274 @@
+{
+ "id": "1452208608",
+ "category": "baroque early",
+ "title": "Bach: Brandenburg Concertos",
+ "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Brandenburg Concerto No. 1 in F, BWV 1046: I. Allegro",
+   "durationMs": 242493,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 1 in F Major, BWV 1046",
+    "part": "I. Allegro",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Brandenburg Concerto No. 1 in F, BWV 1046: II. Adagio",
+   "durationMs": 284667,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 1 in F Major, BWV 1046",
+    "part": "II. Adagio",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Brandenburg Concerto No. 1 in F, BWV 1046: III. Allegro",
+   "durationMs": 262427,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 1 in F Major, BWV 1046",
+    "part": "III. Allegro",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Brandenburg Concerto No. 1 in F, BWV 1046: IV. Menuet - Trio – Polonaise",
+   "durationMs": 598467,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 1 in F Major, BWV 1046",
+    "part": "IV. Menuet - Trio – Polonaise",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Brandenburg Concerto No. 2 in F, BWV 1047: I. Allegro",
+   "durationMs": 327160,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 2 in F Major, BWV 1047",
+    "part": "I. Allegro",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Brandenburg Concerto No. 2 in F, BWV 1047: II. Andante",
+   "durationMs": 263133,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 2 in F Major, BWV 1047",
+    "part": "II. Andante",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Brandenburg Concerto No. 2 in F, BWV 1047: III. Allegro assai",
+   "durationMs": 159800,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 2 in F Major, BWV 1047",
+    "part": "III. Allegro assai",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Brandenburg Concerto No. 3 in G, BWV 1048: I. Allegro",
+   "durationMs": 391560,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 3 in G Major, BWV 1048",
+    "part": "I. Allegro",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Brandenburg Concerto No. 3 in G, BWV 1048: II. Adagio BWV I0I9a",
+   "durationMs": 14440,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 3 in G Major, BWV 1048",
+    "part": "II. Adagio BWV I0I9a",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Brandenburg Concerto No. 3 in G, BWV 1048: III. Allegro",
+   "durationMs": 309400,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 3 in G Major, BWV 1048",
+    "part": "III. Allegro",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 1,
+   "title": "Brandenburg Concerto No. 4 in G, BWV 1049: I. Allegro",
+   "durationMs": 439400,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 4 in G Major, BWV 1049",
+    "part": "I. Allegro",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 2,
+   "title": "Brandenburg Concerto No. 4 in G, BWV 1049: II. Andante",
+   "durationMs": 274667,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 4 in G Major, BWV 1049",
+    "part": "II. Andante",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 3,
+   "title": "Brandenburg Concerto No. 4 in G, BWV 1049: III. Presto",
+   "durationMs": 288427,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 4 in G Major, BWV 1049",
+    "part": "III. Presto",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 4,
+   "title": "Brandenburg Concerto No. 5 in D, BWV 1050: I. Allegro",
+   "durationMs": 651227,
+   "artist": "Berlin Philharmonic Orchestra, Herbert von Karajan, Karlheinz Zoeller, Thomas Brandis & William Tim Read",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 5 in D Major, BWV 1050",
+    "part": "I. Allegro",
+    "performers": "Karlheinz Zoeller, Thomas Brandis, Herbert von Karajan, William Tim Read, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 5,
+   "title": "Brandenburg Concerto No. 5 in D, BWV 1050: II. Affetuoso",
+   "durationMs": 370933,
+   "artist": "Berlin Philharmonic Orchestra, Herbert von Karajan, Karlheinz Zoeller, Thomas Brandis & William Tim Read",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 5 in D Major, BWV 1050",
+    "part": "II. Affetuoso",
+    "performers": "Thomas Brandis, Karlheinz Zoeller, Herbert von Karajan, William Tim Read, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 6,
+   "title": "Brandenburg Concerto No. 5 in D, BWV 1050: III. Allegro",
+   "durationMs": 352587,
+   "artist": "Berlin Philharmonic Orchestra, Herbert von Karajan, Karlheinz Zoeller, Thomas Brandis & William Tim Read",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 5 in D Major, BWV 1050",
+    "part": "III. Allegro",
+    "performers": "Karlheinz Zoeller, Berlin Philharmonic Orchestra, Herbert von Karajan, William Tim Read, Thomas Brandis"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 7,
+   "title": "Brandenburg Concerto No. 6 in B-Flat, BWV 1051: I. Allegro",
+   "durationMs": 422000,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 6,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 6 in B-Flat Major, BWV 1051",
+    "part": "I. Allegro",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 8,
+   "title": "Brandenburg Concerto No. 6 in B-Flat, BWV 1051: II. Adagio ma non tanto",
+   "durationMs": 343667,
+   "artist": "Berlin Philharmonic Orchestra, Herbert von Karajan, Jörg Baumann, Wolfram Christ, Neithart Resa & Ottomar Borwitzky",
+   "apple": {
+    "block": 6,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 6 in B-Flat Major, BWV 1051",
+    "part": "II. Adagio ma non tanto",
+    "performers": "Wolfram Christ, Jörg Baumann, Neithart Resa, Berlin Philharmonic Orchestra, Ottomar Borwitzky, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 9,
+   "title": "Brandenburg Concerto No. 6 in B-Flat, BWV 1051: III. Allegro",
+   "durationMs": 319333,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 6,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 6 in B-Flat Major, BWV 1051",
+    "part": "III. Allegro",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  }
+ ]
+}

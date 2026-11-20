@@ -1,0 +1,64 @@
+{
+ "id": "1452512388",
+ "category": "symphony",
+ "title": "Bruckner: Symphony No. 7",
+ "artist": "Vienna Philharmonic & Herbert von Karajan",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Symphony No. 7 in E Major: I. Allegro Moderato",
+   "durationMs": 1180000,
+   "artist": "Vienna Philharmonic & Herbert von Karajan",
+   "apple": {
+    "block": 1,
+    "composer": "Anton Bruckner",
+    "work": "Symphony No. 7 in E Major, WAB 107 · “Lyric”",
+    "part": "I. Allegro Moderato",
+    "performers": "Herbert von Karajan, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Symphony No. 7 in E Major: II. Adagio. Sehr feierlich und sehr langsam",
+   "durationMs": 1395000,
+   "artist": "Vienna Philharmonic & Herbert von Karajan",
+   "apple": {
+    "block": 1,
+    "composer": "Anton Bruckner",
+    "work": "Symphony No. 7 in E Major, WAB 107 · “Lyric”",
+    "part": "II. Adagio. Sehr feierlich und sehr langsam",
+    "performers": "Herbert von Karajan, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Symphony No. 7 in E Major: III. Scherzo. Sehr schnell - Trio. Etwas langsamer",
+   "durationMs": 611000,
+   "artist": "Vienna Philharmonic & Herbert von Karajan",
+   "apple": {
+    "block": 1,
+    "composer": "Anton Bruckner",
+    "work": "Symphony No. 7 in E Major, WAB 107 · “Lyric”",
+    "part": "III. Scherzo. Sehr schnell - Trio. Etwas langsamer",
+    "performers": "Vienna Philharmonic, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Symphony No. 7 in E Major: IV. Finale. Bewegt, doch nicht schnell",
+   "durationMs": 780000,
+   "artist": "Vienna Philharmonic & Herbert von Karajan",
+   "apple": {
+    "block": 1,
+    "composer": "Anton Bruckner",
+    "work": "Symphony No. 7 in E Major, WAB 107 · “Lyric”",
+    "part": "IV. Finale. Bewegt, doch nicht schnell",
+    "performers": "Vienna Philharmonic, Herbert von Karajan"
+   }
+  }
+ ]
+}

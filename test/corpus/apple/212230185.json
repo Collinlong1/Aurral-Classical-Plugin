@@ -1,0 +1,708 @@
+{
+ "id": "212230185",
+ "category": "guitar harp other",
+ "title": "The Very Best of Andres Segovia - Guitar Genius",
+ "artist": "Andrés Segovia",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Partita No. 3 In e Major, BWV 1006: Gavotte On Rondeau",
+   "durationMs": 169480,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 3 for Solo Violin in E Major, BWV 1006",
+    "part": "Gavotte On Rondeau",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Partita No. 2 In D Major, BWV 1004: Chaconne",
+   "durationMs": 725293,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 2 for Solo Violin in D Minor, BWV 1004",
+    "part": "Chaconne",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Suite No. 6 In D Major, BWV 1012: Gavottes I & II",
+   "durationMs": 221347,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 6 in D Major, BWV 1012",
+    "part": "Gavottes I & II",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Lute Suite In e Minor, BWV 996: Bourree",
+   "durationMs": 199760,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "Lute Suite No. 1 in E Minor, BWV 996",
+    "part": "Bourree",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Prelude In C Minor, BWV 999",
+   "durationMs": 86400,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Prelude in C Minor, BWV 999",
+    "part": "Prelude In C Minor, BWV 999",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Prelude In C Minor, BWV 999",
+   "durationMs": 71960,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Prelude in C Minor, BWV 999",
+    "part": "Prelude In C Minor, BWV 999",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Suite No. 6 In C Major, BWV 1009: Courante",
+   "durationMs": 161000,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 6,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 3 in C Major, BWV 1009",
+    "part": "Courante",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Suite No. 6 In D Major for Violincello, BWV 1012: Gavotte",
+   "durationMs": 217640,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 7,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 6 in D Major, BWV 1012",
+    "part": "Gavotte",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Sonata for Solo Violin No. 1 In G Minor, BWV 1001: Fugue",
+   "durationMs": 263853,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 8,
+    "composer": "Johann Sebastian Bach",
+    "work": "Sonata for Solo Violin No. 1 in G Minor, BWV 1001",
+    "part": "Fugue",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Suite No. 3 In C Major for Violincello, BWV 1009: Courante",
+   "durationMs": 155600,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 9,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 3 in C Major, BWV 1009",
+    "part": "Courante",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 1,
+   "title": "Sarabande",
+   "durationMs": 109880,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 10,
+    "composer": "Robert de Visée",
+    "work": "Sarabande",
+    "part": "Sarabande",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 2,
+   "title": "Bourrée",
+   "durationMs": 54640,
+   "artist": "Ernie Wilkins",
+   "apple": {
+    "block": 11,
+    "composer": "Robert de Visée",
+    "work": "Suite for lute in D Minor",
+    "part": "Bourrée",
+    "performers": "Ernie Wilkins"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 3,
+   "title": "Menuet",
+   "durationMs": 105387,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 12,
+    "composer": "Robert de Visée",
+    "work": "Livre de pièces pour la guittarre",
+    "part": "Menuet",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 4,
+   "title": "Entrada",
+   "durationMs": 105267,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 12,
+    "composer": "Robert de Visée",
+    "work": "Livre de pièces pour la guittarre",
+    "part": "Entrada",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 5,
+   "title": "Gigue",
+   "durationMs": 93173,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 13,
+    "composer": "Johann Jakob Froberger",
+    "work": "Partita in D Minor, FbWV 602",
+    "part": "Gigue",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 6,
+   "title": "Bourée",
+   "durationMs": 47507,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 14,
+    "composer": "Robert de Visée",
+    "work": "Suite for lute in D Minor",
+    "part": "Bourée",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 7,
+   "title": "Menuet",
+   "durationMs": 121533,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 15,
+    "composer": "Robert de Visée",
+    "work": "Livre de pièces pour la guittarre",
+    "part": "Menuet",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 8,
+   "title": "Anon: Canzona",
+   "durationMs": 97427,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 16,
+    "composer": "Visée: Anon",
+    "work": "Visée: Anon",
+    "part": "Canzona",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 9,
+   "title": "Anon: Saltarello",
+   "durationMs": 60560,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 16,
+    "composer": "Visée: Anon",
+    "work": "Visée: Anon",
+    "part": "Saltarello",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 10,
+   "title": "Anon: el Noi de la Mare",
+   "durationMs": 192293,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 17,
+    "composer": "Segovia: Anon",
+    "work": "Segovia: Anon",
+    "part": "el Noi de la Mare",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 11,
+   "title": "Anon: el Testamente de Amelia",
+   "durationMs": 113827,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 18,
+    "composer": "Visée: Anon",
+    "work": "Visée: Anon",
+    "part": "el Testamente de Amelia",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 12,
+   "title": "Etude No. 1 In E Minor",
+   "durationMs": 118147,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 19,
+    "composer": "Heitor Villa-Lobos",
+    "work": "12 Estudos para violão, A 235, W 235",
+    "part": "Etude No. 1 In E Minor",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 13,
+   "title": "Fandanguillo",
+   "durationMs": 237627,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 20,
+    "composer": "Heitor Villa-Lobos",
+    "work": "Fandanguillo, Op. 36",
+    "part": "Fandanguillo",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 14,
+   "title": "Etude No. 8 In A-Sharp Minor",
+   "durationMs": 162320,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 21,
+    "composer": "Heitor Villa-Lobos",
+    "work": "12 Estudos para violão, A 235, W 235",
+    "part": "Etude No. 8 In A-Sharp Minor",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 15,
+   "title": "Sonatina Meridional: Campo",
+   "durationMs": 231547,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 22,
+    "composer": "Manuel Ponce",
+    "work": "Sonatina meridional",
+    "part": "Campo",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 16,
+   "title": "Sonatina Meridional: Copla",
+   "durationMs": 129840,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 22,
+    "composer": "Manuel Ponce",
+    "work": "Sonatina meridional",
+    "part": "Copla",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 17,
+   "title": "Sonatina Meridional: Fiesta",
+   "durationMs": 149800,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 22,
+    "composer": "Manuel Ponce",
+    "work": "Sonatina meridional",
+    "part": "Fiesta",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 1,
+   "title": "Guitar Concerto No. 1 In D Major, Op.99: I. Allegretto Giusto",
+   "durationMs": 375373,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 23,
+    "composer": "Mario Castelnuovo-Tedesco",
+    "work": "Guitar Concerto No. 1 in D Major, Op. 99",
+    "part": "I. Allegretto Giusto",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 2,
+   "title": "Guitar Concerto No. 1 In D Major, Op.99: II. Andatino, Alla Romanza",
+   "durationMs": 393253,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 23,
+    "composer": "Mario Castelnuovo-Tedesco",
+    "work": "Guitar Concerto No. 1 in D Major, Op. 99",
+    "part": "II. Andatino, Alla Romanza",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 3,
+   "title": "Guitar Concerto No. 1 In D Major, Op.99: III. Ritmico e Cavalleresco",
+   "durationMs": 371347,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 23,
+    "composer": "Mario Castelnuovo-Tedesco",
+    "work": "Guitar Concerto No. 1 in D Major, Op. 99",
+    "part": "III. Ritmico e Cavalleresco",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 4,
+   "title": "Guitar Concerto No. 1 In D Major, Op.99: Tarantella, Aranci In Fiore, Op.87",
+   "durationMs": 227467,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 24,
+    "composer": "Mario Castelnuovo-Tedesco",
+    "work": "6 Pieces in Form of Canons, Op. 156",
+    "part": "Tarantella, Aranci In Fiore, Op.87",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 5,
+   "title": "Allegretto (Sonatina In A Major)",
+   "durationMs": 198120,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 25,
+    "composer": "Federico Moreno-Torroba",
+    "work": "Sonatina for Guitar",
+    "part": "Allegretto (Sonatina In A Major)",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 6,
+   "title": "Fandanguillo (Suite Castellana)",
+   "durationMs": 117907,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 26,
+    "composer": "Federico Moreno-Torroba",
+    "work": "Suite castellana",
+    "part": "Fandanguillo (Suite Castellana)",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 7,
+   "title": "Preludio",
+   "durationMs": 113333,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 27,
+    "composer": "Federico Moreno-Torroba",
+    "work": "Preludio",
+    "part": "Preludio",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 8,
+   "title": "Nocturno",
+   "durationMs": 186653,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 28,
+    "composer": "Federico Moreno-Torroba",
+    "work": "Nocturno No. 2",
+    "part": "Nocturno",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 9,
+   "title": "Fandanguillo (Suite Castellana)",
+   "durationMs": 109840,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 29,
+    "composer": "Federico Moreno-Torroba",
+    "work": "Suite castellana",
+    "part": "Fandanguillo (Suite Castellana)",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 10,
+   "title": "Arada (Suite Castellana)",
+   "durationMs": 176640,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 29,
+    "composer": "Federico Moreno-Torroba",
+    "work": "Suite castellana",
+    "part": "Arada (Suite Castellana)",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 11,
+   "title": "Burgalesa",
+   "durationMs": 113893,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 30,
+    "composer": "Federico Moreno-Torroba",
+    "work": "Burgalesa",
+    "part": "Burgalesa",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 12,
+   "title": "Albada",
+   "durationMs": 85707,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 31,
+    "composer": "Federico Moreno-Torroba",
+    "work": "Piezas características",
+    "part": "Albada",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 13,
+   "title": "Arada (Suite Castellana)",
+   "durationMs": 175147,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 32,
+    "composer": "Federico Moreno-Torroba",
+    "work": "Suite castellana",
+    "part": "Arada (Suite Castellana)",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 1,
+   "title": "Suite In A: Prélude. Allemande",
+   "durationMs": 267893,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 33,
+    "composer": "Manuel Ponce",
+    "work": "4 Piezas, “Suite Bitonal”",
+    "part": "Prélude. Allemande",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 2,
+   "title": "Suite In A: Gavotte",
+   "durationMs": 176453,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 33,
+    "composer": "Manuel Ponce",
+    "work": "4 Piezas, “Suite Bitonal”",
+    "part": "Gavotte",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 3,
+   "title": "Suite In A: Sarabande",
+   "durationMs": 176720,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 33,
+    "composer": "Manuel Ponce",
+    "work": "4 Piezas, “Suite Bitonal”",
+    "part": "Sarabande",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 4,
+   "title": "Suite In A: Gigue",
+   "durationMs": 278320,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 33,
+    "composer": "Manuel Ponce",
+    "work": "4 Piezas, “Suite Bitonal”",
+    "part": "Gigue",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 5,
+   "title": "Folia de Espagna - Theme & Variation With Fugue:",
+   "durationMs": 876187,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 34,
+    "composer": "M. Ponce",
+    "work": "M. Ponce",
+    "part": "Folia de Espagna - Theme & Variation With Fugue:",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 6,
+   "title": "Sonata No. 3: Allegro Moderato",
+   "durationMs": 265693,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 35,
+    "composer": "Manuel Ponce",
+    "work": "Guitar Sonata",
+    "part": "Allegro Moderato",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 7,
+   "title": "Sonata No. 3: II. Cancion",
+   "durationMs": 167360,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 35,
+    "composer": "Manuel Ponce",
+    "work": "Guitar Sonata",
+    "part": "II. Cancion",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 8,
+   "title": "Sonata No. 3: Postlude",
+   "durationMs": 115067,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 36,
+    "composer": "Manuel Ponce",
+    "work": "Sonata No. 3",
+    "part": "Postlude",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 9,
+   "title": "Sonata No. 3: Mazurka",
+   "durationMs": 203120,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 37,
+    "composer": "Manuel Ponce",
+    "work": "20 Mazurkas",
+    "part": "Mazurka",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 10,
+   "title": "Sonata No. 3: Petit Valse",
+   "durationMs": 164560,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 38,
+    "composer": "M. Ponce: Sonata No. 3",
+    "work": "M. Ponce: Sonata No. 3",
+    "part": "Petit Valse",
+    "performers": "Andrés Segovia"
+   }
+  }
+ ]
+}

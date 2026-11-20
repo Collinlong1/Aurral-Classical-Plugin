@@ -1,15 +1,15 @@
 {
   "id": "aurral-classical",
   "name": "Aurral Classical",
-  "version": "1.1.6",
+  "version": "1.2.0",
   "api": 1,
-  "description": "Tags classical music as Composer — Soloist — Ensemble — Conductor from MusicBrainz after you preview it, groups album tracks by work, and downloads classical albums from slskd.",
+  "description": "Tags classical music as Composer — Soloist — Ensemble — Conductor from MusicBrainz after you preview it, groups albums by work, and downloads classical albums from slskd.",
   "repository": "https://github.com/Collinlong1/Aurral-Classical-Plugin",
   "uses": [
     "musicbrainz.org, or your mirror",
     "Your slskd",
     "Tags of classical files in your Library",
-    "Aurral's API, to refresh the Library after tagging"
+    "Aurral's API, to read the Library and refresh it after tagging"
   ],
   "settings": [
     {
@@ -52,10 +52,23 @@
       "label": "Separator",
       "type": "text",
       "help": "Goes between the names in the artist tag. Default: —"
+    },
+    {
+      "key": "libraryEpoch",
+      "label": "Library database epoch",
+      "type": "text",
+      "help": "Change this value after replacing or restoring the host library database. Existing catalogue links are held for review. Leave blank for the initial library."
     }
   ],
   "test": true,
   "actions": [
+    {
+      "id": "classical-auto-match",
+      "label": "Match classical works",
+      "target": "album",
+      "admin": true,
+      "background": true
+    },
     {
       "id": "tag-album",
       "label": "Tag as classical",
@@ -92,7 +105,6 @@
       "background": true
     }
   ],
-  "albumPresentation": true,
   "events": [
     "download.finished"
   ],
@@ -101,5 +113,6 @@
   },
   "importList": null,
   "schedule": "15m",
-  "apiAccess": true
+  "apiAccess": true,
+  "albumPresentation": true
 }

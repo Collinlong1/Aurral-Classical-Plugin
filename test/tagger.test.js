@@ -564,14 +564,6 @@ test("menu actions show the planned tags and write nothing until Write planned t
   const [request] = listRequests(input());
   assert.deepEqual([request.mode, request.state, request.target], ["tag", "waiting", "album:7"]);
 
-  // Planning is enough for the album page to group the tracks by work.
-  const headings = await plugin.albumPresentation(input({ album }));
-  assert.equal(headings.label, "By work");
-  assert.deepEqual(headings.groups.map((group) => group.trackIds), [[1, 2]]);
-  // Each track is named by its movement, as on the aurral-classical branch.
-  assert.deepEqual(headings.groups[0].titles, ["I. Allegro con brio", "I. Allegro con brio (Live)"]);
-  assert.ok(headings.groups[0].title);
-
   // Someone edits the MP3 after the plan; writing changes the FLAC only.
   await writeTags(two, { composer: ["Someone"] });
   const result = await plugin.actions["write-album"](input({ user: admin, album }));
@@ -599,14 +591,13 @@ test("a read-only folder is previewed but never written", async (t) => {
     const album = { id: 9, title: "Read only", tracks: [{ id: 3, path: file }] };
     const planned = await plugin.actions["tag-album"](input({ user: admin, album }));
     assert.match(planned.message, /These files are read-only, so they can't be written\.$/);
-    assert.ok((await plugin.albumPresentation(input({ album }))).groups.length);
-  } finally {
+    } finally {
     // The shared cleanup runs before t.after, and can't delete inside a read-only folder.
     await fs.chmod(folder, 0o755);
   }
 });
 
-test("an album in one of Aurral's read-only folders is previewed and grouped, never written", async () => {
+test("an album in one of Aurral's read-only folders is previewed, never written", async () => {
   const admin = { id: 1, role: "admin" };
   // Outside the Library folder, where Aurral's read-only folders live.
   const file = await copyFixture("sine.flac", path.join(folders.root, "music", "ro", "01.flac"));
@@ -615,61 +606,8 @@ test("an album in one of Aurral's read-only folders is previewed and grouped, ne
   const planned = await plugin.actions["tag-album"](input({ user: admin, album }));
   assert.ok(planned.message.includes(`Artist: ${EXPECTED_ARTIST}.`), planned.message);
   assert.match(planned.message, /These files are read-only, so they can't be written\.$/);
-  assert.deepEqual((await plugin.albumPresentation(input({ album }))).groups.map((group) => group.trackIds), [[5]]);
   const written = await plugin.actions["write-album"](input({ user: admin, album }));
   assert.match(written.message, /1 skipped \(read-only folder\)/);
   assert.deepEqual(await fs.readFile(file), before);
-});
-
-test("tracks with no file inside a work stay under its heading", async () => {
-  const admin = { id: 1, role: "admin" };
-  const one = await copyFixture("sine.flac", path.join(folders.libraryFolder, "gap", "01.flac"));
-  const three = await copyFixture("sine.mp3", path.join(folders.libraryFolder, "gap", "03.mp3"));
-  const album = { id: 12, title: "Gap", tracks: [{ id: 1, path: one }, { id: 2, path: null }, { id: 3, path: three }, { id: 4, path: null }] };
-  await plugin.actions["tag-album"](input({ user: admin, album }));
-  const { groups } = await plugin.albumPresentation(input({ album }));
-  assert.deepEqual(groups.map((group) => group.trackIds), [[1, 2, 3]]);
-});
-
-test("a catalogued piece is headed by itself, not by an uncatalogued collection above it", async () => {
-  const admin = { id: 1, role: "admin" };
-  const entities = symphonyEntities();
-  // As MusicBrainz files Chopin: "Ballade No. 1, op. 23" is a part of "Ballades".
-  entities["work:sym5"] = { ...entities["work:sym5"], title: "Ballade No. 1 in G minor, op. 23", relations: [...entities["work:sym5"].relations, { type: "parts", "target-type": "work", direction: "backward", work: { id: "ballades", title: "Ballades" } }] };
-  entities["work:ballades"] = { id: "ballades", title: "Ballades", relations: [] };
-  globalThis.fetch = fakeFetch({ entities });
-  const one = await copyFixture("sine.flac", path.join(folders.libraryFolder, "ballade", "01.flac"));
-  const album = { id: 13, title: "Ballade", tracks: [{ id: 1, path: one }] };
-  await plugin.actions["tag-album"](input({ user: admin, album }));
-  const { groups } = await plugin.albumPresentation(input({ album }));
-  assert.deepEqual(groups.map((group) => group.title), ["Ballade No. 1 in G minor, op. 23"]);
-});
-
-test("headings find tracks by the path Aurral gives, through a symlinked folder", async () => {
-  const admin = { id: 1, role: "admin" };
-  const real = await copyFixture("sine.flac", path.join(folders.libraryFolder, "real", "01.flac"));
-  await fs.symlink(path.dirname(real), path.join(folders.libraryFolder, "linked"));
-  const album = { id: 14, title: "Linked", tracks: [{ id: 1, path: path.join(folders.libraryFolder, "linked", "01.flac") }] };
-  await plugin.actions["tag-album"](input({ user: admin, album }));
-  assert.deepEqual((await plugin.albumPresentation(input({ album }))).groups.map((group) => group.trackIds), [[1]]);
-});
-
-test("a work's tracks share one heading even when other tracks sit between them", async () => {
-  const admin = { id: 1, role: "admin" };
-  const entities = symphonyEntities();
-  const one = await copyFixture("sine.flac", path.join(folders.libraryFolder, "split", "01.flac"));
-  const two = await copyFixture("sine.mp3", path.join(folders.libraryFolder, "split", "02.mp3"));
-  const three = await copyFixture("sine.m4a", path.join(folders.libraryFolder, "split", "03.m4a"));
-  const album = { id: 15, title: "Split", tracks: [{ id: 1, path: one }, { id: 2, path: two }, { id: 3, path: three }] };
-  await plugin.actions["tag-album"](input({ user: admin, album }));
-  // The middle file belongs to another work.
-  const works = JSON.parse(await fs.readFile(path.join(folders.dataFolder, "works.json"), "utf8"));
-  works[two] = { ...works[two], work: { id: "other", title: "Violin Concerto" } };
-  await fs.writeFile(path.join(folders.dataFolder, "works.json"), JSON.stringify(works));
-  const { groups } = await plugin.albumPresentation(input({ album }));
-  assert.deepEqual(groups.map((group) => [group.title, group.trackIds]), [
-    ["Symphony No. 5 in C minor, op. 67", [1, 3]],
-    ["Violin Concerto", [2]],
-  ]);
 });
 

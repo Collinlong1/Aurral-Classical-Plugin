@@ -11,9 +11,14 @@ using the same rules, so beets no longer needs to touch these files.
 * **Preview, then tag.** **Tag as classical** and **Remove classical tags**
   show what they would write and change nothing; **Write planned tags**
   writes it. Read-only Libraries can be previewed safely.
-* **Album headings.** Album tracks grouped under their work, with a
-  **By work** / **By track** switch. Needs an Aurral with album headings (see
-  below).
+* **By work.** A Library album's tracks grouped under their works, with the
+  composer over each, the movements by name and who plays them, as on the
+  aurral-classical branch. Built from the classical catalogue below. Needs an
+  Aurral with the album presentation (see below).
+* **Classical catalogue.** A read-only scan of the Library matches tracks to
+  works and movements from their tags, titles and MusicBrainz, including
+  albums without MusicBrainz IDs (the aurral-classical branch's matching,
+  without its editor, work pages or search).
 * **slskd download source.** Finds classical tracks and albums on Soulseek
   through your slskd, only in folders that line up with the exact release.
 
@@ -142,20 +147,21 @@ tags them as classical again.
 Menu items appear only while the plugin is on. Aurral's web app remembers the
 list for a few minutes, so reload the page after turning the plugin on.
 
-## Album headings
+## By work
 
-On an Aurral that lets plugins add album headings (the
+On an Aurral with the album presentation (the
 `claude/minimal-plugin-features-dmd2rb` branch of
-[Collinlong1/aurral](https://github.com/Collinlong1/aurral), proposed upstream
-in `proposals/upstream-album-presentation.md`), a Library album's tracks are
-grouped under their work: the work's title, its composer, and who plays. The
-album page offers **By work** and **By track**, and remembers the choice.
+[Collinlong1/aurral](https://github.com/Collinlong1/aurral), which takes it
+from the aurral-classical branch), a Library album offers **By work** beside
+**By track**. Each work heads its tracks, wherever they sit on the album, with
+its composer and length; each movement shows its own name and who plays it.
 
-Headings come from what the plugin worked out when it planned or tagged a
-file, so they appear once an album has been through Tag as classical or
-background tagging, read-only or not. Tracks the plugin knows nothing about
-stay in a plain list. Other Aurral versions ignore this and show albums as
-usual.
+The groups come from the classical catalogue in the plugin's data folder.
+Every 15 minutes the plugin scans the Library read-only through Aurral's API
+(it needs API access), matches new or changed albums to works from their
+WORK and GROUPING tags, structured titles and MusicBrainz (one request a
+second on public MusicBrainz), and keeps the result. **Match classical works**
+on an album looks it up straight away. Nothing is written to files.
 
 ## slskd download source
 

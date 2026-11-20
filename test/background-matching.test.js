@@ -1,0 +1,434 @@
+// Matching with no admin clicks (v0.1 completion, step 3): a scan applies
+// the full tag and title rules, and MusicBrainz is asked in the background
+// only about albums whose unmatched tracks are new or changed. The albums
+// already there when this first runs wait for the one-time backlog action.
+import assert from "node:assert/strict";
+import test from "node:test";
+import fs from "node:fs/promises";
+import path from "node:path";
+import http from "node:http";
+import { tempFolders, copyFixture, json as response, symphonyEntities } from "./helpers.js";
+import plugin from "../src/index.js";
+import { writeTags } from "../src/tags.js";
+import { openCatalogue } from "../src/model/catalogue.js";
+import { renderAlbumPresentation, renderWork } from "../src/model/presentation.js";
+import { Metadata } from "../src/model/metadata.js";
+import { enqueueModelScan, identifyBacklog, modelStatus, runModelJobs } from "../src/model/runtime.js";
+
+const admin = { id: 1, role: "admin" };
+const DEBUSSY = "Claude Debussy";
+const recording = (n) => `00000000-0000-4000-8000-${String(n).padStart(12, "0")}`;
+
+// A library the test can grow: each album is its tracks' titles, composer,
+// and recording IDs (or none).
+async function library(t) {
+  const folders = await tempFolders();
+  t.after(() => fs.rm(folders.root, { recursive: true, force: true }));
+  const tracks = [];
+  const add = async (album, titles, { composer = DEBUSSY, recordings = [], workIds = [] } = {}) => {
+    for (const [i, title] of titles.entries()) {
+      const id = tracks.length;
+      const file = await copyFixture("sine.flac", path.join(folders.libraryFolder, `${id}.flac`));
+      // Distinct audio per file.
+      const { size } = await fs.stat(file);
+      const fd = await fs.open(file, "r+");
+      await fd.write(Buffer.from([id + 1]), 0, 1, size - 50);
+      await fd.close();
+      await writeTags(file, { title: [title], composer: [composer], artist: ["Pianist"], ...(recordings[i] && { recordingMbid: [recordings[i]] }), ...(workIds[i] && { workId: [workIds[i]] }) });
+      tracks.push({ id, title, album, file, trackNumber: i + 1 });
+    }
+  };
+  const lookups = [];
+  const works = {
+    // MusicBrainz: each recording is a movement of one parent work.
+    "work-parent": { id: "work-parent", title: "Suite bergamasque", relations: [{ type: "composer", artist: { id: "artist-debussy", name: DEBUSSY } }] },
+    ...Object.fromEntries(
+      ["Prélude", "Menuet", "Clair de lune", "Passepied"].map((title, i) => [
+        `work-${i + 1}`,
+        { id: `work-${i + 1}`, title, relations: [{ type: "parts", direction: "backward", work: { id: "work-parent" } }] },
+      ]),
+    ),
+  };
+  const ctx = {
+    ...folders,
+    settings: {},
+    log: () => {},
+    userOperations: { version: 1, url: "http://host.test/ops", token: "test-only" },
+    fetch: async () =>
+      response({
+        version: 1,
+        complete: true,
+        library: {
+          albums: [...new Set(tracks.map((track) => track.album))].map((album) => ({ id: album, title: album })),
+          tracks: tracks.map((track) => ({
+            id: track.id,
+            title: track.title,
+            files: [{ id: track.id, path: track.file, available: true, durationMs: 1000, albumId: track.album, trackNumber: track.trackNumber, discNumber: 1 }],
+          })),
+        },
+      }),
+    resolver: {
+      async resolve(id) {
+        lookups.push(`recording:${id}`);
+        const n = Number(id.slice(-12));
+        return { workId: `work-${n}`, composers: [DEBUSSY] };
+      },
+    },
+    mb: {
+      async get(kind, id) {
+        lookups.push(`${kind}:${id}`);
+        return works[id] || null;
+      },
+    },
+  };
+  const scan = async () => {
+    await enqueueModelScan(ctx, admin);
+    await runModelJobs(ctx, { budgetMs: 30_000 });
+  };
+  const view = async (albumId) => {
+    const c = await openCatalogue(path.join(folders.dataFolder, "model"));
+    try {
+      return renderAlbumPresentation(c, albumId)?.groups.map((group) => [group.title, Boolean(group.workId), group.items.length]) ?? null;
+    } finally {
+      c.close();
+    }
+  };
+  return { ctx, add, scan, view, lookups, works };
+}
+
+test("background matching: a scan applies the full title rules without MusicBrainz", async (t) => {
+  const lib = await library(t);
+  await lib.add("corner", ["I. Doctor Gradus ad Parnassum", "II. Jimbo’s Lullaby", "III. Serenade for the Doll"].map((m) => `Children’s Corner, L. 113: ${m}`));
+  await lib.scan();
+  // Before: scans read only WORK and GROUPING tags, so this stayed unmatched.
+  assert.deepEqual(await lib.view("corner"), [["Children’s Corner, L. 113", true, 3]]);
+  assert.deepEqual(lib.lookups, []);
+});
+
+test("background matching: only new albums are looked up, once, paced and resumable; the backlog waits for the admin", async (t) => {
+  const lib = await library(t);
+  const titles = ["Prélude", "Menuet", "Clair de lune", "Passepied"];
+  // Titles that name no work: only MusicBrainz can.
+  await lib.add("earlier", titles, { recordings: [1, 2, 3, 4].map(recording) });
+  await lib.scan();
+  // Already there on the first run: recorded as the backlog, not looked up.
+  assert.deepEqual(lib.lookups, []);
+  let status = (await modelStatus(lib.ctx)).identification;
+  assert.equal(status.backlog, 1);
+  assert.equal(status.queued, 0);
+
+  await lib.add("new", titles, { recordings: [1, 2, 3, 4].map(recording) });
+  await lib.scan();
+  // The scan finished first; identification runs on the next job run.
+  status = (await modelStatus(lib.ctx)).identification;
+  assert.equal(status.queued, 1);
+  // A run that stops part way keeps what it looked up.
+  await runModelJobs(lib.ctx, { budgetMs: 0 });
+  await runModelJobs(lib.ctx, { budgetMs: 30_000 });
+  status = (await modelStatus(lib.ctx)).identification;
+  assert.deepEqual([status.queued, status.done, status.matched], [0, 1, 1]);
+  assert.deepEqual(await lib.view("new"), [["Suite bergamasque", true, 4]]);
+  assert.equal(await lib.view("earlier").then((groups) => groups?.some(([, matched]) => matched) ?? false), false);
+  assert.ok(lib.lookups.every((lookup) => !lookup.includes("earlier")));
+
+  // A rescan with nothing changed looks nothing up again.
+  const before = lib.lookups.length;
+  await lib.scan();
+  await runModelJobs(lib.ctx, { budgetMs: 30_000 });
+  assert.equal(lib.lookups.length, before);
+
+  // The admin's one-time backlog lookup.
+  await assert.rejects(identifyBacklog(lib.ctx, { id: 2, role: "user" }), /admin/);
+  assert.deepEqual(await identifyBacklog(lib.ctx, admin), { albums: 1, tracks: 4 });
+  assert.deepEqual(await identifyBacklog(lib.ctx, admin), { albums: 0, tracks: 0 });
+  await runModelJobs(lib.ctx, { budgetMs: 30_000 });
+  // Both albums share the one work MusicBrainz names.
+  const [earlier] = await lib.view("earlier");
+  assert.deepEqual(earlier, ["Suite bergamasque", true, 4]);
+  status = (await modelStatus(lib.ctx)).identification;
+  assert.deepEqual([status.queued, status.backlog, status.done], [0, 0, 2]);
+});
+
+test("background matching: an unreachable MusicBrainz retries the album later instead of skipping it", async (t) => {
+  const lib = await library(t);
+  await lib.add("first", ["Prélude"], { recordings: [recording(1)] });
+  await lib.scan();
+  await lib.add("later", ["Prélude", "Menuet", "Clair de lune", "Passepied"], { recordings: [1, 2, 3, 4].map(recording) });
+  const working = lib.ctx.resolver.resolve;
+  lib.ctx.resolver.resolve = async () => {
+    throw new Error("fetch failed");
+  };
+  await lib.scan();
+  await runModelJobs(lib.ctx, { budgetMs: 30_000 });
+  const c = await openCatalogue(path.join(lib.ctx.dataFolder, "model"));
+  const job = c.db.prepare("SELECT state,error FROM model_job WHERE type='album_identify' AND state!='done'").get();
+  c.db.prepare("UPDATE model_job SET next_run_at=0 WHERE type='album_identify'").run();
+  c.close();
+  assert.equal(job.state, "retry");
+  assert.match(job.error, /MusicBrainz unavailable/);
+  lib.ctx.resolver.resolve = working;
+  await runModelJobs(lib.ctx, { budgetMs: 30_000 });
+  assert.deepEqual(await lib.view("later"), [["Suite bergamasque", true, 4]]);
+});
+
+// On the user's server the backlog stayed "queued": the action only queued
+// it, and the plugin schedule runs the queue. The action now works the
+// queue itself, in its background budget, on the model worker thread.
+test("background matching: the backlog action looks the albums up itself, without the schedule", async (t) => {
+  const lib = await library(t);
+  await lib.add("earlier", ["I. Allegro con brio", "II. Andante con moto"], { composer: "Ludwig van Beethoven", recordings: [recording(1), recording(2)] });
+  await lib.scan();
+  // MusicBrainz as the plugin's own client reads it, through the mirror setting.
+  const entities = symphonyEntities(recording(1));
+  entities[`recording:${recording(2)}`] = {
+    ...entities[`recording:${recording(1)}`],
+    id: recording(2),
+    relations: [{ type: "performance", "target-type": "work", direction: "forward", work: { id: "mvt2", title: "Symphony No. 5: II" } }],
+  };
+  entities["work:mvt2"] = { ...entities["work:mvt1"], id: "mvt2", title: "Symphony No. 5 in C minor, op. 67: II. Andante con moto" };
+  // Served over HTTP as a MusicBrainz mirror: the lookups run on the
+  // model worker thread, which reaches the network itself.
+  const server = http.createServer((request, response) => {
+    const [, , , entity, id] = new URL(request.url, "http://mirror").pathname.split("/");
+    const data = entities[`${entity}:${id}`];
+    response.writeHead(data ? 200 : 404, { "content-type": "application/json" });
+    response.end(JSON.stringify(data || { error: "Not Found" }));
+  });
+  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  t.after(() => server.close());
+  const mirror = `http://127.0.0.1:${server.address().port}`;
+  const input = { ...lib.ctx, settings: { mbMirror: mirror }, user: { id: 1, role: "admin" } };
+  const { message } = await plugin.actions["classical-identify-backlog"](input);
+  assert.match(message, /Queued 1 album \(2 tracks\).* 1 album looked up, 1 work group made/);
+  assert.deepEqual(await lib.view("earlier"), [["Symphony No. 5 in C minor, op. 67", true, 2]]);
+});
+
+// From the user's library: Scriabin's late sonatas are one movement each,
+// titled "Piano Sonata no. 7, op. 64 "Messe blanche": Allegro". MusicBrainz
+// names the sonata itself, a work with no parts, but the colon made the track
+// read as one movement of a bigger work, and one movement alone is refused.
+test("background matching: a whole work in one movement, titled with its tempo, matches from MusicBrainz", async (t) => {
+  const lib = await library(t);
+  await lib.add("earlier", ["Prélude"], { recordings: [recording(1)] });
+  await lib.scan();
+  lib.works["work-7"] = { id: "work-7", title: "Piano Sonata no. 7, op. 64 “White Mass”", relations: [{ type: "composer", artist: { id: "artist-scriabin", name: "Alexander Scriabin" } }] };
+  // A symphony movement that MusicBrainz files under its symphony joins it
+  // as an excerpt (1.0.41), as Apple Music Classical shows it.
+  lib.works["work-8"] = { id: "work-8", title: "Symphony no. 5, op. 67: I. Allegro con brio", relations: [{ type: "parts", direction: "backward", work: { id: "work-sym" } }] };
+  lib.works["work-sym"] = { id: "work-sym", title: "Symphony no. 5, op. 67", relations: [{ type: "parts", direction: "forward", work: { id: "work-8" } }] };
+  await lib.add("scriabin", ['Piano Sonata no. 7, op. 64 "Messe blanche": Allegro', "Symphony no. 5, op. 67: Allegro con brio"], { composer: "Alexander Scriabin", recordings: [recording(7), recording(8)] });
+  await lib.scan();
+  await runModelJobs(lib.ctx, { budgetMs: 30_000 });
+  const groups = await lib.view("scriabin");
+  assert.deepEqual(groups.find(([title]) => /Sonata no\. 7/.test(title)), ['Piano Sonata no. 7, op. 64 "Messe blanche"', true, 1]);
+  assert.deepEqual(groups.find(([title]) => /Symphony no\. 5/.test(title)), ["Symphony no. 5, op. 67", true, 1]);
+});
+
+// From the user's library on 1.0.42: three preludes and fugues on one album
+// were filed under "The Well-Tempered Clavier, BWV 846–893" (identification
+// climbed MusicBrainz's tree into the range of works above them), and works
+// kept German names because their English alias wasn't the primary one.
+test("background matching: no climbing into a range of works; English names; the admin action runs on the worker", async (t) => {
+  const lib = await library(t);
+  await lib.add("earlier", ["Prélude"], { recordings: [recording(1)] });
+  await lib.scan();
+  const part = (id, title, parent) => ({ id, title, relations: [{ type: "parts", direction: "backward", work: { id: parent } }] });
+  Object.assign(lib.works, {
+    "work-31": part("work-31", "Prelude", "pf855"),
+    "work-32": part("work-32", "Fugue", "pf855"),
+    pf855: {
+      id: "pf855",
+      title: "Präludium und Fuge e-Moll, BWV 855",
+      aliases: [{ locale: "en", name: "Prelude and Fugue in E minor, BWV 855", primary: false, type: "Work name" }],
+      relations: [
+        { type: "parts", direction: "backward", work: { id: "wtc1" } },
+        { type: "parts", direction: "forward", work: { id: "work-31" } },
+        { type: "parts", direction: "forward", work: { id: "work-32" } },
+      ],
+    },
+    wtc1: { ...part("wtc1", "Das Wohltemperierte Klavier I, BWV 846–869", "wtc"), aliases: [{ locale: "en", name: "The Well-Tempered Clavier, Book I, BWV 846–869", type: "Work name" }] },
+    wtc: { id: "wtc", title: "The Well-Tempered Clavier, BWV 846–893", relations: [] },
+    "work-33": part("work-33", "Präludium", "pf902"),
+    pf902: { id: "pf902", title: "Präludium und Fughetta G-Dur, BWV 902", relations: [] },
+  });
+  await lib.add("bach", ["Prelude", "Fugue", "Prelude & Fughetta in G major, BWV 902: I. Prelude"], { composer: "Johann Sebastian Bach", recordings: [recording(31), recording(32), recording(33)] });
+  await lib.scan();
+  await runModelJobs(lib.ctx, { budgetMs: 30_000 });
+  // Subtitled with the book it belongs to, as Apple Music Classical shows it.
+  assert.deepEqual(await lib.view("bach"), [
+    ["Prelude and Fugue in E minor, BWV 855 · “The Well-Tempered Clavier, Book I”", true, 2],
+    ["Prelude & Fughetta in G major, BWV 902", true, 1],
+  ]);
+
+  // A work titled before 1.0.43 takes the English name when its album is
+  // matched again, through the admin action, which now runs on the worker.
+  const c = await openCatalogue(path.join(lib.ctx.dataFolder, "model"));
+  const work = c.db.prepare("SELECT entity_id AS id FROM external_identity WHERE record_kind='work' AND record_id='pf855' AND state='active'").get().id;
+  new Metadata(c).derived(work, "title", "Präludium und Fuge e-Moll, BWV 855");
+  c.close();
+  // MusicBrainz as a mirror over HTTP: the worker makes its own client.
+  const server = http.createServer((request, response) => {
+    const [, , , entity, id] = new URL(request.url, "http://mirror").pathname.split("/");
+    const data = entity === "work" ? lib.works[id] : null;
+    response.writeHead(data ? 200 : 404, { "content-type": "application/json" });
+    response.end(JSON.stringify(data || { error: "Not Found" }));
+  });
+  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  t.after(() => server.close());
+  const settings = { mbMirror: `http://127.0.0.1:${server.address().port}` };
+  const { message } = await plugin.actions["classical-auto-match"]({ ...lib.ctx, settings, user: admin, album: { id: "bach" } });
+  assert.match(message, /No new groups|Created/);
+  assert.equal((await lib.view("bach"))[0][0], "Prelude and Fugue in E minor, BWV 855 · “The Well-Tempered Clavier, Book I”");
+  const d = await openCatalogue(path.join(lib.ctx.dataFolder, "model"));
+  assert.deepEqual(renderWork(d, work, admin).work.collections.map((collection) => collection.title), ["The Well-Tempered Clavier, Book I"]);
+  d.close();
+});
+
+// The user's 1.0.43 audit: about a hundred works matched from Hyperion's tags
+// kept German names ("Zwei Konzertetüden, S. 145"); MusicBrainz was never
+// asked about them. The admin's one-time action finds each work's
+// MusicBrainz entry through its tracks' Work Id tags and takes the English
+// name only when that entry carries the work's own number.
+test("background matching: English work names from MusicBrainz, once, for works matched from tags", async (t) => {
+  const lib = await library(t);
+  await lib.add("liszt", ["Zwei Konzertetüden, S. 145: I. Waldesrauschen", "Zwei Konzertetüden, S. 145: II. Gnomenreigen", "Trauervorspiel und Trauermarsch, S206: I. Trauervorspiel", "Trauervorspiel und Trauermarsch, S206: II. Trauermarsch", "Scherzo und Marsch, S177: I. Scherzo", "Scherzo und Marsch, S177: II. Marsch", "Two Episodes from Lenau's Faust, S. 110: I. The Night Procession", "Two Episodes from Lenau's Faust, S. 110: II. Mephisto Waltz", "Präludium und Fuge c-Moll, BWV 847: I. Präludium", "Präludium und Fuge c-Moll, BWV 847: II. Fuge"], {
+    composer: "Franz Liszt",
+    workIds: ["mb-wald", "mb-gnom", "mb-vorspiel", "mb-marsch", "mb-scherzo", "mb-m", "mb-zug", "mb-walzer", "mb-847p", "mb-847f"],
+  });
+  await lib.scan();
+  const part = (id, title, parent) => ({ id, title, relations: [{ type: "parts", direction: "backward", work: { id: parent } }] });
+  const entities = {
+    "mb-wald": part("mb-wald", "Waldesrauschen", "mb-s145"),
+    "mb-s145": { id: "mb-s145", title: "Zwei Konzertetüden, S. 145", aliases: [{ locale: "en", name: "Two Concert Études, S. 145", type: "Work name" }], relations: [] },
+    // MusicBrainz files this movement under another number: no rename.
+    "mb-vorspiel": part("mb-vorspiel", "Trauervorspiel", "mb-other"),
+    "mb-other": { id: "mb-other", title: "Trauerode, S. 112", aliases: [{ locale: "en", name: "Funeral Ode, S. 112", type: "Work name" }], relations: [] },
+    // No English name on MusicBrainz: the tracks' own heading, same number.
+    "mb-zug": part("mb-zug", "Der nächtliche Zug", "mb-s110"),
+    "mb-s110": { id: "mb-s110", title: "Zwei Episoden aus Lenaus Faust, S. 110", relations: [] },
+    // Under a book of works: its English name, and the book as collection.
+    "mb-847p": part("mb-847p", "Präludium", "mb-847"),
+    "mb-847": {
+      id: "mb-847",
+      title: "Präludium und Fuge c-Moll, BWV 847",
+      aliases: [{ locale: "en", name: "Prelude and Fugue in C minor, BWV 847", type: "Work name" }],
+      relations: [
+        { type: "parts", direction: "backward", work: { id: "mb-wtc1", title: "Das Wohltemperierte Klavier I, BWV 846–869" } },
+        { type: "parts", direction: "forward", work: { id: "mb-847p" } },
+      ],
+    },
+    "mb-wtc1": { id: "mb-wtc1", title: "Das Wohltemperierte Klavier I, BWV 846–869", aliases: [{ locale: "en", name: "The Well-Tempered Clavier, Book I, BWV 846–869", type: "Work name" }], relations: [] },
+    "mb-scherzo": part("mb-scherzo", "Scherzo", "mb-s177"),
+    "mb-s177": { id: "mb-s177", title: "Scherzo und Marsch, S. 177", aliases: [{ locale: "en", name: "Scherzo and March, S. 177", type: "Work name" }], relations: [] },
+  };
+  const server = http.createServer((request, response) => {
+    const [, , , entity, id] = new URL(request.url, "http://mirror").pathname.split("/");
+    const data = entity === "work" ? entities[id] : null;
+    response.writeHead(data ? 200 : 404, { "content-type": "application/json" });
+    response.end(JSON.stringify(data || { error: "Not Found" }));
+  });
+  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  t.after(() => server.close());
+  // An admin named this one: theirs stays.
+  const c = await openCatalogue(path.join(lib.ctx.dataFolder, "model"));
+  const work = (title) => renderAlbumPresentation(c, "liszt").groups.find((group) => group.title === title).workId;
+  new Metadata(c).manual(work("Scherzo und Marsch, S177"), "title", "Scherzo und Marsch, S. 177", { actor: "admin" });
+  new Metadata(c).derived(work("Two Episodes from Lenau's Faust, S. 110"), "title", "Zwei Episoden aus Lenaus Faust, S. 110");
+  c.close();
+  const input = { ...lib.ctx, settings: { mbMirror: `http://127.0.0.1:${server.address().port}` }, user: admin };
+  const { message } = await plugin.actions["classical-english-names"](input);
+  assert.match(message, /renamed/);
+  assert.deepEqual((await lib.view("liszt")).map(([title]) => title), ["Two Concert Études, S. 145", "Trauervorspiel und Trauermarsch, S206", "Scherzo und Marsch, S. 177", "Two Episodes from Lenau's Faust, S. 110", "Prelude and Fugue in C minor, BWV 847 · “The Well-Tempered Clavier, Book I”"]);
+  // Once: a second run looks nothing up.
+  assert.match((await plugin.actions["classical-english-names"](input)).message, /already/);
+});
+
+// v0.3 7.1-7.3: details from MusicBrainz for people, ensembles and works
+// with a MusicBrainz ID, through the paced, cached client.
+test("MusicBrainz details: one lookup each, resumable, never over an admin's own values, and pages read them", async (t) => {
+  const { fakeFetch, MB } = await import("./helpers.js");
+  const { MusicBrainz } = await import("../src/mb.js");
+  const { queueEnrichment, enrichmentStatus } = await import("../src/model/runtime.js");
+  const { ensureSearchIndex } = await import("../src/search/engine.js");
+  const { renderClassical } = await import("../src/model/pages.js");
+  const folders = await tempFolders();
+  t.after(() => fs.rm(folders.root, { recursive: true, force: true }));
+  const c = await openCatalogue(path.join(folders.dataFolder, "model"));
+  t.after(() => {
+    try {
+      c.close();
+    } catch {}
+  });
+  const m = new Metadata(c);
+  const entity = (kind, name, mbid) => {
+    const id = c.createEntity(kind);
+    m.manual(id, kind === "work" ? "title" : "name", name, { actor: "test" });
+    if (mbid) c.externalIdentity(id, "musicbrainz", kind === "work" ? "work" : "artist", mbid, { evidence: { source: "tags" } });
+    return id;
+  };
+  const beethoven = entity("person", "Ludwig van Beethoven", "mb-beethoven");
+  const orchestra = entity("ensemble", "Berliner Philharmoniker", "mb-bpo");
+  const sonata = entity("work", "Piano Sonata No. 14, Op. 27 No. 2", "mb-op27");
+  const nobody = entity("person", "Local Pianist", null);
+  // An admin's own sort name (not pinned yet) and a blank they set.
+  m.manual(orchestra, "sortName", "Berlin Philharmonic", { actor: "admin" });
+  m.manual(beethoven, "date", null, { actor: "admin", pin: true });
+  const entities = {
+    "artist:mb-beethoven": { id: "mb-beethoven", name: "Ludwig van Beethoven", "sort-name": "Beethoven, Ludwig van", "life-span": { begin: "1770-12-16", end: "1827-03-26" }, aliases: [{ name: "Louis van Beethoven" }, { name: "Ludwig van Beethoven" }, { name: "Бетховен" }] },
+    "artist:mb-bpo": { id: "mb-bpo", name: "Berliner Philharmoniker", "sort-name": "Berliner Philharmoniker", "life-span": { begin: "1882" }, aliases: [{ name: "Berlin Philharmonic" }] },
+    "work:mb-op27": { id: "mb-op27", title: "Piano Sonata no. 14 in C-sharp minor, op. 27 no. 2", aliases: [{ name: "Moonlight Sonata" }, { name: "Sonata quasi una fantasia" }] },
+  };
+  // The orchestra's first lookup fails (MusicBrainz down), the next succeeds.
+  let down = 1;
+  const base = fakeFetch({ entities });
+  const fetchImpl = async (url, init) => (String(url).includes("/artist/mb-bpo") && down-- > 0 ? response({ error: "busy" }, 503) : base(url, init));
+  fetchImpl.calls = base.calls;
+  const ctx = { ...folders, settings: { mbMirror: MB }, log: () => {}, mb: new MusicBrainz({ settings: { mbMirror: MB }, dataFolder: folders.dataFolder, fetchImpl, maxRetries: 1, retryWaitMs: 1 }) };
+  const requested = () => base.calls.filter((call) => call.url.startsWith(MB)).map((call) => new URL(call.url).pathname.split("/").slice(-2).join(":"));
+
+  assert.deepEqual(await queueEnrichment(ctx, admin), { queued: true, waiting: 3 });
+  await assert.rejects(queueEnrichment(ctx, { id: 2, role: "user" }), /admin/);
+  await runModelJobs(ctx, { budgetMs: 30_000 });
+  // One lookup each, with aliases; the person without an ID is not asked about.
+  assert.deepEqual(requested().sort(), ["artist:mb-beethoven", "work:mb-op27"]);
+  assert.match(base.calls[0].url, /inc=aliases/);
+  let status = await enrichmentStatus(ctx);
+  assert.deepEqual([status.state, status.stored, status.failed, status.waiting], ["done", 2, 1, 1]);
+  // Run again: only what failed is looked up.
+  assert.deepEqual(await queueEnrichment(ctx, admin), { queued: true, waiting: 1 });
+  await runModelJobs(ctx, { budgetMs: 30_000 });
+  assert.deepEqual(requested().filter((call) => call === "artist:mb-bpo").length, 1);
+  status = await enrichmentStatus(ctx);
+  assert.deepEqual([status.state, status.stored, status.waiting], ["done", 1, 0]);
+  // Nothing left: no job, no lookup.
+  const before = base.calls.length;
+  assert.deepEqual(await queueEnrichment(ctx, admin), { queued: false, state: "done", waiting: 0 });
+  assert.equal(base.calls.length, before);
+
+  // Stored as MusicBrainz values; the admin's sort name and blank date hold.
+  const value = (id, field) => m.resolve(id, field);
+  assert.deepEqual([value(beethoven, "sortName").value, value(beethoven, "sortName").source, value(beethoven, "sortName").provider], ["Beethoven, Ludwig van", "provider", "musicbrainz"]);
+  assert.deepEqual(value(beethoven, "aliases").value, ["Louis van Beethoven", "Бетховен"]);
+  assert.deepEqual([value(beethoven, "date").value, value(beethoven, "date").pinned, value(beethoven, "date").providerValue], [null, true, "1770-12-16"]);
+  assert.deepEqual([value(orchestra, "sortName").value, value(orchestra, "sortName").source, value(orchestra, "sortName").pinned], ["Berlin Philharmonic", "manual", true]);
+  assert.equal(value(orchestra, "date").value, "1882");
+  assert.deepEqual(value(sonata, "aliases").value, ["Moonlight Sonata", "Sonata quasi una fantasia"]);
+  assert.equal(value(sonata, "period").value, undefined, "a period is never taken from MusicBrainz");
+  assert.equal(value(nobody, "sortName").value, undefined);
+
+  // 7.3: pages read the resolved values. A composer credit makes Beethoven a page.
+  c.credit(sonata, beethoven, "composer");
+  ensureSearchIndex(c);
+  const composer = renderClassical(c, `composer:${beethoven}`, {}, { id: 1, role: "user" });
+  assert.equal(composer.sections[0].facts.find((fact) => fact.label === "Other names").value, "Louis van Beethoven, Бетховен");
+  assert.equal(composer.sections[0].facts.find((fact) => fact.label === "Dates"), undefined, "the admin's blank date stays blank");
+  assert.equal(c.db.prepare("SELECT sort_title FROM search_doc WHERE kind='composer' AND ref=?").get(beethoven).sort_title, "beethoven ludwig van");
+  const work = renderClassical(c, `work:${sonata}`, {}, { id: 1, role: "user" });
+  assert.equal(work.sections.find((s) => s.id === "about").items.find((item) => item.label === "Other names").value, "Moonlight Sonata, Sonata quasi una fantasia");
+});
+
+test("MusicBrainz details: what an artist or work entry gives, and what it doesn't", async () => {
+  const { enrichmentFields } = await import("../src/model/runtime.js");
+  assert.deepEqual(enrichmentFields("person", { name: "A", "sort-name": "A, B", "life-span": { begin: "about 1600" }, aliases: [{ name: "a " }, { name: "C" }, { name: "C" }, {}] }), { aliases: ["C"], sortName: "A, B" });
+  assert.deepEqual(enrichmentFields("work", { title: "W", "sort-name": "ignored", "life-span": { begin: "1800" }, aliases: [] }), {});
+});

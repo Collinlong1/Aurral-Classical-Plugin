@@ -1,0 +1,372 @@
+{
+ "id": "29766404",
+ "category": "baroque early",
+ "title": "Monteverdi: Madrigals Book 1",
+ "artist": "Delitiæ Musicæ & Marco Longhini",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Ch'io Ami La Mia Vita Mia Nel Tuo Bel Nome",
+   "durationMs": 149147,
+   "artist": "Delitiæ Musicæ & Marco Longhini",
+   "apple": {
+    "block": 1,
+    "composer": "Claudio Monteverdi",
+    "work": "Ch'io ami la vita mia nel tuo bel nome, M i1, SV 23",
+    "part": "Ch'io Ami La Mia Vita Mia Nel Tuo Bel Nome",
+    "performers": "Marco Longhini, Delitiæ Musicæ"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Se Per Averi, Ohime, Donato Il Core",
+   "durationMs": 110733,
+   "artist": "Delitiæ Musicæ & Marco Longhini",
+   "apple": {
+    "block": 2,
+    "composer": "Monteverdi",
+    "work": "Monteverdi",
+    "part": "Se Per Averi, Ohime, Donato Il Core",
+    "performers": "Marco Longhini, Delitiæ Musicæ"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "A Che Tormi Il Ben Mio",
+   "durationMs": 144787,
+   "artist": "Delitiæ Musicæ & Marco Longhini",
+   "apple": {
+    "block": 3,
+    "composer": "Claudio Monteverdi",
+    "work": "A che tormi il ben mio, M i8, SV 25",
+    "part": "A Che Tormi Il Ben Mio",
+    "performers": "Delitiæ Musicæ, Marco Longhini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Amor, Per Tua Merce Vattne A Quella",
+   "durationMs": 105773,
+   "artist": "Delitiæ Musicæ & Marco Longhini",
+   "apple": {
+    "block": 4,
+    "composer": "Monteverdi",
+    "work": "Monteverdi",
+    "part": "Amor, Per Tua Merce Vattne A Quella",
+    "performers": "Delitiæ Musicæ, Marco Longhini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Baci Soavi E Cari",
+   "durationMs": 186440,
+   "artist": "Delitiæ Musicæ & Marco Longhini",
+   "apple": {
+    "block": 5,
+    "composer": "Claudio Monteverdi",
+    "work": "Baci soavi e cari, M i14, SV 27",
+    "part": "Baci Soavi E Cari",
+    "performers": "Delitiæ Musicæ, Marco Longhini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Se Pur Non Mi Consenti",
+   "durationMs": 116427,
+   "artist": "Delitiæ Musicæ & Marco Longhini",
+   "apple": {
+    "block": 6,
+    "composer": "Claudio Monteverdi",
+    "work": "Se pur non mi consenti, M i18, SV 28",
+    "part": "Se Pur Non Mi Consenti",
+    "performers": "Marco Longhini, Delitiæ Musicæ"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Filli Cara Ed Amata",
+   "durationMs": 115093,
+   "artist": "Delitiæ Musicæ & Marco Longhini",
+   "apple": {
+    "block": 7,
+    "composer": "Claudio Monteverdi",
+    "work": "Filli cara e amata, M i21, SV 29",
+    "part": "Filli Cara Ed Amata",
+    "performers": "Marco Longhini, Delitiæ Musicæ"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Poiche Del Mio Dolore",
+   "durationMs": 131893,
+   "artist": "Delitiæ Musicæ & Marco Longhini",
+   "apple": {
+    "block": 8,
+    "composer": "Claudio Monteverdi",
+    "work": "Poi che del mio dolore, M i24, SV 30",
+    "part": "Poiche Del Mio Dolore",
+    "performers": "Delitiæ Musicæ, Marco Longhini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Fumia La Pastorella - Prima Parte",
+   "durationMs": 47707,
+   "artist": "Delitiæ Musicæ & Marco Longhini",
+   "apple": {
+    "block": 9,
+    "composer": "Monteverdi",
+    "work": "Monteverdi",
+    "part": "Fumia La Pastorella - Prima Parte",
+    "performers": "Marco Longhini, Delitiæ Musicæ"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Almo Divino Raggio - Seconda Parte",
+   "durationMs": 108853,
+   "artist": "Delitiæ Musicæ & Marco Longhini",
+   "apple": {
+    "block": 9,
+    "composer": "Monteverdi",
+    "work": "Monteverdi",
+    "part": "Almo Divino Raggio - Seconda Parte",
+    "performers": "Delitiæ Musicæ, Marco Longhini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Allora I Pastor Tutti - Terza Parte",
+   "durationMs": 97293,
+   "artist": "Delitiæ Musicæ & Marco Longhini",
+   "apple": {
+    "block": 9,
+    "composer": "Monteverdi",
+    "work": "Monteverdi",
+    "part": "Allora I Pastor Tutti - Terza Parte",
+    "performers": "Marco Longhini, Delitiæ Musicæ"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Se Nel Partir Da Voi",
+   "durationMs": 130533,
+   "artist": "Delitiæ Musicæ & Marco Longhini",
+   "apple": {
+    "block": 10,
+    "composer": "Claudio Monteverdi",
+    "work": "Se nel partir da voi, vita mia sento, M i36, SV 32",
+    "part": "Se Nel Partir Da Voi",
+    "performers": "Marco Longhini, Delitiæ Musicæ"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Tra Mille Fiamme E Tra Mille Catene",
+   "durationMs": 121280,
+   "artist": "Delitiæ Musicæ & Marco Longhini",
+   "apple": {
+    "block": 11,
+    "composer": "Claudio Monteverdi",
+    "work": "Tra mille fiamme e tra mille catene, M i39, SV 33",
+    "part": "Tra Mille Fiamme E Tra Mille Catene",
+    "performers": "Marco Longhini, Delitiæ Musicæ"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Usicam, Ninfe, Omai Fuor Di Questi Boschi",
+   "durationMs": 108240,
+   "artist": "Delitiæ Musicæ & Marco Longhini",
+   "apple": {
+    "block": 12,
+    "composer": "Monteverdi",
+    "work": "Monteverdi",
+    "part": "Usicam, Ninfe, Omai Fuor Di Questi Boschi",
+    "performers": "Marco Longhini, Delitiæ Musicæ"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Questa Ordi Il Laccio",
+   "durationMs": 95320,
+   "artist": "Delitiæ Musicæ & Marco Longhini",
+   "apple": {
+    "block": 13,
+    "composer": "Claudio Monteverdi",
+    "work": "Questa ordì il laccio, M i46, SV 35",
+    "part": "Questa Ordi Il Laccio",
+    "performers": "Marco Longhini, Delitiæ Musicæ"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "La Vaga Pastorella",
+   "durationMs": 157413,
+   "artist": "Delitiæ Musicæ & Marco Longhini",
+   "apple": {
+    "block": 14,
+    "composer": "Claudio Monteverdi",
+    "work": "La vaga pastorella sen va tra fiori, M i50, SV 36",
+    "part": "La Vaga Pastorella",
+    "performers": "Delitiæ Musicæ, Marco Longhini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Amor S'il Tuo Ferire",
+   "durationMs": 120200,
+   "artist": "Delitiæ Musicæ & Marco Longhini",
+   "apple": {
+    "block": 15,
+    "composer": "Claudio Monteverdi",
+    "work": "Amor, s'il tuo ferire, M i54, SV 37",
+    "part": "Amor S'il Tuo Ferire",
+    "performers": "Delitiæ Musicæ, Marco Longhini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Donna S'io Miro Voi, Giaccio Divengo",
+   "durationMs": 85560,
+   "artist": "Delitiæ Musicæ & Marco Longhini",
+   "apple": {
+    "block": 16,
+    "composer": "Claudio Monteverdi",
+    "work": "Donna, s'io miro voi, giaccio divengo, M i58, SV 38",
+    "part": "Donna S'io Miro Voi, Giaccio Divengo",
+    "performers": "Marco Longhini, Delitiæ Musicæ"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "Ardo, Si, Ma Non T'amo",
+   "durationMs": 84373,
+   "artist": "Delitiæ Musicæ & Marco Longhini",
+   "apple": {
+    "block": 17,
+    "composer": "Claudio Monteverdi",
+    "work": "Ardo, sì, ma non t'amo, M i61, SV 39",
+    "part": "Ardo, Si, Ma Non T'amo",
+    "performers": "Delitiæ Musicæ, Marco Longhini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "Ardi O Gela A Tua Voglia - Risposta",
+   "durationMs": 90107,
+   "artist": "Delitiæ Musicæ & Marco Longhini",
+   "apple": {
+    "block": 18,
+    "composer": "Monteverdi",
+    "work": "Monteverdi",
+    "part": "Ardi O Gela A Tua Voglia - Risposta",
+    "performers": "Marco Longhini, Delitiæ Musicæ"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "Arsi Ed Alsi A Mia Voglia - Contra Risposta",
+   "durationMs": 97133,
+   "artist": "Delitiæ Musicæ & Marco Longhini",
+   "apple": {
+    "block": 18,
+    "composer": "Monteverdi",
+    "work": "Monteverdi",
+    "part": "Arsi Ed Alsi A Mia Voglia - Contra Risposta",
+    "performers": "Delitiæ Musicæ, Marco Longhini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "Voglio Di Vita Uscir",
+   "durationMs": 296947,
+   "artist": "Delitiæ Musicæ & Marco Longhini",
+   "apple": {
+    "block": 19,
+    "composer": "Claudio Monteverdi",
+    "work": "Voglio di vita uscir, M o18, SV 337",
+    "part": "Voglio Di Vita Uscir",
+    "performers": "Delitiæ Musicæ, Marco Longhini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 23,
+   "title": "Fuggi Cor",
+   "durationMs": 100133,
+   "artist": "Delitiæ Musicæ & Marco Longhini",
+   "apple": {
+    "block": 20,
+    "composer": "Monteverdi",
+    "work": "Monteverdi",
+    "part": "Fuggi Cor",
+    "performers": "Marco Longhini, Delitiæ Musicæ"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 24,
+   "title": "Ahi, Che Si Part'il Mio Sol",
+   "durationMs": 175920,
+   "artist": "Delitiæ Musicæ & Marco Longhini",
+   "apple": {
+    "block": 20,
+    "composer": "Monteverdi",
+    "work": "Monteverdi",
+    "part": "Ahi, Che Si Part'il Mio Sol",
+    "performers": "Marco Longhini, Delitiæ Musicæ"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 25,
+   "title": "Se D'un Angels' Il Bel Viso",
+   "durationMs": 166253,
+   "artist": "Delitiæ Musicæ & Marco Longhini",
+   "apple": {
+    "block": 21,
+    "composer": "Claudio Monteverdi",
+    "work": "Se d'un angel il bel viso, SV 330",
+    "part": "Se D'un Angels' Il Bel Viso",
+    "performers": "Marco Longhini, Delitiæ Musicæ"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 26,
+   "title": "Lamento D'olimpia",
+   "durationMs": 595187,
+   "artist": "Delitiæ Musicæ & Marco Longhini",
+   "apple": {
+    "block": 22,
+    "composer": "Claudio Monteverdi",
+    "work": "Lamento d'Olimpia, M o10, SV A2",
+    "part": "Lamento D'olimpia",
+    "performers": "Delitiæ Musicæ, Marco Longhini"
+   }
+  }
+ ]
+}

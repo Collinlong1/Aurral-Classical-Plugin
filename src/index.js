@@ -1,22 +1,59 @@
 import path from "node:path";
-import { albumPresentation } from "./album-works.js";
+import { Worker, isMainThread, parentPort, workerData } from "node:worker_threads";
+import { albumPresentation } from "./model/presentation.js";
+import {
+  modelStatus,
+  enqueueModelScan,
+  cancelModelScan,
+  queueAlbumMatch,
+  albumMatchResult,
+  queueEnglishNames,
+  englishNamesStatus,
+  queueEnrichment,
+  enrichmentStatus,
+  autoMatchLibrary,
+  identifyBacklog,
+  runModelJobs,
+  requestModelSync,
+  modelSyncDue,
+  canReadHostLibrary,
+} from "./model/runtime.js";
+import { albumClassificationSummary } from "./model/classification-report.js";
+import { applyRequest, requestTags, waitingRequest } from "./tag-requests.js";
 import { MusicBrainz, mbBaseUrl, TTL } from "./mb.js";
 import { ClassicalResolver } from "./resolver.js";
 import { parseOrder, parseSeparator, slskdSettings } from "./settings.js";
 import { Slskd } from "./slskd.js";
-import { downloadStatus, searchAlbum, searchTrack, startDownload } from "./source.js";
-import { applyRequest, requestTags, waitingRequest } from "./tag-requests.js";
-import { describeStats, enqueue, libraryIndex, runQueue, runScheduled } from "./tagger.js";
+import {
+  acquisitionIdentity,
+  downloadStatus,
+  searchAlbum,
+  searchTrack,
+  startDownload,
+} from "./source.js";
+import {
+  describeStats,
+  enqueue,
+  libraryIndex,
+  runQueue,
+  runScheduled,
+} from "./tagger.js";
 import { pruneCache } from "./store.js";
 
 const BACKGROUND_BUDGET_MS = 4 * 60_000; // the process stops 5 idle minutes after a call
 const SCHEDULE_BUDGET_MS = 8.5 * 60_000; // a scheduled run has 10 minutes
+const ACTION_BUDGET_MS = 25 * 60_000; // a background action has 30 minutes
 
 const log = (...args) => console.log(...args);
 
 export function makeContext(input, { fetchImpl = fetch } = {}) {
   const settings = input.settings || {};
-  const mb = new MusicBrainz({ settings, dataFolder: input.dataFolder, fetchImpl, log });
+  const mb = new MusicBrainz({
+    settings,
+    dataFolder: input.dataFolder,
+    fetchImpl,
+    log,
+  });
   const resolver = new ClassicalResolver(mb, {
     log,
     separator: parseSeparator(settings.separator),
@@ -27,6 +64,7 @@ export function makeContext(input, { fetchImpl = fetch } = {}) {
     libraryFolder: input.libraryFolder,
     dataFolder: input.dataFolder,
     api: input.api,
+    userOperations: input.userOperations,
     fetch: fetchImpl,
     log,
     mb,
@@ -38,6 +76,7 @@ export function makeContext(input, { fetchImpl = fetch } = {}) {
 // another process may hold the lock, and then it works the queue instead.
 let background = null;
 let again = false;
+// Internal lifecycle hook for disposable tests to drain writes before teardown.
 export async function waitForBackgroundTagging() {
   while (background) await background;
 }
@@ -50,7 +89,8 @@ function tagInBackground(ctx) {
     do {
       again = false;
       const stats = await runQueue(ctx, BACKGROUND_BUDGET_MS);
-      if (stats && (stats.tagged || stats.failed)) log(`Tagging: ${describeStats(stats)}`);
+      if (stats && (stats.tagged || stats.failed))
+        log(`Tagging: ${describeStats(stats)}`);
     } while (again);
   })()
     .catch((error) => console.warn(`Tagging stopped: ${error.message}`))
@@ -60,7 +100,9 @@ function tagInBackground(ctx) {
 }
 
 function artistFiles(index, artist) {
-  const albumIds = new Set(artist.albums.flatMap((a) => [a.mbid]).filter(Boolean));
+  const albumIds = new Set(
+    artist.albums.flatMap((a) => [a.mbid]).filter(Boolean),
+  );
   const name = String(artist.name || "").toLowerCase();
   return Object.entries(index)
     .filter(
@@ -73,8 +115,10 @@ function artistFiles(index, artist) {
     .map(([file]) => file);
 }
 
-const albumPaths = (album) => album.tracks.map((t) => t.path).filter(Boolean);
-
+// The aurral-classical plugin without its editor, work pages, Classical
+// page, search, track links and Compare recordings: tagging with tag
+// requests, the classical catalogue that groups albums for the album page's
+// By work view, and the slskd download source.
 async function writePlanned(ctx, target, what, user) {
   const request = waitingRequest(ctx, target);
   if (!request) return `${what}: nothing is planned. Choose Tag as classical or Remove classical tags first.`;
@@ -82,41 +126,159 @@ async function writePlanned(ctx, target, what, user) {
 }
 
 export default {
+  albumPresentation,
   async test(input) {
     const ctx = makeContext(input);
     const parts = [];
     const host = new URL(mbBaseUrl(ctx.settings)).host;
     const reached = await ctx.mb.ping();
-    if (reached !== true) throw new Error(`Couldn't reach MusicBrainz at ${host}: ${reached}`);
+    if (reached !== true)
+      throw new Error(`Couldn't reach MusicBrainz at ${host}: ${reached}`);
     parts.push(`MusicBrainz answers at ${host}`);
     const slskd = slskdSettings(ctx.settings);
     if (slskd.configured) {
       const app = await new Slskd(slskd).application();
-      const version = app?.version?.full || app?.version?.current || app?.version || "";
-      parts.push(`slskd ${typeof version === "string" ? version : ""} answers`.replace(/\s+/g, " "));
-      if (!slskd.downloadFolder) parts.push("set slskd's download folder to download");
+      const version =
+        app?.version?.full || app?.version?.current || app?.version || "";
+      parts.push(
+        `slskd ${typeof version === "string" ? version : ""} answers`.replace(
+          /\s+/g,
+          " ",
+        ),
+      );
+      if (!slskd.downloadFolder)
+        parts.push("set slskd's download folder to download");
     } else parts.push("slskd isn't set up, so the download source is off");
-    parts.push(`Artists read like ${ctx.resolver.order.filter((r) => r !== "credited").join(ctx.resolver.separator)}`);
-    parts.push(ctx.settings.enableFileWrites === true ? "new downloads are tagged automatically" : "new downloads aren't tagged automatically");
+    parts.push(
+      `Artists read like ${ctx.resolver.order.filter((r) => r !== "credited").join(ctx.resolver.separator)}`,
+    );
     return { message: parts.join(". ").slice(0, 500) };
   },
 
   actions: {
-    async "tag-album"(input) {
+    async "classical-model-status"(input) {
+      if (input.user?.role !== "admin")
+        throw new Error("Classical diagnostics require a host admin");
+      const status = await modelStatus(makeContext(input));
+      const indexed = status.tracks.reduce((sum, row) => sum + row.count, 0);
+      const id = status.identification;
+      const identification = id
+        ? ` MusicBrainz identification: ${id.queued} album${id.queued === 1 ? "" : "s"} queued, ${id.done} done (${id.matched} work group${id.matched === 1 ? "" : "s"} made${id.errors ? `, ${id.errors} lookup${id.errors === 1 ? "" : "s"} failed` : ""})${id.failed ? `, ${id.failed} stopped after retries` : ""}${id.backlog ? `; ${id.backlog} earlier album${id.backlog === 1 ? "" : "s"} wait for the one-time lookup` : ""}.`
+        : "";
+      const scan = status.scan && {
+        ...status.scan,
+        // A running scan whose lease lapsed lost its process; say so.
+        state:
+          status.scan.state === "running" && status.scan.leaseUntil <= status.now
+            ? "interrupted (run Scan again to resume)"
+            : status.scan.state,
+      };
+      return {
+        message:
+          `Classical model schema ${status.schema}; indexed tracks: ${indexed}. ${scan ? `Scan ${scan.id}: ${scan.state}; processed ${scan.processed}/${scan.total} files.${scan.skipped ? ` ${scan.skipped} unreadable file${scan.skipped === 1 ? "" : "s"} skipped.` : ""}${scan.error ? ` Error: ${scan.error}` : ""}` : "No scan has been queued."}${identification}`.slice(
+            0,
+            500,
+          ),
+      };
+    },
+    async "classical-model-scan"(input) {
       const ctx = makeContext(input);
-      const what = `"${input.album.title}"`;
-      return { message: (await requestTags(ctx, albumPaths(input.album), { mode: "tag", what, actor: input.user, target: `album:${input.album.id}` })).message };
+      const id = await enqueueModelScan(ctx, input.user);
+      await modelJobs(ctx, { budgetMs: ACTION_BUDGET_MS });
+      const { scan } = await modelStatus(ctx);
+      return {
+        message:
+          `Classical model scan ${id}: ${scan?.state || "saved"}; processed ${scan?.processed ?? 0}/${scan?.total ?? 0} files.${scan?.skipped ? ` ${scan.skipped} unreadable file${scan.skipped === 1 ? "" : "s"} skipped.` : ""} ${scan?.state === "done" ? "Reload the editor to search indexed tracks." : "Existing progress is saved. Run Scan again to resume immediately, or enable the plugin schedule for automatic continuation."}`.slice(
+            0,
+            500,
+          ),
+      };
+    },
+    async "classical-classification-report"(input) {
+      if (input.user?.role !== "admin")
+        throw new Error("Classical diagnostics require a host admin");
+      return { message: await albumClassificationSummary(makeContext(input), input.album?.id) };
+    },
+    async "classical-model-cancel"(input) {
+      await cancelModelScan(makeContext(input), input.user);
+      return {
+        message:
+          "Model scan cancellation requested; catalogue data is retained.",
+      };
+    },
+    async "classical-auto-match-library"(input) {
+      const result = await autoMatchLibrary(makeContext(input), input.user);
+      return {
+        message: `Checked ${result.albums} album${result.albums === 1 ? "" : "s"} with unmatched classical tracks; created ${result.created} work group${result.created === 1 ? "" : "s"} from WORK and GROUPING tags and titles. Scans now do this by themselves, and look up new or changed albums on MusicBrainz in the background.`,
+      };
+    },
+    async "classical-identify-backlog"(input) {
+      const ctx = makeContext(input);
+      const result = await identifyBacklog(ctx, input.user);
+      // Work the queue now, in this action's budget, rather than waiting for
+      // the plugin schedule (which may be off).
+      await modelJobs(ctx, { budgetMs: ACTION_BUDGET_MS });
+      const { identification: id } = await modelStatus(ctx);
+      const progress = `${id.done} album${id.done === 1 ? "" : "s"} looked up, ${id.matched} work group${id.matched === 1 ? "" : "s"} made${id.queued ? `; ${id.queued} still queued: run this again, or enable the plugin schedule, to continue` : ""}.`;
+      return {
+        message: result.albums
+          ? `Queued ${result.albums} album${result.albums === 1 ? "" : "s"} (${result.tracks} track${result.tracks === 1 ? "" : "s"}) for a one-time MusicBrainz lookup, one request a second on public MusicBrainz. ${progress}`
+          : id.queued
+            ? `Continuing the MusicBrainz lookup. ${progress}`
+            : "No album is waiting for its one-time MusicBrainz lookup: each was looked up already, or has no track with a recording ID outside a work.",
+      };
+    },
+    async "classical-english-names"(input) {
+      // Once: a lookup per work, one request a second on public MusicBrainz,
+      // on the model worker; run again to continue.
+      const ctx = makeContext(input);
+      const queued = await queueEnglishNames(ctx, input.user);
+      if (!queued.queued && queued.state === "done")
+        return { message: `Work names and books were looked up already: ${queued.renamed} of ${queued.total} works renamed, ${queued.filed || 0} filed under their book.` };
+      await modelJobs(ctx, { budgetMs: ACTION_BUDGET_MS });
+      const status = await englishNamesStatus(ctx);
+      return {
+        message:
+          status?.state === "done"
+            ? `Looked up ${status.total} works on MusicBrainz: ${status.renamed} renamed to their English names, ${status.filed || 0} filed under their book (such as The Well-Tempered Clavier, Book I). Titles you set yourself were left alone.`
+            : `Looked up ${status?.cursor ?? 0} of ${status?.total ?? "?"} works so far (${status?.renamed ?? 0} renamed): run this again, or enable the plugin schedule, to continue.`,
+      };
+    },
+    async "classical-auto-match"(input) {
+      // On the model worker: a large album's MusicBrainz lookups no longer
+      // keep the plugin from answering (it was reported "busy").
+      const ctx = makeContext(input);
+      const key = await queueAlbumMatch(ctx, input.user, input.album?.id);
+      await modelJobs(ctx, { budgetMs: ACTION_BUDGET_MS });
+      const result = await albumMatchResult(ctx, key);
+      if (result?.state !== "done")
+        return { message: "Still looking this album up on MusicBrainz in the background (one request a second). Reload the album in a few minutes, or run this again to continue." };
+      return {
+        message:
+          result.matched > 0
+            ? `Created ${result.matched} work group${result.matched === 1 ? "" : "s"} from classical WORK/title, composer and MusicBrainz evidence. Reload the album to use Works view.`
+            : "No new groups matched this album's WORK tags, structured titles or MusicBrainz parent-work evidence. Tracks remain available in the metadata editor.",
+      };
+    },
+    // These only plan what they would write (v0.3 8.7); Write planned tags
+    // on the same album or artist writes the plan (the editor's Activity →
+    // Tag requests isn't part of this plugin).
+    async "tag-album"(input) {
+      const paths = input.album.tracks.map((t) => t.path).filter(Boolean);
+      return { message: (await requestTags(makeContext(input), paths, { mode: "tag", what: `"${input.album.title}"`, actor: input.user, target: `album:${input.album.id}` })).message };
     },
 
     async "untag-album"(input) {
-      const ctx = makeContext(input);
-      const what = `"${input.album.title}"`;
-      return { message: (await requestTags(ctx, albumPaths(input.album), { mode: "restore", what, actor: input.user, target: `album:${input.album.id}` })).message };
+      const paths = input.album.tracks.map((t) => t.path).filter(Boolean);
+      return { message: (await requestTags(makeContext(input), paths, { mode: "restore", what: `"${input.album.title}"`, actor: input.user, target: `album:${input.album.id}` })).message };
     },
 
     async "write-album"(input) {
-      const ctx = makeContext(input);
-      return { message: await writePlanned(ctx, `album:${input.album.id}`, `"${input.album.title}"`, input.user) };
+      return { message: await writePlanned(makeContext(input), `album:${input.album.id}`, `"${input.album.title}"`, input.user) };
+    },
+
+    async "write-artist"(input) {
+      return { message: await writePlanned(makeContext(input), `artist:${input.artist.id}`, input.artist.name, input.user) };
     },
 
     async "tag-artist"(input) {
@@ -125,17 +287,17 @@ export default {
       const index = await libraryIndex(ctx, 10 * 60_000, { priority: true });
       return { message: (await requestTags(ctx, artistFiles(index, input.artist), { mode: "tag", what: input.artist.name, actor: input.user, target: `artist:${input.artist.id}` })).message };
     },
-
-    async "write-artist"(input) {
-      const ctx = makeContext(input);
-      return { message: await writePlanned(ctx, `artist:${input.artist.id}`, input.artist.name, input.user) };
-    },
   },
 
   events: {
     async "download.finished"(input) {
       const ctx = makeContext(input);
-      if (ctx.settings.enableFileWrites !== true || !input.track?.path) return;
+      // New files reach the classical model on the next scheduled run.
+      await requestModelSync(ctx).catch((error) =>
+        log(`Classical model sync request failed: ${error.message}`),
+      );
+      if (ctx.settings.enableFileWrites !== true) return;
+      if (!input.track?.path) return;
       await enqueue(ctx, [input.track.path], { source: input.source });
       tagInBackground(ctx);
     },
@@ -143,20 +305,91 @@ export default {
 
   async scheduled(input) {
     const ctx = makeContext(input);
-    if (ctx.settings.enableFileWrites === true) {
-      const stats = await runScheduled(ctx, SCHEDULE_BUDGET_MS);
-      if (stats) log(`Scheduled tagging: ${describeStats(stats)}`);
+    const deadline = Date.now() + SCHEDULE_BUDGET_MS;
+    // Use the scheduled call's budget, sharing it with optional file tagging.
+    // Model failures never suppress the established source/tagging schedule.
+    // Continue a queued scan, then start an incremental one when a download
+    // asked for it or the last completed scan is older than the sync interval.
+    try {
+      // A scan or lookup an admin started is still running: it carries on
+      // with the queue; a second run beside it would only contend for the
+      // database.
+      if (modelRun) throw Object.assign(new Error("busy"), { skip: true });
+      await modelJobs(ctx, { budgetMs: SCHEDULE_BUDGET_MS });
+      if (canReadHostLibrary(ctx) && (await modelSyncDue(ctx))) {
+        await enqueueModelScan(ctx, null, { system: true });
+        const left = deadline - Date.now();
+        if (left > 0) await modelJobs(ctx, { budgetMs: left });
+      }
+      // A run that finished a scan goes on with MusicBrainz identification.
+      const left = deadline - Date.now();
+      if (left > 0) await modelJobs(ctx, { budgetMs: left });
+    } catch (error) {
+      if (!error.skip) log(`Classical model unavailable: ${error.message}`);
     }
-    await pruneCache(path.join(ctx.dataFolder, "mb-cache"), TTL.default).catch(() => {});
+    if (ctx.settings.enableFileWrites !== true) return;
+    const remainingMs = deadline - Date.now();
+    if (remainingMs <= 0) return;
+    const stats = await runScheduled(ctx, remainingMs);
+    if (stats) log(`Scheduled tagging: ${describeStats(stats)}`);
+    await pruneCache(path.join(ctx.dataFolder, "mb-cache"), TTL.default).catch(
+      () => {},
+    );
   },
-
-  albumPresentation: (input) => albumPresentation(makeContext(input), input.album),
 
   downloadSource: {
+    acquisitionIdentity: (input) =>
+      acquisitionIdentity(makeContext(input), input.track),
     search: (input) => searchTrack(makeContext(input), input.track, { manual: input.manual === true }),
+    // `manual` (fork): a person is choosing, so ambiguous results are offered.
     searchAlbum: (input) => searchAlbum(makeContext(input), input.album, { manual: input.manual === true }),
-    download: (input) => startDownload(makeContext(input), input.result, "track"),
-    downloadAlbum: (input) => startDownload(makeContext(input), input.result, "album"),
-    status: (input) => downloadStatus(makeContext(input), input.id, input.directory),
+    download: (input) =>
+      startDownload(makeContext(input), input.result, "track"),
+    downloadAlbum: (input) =>
+      startDownload(makeContext(input), input.result, "album"),
+    status: (input) =>
+      downloadStatus(makeContext(input), input.id, input.directory),
   },
 };
+
+// Scans and MusicBrainz identification run on a worker thread. Their last
+// steps (publishing a scan, the library-wide matching pass) are seconds of
+// synchronous SQLite work; on the plugin's own thread every album page and
+// editor call waited behind them ("was busy and didn't answer within 15
+// seconds"). The worker opens the catalogue itself (SQLite WAL lets pages
+// read meanwhile) and builds its own MusicBrainz client from the settings.
+// One run at a time in this process: two workers writing to one catalogue
+// made a scan's final step fail with "database is locked". A later run waits
+// for the one before it.
+let modelRun = null;
+function modelJobs(ctx, options) {
+  const run = (modelRun || Promise.resolve()).catch(() => {}).then(() => modelJobsWorker(ctx, options));
+  const tracked = run.finally(() => {
+    if (modelRun === tracked) modelRun = null;
+  });
+  modelRun = tracked;
+  return run;
+}
+function modelJobsWorker(ctx, options) {
+  const input = {
+    settings: ctx.settings,
+    dataFolder: ctx.dataFolder,
+    libraryFolder: ctx.libraryFolder,
+    api: ctx.api,
+    userOperations: ctx.userOperations,
+  };
+  return new Promise((resolve, reject) => {
+    const worker = new Worker(new URL(import.meta.url), { workerData: { classicalModelJobs: { input, options } } });
+    worker.once("message", (message) => (message?.error ? reject(new Error(message.error)) : resolve()));
+    worker.once("error", reject);
+    worker.once("exit", (code) => (code ? reject(new Error(`Classical model worker stopped (${code})`)) : resolve()));
+  });
+}
+
+if (!isMainThread && workerData?.classicalModelJobs) {
+  const { input, options } = workerData.classicalModelJobs;
+  runModelJobs(makeContext(input), options).then(
+    () => parentPort.postMessage({}),
+    (error) => parentPort.postMessage({ error: error?.message || String(error) }),
+  );
+}

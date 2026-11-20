@@ -1,0 +1,176 @@
+{
+ "id": "1424730779",
+ "category": "concerto",
+ "title": "J.S. Bach: Violin Concertos",
+ "artist": "Hilary Hahn, Los Angeles Chamber Orchestra & Jeffrey Kahane",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Violin Concerto No. 2 in E Major, BWV 1042: 1. Allegro",
+   "durationMs": 415000,
+   "artist": "Hilary Hahn, Los Angeles Chamber Orchestra & Jeffrey Kahane",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Violin Concerto No. 2 in E Major, BWV 1042",
+    "part": "1. Allegro",
+    "performers": "Los Angeles Chamber Orchestra, Hilary Hahn, Jeffrey Kahane"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Violin Concerto No. 2 in E Major, BWV 1042: 2. Adagio",
+   "durationMs": 427000,
+   "artist": "Hilary Hahn, Los Angeles Chamber Orchestra & Jeffrey Kahane",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Violin Concerto No. 2 in E Major, BWV 1042",
+    "part": "2. Adagio",
+    "performers": "Hilary Hahn, Los Angeles Chamber Orchestra, Jeffrey Kahane"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Violin Concerto No. 2 in E Major, BWV 1042: 3. Allegro assai",
+   "durationMs": 153000,
+   "artist": "Hilary Hahn, Los Angeles Chamber Orchestra & Jeffrey Kahane",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Violin Concerto No. 2 in E Major, BWV 1042",
+    "part": "3. Allegro assai",
+    "performers": "Hilary Hahn, Los Angeles Chamber Orchestra, Jeffrey Kahane"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Concerto for 2 Violins, Strings, and Continuo in D Minor, BWV 1043: 1. Vivace",
+   "durationMs": 194000,
+   "artist": "Hilary Hahn, Margaret Batjer, Los Angeles Chamber Orchestra & Jeffrey Kahane",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Double Violin Concerto in D Minor, BWV 1043",
+    "part": "1. Vivace",
+    "performers": "Hilary Hahn, Margaret Batjer, Los Angeles Chamber Orchestra, Jeffrey Kahane"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Concerto for 2 Violins, Strings, and Continuo in D Minor, BWV 1043: 2. Largo ma non tanto",
+   "durationMs": 410280,
+   "artist": "Hilary Hahn, Margaret Batjer, Los Angeles Chamber Orchestra & Jeffrey Kahane",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Double Violin Concerto in D Minor, BWV 1043",
+    "part": "2. Largo ma non tanto",
+    "performers": "Hilary Hahn, Margaret Batjer, Los Angeles Chamber Orchestra, Jeffrey Kahane"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Concerto for 2 Violins, Strings, and Continuo in D Minor, BWV 1043: 3. Allegro",
+   "durationMs": 260720,
+   "artist": "Hilary Hahn, Margaret Batjer, Los Angeles Chamber Orchestra & Jeffrey Kahane",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Double Violin Concerto in D Minor, BWV 1043",
+    "part": "3. Allegro",
+    "performers": "Hilary Hahn, Margaret Batjer, Los Angeles Chamber Orchestra, Jeffrey Kahane"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Violin Concerto No. 1 in A Minor, BWV 1041: 1. Allegro moderato",
+   "durationMs": 203280,
+   "artist": "Hilary Hahn, Los Angeles Chamber Orchestra & Jeffrey Kahane",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Violin Concerto No. 1 in A Minor, BWV 1041",
+    "part": "1. Allegro moderato",
+    "performers": "Hilary Hahn, Jeffrey Kahane, Los Angeles Chamber Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Violin Concerto No. 1 in A Minor, BWV 1041: 2. Andante",
+   "durationMs": 404680,
+   "artist": "Hilary Hahn, Los Angeles Chamber Orchestra & Jeffrey Kahane",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Violin Concerto No. 1 in A Minor, BWV 1041",
+    "part": "2. Andante",
+    "performers": "Hilary Hahn, Los Angeles Chamber Orchestra, Jeffrey Kahane"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Violin Concerto No. 1 in A Minor, BWV 1041: 3. Allegro assai",
+   "durationMs": 206960,
+   "artist": "Hilary Hahn, Los Angeles Chamber Orchestra & Jeffrey Kahane",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Violin Concerto No. 1 in A Minor, BWV 1041",
+    "part": "3. Allegro assai",
+    "performers": "Hilary Hahn, Los Angeles Chamber Orchestra, Jeffrey Kahane"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Concerto in C Minor, BWV 1060 (Arr. for Violin, Oboe, Strings & Continuo): 1. Allegro",
+   "durationMs": 269920,
+   "artist": "Hilary Hahn, Allan Vogel, Los Angeles Chamber Orchestra & Jeffrey Kahane",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "Double Keyboard Concerto No. 1 in C Minor, BWV 1060",
+    "part": "1. Allegro",
+    "performers": "Los Angeles Chamber Orchestra, Hilary Hahn, Allan Vogel, Jeffrey Kahane"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Concerto in C Minor, BWV 1060 (Arr. for Violin, Oboe, Strings & Continuo): 2. Adagio",
+   "durationMs": 320400,
+   "artist": "Hilary Hahn, Allan Vogel, Los Angeles Chamber Orchestra & Jeffrey Kahane",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Concerto for Violin and Oboe in C Minor, BWV 1060a, BWV 1060R",
+    "part": "2. Adagio",
+    "performers": "Allan Vogel, Los Angeles Chamber Orchestra, Hilary Hahn, Jeffrey Kahane"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Concerto in C Minor, BWV 1060 (Arr. for Violin, Oboe, Strings & Continuo): 3. Allegro",
+   "durationMs": 193953,
+   "artist": "Hilary Hahn, Allan Vogel, Los Angeles Chamber Orchestra & Jeffrey Kahane",
+   "apple": {
+    "block": 6,
+    "composer": "Johann Sebastian Bach",
+    "work": "Double Keyboard Concerto No. 1 in C Minor, BWV 1060",
+    "part": "3. Allegro",
+    "performers": "Los Angeles Chamber Orchestra, Allan Vogel, Hilary Hahn, Jeffrey Kahane"
+   }
+  }
+ ]
+}

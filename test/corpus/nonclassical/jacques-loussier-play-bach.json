@@ -1,0 +1,104 @@
+{
+ "id": "jacques-loussier-play-bach",
+ "family": "crossover",
+ "title": "Play Bach No. 1",
+ "artist": "Jacques Loussier Trio",
+ "source": "jazz trio arrangements of Bach, titled by the original works",
+ "expect": {
+  "album": "unsure",
+  "note": "Jazz improvisation on Bach; placement is a curator's choice."
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Prelude No. 1 in C Major, BWV 846",
+   "durationMs": 180000,
+   "artist": "Jacques Loussier Trio",
+   "composer": [
+    "Johann Sebastian Bach"
+   ],
+   "genres": [
+    "Jazz"
+   ],
+   "work": "",
+   "expect": "unsure",
+   "scenarios": [
+    "crossover",
+    "misleading-title"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Fugue No. 1 in C Major, BWV 846",
+   "durationMs": 170000,
+   "artist": "Jacques Loussier Trio",
+   "composer": [
+    "Johann Sebastian Bach"
+   ],
+   "genres": [
+    "Jazz"
+   ],
+   "work": "",
+   "expect": "unsure",
+   "scenarios": [
+    "crossover"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Toccata and Fugue in D Minor, BWV 565",
+   "durationMs": 336000,
+   "artist": "Jacques Loussier Trio",
+   "composer": [
+    "Johann Sebastian Bach"
+   ],
+   "genres": [
+    "Jazz"
+   ],
+   "work": "",
+   "expect": "unsure",
+   "scenarios": [
+    "crossover"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Air on the G String (Orchestral Suite No. 3, BWV 1068)",
+   "durationMs": 250000,
+   "artist": "Jacques Loussier Trio",
+   "composer": [
+    "Johann Sebastian Bach"
+   ],
+   "genres": [
+    "Jazz"
+   ],
+   "work": "",
+   "expect": "unsure",
+   "scenarios": [
+    "crossover"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Italian Concerto, BWV 971: I. Allegro",
+   "durationMs": 272000,
+   "artist": "Jacques Loussier Trio",
+   "composer": [
+    "Johann Sebastian Bach"
+   ],
+   "genres": [
+    "Jazz"
+   ],
+   "work": "",
+   "expect": "unsure",
+   "scenarios": [
+    "crossover"
+   ]
+  }
+ ]
+}

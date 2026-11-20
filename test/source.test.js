@@ -264,6 +264,17 @@ test("album search ranks by performer and release, keeps copies as fallbacks, an
   assert.match(byUser.alice.reasons.join(", "), /performer Karajan.*every track lines up/);
   assert.equal(byUser.frank.duplicateOf, "bob:@@b\\Karajan 1963");
   assert.equal(byUser.gina.review, true);
+  // The editor's Downloads tab shows the same log.
+  const { readEditor } = await import("../src/model/editor.js");
+  const editorInput = { dataFolder: folders.dataFolder, user: { id: 1, role: "admin" }, pageId: "editor", capabilities: { adminForms: 2 } };
+  const list = await readEditor({ ...editorInput, query: { tab: "activity" } });
+  assert.equal(list.list.items[0].label, "Maintenance");
+  assert.equal(list.list.items[1].badge.label, "Manual");
+  const view = (await readEditor({ ...editorInput, query: { selection: "slskd:0" } })).view;
+  assert.deepEqual(view.sections.map((section) => section.id), ["steps", "candidates", "rejected"]);
+  assert.match(view.sections[0].rows[0].label, /^1\. Performer \+ album: “Karajan Symphonies 5 7”/);
+  assert.equal(view.sections[1].rows.find((row) => row.label.includes("gina")).badge.label, "Needs a person");
+  assert.ok(view.sections[2].rows.some((row) => row.label.startsWith("hank:") && /names the composer but none of the performers/.test(row.detail)));
   assert.deepEqual(latest.rejected.find((r) => r.username === "hank"), { username: "hank", directory: "@@h\\Beethoven Symphonies", reason: "names the composer but none of the performers", step: 1 });
 });
 

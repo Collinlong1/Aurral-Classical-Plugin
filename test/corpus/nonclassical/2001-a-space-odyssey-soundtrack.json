@@ -1,0 +1,106 @@
+{
+ "id": "2001-a-space-odyssey-soundtrack",
+ "family": "classical-mistagged",
+ "title": "2001: A Space Odyssey (Original Motion Picture Soundtrack)",
+ "artist": "Various Artists",
+ "source": "film soundtrack made entirely of existing classical recordings",
+ "expect": {
+  "album": "classical"
+ },
+ "pins": {
+  "album": "classical",
+  "note": "Admin sends the whole album to Classical; unsure tracks inherit it."
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Also sprach Zarathustra, Op. 30: Einleitung",
+   "durationMs": 102000,
+   "artist": "Wiener Philharmoniker & Herbert von Karajan",
+   "composer": [
+    "Richard Strauss"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "classical",
+   "scenarios": [
+    "classical-nonclassical-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Lux Aeterna",
+   "durationMs": 359000,
+   "artist": "Stuttgart Schola Cantorum & Clytus Gottwald",
+   "composer": [
+    "György Ligeti"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "classical",
+   "scenarios": [
+    "classical-nonclassical-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "An der schönen blauen Donau, Op. 314",
+   "durationMs": 613000,
+   "artist": "Berliner Philharmoniker & Herbert von Karajan",
+   "composer": [
+    "Johann Strauss II"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "classical",
+   "scenarios": [
+    "classical-nonclassical-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Gayane Ballet Suite: Adagio",
+   "durationMs": 316000,
+   "artist": "Leningrad Philharmonic Orchestra & Gennadi Rozhdestvensky",
+   "composer": [
+    "Aram Khachaturian"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "classical",
+   "scenarios": [
+    "classical-nonclassical-genre"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Atmosphères",
+   "durationMs": 526000,
+   "artist": "Südwestfunk Orchestra & Ernest Bour",
+   "composer": [
+    "György Ligeti"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "classical",
+   "scenarios": [
+    "classical-nonclassical-genre"
+   ]
+  }
+ ]
+}

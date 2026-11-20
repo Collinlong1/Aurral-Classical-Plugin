@@ -1,0 +1,108 @@
+{
+ "id": "andrea-bocelli-romanza",
+ "family": "crossover",
+ "title": "Romanza",
+ "artist": "Andrea Bocelli",
+ "source": "store download; 'Classical Crossover' genre on Italian pop ballads",
+ "expect": {
+  "album": "unsure",
+  "note": "Pop ballads sung operatically; placement is a curator's choice."
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Con te partirò",
+   "durationMs": 249000,
+   "artist": "Andrea Bocelli",
+   "composer": [
+    "Francesco Sartori",
+    "Lucio Quarantotto"
+   ],
+   "genres": [
+    "Classical Crossover"
+   ],
+   "work": "",
+   "expect": "unsure",
+   "scenarios": [
+    "crossover"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Vivo per lei (feat. Giorgia)",
+   "durationMs": 265000,
+   "artist": "Andrea Bocelli",
+   "composer": [
+    "Valerio Zelli",
+    "Mauro Mengali",
+    "Gatto Panceri"
+   ],
+   "genres": [
+    "Classical Crossover"
+   ],
+   "work": "",
+   "expect": "unsure",
+   "scenarios": [
+    "crossover"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Il mare calmo della sera",
+   "durationMs": 279000,
+   "artist": "Andrea Bocelli",
+   "composer": [
+    "Gian Pietro Felisatti",
+    "Zucchero"
+   ],
+   "genres": [
+    "Classical Crossover"
+   ],
+   "work": "",
+   "expect": "unsure",
+   "scenarios": [
+    "crossover"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Caruso",
+   "durationMs": 316000,
+   "artist": "Andrea Bocelli",
+   "composer": [
+    "Lucio Dalla"
+   ],
+   "genres": [
+    "Classical Crossover"
+   ],
+   "work": "",
+   "expect": "unsure",
+   "scenarios": [
+    "crossover"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Time to Say Goodbye (feat. Sarah Brightman)",
+   "durationMs": 244000,
+   "artist": "Andrea Bocelli",
+   "composer": [
+    "Francesco Sartori",
+    "Lucio Quarantotto"
+   ],
+   "genres": [
+    "Classical Crossover"
+   ],
+   "work": "",
+   "expect": "unsure",
+   "scenarios": [
+    "crossover"
+   ]
+  }
+ ]
+}

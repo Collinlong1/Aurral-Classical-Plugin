@@ -1,0 +1,92 @@
+{
+ "id": "693394415",
+ "category": "concerto",
+ "title": "Grieg & Schumann: Piano Concertos",
+ "artist": "Mariss Jansons, Berlin Philharmonic Orchestra & Leif Ove Andsnes",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Piano Concerto in A Minor, Op. 16: I. Allegro molto moderato",
+   "durationMs": 766373,
+   "artist": "Mariss Jansons, Berlin Philharmonic Orchestra & Leif Ove Andsnes",
+   "apple": {
+    "block": 1,
+    "composer": "Edvard Grieg",
+    "work": "Piano Concerto in A Minor, Op. 16",
+    "part": "I. Allegro molto moderato",
+    "performers": "Leif Ove Andsnes, Mariss Jansons, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Piano Concerto in A Minor, Op. 16: II. Adagio",
+   "durationMs": 369373,
+   "artist": "Mariss Jansons, Berlin Philharmonic Orchestra & Leif Ove Andsnes",
+   "apple": {
+    "block": 1,
+    "composer": "Edvard Grieg",
+    "work": "Piano Concerto in A Minor, Op. 16",
+    "part": "II. Adagio",
+    "performers": "Leif Ove Andsnes, Berlin Philharmonic Orchestra, Mariss Jansons"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Piano Concerto in A Minor, Op. 16: III. Allegro moderato molto e marcato",
+   "durationMs": 600387,
+   "artist": "Mariss Jansons, Berlin Philharmonic Orchestra & Leif Ove Andsnes",
+   "apple": {
+    "block": 1,
+    "composer": "Edvard Grieg",
+    "work": "Piano Concerto in A Minor, Op. 16",
+    "part": "III. Allegro moderato molto e marcato",
+    "performers": "Mariss Jansons, Leif Ove Andsnes, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Piano Concerto in A Minor, Op. 54: I. Allegro affettuoso",
+   "durationMs": 877120,
+   "artist": "Mariss Jansons, Berlin Philharmonic Orchestra & Leif Ove Andsnes",
+   "apple": {
+    "block": 2,
+    "composer": "Robert Schumann",
+    "work": "Piano Concerto in A Minor, Op. 54",
+    "part": "I. Allegro affettuoso",
+    "performers": "Mariss Jansons, Berlin Philharmonic Orchestra, Leif Ove Andsnes"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Piano Concerto in A Minor, Op. 54: II. Intermezzo. Andantino grazioso",
+   "durationMs": 307560,
+   "artist": "Mariss Jansons, Berlin Philharmonic Orchestra & Leif Ove Andsnes",
+   "apple": {
+    "block": 2,
+    "composer": "Robert Schumann",
+    "work": "Piano Concerto in A Minor, Op. 54",
+    "part": "II. Intermezzo. Andantino grazioso",
+    "performers": "Berlin Philharmonic Orchestra, Mariss Jansons, Leif Ove Andsnes"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Piano Concerto in A Minor, Op. 54: III. Allegro vivace",
+   "durationMs": 613573,
+   "artist": "Mariss Jansons, Berlin Philharmonic Orchestra & Leif Ove Andsnes",
+   "apple": {
+    "block": 2,
+    "composer": "Robert Schumann",
+    "work": "Piano Concerto in A Minor, Op. 54",
+    "part": "III. Allegro vivace",
+    "performers": "Mariss Jansons, Leif Ove Andsnes, Berlin Philharmonic Orchestra"
+   }
+  }
+ ]
+}

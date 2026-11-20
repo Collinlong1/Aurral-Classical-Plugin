@@ -1,0 +1,64 @@
+{
+ "id": "1452249346",
+ "category": "symphony",
+ "title": "Bruckner: Symphony No. 7 in E Major, WAB 107",
+ "artist": "Vienna Philharmonic & Claudio Abbado",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Symphony No. 7 in E Major, WAB 107: I. Allegro moderato",
+   "durationMs": 1216999,
+   "artist": "Vienna Philharmonic & Claudio Abbado",
+   "apple": {
+    "block": 1,
+    "composer": "Anton Bruckner",
+    "work": "Symphony No. 7 in E Major, WAB 107 · “Lyric”",
+    "part": "I. Allegro moderato",
+    "performers": "Vienna Philharmonic, Claudio Abbado"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Symphony No. 7 in E Major, WAB 107: II. Adagio. Sehr feierlich und sehr langsam",
+   "durationMs": 1316999,
+   "artist": "Vienna Philharmonic & Claudio Abbado",
+   "apple": {
+    "block": 1,
+    "composer": "Anton Bruckner",
+    "work": "Symphony No. 7 in E Major, WAB 107 · “Lyric”",
+    "part": "II. Adagio. Sehr feierlich und sehr langsam",
+    "performers": "Claudio Abbado, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Symphony No. 7 in E Major, WAB 107: III. Scherzo. Sehr schnell",
+   "durationMs": 556999,
+   "artist": "Vienna Philharmonic & Claudio Abbado",
+   "apple": {
+    "block": 1,
+    "composer": "Anton Bruckner",
+    "work": "Symphony No. 7 in E Major, WAB 107 · “Lyric”",
+    "part": "III. Scherzo. Sehr schnell",
+    "performers": "Vienna Philharmonic, Claudio Abbado"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Symphony No. 7 in E Major, WAB 107: IV. Finale. Bewegt doch nicht schnell",
+   "durationMs": 770999,
+   "artist": "Vienna Philharmonic & Claudio Abbado",
+   "apple": {
+    "block": 1,
+    "composer": "Anton Bruckner",
+    "work": "Symphony No. 7 in E Major, WAB 107 · “Lyric”",
+    "part": "IV. Finale. Bewegt doch nicht schnell",
+    "performers": "Vienna Philharmonic, Claudio Abbado"
+   }
+  }
+ ]
+}

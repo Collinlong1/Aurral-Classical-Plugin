@@ -1,0 +1,834 @@
+{
+ "id": "1452548501",
+ "category": "opera",
+ "title": "Mozart: Don Giovanni",
+ "artist": "Karl Böhm & Vienna Philharmonic",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Don Giovanni, K. 527: Overture",
+   "durationMs": 377987,
+   "artist": "Vienna Philharmonic, Karl Böhm & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "Overture",
+    "performers": "Karl Böhm, Vienna Philharmonic, Walter Taussig"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Don Giovanni, K. 527, Act 1: \"Notte e giorno faticar\"",
+   "durationMs": 361667,
+   "artist": "Anna Tomowa-Sintow, Karl Böhm, Vienna Philharmonic, Sherrill Milnes, Walter Berry, John Macurdy & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Notte e giorno faticar\"",
+    "performers": "Walter Taussig, John Macurdy, Vienna Philharmonic, Anna Tomowa-Sintow, Sherrill Milnes, Karl Böhm, Walter Berry"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Don Giovanni, K. 527, Act 1: \"Leporello, ove sei?\"",
+   "durationMs": 31133,
+   "artist": "Sherrill Milnes, Karl Böhm, Vienna Philharmonic, Walter Berry & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Leporello, ove sei?\"",
+    "performers": "Walter Berry, Sherrill Milnes, Karl Böhm, Vienna Philharmonic, Walter Taussig"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Don Giovanni, K. 527, Act 1: \"Ah! del padre in periglio\"",
+   "durationMs": 11973,
+   "artist": "Anna Tomowa-Sintow, Karl Böhm, Vienna Philharmonic, Peter Schreier & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Ah! del padre in periglio\"",
+    "performers": "Anna Tomowa-Sintow, Karl Böhm, Vienna Philharmonic, Walter Taussig, Peter Schreier"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Don Giovanni, K. 527, Act 1: Ma qual mai s'offre, o Dei",
+   "durationMs": 172307,
+   "artist": "Karl Böhm, Vienna Philharmonic, Anna Tomowa-Sintow, Peter Schreier & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "Ma qual mai s'offre, o Dei",
+    "performers": "Vienna Philharmonic, Walter Taussig, Peter Schreier, Anna Tomowa-Sintow, Karl Böhm"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Don Giovanni, K. 527, Act 1: \"Fuggi, crudele, fuggi!\"",
+   "durationMs": 271280,
+   "artist": "Anna Tomowa-Sintow, Karl Böhm, Vienna Philharmonic, Peter Schreier & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Fuggi, crudele, fuggi!\"",
+    "performers": "Anna Tomowa-Sintow, Vienna Philharmonic, Peter Schreier, Karl Böhm, Walter Taussig"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Don Giovanni, K. 527, Act 1: \"Orsù, spicciati presto\"",
+   "durationMs": 92760,
+   "artist": "Sherrill Milnes, Karl Böhm, Vienna Philharmonic, Walter Berry & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Orsù, spicciati presto\"",
+    "performers": "Walter Berry, Vienna Philharmonic, Walter Taussig, Karl Böhm, Sherrill Milnes"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Don Giovanni, K. 527, Act 1: \"Ah! chi mi dice mai\" - \"Udisti? qualche bella\"",
+   "durationMs": 225680,
+   "artist": "Teresa Zylis-Gara, Karl Böhm, Vienna Philharmonic, Sherrill Milnes, Walter Berry & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Ah! chi mi dice mai\" - \"Udisti? qualche bella\"",
+    "performers": "Vienna Philharmonic, Walter Berry, Sherrill Milnes, Teresa Zylis-Gara, Karl Böhm, Walter Taussig"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Don Giovanni, K. 527, Act 1: \"Chi è là?\"",
+   "durationMs": 179267,
+   "artist": "Teresa Zylis-Gara, Karl Böhm, Vienna Philharmonic, Sherrill Milnes, Walter Berry & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Chi è là?\"",
+    "performers": "Vienna Philharmonic, Sherrill Milnes, Walter Berry, Karl Böhm, Walter Taussig, Teresa Zylis-Gara"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Don Giovanni, K. 527, Act 1: \"Madamina, il catalogo è questo\"",
+   "durationMs": 394720,
+   "artist": "Walter Berry, Karl Böhm, Vienna Philharmonic & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Madamina, il catalogo è questo\"",
+    "performers": "Walter Berry, Walter Taussig, Vienna Philharmonic, Karl Böhm"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Don Giovanni, K. 527, Act 1: \"Giovinette, che fate all'amore\"",
+   "durationMs": 93760,
+   "artist": "Edith Mathis, Karl Böhm, Vienna Philharmonic, Dale Duesing, Chorus of the Vienna State Opera & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Giovinette, che fate all'amore\"",
+    "performers": "Chorus of the Vienna State Opera, Walter Taussig, Karl Böhm, Edith Mathis, Dale Duesing, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Don Giovanni, K. 527, Act 1: \"Manco male, è partita\"",
+   "durationMs": 136813,
+   "artist": "Edith Mathis, Karl Böhm, Vienna Philharmonic, Sherrill Milnes, Dale Duesing, Walter Berry & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Manco male, è partita\"",
+    "performers": "Walter Taussig, Sherrill Milnes, Dale Duesing, Vienna Philharmonic, Walter Berry, Edith Mathis, Karl Böhm"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Don Giovanni, K. 527, Act 1: \"Ho capito, signor sì!\"",
+   "durationMs": 98347,
+   "artist": "Dale Duesing, Karl Böhm, Vienna Philharmonic & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Ho capito, signor sì!\"",
+    "performers": "Vienna Philharmonic, Karl Böhm, Dale Duesing, Walter Taussig"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Don Giovanni, K. 527, Act 1: \"Alfin siam liberati\"",
+   "durationMs": 121400,
+   "artist": "Edith Mathis, Karl Böhm, Vienna Philharmonic, Sherrill Milnes & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Alfin siam liberati\"",
+    "performers": "Karl Böhm, Sherrill Milnes, Edith Mathis, Vienna Philharmonic, Walter Taussig"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Don Giovanni, K. 527, Act 1: \"Là ci darem la mano\"",
+   "durationMs": 220573,
+   "artist": "Edith Mathis, Karl Böhm, Vienna Philharmonic, Sherrill Milnes & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Là ci darem la mano\"",
+    "performers": "Walter Taussig, Karl Böhm, Edith Mathis, Sherrill Milnes, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Don Giovanni, K. 527, Act 1: \"Fermati, scellerato!\"",
+   "durationMs": 46987,
+   "artist": "Teresa Zylis-Gara, Karl Böhm, Vienna Philharmonic, Edith Mathis, Sherrill Milnes & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Fermati, scellerato!\"",
+    "performers": "Edith Mathis, Karl Böhm, Sherrill Milnes, Walter Taussig, Teresa Zylis-Gara, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Don Giovanni, K. 527, Act 1: \"Ah, fuggi il traditor\"",
+   "durationMs": 83013,
+   "artist": "Teresa Zylis-Gara, Karl Böhm, Vienna Philharmonic & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Ah, fuggi il traditor\"",
+    "performers": "Vienna Philharmonic, Karl Böhm, Walter Taussig, Teresa Zylis-Gara"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Don Giovanni, K. 527, Act 1: \"Mi par ch'oggi il demonio si diverta\"",
+   "durationMs": 72227,
+   "artist": "Anna Tomowa-Sintow, Karl Böhm, Vienna Philharmonic, Teresa Zylis-Gara, Peter Schreier, Sherrill Milnes & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Mi par ch'oggi il demonio si diverta\"",
+    "performers": "Karl Böhm, Peter Schreier, Sherrill Milnes, Vienna Philharmonic, Teresa Zylis-Gara, Walter Taussig, Anna Tomowa-Sintow"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "Don Giovanni, K. 527, Act 1: \"Non ti fidar, o misera\"",
+   "durationMs": 267120,
+   "artist": "Teresa Zylis-Gara, Karl Böhm, Vienna Philharmonic, Anna Tomowa-Sintow, Peter Schreier, Sherrill Milnes & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Non ti fidar, o misera\"",
+    "performers": "Karl Böhm, Anna Tomowa-Sintow, Vienna Philharmonic, Teresa Zylis-Gara, Walter Taussig, Peter Schreier, Sherrill Milnes"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "Don Giovanni, K. 527, Act 1: \"Povera sventurata!\"",
+   "durationMs": 24560,
+   "artist": "Sherrill Milnes, Karl Böhm, Vienna Philharmonic & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Povera sventurata!\"",
+    "performers": "Vienna Philharmonic, Sherrill Milnes, Karl Böhm, Walter Taussig"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "Don Giovanni, K. 527, Act 1: \"Don Ottavio. son morta!\"",
+   "durationMs": 203480,
+   "artist": "Anna Tomowa-Sintow, Karl Böhm, Vienna Philharmonic, Peter Schreier & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Don Ottavio. son morta!\"",
+    "performers": "Peter Schreier, Vienna Philharmonic, Walter Taussig, Anna Tomowa-Sintow, Karl Böhm"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "Don Giovanni, K. 527, Act 1: \"Or sai chi l'onore\"",
+   "durationMs": 194027,
+   "artist": "Karl Böhm, Vienna Philharmonic, Anna Tomowa-Sintow & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Or sai chi l'onore\"",
+    "performers": "Walter Taussig, Anna Tomowa-Sintow, Vienna Philharmonic, Karl Böhm"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 23,
+   "title": "Don Giovanni, K. 527, Act 1: \"Dalla sua pace\"",
+   "durationMs": 293960,
+   "artist": "Peter Schreier, Karl Böhm, Vienna Philharmonic & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Dalla sua pace\"",
+    "performers": "Walter Taussig, Karl Böhm, Vienna Philharmonic, Peter Schreier"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 24,
+   "title": "Don Giovanni, K. 527, Act 1: \"Io deggio ad ogni patto\"",
+   "durationMs": 95827,
+   "artist": "Sherrill Milnes, Karl Böhm, Vienna Philharmonic, Walter Berry & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Io deggio ad ogni patto\"",
+    "performers": "Sherrill Milnes, Karl Böhm, Walter Berry, Walter Taussig, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 25,
+   "title": "Don Giovanni, K. 527, Act 1: \"Fin ch'han dal vino\"",
+   "durationMs": 104920,
+   "artist": "Sherrill Milnes, Karl Böhm, Vienna Philharmonic & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Fin ch'han dal vino\"",
+    "performers": "Karl Böhm, Walter Taussig, Sherrill Milnes, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 1,
+   "title": "Don Giovanni, K. 527, Act 1: \"Masetto. senti un po'.\"",
+   "durationMs": 82893,
+   "artist": "Edith Mathis, Karl Böhm, Vienna Philharmonic, Dale Duesing & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Masetto. senti un po'.\"",
+    "performers": "Karl Böhm, Walter Taussig, Dale Duesing, Vienna Philharmonic, Edith Mathis"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 2,
+   "title": "Don Giovanni, K. 527, Act 1: \"Batti, batti, o bel Masetto\"",
+   "durationMs": 239173,
+   "artist": "Karl Böhm, Vienna Philharmonic, Edith Mathis & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Batti, batti, o bel Masetto\"",
+    "performers": "Vienna Philharmonic, Karl Böhm, Walter Taussig, Edith Mathis"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 3,
+   "title": "Don Giovanni, K. 527, Act 1: \"Guarda un po' come seppe questa strega\"",
+   "durationMs": 34133,
+   "artist": "Edith Mathis, Karl Böhm, Vienna Philharmonic, Dale Duesing, Sherrill Milnes & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Guarda un po' come seppe questa strega\"",
+    "performers": "Vienna Philharmonic, Dale Duesing, Karl Böhm, Walter Taussig, Edith Mathis, Sherrill Milnes"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 4,
+   "title": "Don Giovanni, K. 527, Act 1: \"Presto, presto. pria ch'ei venga\"",
+   "durationMs": 122333,
+   "artist": "Edith Mathis, Karl Böhm, Vienna Philharmonic, Dale Duesing, Chorus of the Vienna State Opera, Sherrill Milnes & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Presto, presto. pria ch'ei venga\"",
+    "performers": "Vienna Philharmonic, Edith Mathis, Dale Duesing, Chorus of the Vienna State Opera, Karl Böhm, Sherrill Milnes, Walter Taussig"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 5,
+   "title": "Don Giovanni, K. 527, Act 1: \"Tra quest'arbori celata\"",
+   "durationMs": 157333,
+   "artist": "Edith Mathis, Karl Böhm, Vienna Philharmonic, Sherrill Milnes, Dale Duesing & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Tra quest'arbori celata\"",
+    "performers": "Karl Böhm, Walter Taussig, Sherrill Milnes, Vienna Philharmonic, Dale Duesing, Edith Mathis"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 6,
+   "title": "Don Giovanni, K. 527, Act 1: \"Bisogna aver corragio\"",
+   "durationMs": 292493,
+   "artist": "Teresa Zylis-Gara, Karl Böhm, Vienna Philharmonic, Anna Tomowa-Sintow, Peter Schreier, Sherrill Milnes, Walter Berry & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Bisogna aver corragio\"",
+    "performers": "Karl Böhm, Anna Tomowa-Sintow, Walter Berry, Teresa Zylis-Gara, Vienna Philharmonic, Walter Taussig, Peter Schreier, Sherrill Milnes"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 7,
+   "title": "Don Giovanni, K. 527, Act 1: \"Riposate, vezzose ragazze\"",
+   "durationMs": 665707,
+   "artist": "Edith Mathis, Karl Böhm, Vienna Philharmonic, Anna Tomowa-Sintow, Teresa Zylis-Gara, Peter Schreier, Sherrill Milnes, Dale Duesing, Walter Berry & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Riposate, vezzose ragazze\"",
+    "performers": "Edith Mathis, Walter Taussig, Vienna Philharmonic, Karl Böhm, Teresa Zylis-Gara, Walter Berry, Anna Tomowa-Sintow, Peter Schreier, Dale Duesing, Sherrill Milnes"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 8,
+   "title": "Don Giovanni, K. 527, Act 2: \"Eh via, buffone, non mi seccar\"",
+   "durationMs": 68333,
+   "artist": "Karl Böhm, Vienna Philharmonic, Sherrill Milnes, Walter Berry & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Eh via, buffone, non mi seccar\"",
+    "performers": "Sherrill Milnes, Walter Berry, Walter Taussig, Karl Böhm, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 9,
+   "title": "Don Giovanni, K. 527, Act 2: \"Leporello!\"",
+   "durationMs": 105867,
+   "artist": "Sherrill Milnes, Karl Böhm, Vienna Philharmonic, Walter Berry & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Leporello!\"",
+    "performers": "Karl Böhm, Sherrill Milnes, Vienna Philharmonic, Walter Berry, Walter Taussig"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 10,
+   "title": "Don Giovanni, K. 527, Act 2: \"Ah! taci, ingiusto core\"",
+   "durationMs": 318293,
+   "artist": "Teresa Zylis-Gara, Karl Böhm, Vienna Philharmonic, Sherrill Milnes, Walter Berry & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Ah! taci, ingiusto core\"",
+    "performers": "Teresa Zylis-Gara, Walter Taussig, Karl Böhm, Walter Berry, Sherrill Milnes, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 11,
+   "title": "Don Giovanni, K. 527, Act 2: \"Amico, che ti par?\"",
+   "durationMs": 123707,
+   "artist": "Karl Böhm, Vienna Philharmonic, Teresa Zylis-Gara, Sherrill Milnes, Walter Berry & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Amico, che ti par?\"",
+    "performers": "Teresa Zylis-Gara, Vienna Philharmonic, Sherrill Milnes, Walter Berry, Karl Böhm, Walter Taussig"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 12,
+   "title": "Don Giovanni, K. 527, Act 2: \"Deh! vieni alla finestra\"",
+   "durationMs": 126867,
+   "artist": "Sherrill Milnes, Karl Böhm, Vienna Philharmonic & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Deh! vieni alla finestra\"",
+    "performers": "Sherrill Milnes, Vienna Philharmonic, Karl Böhm, Walter Taussig"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 13,
+   "title": "Don Giovanni, K. 527, Act 2: \"V'è gente alla finestra\"",
+   "durationMs": 67733,
+   "artist": "Sherrill Milnes, Karl Böhm, Vienna Philharmonic, Dale Duesing & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"V'è gente alla finestra\"",
+    "performers": "Vienna Philharmonic, Dale Duesing, Sherrill Milnes, Karl Böhm, Walter Taussig"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 14,
+   "title": "Don Giovanni, K. 527, Act 2: \"Metà di voi qua vadano\"",
+   "durationMs": 177627,
+   "artist": "Karl Böhm, Vienna Philharmonic, Sherrill Milnes & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Metà di voi qua vadano\"",
+    "performers": "Vienna Philharmonic, Walter Taussig, Sherrill Milnes, Karl Böhm"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 15,
+   "title": "Don Giovanni, K. 527, Act 2: \"Zitto. Lascia ch'io senta. Ottimamente\"",
+   "durationMs": 51800,
+   "artist": "Sherrill Milnes, Karl Böhm, Vienna Philharmonic, Dale Duesing & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Zitto. Lascia ch'io senta. Ottimamente\"",
+    "performers": "Karl Böhm, Dale Duesing, Walter Taussig, Sherrill Milnes, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 16,
+   "title": "Don Giovanni, K. 527, Act 2: Ahi, ahi! La testa mia!",
+   "durationMs": 103000,
+   "artist": "Edith Mathis, Karl Böhm, Vienna Philharmonic, Dale Duesing & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "Ahi, ahi! La testa mia!",
+    "performers": "Dale Duesing, Edith Mathis, Walter Taussig, Karl Böhm, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 17,
+   "title": "Don Giovanni, K. 527, Act 2: \"Vedrai, carino\"",
+   "durationMs": 251600,
+   "artist": "Karl Böhm, Vienna Philharmonic, Edith Mathis & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Vedrai, carino\"",
+    "performers": "Edith Mathis, Walter Taussig, Karl Böhm, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 18,
+   "title": "Don Giovanni, K. 527, Act 2: \"Di molte faci il lume\"",
+   "durationMs": 30640,
+   "artist": "Teresa Zylis-Gara, Karl Böhm, Vienna Philharmonic, Walter Berry & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Di molte faci il lume\"",
+    "performers": "Walter Berry, Teresa Zylis-Gara, Vienna Philharmonic, Karl Böhm, Walter Taussig"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 19,
+   "title": "Don Giovanni, K. 527, Act 2: \"Sola, sola in buio loco\"",
+   "durationMs": 505400,
+   "artist": "Karl Böhm, Vienna Philharmonic, Teresa Zylis-Gara, Anna Tomowa-Sintow, Edith Mathis, Peter Schreier, Dale Duesing, Walter Berry & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Sola, sola in buio loco\"",
+    "performers": "Walter Berry, Edith Mathis, Vienna Philharmonic, Karl Böhm, Anna Tomowa-Sintow, Peter Schreier, Teresa Zylis-Gara, Walter Taussig, Dale Duesing"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 1,
+   "title": "Don Giovanni, K. 527, Act 2: \"Dunque quello sei tu\"",
+   "durationMs": 21160,
+   "artist": "Edith Mathis, Karl Böhm, Vienna Philharmonic, Teresa Zylis-Gara, Peter Schreier, Dale Duesing & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Dunque quello sei tu\"",
+    "performers": "Vienna Philharmonic, Teresa Zylis-Gara, Edith Mathis, Peter Schreier, Dale Duesing, Walter Taussig, Karl Böhm"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 2,
+   "title": "Don Giovanni, K. 527, Act 2: \"Ah! pietà, signori miei!\"",
+   "durationMs": 104267,
+   "artist": "Walter Berry, Karl Böhm, Vienna Philharmonic & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Ah! pietà, signori miei!\"",
+    "performers": "Walter Taussig, Karl Böhm, Vienna Philharmonic, Walter Berry"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 3,
+   "title": "Don Giovanni, K. 527, Act 2: \"Ferma, perfido; ferma\"",
+   "durationMs": 43867,
+   "artist": "Teresa Zylis-Gara, Karl Böhm, Vienna Philharmonic, Edith Mathis, Peter Schreier, Dale Duesing & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Ferma, perfido; ferma\"",
+    "performers": "Edith Mathis, Vienna Philharmonic, Peter Schreier, Walter Taussig, Dale Duesing, Teresa Zylis-Gara, Karl Böhm"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 4,
+   "title": "Don Giovanni, K. 527, Act 2: \"Il mio tesoro intanto\"",
+   "durationMs": 302000,
+   "artist": "Peter Schreier, Karl Böhm, Vienna Philharmonic & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Il mio tesoro intanto\"",
+    "performers": "Vienna Philharmonic, Walter Taussig, Karl Böhm, Peter Schreier"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 5,
+   "title": "Don Giovanni, K. 527, Act 2: \"In quali eccessi, o numi\"",
+   "durationMs": 124507,
+   "artist": "Teresa Zylis-Gara, Karl Böhm, Vienna Philharmonic & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"In quali eccessi, o numi\"",
+    "performers": "Teresa Zylis-Gara, Walter Taussig, Vienna Philharmonic, Karl Böhm"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 6,
+   "title": "Don Giovanni, K. 527, Act 2: \"Mi tradì quell'alma ingrata\"",
+   "durationMs": 276533,
+   "artist": "Teresa Zylis-Gara, Karl Böhm, Vienna Philharmonic & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Mi tradì quell'alma ingrata\"",
+    "performers": "Walter Taussig, Teresa Zylis-Gara, Karl Böhm, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 7,
+   "title": "Don Giovanni, K. 527, Act 2: \"Ah! ah! ah! questa è buona!\"",
+   "durationMs": 267827,
+   "artist": "Sherrill Milnes, Karl Böhm, Vienna Philharmonic, Walter Berry, John Macurdy & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Ah! ah! ah! questa è buona!\"",
+    "performers": "John Macurdy, Vienna Philharmonic, Walter Taussig, Walter Berry, Karl Böhm, Sherrill Milnes"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 8,
+   "title": "Don Giovanni, K. 527, Act 2: \"O statua gentilissima\"",
+   "durationMs": 220173,
+   "artist": "Sherrill Milnes, Karl Böhm, Vienna Philharmonic, Walter Berry & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"O statua gentilissima\"",
+    "performers": "Vienna Philharmonic, Sherrill Milnes, Karl Böhm, Walter Taussig, Walter Berry"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 9,
+   "title": "Don Giovanni, K. 527, Act 2: \"Calmatevi, idol mio\"",
+   "durationMs": 53160,
+   "artist": "Karl Böhm, Vienna Philharmonic, Anna Tomowa-Sintow, Peter Schreier & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Calmatevi, idol mio\"",
+    "performers": "Karl Böhm, Peter Schreier, Walter Taussig, Vienna Philharmonic, Anna Tomowa-Sintow"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 10,
+   "title": "Don Giovanni, K. 527, Act 2: \"Crudele? Ah no! mio bene!\"",
+   "durationMs": 115040,
+   "artist": "Anna Tomowa-Sintow, Karl Böhm, Vienna Philharmonic & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Crudele? Ah no! mio bene!\"",
+    "performers": "Walter Taussig, Karl Böhm, Vienna Philharmonic, Anna Tomowa-Sintow"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 11,
+   "title": "Don Giovanni, K. 527, Act 2: \"Non mi dir, bell'idol mio\"",
+   "durationMs": 338267,
+   "artist": "Karl Böhm, Vienna Philharmonic, Anna Tomowa-Sintow & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Non mi dir, bell'idol mio\"",
+    "performers": "Vienna Philharmonic, Karl Böhm, Walter Taussig, Anna Tomowa-Sintow"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 12,
+   "title": "Don Giovanni, K. 527, Act 2: \"Già la mensa è preparata\"",
+   "durationMs": 300600,
+   "artist": "Teresa Zylis-Gara, Karl Böhm, Vienna Philharmonic, Sherrill Milnes, Walter Berry & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Già la mensa è preparata\"",
+    "performers": "Teresa Zylis-Gara, Walter Berry, Sherrill Milnes, Walter Taussig, Karl Böhm, Vienna Philharmonic"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 13,
+   "title": "Don Giovanni, K. 527, Act 2: \"L'ultima prova\"",
+   "durationMs": 229733,
+   "artist": "Teresa Zylis-Gara, Karl Böhm, Vienna Philharmonic, Sherrill Milnes, Walter Berry & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"L'ultima prova\"",
+    "performers": "Walter Taussig, Karl Böhm, Vienna Philharmonic, Sherrill Milnes, Teresa Zylis-Gara, Walter Berry"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 14,
+   "title": "Don Giovanni, K. 527, Act 2: \"Don Giovanni, a cenar teco m'invitasti\"",
+   "durationMs": 492360,
+   "artist": "Sherrill Milnes, Karl Böhm, Vienna Philharmonic, Walter Berry, Chorus of the Vienna State Opera, John Macurdy & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Don Giovanni, a cenar teco m'invitasti\"",
+    "performers": "Walter Taussig, Chorus of the Vienna State Opera, Sherrill Milnes, Walter Berry, Karl Böhm, Vienna Philharmonic, John Macurdy"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 15,
+   "title": "Don Giovanni, K. 527, Act 2: \"Ah! dov'è il perfido?\"",
+   "durationMs": 449080,
+   "artist": "Anna Tomowa-Sintow, Karl Böhm, Vienna Philharmonic, Teresa Zylis-Gara, Edith Mathis, Peter Schreier, Dale Duesing, Walter Berry & Walter Taussig",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Don Giovanni, K. 527, KV 527",
+    "part": "\"Ah! dov'è il perfido?\"",
+    "performers": "Walter Taussig, Walter Berry, Anna Tomowa-Sintow, Edith Mathis, Karl Böhm, Teresa Zylis-Gara, Dale Duesing, Peter Schreier, Vienna Philharmonic"
+   }
+  }
+ ]
+}

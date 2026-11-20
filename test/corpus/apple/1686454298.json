@@ -1,0 +1,50 @@
+{
+ "id": "1686454298",
+ "category": "concerto",
+ "title": "Rachmaninoff: Piano Concerto No. 2",
+ "artist": "Berlin Philharmonic Orchestra, Kirill Gerstein & Kirill Petrenko",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Concerto for Piano and Orchestra No. 2 in C Minor, Op. 18: I. Moderato",
+   "durationMs": 587707,
+   "artist": "Berlin Philharmonic, Kirill Gerstein & Kirill Petrenko",
+   "apple": {
+    "block": 1,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Piano Concerto No. 2 in C Minor, Op. 18",
+    "part": "I. Moderato",
+    "performers": "Kirill Gerstein, Kirill Petrenko, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Concerto for Piano and Orchestra No. 2 in C Minor, Op. 18: II. Adagio sostenuto",
+   "durationMs": 638576,
+   "artist": "Berlin Philharmonic, Kirill Gerstein & Kirill Petrenko",
+   "apple": {
+    "block": 1,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Piano Concerto No. 2 in C Minor, Op. 18",
+    "part": "II. Adagio sostenuto",
+    "performers": "Berlin Philharmonic Orchestra, Kirill Gerstein, Kirill Petrenko"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Concerto for Piano and Orchestra No. 2 in C Minor, Op. 18: III. Allegro scherzando",
+   "durationMs": 639990,
+   "artist": "Berlin Philharmonic, Kirill Gerstein & Kirill Petrenko",
+   "apple": {
+    "block": 1,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Piano Concerto No. 2 in C Minor, Op. 18",
+    "part": "III. Allegro scherzando",
+    "performers": "Kirill Petrenko, Kirill Gerstein, Berlin Philharmonic Orchestra"
+   }
+  }
+ ]
+}

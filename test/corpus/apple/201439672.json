@@ -1,0 +1,232 @@
+{
+ "id": "201439672",
+ "category": "concerto",
+ "title": "Vivaldi: The Four Seasons - Bach: Brandenburg Concerto No. 3",
+ "artist": "Royal Philharmonic Orchestra",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Seasons (Spring): I. Allegro",
+   "durationMs": 198667,
+   "artist": "Jonathan Carney & Royal Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Antonio Vivaldi",
+    "work": "Violin Concerto in E Major, Op. 8/1, RV 269 · “Spring from The Four Seasons”",
+    "part": "I. Allegro",
+    "performers": "Royal Philharmonic Orchestra, Jonathan Carney"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Seasons (Spring): II. Largo e Pianissimo Sempre",
+   "durationMs": 158333,
+   "artist": "Jonathan Carney & Royal Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Antonio Vivaldi",
+    "work": "Violin Concerto in E Major, Op. 8/1, RV 269 · “Spring from The Four Seasons”",
+    "part": "II. Largo e Pianissimo Sempre",
+    "performers": "Jonathan Carney, Royal Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Seasons (Spring): III. Danza Pastorale, Allegro",
+   "durationMs": 237000,
+   "artist": "Jonathan Carney & Royal Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Antonio Vivaldi",
+    "work": "Violin Concerto in E Major, Op. 8/1, RV 269 · “Spring from The Four Seasons”",
+    "part": "III. Danza Pastorale, Allegro",
+    "performers": "Royal Philharmonic Orchestra, Jonathan Carney"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Seasons (Summer): I.  Allegro Con Molto",
+   "durationMs": 306507,
+   "artist": "Jonathan Carney & Royal Philharmonic Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Antonio Vivaldi",
+    "work": "Violin Concerto in G Minor, Op. 8/2, RV 315 · “Summer from The Four Seasons”",
+    "part": "I.  Allegro Con Molto",
+    "performers": "Jonathan Carney, Royal Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Seasons (Summer): II.  Adagio",
+   "durationMs": 136667,
+   "artist": "Jonathan Carney & Royal Philharmonic Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Antonio Vivaldi",
+    "work": "Violin Concerto in G Minor, Op. 8/2, RV 315 · “Summer from The Four Seasons”",
+    "part": "II.  Adagio",
+    "performers": "Jonathan Carney, Royal Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Seasons (Summer): III. Presto",
+   "durationMs": 161333,
+   "artist": "Jonathan Carney & Royal Philharmonic Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Antonio Vivaldi",
+    "work": "Violin Concerto in G Minor, Op. 8/2, RV 315 · “Summer from The Four Seasons”",
+    "part": "III. Presto",
+    "performers": "Jonathan Carney, Royal Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Seasons (Autumn): I. Allegro",
+   "durationMs": 322493,
+   "artist": "Jonathan Carney & Royal Philharmonic Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Antonio Vivaldi",
+    "work": "Violin Concerto in F Major, Op. 8/3, RV 293 · “Autumn from The Four Seasons”",
+    "part": "I. Allegro",
+    "performers": "Royal Philharmonic Orchestra, Jonathan Carney"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Seasons (Autumn): II. Adagio",
+   "durationMs": 159173,
+   "artist": "Jonathan Carney & Royal Philharmonic Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Antonio Vivaldi",
+    "work": "Violin Concerto in F Major, Op. 8/3, RV 293 · “Autumn from The Four Seasons”",
+    "part": "II. Adagio",
+    "performers": "Jonathan Carney, Royal Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Seasons (Autumn): III. Allegro 2",
+   "durationMs": 196667,
+   "artist": "Jonathan Carney & Royal Philharmonic Orchestra",
+   "apple": {
+    "block": 4,
+    "composer": "A. Vivaldi: Seasons (Autumn)",
+    "work": "A. Vivaldi: Seasons (Autumn)",
+    "part": "III. Allegro 2",
+    "performers": "Royal Philharmonic Orchestra, Jonathan Carney"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Seasons (Winter): I. Allegro Con Molto",
+   "durationMs": 198493,
+   "artist": "Jonathan Carney & Royal Philharmonic Orchestra",
+   "apple": {
+    "block": 5,
+    "composer": "Antonio Vivaldi",
+    "work": "Violin Concerto in F Minor, Op. 8/4, RV 297 · “Winter from The Four Seasons”",
+    "part": "I. Allegro Con Molto",
+    "performers": "Jonathan Carney, Royal Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Seasons (Winter): II. Largo",
+   "durationMs": 123000,
+   "artist": "Jonathan Carney & Royal Philharmonic Orchestra",
+   "apple": {
+    "block": 5,
+    "composer": "Antonio Vivaldi",
+    "work": "Violin Concerto in F Minor, Op. 8/4, RV 297 · “Winter from The Four Seasons”",
+    "part": "II. Largo",
+    "performers": "Jonathan Carney, Royal Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Seasons (Winter): III. Allegro",
+   "durationMs": 200667,
+   "artist": "Jonathan Carney & Royal Philharmonic Orchestra",
+   "apple": {
+    "block": 5,
+    "composer": "Antonio Vivaldi",
+    "work": "Violin Concerto in F Minor, Op. 8/4, RV 297 · “Winter from The Four Seasons”",
+    "part": "III. Allegro",
+    "performers": "Jonathan Carney, Royal Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Canon",
+   "durationMs": 338507,
+   "artist": "Jonathan Carney & Royal Philharmonic Orchestra",
+   "apple": {
+    "block": 6,
+    "composer": "Johann Pachelbel",
+    "work": "Canon and Gigue in D Major, P. 37",
+    "part": "Canon",
+    "performers": "Jonathan Carney, Royal Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Brandenburg Concerto No. 3 in G, BWV 1048: I. Allegro",
+   "durationMs": 344893,
+   "artist": "Jonathan Carney & Royal Philharmonic Orchestra",
+   "apple": {
+    "block": 7,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 3 in G Major, BWV 1048",
+    "part": "I. Allegro",
+    "performers": "Jonathan Carney, Royal Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Brandenburg Concerto No. 3 in G, BWV 1048: II. Adagio Ma Non Tanto",
+   "durationMs": 198507,
+   "artist": "Jonathan Carney & Royal Philharmonic Orchestra",
+   "apple": {
+    "block": 7,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 3 in G Major, BWV 1048",
+    "part": "II. Adagio Ma Non Tanto",
+    "performers": "Jonathan Carney, Royal Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Brandenburg Concerto No. 3 in G, BWV 1048: III. Allegro 2",
+   "durationMs": 329093,
+   "artist": "Jonathan Carney & Royal Philharmonic Orchestra",
+   "apple": {
+    "block": 7,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 3 in G Major, BWV 1048",
+    "part": "III. Allegro 2",
+    "performers": "Jonathan Carney, Royal Philharmonic Orchestra"
+   }
+  }
+ ]
+}

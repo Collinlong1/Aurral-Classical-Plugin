@@ -1,0 +1,92 @@
+{
+ "id": "1452677075",
+ "category": "orchestral",
+ "title": "Smetana: Má Vlast",
+ "artist": "Jiří Bělohlávek & Czech Philharmonic",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Má Vlast, JB1:112: 1. Vysehrad",
+   "durationMs": 908573,
+   "artist": "Czech Philharmonic & Jiří Bělohlávek",
+   "apple": {
+    "block": 1,
+    "composer": "Bedřich Smetana",
+    "work": "Má Vlast, JB 1:112, T 110, T 111, T 113, T 114, T 120, T 121 · “My Homeland”",
+    "part": "1. Vysehrad",
+    "performers": "Jiří Bělohlávek, Czech Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Má Vlast, JB1:112: 2. Vltava",
+   "durationMs": 726893,
+   "artist": "Czech Philharmonic & Jiří Bělohlávek",
+   "apple": {
+    "block": 1,
+    "composer": "Bedřich Smetana",
+    "work": "Má Vlast, JB 1:112, T 110, T 111, T 113, T 114, T 120, T 121 · “My Homeland”",
+    "part": "2. Vltava",
+    "performers": "Czech Philharmonic, Jiří Bělohlávek"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Má Vlast, JB1:112: 3. Sarka",
+   "durationMs": 611280,
+   "artist": "Czech Philharmonic & Jiří Bělohlávek",
+   "apple": {
+    "block": 1,
+    "composer": "Bedřich Smetana",
+    "work": "Má Vlast, JB 1:112, T 110, T 111, T 113, T 114, T 120, T 121 · “My Homeland”",
+    "part": "3. Sarka",
+    "performers": "Czech Philharmonic, Jiří Bělohlávek"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Má Vlast, JB1:112: 4. Z ceskych luhu a haju",
+   "durationMs": 759240,
+   "artist": "Czech Philharmonic & Jiří Bělohlávek",
+   "apple": {
+    "block": 1,
+    "composer": "Bedřich Smetana",
+    "work": "Má Vlast, JB 1:112, T 110, T 111, T 113, T 114, T 120, T 121 · “My Homeland”",
+    "part": "4. Z ceskych luhu a haju",
+    "performers": "Jiří Bělohlávek, Czech Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Má Vlast, JB1:112: 5. Tábor",
+   "durationMs": 753880,
+   "artist": "Czech Philharmonic & Jiří Bělohlávek",
+   "apple": {
+    "block": 1,
+    "composer": "Bedřich Smetana",
+    "work": "Má Vlast, JB 1:112, T 110, T 111, T 113, T 114, T 120, T 121 · “My Homeland”",
+    "part": "5. Tábor",
+    "performers": "Jiří Bělohlávek, Czech Philharmonic"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Má Vlast, JB1:112: 6. Blanik",
+   "durationMs": 848411,
+   "artist": "Czech Philharmonic & Jiří Bělohlávek",
+   "apple": {
+    "block": 1,
+    "composer": "Bedřich Smetana",
+    "work": "Má Vlast, JB 1:112, T 110, T 111, T 113, T 114, T 120, T 121 · “My Homeland”",
+    "part": "6. Blanik",
+    "performers": "Jiří Bělohlávek, Czech Philharmonic"
+   }
+  }
+ ]
+}

@@ -1,0 +1,95 @@
+{
+ "id": "queen-a-night-at-the-opera",
+ "family": "rock",
+ "title": "A Night at the Opera",
+ "artist": "Queen",
+ "source": "store download with songwriter composer tags; 'opera' in the album title",
+ "expect": {
+  "album": "not_classical"
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Lazing on a Sunday Afternoon",
+   "durationMs": 68000,
+   "artist": "Queen",
+   "composer": [
+    "Freddie Mercury"
+   ],
+   "genres": [
+    "Rock"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "You're My Best Friend",
+   "durationMs": 170000,
+   "artist": "Queen",
+   "composer": [
+    "John Deacon"
+   ],
+   "genres": [
+    "Rock"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "'39",
+   "durationMs": 210000,
+   "artist": "Queen",
+   "composer": [
+    "Brian May"
+   ],
+   "genres": [
+    "Rock"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Bohemian Rhapsody",
+   "durationMs": 355000,
+   "artist": "Queen",
+   "composer": [
+    "Freddie Mercury"
+   ],
+   "genres": [
+    "Rock"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [
+    "misleading-title"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "God Save the Queen",
+   "durationMs": 71000,
+   "artist": "Queen",
+   "composer": [
+    "Traditional"
+   ],
+   "genres": [
+    "Rock"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [],
+   "note": "Arrangement of the anthem; not a classical recording."
+  }
+ ]
+}

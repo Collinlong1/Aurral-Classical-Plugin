@@ -1,0 +1,120 @@
+{
+ "id": "1452218731",
+ "category": "choral sacred",
+ "title": "Fauré: Requiem",
+ "artist": "Kathleen Battle, Carlo Maria Giulini & Philharmonia Orchestra",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Requiem, Op. 48: I. Introit et Kyrie (Chorus)",
+   "durationMs": 470093,
+   "artist": "Philharmonia Orchestra, Carlo Maria Giulini, Timothy Farrell, Philharmonia Chorus London & Horst Neumann",
+   "apple": {
+    "block": 1,
+    "composer": "Gabriel Fauré",
+    "work": "Requiem in D Minor, Op. 48",
+    "part": "I. Introit et Kyrie (Chorus)",
+    "performers": "Philharmonia Chorus London, Horst Neumann, Timothy Farrell, Philharmonia Orchestra, Carlo Maria Giulini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Requiem, Op. 48: II. Offertoire (Bariton, Chorus)",
+   "durationMs": 586000,
+   "artist": "Andreas Schmidt, Carlo Maria Giulini, Philharmonia Orchestra, Philharmonia Chorus London, Timothy Farrell & Horst Neumann",
+   "apple": {
+    "block": 1,
+    "composer": "Gabriel Fauré",
+    "work": "Requiem in D Minor, Op. 48",
+    "part": "II. Offertoire (Bariton, Chorus)",
+    "performers": "Horst Neumann, Philharmonia Chorus London, Philharmonia Orchestra, Carlo Maria Giulini, Andreas Schmidt, Timothy Farrell"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Requiem, Op. 48: III. Sanctus (Chorus)",
+   "durationMs": 219000,
+   "artist": "Philharmonia Orchestra, Timothy Farrell, Carlo Maria Giulini, Philharmonia Chorus London & Horst Neumann",
+   "apple": {
+    "block": 1,
+    "composer": "Gabriel Fauré",
+    "work": "Requiem in D Minor, Op. 48",
+    "part": "III. Sanctus (Chorus)",
+    "performers": "Philharmonia Orchestra, Philharmonia Chorus London, Timothy Farrell, Horst Neumann, Carlo Maria Giulini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Requiem, Op. 48: IV. Pie Jesu (Sopran)",
+   "durationMs": 244971,
+   "artist": "Carlo Maria Giulini, Philharmonia Orchestra, Kathleen Battle & Timothy Farrell",
+   "apple": {
+    "block": 1,
+    "composer": "Gabriel Fauré",
+    "work": "Requiem in D Minor, Op. 48",
+    "part": "IV. Pie Jesu (Sopran)",
+    "performers": "Timothy Farrell, Philharmonia Orchestra, Carlo Maria Giulini, Kathleen Battle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Requiem, Op. 48: V. Agnus Dei (Chorus)",
+   "durationMs": 428000,
+   "artist": "Philharmonia Orchestra, Carlo Maria Giulini, Timothy Farrell, Philharmonia Chorus London & Horst Neumann",
+   "apple": {
+    "block": 1,
+    "composer": "Gabriel Fauré",
+    "work": "Requiem in D Minor, Op. 48",
+    "part": "V. Agnus Dei (Chorus)",
+    "performers": "Philharmonia Orchestra, Philharmonia Chorus London, Carlo Maria Giulini, Horst Neumann, Timothy Farrell"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Requiem, Op. 48: VI. Libera me (Bariton, Chorus)",
+   "durationMs": 351000,
+   "artist": "Andreas Schmidt, Carlo Maria Giulini, Philharmonia Orchestra, Philharmonia Chorus London, Timothy Farrell & Horst Neumann",
+   "apple": {
+    "block": 1,
+    "composer": "Gabriel Fauré",
+    "work": "Requiem in D Minor, Op. 48",
+    "part": "VI. Libera me (Bariton, Chorus)",
+    "performers": "Philharmonia Orchestra, Philharmonia Chorus London, Horst Neumann, Carlo Maria Giulini, Andreas Schmidt, Timothy Farrell"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Requiem, Op. 48: VII. in Paradisum (Chorus)",
+   "durationMs": 239000,
+   "artist": "Timothy Farrell, Carlo Maria Giulini, Philharmonia Orchestra & Philharmonia Chorus London",
+   "apple": {
+    "block": 1,
+    "composer": "Gabriel Fauré",
+    "work": "Requiem in D Minor, Op. 48",
+    "part": "VII. in Paradisum (Chorus)",
+    "performers": "Carlo Maria Giulini, Timothy Farrell, Philharmonia Orchestra, Philharmonia Chorus London"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Pavane pour une infante défunte: Lent",
+   "durationMs": 429000,
+   "artist": "Philharmonia Orchestra & Carlo Maria Giulini",
+   "apple": {
+    "block": 2,
+    "composer": "Maurice Ravel",
+    "work": "Pavane pour une infante défunte, M. 19, M. 19a · “Pavane for a Dead Princess”",
+    "part": "Lent",
+    "performers": "Carlo Maria Giulini, Philharmonia Orchestra"
+   }
+  }
+ ]
+}

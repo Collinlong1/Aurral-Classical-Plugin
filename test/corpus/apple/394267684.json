@@ -1,0 +1,120 @@
+{
+ "id": "394267684",
+ "category": "concerto",
+ "title": "Beethoven: Violin Concerto - Bernstein: Serenade",
+ "artist": "Hilary Hahn, David Zinman & Baltimore Symphony Orchestra",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Violin Concerto in D Major, Op. 61: I. Allegro ma non troppo",
+   "durationMs": 1465600,
+   "artist": "Hilary Hahn, Baltimore Symphony Orchestra & David Zinman",
+   "apple": {
+    "block": 1,
+    "composer": "Ludwig van Beethoven",
+    "work": "Violin Concerto in D Major, Op. 61",
+    "part": "I. Allegro ma non troppo",
+    "performers": "Hilary Hahn, David Zinman, Baltimore Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Violin Concerto in D Major, Op. 61: II. Larghetto",
+   "durationMs": 587200,
+   "artist": "Hilary Hahn, Baltimore Symphony Orchestra & David Zinman",
+   "apple": {
+    "block": 1,
+    "composer": "Ludwig van Beethoven",
+    "work": "Violin Concerto in D Major, Op. 61",
+    "part": "II. Larghetto",
+    "performers": "David Zinman, Baltimore Symphony Orchestra, Hilary Hahn"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Violin Concerto in D Major, Op. 61: III. Rondo. Allegro",
+   "durationMs": 583400,
+   "artist": "Hilary Hahn, Baltimore Symphony Orchestra & David Zinman",
+   "apple": {
+    "block": 1,
+    "composer": "Ludwig van Beethoven",
+    "work": "Violin Concerto in D Major, Op. 61",
+    "part": "III. Rondo. Allegro",
+    "performers": "Hilary Hahn, David Zinman, Baltimore Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Serenade (after Plato's \"Symposium\"): I. Phaedrus. Pausanias (Lento - Allegro)",
+   "durationMs": 420360,
+   "artist": "Hilary Hahn, Baltimore Symphony Orchestra & David Zinman",
+   "apple": {
+    "block": 2,
+    "composer": "L. Bernstein: Serenade (after Plato's \"Symposium\")",
+    "work": "L. Bernstein: Serenade (after Plato's \"Symposium\")",
+    "part": "I. Phaedrus. Pausanias (Lento - Allegro)",
+    "performers": "Hilary Hahn, Baltimore Symphony Orchestra, David Zinman"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Serenade (after Plato's \"Symposium\"): II. Aristophanes (Allegretto)",
+   "durationMs": 258733,
+   "artist": "Hilary Hahn, Baltimore Symphony Orchestra & David Zinman",
+   "apple": {
+    "block": 3,
+    "composer": "Leonard Bernstein",
+    "work": "Serenade after Plato’s Symposium",
+    "part": "II. Aristophanes (Allegretto)",
+    "performers": "Baltimore Symphony Orchestra, David Zinman, Hilary Hahn"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Serenade (after Plato's \"Symposium\"): III. Eryximachus (Presto)",
+   "durationMs": 89440,
+   "artist": "Hilary Hahn, Baltimore Symphony Orchestra & David Zinman",
+   "apple": {
+    "block": 3,
+    "composer": "Leonard Bernstein",
+    "work": "Serenade after Plato’s Symposium",
+    "part": "III. Eryximachus (Presto)",
+    "performers": "Hilary Hahn, Baltimore Symphony Orchestra, David Zinman"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Serenade (after Plato's \"Symposium\"): IV. Agathon (Adagio)",
+   "durationMs": 429867,
+   "artist": "Hilary Hahn, Baltimore Symphony Orchestra & David Zinman",
+   "apple": {
+    "block": 3,
+    "composer": "Leonard Bernstein",
+    "work": "Serenade after Plato’s Symposium",
+    "part": "IV. Agathon (Adagio)",
+    "performers": "Hilary Hahn, David Zinman, Baltimore Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Serenade (after Plato's \"Symposium\"): V. Socrates. Alcibiades (Molto tenuto - Allegro molto vivace)",
+   "durationMs": 633133,
+   "artist": "Hilary Hahn, Baltimore Symphony Orchestra & David Zinman",
+   "apple": {
+    "block": 4,
+    "composer": "L. Bernstein: Serenade (after Plato's \"Symposium\")",
+    "work": "L. Bernstein: Serenade (after Plato's \"Symposium\")",
+    "part": "V. Socrates. Alcibiades (Molto tenuto - Allegro molto vivace)",
+    "performers": "Baltimore Symphony Orchestra, David Zinman, Hilary Hahn"
+   }
+  }
+ ]
+}

@@ -1,0 +1,93 @@
+{
+ "id": "john-williams-star-wars",
+ "family": "film-score",
+ "title": "Star Wars (Original Motion Picture Soundtrack)",
+ "artist": "London Symphony Orchestra",
+ "source": "store download; orchestra as artist, film composer credited",
+ "expect": {
+  "album": "not_classical",
+  "note": "Orchestral film score; scores are not classical in v0.1."
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Main Title",
+   "durationMs": 320000,
+   "artist": "London Symphony Orchestra",
+   "composer": [
+    "John Williams"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Imperial Attack",
+   "durationMs": 403000,
+   "artist": "London Symphony Orchestra",
+   "composer": [
+    "John Williams"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Princess Leia's Theme",
+   "durationMs": 267000,
+   "artist": "London Symphony Orchestra",
+   "composer": [
+    "John Williams"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "The Desert and the Robot Auction",
+   "durationMs": 171000,
+   "artist": "London Symphony Orchestra",
+   "composer": [
+    "John Williams"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "The Throne Room and End Title",
+   "durationMs": 337000,
+   "artist": "London Symphony Orchestra",
+   "composer": [
+    "John Williams"
+   ],
+   "genres": [
+    "Soundtrack"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  }
+ ]
+}

@@ -1,0 +1,302 @@
+{
+ "id": "1580358563",
+ "category": "compilation",
+ "title": "Best of Mozart",
+ "artist": "Various Artists",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Die Entführung aus dem Serail, K. 384, Pt. 1: I. Overture",
+   "durationMs": 262227,
+   "artist": "Staatskapelle Dresden, Otmar Suitner & Dresden State Opera Chorus",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Die Entführung aus dem Serail, K. 384, KV 384 · “The Abduction from the Seraglio”",
+    "part": "I. Overture",
+    "performers": "Otmar Suitner, Dresden State Opera Chorus, Staatskapelle Dresden"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Piano Concerto No. 21 in C Major, K. 467 \"Elvira Madigan\": II. Andante",
+   "durationMs": 408400,
+   "artist": "Derek Han, Philharmonia Orchestra & Paul Freeman",
+   "apple": {
+    "block": 2,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Concerto No. 21 in C Major, K. 467, KV 467 · “Elvira Madigan”",
+    "part": "II. Andante",
+    "performers": "Derek Han, Philharmonia Orchestra, Paul Freeman"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Piano Sonata No. 11 in A Major, K. 331: III. Alla turca. Allegretto",
+   "durationMs": 205653,
+   "artist": "Klára Würtz",
+   "apple": {
+    "block": 3,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Sonata No. 11 in A Major, K. 331, K. 300i, KV 331, KV 300i · “Alla Turca”",
+    "part": "III. Alla turca. Allegretto",
+    "performers": "Klára Würtz"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Clarinet Concerto in A Major, K. 622: II. Adagio",
+   "durationMs": 440533,
+   "artist": "Staatskapelle Dresden, Siegfried Kurz & Oskar Michallik",
+   "apple": {
+    "block": 4,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Clarinet Concerto in A Major, K. 622, KV 622",
+    "part": "II. Adagio",
+    "performers": "Staatskapelle Dresden, Oskar Michallik, Siegfried Kurz"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Symphony No. 41 in C Major, K. 551 \"Jupiter\": I. Allegro Vivace",
+   "durationMs": 702480,
+   "artist": "Mozart Akademie Amsterdam & Jaap Ter Linden",
+   "apple": {
+    "block": 5,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Symphony No. 41 in C Major, K. 551, KV 551 · “Jupiter Symphony”",
+    "part": "I. Allegro Vivace",
+    "performers": "Jaap Ter Linden, Mozart Akademie Amsterdam"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Requiem in D Minor, K. 626: I. Introitus. Requiem aeternam",
+   "durationMs": 285600,
+   "artist": "Pamela Heuvelmans, Barbara Werner, Robert Morvaj, Thomas Pfeiffer, Chamber Choir of Europe, Südwestdeutsches Kammerorchester Pforzheim & Nicol Matt",
+   "apple": {
+    "block": 6,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Requiem in D Minor, K. 626, KV 626",
+    "part": "I. Introitus. Requiem aeternam",
+    "performers": "Thomas Pfeiffer, Chamber Choir of Europe, Pamela Heuvelmans, Nicol Matt, Barbara Werner, Southwest German Chamber Orchestra, Róbert Morvai"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Ave verum corpus in D Major, K. 618",
+   "durationMs": 184533,
+   "artist": "Teatro Armonico Stuttgart & Nicol Matt",
+   "apple": {
+    "block": 7,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Ave verum Corpus in D Major, K. 618, KV 618",
+    "part": "Ave verum corpus in D Major, K. 618",
+    "performers": "Nicol Matt, Teatro Armonico Stuttgart, Chamber Choir of Europe, Jens Wollenschläger"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Clarinet Quintet in A Major, K. 581: I. Allegro",
+   "durationMs": 543000,
+   "artist": "Brandis Quartet",
+   "apple": {
+    "block": 8,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Clarinet Quintet in A Major, K. 581, KV 581 · “Stadler”",
+    "part": "I. Allegro",
+    "performers": "Brandis Quartet, Karl Leister, Brandis Quartett"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Serenade in G Major, K. 525 \"Eine, kleine Nachtmusik\": I. Allegro",
+   "durationMs": 316307,
+   "artist": "Kurpfälzisches Kammerorchester Mannheim & Florian Heyerick",
+   "apple": {
+    "block": 9,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Serenade No. 13 in G Major, K. 525, KV 525 · “Eine kleine Nachtmusik (A Little Night Music)”",
+    "part": "I. Allegro",
+    "performers": "Florian Heyerick, Kammerorchester Mannheim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Serenade in G Major, K. 525 \"Eine, kleine Nachtmusik\": II. Romance. Andante",
+   "durationMs": 276320,
+   "artist": "Kurpfälzisches Kammerorchester Mannheim & Florian Heyerick",
+   "apple": {
+    "block": 9,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Serenade No. 13 in G Major, K. 525, KV 525 · “Eine kleine Nachtmusik (A Little Night Music)”",
+    "part": "II. Romance. Andante",
+    "performers": "Florian Heyerick, Gil Sharon, Amati Chamber Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Serenade in G Major, K. 525 \"Eine, kleine Nachtmusik\": III. Menuetto",
+   "durationMs": 101853,
+   "artist": "Kurpfälzisches Kammerorchester Mannheim & Florian Heyerick",
+   "apple": {
+    "block": 9,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Serenade No. 13 in G Major, K. 525, KV 525 · “Eine kleine Nachtmusik (A Little Night Music)”",
+    "part": "III. Menuetto",
+    "performers": "Florian Heyerick, Kurpfälzisches Kammerochester Mannheim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Serenade in G Major, K. 525 \"Eine, kleine Nachtmusik\": IV. Rondo. Allegro",
+   "durationMs": 236920,
+   "artist": "Kurpfälzisches Kammerorchester Mannheim & Florian Heyerick",
+   "apple": {
+    "block": 9,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Serenade No. 13 in G Major, K. 525, KV 525 · “Eine kleine Nachtmusik (A Little Night Music)”",
+    "part": "IV. Rondo. Allegro",
+    "performers": "Florian Heyerick, Kurpfälzisches Kammerochester Mannheim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Flute Concerto No. 1 in G Major, K. 313: I. Allegro maestoso",
+   "durationMs": 535467,
+   "artist": "Johannes Walter, Staatskapelle Dresden & Herbert Blomstedt",
+   "apple": {
+    "block": 10,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Flute Concerto No. 1 in G Major, K. 313, K. 285c, KV 313, KV 285c",
+    "part": "I. Allegro maestoso",
+    "performers": "Johannes Walter, Herbert Blomstedt, Staatskapelle Dresden"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Die Zauberflöte, K. 620, Pt. 1: I. Ouvertüre",
+   "durationMs": 377413,
+   "artist": "Isolde Siebert, Suzy Le Blanc, Christoph Genz, Tölzer Knabenchor, La Petite Bande & Sigiswald Kuijken",
+   "apple": {
+    "block": 11,
+    "composer": "W. A. Mozart: Die Zauberflöte, K. 620, Pt. 1",
+    "work": "W. A. Mozart: Die Zauberflöte, K. 620, Pt. 1",
+    "part": "I. Ouvertüre",
+    "performers": "La Petite Bande, Tölzer Knabenchor, Isolde Siebert, Suzy Le Blanc, Sigiswald Kuijken, Christoph Genz"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Sinfonia Concertante in E-Flat Major, K. 364: II. Andante",
+   "durationMs": 599067,
+   "artist": "Gil Sharon, Yuri Gandelsman & Amati Chamber Orchestra",
+   "apple": {
+    "block": 12,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Sinfonia Concertante in E-Flat Major, K. 364, K. 320d, KV 364, KV 320d",
+    "part": "II. Andante",
+    "performers": "Amati Chamber Orchestra, Gil Sharon, Yuri Gandelsman"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Piano Concerto No. 19 in F Major, K. 459: III. Allegro Assai",
+   "durationMs": 468720,
+   "artist": "Derek Han, Philharmonia Orchestra & Paul Freeman",
+   "apple": {
+    "block": 13,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Concerto No. 19 in F Major, K. 459, KV 459",
+    "part": "III. Allegro Assai",
+    "performers": "Philharmonia Orchestra, Paul Freeman, Derek Han"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Symphony No. 36 in C Major, K. 425 \"Linz\": II. Andante",
+   "durationMs": 562960,
+   "artist": "Mozart Akademie Amsterdam & Jaap Ter Linden",
+   "apple": {
+    "block": 14,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Symphony No. 36 in C Major, K. 425, KV 425 · “Linz”",
+    "part": "II. Andante",
+    "performers": "Mozart Akademie Amsterdam, Jaap Ter Linden"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Serenata notturna in D Major, K. 239: I. Marcia. Maestoso",
+   "durationMs": 255467,
+   "artist": "Amati Chamber Orchestra & Gil Sharon",
+   "apple": {
+    "block": 15,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Serenade No. 6 in D Major, K. 239, KV 239 · “Serenata Notturna”",
+    "part": "I. Marcia. Maestoso",
+    "performers": "Amati Chamber Orchestra, Gil Sharon"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "Violin Concerto No. 5 in A Major, K. 219: I. Allegro aperto",
+   "durationMs": 535373,
+   "artist": "Hungarian Chamber Orchestra & Krist​ó​f Baráti",
+   "apple": {
+    "block": 16,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Violin Concerto No. 5 in A Major, K. 219, KV 219 · “Turkish”",
+    "part": "I. Allegro aperto",
+    "performers": "Hungarian Chamber Orchestra, Krist​ó​f Baráti"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "Piano Sonata No. 16 in C Major, K. 545: I. Allegro",
+   "durationMs": 200000,
+   "artist": "Klára Würtz",
+   "apple": {
+    "block": 17,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Sonata No. 16 in C Major, K. 545, KV 545 · “Sonata facile”",
+    "part": "I. Allegro",
+    "performers": "Klára Würtz"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "Le nozze di Figaro, K. 492, Pt. 2: II. Canzona. Voi che sapete (Cherubino)",
+   "durationMs": 226867,
+   "artist": "La Petite Bande & Sigiswald Kuijken",
+   "apple": {
+    "block": 18,
+    "composer": "W. A. Mozart: Le nozze di Figaro, K. 492, Pt. 2",
+    "work": "W. A. Mozart: Le nozze di Figaro, K. 492, Pt. 2",
+    "part": "II. Canzona. Voi che sapete (Cherubino)",
+    "performers": "Sigiswald Kuijken, La Petite Bande, Philip Defrancq, Yves Saelens, Harry van der Kamp, Werner van Mechelen, Monica Groop, Patrizia Biccirè, Marie Kuijken, Jean-Guy Devienne, Béatrice Cramoix, Huub Claessens, Christiane Oelze, Chceur de Chambre de Namur"
+   }
+  }
+ ]
+}

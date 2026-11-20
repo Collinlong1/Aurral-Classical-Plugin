@@ -1,0 +1,68 @@
+{
+ "id": "taylor-swift-1989",
+ "family": "pop",
+ "title": "1989",
+ "artist": "Taylor Swift",
+ "source": "store download without composer tags",
+ "expect": {
+  "album": "not_classical"
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Welcome to New York",
+   "durationMs": 212000,
+   "artist": "Taylor Swift",
+   "composer": [],
+   "genres": [
+    "Pop"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Blank Space",
+   "durationMs": 231000,
+   "artist": "Taylor Swift",
+   "composer": [],
+   "genres": [
+    "Pop"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Style",
+   "durationMs": 231000,
+   "artist": "Taylor Swift",
+   "composer": [],
+   "genres": [
+    "Pop"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Shake It Off",
+   "durationMs": 219000,
+   "artist": "Taylor Swift",
+   "composer": [],
+   "genres": [
+    "Pop"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  }
+ ]
+}

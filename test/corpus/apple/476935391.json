@@ -1,0 +1,470 @@
+{
+ "id": "476935391",
+ "category": "solo instrument",
+ "title": "Bach: Goldberg Variations, BWV 988 (1981 Recording)",
+ "artist": "Glenn Gould",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Goldberg Variations, BWV 988: Aria",
+   "durationMs": 185400,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Aria",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Goldberg Variations, BWV 988: Variation 1 a 1 Clav.",
+   "durationMs": 70293,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Variation 1 a 1 Clav.",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Goldberg Variations, BWV 988: Variation 2 a 1 Clav.",
+   "durationMs": 49373,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Variation 2 a 1 Clav.",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Goldberg Variations, BWV 988: Variation 3 a 1 Clav. Canone all'unisono",
+   "durationMs": 90667,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Variation 3 a 1 Clav. Canone all'unisono",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Goldberg Variations, BWV 988: Variation 4 a 1 Clav.",
+   "durationMs": 50427,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Variation 4 a 1 Clav.",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Goldberg Variations, BWV 988: Variation 5 a 1 ovvero 2 Clav.",
+   "durationMs": 37107,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Variation 5 a 1 ovvero 2 Clav.",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Goldberg Variations, BWV 988: Variation 6 a 1 Clav. Canone alla seconda",
+   "durationMs": 40027,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Variation 6 a 1 Clav. Canone alla seconda",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Goldberg Variations, BWV 988: Variation 7 a 1 ovvero 2 Clav.",
+   "durationMs": 76107,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Variation 7 a 1 ovvero 2 Clav.",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Goldberg Variations, BWV 988: Variation 8 a 2 Clav.",
+   "durationMs": 53827,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Variation 8 a 2 Clav.",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Goldberg Variations, BWV 988: Variation 9 a 1 Clav. Canone alla terza",
+   "durationMs": 59267,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Variation 9 a 1 Clav. Canone alla terza",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Goldberg Variations, BWV 988: Variation 10 a 1 Clav. Fughetta",
+   "durationMs": 64267,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Variation 10 a 1 Clav. Fughetta",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Goldberg Variations, BWV 988: Variation 11 a 2 Clav.",
+   "durationMs": 53467,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Variation 11 a 2 Clav.",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Goldberg Variations, BWV 988: Variation 12 Canone alla quarta",
+   "durationMs": 98133,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Variation 12 Canone alla quarta",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Goldberg Variations, BWV 988: Variation 13 a 2 Clav.",
+   "durationMs": 158133,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Variation 13 a 2 Clav.",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Goldberg Variations, BWV 988: Variation 14 a 2 Clav.",
+   "durationMs": 65000,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Variation 14 a 2 Clav.",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Goldberg Variations, BWV 988: Variation 15 a 1 Clav. Canone alla quinta. Andante",
+   "durationMs": 301267,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Variation 15 a 1 Clav. Canone alla quinta. Andante",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Goldberg Variations, BWV 988: Variation 16 a 1 Clav. Overture",
+   "durationMs": 98200,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Variation 16 a 1 Clav. Overture",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Goldberg Variations, BWV 988: Variation 17 a 2 Clav.",
+   "durationMs": 54067,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Variation 17 a 2 Clav.",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "Goldberg Variations, BWV 988: Variation 18 a 1 Clav. Canone alla sesta",
+   "durationMs": 63200,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Variation 18 a 1 Clav. Canone alla sesta",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "Goldberg Variations, BWV 988: Variation 19 a 1 Clav.",
+   "durationMs": 62907,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Variation 19 a 1 Clav.",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "Goldberg Variations, BWV 988: Variation 20 a 2 Clav.",
+   "durationMs": 50067,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Variation 20 a 2 Clav.",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "Goldberg Variations, BWV 988: Variation 21 Canone alla settima",
+   "durationMs": 132627,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Variation 21 Canone alla settima",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 23,
+   "title": "Goldberg Variations, BWV 988: Variation 22 a 1 Clav. Alla breve",
+   "durationMs": 63400,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Variation 22 a 1 Clav. Alla breve",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 24,
+   "title": "Goldberg Variations, BWV 988: Variation 23 a 2 Clav.",
+   "durationMs": 57973,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Variation 23 a 2 Clav.",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 25,
+   "title": "Goldberg Variations, BWV 988: Variation 24 a 1 Clav. Canone all'ottava",
+   "durationMs": 104027,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Variation 24 a 1 Clav. Canone all'ottava",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 26,
+   "title": "Goldberg Variations, BWV 988: Variation 25 a 2 Clav.",
+   "durationMs": 362507,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Variation 25 a 2 Clav.",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 27,
+   "title": "Goldberg Variations, BWV 988: Variation 26 a 2 Clav.",
+   "durationMs": 51867,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Variation 26 a 2 Clav.",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 28,
+   "title": "Goldberg Variations, BWV 988: Variation 27 a 2 Clav. Canone alla nona",
+   "durationMs": 81267,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Variation 27 a 2 Clav. Canone alla nona",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 29,
+   "title": "Goldberg Variations, BWV 988: Variation 28 a 2 Clav.",
+   "durationMs": 63293,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Variation 28 a 2 Clav.",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 30,
+   "title": "Goldberg Variations, BWV 988: Variation 29 a 1 ovvero 2 Clav.",
+   "durationMs": 61867,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Variation 29 a 1 ovvero 2 Clav.",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 31,
+   "title": "Goldberg Variations, BWV 988: Variation 30 a 1 Clav. Quodlibet",
+   "durationMs": 90240,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Variation 30 a 1 Clav. Quodlibet",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 32,
+   "title": "Goldberg Variations, BWV 988: Aria da capo",
+   "durationMs": 224133,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Aria da capo",
+    "performers": "Glenn Gould"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 33,
+   "title": "Glenn Gould Discusses His Performances of the \"Goldberg Variations\" With Tim Page",
+   "durationMs": 1385267,
+   "artist": "Glenn Gould",
+   "apple": {
+    "block": 2,
+    "composer": "Spoken Word",
+    "work": "Spoken Word",
+    "part": "Glenn Gould Discusses His Performances of the \"Goldberg Variations\" With Tim Page",
+    "performers": "Glenn Gould"
+   }
+  }
+ ]
+}

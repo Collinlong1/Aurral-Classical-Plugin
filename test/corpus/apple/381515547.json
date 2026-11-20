@@ -1,0 +1,512 @@
+{
+ "id": "381515547",
+ "category": "solo instrument",
+ "title": "Bach: Cello Suites Nos. 1-6, BWV 1007-1012 (2009 Remaster)",
+ "artist": "Yo-Yo Ma",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Cello Suite No. 1 in G Major, BWV 1007: I. Prélude",
+   "durationMs": 151480,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 1 in G Major, BWV 1007",
+    "part": "I. Prélude",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Cello Suite No. 1 in G Major, BWV 1007: II. Allemande",
+   "durationMs": 226720,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 1 in G Major, BWV 1007",
+    "part": "II. Allemande",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Cello Suite No. 1 in G Major, BWV 1007: III. Courante",
+   "durationMs": 146427,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 1 in G Major, BWV 1007",
+    "part": "III. Courante",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Cello Suite No. 1 in G Major, BWV 1007: IV. Sarabande",
+   "durationMs": 176320,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 1 in G Major, BWV 1007",
+    "part": "IV. Sarabande",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Cello Suite No. 1 in G Major, BWV 1007: V. Menuets I & II",
+   "durationMs": 185493,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 1 in G Major, BWV 1007",
+    "part": "V. Menuets I & II",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Cello Suite No. 1 in G Major, BWV 1007: VI. Gigue",
+   "durationMs": 107973,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 1 in G Major, BWV 1007",
+    "part": "VI. Gigue",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Cello Suite No. 4 in E-Flat Major, BWV 1010: I. Prélude",
+   "durationMs": 290800,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 4 in E-Flat Major, BWV 1010",
+    "part": "I. Prélude",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Cello Suite No. 4 in E-Flat Major, BWV 1010: II. Allemande",
+   "durationMs": 229120,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 4 in E-Flat Major, BWV 1010",
+    "part": "II. Allemande",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Cello Suite No. 4 in E-Flat Major, BWV 1010: III. Courante",
+   "durationMs": 222187,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 4 in E-Flat Major, BWV 1010",
+    "part": "III. Courante",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Cello Suite No. 4 in E-Flat Major, BWV 1010: IV. Sarabande",
+   "durationMs": 272107,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 4 in E-Flat Major, BWV 1010",
+    "part": "IV. Sarabande",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Cello Suite No. 4 in E-Flat Major, BWV 1010: V. Bourrées I & II",
+   "durationMs": 304227,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 4 in E-Flat Major, BWV 1010",
+    "part": "V. Bourrées I & II",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Cello Suite No. 4 in E-Flat Major, BWV 1010: VI. Gigue",
+   "durationMs": 153147,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 4 in E-Flat Major, BWV 1010",
+    "part": "VI. Gigue",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Cello Suite No. 5 in C Minor, BWV 1011: I. Prélude",
+   "durationMs": 378307,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 5 in C Minor, BWV 1011",
+    "part": "I. Prélude",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Cello Suite No. 5 in C Minor, BWV 1011: II. Allemande",
+   "durationMs": 322280,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 5 in C Minor, BWV 1011",
+    "part": "II. Allemande",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Cello Suite No. 5 in C Minor, BWV 1011: III. Courante",
+   "durationMs": 116040,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 5 in C Minor, BWV 1011",
+    "part": "III. Courante",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Cello Suite No. 5 in C Minor, BWV 1011: IV. Sarabande",
+   "durationMs": 198320,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 5 in C Minor, BWV 1011",
+    "part": "IV. Sarabande",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Cello Suite No. 5 in C Minor, BWV 1011: V. Gavottes I & II",
+   "durationMs": 254947,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 5 in C Minor, BWV 1011",
+    "part": "V. Gavottes I & II",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Cello Suite No. 5 in C Minor, BWV 1011: VI. Gigue",
+   "durationMs": 154160,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 5 in C Minor, BWV 1011",
+    "part": "VI. Gigue",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 1,
+   "title": "Cello Suite No. 2 in D Minor, BWV 1008: I. Prélude",
+   "durationMs": 243520,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 2 in D Minor, BWV 1008",
+    "part": "I. Prélude",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 2,
+   "title": "Cello Suite No. 2 in D Minor, BWV 1008: II. Allemande",
+   "durationMs": 190640,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 2 in D Minor, BWV 1008",
+    "part": "II. Allemande",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 3,
+   "title": "Cello Suite No. 2 in D Minor, BWV 1008: III. Courante",
+   "durationMs": 108507,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 2 in D Minor, BWV 1008",
+    "part": "III. Courante",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 4,
+   "title": "Cello Suite No. 2 in D Minor, BWV 1008: IV. Sarabande",
+   "durationMs": 282333,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 2 in D Minor, BWV 1008",
+    "part": "IV. Sarabande",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 5,
+   "title": "Cello Suite No. 2 in D Minor, BWV 1008: V. Menuets I & II",
+   "durationMs": 179853,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 2 in D Minor, BWV 1008",
+    "part": "V. Menuets I & II",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 6,
+   "title": "Cello Suite No. 2 in D Minor, BWV 1008: VI. Gigue",
+   "durationMs": 136333,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 2 in D Minor, BWV 1008",
+    "part": "VI. Gigue",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 7,
+   "title": "Cello Suite No. 3 in C Major, BWV 1009: I. Prélude",
+   "durationMs": 193973,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 3 in C Major, BWV 1009",
+    "part": "I. Prélude",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 8,
+   "title": "Cello Suite No. 3 in C Major, BWV 1009: II. Allemande",
+   "durationMs": 215213,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 3 in C Major, BWV 1009",
+    "part": "II. Allemande",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 9,
+   "title": "Cello Suite No. 3 in C Major, BWV 1009: III. Courante",
+   "durationMs": 147467,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 3 in C Major, BWV 1009",
+    "part": "III. Courante",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 10,
+   "title": "Cello Suite No. 3 in C Major, BWV 1009: IV. Sarabande",
+   "durationMs": 223040,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 3 in C Major, BWV 1009",
+    "part": "IV. Sarabande",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 11,
+   "title": "Cello Suite No. 3 in C Major, BWV 1009: V. Bourrées I & II",
+   "durationMs": 203200,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 3 in C Major, BWV 1009",
+    "part": "V. Bourrées I & II",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 12,
+   "title": "Cello Suite No. 3 in C Major, BWV 1009: VI. Gigue",
+   "durationMs": 183267,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 3 in C Major, BWV 1009",
+    "part": "VI. Gigue",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 13,
+   "title": "Cello Suite No. 6 in D Major, BWV 1012: I. Prélude",
+   "durationMs": 251680,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 6,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 6 in D Major, BWV 1012",
+    "part": "I. Prélude",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 14,
+   "title": "Cello Suite No. 6 in D Major, BWV 1012: II. Allemande",
+   "durationMs": 421973,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 6,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 6 in D Major, BWV 1012",
+    "part": "II. Allemande",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 15,
+   "title": "Cello Suite No. 6 in D Major, BWV 1012: III. Courante",
+   "durationMs": 223453,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 6,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 6 in D Major, BWV 1012",
+    "part": "III. Courante",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 16,
+   "title": "Cello Suite No. 6 in D Major, BWV 1012: IV. Sarabande",
+   "durationMs": 271027,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 6,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 6 in D Major, BWV 1012",
+    "part": "IV. Sarabande",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 17,
+   "title": "Cello Suite No. 6 in D Major, BWV 1012: V. Gavottes I & II",
+   "durationMs": 208147,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 6,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 6 in D Major, BWV 1012",
+    "part": "V. Gavottes I & II",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 18,
+   "title": "Cello Suite No. 6 in D Major, BWV 1012: VI. Gigue",
+   "durationMs": 234240,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 6,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 6 in D Major, BWV 1012",
+    "part": "VI. Gigue",
+    "performers": "Yo-Yo Ma"
+   }
+  }
+ ]
+}

@@ -1,0 +1,176 @@
+{
+ "id": "468905969",
+ "category": "compilation",
+ "title": "Classical Music for Studying",
+ "artist": "Various Artists",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Symphony No. 5 in B-Flat Major, D 485: II. Andante con moto",
+   "durationMs": 520707,
+   "artist": "Royal Philharmonic Orchestra & Sir Thomas Beecham",
+   "apple": {
+    "block": 1,
+    "composer": "Franz Schubert",
+    "work": "Symphony No. 5 in B-Flat Major, D 485",
+    "part": "II. Andante con moto",
+    "performers": "Royal Philharmonic Orchestra, Sir Thomas Beecham"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "The Planets, Op. 32: VII. Neptune, the Mystic",
+   "durationMs": 412000,
+   "artist": "BBC Symphony Orchestra, BBC Women's Chorus & Sir Malcolm Sargent",
+   "apple": {
+    "block": 2,
+    "composer": "Gustav Holst",
+    "work": "The Planets, H 125, Op. 32",
+    "part": "VII. Neptune, the Mystic",
+    "performers": "Sir Malcolm Sargent, BBC Women's Chorus, BBC Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "The Four Seasons, No. 3 in F Major, \"Autumn\": II. Adagio molto",
+   "durationMs": 125320,
+   "artist": "Julian Olevsky, Orchestra of the Vienna State Opera & Hermann Scherchen",
+   "apple": {
+    "block": 3,
+    "composer": "Antonio Vivaldi",
+    "work": "Violin Concerto in F Major, Op. 8/3, RV 293 · “Autumn from The Four Seasons”",
+    "part": "II. Adagio molto",
+    "performers": "Orchestra of the Vienna State Opera, Hermann Scherchen, Julian Olevsky"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Symphony No. 6 in F Major, Op. 68: II. Scene At the Brook; Andante molto mosso",
+   "durationMs": 818467,
+   "artist": "Berlin Philharmonic Orchestra & André Cluytens",
+   "apple": {
+    "block": 4,
+    "composer": "Ludwig van Beethoven",
+    "work": "Symphony No. 6 in F Major, Op. 68 · “Pastoral Symphony”",
+    "part": "II. Scene At the Brook; Andante molto mosso",
+    "performers": "André Cluytens, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Suite No. 3 in D Major, BWV 1068: II. Air",
+   "durationMs": 323133,
+   "artist": "Royal Concertgebouw Orchestra & Eduard van Beinum",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Orchestral Suite No. 3 in D Major, BWV 1068",
+    "part": "II. Air",
+    "performers": "Eduard van Beinum, Royal Concertgebouw Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Brandenburg Concerto No. 1 in F Major: II. Adagio",
+   "durationMs": 280053,
+   "artist": "Hamburg Chamber Orchestra & Harry Newstone",
+   "apple": {
+    "block": 6,
+    "composer": "Johann Sebastian Bach",
+    "work": "Concerto for Solo Keyboard No. 6 in C Major, BWV 977",
+    "part": "II. Adagio",
+    "performers": "Harry Newstone, Hamburg Chamber Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Little Prelude in C Minor, BWV 999",
+   "durationMs": 100187,
+   "artist": "Julian Bream",
+   "apple": {
+    "block": 7,
+    "composer": "Johann Sebastian Bach",
+    "work": "Prelude in C Minor, BWV 999",
+    "part": "Little Prelude in C Minor, BWV 999",
+    "performers": "Julian Bream"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Prince Igor: Polovtsian Dance",
+   "durationMs": 640440,
+   "artist": "London Philharmonic Orchestra & Sir Thomas Beecham",
+   "apple": {
+    "block": 8,
+    "composer": "Alexander Borodin",
+    "work": "Prince Igor",
+    "part": "Polovtsian Dance",
+    "performers": "London Philharmonic Orchestra, Sir Thomas Beecham"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Carnival of the Animals: XIII. The Swan",
+   "durationMs": 180000,
+   "artist": "Concerts Arts Orchestra & Felix Slatkin",
+   "apple": {
+    "block": 9,
+    "composer": "Camille Saint-Saëns",
+    "work": "Le carnaval des animaux, R. 125 · “The Carnival of the Animals”",
+    "part": "XIII. The Swan",
+    "performers": "Concerts Arts Orchestra, Felix Slatkin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Sicilienne",
+   "durationMs": 243320,
+   "artist": "Laurindo Almeida & Martin Ruderman",
+   "apple": {
+    "block": 10,
+    "composer": "Gabriel Fauré",
+    "work": "Sicilienne, Op. 78",
+    "part": "Sicilienne",
+    "performers": "Laurindo Almeida, Martin Ruderman"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Violin Concerto No. 3 in G, K 216: II. Adagio",
+   "durationMs": 462827,
+   "artist": "Gioconda de Vito, Royal Philharmonic Orchestra & Sir Thomas Beecham",
+   "apple": {
+    "block": 11,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Violin Concerto No. 3 in G Major, K. 216, KV 216",
+    "part": "II. Adagio",
+    "performers": "Gioconda de Vito, Royal Philharmonic Orchestra, Sir Thomas Beecham"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "On Hearing the First Cuckoo in Spring",
+   "durationMs": 420467,
+   "artist": "Royal Philharmonic Orchestra & Sir Thomas Beecham",
+   "apple": {
+    "block": 12,
+    "composer": "Frederick Delius",
+    "work": "2 Pieces, RT VI/19",
+    "part": "On Hearing the First Cuckoo in Spring",
+    "performers": "Sir Thomas Beecham, Royal Philharmonic Orchestra"
+   }
+  }
+ ]
+}

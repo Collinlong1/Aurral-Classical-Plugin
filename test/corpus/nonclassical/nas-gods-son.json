@@ -1,0 +1,84 @@
+{
+ "id": "nas-gods-son",
+ "family": "hip-hop",
+ "title": "God's Son",
+ "artist": "Nas",
+ "source": "store download; a single built on a Beethoven sample",
+ "expect": {
+  "album": "not_classical"
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Get Down",
+   "durationMs": 237000,
+   "artist": "Nas",
+   "composer": [
+    "Nasir Jones",
+    "Salaam Remi"
+   ],
+   "genres": [
+    "Hip-Hop/Rap"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "The Cross",
+   "durationMs": 235000,
+   "artist": "Nas",
+   "composer": [
+    "Nasir Jones",
+    "Eminem"
+   ],
+   "genres": [
+    "Hip-Hop/Rap"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Made You Look",
+   "durationMs": 202000,
+   "artist": "Nas",
+   "composer": [
+    "Nasir Jones",
+    "Salaam Remi"
+   ],
+   "genres": [
+    "Hip-Hop/Rap"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": []
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "I Can",
+   "durationMs": 253000,
+   "artist": "Nas",
+   "composer": [
+    "Nasir Jones",
+    "Salaam Remi",
+    "Ludwig van Beethoven"
+   ],
+   "genres": [
+    "Hip-Hop/Rap"
+   ],
+   "work": "",
+   "expect": "not_classical",
+   "scenarios": [
+    "classical-sample"
+   ],
+   "note": "Hip-hop single sampling Für Elise; Beethoven credited as a writer."
+  }
+ ]
+}

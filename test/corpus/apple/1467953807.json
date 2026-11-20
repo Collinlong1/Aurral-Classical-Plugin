@@ -1,0 +1,428 @@
+{
+ "id": "1467953807",
+ "category": "concerto",
+ "title": "Rachmaninov: Piano Concerto No. 2; Paganini Rhapsody",
+ "artist": "Lang Lang, Valery Gergiev & Mariinsky Orchestra",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Piano Concerto No. 2 in C Minor, Op. 18: 1. Moderato",
+   "durationMs": 704693,
+   "artist": "Lang Lang, Valery Gergiev & The Mariinsky Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Piano Concerto No. 2 in C Minor, Op. 18",
+    "part": "I. Moderato",
+    "performers": "Lang Lang, Mariinsky Orchestra, Valery Gergiev"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Piano Concerto No. 2 in C Minor, Op. 18: 2. Adagio sostenuto",
+   "durationMs": 747240,
+   "artist": "Lang Lang, Valery Gergiev & The Mariinsky Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Piano Concerto No. 2 in C Minor, Op. 18",
+    "part": "II. Adagio sostenuto",
+    "performers": "Lang Lang, Valery Gergiev, Mariinsky Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Piano Concerto No. 2 in C Minor, Op. 18: 3. Allegro scherzando",
+   "durationMs": 740747,
+   "artist": "Lang Lang, Valery Gergiev & The Mariinsky Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Piano Concerto No. 2 in C Minor, Op. 18",
+    "part": "III. Allegro scherzando",
+    "performers": "Mariinsky Orchestra, Valery Gergiev, Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Rhapsody On A Theme By Paganini, Op. 43: Introduction",
+   "durationMs": 8627,
+   "artist": "Lang Lang, Valery Gergiev & The Mariinsky Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Introduction",
+    "performers": "Valery Gergiev, Mariinsky Orchestra, Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Rhapsody On A Theme By Paganini, Op. 43: Variation 1",
+   "durationMs": 20693,
+   "artist": "Lang Lang, Valery Gergiev & The Mariinsky Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Variation 1",
+    "performers": "Lang Lang, Valery Gergiev, Mariinsky Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Rhapsody On A Theme By Paganini, Op. 43: Theme",
+   "durationMs": 20507,
+   "artist": "Lang Lang, Valery Gergiev & The Mariinsky Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Theme",
+    "performers": "Mariinsky Orchestra, Valery Gergiev, Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Rhapsody On A Theme By Paganini, Op. 43: Variation 2",
+   "durationMs": 20293,
+   "artist": "Lang Lang, Valery Gergiev & The Mariinsky Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Variation 2",
+    "performers": "Mariinsky Orchestra, Lang Lang, Valery Gergiev"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Rhapsody On A Theme By Paganini, Op. 43: Variation 3",
+   "durationMs": 26280,
+   "artist": "Lang Lang, Valery Gergiev & The Mariinsky Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Variation 3",
+    "performers": "Valery Gergiev, Mariinsky Orchestra, Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Rhapsody On A Theme By Paganini, Op. 43: Variation 4",
+   "durationMs": 29280,
+   "artist": "Lang Lang, Valery Gergiev & The Mariinsky Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Variation 4",
+    "performers": "Mariinsky Orchestra, Lang Lang, Valery Gergiev"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Rhapsody On A Theme By Paganini, Op. 43: Variation 5",
+   "durationMs": 30093,
+   "artist": "Lang Lang, Valery Gergiev & The Mariinsky Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Variation 5",
+    "performers": "Mariinsky Orchestra, Valery Gergiev, Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Rhapsody On A Theme By Paganini, Op. 43: Variation 6",
+   "durationMs": 67413,
+   "artist": "Lang Lang, Valery Gergiev & The Mariinsky Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Variation 6",
+    "performers": "Mariinsky Orchestra, Valery Gergiev, Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Rhapsody On A Theme By Paganini, Op. 43: Variation 7",
+   "durationMs": 72560,
+   "artist": "Lang Lang, Valery Gergiev & The Mariinsky Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Variation 7",
+    "performers": "Mariinsky Orchestra, Lang Lang, Valery Gergiev"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Rhapsody On A Theme By Paganini, Op. 43: Variation 8",
+   "durationMs": 35160,
+   "artist": "Lang Lang, Valery Gergiev & The Mariinsky Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Variation 8",
+    "performers": "Lang Lang, Mariinsky Orchestra, Valery Gergiev"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Rhapsody On A Theme By Paganini, Op. 43: Variation 9",
+   "durationMs": 32227,
+   "artist": "Lang Lang, Valery Gergiev & The Mariinsky Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Variation 9",
+    "performers": "Valery Gergiev, Mariinsky Orchestra, Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Rhapsody On A Theme By Paganini, Op. 43: Variation 10",
+   "durationMs": 56827,
+   "artist": "Lang Lang, Valery Gergiev & The Mariinsky Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Variation 10",
+    "performers": "Valery Gergiev, Mariinsky Orchestra, Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Rhapsody On A Theme By Paganini, Op. 43: Variation 11",
+   "durationMs": 104320,
+   "artist": "Lang Lang, Valery Gergiev & The Mariinsky Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Variation 11",
+    "performers": "Valery Gergiev, Lang Lang, Mariinsky Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Rhapsody On A Theme By Paganini, Op. 43: Variation 12",
+   "durationMs": 73733,
+   "artist": "Lang Lang, Valery Gergiev & The Mariinsky Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Variation 12",
+    "performers": "Mariinsky Orchestra, Valery Gergiev, Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Rhapsody On A Theme By Paganini, Op. 43: Variation 13",
+   "durationMs": 28933,
+   "artist": "Lang Lang, Valery Gergiev & The Mariinsky Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Variation 13",
+    "performers": "Mariinsky Orchestra, Lang Lang, Valery Gergiev"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "Rhapsody On A Theme By Paganini, Op. 43: Variation 14",
+   "durationMs": 43400,
+   "artist": "Lang Lang, Valery Gergiev & The Mariinsky Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Variation 14",
+    "performers": "Lang Lang, Mariinsky Orchestra, Valery Gergiev"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "Rhapsody On A Theme By Paganini, Op. 43: Variation 15",
+   "durationMs": 70973,
+   "artist": "Lang Lang, Valery Gergiev & The Mariinsky Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Variation 15",
+    "performers": "Mariinsky Orchestra, Valery Gergiev, Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 21,
+   "title": "Rhapsody On A Theme By Paganini, Op. 43: Variation 16",
+   "durationMs": 90627,
+   "artist": "Lang Lang, Valery Gergiev & The Mariinsky Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Variation 16",
+    "performers": "Mariinsky Orchestra, Lang Lang, Valery Gergiev"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 22,
+   "title": "Rhapsody On A Theme By Paganini, Op. 43: Variation 17",
+   "durationMs": 117973,
+   "artist": "Lang Lang, Valery Gergiev & The Mariinsky Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Variation 17",
+    "performers": "Mariinsky Orchestra, Valery Gergiev, Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 23,
+   "title": "Rhapsody On A Theme By Paganini, Op. 43: Variation 18",
+   "durationMs": 168613,
+   "artist": "Lang Lang, Valery Gergiev & The Mariinsky Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Variation 18",
+    "performers": "Valery Gergiev, Lang Lang, Mariinsky Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 24,
+   "title": "Rhapsody On A Theme By Paganini, Op. 43: Variation 19",
+   "durationMs": 26240,
+   "artist": "Lang Lang, Valery Gergiev & The Mariinsky Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Variation 19",
+    "performers": "Valery Gergiev, Mariinsky Orchestra, Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 25,
+   "title": "Rhapsody On A Theme By Paganini, Op. 43: Variation 20",
+   "durationMs": 35400,
+   "artist": "Lang Lang, Valery Gergiev & The Mariinsky Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Variation 20",
+    "performers": "Mariinsky Orchestra, Lang Lang, Valery Gergiev"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 26,
+   "title": "Rhapsody On A Theme By Paganini, Op. 43: Variation 21",
+   "durationMs": 25533,
+   "artist": "Lang Lang, Valery Gergiev & The Mariinsky Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Variation 21",
+    "performers": "Mariinsky Orchestra, Valery Gergiev, Lang Lang"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 27,
+   "title": "Rhapsody On A Theme By Paganini, Op. 43: Variation 22",
+   "durationMs": 99547,
+   "artist": "Lang Lang, Valery Gergiev & The Mariinsky Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Variation 22",
+    "performers": "Valery Gergiev, Lang Lang, Mariinsky Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 28,
+   "title": "Rhapsody On A Theme By Paganini, Op. 43: Variation 23",
+   "durationMs": 51733,
+   "artist": "Lang Lang, Valery Gergiev & The Mariinsky Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Variation 23",
+    "performers": "Valery Gergiev, Lang Lang, Mariinsky Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 29,
+   "title": "Rhapsody On A Theme By Paganini, Op. 43: Variation 24",
+   "durationMs": 84453,
+   "artist": "Lang Lang, Valery Gergiev & The Mariinsky Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Rhapsody on a Theme of Paganini, Op. 43",
+    "part": "Variation 24",
+    "performers": "Mariinsky Orchestra, Lang Lang, Valery Gergiev"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 30,
+   "title": "10 Preludes, Op. 23: No. 5. in G Minor \"Alla marcia\"",
+   "durationMs": 265773,
+   "artist": "Lang Lang",
+   "apple": {
+    "block": 3,
+    "composer": "Sergei Rachmaninoff",
+    "work": "Prelude No. 5 in G Minor, Op. 23/5",
+    "part": "No. 5. in G Minor \"Alla marcia\"",
+    "performers": "Lang Lang"
+   }
+  }
+ ]
+}

@@ -1,0 +1,988 @@
+{
+ "id": "1452755388",
+ "category": "box set",
+ "title": "Mozart: Complete Edition Box 6: Quintets, Quartets etc",
+ "artist": "Various Artists",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Clarinet Quintet in A, K. 581: 1. Allegro",
+   "durationMs": 595000,
+   "artist": "Academy of St Martin in the Fields",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Clarinet Quintet in A Major, K. 581, KV 581 · “Stadler”",
+    "part": "1. Allegro",
+    "performers": "Academy of St Martin in the Fields, Denis Vigay, Stephen Shingles, Iona Brown, Antony Pay, Malcolm Latchem"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Clarinet Quintet in A, K. 581: 2. Larghetto",
+   "durationMs": 450000,
+   "artist": "Academy of St Martin in the Fields",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Clarinet Quintet in A Major, K. 581, KV 581 · “Stadler”",
+    "part": "2. Larghetto",
+    "performers": "Academy of St Martin in the Fields, Stephen Shingles, Denis Vigay, Antony Pay, Malcolm Latchem, Iona Brown"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Clarinet Quintet in A, K. 581: 3. Menuetto",
+   "durationMs": 461000,
+   "artist": "Academy of St Martin in the Fields",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Clarinet Quintet in A Major, K. 581, KV 581 · “Stadler”",
+    "part": "3. Menuetto",
+    "performers": "Academy of St Martin in the Fields, Denis Vigay, Stephen Shingles, Iona Brown, Antony Pay, Malcolm Latchem"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Clarinet Quintet in A, K. 581: 4. Allegretto con variazioni",
+   "durationMs": 592000,
+   "artist": "Academy of St Martin in the Fields",
+   "apple": {
+    "block": 1,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Clarinet Quintet in A Major, K. 581, KV 581 · “Stadler”",
+    "part": "4. Allegretto con variazioni",
+    "performers": "Academy of St Martin in the Fields, Stephen Shingles, Denis Vigay, Antony Pay, Malcolm Latchem, Iona Brown"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Horn Quintet in E-Flat, K. 407: 1. Allegro",
+   "durationMs": 379000,
+   "artist": "Academy of St Martin in the Fields",
+   "apple": {
+    "block": 2,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Horn Quintet in E-Flat Major, K. 407, K. 386c, KV 407 · “Leitgebisches Quintet”",
+    "part": "1. Allegro",
+    "performers": "Academy of St Martin in the Fields, Stephen Shingles, Iona Brown, Anthony Jenkins, Denis Vigay, Timothy Brown"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Horn Quintet in E-Flat, K. 407: 2. Andante",
+   "durationMs": 448000,
+   "artist": "Academy of St Martin in the Fields, Timothy Brown, Iona Brown, Stephen Shingles, Anthony Jenkins & Denis Vigay",
+   "apple": {
+    "block": 2,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Horn Quintet in E-Flat Major, K. 407, K. 386c, KV 407 · “Leitgebisches Quintet”",
+    "part": "2. Andante",
+    "performers": "Denis Vigay, Anthony Jenkins, Iona Brown, Stephen Shingles, Academy of St Martin in the Fields, Timothy Brown"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Horn Quintet in E-Flat, K. 407: 3. Allegro",
+   "durationMs": 238000,
+   "artist": "Academy of St Martin in the Fields",
+   "apple": {
+    "block": 2,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Horn Quintet in E-Flat Major, K. 407, K. 386c, KV 407 · “Leitgebisches Quintet”",
+    "part": "3. Allegro",
+    "performers": "Academy of St Martin in the Fields, Iona Brown, Stephen Shingles, Denis Vigay, Anthony Jenkins, Timothy Brown"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Oboe Quartet in F, K. 370: 1. Allegro",
+   "durationMs": 298000,
+   "artist": "Academy of St Martin in the Fields",
+   "apple": {
+    "block": 3,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Oboe Quartet in F Major, K. 370, K. 368b, KV 370",
+    "part": "1. Allegro",
+    "performers": "Academy of St Martin in the Fields"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Oboe Quartet in F, K. 370: 2. Adagio",
+   "durationMs": 251000,
+   "artist": "Academy of St Martin in the Fields",
+   "apple": {
+    "block": 3,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Oboe Quartet in F Major, K. 370, K. 368b, KV 370",
+    "part": "2. Adagio",
+    "performers": "Academy of St Martin in the Fields, Iona Brown, Neil Black, Denis Vigay, Stephen Shingles"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Oboe Quartet in F, K. 370: 3. Rondeau (Allegro)",
+   "durationMs": 277000,
+   "artist": "Academy of St Martin in the Fields",
+   "apple": {
+    "block": 3,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Oboe Quartet in F Major, K. 370, K. 368b, KV 370",
+    "part": "3. Rondeau (Allegro)",
+    "performers": "Academy of St Martin in the Fields, Neil Black, Denis Vigay, Iona Brown, Stephen Shingles"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Sonata (Duo) for Bassoon and Cello in B-Flat, K. 292: 1. Allegro",
+   "durationMs": 222000,
+   "artist": "Klaus Thunemann & Stephen Orton",
+   "apple": {
+    "block": 4,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Allegro in B-Flat Major, K. 400, K. 372a, KV 400, KV 372a · “Sophie und Constanze”",
+    "part": "1. Allegro",
+    "performers": "Klaus Thunemann, Stephen Orton"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Sonata (Duo) for Bassoon and Cello in B-Flat, K. 292: 2. Andante",
+   "durationMs": 176667,
+   "artist": "Klaus Thunemann & Stephen Orton",
+   "apple": {
+    "block": 5,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Duo Sonata in B-Flat Major, K. 292, K. 196c, KV 292",
+    "part": "2. Andante",
+    "performers": "Klaus Thunemann, Stephen Orton"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Sonata (Duo) for Bassoon and Cello in B-Flat, K. 292: 3. Rondo (Allegro)",
+   "durationMs": 165333,
+   "artist": "Klaus Thunemann & Stephen Orton",
+   "apple": {
+    "block": 5,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Duo Sonata in B-Flat Major, K. 292, K. 196c, KV 292",
+    "part": "3. Rondo (Allegro)",
+    "performers": "Klaus Thunemann, Stephen Orton"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 1,
+   "title": "Flute Quartet in D, K. 285: 1. Allegro",
+   "durationMs": 404000,
+   "artist": "William Bennett & Grumiaux Trio",
+   "apple": {
+    "block": 6,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Flute Quartet No. 1 in D Major, K. 285, KV 285",
+    "part": "1. Allegro",
+    "performers": "William Bennett, Grumiaux Trio"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 2,
+   "title": "Flute Quartet in D, K. 285: 2. Adagio - (attacca)",
+   "durationMs": 142667,
+   "artist": "William Bennett & Grumiaux Trio",
+   "apple": {
+    "block": 6,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Flute Quartet No. 1 in D Major, K. 285, KV 285",
+    "part": "2. Adagio - (attacca)",
+    "performers": "Grumiaux Trio, William Bennett"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 3,
+   "title": "Flute Quartet in D, K. 285: 3. Rondeau",
+   "durationMs": 251333,
+   "artist": "William Bennett & Grumiaux Trio",
+   "apple": {
+    "block": 6,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Flute Quartet No. 1 in D Major, K. 285, KV 285",
+    "part": "3. Rondeau",
+    "performers": "Grumiaux Trio, William Bennett"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 4,
+   "title": "Flute Quartet in A, K. 298: 1. Thema (Andante) con variazioni",
+   "durationMs": 345000,
+   "artist": "William Bennett & Grumiaux Trio",
+   "apple": {
+    "block": 7,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Flute Quartet No. 4 in A Major, K. 298, KV 298",
+    "part": "1. Thema (Andante) con variazioni",
+    "performers": "William Bennett, Grumiaux Trio"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 5,
+   "title": "Flute Quartet in A, K. 298: 2. Menuetto",
+   "durationMs": 127000,
+   "artist": "William Bennett & Grumiaux Trio",
+   "apple": {
+    "block": 7,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Flute Quartet No. 4 in A Major, K. 298, KV 298",
+    "part": "2. Menuetto",
+    "performers": "Grumiaux Trio, William Bennett"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 6,
+   "title": "Flute Quartet in A, K. 298: 3. Rondeau (Allegretto grazioso)",
+   "durationMs": 176000,
+   "artist": "William Bennett & Grumiaux Trio",
+   "apple": {
+    "block": 7,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Flute Quartet No. 4 in A Major, K. 298, KV 298",
+    "part": "3. Rondeau (Allegretto grazioso)",
+    "performers": "William Bennett, Grumiaux Trio"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 7,
+   "title": "Flute Quartet in C Major, K. 285b (doubtful): 1. Allegro",
+   "durationMs": 348000,
+   "artist": "William Bennett & Grumiaux Trio",
+   "apple": {
+    "block": 8,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Flute Quartet No. 3 in C Major, App 171, K. 285b, K. Anh.71, KV 285b",
+    "part": "1. Allegro",
+    "performers": "Grumiaux Trio, William Bennett"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 8,
+   "title": "Flute Quartet in C Major, K. 285b (doubtful): 2. Tema (Andantino) con variazioni",
+   "durationMs": 572000,
+   "artist": "William Bennett & Grumiaux Trio",
+   "apple": {
+    "block": 8,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Flute Quartet No. 3 in C Major, App 171, K. 285b, K. Anh.71, KV 285b",
+    "part": "2. Tema (Andantino) con variazioni",
+    "performers": "William Bennett, Grumiaux Trio"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 9,
+   "title": "Flute Quartet No. 2 in G, K. 285a: 1. Andante",
+   "durationMs": 369000,
+   "artist": "William Bennett & Grumiaux Trio",
+   "apple": {
+    "block": 9,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Flute Quartet No. 2 in G Major, K. 285a, KV 285a",
+    "part": "1. Andante",
+    "performers": "William Bennett, Grumiaux Trio"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 10,
+   "title": "Flute Quartet No. 2 in G, K. 285a: 2. Tempo di menuetto",
+   "durationMs": 211000,
+   "artist": "William Bennett & Grumiaux Trio",
+   "apple": {
+    "block": 9,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Flute Quartet No. 2 in G Major, K. 285a, KV 285a",
+    "part": "2. Tempo di menuetto",
+    "performers": "William Bennett, Grumiaux Trio"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 1,
+   "title": "String Quintet No. 1 in B-Flat, K. 174 - Two original movements: 3. Trio",
+   "durationMs": 83000,
+   "artist": "Academy of St Martin in the Fields",
+   "apple": {
+    "block": 10,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Trio No. 1 in B-Flat Major, K. 254, KV 254",
+    "part": "3. Trio",
+    "performers": "Academy of St Martin in the Fields"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 2,
+   "title": "String Quintet No. 1 in B-Flat, K. 174 - Two original movements: 4. Finale: Allegro",
+   "durationMs": 441000,
+   "artist": "Academy of St Martin in the Fields",
+   "apple": {
+    "block": 11,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "String Quintet No. 1 in B-Flat Major, K. 174, KV 174",
+    "part": "4. Finale: Allegro",
+    "performers": "Academy of St Martin in the Fields"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 3,
+   "title": "Minuet for String Quartet in F, K. 168a",
+   "durationMs": 91000,
+   "artist": "Academy of St Martin in the Fields",
+   "apple": {
+    "block": 12,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "7 Minuets, K. 61b, K. 65a",
+    "part": "Minuet for String Quartet in F, K. 168a",
+    "performers": "Academy of St Martin in the Fields"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 4,
+   "title": "Allegro in F, K. 288 - compl. Erik Smith",
+   "durationMs": 307000,
+   "artist": "Academy of St Martin in the Fields",
+   "apple": {
+    "block": 13,
+    "composer": "W. A. Mozart",
+    "work": "W. A. Mozart",
+    "part": "Allegro in F, K. 288 - compl. Erik Smith",
+    "performers": "Academy of St Martin in the Fields"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 5,
+   "title": "Allegretto in B-Flat Major for String Quartet, K. 589a",
+   "durationMs": 260000,
+   "artist": "Academy of St Martin in the Fields, Kenneth Sillito, Malcolm Latchem, Robert Smissen & Stephen Orton",
+   "apple": {
+    "block": 14,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Allegretto in B-Flat Major, App 68, K. 589a, K. Anh.68",
+    "part": "Allegretto in B-Flat Major for String Quartet, K. 589a",
+    "performers": "Stephen Orton, Robert Smissen, Academy of St Martin in the Fields, Malcolm Latchem, Kenneth Sillito"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 6,
+   "title": "Movement for String Quartet in A, K. App.72 - Compl. by Erik Smith",
+   "durationMs": 459000,
+   "artist": "Academy of St Martin in the Fields",
+   "apple": {
+    "block": 15,
+    "composer": "W. A. Mozart",
+    "work": "W. A. Mozart",
+    "part": "Movement for String Quartet in A, K. App.72 - Compl. by Erik Smith",
+    "performers": "Academy of St Martin in the Fields"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 7,
+   "title": "Movement for String Quintet in B-Flat, K. 514a",
+   "durationMs": 372000,
+   "artist": "Academy of St Martin in the Fields",
+   "apple": {
+    "block": 15,
+    "composer": "W. A. Mozart",
+    "work": "W. A. Mozart",
+    "part": "Movement for String Quintet in B-Flat, K. 514a",
+    "performers": "Academy of St Martin in the Fields"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 8,
+   "title": "Allegro for Clarinet, Basset Horn, Violin, Viola and Cello in F Major, K. 580b",
+   "durationMs": 424000,
+   "artist": "Academy of St Martin in the Fields",
+   "apple": {
+    "block": 15,
+    "composer": "W. A. Mozart",
+    "work": "W. A. Mozart",
+    "part": "Allegro for Clarinet, Basset Horn, Violin, Viola and Cello in F Major, K. 580b",
+    "performers": "Academy of St Martin in the Fields, Kenneth Sillito, Andrew Marriner, Angela Malbury, Robert Smissen, Stephen Orton"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 9,
+   "title": "Allegro for String Trio in G Major, K. 562e",
+   "durationMs": 236000,
+   "artist": "Academy of St Martin in the Fields, Kenneth Sillito, Robert Smissen & Stephen Orton",
+   "apple": {
+    "block": 16,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Allegro in G Major, K. 72a, KV 72a",
+    "part": "Allegro for String Trio in G Major, K. 562e",
+    "performers": "Robert Smissen, Kenneth Sillito, Academy of St Martin in the Fields, Stephen Orton"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 10,
+   "title": "Allegro for Clarinet, 2 Violins, Viola and Cello in B-Flat, K. App.91",
+   "durationMs": 257000,
+   "artist": "Academy of St Martin in the Fields, Andrew Marriner, Kenneth Sillito, Malcolm Latchem, Robert Smissen & Stephen Orton",
+   "apple": {
+    "block": 17,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Allegro in B-Flat Major, K. 400, K. 372a, KV 400, KV 372a · “Sophie und Constanze”",
+    "part": "Allegro for Clarinet, 2 Violins, Viola and Cello in B-Flat, K. App.91",
+    "performers": "Andrew Marriner, Kenneth Sillito, Malcolm Latchem, Academy of St Martin in the Fields, Stephen Orton, Robert Smissen"
+   }
+  },
+  {
+   "disc": 3,
+   "number": 11,
+   "title": "Movement for String Quintet in A Minor, K. 515c",
+   "durationMs": 318000,
+   "artist": "Academy of St Martin in the Fields",
+   "apple": {
+    "block": 18,
+    "composer": "W. A. Mozart",
+    "work": "W. A. Mozart",
+    "part": "Movement for String Quintet in A Minor, K. 515c",
+    "performers": "Academy of St Martin in the Fields"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 1,
+   "title": "Quintet for Piano, Oboe, Clarinet, Horn, and Bassoon in E-Flat, K. 452: 1. Largo - Allegro moderato",
+   "durationMs": 603000,
+   "artist": "Alfred Brendel, Heinz Holliger, Eduard Brunner, Hermann Baumann & Klaus Thunemann",
+   "apple": {
+    "block": 19,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano & Wind Quintet in E-Flat Major, K. 452, KV 452",
+    "part": "1. Largo - Allegro moderato",
+    "performers": "Hermann Baumann, Heinz Holliger, Eduard Brunner, Alfred Brendel, Klaus Thunemann"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 2,
+   "title": "Quintet for Piano, Oboe, Clarinet, Horn, and Bassoon in E-Flat, K. 452: 2. Larghetto",
+   "durationMs": 575493,
+   "artist": "Alfred Brendel, Heinz Holliger, Eduard Brunner, Hermann Baumann & Klaus Thunemann",
+   "apple": {
+    "block": 19,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano & Wind Quintet in E-Flat Major, K. 452, KV 452",
+    "part": "2. Larghetto",
+    "performers": "Alfred Brendel, Hermann Baumann, Eduard Brunner, Heinz Holliger, Klaus Thunemann"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 3,
+   "title": "Quintet for Piano, Oboe, Clarinet, Horn, and Bassoon in E-Flat, K. 452: 3. Allegretto",
+   "durationMs": 310507,
+   "artist": "Alfred Brendel, Heinz Holliger, Eduard Brunner, Hermann Baumann & Klaus Thunemann",
+   "apple": {
+    "block": 19,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano & Wind Quintet in E-Flat Major, K. 452, KV 452",
+    "part": "3. Allegretto",
+    "performers": "Heinz Holliger, Hermann Baumann, Klaus Thunemann, Alfred Brendel, Eduard Brunner"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 4,
+   "title": "Trio for Clarinet, Viola and Piano in E-Flat K. 498 \"Kegelstatt\": 1. Andante",
+   "durationMs": 377000,
+   "artist": "Stephen Kovacevich, Jack Brymer & Patrick Ireland",
+   "apple": {
+    "block": 20,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Clarinet Trio in E-Flat Major, K. 498, KV 498 · “Kegelstatt”",
+    "part": "1. Andante",
+    "performers": "Jack Brymer, Patrick Ireland, Stephen Kovacevich"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 5,
+   "title": "Trio for Clarinet, Viola and Piano in E-Flat K. 498 \"Kegelstatt\": 2. Menuetto & Trio",
+   "durationMs": 351000,
+   "artist": "Stephen Kovacevich, Jack Brymer & Patrick Ireland",
+   "apple": {
+    "block": 20,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Clarinet Trio in E-Flat Major, K. 498, KV 498 · “Kegelstatt”",
+    "part": "2. Menuetto & Trio",
+    "performers": "Jack Brymer, Patrick Ireland, Stephen Kovacevich"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 6,
+   "title": "Trio for Clarinet, Viola and Piano in E-Flat K. 498 \"Kegelstatt\": 3. Rondeau (Allegretto)",
+   "durationMs": 503000,
+   "artist": "Stephen Kovacevich, Jack Brymer & Patrick Ireland",
+   "apple": {
+    "block": 20,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Clarinet Trio in E-Flat Major, K. 498, KV 498 · “Kegelstatt”",
+    "part": "3. Rondeau (Allegretto)",
+    "performers": "Jack Brymer, Stephen Kovacevich, Patrick Ireland"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 7,
+   "title": "Adagio and Rondo for Glass Harmonica, Flute, Oboe, Viola, and Cello in C Minor, K. 617: 1. Adagio",
+   "durationMs": 399333,
+   "artist": "Bruno Hoffmann, Aurèle Nicolet, Heinz Holliger, Karl Schouten & Jean Decroos",
+   "apple": {
+    "block": 21,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Adagio & Rondo in C Minor, K. 617, KV 617",
+    "part": "1. Adagio",
+    "performers": "Karl Schouten, Jean Decroos, Aurèle Nicolet, Bruno Hoffmann, Heinz Holliger"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 8,
+   "title": "Adagio and Rondo for Glass Harmonica, Flute, Oboe, Viola, and Cello in C Minor, K. 617: 2. Rondo",
+   "durationMs": 579667,
+   "artist": "Bruno Hoffmann, Aurèle Nicolet, Heinz Holliger, Karl Schouten & Jean Decroos",
+   "apple": {
+    "block": 21,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Adagio & Rondo in C Minor, K. 617, KV 617",
+    "part": "2. Rondo",
+    "performers": "Bruno Hoffmann, Jean Decroos, Aurèle Nicolet, Heinz Holliger, Karl Schouten"
+   }
+  },
+  {
+   "disc": 4,
+   "number": 9,
+   "title": "Adagio for Glass Harmonica in C, K. 356",
+   "durationMs": 239000,
+   "artist": "Bruno Hoffmann",
+   "apple": {
+    "block": 22,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Adagio in C Major, K. 356, K. 617a, KV 356, KV 617a",
+    "part": "Adagio for Glass Harmonica in C, K. 356",
+    "performers": "Bruno Hoffmann"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 1,
+   "title": "Piano Quartet No. 1 in G Minor, K. 478: 1. Allegro",
+   "durationMs": 864000,
+   "artist": "Beaux Arts Trio & Bruno Giuranna",
+   "apple": {
+    "block": 23,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Quartet No. 1 in G Minor, K. 478, KV 478",
+    "part": "1. Allegro",
+    "performers": "Beaux Arts Trio, Bruno Giuranna"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 2,
+   "title": "Piano Quartet No. 1 in G Minor, K. 478: 2. Andante",
+   "durationMs": 415493,
+   "artist": "Beaux Arts Trio & Bruno Giuranna",
+   "apple": {
+    "block": 23,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Quartet No. 1 in G Minor, K. 478, KV 478",
+    "part": "2. Andante",
+    "performers": "Bruno Giuranna, Beaux Arts Trio"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 3,
+   "title": "Piano Quartet No. 1 in G Minor, K. 478: 3. Rondo (Allegro moderato)",
+   "durationMs": 461507,
+   "artist": "Beaux Arts Trio & Bruno Giuranna",
+   "apple": {
+    "block": 23,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Quartet No. 1 in G Minor, K. 478, KV 478",
+    "part": "3. Rondo (Allegro moderato)",
+    "performers": "Beaux Arts Trio, Bruno Giuranna"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 4,
+   "title": "Piano Quartet No. 2 in E-Flat, K. 493: 1. Allegro",
+   "durationMs": 849000,
+   "artist": "Beaux Arts Trio & Bruno Giuranna",
+   "apple": {
+    "block": 24,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Quartet No. 2 in E-Flat Major, K. 493, KV 493",
+    "part": "1. Allegro",
+    "performers": "Bruno Giuranna, Beaux Arts Trio"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 5,
+   "title": "Piano Quartet No. 2 in E-Flat, K. 493: 2. Larghetto",
+   "durationMs": 553160,
+   "artist": "Beaux Arts Trio & Bruno Giuranna",
+   "apple": {
+    "block": 24,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Quartet No. 2 in E-Flat Major, K. 493, KV 493",
+    "part": "2. Larghetto",
+    "performers": "Bruno Giuranna, Beaux Arts Trio"
+   }
+  },
+  {
+   "disc": 5,
+   "number": 6,
+   "title": "Piano Quartet No. 2 in E-Flat, K. 493: 3. Allegretto",
+   "durationMs": 504000,
+   "artist": "Beaux Arts Trio & Bruno Giuranna",
+   "apple": {
+    "block": 24,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Quartet No. 2 in E-Flat Major, K. 493, KV 493",
+    "part": "3. Allegretto",
+    "performers": "Bruno Giuranna, Beaux Arts Trio"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 1,
+   "title": "Divertimento (Piano Trio) in B-Flat, K. 254: 1. Allegro assai",
+   "durationMs": 383333,
+   "artist": "Beaux Arts Trio",
+   "apple": {
+    "block": 25,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Trio No. 1 in B-Flat Major, K. 254, KV 254",
+    "part": "1. Allegro assai",
+    "performers": "Beaux Arts Trio"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 2,
+   "title": "Divertimento (Piano Trio) in B-Flat, K. 254: 2. Adagio",
+   "durationMs": 442000,
+   "artist": "Beaux Arts Trio",
+   "apple": {
+    "block": 25,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Trio No. 1 in B-Flat Major, K. 254, KV 254",
+    "part": "2. Adagio",
+    "performers": "Beaux Arts Trio"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 3,
+   "title": "Divertimento (Piano Trio) in B-Flat, K. 254: 3. Rondeau (Tempo di menuetto)",
+   "durationMs": 407493,
+   "artist": "Beaux Arts Trio",
+   "apple": {
+    "block": 25,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Trio No. 1 in B-Flat Major, K. 254, KV 254",
+    "part": "3. Rondeau (Tempo di menuetto)",
+    "performers": "Beaux Arts Trio"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 4,
+   "title": "Piano Trio in G, K. 496: 1. Allegro",
+   "durationMs": 509000,
+   "artist": "Beaux Arts Trio",
+   "apple": {
+    "block": 26,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Trio No. 2 in G Major, K. 496, KV 496",
+    "part": "1. Allegro",
+    "performers": "Beaux Arts Trio"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 5,
+   "title": "Piano Trio in G, K. 496: 2. Andante",
+   "durationMs": 473667,
+   "artist": "Beaux Arts Trio",
+   "apple": {
+    "block": 26,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Trio No. 2 in G Major, K. 496, KV 496",
+    "part": "2. Andante",
+    "performers": "Beaux Arts Trio"
+   }
+  },
+  {
+   "disc": 6,
+   "number": 6,
+   "title": "Piano Trio in G, K. 496: 3. Allegretto (Thema mit 6 Variationen)",
+   "durationMs": 641893,
+   "artist": "Beaux Arts Trio",
+   "apple": {
+    "block": 26,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Trio No. 2 in G Major, K. 496, KV 496",
+    "part": "3. Allegretto (Thema mit 6 Variationen)",
+    "performers": "Beaux Arts Trio"
+   }
+  },
+  {
+   "disc": 7,
+   "number": 1,
+   "title": "Piano Trio in B-Flat, K. 502: 1. Allegro",
+   "durationMs": 488493,
+   "artist": "Beaux Arts Trio",
+   "apple": {
+    "block": 27,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Trio No. 3 in B-Flat Major, K. 502, KV 502",
+    "part": "1. Allegro",
+    "performers": "Beaux Arts Trio"
+   }
+  },
+  {
+   "disc": 7,
+   "number": 2,
+   "title": "Piano Trio in B-Flat, K. 502: 2. Larghetto",
+   "durationMs": 550827,
+   "artist": "Beaux Arts Trio",
+   "apple": {
+    "block": 27,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Trio No. 3 in B-Flat Major, K. 502, KV 502",
+    "part": "2. Larghetto",
+    "performers": "Beaux Arts Trio"
+   }
+  },
+  {
+   "disc": 7,
+   "number": 3,
+   "title": "Piano Trio in B-Flat, K. 502: 3. Allegretto",
+   "durationMs": 359667,
+   "artist": "Beaux Arts Trio",
+   "apple": {
+    "block": 27,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Trio No. 3 in B-Flat Major, K. 502, KV 502",
+    "part": "3. Allegretto",
+    "performers": "Beaux Arts Trio"
+   }
+  },
+  {
+   "disc": 7,
+   "number": 4,
+   "title": "Piano Trio in E, K. 542: 1. Allegro",
+   "durationMs": 443667,
+   "artist": "Beaux Arts Trio",
+   "apple": {
+    "block": 28,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Trio No. 4 in E Major, K. 542, KV 542",
+    "part": "1. Allegro",
+    "performers": "Beaux Arts Trio"
+   }
+  },
+  {
+   "disc": 7,
+   "number": 5,
+   "title": "Piano Trio in E, K. 542: 2. Andante grazioso",
+   "durationMs": 295333,
+   "artist": "Beaux Arts Trio",
+   "apple": {
+    "block": 28,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Trio No. 4 in E Major, K. 542, KV 542",
+    "part": "2. Andante grazioso",
+    "performers": "Beaux Arts Trio"
+   }
+  },
+  {
+   "disc": 7,
+   "number": 6,
+   "title": "Piano Trio in E, K. 542: 3. Allegro",
+   "durationMs": 407333,
+   "artist": "Beaux Arts Trio",
+   "apple": {
+    "block": 28,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Trio No. 4 in E Major, K. 542, KV 542",
+    "part": "3. Allegro",
+    "performers": "Beaux Arts Trio"
+   }
+  },
+  {
+   "disc": 8,
+   "number": 1,
+   "title": "Piano Trio in C, K. 548: 1. Allegro",
+   "durationMs": 447000,
+   "artist": "Beaux Arts Trio",
+   "apple": {
+    "block": 29,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Trio No. 5 in C Major, K. 548, KV 548",
+    "part": "1. Allegro",
+    "performers": "Beaux Arts Trio"
+   }
+  },
+  {
+   "disc": 8,
+   "number": 2,
+   "title": "Piano Trio in C, K. 548: 2. Andante cantabile",
+   "durationMs": 578000,
+   "artist": "Beaux Arts Trio",
+   "apple": {
+    "block": 29,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Trio No. 5 in C Major, K. 548, KV 548",
+    "part": "2. Andante cantabile",
+    "performers": "Beaux Arts Trio"
+   }
+  },
+  {
+   "disc": 8,
+   "number": 3,
+   "title": "Piano Trio in C, K. 548: 3. Allegro",
+   "durationMs": 254000,
+   "artist": "Beaux Arts Trio",
+   "apple": {
+    "block": 29,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Trio No. 5 in C Major, K. 548, KV 548",
+    "part": "3. Allegro",
+    "performers": "Beaux Arts Trio"
+   }
+  },
+  {
+   "disc": 8,
+   "number": 4,
+   "title": "Piano Trio in G, K. 564: 1. Allegro",
+   "durationMs": 314493,
+   "artist": "Beaux Arts Trio",
+   "apple": {
+    "block": 30,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Trio No. 6 in G Major, K. 564, KV 564",
+    "part": "1. Allegro",
+    "performers": "Beaux Arts Trio"
+   }
+  },
+  {
+   "disc": 8,
+   "number": 5,
+   "title": "Piano Trio in G, K. 564: 2. Andante (Thema mit 6 Variationen)",
+   "durationMs": 430160,
+   "artist": "Beaux Arts Trio",
+   "apple": {
+    "block": 30,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Trio No. 6 in G Major, K. 564, KV 564",
+    "part": "2. Andante (Thema mit 6 Variationen)",
+    "performers": "Beaux Arts Trio"
+   }
+  },
+  {
+   "disc": 8,
+   "number": 6,
+   "title": "Piano Trio in G, K. 564: 3. Allegretto",
+   "durationMs": 287333,
+   "artist": "Beaux Arts Trio",
+   "apple": {
+    "block": 30,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Trio No. 6 in G Major, K. 564, KV 564",
+    "part": "3. Allegretto",
+    "performers": "Beaux Arts Trio"
+   }
+  },
+  {
+   "disc": 8,
+   "number": 7,
+   "title": "Drei Stücke for Piano Trio, K442: 1. Allegro in D Minor",
+   "durationMs": 319507,
+   "artist": "Beaux Arts Trio",
+   "apple": {
+    "block": 31,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Allegro in D Major, K. 626b/16",
+    "part": "1. Allegro in D Minor",
+    "performers": "Beaux Arts Trio"
+   }
+  },
+  {
+   "disc": 8,
+   "number": 8,
+   "title": "Drei Stücke for Piano Trio, K442: 2. Tempo di minuetto in G",
+   "durationMs": 360827,
+   "artist": "Beaux Arts Trio",
+   "apple": {
+    "block": 32,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Piano Trio in D Minor, K. 442, KV 442",
+    "part": "2. Tempo di minuetto in G",
+    "performers": "Beaux Arts Trio"
+   }
+  },
+  {
+   "disc": 8,
+   "number": 9,
+   "title": "Drei Stücke for Piano Trio, K442: 3. Allegro in D",
+   "durationMs": 307000,
+   "artist": "Beaux Arts Trio",
+   "apple": {
+    "block": 33,
+    "composer": "Wolfgang Amadeus Mozart",
+    "work": "Allegro in D Major, K. 626b/16",
+    "part": "3. Allegro in D",
+    "performers": "Beaux Arts Trio"
+   }
+  }
+ ]
+}

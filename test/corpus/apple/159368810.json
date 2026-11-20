@@ -1,0 +1,498 @@
+{
+ "id": "159368810",
+ "category": "guitar harp other",
+ "title": "Essential Yo-Yo Ma",
+ "artist": "Yo-Yo Ma",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Cello Suite No. 1 in G Major, BWV 1007: Prélude",
+   "durationMs": 139000,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 1 in G Major, BWV 1007",
+    "part": "I. Prélude",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "The Four Seasons, Violin Concerto in F Minor, Op. 8 No. 4, RV 297 \"Winter\": II. Largo",
+   "durationMs": 106800,
+   "artist": "Yo-Yo Ma, Amsterdam Baroque Orchestra & Ton Koopman",
+   "apple": {
+    "block": 2,
+    "composer": "Antonio Vivaldi",
+    "work": "Violin Concerto in F Minor, Op. 8/4, RV 297 · “Winter from The Four Seasons”",
+    "part": "II. Largo",
+    "performers": "Amsterdam Baroque Orchestra, Ton Koopman, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Cantata, BWV 147: Jesus bleibet meine Freude",
+   "durationMs": 162667,
+   "artist": "Yo-Yo Ma, Amsterdam Baroque Orchestra & Ton Koopman",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Herz und Mund und Tat und Leben, BWV 147 · “Heart and Mouth and Deed and Life”",
+    "part": "Jesus, bleibet meine Freude (Jesu, Joy of Man's Desiring)",
+    "performers": "Amsterdam Baroque Orchestra, Ton Koopman, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Cantata, BWV 208: Schafe können sicher weiden",
+   "durationMs": 217933,
+   "artist": "Yo-Yo Ma, Ton Koopman & Amsterdam Baroque Orchestra",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "Was mir behagt, ist nur die muntre Jagd, BWV 208 · “Hunting Cantata”",
+    "part": "Schafe können sicher weiden (Sheep May Safely Graze)",
+    "performers": "Amsterdam Baroque Orchestra, Ton Koopman, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Wachet auf, ruft uns die Stimme, BWV 645",
+   "durationMs": 228400,
+   "artist": "Yo-Yo Ma, Ton Koopman & Amsterdam Baroque Orchestra",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Wachet auf, ruft uns die Stimme in E-Flat Major, BWV 645",
+    "part": "Wachet auf, ruft uns die Stimme (Sleepers Awake)",
+    "performers": "Yo-Yo Ma, Amsterdam Baroque Orchestra, Ton Koopman"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Carnival of the Animals, R. 125: XIII. The Swan",
+   "durationMs": 188000,
+   "artist": "Yo-Yo Ma, Philippe Entremont & Gaby Casadesus",
+   "apple": {
+    "block": 6,
+    "composer": "Camille Saint-Saëns",
+    "work": "Le carnaval des animaux, R. 125 · “The Carnival of the Animals”",
+    "part": "XIII. The Swan",
+    "performers": "Philippe Entremont, Gaby Casadesus, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Havanaise, Op. 83",
+   "durationMs": 530000,
+   "artist": "Yo-Yo Ma & Kathryn Stott",
+   "apple": {
+    "block": 7,
+    "composer": "Camille Saint-Saëns",
+    "work": "Havanaise in E Major, Op. 83",
+    "part": "Havanaise, Op. 83",
+    "performers": "Kathryn Stott, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Thaïs: Méditation (Arr. for Cello & Piano)",
+   "durationMs": 348013,
+   "artist": "Yo-Yo Ma & Kathryn Stott",
+   "apple": {
+    "block": 8,
+    "composer": "Jules Massenet",
+    "work": "Thaïs",
+    "part": "Méditation",
+    "performers": "Kathryn Stott, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "3 Old Viennese Dances: I. Liebesfreud",
+   "durationMs": 191987,
+   "artist": "Yo-Yo Ma & Patricia Zander",
+   "apple": {
+    "block": 9,
+    "composer": "Fritz Kreisler",
+    "work": "Liebesfreud, “Love's joy”",
+    "part": "Liebesfreud",
+    "performers": "Patricia Zander, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Three Preludes: I. Allegro ben ritmato e deciso",
+   "durationMs": 103253,
+   "artist": "Yo-Yo Ma & Jeffrey Kahane",
+   "apple": {
+    "block": 10,
+    "composer": "George Gershwin",
+    "work": "3 Preludes",
+    "part": "I. Allegro ben ritmato e deciso",
+    "performers": "Yo-Yo Ma, Jeffrey Kahane"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Vocalise (From \"14 Romances, Op. 34\")",
+   "durationMs": 386747,
+   "artist": "Yo-Yo Ma, Bobby McFerrin & Rachmaninoff Quartet",
+   "apple": {
+    "block": 11,
+    "composer": "Sergei Rachmaninoff",
+    "work": "14 Romances, Op. 34 · “14 Songs”",
+    "part": "No. 14, Vocalise",
+    "performers": "Bobby McFerrin, Rachmaninoff Quartet, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "IV. Allegro from Sonata in D minor for Cello and Piano, Op. 40",
+   "durationMs": 265693,
+   "artist": "Yo-Yo Ma & Emanuel Ax",
+   "apple": {
+    "block": 12,
+    "composer": "Dmitri Shostakovich",
+    "work": "Cello Sonata in D Minor, Op. 40",
+    "part": "IV. Allegro",
+    "performers": "Emanuel Ax, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Andante Cantabile for Cello Solo and String Orchestra, Op. posth.",
+   "durationMs": 501467,
+   "artist": "Yo-Yo Ma, Lorin Maazel & Pittsburgh Symphony Orchestra",
+   "apple": {
+    "block": 13,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "Andante cantabile in B Major, CW 348, TH 63 · “Arranged from String Quartet Op. 11, TH 111”",
+    "part": "Andante cantabile, Op. Posth.",
+    "performers": "Pittsburgh Symphony Orchestra, Yo-Yo Ma, Lorin Maazel"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "IV. Rondo alla Zingarese. Presto from Quartet No. 1 in G minor for Piano and Strings, Op. 25",
+   "durationMs": 484840,
+   "artist": "Isaac Stern, Jaime Laredo, Yo-Yo Ma & Emanuel Ax",
+   "apple": {
+    "block": 14,
+    "composer": "Johannes Brahms",
+    "work": "Piano Quartet No. 1 in G Minor, Op. 25",
+    "part": "IV. Rondo alla Zingarese. Presto",
+    "performers": "Emanuel Ax, Jaime Laredo, Isaac Stern, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "III. Finale. Allegro moderato from Concerto in B minor for Cello and Orchestra, Op. 104",
+   "durationMs": 770107,
+   "artist": "Yo-Yo Ma, Kurt Masur & New York Philharmonic",
+   "apple": {
+    "block": 15,
+    "composer": "Antonín Dvořák",
+    "work": "Cello Concerto in B Minor, B 191, Op. 104",
+    "part": "III. Finale. Allegro moderato",
+    "performers": "Kurt Masur, New York Philharmonic, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 1,
+   "title": "Cristal",
+   "durationMs": 170920,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 16,
+    "composer": "Mariano: Cristal",
+    "work": "Mariano: Cristal",
+    "part": "Cristal",
+    "performers": "Yo-Yo Ma, Cesar Mariano"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 2,
+   "title": "A lenda do caboclo",
+   "durationMs": 191160,
+   "artist": "Yo-Yo Ma, Odair Assad & Sérgio Assad",
+   "apple": {
+    "block": 17,
+    "composer": "Heitor Villa-Lobos",
+    "work": "Ciclo brasileiro, A 374, W 374",
+    "part": "A lenda do caboclo",
+    "performers": "Yo-Yo Ma, Sérgio Assad, Odair Assad"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 3,
+   "title": "Chega de Saudade (Live)",
+   "durationMs": 301547,
+   "artist": "Yo-Yo Ma, Kathryn Stott, Rosa Passos, Cyro Baptista & Nilson Matta",
+   "apple": {
+    "block": 18,
+    "composer": "Chega de Saudade (Live)",
+    "work": "Chega de Saudade (Live)",
+    "part": "Chega de Saudade (Live)",
+    "performers": "Nilson Matta, Kathryn Stott, Cyro Baptista, Rosa Passos, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 4,
+   "title": "Wapango (Live)",
+   "durationMs": 226760,
+   "artist": "Yo-Yo Ma, Paquito D'Rivera, Kathryn Stott & Cyro Baptista",
+   "apple": {
+    "block": 19,
+    "composer": "Paquito D'Rivera",
+    "work": "Tres danzas latinoamericanas",
+    "part": "Wapango (Live)",
+    "performers": "Paquito D'Rivera, Cyro Baptista, Kathryn Stott, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 5,
+   "title": "Libertango",
+   "durationMs": 191333,
+   "artist": "Yo-Yo Ma, Horacio Malvicino, Leonardo Marconi, Antonio Agri, Hector Console, Nestor Marconi & Jorge Calandrelli",
+   "apple": {
+    "block": 20,
+    "composer": "Astor Piazzolla",
+    "work": "Libertango",
+    "part": "Libertango",
+    "performers": "Nestor Marconi, Antonio Agri, Jorge Calandrelli, Leonardo Marconi, Hector Console, Horacio Malvicino, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 6,
+   "title": "Appalachia Waltz (Version for Cello) [Solo Cello Version]",
+   "durationMs": 260867,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 21,
+    "composer": "O'Connor: Appalachia Waltz (Solo Cello Version)",
+    "work": "O'Connor: Appalachia Waltz (Solo Cello Version)",
+    "part": "Appalachia Waltz (Solo Cello Version)",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 7,
+   "title": "Butterfly's Day Out",
+   "durationMs": 286267,
+   "artist": "Yo-Yo Ma, Edgar Meyer & Mark O'Connor",
+   "apple": {
+    "block": 22,
+    "composer": "O'Connor: Butterfly's Day Out",
+    "work": "O'Connor: Butterfly's Day Out",
+    "part": "Butterfly's Day Out",
+    "performers": "Mark O'Connor, Edgar Meyer, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 8,
+   "title": "1B",
+   "durationMs": 241613,
+   "artist": "Yo-Yo Ma, Edgar Meyer & Mark O'Connor",
+   "apple": {
+    "block": 23,
+    "composer": "Edgar Meyer",
+    "work": "1B",
+    "part": "1B",
+    "performers": "Mark O'Connor, Yo-Yo Ma, Edgar Meyer"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 9,
+   "title": "Pickin' from Three Pieces for Solo Cello",
+   "durationMs": 154133,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 24,
+    "composer": "John Williams",
+    "work": "Three pieces for Solo Cello",
+    "part": "No. 2, Pickin'",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 10,
+   "title": "Simple Gifts",
+   "durationMs": 151213,
+   "artist": "Yo-Yo Ma & Alison Krauss",
+   "apple": {
+    "block": 25,
+    "composer": "Simple Gifts",
+    "work": "Simple Gifts",
+    "part": "Simple Gifts",
+    "performers": "Alison Krauss, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 11,
+   "title": "The Mission: Gabriel's Oboe",
+   "durationMs": 191800,
+   "artist": "Yo-Yo Ma, Ennio Morricone & Roma Sinfonietta",
+   "apple": {
+    "block": 26,
+    "composer": "Ennio Morricone",
+    "work": "The Mission",
+    "part": "Gabriel's Oboe",
+    "performers": "Ennio Morricone, Roma Sinfonietta, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 12,
+   "title": "The Mission: The Falls",
+   "durationMs": 148347,
+   "artist": "Yo-Yo Ma, Roma Sinfonietta & Ennio Morricone",
+   "apple": {
+    "block": 26,
+    "composer": "Ennio Morricone",
+    "work": "The Mission",
+    "part": "The Falls",
+    "performers": "Roma Sinfonietta, Ennio Morricone, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 13,
+   "title": "The Eternal Vow",
+   "durationMs": 181573,
+   "artist": "Yo-Yo Ma, Tan Dun, Chen Xie-Yang, David Cossin, Shanghai Symphony Orchestra & Shanghai National Orchestra",
+   "apple": {
+    "block": 27,
+    "composer": "Tan Dun",
+    "work": "Crouching Tiger, Hidden Dragon",
+    "part": "The Eternal Vow (From \"Crouching Tiger, Hidden Dragon\")",
+    "performers": "Shanghai Symphony Orchestra, Tan Dun, Chen Xie-Yang, David Cossin, Shanghai National Orchestra, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 14,
+   "title": "The Cellist of Sarajevo, Op. 12",
+   "durationMs": 417093,
+   "artist": "Yo-Yo Ma",
+   "apple": {
+    "block": 28,
+    "composer": "David Wilde: The Cellist of Sarajevo - A Lament in Rondo Form for Solo Cello, Op. 12",
+    "work": "David Wilde: The Cellist of Sarajevo - A Lament in Rondo Form for Solo Cello, Op. 12",
+    "part": "The Cellist of Sarajevo - A Lament in Rondo Form for Solo Cello, Op. 12",
+    "performers": "Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 15,
+   "title": "Chi passa per'sta strada",
+   "durationMs": 281813,
+   "artist": "Yo-Yo Ma & Silkroad Ensemble",
+   "apple": {
+    "block": 29,
+    "composer": "Filippo Azzaiolo",
+    "work": "Chi passa per sta strada in D Major",
+    "part": "Chi passa per'sta strada",
+    "performers": "Silkroad Ensemble, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 16,
+   "title": "Mido Mountain (Chinese Traditional)",
+   "durationMs": 231520,
+   "artist": "Yo-Yo Ma & Silkroad Ensemble",
+   "apple": {
+    "block": 30,
+    "composer": "Mido Mountain (Chinese Traditional)",
+    "work": "Mido Mountain (Chinese Traditional)",
+    "part": "Mido Mountain (Chinese Traditional)",
+    "performers": "Yo-Yo Ma, Silkroad Ensemble"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 17,
+   "title": "Mohini (Enchantment)",
+   "durationMs": 107467,
+   "artist": "Yo-Yo Ma & The Silk Road Ensemble",
+   "apple": {
+    "block": 31,
+    "composer": "S. Das: Mohini (Enchantment)",
+    "work": "S. Das: Mohini (Enchantment)",
+    "part": "Mohini (Enchantment)",
+    "performers": "Silkroad Ensemble, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 18,
+   "title": "Baroque in Rhythm from Suite for Cello and Jazz Piano Trio",
+   "durationMs": 265533,
+   "artist": "Yo-Yo Ma, Jean-Luc Dayan, Claude Bolling & Marc Michel",
+   "apple": {
+    "block": 32,
+    "composer": "Claude Bolling",
+    "work": "Suite for Cello and Jazz Piano Trio",
+    "part": "I. Baroque in Rhythm",
+    "performers": "Jean-Luc Dayan, Marc Michel, Claude Bolling, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 19,
+   "title": "Anything Goes (From \"Anything Goes\")",
+   "durationMs": 353307,
+   "artist": "Yo-Yo Ma & Stéphane Grappelli",
+   "apple": {
+    "block": 33,
+    "composer": "Cole Porter",
+    "work": "Anything Goes",
+    "part": "Anything Goes",
+    "performers": "Stéphane Grappelli, Yo-Yo Ma"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 20,
+   "title": "I Could Have Danced All Night (Extended version)",
+   "durationMs": 223853,
+   "artist": "Yo-Yo Ma & Steven Prutsman",
+   "apple": {
+    "block": 34,
+    "composer": "Frederick Loewe",
+    "work": "My Fair Lady",
+    "part": "I Could Have Danced All Night",
+    "performers": "Steven Prutsman, Yo-Yo Ma"
+   }
+  }
+ ]
+}

@@ -1,0 +1,92 @@
+{
+ "id": "697655461",
+ "category": "twentieth century contemporary",
+ "title": "Adams: Harmonielehre",
+ "artist": "Sir Simon Rattle",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Harmonielehre: I. (without title)",
+   "durationMs": 1049533,
+   "artist": "City of Birmingham Symphony Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "John Adams",
+    "work": "Harmonielehre",
+    "part": "I. (without title)",
+    "performers": "City of Birmingham Symphony Orchestra, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Harmonielehre: II. The Anfortas Wound",
+   "durationMs": 746293,
+   "artist": "City of Birmingham Symphony Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "John Adams",
+    "work": "Harmonielehre",
+    "part": "II. The Anfortas Wound",
+    "performers": "Sir Simon Rattle, City of Birmingham Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Harmonielehre: III. Meister Eckhardt and Quackie",
+   "durationMs": 634867,
+   "artist": "City of Birmingham Symphony Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "John Adams",
+    "work": "Harmonielehre",
+    "part": "III. Meister Eckhardt and Quackie",
+    "performers": "City of Birmingham Symphony Orchestra, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "The Chairman Dances (Foxtrot for Orchestra)",
+   "durationMs": 767707,
+   "artist": "City of Birmingham Symphony Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 2,
+    "composer": "John Adams",
+    "work": "The Chairman Dances",
+    "part": "The Chairman Dances (Foxtrot for Orchestra)",
+    "performers": "City of Birmingham Symphony Orchestra, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Two Fanfares for Orchestra: I. Tromba Lontana",
+   "durationMs": 247493,
+   "artist": "Wesley Warren, Jonathan Holland, City of Birmingham Symphony Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 3,
+    "composer": "J. Adams: Two Fanfares for Orchestra",
+    "work": "J. Adams: Two Fanfares for Orchestra",
+    "part": "I. Tromba Lontana",
+    "performers": "Sir Simon Rattle, Wesley Warren, Jonathan Holland, City of Birmingham Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Two Fanfares for Orchestra: II. Short Ride in a Fast Machine",
+   "durationMs": 264133,
+   "artist": "City of Birmingham Symphony Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 3,
+    "composer": "J. Adams: Two Fanfares for Orchestra",
+    "work": "J. Adams: Two Fanfares for Orchestra",
+    "part": "II. Short Ride in a Fast Machine",
+    "performers": "City of Birmingham Symphony Orchestra, Sir Simon Rattle"
+   }
+  }
+ ]
+}

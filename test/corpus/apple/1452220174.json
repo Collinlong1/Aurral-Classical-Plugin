@@ -1,0 +1,50 @@
+{
+ "id": "1452220174",
+ "category": "concerto",
+ "title": "Brahms: Piano Concerto No. 1",
+ "artist": "Krystian Zimerman, Berlin Philharmonic Orchestra & Sir Simon Rattle",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Piano Concerto No. 1 in D Minor, Op. 151: I. Maestoso - Poco piu moderato",
+   "durationMs": 1407000,
+   "artist": "Krystian Zimerman, Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Johannes Brahms",
+    "work": "Piano Concerto No. 1 in D Minor, Op. 15",
+    "part": "I. Maestoso - Poco piu moderato",
+    "performers": "Berlin Philharmonic Orchestra, Sir Simon Rattle, Krystian Zimerman"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Piano Concerto No. 1 in D Minor, Op. 151: II. Adagio",
+   "durationMs": 945000,
+   "artist": "Krystian Zimerman, Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Johannes Brahms",
+    "work": "Piano Concerto No. 1 in D Minor, Op. 15",
+    "part": "II. Adagio",
+    "performers": "Krystian Zimerman, Berlin Philharmonic Orchestra, Sir Simon Rattle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Piano Concerto No. 1 in D Minor, Op. 151: III. Rondo (Allegro non troppo)",
+   "durationMs": 729000,
+   "artist": "Krystian Zimerman, Berlin Philharmonic Orchestra & Sir Simon Rattle",
+   "apple": {
+    "block": 1,
+    "composer": "Johannes Brahms",
+    "work": "Piano Concerto No. 1 in D Minor, Op. 15",
+    "part": "III. Rondo (Allegro non troppo)",
+    "performers": "Berlin Philharmonic Orchestra, Sir Simon Rattle, Krystian Zimerman"
+   }
+  }
+ ]
+}

@@ -1,0 +1,64 @@
+{
+ "id": "1452133133",
+ "category": "concerto",
+ "title": "Tchaikovsky: Violin Concerto",
+ "artist": "Gidon Kremer, Berlin Philharmonic Orchestra & Lorin Maazel",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Violin Concerto in D, Op.35: 1. Allegro moderato",
+   "durationMs": 1067027,
+   "artist": "Gidon Kremer, Lorin Maazel & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "Violin Concerto in D Major, Op. 35, TH 59",
+    "part": "1. Allegro moderato",
+    "performers": "Lorin Maazel, Berlin Philharmonic Orchestra, Gidon Kremer"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Violin Concerto in D, Op.35: 2. Canzonetta: Andante - attacca:",
+   "durationMs": 344267,
+   "artist": "Gidon Kremer, Lorin Maazel & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "Violin Concerto in D Major, Op. 35, TH 59",
+    "part": "2. Canzonetta: Andante - attacca:",
+    "performers": "Lorin Maazel, Berlin Philharmonic Orchestra, Gidon Kremer"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Violin Concerto in D, Op.35: 3. Finale (Allegro vivacissimo)",
+   "durationMs": 593973,
+   "artist": "Gidon Kremer, Lorin Maazel & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "Violin Concerto in D Major, Op. 35, TH 59",
+    "part": "3. Finale (Allegro vivacissimo)",
+    "performers": "Lorin Maazel, Berlin Philharmonic Orchestra, Gidon Kremer"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Sérénade mélancolique in B flat minor, Op.26",
+   "durationMs": 497133,
+   "artist": "Gidon Kremer, Lorin Maazel & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "work": "Sérénade mélancolique in B-Flat Minor, Op. 26, TH 56 · “Melancholy Serenade”",
+    "part": "Sérénade mélancolique in B flat minor, Op.26",
+    "performers": "Berlin Philharmonic Orchestra, Lorin Maazel, Gidon Kremer"
+   }
+  }
+ ]
+}

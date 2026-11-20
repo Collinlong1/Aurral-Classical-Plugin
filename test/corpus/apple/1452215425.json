@@ -1,0 +1,386 @@
+{
+ "id": "1452215425",
+ "category": "choral sacred",
+ "title": "Bach: Mass in B Minor",
+ "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Mass in B Minor, BWV 232: Kyrie Eleison",
+   "durationMs": 708000,
+   "artist": "Wiener Singverein, Herbert von Karajan & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Kyrie Eleison",
+    "performers": "Wiener Singverein, Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Mass in B Minor, BWV 232: Christe Eleison",
+   "durationMs": 375000,
+   "artist": "Gundula Janowitz, Herbert von Karajan, Berlin Philharmonic Orchestra & Christa Ludwig",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Christe Eleison",
+    "performers": "Herbert von Karajan, Christa Ludwig, Berlin Philharmonic Orchestra, Gundula Janowitz"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Mass in B Minor, BWV 232: Kyrie Eleison",
+   "durationMs": 200000,
+   "artist": "Wiener Singverein, Herbert von Karajan & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Kyrie Eleison",
+    "performers": "Wiener Singverein, Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Mass in B Minor, BWV 232: Gloria in Excelsis Deo",
+   "durationMs": 115400,
+   "artist": "Wiener Singverein, Herbert von Karajan & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Gloria in Excelsis Deo",
+    "performers": "Herbert von Karajan, Wiener Singverein, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Mass in B Minor, BWV 232: Et in Terra Pax",
+   "durationMs": 242600,
+   "artist": "Wiener Singverein, Herbert von Karajan & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Et in Terra Pax",
+    "performers": "Wiener Singverein, Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Mass in B Minor, BWV 232: Laudamus Te",
+   "durationMs": 325000,
+   "artist": "Christa Ludwig, Herbert von Karajan & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Laudamus Te",
+    "performers": "Christa Ludwig, Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Mass in B Minor, BWV 232: Gratias Agimus Tibi",
+   "durationMs": 225000,
+   "artist": "Wiener Singverein, Herbert von Karajan & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Gratias Agimus Tibi",
+    "performers": "Wiener Singverein, Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Mass in B Minor, BWV 232: Domine Deus",
+   "durationMs": 371000,
+   "artist": "Gundula Janowitz, Herbert von Karajan, Berlin Philharmonic Orchestra & Peter Schreier",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Domine Deus",
+    "performers": "Peter Schreier, Gundula Janowitz, Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Mass in B Minor, BWV 232: Qui Tollis Peccata Mundi",
+   "durationMs": 230000,
+   "artist": "Wiener Singverein, Herbert von Karajan & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Qui Tollis Peccata Mundi",
+    "performers": "Wiener Singverein, Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Mass in B Minor, BWV 232: Qui Sedes Ad Dexteram Patris",
+   "durationMs": 347000,
+   "artist": "Christa Ludwig, Herbert von Karajan & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Qui Sedes Ad Dexteram Patris",
+    "performers": "Berlin Philharmonic Orchestra, Christa Ludwig, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Mass in B Minor, BWV 232: Quoniam Tu Solus Sanctus",
+   "durationMs": 294973,
+   "artist": "Karl Ridderbusch, Herbert von Karajan & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Quoniam Tu Solus Sanctus",
+    "performers": "Karl Ridderbusch, Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Mass in B Minor, BWV 232: Cum Sancto Spiritu",
+   "durationMs": 253027,
+   "artist": "Wiener Singverein, Herbert von Karajan & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Cum Sancto Spiritu",
+    "performers": "Herbert von Karajan, Wiener Singverein, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 1,
+   "title": "Mass in B Minor, BWV 232: Credo in Unum Deum",
+   "durationMs": 167973,
+   "artist": "Wiener Singverein, Herbert von Karajan & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Credo in Unum Deum",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra, Wiener Singverein"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 2,
+   "title": "Mass in B Minor, BWV 232: Patrem Omnipotentem",
+   "durationMs": 135027,
+   "artist": "Wiener Singverein, Herbert von Karajan & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Patrem Omnipotentem",
+    "performers": "Wiener Singverein, Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 3,
+   "title": "Mass in B Minor, BWV 232: Et in Unum Dominum",
+   "durationMs": 336000,
+   "artist": "Herbert von Karajan, Berlin Philharmonic Orchestra, Gundula Janowitz & Christa Ludwig",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Et in Unum Dominum",
+    "performers": "Berlin Philharmonic Orchestra, Christa Ludwig, Gundula Janowitz, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 4,
+   "title": "Mass in B Minor, BWV 232: Et Incarnatus Est",
+   "durationMs": 242000,
+   "artist": "Wiener Singverein, Herbert von Karajan & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Et Incarnatus Est",
+    "performers": "Wiener Singverein, Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 5,
+   "title": "Mass in B Minor, BWV 232: Crucifixus",
+   "durationMs": 161000,
+   "artist": "Wiener Singverein, Herbert von Karajan & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Crucifixus",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra, Wiener Singverein"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 6,
+   "title": "Mass in B Minor, BWV 232: Et Resurrexit",
+   "durationMs": 257000,
+   "artist": "Wiener Singverein, Herbert von Karajan & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Et Resurrexit",
+    "performers": "Wiener Singverein, Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 7,
+   "title": "Mass in B Minor, BWV 232: Et in Spiritum Sanctum",
+   "durationMs": 390000,
+   "artist": "Robert Kerns, Herbert von Karajan & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Et in Spiritum Sanctum",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan, Robert Kerns"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 8,
+   "title": "Mass in B Minor, BWV 232: Confiteor Unum Baptisma",
+   "durationMs": 219667,
+   "artist": "Wiener Singverein, Herbert von Karajan & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Confiteor Unum Baptisma",
+    "performers": "Wiener Singverein, Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 9,
+   "title": "Mass in B Minor, BWV 232: Et Expecto Resurrectionem",
+   "durationMs": 251333,
+   "artist": "Wiener Singverein, Herbert von Karajan & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Et Expecto Resurrectionem",
+    "performers": "Wiener Singverein, Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 10,
+   "title": "Mass in B Minor, BWV 232: Sanctus",
+   "durationMs": 373507,
+   "artist": "Wiener Singverein, Herbert von Karajan & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Sanctus",
+    "performers": "Wiener Singverein, Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 11,
+   "title": "Mass in B Minor, BWV 232: Osanna in Excelsis",
+   "durationMs": 163493,
+   "artist": "Wiener Singverein, Herbert von Karajan & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Osanna in Excelsis",
+    "performers": "Wiener Singverein, Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 12,
+   "title": "Mass in B Minor, BWV 232: Benedictus",
+   "durationMs": 330000,
+   "artist": "Peter Schreier, Herbert von Karajan & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Benedictus",
+    "performers": "Peter Schreier, Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 13,
+   "title": "Mass in B Minor, BWV 232: Osanna in Excelsis",
+   "durationMs": 166000,
+   "artist": "Wiener Singverein, Herbert von Karajan & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Osanna in Excelsis",
+    "performers": "Wiener Singverein, Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 14,
+   "title": "Mass in B Minor, BWV 232: Agnus Dei",
+   "durationMs": 453000,
+   "artist": "Christa Ludwig, Herbert von Karajan & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Agnus Dei",
+    "performers": "Christa Ludwig, Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 15,
+   "title": "Mass in B Minor, BWV 232: Dona Nobis Pacem",
+   "durationMs": 242000,
+   "artist": "Wiener Singverein, Herbert von Karajan & Berlin Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Mass in B Minor, BWV 232",
+    "part": "Dona Nobis Pacem",
+    "performers": "Herbert von Karajan, Wiener Singverein, Berlin Philharmonic Orchestra"
+   }
+  }
+ ]
+}

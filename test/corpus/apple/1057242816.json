@@ -1,0 +1,288 @@
+{
+ "id": "1057242816",
+ "category": "guitar harp other",
+ "title": "Bach",
+ "artist": "Various Artists",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Toccata and Fugue in D Minor for Organ, BWV 565",
+   "durationMs": 534627,
+   "artist": "Klemens Schnorr",
+   "apple": {
+    "block": 1,
+    "composer": "Johann Sebastian Bach",
+    "work": "Toccata & Fugue in D Minor, BWV 565",
+    "part": "Toccata and Fugue in D Minor for Organ, BWV 565",
+    "performers": "Klemens Schnorr"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Herz und Mund und Tat und Leben, BWV 147: X. Jesu, Joy of Mans' Desiring",
+   "durationMs": 218010,
+   "artist": "Magnus Ludwigsson",
+   "apple": {
+    "block": 2,
+    "composer": "Johann Sebastian Bach",
+    "work": "Herz und Mund und Tat und Leben, BWV 147 · “Heart and Mouth and Deed and Life”",
+    "part": "X. Jesu, Joy of Mans' Desiring",
+    "performers": "Magnus Ludwigsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Orchestral Suite No. 3 in D Major, BWV 1068: II. Air",
+   "durationMs": 254427,
+   "artist": "David Parry & London Philharmonic Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Johann Sebastian Bach",
+    "work": "Orchestral Suite No. 3 in D Major, BWV 1068",
+    "part": "II. Air",
+    "performers": "London Philharmonic Orchestra, David Parry"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Concerto in G Minor for Violin and Strings, BWV 1056R: II. Arioso. Largo",
+   "durationMs": 194893,
+   "artist": "Alun Francis, Camerata Antonio Lucio & Emmy Verhey",
+   "apple": {
+    "block": 4,
+    "composer": "Johann Sebastian Bach",
+    "work": "Concerto for Oboe, Strings & Continuo in G Minor, BWV 1056R",
+    "part": "II. Arioso. Largo",
+    "performers": "Camerata Antonio Lucio, Alun Francis, Emmy Verhey"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Cello Suite No. 1 in G Major, BWV 1007: V. Menuetts I & II",
+   "durationMs": 273027,
+   "artist": "Victor Yoran",
+   "apple": {
+    "block": 5,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 1 in G Major, BWV 1007",
+    "part": "V. Menuetts I & II",
+    "performers": "Victor Yoran"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Double Concerto in D Minor for Two Violins and Strings, BWV 1043: I. Vivace",
+   "durationMs": 224507,
+   "artist": "Camerata Lysy Gstaad, Alberto Lysy & Yehudi Menuhin",
+   "apple": {
+    "block": 6,
+    "composer": "Johann Sebastian Bach",
+    "work": "Double Violin Concerto in D Minor, BWV 1043",
+    "part": "I. Vivace",
+    "performers": "Camerata Lysy Gstaad, Alberto Lysy, Yehudi Menuhin"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Goldberg Variations, BWV 988: Aria",
+   "durationMs": 291114,
+   "artist": "Henrik Måwe",
+   "apple": {
+    "block": 7,
+    "composer": "Johann Sebastian Bach",
+    "work": "Goldberg Variations, BWV 988",
+    "part": "Aria",
+    "performers": "Henrik Måwe"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "The Well-Tempered Clavier, Book 1: Prelude and Fugue No. 1 in C Major, BWV 846: I. Prelude",
+   "durationMs": 127119,
+   "artist": "Magnus Ludwigsson",
+   "apple": {
+    "block": 8,
+    "composer": "Johann Sebastian Bach",
+    "work": "Prelude & Fugue No. 1 in C Major, BWV 846 · “The Well-tempered Clavier, Book 1”",
+    "part": "Prelude No. 1 in C Major, BWV 846",
+    "performers": "Magnus Ludwigsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Brandenburg Concerto No. 3 in G Major, BWV 1048: III. Allegro",
+   "durationMs": 344840,
+   "artist": "David Parry & London Philharmonic Orchestra",
+   "apple": {
+    "block": 9,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 3 in G Major, BWV 1048",
+    "part": "III. Allegro",
+    "performers": "London Philharmonic Orchestra, David Parry"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Brandenburg Concerto No. 6 in B-Flat Major, BWV 1051: II. Adagio ma non tanto",
+   "durationMs": 350960,
+   "artist": "Bohdan Warchal & Slovak Chamber Orchestra",
+   "apple": {
+    "block": 10,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 6 in B-Flat Major, BWV 1051",
+    "part": "II. Adagio ma non tanto",
+    "performers": "Bohdan Warchal, Slovak Chamber Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Brandenburg Concerto No. 4 in G Major, BWV 1049: III. Presto",
+   "durationMs": 332387,
+   "artist": "Alexander Titov & St. Petersburg Opera Orchestra",
+   "apple": {
+    "block": 11,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 4 in G Major, BWV 1049",
+    "part": "III. Presto",
+    "performers": "St. Petersburg Opera Orchestra, Alexander Titov"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Brandenburg Concerto No. 1 in F Major, BWV 1046: IV. Menuetto - Polacca",
+   "durationMs": 539373,
+   "artist": "Alexander Titov & St. Petersburg Opera Orchestra",
+   "apple": {
+    "block": 12,
+    "composer": "Johann Sebastian Bach",
+    "work": "Brandenburg Concerto No. 1 in F Major, BWV 1046",
+    "part": "IV. Menuetto - Polacca",
+    "performers": "Alexander Titov, St. Petersburg Opera Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Cello Suite No. 5 in C Minor, BWV 1011: IV. Sarabande",
+   "durationMs": 231600,
+   "artist": "Victor Yoran",
+   "apple": {
+    "block": 13,
+    "composer": "Johann Sebastian Bach",
+    "work": "Cello Suite No. 5 in C Minor, BWV 1011",
+    "part": "IV. Sarabande",
+    "performers": "Victor Yoran"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Fugue for Solo Guitar in G Minor, BWV 1000",
+   "durationMs": 345760,
+   "artist": "Klaus Jäckle",
+   "apple": {
+    "block": 14,
+    "composer": "Johann Sebastian Bach",
+    "work": "Fugue in G Minor, BWV 1000",
+    "part": "Fugue for Solo Guitar in G Minor, BWV 1000",
+    "performers": "Klaus Jäckle"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Lute Suite in E Minor, BWV 996: V. Bourrée",
+   "durationMs": 88293,
+   "artist": "Andrés Segovia",
+   "apple": {
+    "block": 15,
+    "composer": "Johann Sebastian Bach",
+    "work": "Lute Suite No. 1 in E Minor, BWV 996",
+    "part": "VI. Bourrée",
+    "performers": "Andrés Segovia"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Christmas Oratorio, BWV 248: No. 64, Chorale. Nun Seid Ihr Wohl Gerochen",
+   "durationMs": 186067,
+   "artist": "Marc Ullrich & Basel Brass Quintet",
+   "apple": {
+    "block": 16,
+    "composer": "Johann Sebastian Bach",
+    "work": "Christmas Oratorio, BWV 248",
+    "part": "No. 64, Chorale. Nun Seid Ihr Wohl Gerochen",
+    "performers": "Basel Brass Quintet, Marc Ullrich"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "Partita No. 2 in D Minor for Solo Violin, BWV 1004: V. Chaconne",
+   "durationMs": 954133,
+   "artist": "Conrad von der Goltz",
+   "apple": {
+    "block": 17,
+    "composer": "Johann Sebastian Bach",
+    "work": "Partita No. 2 for Solo Violin in D Minor, BWV 1004",
+    "part": "V. Chaconne",
+    "performers": "Conrad von der Goltz"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 18,
+   "title": "Erbarm dich mein, o Herre Gott, BWV 721",
+   "durationMs": 472773,
+   "artist": "Susanne Doll",
+   "apple": {
+    "block": 18,
+    "composer": "Johann Sebastian Bach",
+    "work": "Erbarm dich mein, o Herre Gott, BWV 721",
+    "part": "Erbarm dich mein, o Herre Gott, BWV 721",
+    "performers": "Susanne Doll"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 19,
+   "title": "Eight Short Preludes and Fugues: No. 6, Prelude and Fugue in G Minor, BWV 558",
+   "durationMs": 228000,
+   "artist": "Hans Fagius",
+   "apple": {
+    "block": 19,
+    "composer": "Johann Sebastian Bach",
+    "work": "Prelude & Fugue No. 24 in B Minor, BWV 869 · “The Well-tempered Clavier, Book 1”",
+    "part": "No. 6, Prelude and Fugue in G Minor, BWV 558",
+    "performers": "Hans Fagius"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 20,
+   "title": "Chorale for Organ, BWV 650 \"Kommst du nun, Jesu von himmel her unter\"",
+   "durationMs": 208400,
+   "artist": "Armand Belien",
+   "apple": {
+    "block": 20,
+    "composer": "Johann Sebastian Bach",
+    "work": "Kommst du nun, Jesu, vom Himmel herunter in G Major, BWV 650 · “Are You Coming Now, Jesu, From Heaven Down To Earth?”",
+    "part": "Chorale for Organ, BWV 650 \"Kommst du nun, Jesu von himmel her unter\"",
+    "performers": "Armand Belien"
+   }
+  }
+ ]
+}

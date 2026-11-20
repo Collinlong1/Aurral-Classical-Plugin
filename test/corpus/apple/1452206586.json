@@ -1,0 +1,64 @@
+{
+ "id": "1452206586",
+ "category": "concerto",
+ "title": "Brahms: Piano Concerto No. 2",
+ "artist": "Berlin Philharmonic Orchestra, Maurizio Pollini & Claudio Abbado",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Piano Concerto No. 2 in B-Flat, Op. 83: I. Allegro non troppo",
+   "durationMs": 1065000,
+   "artist": "Berlin Philharmonic Orchestra, Claudio Abbado & Maurizio Pollini",
+   "apple": {
+    "block": 1,
+    "composer": "Johannes Brahms",
+    "work": "Piano Concerto No. 2 in B-Flat Major, Op. 83",
+    "part": "I. Allegro non troppo",
+    "performers": "Berlin Philharmonic Orchestra, Claudio Abbado, Maurizio Pollini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Piano Concerto No. 2 in B-Flat, Op. 83: II. Allegro appassionato",
+   "durationMs": 535000,
+   "artist": "Berlin Philharmonic Orchestra, Claudio Abbado & Maurizio Pollini",
+   "apple": {
+    "block": 1,
+    "composer": "Johannes Brahms",
+    "work": "Piano Concerto No. 2 in B-Flat Major, Op. 83",
+    "part": "II. Allegro appassionato",
+    "performers": "Maurizio Pollini, Claudio Abbado, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Piano Concerto No. 2 in B-Flat, Op. 83: III. Andante - Più adagio",
+   "durationMs": 753000,
+   "artist": "Berlin Philharmonic Orchestra, Claudio Abbado & Maurizio Pollini",
+   "apple": {
+    "block": 1,
+    "composer": "Johannes Brahms",
+    "work": "Piano Concerto No. 2 in B-Flat Major, Op. 83",
+    "part": "III. Andante - Più adagio",
+    "performers": "Berlin Philharmonic Orchestra, Claudio Abbado, Maurizio Pollini"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Piano Concerto No. 2 in B-Flat, Op. 83: IV. Allegretto grazioso - Un poco più presto",
+   "durationMs": 564000,
+   "artist": "Berlin Philharmonic Orchestra, Claudio Abbado & Maurizio Pollini",
+   "apple": {
+    "block": 1,
+    "composer": "Johannes Brahms",
+    "work": "Piano Concerto No. 2 in B-Flat Major, Op. 83",
+    "part": "IV. Allegretto grazioso - Un poco più presto",
+    "performers": "Claudio Abbado, Berlin Philharmonic Orchestra, Maurizio Pollini"
+   }
+  }
+ ]
+}

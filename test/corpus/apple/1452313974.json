@@ -1,0 +1,246 @@
+{
+ "id": "1452313974",
+ "category": "piano recital",
+ "title": "Debussy",
+ "artist": "Seong-Jin Cho",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Images I, CD 105: I. Reflets dans l'eau",
+   "durationMs": 344048,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 1,
+    "composer": "Claude Debussy",
+    "work": "Images, Set I, CD 105, L. 110",
+    "part": "I. Reflets dans l'eau",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Images I, CD 105: II. Hommage à Rameau",
+   "durationMs": 425226,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 1,
+    "composer": "Claude Debussy",
+    "work": "Images, Set I, CD 105, L. 110",
+    "part": "II. Hommage à Rameau",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Images I, CD 105: III. Mouvement",
+   "durationMs": 210484,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 1,
+    "composer": "Claude Debussy",
+    "work": "Images, Set I, CD 105, L. 110",
+    "part": "III. Mouvement",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Images II, CD 120: I. Cloches à travers les feuilles",
+   "durationMs": 272919,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 2,
+    "composer": "Claude Debussy",
+    "work": "Images, Set II, CD 120, L. 111",
+    "part": "I. Cloches à travers les feuilles",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Images II, CD 120: II. Et la lune descend sur le temple qui fut",
+   "durationMs": 356795,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 2,
+    "composer": "Claude Debussy",
+    "work": "Images, Set II, CD 120, L. 111",
+    "part": "II. Et la lune descend sur le temple qui fut",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Images II, CD 120: III. Poissons d'or",
+   "durationMs": 262674,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 2,
+    "composer": "Claude Debussy",
+    "work": "Images, Set II, CD 120, L. 111",
+    "part": "III. Poissons d'or",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Children's Corner, CD 119: I. Doctor Gradus Ad Parnassum",
+   "durationMs": 141983,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 3,
+    "composer": "Claude Debussy",
+    "work": "Children's Corner, CD 119, L. 113",
+    "part": "I. Doctor Gradus Ad Parnassum",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Children's Corner, CD 119: II. Jimbo's Lullaby",
+   "durationMs": 220821,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 3,
+    "composer": "Claude Debussy",
+    "work": "Children's Corner, CD 119, L. 113",
+    "part": "II. Jimbo's Lullaby",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Children's Corner, CD 119: III. Serenade for the Doll",
+   "durationMs": 162049,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 3,
+    "composer": "Claude Debussy",
+    "work": "Children's Corner, CD 119, L. 113",
+    "part": "III. Serenade for the Doll",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Children's Corner, CD 119: IV. The Snow is Dancing",
+   "durationMs": 149342,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 3,
+    "composer": "Claude Debussy",
+    "work": "Children's Corner, CD 119, L. 113",
+    "part": "IV. The Snow is Dancing",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Children's Corner, CD 119: V. The Little Shepherd",
+   "durationMs": 173928,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 3,
+    "composer": "Claude Debussy",
+    "work": "Children's Corner, CD 119, L. 113",
+    "part": "V. The Little Shepherd",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Children's Corner, CD 119: VI. Cakewalk",
+   "durationMs": 179275,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 3,
+    "composer": "Claude Debussy",
+    "work": "Children's Corner, CD 119, L. 113",
+    "part": "VI. Cakewalk",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Suite bergamasque, CD 82: I. Prélude",
+   "durationMs": 270757,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 4,
+    "composer": "Claude Debussy",
+    "work": "Suite bergamasque, CD 82, L. 75",
+    "part": "I. Prélude",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "Suite bergamasque, CD 82: II. Menuet",
+   "durationMs": 255695,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 4,
+    "composer": "Claude Debussy",
+    "work": "Suite bergamasque, CD 82, L. 75",
+    "part": "II. Menuet",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "Suite bergamasque, CD 82: III. Clair de lune",
+   "durationMs": 330831,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 4,
+    "composer": "Claude Debussy",
+    "work": "Suite bergamasque, CD 82, L. 75",
+    "part": "III. Clair de lune",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 16,
+   "title": "Suite bergamasque, CD 82: IV. Passepied",
+   "durationMs": 235167,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 4,
+    "composer": "Claude Debussy",
+    "work": "Suite bergamasque, CD 82, L. 75",
+    "part": "IV. Passepied",
+    "performers": "Seong-Jin Cho"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 17,
+   "title": "L'isle joyeuse, CD 109",
+   "durationMs": 375178,
+   "artist": "Seong-Jin Cho",
+   "apple": {
+    "block": 5,
+    "composer": "Claude Debussy",
+    "work": "L'îsle joyeuse, CD 109, L. 106",
+    "part": "L'isle joyeuse, CD 109",
+    "performers": "Seong-Jin Cho"
+   }
+  }
+ ]
+}

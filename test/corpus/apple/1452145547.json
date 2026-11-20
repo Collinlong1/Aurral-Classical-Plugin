@@ -1,0 +1,344 @@
+{
+ "id": "1452145547",
+ "category": "opera",
+ "title": "Verdi: La Traviata",
+ "artist": "Dame Joan Sutherland, Luciano Pavarotti, Matteo Manuguerra, National Philharmonic Orchestra & Richard Bonynge",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "La traviata, Act I: Prelude",
+   "durationMs": 247120,
+   "artist": "National Philharmonic Orchestra & Richard Bonynge",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "Prelude",
+    "performers": "Richard Bonynge, National Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "La traviata, Act I: Dell'invito trascorsa è già l'ora",
+   "durationMs": 279173,
+   "artist": "Dame Joan Sutherland, Richard Bonynge, National Philharmonic Orchestra, Della Jones, Sir John Tomlinson, Alexander Oliver, Luciano Pavarotti, Jonathan Summers & The London Opera Chorus",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "Dell'invito trascorsa è già l'ora",
+    "performers": "Alexander Oliver, Sir John Tomlinson, National Philharmonic Orchestra, Richard Bonynge, Dame Joan Sutherland, Jonathan Summers, Luciano Pavarotti, The London Opera Chorus, Della Jones"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "La traviata, Act I: Libiamo ne'lieti calici",
+   "durationMs": 167027,
+   "artist": "Luciano Pavarotti, Richard Bonynge, National Philharmonic Orchestra, Dame Joan Sutherland & The London Opera Chorus",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "Libiamo ne'lieti calici",
+    "performers": "Luciano Pavarotti, Richard Bonynge, The London Opera Chorus, National Philharmonic Orchestra, Dame Joan Sutherland"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "La traviata, Act I: Che è ciò?",
+   "durationMs": 130173,
+   "artist": "Dame Joan Sutherland, Richard Bonynge, National Philharmonic Orchestra, Luciano Pavarotti & The London Opera Chorus",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "Che è ciò?",
+    "performers": "Dame Joan Sutherland, National Philharmonic Orchestra, Luciano Pavarotti, The London Opera Chorus, Richard Bonynge"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "La traviata, Act I: Un dì felice, eterea - Si ridesta in ciel l'aurora",
+   "durationMs": 370400,
+   "artist": "Luciano Pavarotti, Richard Bonynge, National Philharmonic Orchestra, Dame Joan Sutherland, Alexander Oliver & The London Opera Chorus",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "Un dì felice, eterea - Si ridesta in ciel l'aurora",
+    "performers": "National Philharmonic Orchestra, Dame Joan Sutherland, Alexander Oliver, Richard Bonynge, The London Opera Chorus, Luciano Pavarotti"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "La traviata, Act I: E strano! - Ah, fors'è lui",
+   "durationMs": 413600,
+   "artist": "Richard Bonynge, National Philharmonic Orchestra & Dame Joan Sutherland",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "E strano! - Ah, fors'è lui",
+    "performers": "National Philharmonic Orchestra, Dame Joan Sutherland, Richard Bonynge"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "La traviata, Act I: Follie! Delirio vano è questo! - Sempre libera",
+   "durationMs": 303227,
+   "artist": "Dame Joan Sutherland, Richard Bonynge, National Philharmonic Orchestra & Luciano Pavarotti",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "Follie! Delirio vano è questo! - Sempre libera",
+    "performers": "National Philharmonic Orchestra, Richard Bonynge, Dame Joan Sutherland, Luciano Pavarotti"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "La traviata, Act II: Lunge da lei",
+   "durationMs": 121907,
+   "artist": "Luciano Pavarotti, Richard Bonynge & National Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "Lunge da lei",
+    "performers": "Luciano Pavarotti, National Philharmonic Orchestra, Richard Bonynge"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "La traviata, Act II: De' miei bollenti spiriti - Annina, donde vieni?",
+   "durationMs": 165400,
+   "artist": "Richard Bonynge, National Philharmonic Orchestra, Luciano Pavarotti & Marjon Lambriks",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "De' miei bollenti spiriti - Annina, donde vieni?",
+    "performers": "Luciano Pavarotti, Marjon Lambriks, National Philharmonic Orchestra, Richard Bonynge"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "La traviata, Act II: O mio rimorso! - Alfredo?",
+   "durationMs": 405360,
+   "artist": "Luciano Pavarotti, Richard Bonynge, National Philharmonic Orchestra, Dame Joan Sutherland, Marjon Lambriks, Ubaldo Gardini & Matteo Manuguerra",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "O mio rimorso! - Alfredo?",
+    "performers": "Luciano Pavarotti, Ubaldo Gardini, Dame Joan Sutherland, Marjon Lambriks, Richard Bonynge, National Philharmonic Orchestra, Matteo Manuguerra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "La traviata, Act II: Pura, siccome un angelo - Un dì, quando le veneri",
+   "durationMs": 408173,
+   "artist": "Matteo Manuguerra, Richard Bonynge, National Philharmonic Orchestra & Dame Joan Sutherland",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "Pura, siccome un angelo - Un dì, quando le veneri",
+    "performers": "Matteo Manuguerra, Richard Bonynge, Dame Joan Sutherland, National Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "La traviata, Act II: Dite alla giovine - Non amarlo ditegli",
+   "durationMs": 577360,
+   "artist": "Dame Joan Sutherland, Richard Bonynge, National Philharmonic Orchestra & Matteo Manuguerra",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "Dite alla giovine - Non amarlo ditegli",
+    "performers": "Dame Joan Sutherland, Matteo Manuguerra, Richard Bonynge, National Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "La traviata, Act II: Dammi tu forza, o ciel! - Ah, vive sol quel core",
+   "durationMs": 408133,
+   "artist": "Dame Joan Sutherland, Richard Bonynge, National Philharmonic Orchestra, Marjon Lambriks, Luciano Pavarotti, Ubaldo Gardini, William Elvin & Matteo Manuguerra",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "Dammi tu forza, o ciel! - Ah, vive sol quel core",
+    "performers": "Luciano Pavarotti, Ubaldo Gardini, William Elvin, Matteo Manuguerra, Dame Joan Sutherland, National Philharmonic Orchestra, Richard Bonynge, Marjon Lambriks"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 14,
+   "title": "La traviata, Act II: Di Provenza il mar - Né risponde d'un padre",
+   "durationMs": 272507,
+   "artist": "Matteo Manuguerra, Richard Bonynge, National Philharmonic Orchestra & Luciano Pavarotti",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "Di Provenza il mar - Né risponde d'un padre",
+    "performers": "National Philharmonic Orchestra, Luciano Pavarotti, Richard Bonynge, Matteo Manuguerra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 15,
+   "title": "La traviata, Act II: No., non udrai rimproveri",
+   "durationMs": 221693,
+   "artist": "Matteo Manuguerra, Richard Bonynge, National Philharmonic Orchestra & Luciano Pavarotti",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "No., non udrai rimproveri",
+    "performers": "Richard Bonynge, Luciano Pavarotti, Matteo Manuguerra, National Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 1,
+   "title": "La traviata, Act II: Avrem lieta di maschere la notte - Di Madridi",
+   "durationMs": 417533,
+   "artist": "The London Opera Chorus, Richard Bonynge & National Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "Avrem lieta di maschere la notte - Di Madridi",
+    "performers": "The London Opera Chorus, National Philharmonic Orchestra, Richard Bonynge"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 2,
+   "title": "La traviata, Act II: Alfredo! Voi! - Or tutti a me.Ogni suo aver",
+   "durationMs": 530360,
+   "artist": "Luciano Pavarotti, Richard Bonynge, National Philharmonic Orchestra, Della Jones, Dame Joan Sutherland, Jonathan Summers, Alexander Oliver, David Wilson-Johnson & The London Opera Chorus",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "Alfredo! Voi! - Or tutti a me.Ogni suo aver",
+    "performers": "The London Opera Chorus, Jonathan Summers, David Wilson-Johnson, Luciano Pavarotti, Dame Joan Sutherland, Della Jones, Alexander Oliver, National Philharmonic Orchestra, Richard Bonynge"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 3,
+   "title": "La traviata, Act II: Di sprezzo degno - Alfredo, Alfredo, di questo core",
+   "durationMs": 378600,
+   "artist": "Matteo Manuguerra, Richard Bonynge, National Philharmonic Orchestra, Luciano Pavarotti, Della Jones, Alexander Oliver, Giorgio Tadeo, Sir John Tomlinson, Jonathan Summers, Dame Joan Sutherland & The London Opera Chorus",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "Di sprezzo degno - Alfredo, Alfredo, di questo core",
+    "performers": "Richard Bonynge, Sir John Tomlinson, The London Opera Chorus, Luciano Pavarotti, Giorgio Tadeo, Alexander Oliver, National Philharmonic Orchestra, Jonathan Summers, Della Jones, Dame Joan Sutherland, Matteo Manuguerra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 4,
+   "title": "La traviata, Act III: Prelude - Annina? Comandate?",
+   "durationMs": 628240,
+   "artist": "Dame Joan Sutherland, Richard Bonynge, National Philharmonic Orchestra, Marjon Lambriks & Giorgio Tadeo",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "Prelude - Annina? Comandate?",
+    "performers": "Richard Bonynge, Marjon Lambriks, Giorgio Tadeo, Dame Joan Sutherland, National Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 5,
+   "title": "La traviata, Act III: Tenesta la promessa - Attendo, né a me giungon mai - Addio del passato",
+   "durationMs": 398067,
+   "artist": "Dame Joan Sutherland, Richard Bonynge & National Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "Tenesta la promessa - Attendo, né a me giungon mai - Addio del passato",
+    "performers": "National Philharmonic Orchestra, Dame Joan Sutherland, Richard Bonynge"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 6,
+   "title": "La traviata, Act III: Largo a quadrupede",
+   "durationMs": 45627,
+   "artist": "The London Opera Chorus, Richard Bonynge & National Philharmonic Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "Largo a quadrupede",
+    "performers": "National Philharmonic Orchestra, The London Opera Chorus, Richard Bonynge"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 7,
+   "title": "La traviata, Act III: Signora - Che t'accade?",
+   "durationMs": 112773,
+   "artist": "Marjon Lambriks, Richard Bonynge, National Philharmonic Orchestra, Dame Joan Sutherland & Luciano Pavarotti",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "Signora - Che t'accade?",
+    "performers": "Richard Bonynge, Dame Joan Sutherland, Marjon Lambriks, National Philharmonic Orchestra, Luciano Pavarotti"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 8,
+   "title": "La traviata, Act III: Parigi, o cara - Ah! Gran Dio!",
+   "durationMs": 598333,
+   "artist": "Luciano Pavarotti, Richard Bonynge, National Philharmonic Orchestra & Dame Joan Sutherland",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "Parigi, o cara - Ah! Gran Dio!",
+    "performers": "National Philharmonic Orchestra, Dame Joan Sutherland, Luciano Pavarotti, Richard Bonynge"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 9,
+   "title": "La traviata, Act III: Ah, Violetta! - Se una pudica vergine",
+   "durationMs": 401307,
+   "artist": "Matteo Manuguerra, Richard Bonynge, National Philharmonic Orchestra, Dame Joan Sutherland, Luciano Pavarotti, Marjon Lambriks & Giorgio Tadeo",
+   "apple": {
+    "block": 1,
+    "composer": "Giuseppe Verdi",
+    "work": "La traviata",
+    "part": "Ah, Violetta! - Se una pudica vergine",
+    "performers": "Marjon Lambriks, Giorgio Tadeo, Matteo Manuguerra, Richard Bonynge, Dame Joan Sutherland, Luciano Pavarotti, National Philharmonic Orchestra"
+   }
+  }
+ ]
+}

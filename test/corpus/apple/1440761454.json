@@ -1,0 +1,190 @@
+{
+ "id": "1440761454",
+ "category": "solo instrument",
+ "title": "Chopin: Nocturnes",
+ "artist": "Daniel Barenboim",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Nocturne No. 2 in E-Flat Major, Op. 9, No. 2",
+   "durationMs": 273667,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 1,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 2 in E-Flat Major, B. 54/2, Op. 9/2 · “Murmures de la Seine 2”",
+    "part": "Nocturne No. 2 in E-Flat Major, Op. 9, No. 2",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Nocturne No. 4 in F Major, Op. 15, No. 1",
+   "durationMs": 267600,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 2,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 4 in F Major, B. 55/1, Op. 15/1 · “Les zéphyrs 1”",
+    "part": "Nocturne No. 4 in F Major, Op. 15, No. 1",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Nocturne No. 5 in F-Sharp Major, Op. 15, No. 2",
+   "durationMs": 233240,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 3,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 5 in F-Sharp Major, B. 55/2, Op. 15/2 · “Les zéphyrs 2”",
+    "part": "Nocturne No. 5 in F-Sharp Major, Op. 15, No. 2",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Nocturne No. 6 in G Minor, Op. 15, No. 3",
+   "durationMs": 236467,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 4,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 6 in G Minor, B. 79, Op. 15/3 · “Les zéphyrs 3”",
+    "part": "Nocturne No. 6 in G Minor, Op. 15, No. 3",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Nocturne No. 7 in C-Sharp Minor, Op. 27, No. 1",
+   "durationMs": 294733,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 5,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 7 in C-Sharp Minor, B. 91, Op. 27/1 · “Les plaintives 1”",
+    "part": "Nocturne No. 7 in C-Sharp Minor, Op. 27, No. 1",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Nocturne No. 9 in B Major, Op. 32, No. 1",
+   "durationMs": 320440,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 6,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 9 in B Major, B. 106/1, Op. 32/1 · “Il lamento e la consolazione 1”",
+    "part": "Nocturne No. 9 in B Major, Op. 32, No. 1",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Nocturne No. 11 in G Minor, Op. 37, No. 1",
+   "durationMs": 343440,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 7,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 11 in G Minor, B. 119, Op. 37/1",
+    "part": "Nocturne No. 11 in G Minor, Op. 37, No. 1",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Nocturne No. 12 in G Major, Op. 37, No. 2",
+   "durationMs": 344173,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 8,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 12 in G Major, B. 127, Op. 37/2",
+    "part": "Nocturne No. 12 in G Major, Op. 37, No. 2",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Nocturne No. 13 in C Minor, Op. 48, No. 1",
+   "durationMs": 374133,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 9,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 13 in C Minor, B. 142/1, Op. 48/1",
+    "part": "Nocturne No. 13 in C Minor, Op. 48, No. 1",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Nocturne No. 14 in F-Sharp Minor, Op. 48, No. 2",
+   "durationMs": 432200,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 10,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 14 in F-Sharp Minor, B. 142/2, Op. 48/2",
+    "part": "Nocturne No. 14 in F-Sharp Minor, Op. 48, No. 2",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Nocturne No. 15 in F Minor, Op. 55, No. 1",
+   "durationMs": 280000,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 11,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 15 in F Minor, B. 152/1, Op. 55/1",
+    "part": "Nocturne No. 15 in F Minor, Op. 55, No. 1",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Nocturne No. 18 in E Major, Op. 62, No. 2",
+   "durationMs": 370773,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 12,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 18 in E Major, B. 161/2, Op. 62/2",
+    "part": "Nocturne No. 18 in E Major, Op. 62, No. 2",
+    "performers": "Daniel Barenboim"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Nocturne No. 19 in E Minor, Op. 72, No. 1",
+   "durationMs": 262013,
+   "artist": "Daniel Barenboim",
+   "apple": {
+    "block": 13,
+    "composer": "Frédéric Chopin",
+    "work": "Nocturne No. 19 in E Minor, B. 19, Op. 72/1",
+    "part": "Nocturne No. 19 in E Minor, Op. 72, No. 1",
+    "performers": "Daniel Barenboim"
+   }
+  }
+ ]
+}

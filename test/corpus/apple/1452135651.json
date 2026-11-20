@@ -1,0 +1,232 @@
+{
+ "id": "1452135651",
+ "category": "symphony",
+ "title": "Brahms: The 4 Symphonies",
+ "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Symphony No. 1 in C Minor, Op. 68: I. Un Poco Sostenuto - Allegro - Meno Allegro",
+   "durationMs": 806000,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 1,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 1 in C Minor, Op. 68",
+    "part": "I. Un Poco Sostenuto - Allegro - Meno Allegro",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Symphony No. 1 in C Minor, Op. 68: II. Andante Sostenuto",
+   "durationMs": 506000,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 1,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 1 in C Minor, Op. 68",
+    "part": "II. Andante Sostenuto",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Symphony No. 1 in C Minor, Op. 68: III. un Poco Allegretto e Grazioso",
+   "durationMs": 288000,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 1,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 1 in C Minor, Op. 68",
+    "part": "III. un Poco Allegretto e Grazioso",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Symphony No. 1 in C Minor, Op. 68: IV. Adagio - Piu Andante - Allegro Non Troppo, Ma Con Brio - Piu Allegro",
+   "durationMs": 1058000,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 1,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 1 in C Minor, Op. 68",
+    "part": "IV. Adagio - Piu Andante - Allegro Non Troppo, Ma Con Brio - Piu Allegro",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Symphony No. 3 in F, Op. 90: I. Allegro Con Brio - un Poco Sostenuto - Tempo I",
+   "durationMs": 579000,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 2,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 3 in F Major, Op. 90",
+    "part": "I. Allegro Con Brio - un Poco Sostenuto - Tempo I",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Symphony No. 3 in F, Op. 90: II. Andante",
+   "durationMs": 494000,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 2,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 3 in F Major, Op. 90",
+    "part": "II. Andante",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Symphony No. 3 in F, Op. 90: III. Poco Allegretto",
+   "durationMs": 378000,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 2,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 3 in F Major, Op. 90",
+    "part": "III. Poco Allegretto",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Symphony No. 3 in F, Op. 90: IV. Allegro",
+   "durationMs": 557000,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 2,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 3 in F Major, Op. 90",
+    "part": "IV. Allegro",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 1,
+   "title": "Symphony No. 2 in D, Op. 73: I. Allegro Non Troppo",
+   "durationMs": 950000,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 3,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 2 in D Major, Op. 73",
+    "part": "I. Allegro Non Troppo",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 2,
+   "title": "Symphony No. 2 in D, Op. 73: II. Adagio Non Troppo - L'istesso Tempo, Ma Grazioso",
+   "durationMs": 589000,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 3,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 2 in D Major, Op. 73",
+    "part": "II. Adagio Non Troppo - L'istesso Tempo, Ma Grazioso",
+    "performers": "Berlin Philharmonic Orchestra, Herbert von Karajan"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 3,
+   "title": "Symphony No. 2 in D, Op. 73: III. Allegretto Grazioso ( Quasi Andantino) - Presto Ma Non Assai",
+   "durationMs": 323000,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 3,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 2 in D Major, Op. 73",
+    "part": "III. Allegretto Grazioso ( Quasi Andantino) - Presto Ma Non Assai",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 4,
+   "title": "Symphony No. 2 in D, Op. 73: IV. Allegro Con Spirito",
+   "durationMs": 561000,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 3,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 2 in D Major, Op. 73",
+    "part": "IV. Allegro Con Spirito",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 5,
+   "title": "Symphony No. 4 in E Minor, Op. 98: I. Allegro Non Troppo",
+   "durationMs": 766320,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 4,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 4 in E Minor, Op. 98",
+    "part": "I. Allegro Non Troppo",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 6,
+   "title": "Symphony No. 4 in E Minor, Op. 98: II. Andante Moderato",
+   "durationMs": 664693,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 4,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 4 in E Minor, Op. 98",
+    "part": "II. Andante Moderato",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 7,
+   "title": "Symphony No. 4 in E Minor, Op. 98: III. Allegro Giocoso - Poco Meno Presto - Tempo I",
+   "durationMs": 363987,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 4,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 4 in E Minor, Op. 98",
+    "part": "III. Allegro Giocoso - Poco Meno Presto - Tempo I",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  },
+  {
+   "disc": 2,
+   "number": 8,
+   "title": "Symphony No. 4 in E Minor, Op. 98: IV. Allegro Energico e Passionato - Più Allegro",
+   "durationMs": 600013,
+   "artist": "Berlin Philharmonic Orchestra & Herbert von Karajan",
+   "apple": {
+    "block": 4,
+    "composer": "Johannes Brahms",
+    "work": "Symphony No. 4 in E Minor, Op. 98",
+    "part": "IV. Allegro Energico e Passionato - Più Allegro",
+    "performers": "Herbert von Karajan, Berlin Philharmonic Orchestra"
+   }
+  }
+ ]
+}

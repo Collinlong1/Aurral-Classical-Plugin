@@ -1,0 +1,67 @@
+{
+ "id": "deep-purple-concerto-for-group-and-orchestra",
+ "family": "crossover",
+ "title": "Concerto for Group and Orchestra",
+ "artist": "Deep Purple & Royal Philharmonic Orchestra",
+ "source": "store download of a rock band with orchestra",
+ "expect": {
+  "album": "unsure",
+  "note": "A concerto by a rock keyboardist for band and orchestra."
+ },
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "First Movement: Moderato – Allegro",
+   "durationMs": 1162000,
+   "artist": "Deep Purple & Royal Philharmonic Orchestra",
+   "composer": [
+    "Jon Lord"
+   ],
+   "genres": [
+    "Rock"
+   ],
+   "work": "",
+   "expect": "unsure",
+   "scenarios": [
+    "crossover"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Second Movement: Andante",
+   "durationMs": 1151000,
+   "artist": "Deep Purple & Royal Philharmonic Orchestra",
+   "composer": [
+    "Jon Lord"
+   ],
+   "genres": [
+    "Rock"
+   ],
+   "work": "",
+   "expect": "unsure",
+   "scenarios": [
+    "crossover"
+   ]
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Third Movement: Vivace – Presto",
+   "durationMs": 813000,
+   "artist": "Deep Purple & Royal Philharmonic Orchestra",
+   "composer": [
+    "Jon Lord"
+   ],
+   "genres": [
+    "Rock"
+   ],
+   "work": "",
+   "expect": "unsure",
+   "scenarios": [
+    "crossover"
+   ]
+  }
+ ]
+}

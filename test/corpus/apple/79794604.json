@@ -1,0 +1,190 @@
+{
+ "id": "79794604",
+ "category": "solo instrument",
+ "title": "Scarlatti: Sonatas",
+ "artist": "Dubravka Tomšič",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Sonata in D Minor, L. 366",
+   "durationMs": 118467,
+   "artist": "Dubravka Tomšič",
+   "apple": {
+    "block": 1,
+    "composer": "Domenico Scarlatti",
+    "work": "Keyboard Sonata in D Minor, K. 1, Kk 1",
+    "part": "Sonata in D Minor, L. 366",
+    "performers": "Dubravka Tomšič"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Sonata in F Minor, L. 383",
+   "durationMs": 371360,
+   "artist": "Dubravka Tomšič",
+   "apple": {
+    "block": 2,
+    "composer": "Domenico Scarlatti",
+    "work": "Keyboard Sonata in F Minor, K. 19, Kk 19",
+    "part": "Sonata in F Minor, L. 383",
+    "performers": "Dubravka Tomšič"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Sonata in G Major, L. 103",
+   "durationMs": 361373,
+   "artist": "Dubravka Tomšič",
+   "apple": {
+    "block": 3,
+    "composer": "D. Scarlatti",
+    "work": "D. Scarlatti",
+    "part": "Sonata in G Major, L. 103",
+    "performers": "Dubravka Tomšič"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Sonata in G Major, L. 487",
+   "durationMs": 131200,
+   "artist": "Dubravka Tomšič",
+   "apple": {
+    "block": 4,
+    "composer": "Domenico Scarlatti",
+    "work": "Keyboard Sonata in G Major, K. 125, Kk 125",
+    "part": "Sonata in G Major, L. 487",
+    "performers": "Dubravka Tomšič"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Sonata in C Minor, L. 352",
+   "durationMs": 205827,
+   "artist": "Dubravka Tomšič",
+   "apple": {
+    "block": 5,
+    "composer": "Domenico Scarlatti",
+    "work": "Keyboard Sonata in D Minor, K. 11, Kk 11",
+    "part": "Sonata in C Minor, L. 352",
+    "performers": "Dubravka Tomšič"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Sonata in C Major, L. 104",
+   "durationMs": 133133,
+   "artist": "Dubravka Tomšič",
+   "apple": {
+    "block": 6,
+    "composer": "Domenico Scarlatti",
+    "work": "Keyboard Sonata in C Major, K. 159, Kk 159 · “La Caccia”",
+    "part": "Sonata in C Major, L. 104",
+    "performers": "Dubravka Tomšič"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Sonata in D Minor, L. 413",
+   "durationMs": 242267,
+   "artist": "Dubravka Tomšič",
+   "apple": {
+    "block": 7,
+    "composer": "Domenico Scarlatti",
+    "work": "Keyboard Sonata in C Major, K. 513, Kk 513 · “Pastorale”",
+    "part": "Sonata in D Minor, L. 413",
+    "performers": "Dubravka Tomšič"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Sonata in E Major, L. 210",
+   "durationMs": 353507,
+   "artist": "Dubravka Tomšič",
+   "apple": {
+    "block": 8,
+    "composer": "Domenico Scarlatti",
+    "work": "Keyboard Sonata in E Major, K. 162, Kk 162",
+    "part": "Sonata in E Major, L. 210",
+    "performers": "Dubravka Tomšič"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Sonata in G Major, L. 387",
+   "durationMs": 167627,
+   "artist": "Dubravka Tomšič",
+   "apple": {
+    "block": 9,
+    "composer": "Domenico Scarlatti",
+    "work": "Keyboard Sonata in G Major, K. 14, Kk 14",
+    "part": "Sonata in G Major, L. 387",
+    "performers": "Dubravka Tomšič"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 10,
+   "title": "Sonata in A Major, L. 391",
+   "durationMs": 172973,
+   "artist": "Dubravka Tomšič",
+   "apple": {
+    "block": 10,
+    "composer": "Domenico Scarlatti",
+    "work": "Keyboard Sonata in A Major, K. 39, Kk 39",
+    "part": "Sonata in A Major, L. 391",
+    "performers": "Dubravka Tomšič"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 11,
+   "title": "Sonata in F Minor, L. 118",
+   "durationMs": 525533,
+   "artist": "Dubravka Tomšič",
+   "apple": {
+    "block": 11,
+    "composer": "Domenico Scarlatti",
+    "work": "Keyboard Sonata in F Minor, K. 466, Kk 466",
+    "part": "Sonata in F Minor, L. 118",
+    "performers": "Dubravka Tomšič"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 12,
+   "title": "Sonata in G Major, L. 349",
+   "durationMs": 208360,
+   "artist": "Dubravka Tomšič",
+   "apple": {
+    "block": 12,
+    "composer": "Domenico Scarlatti",
+    "work": "Keyboard Sonata in G Major, K. 146, Kk 146",
+    "part": "Sonata in G Major, L. 349",
+    "performers": "Dubravka Tomšič"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 13,
+   "title": "Sonata in B-Flat Major, L. 396",
+   "durationMs": 248467,
+   "artist": "Dubravka Tomšič",
+   "apple": {
+    "block": 13,
+    "composer": "Domenico Scarlatti",
+    "work": "Keyboard Sonata in B-Flat Major, K. 551, Kk 551",
+    "part": "Sonata in B-Flat Major, L. 396",
+    "performers": "Dubravka Tomšič"
+   }
+  }
+ ]
+}

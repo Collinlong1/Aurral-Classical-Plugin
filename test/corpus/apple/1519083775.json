@@ -1,0 +1,64 @@
+{
+ "id": "1519083775",
+ "category": "twentieth century contemporary",
+ "title": "Adams: Harmonielehre & Short Ride in a Fast Machine",
+ "artist": "San Francisco Symphony",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Harmonielehre: I.",
+   "durationMs": 1042682,
+   "artist": "Michael Tilson Thomas & San Francisco Symphony",
+   "apple": {
+    "block": 1,
+    "composer": "John Adams",
+    "work": "Harmonielehre",
+    "part": "I.",
+    "performers": "San Francisco Symphony, Michael Tilson Thomas"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Harmonielehre: II. The Anfortas Wound",
+   "durationMs": 774241,
+   "artist": "Michael Tilson Thomas & San Francisco Symphony",
+   "apple": {
+    "block": 1,
+    "composer": "John Adams",
+    "work": "Harmonielehre",
+    "part": "II. The Anfortas Wound",
+    "performers": "San Francisco Symphony, Michael Tilson Thomas"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Harmonielehre: III. Meister Eckhardt and Quackie",
+   "durationMs": 707542,
+   "artist": "Michael Tilson Thomas & San Francisco Symphony",
+   "apple": {
+    "block": 1,
+    "composer": "John Adams",
+    "work": "Harmonielehre",
+    "part": "III. Meister Eckhardt and Quackie",
+    "performers": "San Francisco Symphony, Michael Tilson Thomas"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Short Ride in a Fast Machine",
+   "durationMs": 304770,
+   "artist": "Michael Tilson Thomas & San Francisco Symphony",
+   "apple": {
+    "block": 2,
+    "composer": "John Adams",
+    "work": "Short Ride in a Fast Machine",
+    "part": "Short Ride in a Fast Machine",
+    "performers": "San Francisco Symphony, Michael Tilson Thomas"
+   }
+  }
+ ]
+}

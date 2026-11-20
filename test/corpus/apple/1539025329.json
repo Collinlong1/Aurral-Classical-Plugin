@@ -1,0 +1,134 @@
+{
+ "id": "1539025329",
+ "category": "concerto",
+ "title": "Elgar: Cello Concerto, Op. 85 & Sea Pictures, Op. 37",
+ "artist": "Jacqueline du Pré, Sir John Barbirolli, Dame Janet Baker & London Symphony Orchestra",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Cello Concerto in E Minor, Op. 85: I. Adagio - Moderato",
+   "durationMs": 478333,
+   "artist": "Jacqueline du Pré, Sir John Barbirolli & London Symphony Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Sir Edward Elgar",
+    "work": "Cello Concerto in E Minor, Op. 85",
+    "part": "I. Adagio - Moderato",
+    "performers": "London Symphony Orchestra, Jacqueline du Pré, Sir John Barbirolli"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Cello Concerto in E Minor, Op. 85: II. Lento - Allegro molto",
+   "durationMs": 271293,
+   "artist": "Jacqueline du Pré, Sir John Barbirolli & London Symphony Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Sir Edward Elgar",
+    "work": "Cello Concerto in E Minor, Op. 85",
+    "part": "II. Lento - Allegro molto",
+    "performers": "London Symphony Orchestra, Jacqueline du Pré, Sir John Barbirolli"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Cello Concerto in E Minor, Op. 85: III. Adagio",
+   "durationMs": 316347,
+   "artist": "Jacqueline du Pré, Sir John Barbirolli & London Symphony Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Sir Edward Elgar",
+    "work": "Cello Concerto in E Minor, Op. 85",
+    "part": "III. Adagio",
+    "performers": "Sir John Barbirolli, Jacqueline du Pré, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Cello Concerto in E Minor, Op. 85: IV. Allegro - Moderato - Allegro ma non troppo",
+   "durationMs": 741080,
+   "artist": "Jacqueline du Pré, Sir John Barbirolli & London Symphony Orchestra",
+   "apple": {
+    "block": 1,
+    "composer": "Sir Edward Elgar",
+    "work": "Cello Concerto in E Minor, Op. 85",
+    "part": "IV. Allegro - Moderato - Allegro ma non troppo",
+    "performers": "Jacqueline du Pré, Sir John Barbirolli, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Sea Pictures, Op. 37: No. 1, Slumber Song",
+   "durationMs": 304053,
+   "artist": "Sir John Barbirolli, Dame Janet Baker & London Symphony Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sir Edward Elgar",
+    "work": "Sea Pictures, Op. 37",
+    "part": "No. 1, Slumber Song",
+    "performers": "Sir John Barbirolli, Dame Janet Baker, London Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Sea Pictures, Op. 37: No. 2, In Haven (Capri)",
+   "durationMs": 126160,
+   "artist": "Sir John Barbirolli, Dame Janet Baker & London Symphony Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sir Edward Elgar",
+    "work": "Sea Pictures, Op. 37",
+    "part": "No. 2, In Haven (Capri)",
+    "performers": "Sir John Barbirolli, London Symphony Orchestra, Dame Janet Baker"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 7,
+   "title": "Sea Pictures, Op. 37: No. 3, Sabbath Morning at Sea",
+   "durationMs": 378280,
+   "artist": "Sir John Barbirolli, Dame Janet Baker & London Symphony Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sir Edward Elgar",
+    "work": "Sea Pictures, Op. 37",
+    "part": "No. 3, Sabbath Morning at Sea",
+    "performers": "Sir John Barbirolli, London Symphony Orchestra, Dame Janet Baker"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 8,
+   "title": "Sea Pictures, Op. 37: No. 4, Where Corals Lie",
+   "durationMs": 250800,
+   "artist": "Sir John Barbirolli, Dame Janet Baker & London Symphony Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sir Edward Elgar",
+    "work": "Sea Pictures, Op. 37",
+    "part": "No. 4, Where Corals Lie",
+    "performers": "Sir John Barbirolli, London Symphony Orchestra, Dame Janet Baker"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 9,
+   "title": "Sea Pictures, Op. 37: No. 5, The Swimmer",
+   "durationMs": 366467,
+   "artist": "Sir John Barbirolli, Dame Janet Baker & London Symphony Orchestra",
+   "apple": {
+    "block": 2,
+    "composer": "Sir Edward Elgar",
+    "work": "Sea Pictures, Op. 37",
+    "part": "No. 5, The Swimmer",
+    "performers": "Sir John Barbirolli, London Symphony Orchestra, Dame Janet Baker"
+   }
+  }
+ ]
+}

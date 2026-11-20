@@ -1,0 +1,92 @@
+{
+ "id": "1467965079",
+ "category": "choral sacred",
+ "title": "Pärt: Tabula Rasa",
+ "artist": "Gil Shaham, Gothenburg Symphony Orchestra & Neeme Järvi",
+ "tracks": [
+  {
+   "disc": 1,
+   "number": 1,
+   "title": "Fratres for Violin, String Orchestra and Percussion",
+   "durationMs": 583000,
+   "artist": "Gil Shaham, Neeme Järvi, Gothenburg Symphony Orchestra & Roger Carlsson",
+   "apple": {
+    "block": 1,
+    "composer": "Arvo Pärt",
+    "work": "Fratres",
+    "part": "Fratres for Violin, String Orchestra and Percussion",
+    "performers": "Neeme Järvi, Gil Shaham, Gothenburg Symphony Orchestra, Roger Carlsson"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 2,
+   "title": "Tabula rasa: I. Ludus. Con moto",
+   "durationMs": 590000,
+   "artist": "Gil Shaham, Neeme Järvi, Gothenburg Symphony Orchestra, Adele Anthony & Erik Risberg",
+   "apple": {
+    "block": 2,
+    "composer": "Arvo Pärt",
+    "work": "Tabula Rasa",
+    "part": "I. Ludus. Con moto",
+    "performers": "Gothenburg Symphony Orchestra, Adele Anthony, Neeme Järvi, Erik Risberg, Gil Shaham"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 3,
+   "title": "Tabula rasa: II. Silentium. Senza moto",
+   "durationMs": 797000,
+   "artist": "Gil Shaham, Neeme Järvi, Gothenburg Symphony Orchestra, Adele Anthony & Erik Risberg",
+   "apple": {
+    "block": 2,
+    "composer": "Arvo Pärt",
+    "work": "Tabula Rasa",
+    "part": "II. Silentium. Senza moto",
+    "performers": "Neeme Järvi, Erik Risberg, Gil Shaham, Gothenburg Symphony Orchestra, Adele Anthony"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 4,
+   "title": "Symphony No. 3: I. Attacca",
+   "durationMs": 419000,
+   "artist": "Neeme Järvi & Gothenburg Symphony Orchestra",
+   "apple": {
+    "block": 3,
+    "composer": "Arvo Pärt",
+    "work": "Symphony No. 3",
+    "part": "I. Attacca",
+    "performers": "Gothenburg Symphony Orchestra, Neeme Järvi"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 5,
+   "title": "Symphony No. 3: II. Più mosso (Attacca)",
+   "durationMs": 549000,
+   "artist": "Gothenburg Symphony Orchestra & Neeme Järvi",
+   "apple": {
+    "block": 3,
+    "composer": "Arvo Pärt",
+    "work": "Symphony No. 3",
+    "part": "II. Più mosso (Attacca)",
+    "performers": "Neeme Järvi, Gothenburg Symphony Orchestra"
+   }
+  },
+  {
+   "disc": 1,
+   "number": 6,
+   "title": "Symphony No. 3: III. Alla breve",
+   "durationMs": 549000,
+   "artist": "Gothenburg Symphony Orchestra & Neeme Järvi",
+   "apple": {
+    "block": 3,
+    "composer": "Arvo Pärt",
+    "work": "Symphony No. 3",
+    "part": "III. Alla breve",
+    "performers": "Gothenburg Symphony Orchestra, Neeme Järvi"
+   }
+  }
+ ]
+}
