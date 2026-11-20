@@ -1,7 +1,7 @@
 {
   "id": "aurral-classical",
   "name": "Aurral Classical",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "api": 1,
   "description": "Tags classical music as Composer — Soloist — Ensemble — Conductor from MusicBrainz after you preview it, groups albums by work, and downloads classical albums from slskd.",
   "repository": "https://github.com/Collinlong1/Aurral-Classical-Plugin",
@@ -65,6 +65,13 @@
     {
       "id": "classical-auto-match",
       "label": "Match classical works",
+      "target": "album",
+      "admin": true,
+      "background": true
+    },
+    {
+      "id": "classical-model-scan",
+      "label": "Scan classical catalogue",
       "target": "album",
       "admin": true,
       "background": true

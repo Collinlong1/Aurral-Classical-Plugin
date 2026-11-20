@@ -161,7 +161,10 @@ Every 15 minutes the plugin scans the Library read-only through Aurral's API
 (it needs API access), matches new or changed albums to works from their
 WORK and GROUPING tags, structured titles and MusicBrainz (one request a
 second on public MusicBrainz), and keeps the result. **Match classical works**
-on an album looks it up straight away. Nothing is written to files.
+on an album looks it up straight away. **Scan classical catalogue** (admin,
+in any album's menu) scans the whole Library now instead of waiting for the
+schedule; a large Library may take more than one run, and progress is kept
+between them. Nothing is written to files.
 
 ## slskd download source
 

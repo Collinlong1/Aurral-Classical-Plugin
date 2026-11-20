@@ -43246,7 +43246,7 @@ async function applyRequest(ctx, id, actor2) {
 import path10 from "node:path";
 
 // src/version.js
-var VERSION = "1.2.0";
+var VERSION = "1.2.1";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js
@@ -44251,7 +44251,7 @@ var index_default = {
       await modelJobs(ctx, { budgetMs: ACTION_BUDGET_MS });
       const { scan } = await modelStatus(ctx);
       return {
-        message: `Classical model scan ${id}: ${scan?.state || "saved"}; processed ${scan?.processed ?? 0}/${scan?.total ?? 0} files.${scan?.skipped ? ` ${scan.skipped} unreadable file${scan.skipped === 1 ? "" : "s"} skipped.` : ""} ${scan?.state === "done" ? "Reload the editor to search indexed tracks." : "Existing progress is saved. Run Scan again to resume immediately, or enable the plugin schedule for automatic continuation."}`.slice(
+        message: `Classical model scan ${id}: ${scan?.state || "saved"}; processed ${scan?.processed ?? 0}/${scan?.total ?? 0} files.${scan?.skipped ? ` ${scan.skipped} unreadable file${scan.skipped === 1 ? "" : "s"} skipped.` : ""} ${scan?.state === "done" ? "Albums are matched to works as they're scanned; reload an album to see it By work." : "Progress is saved: run Scan classical catalogue again to continue now, or the 15-minute schedule carries on."}`.slice(
           0,
           500
         )
@@ -44303,7 +44303,7 @@ var index_default = {
       if (result?.state !== "done")
         return { message: "Still looking this album up on MusicBrainz in the background (one request a second). Reload the album in a few minutes, or run this again to continue." };
       return {
-        message: result.matched > 0 ? `Created ${result.matched} work group${result.matched === 1 ? "" : "s"} from classical WORK/title, composer and MusicBrainz evidence. Reload the album to use Works view.` : "No new groups matched this album's WORK tags, structured titles or MusicBrainz parent-work evidence. Tracks remain available in the metadata editor."
+        message: result.matched > 0 ? `Created ${result.matched} work group${result.matched === 1 ? "" : "s"} from classical WORK/title, composer and MusicBrainz evidence. Reload the album to use Works view.` : "No new groups matched this album's WORK tags, structured titles or MusicBrainz parent-work evidence. If the album came after the last scan, run Scan classical catalogue first."
       };
     },
     // These only plan what they would write (v0.3 8.7); Write planned tags

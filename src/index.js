@@ -188,7 +188,7 @@ export default {
       const { scan } = await modelStatus(ctx);
       return {
         message:
-          `Classical model scan ${id}: ${scan?.state || "saved"}; processed ${scan?.processed ?? 0}/${scan?.total ?? 0} files.${scan?.skipped ? ` ${scan.skipped} unreadable file${scan.skipped === 1 ? "" : "s"} skipped.` : ""} ${scan?.state === "done" ? "Reload the editor to search indexed tracks." : "Existing progress is saved. Run Scan again to resume immediately, or enable the plugin schedule for automatic continuation."}`.slice(
+          `Classical model scan ${id}: ${scan?.state || "saved"}; processed ${scan?.processed ?? 0}/${scan?.total ?? 0} files.${scan?.skipped ? ` ${scan.skipped} unreadable file${scan.skipped === 1 ? "" : "s"} skipped.` : ""} ${scan?.state === "done" ? "Albums are matched to works as they're scanned; reload an album to see it By work." : "Progress is saved: run Scan classical catalogue again to continue now, or the 15-minute schedule carries on."}`.slice(
             0,
             500,
           ),
@@ -257,7 +257,7 @@ export default {
         message:
           result.matched > 0
             ? `Created ${result.matched} work group${result.matched === 1 ? "" : "s"} from classical WORK/title, composer and MusicBrainz evidence. Reload the album to use Works view.`
-            : "No new groups matched this album's WORK tags, structured titles or MusicBrainz parent-work evidence. Tracks remain available in the metadata editor.",
+            : "No new groups matched this album's WORK tags, structured titles or MusicBrainz parent-work evidence. If the album came after the last scan, run Scan classical catalogue first.",
       };
     },
     // These only plan what they would write (v0.3 8.7); Write planned tags
