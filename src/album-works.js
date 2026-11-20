@@ -46,7 +46,6 @@ export async function albumPresentation(ctx, album) {
       workId: entry.work.id,
       title: entry.work.title || "Untitled work",
       ...(entry.composer && { subtitle: entry.composer }),
-      ...(entry.performers && { detail: entry.performers }),
       trackIds: [track.id],
     };
     groups.push(current);

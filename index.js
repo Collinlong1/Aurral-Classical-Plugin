@@ -36274,7 +36274,6 @@ async function albumPresentation(ctx, album) {
       workId: entry.work.id,
       title: entry.work.title || "Untitled work",
       ...entry.composer && { subtitle: entry.composer },
-      ...entry.performers && { detail: entry.performers },
       trackIds: [track.id]
     };
     groups.push(current);
@@ -36287,7 +36286,7 @@ async function albumPresentation(ctx, album) {
 import path5 from "node:path";
 
 // src/version.js
-var VERSION = "1.1.3";
+var VERSION = "1.1.4";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js
