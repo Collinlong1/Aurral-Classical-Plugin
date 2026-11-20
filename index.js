@@ -35290,6 +35290,19 @@ var movementNameField = textField("MOVEMENTNAME", "MOVEMENTNAME", { name: "MOVEM
 var movementNumberField = textField("MOVEMENT", "MOVEMENT", { name: "MOVEMENT" });
 var movementTotalField = textField("MOVEMENTTOTAL", "MOVEMENTTOTAL", { name: "MOVEMENTTOTAL" });
 var catalogueField = textField("CLASSICAL_CATALOGUE", "CLASSICAL_CATALOGUE", { name: "CLASSICAL_CATALOGUE" });
+var appleMovementName = textField("MOVEMENTNAME", "MOVEMENTNAME", { box: "\xA9mvn" });
+var APPLE_MOVEMENT_NUMBER = import_node_taglib_sharp.ByteVector.fromString("\xA9mvi", import_node_taglib_sharp.StringType.Latin1);
+function movementNumberOf(file) {
+  const tagged = positive(movementNumberField.read(file)[0]?.split("/")[0]);
+  if (tagged) return tagged;
+  try {
+    const [data] = appleOf(file)?.getQuickTimeData(APPLE_MOVEMENT_NUMBER, 21) ?? [];
+    const bytes = data ? [...data.toByteArray()] : [];
+    return positive(bytes.reduce((n, byte) => n * 256 + byte, 0));
+  } catch {
+    return 0;
+  }
+}
 var performersField = {
   read: (file) => texts(xiphOf(file)?.getField("PERFORMER") ?? []),
   write(file, values) {
@@ -35411,6 +35424,8 @@ function readTags(filePath) {
       // Some taggers put the work here and leave WORK empty.
       grouping: text(tag.grouping),
       workId: workIdField.read(file)[0] ?? "",
+      movementName: movementNameField.read(file)[0] ?? appleMovementName.read(file)[0] ?? "",
+      movementNumber: movementNumberOf(file),
       trackNumber: positive(tag.track),
       discNumber: positive(tag.disc),
       durationMs: Math.round(file.properties?.durationMilliseconds || 0),
@@ -35507,6 +35522,9 @@ var SUFFIX = "(?:[a-z]{1,3}(?![a-z]))?";
 var CATALOGUES = [
   // Before "D": the "D1" in Telemann's "TWV 55:D1" is a key, not a D number.
   [/\bTWV\s*(\d+(?:\s*:\s*[A-Za-z]{0,3}\d+[a-z]?)?)/i, "TWV"],
+  // Scarlatti's Kirkpatrick numbers before Mozart's K.; C. P. E. Bach's Wq.
+  [new RegExp(`\\bKk\\.?\\s*(\\d+${SUFFIX})`), "Kk"],
+  [new RegExp(`\\bWq\\.?\\s*(\\d+${SUFFIX})`), "Wq"],
   [/\bBWV\s*(\d+[a-z]?)/i, "BWV"],
   [/\bHWV\s*(\d+[a-z]?)/i, "HWV"],
   [/\bRV\s*(\d+[a-z]?)/i, "RV"],
@@ -35523,6 +35541,10 @@ var CATALOGUES = [
   [new RegExp(`\\bTrV\\s*(\\d+${SUFFIX})`, "i"), "TrV"],
   [new RegExp(`\\bL\\.\\s*(\\d+${SUFFIX})`), "L"],
   [new RegExp(`\\bFP\\s*(\\d+${SUFFIX})`), "FP"],
+  // Berlioz's and Honegger's H., Purcell's Z.: capital, with a dot ("Z. 626")
+  // or after a comma ("Dido and Aeneas, Z 626").
+  [new RegExp(`(?:\\bH\\.\\s*|,\\s*H\\s+)(\\d+${SUFFIX})(?![\\d])`), "H"],
+  [new RegExp(`(?:\\bZ\\.\\s*|,\\s*Z\\s+)(\\d+${SUFFIX})(?![\\d])`), "Z"],
   // Ravel's (Marnat): "Boléro, M 81", "Pavane…, M.19". Capital M only.
   // "M. 63/2" is the second of M. 63's pieces.
   [new RegExp(`(?<![\\p{L}\\d])M(?:\\.\\s*|\\s+)(\\d+${SUFFIX}(?:\\/\\d+)?)(?![\\d])`, "u"), "M"]
@@ -35562,11 +35584,13 @@ function shortWorkTitle(title) {
 function searchWords(text7) {
   return String(text7 || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim().split(/\s+/).filter(Boolean).join(" ");
 }
-function surname(person) {
+function surname(person, { group = false } = {}) {
   if (!person) return "";
   const sort = String(person.sortName || "");
   if (sort.includes(",")) return searchWords(sort.split(",")[0]);
-  return searchWords(person.name);
+  const name = searchWords(person.name);
+  const last3 = name.split(" ").at(-1) || "";
+  return group || last3.length < 3 ? name : last3;
 }
 function creditString(credit) {
   return (credit || []).map((entry) => `${entry.name ?? entry.artist?.name ?? ""}${entry.joinphrase ?? ""}`).join("").trim();
@@ -38476,6 +38500,16 @@ function composersOf(hints = {}, options) {
   const credit = artistCredits(hints, options);
   return credit?.confidence === "high" ? credit.composers : [];
 }
+var NAME_SUFFIX = /^(?:jr|sr|ii|iii|iv|the elder|the younger|arr|arranged|orch|ed|trad|anon)\b/i;
+function uninvertedName(name) {
+  const text7 = String(name ?? "").trim();
+  const parts = text7.split(",");
+  if (parts.length !== 2 || /[\d;/&+]|\band\b/i.test(text7)) return text7;
+  const [surname2, given] = parts.map((part) => part.trim().replace(/\s+/g, " "));
+  if (!surname2 || !given || NAME_SUFFIX.test(given)) return text7;
+  if (surname2.split(" ").length > 3 || given.split(" ").length > 4) return text7;
+  return `${given} ${surname2}`;
+}
 
 // src/model/classify-evidence.js
 var escape = (text7) => text7.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -38513,7 +38547,7 @@ function genreKinds(genres = []) {
 }
 var TEMPO = /\b(allegr(?:o|etto)|adagi(?:o|etto)|andant(?:e|ino)|larghetto|largo|lento|grave|prestissimo|presto|vivace|moderato|scherzo|menuetto|minuet|menuet|rondo|finale|maestoso|sostenuto|cantabile)\b/i;
 var NUMBERED_TEMPO = new RegExp(`(?:^|[:;\\-\u2013\u2014]\\s*)[IVXL]{1,6}\\.\\s*${TEMPO.source.replace(/^\\b/, "")}`, "i");
-var CATALOGUE_NUMBER = /\b(op(?:us)?\.?|bwv|buxwv|swv|wwv|kv?\.?|d\.|hob\.?|rv|woo|hwv|sz\.?|twv|trv)\s*\d|,\s*(?:L\.|M\.|S\.|FP)\s*\d/i;
+var CATALOGUE_NUMBER = /\b(op(?:us)?\.?|bwv|buxwv|swv|wwv|kv?\.?|kk\.?|wq\.?|d\.|hob\.?|rv|woo|hwv|sz\.?|twv|trv)\s*\d|\bop(?:us)?\.?\s*posth\b|,\s*(?:L\.|M\.|S\.|H\.|Z\.?|FP)\s*\d/i;
 var FORM = /\b(symphon(?:y|ie)|sinfonia|sonata|concerto|suite|partita|string quartet|piano trio|quintet|nocturne|mazurka|polonaise|etude|prelude|fugue|toccata|cantata|oratorio|requiem|mass in|missa|motet|madrigal|lieder|impromptu|ballade|rhapsody|overture)(?:s|es)?\b/i;
 var NAME_WORD = "\\p{Lu}[\\p{L}'\u2019.\\-]+";
 var COMPOSER_ALBUM = new RegExp(`^(?!The\\s)${NAME_WORD}(?:\\s+(?:van|von|de|da|di|du|del|der|le|la|${NAME_WORD})){0,3}:\\s`, "u");
@@ -39765,6 +39799,239 @@ function linkReissues(c, { albumId = null } = {}) {
   return added;
 }
 
+// src/model/history.js
+import { randomUUID as randomUUID9 } from "node:crypto";
+var list3 = (ids) => [...ids];
+var marks = (ids) => list3(ids).map(() => "?").join(",") || "NULL";
+function workClosure(c, workIds) {
+  const db = c.db;
+  const entities2 = new Set(workIds);
+  const all = (sql, ids) => ids.length ? db.prepare(sql.replace("$", marks(ids))).all(...ids) : [];
+  for (const row of all("SELECT target_id AS id FROM relation WHERE kind='movement' AND source_id IN ($)", workIds)) entities2.add(row.id);
+  const pw = all("SELECT id,source_id FROM relation WHERE kind='performance_work' AND target_id IN ($)", workIds);
+  const relations2 = new Set(pw.map((row) => row.id));
+  const performances = pw.map((row) => row.source_id);
+  for (const id of performances) entities2.add(id);
+  for (const row of all("SELECT source_id AS id FROM relation WHERE kind='recording_performance' AND target_id IN ($)", performances)) entities2.add(row.id);
+  const realizations2 = new Set(all("SELECT id FROM realization WHERE work_id IN ($)", workIds).map((row) => row.id));
+  const segments = new Set(all("SELECT segment_id AS id FROM realization_item WHERE realization_id IN ($)", list3(realizations2)).map((row) => row.id));
+  const contents = new Set(
+    all("SELECT id FROM recording_content WHERE performance_work_id IN ($)", list3(relations2)).map((row) => row.id)
+  );
+  for (const row of all("SELECT content_id AS id FROM segment_content WHERE segment_id IN ($)", list3(segments))) contents.add(row.id);
+  return { entities: entities2, relations: relations2, realizations: realizations2, segments, contents };
+}
+function contributorClosure(c, ids) {
+  return { entities: new Set(ids), relations: /* @__PURE__ */ new Set(), realizations: /* @__PURE__ */ new Set(), segments: /* @__PURE__ */ new Set(), contents: /* @__PURE__ */ new Set() };
+}
+var creditState = (c, ids) => JSON.stringify(c.db.prepare(`SELECT id,target_id,contributor_id,role,instrument,state FROM credit WHERE contributor_id IN (${marks(ids)}) ORDER BY id`).all(...ids).map((row) => ({ ...row })));
+var CHANGE_KINDS = ["merge", "delete", "merge-person", "delete-person", "reorder"];
+function predicates(set) {
+  const e = list3(set.entities), r = list3(set.realizations), s = list3(set.segments), k = list3(set.contents), pw = list3(set.relations);
+  const any = (column, ids) => [`${column} IN (${marks(ids)})`, ids];
+  const or = (...parts) => [parts.map(([sql]) => sql).join(" OR "), parts.flatMap(([, ids]) => ids)];
+  return [
+    ["segment_content", or(any("segment_id", s), any("content_id", k))],
+    ["realization_item", or(any("realization_id", r), any("movement_id", e), any("segment_id", s))],
+    ["recording_content", or(any("id", k), any("recording_id", e), any("movement_id", e), any("performance_work_id", pw))],
+    ["user_work_state", or(any("work_id", e), any("picked_realization_id", r))],
+    ["admin_work_pick", or(any("work_id", e), any("realization_id", r))],
+    ["realization", or(any("id", r), any("work_id", e))],
+    ["segment", any("id", s)],
+    ["review_item", any("target_id", e)],
+    ["field_resolution", any("target_id", e)],
+    ["pinned_override", any("target_id", e)],
+    ["provider_record", any("target_id", e)],
+    ["credit", or(any("target_id", e), any("contributor_id", e))],
+    ["alias", any("entity_id", e)],
+    ["catalogue_number", any("entity_id", e)],
+    ["assertion", any("target_id", e)],
+    ["external_identity", any("entity_id", e)],
+    ["relation", or(any("source_id", e), any("target_id", e))],
+    ["metadata_target", any("entity_id", e)],
+    ["entity", any("id", e)]
+  ];
+}
+function listenerState(c, set) {
+  const tables = new Map(predicates(set));
+  const rows = (table) => {
+    const [where, ids] = tables.get(table);
+    return c.db.prepare(`SELECT * FROM ${table} WHERE ${where}`).all(...ids).map((row) => ({ ...row }));
+  };
+  return { user_work_state: rows("user_work_state"), admin_work_pick: rows("admin_work_pick") };
+}
+function laterListenerEdits(c, set, data, createdAt) {
+  const now = listenerState(c, set);
+  const userKey = (row) => `${row.user_id}|${row.work_id}`;
+  if (!data.listeners) {
+    return {
+      users: now.user_work_state.filter((row) => row.updated_at > createdAt).map((row) => ({ row, before: null, legacy: true })),
+      picks: now.admin_work_pick.filter((row) => row.updated_at > createdAt).map((row) => ({ row, before: null })),
+      removedPicks: []
+    };
+  }
+  const was = new Map(data.listeners.user_work_state.map((row) => [userKey(row), row]));
+  const users = now.user_work_state.filter((row) => JSON.stringify(row) !== JSON.stringify(was.get(userKey(row)))).map((row) => ({ row, before: was.get(userKey(row)) || null }));
+  const picks = new Map(now.admin_work_pick.map((row) => [row.work_id, row]));
+  return {
+    users,
+    picks: now.admin_work_pick.filter((row) => JSON.stringify(row) !== JSON.stringify(data.listeners.admin_work_pick.find((old) => old.work_id === row.work_id))).map((row) => ({ row })),
+    removedPicks: data.listeners.admin_work_pick.filter((row) => !picks.has(row.work_id))
+  };
+}
+function reapplyListenerEdits(c, set, edits) {
+  const liveWork = (id) => Boolean(id && c.db.prepare("SELECT 1 FROM entity WHERE id=? AND kind='work' AND deleted_at IS NULL").get(id));
+  const workOf = (realization) => realization && c.db.prepare("SELECT work_id FROM realization WHERE id=?").get(realization)?.work_id;
+  const works = list3(set.entities).filter(liveWork);
+  const upsert = (user, work, column, value, at) => {
+    c.db.prepare(
+      `INSERT INTO user_work_state(user_id,work_id,favourite,picked_realization_id,updated_at) VALUES (?,?,0,NULL,?)
+         ON CONFLICT(user_id,work_id) DO UPDATE SET updated_at=max(updated_at,excluded.updated_at)`
+    ).run(user, work, at);
+    c.db.prepare(`UPDATE user_work_state SET ${column}=? WHERE user_id=? AND work_id=?`).run(value, user, work);
+  };
+  for (const { row, before, legacy } of edits.users) {
+    if ((before?.favourite ?? 0) !== row.favourite) {
+      if (row.favourite && liveWork(row.work_id)) upsert(row.user_id, row.work_id, "favourite", 1, row.updated_at);
+      else if (!row.favourite && !legacy)
+        for (const work of works) c.db.prepare("UPDATE user_work_state SET favourite=0 WHERE user_id=? AND work_id=?").run(row.user_id, work);
+    }
+    if ((before?.picked_realization_id ?? null) !== row.picked_realization_id) {
+      const work = workOf(row.picked_realization_id);
+      if (row.picked_realization_id && liveWork(work)) upsert(row.user_id, work, "picked_realization_id", row.picked_realization_id, row.updated_at);
+      else if (!row.picked_realization_id && !legacy && liveWork(row.work_id))
+        c.db.prepare("UPDATE user_work_state SET picked_realization_id=NULL WHERE user_id=? AND work_id=?").run(row.user_id, row.work_id);
+    }
+  }
+  for (const { row } of edits.picks) {
+    const work = workOf(row.realization_id);
+    if (liveWork(work))
+      c.db.prepare(
+        `INSERT INTO admin_work_pick VALUES (?,?,?,?) ON CONFLICT(work_id) DO UPDATE SET
+           realization_id=excluded.realization_id,actor_id=excluded.actor_id,updated_at=excluded.updated_at`
+      ).run(work, row.realization_id, row.actor_id, row.updated_at);
+  }
+  for (const row of edits.removedPicks) c.db.prepare("DELETE FROM admin_work_pick WHERE work_id=?").run(row.work_id);
+}
+function snapshot(c, set) {
+  const rows = {};
+  for (const [table, [where, ids]] of predicates(set)) rows[table] = c.db.prepare(`SELECT * FROM ${table} WHERE ${where}`).all(...ids).map((row) => ({ ...row }));
+  return rows;
+}
+var serialSet = (set) => Object.fromEntries(Object.entries(set).map(([key, ids]) => [key, list3(ids)]));
+var parseSet = (data) => Object.fromEntries(Object.entries(data).map(([key, ids]) => [key, new Set(ids)]));
+function recordChange(c, { kind, summary, works = [], contributors = [], actor: actor4, extra = {} }, change) {
+  return transaction(c.db, () => {
+    const set = contributors.length ? contributorClosure(c, contributors) : workClosure(c, works);
+    const rows = snapshot(c, set);
+    const result = change();
+    const after = c.db.prepare("SELECT coalesce(max(id),0) AS n FROM audit_event").get().n;
+    const id = randomUUID9();
+    c.db.prepare("INSERT INTO change_set(id,kind,actor,summary,data,created_at) VALUES (?,?,?,?,?,?)").run(id, kind, actor4, summary.slice(0, 500), JSON.stringify({ set: serialSet(set), rows, after, listeners: listenerState(c, set), ...contributors.length && { contributors, credits: creditState(c, contributors) }, ...extra }), Date.now());
+    return { result, changeId: id };
+  });
+}
+function undoChange(c, id, actor4) {
+  return transaction(c.db, () => {
+    const row = c.db.prepare("SELECT * FROM change_set WHERE id=?").get(id);
+    if (!row) throw new Error("That change isn't in the history");
+    if (row.undone_at) throw new Error("That change was undone already");
+    const data = JSON.parse(row.data);
+    const set = parseSet(data.set);
+    if (row.kind === "delete") {
+      const tracks = [...new Set((data.rows.segment || []).map((segment) => segment.track_link_id))];
+      const attached = c.db.prepare(`SELECT 1 FROM realization_item i JOIN segment s ON s.id=i.segment_id WHERE s.track_link_id=? LIMIT 1`);
+      if (tracks.some((track) => attached.get(track)))
+        throw new Error("These tracks are in a work again; take them out first, then undo");
+    }
+    const ids = list3(set.entities);
+    const later = c.db.prepare(`SELECT 1 FROM audit_event WHERE id>? AND target_id IN (${marks(ids)})
+         AND action NOT IN ('editor.open','editor.move-tracks-open','editor.bulk-edit-open',
+           'editor.choose-album-work','editor.new-album-work') LIMIT 1`).get(data.after, ...ids);
+    const laterChange = c.db.prepare(`SELECT 1 FROM change_set c
+      WHERE c.rowid > (SELECT rowid FROM change_set WHERE id=?)
+        AND c.kind IN ('merge','delete','merge-person','delete-person') AND c.undone_at IS NULL
+        AND EXISTS (SELECT 1 FROM json_each(c.data, '$.set.entities') e
+          WHERE e.value IN (${marks(ids)})) LIMIT 1`).get(id, ...ids);
+    const creditsChanged = data.contributors && creditState(c, data.contributors) !== data.credits;
+    if (later || laterChange || creditsChanged) throw new Error("These entries changed after this, so undoing it would lose that change. Undo the later changes first, or fix it by hand.");
+    const listeners = laterListenerEdits(c, set, data, row.created_at);
+    c.db.exec("PRAGMA defer_foreign_keys=ON");
+    const tables = predicates(set);
+    for (const [table, [where, args]] of tables) c.db.prepare(`DELETE FROM ${table} WHERE ${where}`).run(...args);
+    for (const [table] of [...tables].reverse())
+      for (const saved of data.rows[table] || []) {
+        const columns = Object.keys(saved);
+        c.db.prepare(`INSERT INTO ${table}(${columns.join(",")}) VALUES (${columns.map(() => "?").join(",")})`).run(...columns.map((key) => saved[key]));
+      }
+    const named = [...new Set((data.rows.credit || []).map((credit) => credit.contributor_id))];
+    if (named.length)
+      c.db.prepare(`UPDATE entity SET deleted_at=NULL,updated_at=? WHERE kind IN ('person','ensemble') AND deleted_at IS NOT NULL AND id IN (${marks(named)})`).run(Date.now(), ...named);
+    reapplyListenerEdits(c, set, listeners);
+    if (c.db.prepare("PRAGMA foreign_key_check").all().length) throw new Error("Undo would break the catalogue's links; nothing was changed");
+    for (const key of data.suppressions || []) c.db.prepare("DELETE FROM match_suppression WHERE key=?").run(key);
+    for (const key of data.keepApart || [])
+      c.db.prepare("INSERT INTO match_suppression VALUES (?,?,?,?,?) ON CONFLICT(key) DO NOTHING").run(key, row.summary.slice(0, 200), "distinct", actor4, Date.now());
+    c.db.prepare("UPDATE change_set SET undone_at=? WHERE id=?").run(Date.now(), id);
+    c.audit("change.undo", data.set.entities[0] || id, { change: id, kind: row.kind }, actor4);
+    return { kind: row.kind, summary: row.summary, works: data.works || [] };
+  });
+}
+function recentChanges(c, limit = 50) {
+  return c.db.prepare(`SELECT id,kind,actor,summary,created_at,undone_at FROM change_set WHERE kind IN (${CHANGE_KINDS.map(() => "?").join(",")}) ORDER BY created_at DESC LIMIT ?`).all(...CHANGE_KINDS, limit);
+}
+function deletionImpact(c, workIds) {
+  const set = workClosure(c, workIds);
+  const count = (sql, ids) => ids.length ? c.db.prepare(sql.replace("$", marks(ids))).get(...ids).n : 0;
+  return {
+    works: workIds.length,
+    movements: count("SELECT count(*) AS n FROM relation WHERE kind='movement' AND source_id IN ($)", workIds),
+    recordings: set.realizations.size,
+    tracks: count("SELECT count(DISTINCT s.track_link_id) AS n FROM segment s WHERE s.id IN ($)", list3(set.segments))
+  };
+}
+function deleteWorks(c, workIds, actor4, { names }) {
+  const impact = deletionImpact(c, workIds);
+  const keys = [];
+  return recordChange(
+    c,
+    { kind: "delete", summary: `Deleted ${workIds.length === 1 ? `\u201C${names[0]}\u201D` : `${workIds.length} works`}`, works: workIds, actor: actor4, extra: { works: workIds, impact, get suppressions() {
+      return keys;
+    } } },
+    () => {
+      const now = Date.now();
+      for (const work of workIds) {
+        for (const item of c.db.prepare("SELECT i.id FROM realization_item i JOIN realization r ON r.id=i.realization_id WHERE r.work_id=?").all(work))
+          c.detachItem(item.id, { dropRecording: true });
+        c.db.prepare("DELETE FROM realization WHERE work_id=?").run(work);
+        for (const { target_id: movement } of c.db.prepare("SELECT target_id FROM relation WHERE kind='movement' AND source_id=?").all(work))
+          c.db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(now, now, movement);
+        c.db.prepare("DELETE FROM relation WHERE kind='movement' AND source_id=?").run(work);
+        c.db.prepare("DELETE FROM relation WHERE kind='collection_member' AND (source_id=? OR target_id=?)").run(work, work);
+        c.db.prepare("UPDATE user_work_state SET favourite=0,picked_realization_id=NULL,updated_at=? WHERE work_id=?").run(now, work);
+        c.db.prepare("DELETE FROM admin_work_pick WHERE work_id=?").run(work);
+        c.db.prepare("UPDATE review_item SET status='resolved' WHERE target_id=? AND status='open'").run(work);
+        const composers = c.db.prepare(
+          `SELECT a.value FROM credit k JOIN field_resolution f ON f.target_id=k.contributor_id AND f.field='name'
+             JOIN assertion a ON a.id=f.assertion_id WHERE k.target_id=? AND k.role='composer' AND k.state='active'`
+        ).all(work).map((row) => JSON.parse(row.value));
+        const mb = c.db.prepare("SELECT record_id FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='work' AND state='active'").all(work);
+        for (const key of [
+          ...suppressionKeys(names[workIds.indexOf(work)], composers),
+          ...mb.map((row) => `musicbrainz:${row.record_id}`)
+        ]) {
+          keys.push(key);
+          c.db.prepare("INSERT INTO match_suppression VALUES (?,?,?,?,?) ON CONFLICT(key) DO NOTHING").run(key, names[workIds.indexOf(work)], "deleted", actor4, now);
+        }
+        c.db.prepare("DELETE FROM credit WHERE target_id=?").run(work);
+        c.db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(now, now, work);
+        c.audit("work.delete", work, { impact }, actor4);
+      }
+      return impact;
+    }
+  );
+}
+
 // src/model/auto-match.js
 var MULTI_MOVEMENT = /\b(symphon(?:y|ie)|sinfonia|sonata|sonatina|concerto|suite|partita|quartet|quintet|sextet|septet|octet|nonet|trio|serenade|divertimento|cassation|mass|missa|requiem|stabat mater|magnificat|te deum|vespers|cantata|oratorio|passion|variations?|ballet)\b/i;
 var COLLECTION_LIKE = new RegExp("(?<!\\p{L})(etudes?|\xE9tudes?|preludes?|pr\xE9ludes?|songs?|lieder)(?!\\p{L})", "iu");
@@ -39936,7 +40203,7 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
     const credit = hints.composer?.length || provider?.composers?.length ? null : artistCredits(hints, { knownComposers });
     const rawComposers = [
       ...new Set(
-        (hints.composer?.length ? hints.composer : provider?.composers?.length ? provider.composers : credit?.composers || []).map(clean3).filter(Boolean)
+        (hints.composer?.length ? hints.composer : provider?.composers?.length ? provider.composers : credit?.composers || []).map((name) => uninvertedName(clean3(name))).filter(Boolean)
       )
     ];
     const composers = canonicalComposers(catalogue, composerIndex, rawComposers, provider?.composerIds);
@@ -39995,7 +40262,7 @@ function candidates(catalogue, albumId = null, allowStructuredTitles = false, pr
     group.tracks.push({
       ...row,
       composers,
-      providerMovement: provider?.movement ? clean3(provider.movement) : null,
+      providerMovement: provider?.movement ? clean3(provider.movement) : taggedMovement(hints),
       providerLeaf: provider?.leafWorkId || null,
       title: clean3(tagged.title),
       // The title without a "Composer: " prefix, for reading the movement.
@@ -40162,6 +40429,16 @@ function existingIdentity(catalogue, recordKind, recordId) {
        AND x.state='active' AND e.deleted_at IS NULL`
   ).get(recordKind, recordId)?.entity_id;
 }
+var ROMAN_DIGITS = [[10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"]];
+function taggedMovement(hints) {
+  const name = clean3(hints.movement);
+  if (!clean3(hints.work) || !name) return null;
+  let n = Number(hints.movementNumber) || 0;
+  if (!n || n > 39 || MOVEMENT_PREFIX.test(name)) return name;
+  let numeral = "";
+  for (const [value, digits] of ROMAN_DIGITS) while (n >= value) numeral += digits, n -= value;
+  return `${numeral}. ${name}`;
+}
 var words3 = (value) => normalized(value).replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 var CATALOGUE = /\b(op|opus|bwv|kv|k|d|hob|rv|woo|hwv|sz|twv|bb)\s*((?:[ivxlc]+\s+)?\d+[a-z]?)(?:\s+(?:no|nr|n)\s*(\d+))?\b/;
 var KEY_PHRASE = /\bin\s+[a-h](?:\s*(?:flat|sharp|b|#))?(?:\s+(?:major|minor|dur|moll))?\b/g;
@@ -40186,8 +40463,9 @@ function legacyCatalogueSubject(title) {
   return system ? `cat:${system}:${number.match(/^\d+/)?.[0] ?? number}` : "";
 }
 var keyOf = (subjectOf) => (title, composers) => JSON.stringify([
-  [...new Set(composers.map(words3))].filter(Boolean).sort(),
-  subjectOf(title) || `title:${words3(title).replace(KEY_PHRASE, " ").replace(/\s+/g, " ").trim()}`
+  [...new Set(composers.map((name) => words3(uninvertedName(name))))].filter(Boolean).sort(),
+  // "Op. posth." names no one piece, so it is left out like the key.
+  subjectOf(title) || `title:${words3(title).replace(KEY_PHRASE, " ").replace(/\bop(?:us)? posth\b/g, " ").replace(/\s+/g, " ").trim()}`
 ]);
 var workKey = keyOf(catalogueSubject);
 var distinctKey = (a, b) => `distinct:${[a, b].sort().join("|")}`;
@@ -40320,8 +40598,8 @@ function composerPeople(catalogue) {
       ...Array.isArray(other) ? other : [],
       ...catalogue.db.prepare("SELECT text FROM alias WHERE entity_id=?").all(id).map((a) => a.text)
     ];
-    for (const spelling of names) {
-      const key = words3(String(spelling));
+    for (const spelling of names.flatMap((text7) => [String(text7), uninvertedName(text7)])) {
+      const key = words3(spelling);
       if (key) people.set(key, [.../* @__PURE__ */ new Set([...people.get(key) || [], id])]);
     }
   }
@@ -41576,6 +41854,23 @@ function compatibleAutoWorks(catalogue, a, b) {
   const other = composers(b);
   return ![...composers(a)].some(([name, ids]) => distinctIdentities(ids, other.get(name) || /* @__PURE__ */ new Set()));
 }
+var NOT_MERGED = Symbol("not merged");
+function recordedMerge(catalogue, keep, drop, actor4) {
+  const title = (id) => resolvedName(catalogue, id, "title") || "Untitled work";
+  try {
+    recordChange(
+      catalogue,
+      { kind: "merge", summary: `Matching merged \u201C${title(drop)}\u201D into \u201C${title(keep)}\u201D`, works: [keep, drop], actor: actor4 || "model-scan", extra: { keepApart: [distinctKey(keep, drop)] } },
+      () => {
+        if (!mergeWork(catalogue, keep, drop, actor4)) throw NOT_MERGED;
+      }
+    );
+    return true;
+  } catch (error) {
+    if (error === NOT_MERGED) return false;
+    throw error;
+  }
+}
 function mergeDuplicateAutoWorks(catalogue, { actor: actor4 = null } = {}) {
   return transaction(catalogue.db, () => {
     let index = catalogueIndex(catalogue);
@@ -41599,7 +41894,7 @@ function mergeDuplicateAutoWorks(catalogue, { actor: actor4 = null } = {}) {
           catalogue.review("identity", id, { reason: "duplicate-work", keep, evidence: "work not created by automatic matching" });
         else if (severalEdited) continue;
         else if (!compatibleAutoWorks(catalogue, keep, id)) catalogue.review("identity", id, { reason: "duplicate-work", keep, evidence: "different MusicBrainz identities" });
-        else if (mergeWork(catalogue, keep, id, actor4)) works++;
+        else if (recordedMerge(catalogue, keep, id, actor4)) works++;
         else catalogue.review("identity", id, { reason: "duplicate-work", keep });
     }
     return { people, works };
@@ -41766,7 +42061,7 @@ function repairCompletionSplits(catalogue, albumId, actor4) {
 }
 var INSTRUMENT = /\b(piano|violin|viola|cello|violoncello|double bass|flute|oboe|clarinet|bassoon|horn|trumpet|trombone|organ|harpsichord|guitar|harp|string|wind|piano and violin|violin and piano|cello and piano)\s+(?=(?:sonata|sonatina|concerto|quartet|quintet|trio|sextet|octet|suite|partita)\b)/i;
 var KEY = /\bin\s+([a-h])(?:[\s-]?(flat|sharp|♭|♯))?\s+(major|minor)\b/i;
-var CATALOGUE_TEXT = /\b(?:op(?:us|\.)?\s*\d+[a-z]?(?:\s*,?\s*no\.?\s*\d+)?|TWV\s*\d+(?:\s*:\s*[a-z]{0,3}\d+[a-z]?)?|(?:BWV|HWV|RV|WoO|K(?:V|\.)?|D\.?|Hob\.?\s*[IVXL]+[a-z]?:?)\s*\d+[a-z]?)/gi;
+var CATALOGUE_TEXT = /\b(?:op(?:us|\.)?\s*\d+[a-z]?(?:\s*,?\s*no\.?\s*\d+)?|op(?:us|\.)?\s*posth\b\.?|TWV\s*\d+(?:\s*:\s*[a-z]{0,3}\d+[a-z]?)?|(?:BWV|HWV|RV|WoO|Kk\.?|Wq\.?|K(?:V|\.)?|D\.?|Hob\.?\s*[IVXL]+[a-z]?:?)\s*\d+[a-z]?|(?<=,\s*)(?:H\.|Z\.?)\s*\d+[a-z]?)/gi;
 var tidyCatalogue = (value) => clean3(value).replace(/^op(?:us|\.)?\s*/i, "Op. ").replace(/\s*,?\s*no\.?\s*(\d)/i, " No. $1");
 function workFieldsFromTitle(title) {
   const text7 = clean3(title);
@@ -41990,9 +42285,6 @@ function autoMatchTaggedWorks(catalogue, {
     ).all())
       if (!combinedWorks.has(work) && sectionTitles(String(JSON.parse(value) ?? "")).length > 1) combinedWorks.add(work);
     for (const work of combinedWorks) splitCombinedMovements(catalogue, work, actor4);
-    const metadata = new Metadata(catalogue);
-    for (const { id } of catalogue.db.prepare("SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL").all())
-      deriveWorkFields(catalogue, id, metadata);
   }
   recordTaggedLeaves(catalogue, { albumId });
   const index = catalogueIndex(catalogue);
@@ -42000,6 +42292,14 @@ function autoMatchTaggedWorks(catalogue, {
   for (const group of groups)
     if (createGroup(catalogue, group, actor4, index)) created++;
   keyMovementTitles(catalogue, { albumId });
+  const metadata = new Metadata(catalogue);
+  for (const { id } of catalogue.db.prepare(
+    albumId == null ? "SELECT id FROM entity WHERE kind='work' AND deleted_at IS NULL" : `SELECT DISTINCT r.work_id AS id FROM realization r JOIN realization_item i ON i.realization_id=r.id
+           JOIN segment s ON s.id=i.segment_id JOIN track_link t ON t.id=s.track_link_id
+           JOIN entity e ON e.id=r.work_id AND e.deleted_at IS NULL
+           WHERE CAST(json_extract(t.evidence,'$.albumId') AS TEXT)=?`
+  ).all(...albumId == null ? [] : [String(albumId)]))
+    deriveWorkFields(catalogue, id, metadata);
   deriveCredits(catalogue, { albumId });
   conductorConflicts(catalogue, { albumId });
   linkReissues(catalogue, { albumId });
@@ -42046,12 +42346,12 @@ function ownedTracks(catalogue, { albumId = null } = {}) {
 }
 
 // src/source.js
-import { randomUUID as randomUUID10 } from "node:crypto";
+import { randomUUID as randomUUID11 } from "node:crypto";
 import fs8 from "node:fs/promises";
 import path8 from "node:path";
 
 // src/slskd.js
-import { randomUUID as randomUUID9 } from "node:crypto";
+import { randomUUID as randomUUID10 } from "node:crypto";
 var Slskd = class {
   constructor({ url, apiKey }, fetchImpl = fetch) {
     if (!url || !apiKey) throw new Error("Set the slskd URL and API key on the plugin's page");
@@ -42096,7 +42396,7 @@ var Slskd = class {
   }
   // Starts a search and returns its id.
   async startSearch(searchText2, searchTimeoutMs) {
-    const id = randomUUID9();
+    const id = randomUUID10();
     const body = { id, searchText: searchText2, searchTimeout: searchTimeoutMs, filterResponses: true, minimumResponseFileCount: 1, responseLimit: 200, fileLimit: 2e4 };
     await this.request("POST", "/searches", body, { timeoutMs: searchTimeoutMs + 15e3 });
     return id;
@@ -42184,9 +42484,9 @@ var GOOD_SCORE = 60;
 var REVIEW_SCORE = 45;
 function searchLadder(info, { albumTitle = "" } = {}) {
   if (!info?.performer) return [];
-  const performer = surname(info.performer);
+  const performer = surname(info.performer, { group: info.performer === info.ensemble });
   const conductor = info.conductor && info.conductor !== info.performer ? surname(info.conductor) : "";
-  const ensemble = info.ensemble && info.ensemble !== info.performer ? surname(info.ensemble) : "";
+  const ensemble = info.ensemble && info.ensemble !== info.performer ? surname(info.ensemble, { group: true }) : "";
   const composer = surname(info.composer);
   const work = shortWorkTitle(info.workTitle);
   const catalogue = catalogueNumber(info.workTitle) || catalogueNumber(info.movementTitle);
@@ -42222,9 +42522,9 @@ function scoreFolder(folder2, info, { albumTitle = "", movements = [] } = {}) {
   const haystack = haystackOf(folder2);
   const reasons = [];
   let score = 0;
-  const performer = surname(info.performer);
+  const performer = surname(info.performer, { group: info.performer === info.ensemble });
   const conductor = info.conductor && info.conductor !== info.performer ? surname(info.conductor) : "";
-  const ensemble = info.ensemble && info.ensemble !== info.performer ? surname(info.ensemble) : "";
+  const ensemble = info.ensemble && info.ensemble !== info.performer ? surname(info.ensemble, { group: true }) : "";
   const hasPerformer = has(haystack, performer);
   const hasConductor = Boolean(conductor) && has(haystack, conductor);
   const hasEnsemble = Boolean(ensemble) && has(haystack, ensemble);
@@ -42468,7 +42768,7 @@ async function acquisitionIdentity(ctx, track) {
   const info = await classicalInfo(ctx, track.trackMbid);
   if (!info) return null;
   if (!info.performer) return { blocked: true };
-  return { artist: [info.performer.name, info.performer !== info.ensemble && info.ensemble?.name].filter(Boolean).join(" "), aliases: [], requiredTerms: [surname(info.performer)] };
+  return { artist: [info.performer.name, info.performer !== info.ensemble && info.ensemble?.name].filter(Boolean).join(" "), aliases: [], requiredTerms: [surname(info.performer, { group: info.performer === info.ensemble })] };
 }
 async function searchFolders(ctx, slskd, ladder, { info, albumTitle, movements, accept }, started) {
   const deadline = started + SEARCH_BUDGET_MS;
@@ -42653,7 +42953,7 @@ async function startDownload(ctx, result, kind) {
   }
   const slskd = slskdFor(ctx);
   await slskd.enqueue(data.username, data.files.map((f) => ({ filename: f.filename, size: f.size })));
-  const id = randomUUID10();
+  const id = randomUUID11();
   await writeJson(path8.join(downloadsDir(ctx), `${id}.json`), { kind, key, username: data.username, files: data.files, startedAt: Date.now() });
   return { pending: id };
 }
@@ -42756,7 +43056,7 @@ async function freeBytes(ctx, dir) {
 }
 var link2 = (ctx, local, target) => (ctx.linkFile ?? fs8.link)(local, target);
 async function copyInto(local, target) {
-  const temp = `${target}.${randomUUID10()}.part`;
+  const temp = `${target}.${randomUUID11()}.part`;
   try {
     await fs8.copyFile(local, temp);
     await fs8.rename(temp, target);
@@ -42829,237 +43129,6 @@ async function moveIntoPlace(ctx, id, record, directory) {
 // src/model/editor-v2.js
 import path11 from "node:path";
 import { randomUUID as randomUUID14 } from "node:crypto";
-
-// src/model/history.js
-import { randomUUID as randomUUID11 } from "node:crypto";
-var list3 = (ids) => [...ids];
-var marks = (ids) => list3(ids).map(() => "?").join(",") || "NULL";
-function workClosure(c, workIds) {
-  const db = c.db;
-  const entities2 = new Set(workIds);
-  const all = (sql, ids) => ids.length ? db.prepare(sql.replace("$", marks(ids))).all(...ids) : [];
-  for (const row of all("SELECT target_id AS id FROM relation WHERE kind='movement' AND source_id IN ($)", workIds)) entities2.add(row.id);
-  const pw = all("SELECT id,source_id FROM relation WHERE kind='performance_work' AND target_id IN ($)", workIds);
-  const relations2 = new Set(pw.map((row) => row.id));
-  const performances = pw.map((row) => row.source_id);
-  for (const id of performances) entities2.add(id);
-  for (const row of all("SELECT source_id AS id FROM relation WHERE kind='recording_performance' AND target_id IN ($)", performances)) entities2.add(row.id);
-  const realizations2 = new Set(all("SELECT id FROM realization WHERE work_id IN ($)", workIds).map((row) => row.id));
-  const segments = new Set(all("SELECT segment_id AS id FROM realization_item WHERE realization_id IN ($)", list3(realizations2)).map((row) => row.id));
-  const contents = new Set(
-    all("SELECT id FROM recording_content WHERE performance_work_id IN ($)", list3(relations2)).map((row) => row.id)
-  );
-  for (const row of all("SELECT content_id AS id FROM segment_content WHERE segment_id IN ($)", list3(segments))) contents.add(row.id);
-  return { entities: entities2, relations: relations2, realizations: realizations2, segments, contents };
-}
-function contributorClosure(c, ids) {
-  return { entities: new Set(ids), relations: /* @__PURE__ */ new Set(), realizations: /* @__PURE__ */ new Set(), segments: /* @__PURE__ */ new Set(), contents: /* @__PURE__ */ new Set() };
-}
-var creditState = (c, ids) => JSON.stringify(c.db.prepare(`SELECT id,target_id,contributor_id,role,instrument,state FROM credit WHERE contributor_id IN (${marks(ids)}) ORDER BY id`).all(...ids).map((row) => ({ ...row })));
-var CHANGE_KINDS = ["merge", "delete", "merge-person", "delete-person"];
-function predicates(set) {
-  const e = list3(set.entities), r = list3(set.realizations), s = list3(set.segments), k = list3(set.contents), pw = list3(set.relations);
-  const any = (column, ids) => [`${column} IN (${marks(ids)})`, ids];
-  const or = (...parts) => [parts.map(([sql]) => sql).join(" OR "), parts.flatMap(([, ids]) => ids)];
-  return [
-    ["segment_content", or(any("segment_id", s), any("content_id", k))],
-    ["realization_item", or(any("realization_id", r), any("movement_id", e), any("segment_id", s))],
-    ["recording_content", or(any("id", k), any("recording_id", e), any("movement_id", e), any("performance_work_id", pw))],
-    ["user_work_state", or(any("work_id", e), any("picked_realization_id", r))],
-    ["admin_work_pick", or(any("work_id", e), any("realization_id", r))],
-    ["realization", or(any("id", r), any("work_id", e))],
-    ["segment", any("id", s)],
-    ["review_item", any("target_id", e)],
-    ["field_resolution", any("target_id", e)],
-    ["pinned_override", any("target_id", e)],
-    ["provider_record", any("target_id", e)],
-    ["credit", or(any("target_id", e), any("contributor_id", e))],
-    ["alias", any("entity_id", e)],
-    ["catalogue_number", any("entity_id", e)],
-    ["assertion", any("target_id", e)],
-    ["external_identity", any("entity_id", e)],
-    ["relation", or(any("source_id", e), any("target_id", e))],
-    ["metadata_target", any("entity_id", e)],
-    ["entity", any("id", e)]
-  ];
-}
-function listenerState(c, set) {
-  const tables = new Map(predicates(set));
-  const rows = (table) => {
-    const [where, ids] = tables.get(table);
-    return c.db.prepare(`SELECT * FROM ${table} WHERE ${where}`).all(...ids).map((row) => ({ ...row }));
-  };
-  return { user_work_state: rows("user_work_state"), admin_work_pick: rows("admin_work_pick") };
-}
-function laterListenerEdits(c, set, data, createdAt) {
-  const now = listenerState(c, set);
-  const userKey = (row) => `${row.user_id}|${row.work_id}`;
-  if (!data.listeners) {
-    return {
-      users: now.user_work_state.filter((row) => row.updated_at > createdAt).map((row) => ({ row, before: null, legacy: true })),
-      picks: now.admin_work_pick.filter((row) => row.updated_at > createdAt).map((row) => ({ row, before: null })),
-      removedPicks: []
-    };
-  }
-  const was = new Map(data.listeners.user_work_state.map((row) => [userKey(row), row]));
-  const users = now.user_work_state.filter((row) => JSON.stringify(row) !== JSON.stringify(was.get(userKey(row)))).map((row) => ({ row, before: was.get(userKey(row)) || null }));
-  const picks = new Map(now.admin_work_pick.map((row) => [row.work_id, row]));
-  return {
-    users,
-    picks: now.admin_work_pick.filter((row) => JSON.stringify(row) !== JSON.stringify(data.listeners.admin_work_pick.find((old) => old.work_id === row.work_id))).map((row) => ({ row })),
-    removedPicks: data.listeners.admin_work_pick.filter((row) => !picks.has(row.work_id))
-  };
-}
-function reapplyListenerEdits(c, set, edits) {
-  const liveWork = (id) => Boolean(id && c.db.prepare("SELECT 1 FROM entity WHERE id=? AND kind='work' AND deleted_at IS NULL").get(id));
-  const workOf = (realization) => realization && c.db.prepare("SELECT work_id FROM realization WHERE id=?").get(realization)?.work_id;
-  const works = list3(set.entities).filter(liveWork);
-  const upsert = (user, work, column, value, at) => {
-    c.db.prepare(
-      `INSERT INTO user_work_state(user_id,work_id,favourite,picked_realization_id,updated_at) VALUES (?,?,0,NULL,?)
-         ON CONFLICT(user_id,work_id) DO UPDATE SET updated_at=max(updated_at,excluded.updated_at)`
-    ).run(user, work, at);
-    c.db.prepare(`UPDATE user_work_state SET ${column}=? WHERE user_id=? AND work_id=?`).run(value, user, work);
-  };
-  for (const { row, before, legacy } of edits.users) {
-    if ((before?.favourite ?? 0) !== row.favourite) {
-      if (row.favourite && liveWork(row.work_id)) upsert(row.user_id, row.work_id, "favourite", 1, row.updated_at);
-      else if (!row.favourite && !legacy)
-        for (const work of works) c.db.prepare("UPDATE user_work_state SET favourite=0 WHERE user_id=? AND work_id=?").run(row.user_id, work);
-    }
-    if ((before?.picked_realization_id ?? null) !== row.picked_realization_id) {
-      const work = workOf(row.picked_realization_id);
-      if (row.picked_realization_id && liveWork(work)) upsert(row.user_id, work, "picked_realization_id", row.picked_realization_id, row.updated_at);
-      else if (!row.picked_realization_id && !legacy && liveWork(row.work_id))
-        c.db.prepare("UPDATE user_work_state SET picked_realization_id=NULL WHERE user_id=? AND work_id=?").run(row.user_id, row.work_id);
-    }
-  }
-  for (const { row } of edits.picks) {
-    const work = workOf(row.realization_id);
-    if (liveWork(work))
-      c.db.prepare(
-        `INSERT INTO admin_work_pick VALUES (?,?,?,?) ON CONFLICT(work_id) DO UPDATE SET
-           realization_id=excluded.realization_id,actor_id=excluded.actor_id,updated_at=excluded.updated_at`
-      ).run(work, row.realization_id, row.actor_id, row.updated_at);
-  }
-  for (const row of edits.removedPicks) c.db.prepare("DELETE FROM admin_work_pick WHERE work_id=?").run(row.work_id);
-}
-function snapshot(c, set) {
-  const rows = {};
-  for (const [table, [where, ids]] of predicates(set)) rows[table] = c.db.prepare(`SELECT * FROM ${table} WHERE ${where}`).all(...ids).map((row) => ({ ...row }));
-  return rows;
-}
-var serialSet = (set) => Object.fromEntries(Object.entries(set).map(([key, ids]) => [key, list3(ids)]));
-var parseSet = (data) => Object.fromEntries(Object.entries(data).map(([key, ids]) => [key, new Set(ids)]));
-function recordChange(c, { kind, summary, works = [], contributors = [], actor: actor4, extra = {} }, change) {
-  return transaction(c.db, () => {
-    const set = contributors.length ? contributorClosure(c, contributors) : workClosure(c, works);
-    const rows = snapshot(c, set);
-    const result = change();
-    const after = c.db.prepare("SELECT coalesce(max(id),0) AS n FROM audit_event").get().n;
-    const id = randomUUID11();
-    c.db.prepare("INSERT INTO change_set(id,kind,actor,summary,data,created_at) VALUES (?,?,?,?,?,?)").run(id, kind, actor4, summary.slice(0, 500), JSON.stringify({ set: serialSet(set), rows, after, listeners: listenerState(c, set), ...contributors.length && { contributors, credits: creditState(c, contributors) }, ...extra }), Date.now());
-    return { result, changeId: id };
-  });
-}
-function undoChange(c, id, actor4) {
-  return transaction(c.db, () => {
-    const row = c.db.prepare("SELECT * FROM change_set WHERE id=?").get(id);
-    if (!row) throw new Error("That change isn't in the history");
-    if (row.undone_at) throw new Error("That change was undone already");
-    const data = JSON.parse(row.data);
-    const set = parseSet(data.set);
-    if (row.kind === "delete") {
-      const tracks = [...new Set((data.rows.segment || []).map((segment) => segment.track_link_id))];
-      const attached = c.db.prepare(`SELECT 1 FROM realization_item i JOIN segment s ON s.id=i.segment_id WHERE s.track_link_id=? LIMIT 1`);
-      if (tracks.some((track) => attached.get(track)))
-        throw new Error("These tracks are in a work again; take them out first, then undo");
-    }
-    const ids = list3(set.entities);
-    const later = c.db.prepare(`SELECT 1 FROM audit_event WHERE id>? AND target_id IN (${marks(ids)})
-         AND action NOT IN ('editor.open','editor.move-tracks-open','editor.bulk-edit-open',
-           'editor.choose-album-work','editor.new-album-work') LIMIT 1`).get(data.after, ...ids);
-    const laterChange = c.db.prepare(`SELECT 1 FROM change_set c
-      WHERE c.rowid > (SELECT rowid FROM change_set WHERE id=?)
-        AND c.kind IN ('merge','delete','merge-person','delete-person') AND c.undone_at IS NULL
-        AND EXISTS (SELECT 1 FROM json_each(c.data, '$.set.entities') e
-          WHERE e.value IN (${marks(ids)})) LIMIT 1`).get(id, ...ids);
-    const creditsChanged = data.contributors && creditState(c, data.contributors) !== data.credits;
-    if (later || laterChange || creditsChanged) throw new Error("These entries changed after this, so undoing it would lose that change. Undo the later changes first, or fix it by hand.");
-    const listeners = laterListenerEdits(c, set, data, row.created_at);
-    c.db.exec("PRAGMA defer_foreign_keys=ON");
-    const tables = predicates(set);
-    for (const [table, [where, args]] of tables) c.db.prepare(`DELETE FROM ${table} WHERE ${where}`).run(...args);
-    for (const [table] of [...tables].reverse())
-      for (const saved of data.rows[table] || []) {
-        const columns = Object.keys(saved);
-        c.db.prepare(`INSERT INTO ${table}(${columns.join(",")}) VALUES (${columns.map(() => "?").join(",")})`).run(...columns.map((key) => saved[key]));
-      }
-    const named = [...new Set((data.rows.credit || []).map((credit) => credit.contributor_id))];
-    if (named.length)
-      c.db.prepare(`UPDATE entity SET deleted_at=NULL,updated_at=? WHERE kind IN ('person','ensemble') AND deleted_at IS NOT NULL AND id IN (${marks(named)})`).run(Date.now(), ...named);
-    reapplyListenerEdits(c, set, listeners);
-    if (c.db.prepare("PRAGMA foreign_key_check").all().length) throw new Error("Undo would break the catalogue's links; nothing was changed");
-    for (const key of data.suppressions || []) c.db.prepare("DELETE FROM match_suppression WHERE key=?").run(key);
-    c.db.prepare("UPDATE change_set SET undone_at=? WHERE id=?").run(Date.now(), id);
-    c.audit("change.undo", data.set.entities[0] || id, { change: id, kind: row.kind }, actor4);
-    return { kind: row.kind, summary: row.summary, works: data.works || [] };
-  });
-}
-function recentChanges(c, limit = 50) {
-  return c.db.prepare(`SELECT id,kind,actor,summary,created_at,undone_at FROM change_set WHERE kind IN (${CHANGE_KINDS.map(() => "?").join(",")}) ORDER BY created_at DESC LIMIT ?`).all(...CHANGE_KINDS, limit);
-}
-function deletionImpact(c, workIds) {
-  const set = workClosure(c, workIds);
-  const count = (sql, ids) => ids.length ? c.db.prepare(sql.replace("$", marks(ids))).get(...ids).n : 0;
-  return {
-    works: workIds.length,
-    movements: count("SELECT count(*) AS n FROM relation WHERE kind='movement' AND source_id IN ($)", workIds),
-    recordings: set.realizations.size,
-    tracks: count("SELECT count(DISTINCT s.track_link_id) AS n FROM segment s WHERE s.id IN ($)", list3(set.segments))
-  };
-}
-function deleteWorks(c, workIds, actor4, { names }) {
-  const impact = deletionImpact(c, workIds);
-  const keys = [];
-  return recordChange(
-    c,
-    { kind: "delete", summary: `Deleted ${workIds.length === 1 ? `\u201C${names[0]}\u201D` : `${workIds.length} works`}`, works: workIds, actor: actor4, extra: { works: workIds, impact, get suppressions() {
-      return keys;
-    } } },
-    () => {
-      const now = Date.now();
-      for (const work of workIds) {
-        for (const item of c.db.prepare("SELECT i.id FROM realization_item i JOIN realization r ON r.id=i.realization_id WHERE r.work_id=?").all(work))
-          c.detachItem(item.id, { dropRecording: true });
-        c.db.prepare("DELETE FROM realization WHERE work_id=?").run(work);
-        for (const { target_id: movement } of c.db.prepare("SELECT target_id FROM relation WHERE kind='movement' AND source_id=?").all(work))
-          c.db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(now, now, movement);
-        c.db.prepare("DELETE FROM relation WHERE kind='movement' AND source_id=?").run(work);
-        c.db.prepare("DELETE FROM relation WHERE kind='collection_member' AND (source_id=? OR target_id=?)").run(work, work);
-        c.db.prepare("UPDATE user_work_state SET favourite=0,picked_realization_id=NULL,updated_at=? WHERE work_id=?").run(now, work);
-        c.db.prepare("DELETE FROM admin_work_pick WHERE work_id=?").run(work);
-        c.db.prepare("UPDATE review_item SET status='resolved' WHERE target_id=? AND status='open'").run(work);
-        const composers = c.db.prepare(
-          `SELECT a.value FROM credit k JOIN field_resolution f ON f.target_id=k.contributor_id AND f.field='name'
-             JOIN assertion a ON a.id=f.assertion_id WHERE k.target_id=? AND k.role='composer' AND k.state='active'`
-        ).all(work).map((row) => JSON.parse(row.value));
-        const mb = c.db.prepare("SELECT record_id FROM external_identity WHERE entity_id=? AND provider='musicbrainz' AND record_kind='work' AND state='active'").all(work);
-        for (const key of [
-          ...suppressionKeys(names[workIds.indexOf(work)], composers),
-          ...mb.map((row) => `musicbrainz:${row.record_id}`)
-        ]) {
-          keys.push(key);
-          c.db.prepare("INSERT INTO match_suppression VALUES (?,?,?,?,?) ON CONFLICT(key) DO NOTHING").run(key, names[workIds.indexOf(work)], "deleted", actor4, now);
-        }
-        c.db.prepare("DELETE FROM credit WHERE target_id=?").run(work);
-        c.db.prepare("UPDATE entity SET deleted_at=?,updated_at=? WHERE id=?").run(now, now, work);
-        c.audit("work.delete", work, { impact }, actor4);
-      }
-      return impact;
-    }
-  );
-}
 
 // src/model/tag-write.js
 import { randomUUID as randomUUID13 } from "node:crypto";
@@ -43321,7 +43390,8 @@ function pieceGroups(c, album, following) {
   }));
 }
 function compareAlbumGroups(a, b) {
-  return a.first - b.first || b.items.length - a.items.length || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
+  return a.first - b.first || // Two works cut from one track by ranges: the one that plays first.
+  (a.items[0]?.startMs ?? 0) - (b.items[0]?.startMs ?? 0) || b.items.length - a.items.length || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
 }
 function renderAlbumPresentation(c, albumId, capabilities = {}) {
   const metadata = new DisplayValues(c);
@@ -45099,10 +45169,15 @@ function albumView(c, albumId, chosenWork, page2 = 0, move = "") {
       note: chosenWork ? `Step 1 of 3: select tracks for \u201C${entityLabel(c, chosenWork, "work")}\u201D. Selection applies to this page.` : "Step 1 of 3: select tracks, then Group selected tracks to choose an existing or new work. Selection applies to this page.",
       rows: onPage.map((track) => {
         const state = stateOf(track.id);
+        const links = assigned.get(track.id);
+        const hints = track.evidence.hints || {};
+        const ownTitle = searchText(track.title);
+        const titleSaysIt = links.every((link3) => ownTitle.includes(searchText(entityLabel(c, link3.movement_id || link3.work_id, link3.movement_id ? "movement" : "work"))));
+        const detail = links.length ? [titleSaysIt ? "" : track.title, track.artist] : ["Not in a work", hints.work && `WORK \u201C${hints.work}\u201D`, (hints.composer || []).join(", "), track.artist];
         return {
           id: track.id,
-          label: `${number(track)}. ${track.title}`.slice(0, 500),
-          detail: [where(track) || "Not in a work", track.artist].filter(Boolean).join(" \xB7 ").slice(0, 500),
+          label: `${number(track)}. ${links.length ? where(track) : track.title}`.slice(0, 500),
+          detail: detail.filter(Boolean).join(" \xB7 ").slice(0, 500),
           badge: { ...CLASSIFICATION[state.state], ...state.pinned ? { label: `${CLASSIFICATION[state.state].label} \xB7 Set by you` } : {} },
           selection: `track:${track.id}`
         };
@@ -45790,7 +45865,7 @@ function changeView(c, id) {
         id: "change",
         title: "What changed",
         items: [
-          { label: "Kind", value: { merge: "Merge of two works", "merge-person": "Merge of two people or ensembles", "delete-person": "Deletion of a person or ensemble" }[row.kind] || "Deletion" },
+          { label: "Kind", value: { merge: "Merge of two works", "merge-person": "Merge of two people or ensembles", "delete-person": "Deletion of a person or ensemble", reorder: "New movement order" }[row.kind] || "Deletion" },
           ...impact.movements != null ? [{ label: "Movements", value: String(impact.movements) }, { label: "Recordings", value: String(impact.recordings) }, { label: "Tracks taken out of works", value: String(impact.tracks) }] : [],
           { label: "Audio files", value: "Never changed" },
           ...(data.works || []).filter((work) => c.db.prepare("SELECT 1 FROM entity WHERE id=? AND deleted_at IS NULL").get(work)).map((work) => ({ label: "Work", value: entityLabel(c, work, "work"), selection: work })),
@@ -46344,6 +46419,12 @@ function albumTracks(c, albumId) {
     return { id: row.id, hints, state: row.state };
   });
 }
+function reorderMovements(c, who, work, order) {
+  return recordChange(c, { kind: "reorder", summary: `Reordered the movements of \u201C${entityLabel(c, work, "work")}\u201D`, works: [work], actor: who }, () => {
+    c.db.prepare("UPDATE relation SET position=position+? WHERE kind='movement' AND source_id=?").run(order.length + 1e3, work);
+    order.forEach((id, i) => c.db.prepare("UPDATE relation SET position=? WHERE kind='movement' AND source_id=? AND target_id=?").run(i + 1, work, id));
+  }).changeId;
+}
 function addAlias(c, entity, text7) {
   const spelling = String(text7 ?? "").trim();
   if (!spelling) return;
@@ -46510,10 +46591,7 @@ function applyV2(c, request, who) {
       const swap = index + (v.direction === "up" ? -1 : 1);
       if (index < 0 || swap < 0 || swap >= rows.length) fail("That movement can't move further");
       [rows[index], rows[swap]] = [rows[swap], rows[index]];
-      const bump = rows.length + 1e3;
-      c.db.prepare("UPDATE relation SET position=position+? WHERE kind='movement' AND source_id=?").run(bump, work);
-      rows.forEach((id, i) => c.db.prepare("UPDATE relation SET position=? WHERE kind='movement' AND source_id=? AND target_id=?").run(i + 1, work, id));
-      return { selection: work, message: "Movement order saved." };
+      return { selection: work, message: "Movement order saved. Undo it from Activity.", changeId: reorderMovements(c, who, work, rows) };
     }
     case "set-movement-order": {
       const work = str(v.work, "work", { max: 200 });
@@ -46535,10 +46613,7 @@ function applyV2(c, request, who) {
       }
       const moved = order.filter((id, i) => id !== rows[i]);
       if (!moved.length) return { selection: work, message: "The order is unchanged." };
-      const bump = rows.length + 1e3;
-      c.db.prepare("UPDATE relation SET position=position+? WHERE kind='movement' AND source_id=?").run(bump, work);
-      order.forEach((id, i) => c.db.prepare("UPDATE relation SET position=? WHERE kind='movement' AND source_id=? AND target_id=?").run(i + 1, work, id));
-      return { selection: work, message: "Movement order saved." };
+      return { selection: work, message: "Movement order saved. Undo it from Activity.", changeId: reorderMovements(c, who, work, order) };
     }
     case "delete-movement": {
       const work = str(v.work, "work", { max: 200 });
@@ -49159,6 +49234,9 @@ async function scanFile(file, root, prior) {
       ...tags.performers.length && { performers: tags.performers },
       ...tags.artistMbids.length && { artistMbids: tags.artistMbids },
       workId: tags.workId,
+      // Picard's (and iTunes') movement fields, only when set.
+      ...tags.movementName && { movement: tags.movementName },
+      ...tags.movementNumber && { movementNumber: tags.movementNumber },
       recordingMbid: tags.recordingMbid || file.recordingMbid || "",
       composerDistinct: tags.composer.length > 0 && !tags.composer.includes(tags.artist)
     }

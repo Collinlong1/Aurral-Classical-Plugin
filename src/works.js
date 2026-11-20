@@ -8,6 +8,9 @@ const SUFFIX = "(?:[a-z]{1,3}(?![a-z]))?";
 const CATALOGUES = [
   // Before "D": the "D1" in Telemann's "TWV 55:D1" is a key, not a D number.
   [/\bTWV\s*(\d+(?:\s*:\s*[A-Za-z]{0,3}\d+[a-z]?)?)/i, "TWV"],
+  // Scarlatti's Kirkpatrick numbers before Mozart's K.; C. P. E. Bach's Wq.
+  [new RegExp(`\\bKk\\.?\\s*(\\d+${SUFFIX})`), "Kk"],
+  [new RegExp(`\\bWq\\.?\\s*(\\d+${SUFFIX})`), "Wq"],
   [/\bBWV\s*(\d+[a-z]?)/i, "BWV"],
   [/\bHWV\s*(\d+[a-z]?)/i, "HWV"],
   [/\bRV\s*(\d+[a-z]?)/i, "RV"],
@@ -24,6 +27,10 @@ const CATALOGUES = [
   [new RegExp(`\\bTrV\\s*(\\d+${SUFFIX})`, "i"), "TrV"],
   [new RegExp(`\\bL\\.\\s*(\\d+${SUFFIX})`), "L"],
   [new RegExp(`\\bFP\\s*(\\d+${SUFFIX})`), "FP"],
+  // Berlioz's and Honegger's H., Purcell's Z.: capital, with a dot ("Z. 626")
+  // or after a comma ("Dido and Aeneas, Z 626").
+  [new RegExp(`(?:\\bH\\.\\s*|,\\s*H\\s+)(\\d+${SUFFIX})(?![\\d])`), "H"],
+  [new RegExp(`(?:\\bZ\\.\\s*|,\\s*Z\\s+)(\\d+${SUFFIX})(?![\\d])`), "Z"],
   // Ravel's (Marnat): "Boléro, M 81", "Pavane…, M.19". Capital M only.
   // "M. 63/2" is the second of M. 63's pieces.
   [new RegExp(`(?<![\\p{L}\\d])M(?:\\.\\s*|\\s+)(\\d+${SUFFIX}(?:\\/\\d+)?)(?![\\d])`, "u"), "M"],
@@ -90,11 +97,16 @@ export function searchWords(text) {
 }
 
 // "Beethoven, Ludwig van" -> "Beethoven"; "Berlin Philharmonic" stays whole.
-export function surname(person) {
+// A person's surname from their sort name ("Kleiber, Carlos"); without one,
+// the last word of the name ("Carlos Kleiber"), unless that is too short to
+// tell anyone apart ("Yo-Yo Ma"). An ensemble (`group`) keeps its whole name.
+export function surname(person, { group = false } = {}) {
   if (!person) return "";
   const sort = String(person.sortName || "");
   if (sort.includes(",")) return searchWords(sort.split(",")[0]);
-  return searchWords(person.name);
+  const name = searchWords(person.name);
+  const last = name.split(" ").at(-1) || "";
+  return group || last.length < 3 ? name : last;
 }
 
 export function creditString(credit) {

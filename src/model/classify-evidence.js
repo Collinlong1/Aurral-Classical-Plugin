@@ -71,10 +71,11 @@ const TEMPO =
 // "II. Adagio sostenuto", "Spring - I. Allegro": a movement numbered with a
 // Roman numeral and marked with a tempo, rather than a song called "Finale".
 const NUMBERED_TEMPO = new RegExp(`(?:^|[:;\\-–—]\\s*)[IVXL]{1,6}\\.\\s*${TEMPO.source.replace(/^\\b/, "")}`, "i");
-// Single-letter systems (Debussy's L., Ravel's M., Liszt's S.) only after a
+// Single-letter systems (Debussy's L., Ravel's M., Liszt's S., Berlioz's and
+// Honegger's H., Purcell's Z.) only after a
 // comma, as in "La Mer, L. 109", so ordinary words and initials never count.
 const CATALOGUE_NUMBER =
-  /\b(op(?:us)?\.?|bwv|buxwv|swv|wwv|kv?\.?|d\.|hob\.?|rv|woo|hwv|sz\.?|twv|trv)\s*\d|,\s*(?:L\.|M\.|S\.|FP)\s*\d/i;
+  /\b(op(?:us)?\.?|bwv|buxwv|swv|wwv|kv?\.?|kk\.?|wq\.?|d\.|hob\.?|rv|woo|hwv|sz\.?|twv|trv)\s*\d|\bop(?:us)?\.?\s*posth\b|,\s*(?:L\.|M\.|S\.|H\.|Z\.?|FP)\s*\d/i;
 const FORM =
   /\b(symphon(?:y|ie)|sinfonia|sonata|concerto|suite|partita|string quartet|piano trio|quintet|nocturne|mazurka|polonaise|etude|prelude|fugue|toccata|cantata|oratorio|requiem|mass in|missa|motet|madrigal|lieder|impromptu|ballade|rhapsody|overture)(?:s|es)?\b/i;
 // "Bach: The Goldberg Variations", "Ravel: Boléro": an album named after a

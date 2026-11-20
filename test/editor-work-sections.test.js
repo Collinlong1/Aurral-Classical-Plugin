@@ -124,7 +124,7 @@ test("Reorder movements moves several at once and keeps the rest in order", asyn
   // E to 1 and A to 3: the others keep their order around them.
   const saved = await s.mutate(form.command, { ...form.arguments, positions: ["3", "2", "3", "4", "1"] }, reordering);
   assert.equal(saved.ok, true, saved.message);
-  assert.equal(saved.message, "Movement order saved.");
+  assert.equal(saved.message, "Movement order saved. Undo it from Activity.");
   assert.equal(saved.selection, movements, "returns to Movements");
   assert.equal(saved.focus, "movements");
   const [a, b, c, d, e] = ids;

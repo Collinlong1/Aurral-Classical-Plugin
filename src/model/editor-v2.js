@@ -1285,8 +1285,18 @@ function albumView(c, albumId, chosenWork, page = 0, move = "") {
       note: chosenWork ? `Step 1 of 3: select tracks for “${entityLabel(c, chosenWork, "work")}”. Selection applies to this page.` : "Step 1 of 3: select tracks, then Group selected tracks to choose an existing or new work. Selection applies to this page.",
       rows: onPage.map((track) => {
         const state = stateOf(track.id);
-        return { id: track.id, label: `${number(track)}. ${track.title}`.slice(0, 500),
-          detail: [where(track) || "Not in a work", track.artist].filter(Boolean).join(" · ").slice(0, 500),
+        // In a work: the work and movement it is, and the file's own title
+        // only when that says something else. Not in one: what grouping it
+        // needs, its WORK tag and composer.
+        const links = assigned.get(track.id);
+        const hints = track.evidence.hints || {};
+        const ownTitle = searchText(track.title);
+        const titleSaysIt = links.every((link) => ownTitle.includes(searchText(entityLabel(c, link.movement_id || link.work_id, link.movement_id ? "movement" : "work"))));
+        const detail = links.length
+          ? [titleSaysIt ? "" : track.title, track.artist]
+          : ["Not in a work", hints.work && `WORK “${hints.work}”`, (hints.composer || []).join(", "), track.artist];
+        return { id: track.id, label: `${number(track)}. ${links.length ? where(track) : track.title}`.slice(0, 500),
+          detail: detail.filter(Boolean).join(" · ").slice(0, 500),
           badge: { ...CLASSIFICATION[state.state], ...(state.pinned ? { label: `${CLASSIFICATION[state.state].label} · Set by you` } : {}) }, selection: `track:${track.id}`,
         };
       }),
@@ -2053,7 +2063,7 @@ function changeView(c, id) {
         id: "change",
         title: "What changed",
         items: [
-          { label: "Kind", value: { merge: "Merge of two works", "merge-person": "Merge of two people or ensembles", "delete-person": "Deletion of a person or ensemble" }[row.kind] || "Deletion" },
+          { label: "Kind", value: { merge: "Merge of two works", "merge-person": "Merge of two people or ensembles", "delete-person": "Deletion of a person or ensemble", reorder: "New movement order" }[row.kind] || "Deletion" },
           ...(impact.movements != null ? [{ label: "Movements", value: String(impact.movements) }, { label: "Recordings", value: String(impact.recordings) }, { label: "Tracks taken out of works", value: String(impact.tracks) }] : []),
           { label: "Audio files", value: "Never changed" },
           ...(data.works || []).filter((work) => c.db.prepare("SELECT 1 FROM entity WHERE id=? AND deleted_at IS NULL").get(work)).map((work) => ({ label: "Work", value: entityLabel(c, work, "work"), selection: work })),
@@ -2728,6 +2738,14 @@ function albumTracks(c, albumId) {
   });
 }
 
+// Puts a work's movements in this order, recorded for undo (E9).
+function reorderMovements(c, who, work, order) {
+  return recordChange(c, { kind: "reorder", summary: `Reordered the movements of “${entityLabel(c, work, "work")}”`, works: [work], actor: who }, () => {
+    c.db.prepare("UPDATE relation SET position=position+? WHERE kind='movement' AND source_id=?").run(order.length + 1000, work);
+    order.forEach((id, i) => c.db.prepare("UPDATE relation SET position=? WHERE kind='movement' AND source_id=? AND target_id=?").run(i + 1, work, id));
+  }).changeId;
+}
+
 // An alias for a contributor, once per spelling.
 function addAlias(c, entity, text) {
   const spelling = String(text ?? "").trim();
@@ -2917,10 +2935,7 @@ export function applyV2(c, request, who) {
       const swap = index + (v.direction === "up" ? -1 : 1);
       if (index < 0 || swap < 0 || swap >= rows.length) fail("That movement can't move further");
       [rows[index], rows[swap]] = [rows[swap], rows[index]];
-      const bump = rows.length + 1000;
-      c.db.prepare("UPDATE relation SET position=position+? WHERE kind='movement' AND source_id=?").run(bump, work);
-      rows.forEach((id, i) => c.db.prepare("UPDATE relation SET position=? WHERE kind='movement' AND source_id=? AND target_id=?").run(i + 1, work, id));
-      return { selection: work, message: "Movement order saved." };
+      return { selection: work, message: "Movement order saved. Undo it from Activity.", changeId: reorderMovements(c, who, work, rows) };
     }
     case "set-movement-order": {
       // Movements given a new number move there; the rest keep their order
@@ -2945,10 +2960,7 @@ export function applyV2(c, request, who) {
       }
       const moved = order.filter((id, i) => id !== rows[i]);
       if (!moved.length) return { selection: work, message: "The order is unchanged." };
-      const bump = rows.length + 1000;
-      c.db.prepare("UPDATE relation SET position=position+? WHERE kind='movement' AND source_id=?").run(bump, work);
-      order.forEach((id, i) => c.db.prepare("UPDATE relation SET position=? WHERE kind='movement' AND source_id=? AND target_id=?").run(i + 1, work, id));
-      return { selection: work, message: "Movement order saved." };
+      return { selection: work, message: "Movement order saved. Undo it from Activity.", changeId: reorderMovements(c, who, work, order) };
     }
     case "delete-movement": {
       const work = str(v.work, "work", { max: 200 });

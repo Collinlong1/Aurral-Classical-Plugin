@@ -1,3 +1,24 @@
+# Review fixes U5, L14, E9, D1 and optional 1–5 — the last open review issues (issues #40–#46, #49, #50; core #50)
+
+The last ten open review and optional issues: nine in the plugin, and core #50 (U3) in Collinlong1/aurral on its `claude/fervent-cray-ajjtft` branch. No schema change; no settings added.
+
+- **U5 (#40)** An album's track rows name a track in a work by its work and movement ("1. Symphony No. 5 …: I. Allegro con brio"), with the file's title in the detail only when it says something else; a track in no work shows "Not in a work · WORK “…” · composer · artist".
+- **L14 (#41)** `compareAlbumGroups` breaks a tie on the first track with the first item's start, so two works cut from one track by ranges list in playing order, not by random id.
+- **E9 (#42)** Moving a movement and saving a new order go through `recordChange` (kind `reorder`): Activity lists "Reordered the movements of “…”" ("New movement order"), Undo puts the order back, and a later edit of the work blocks it as for merges. Renames stay as they were (the issue's choice).
+- **D1 (#43)** `surname` falls back to the last word of a person's name when there is no "Surname, Given" sort name ("Kleiber - Beethoven 5" now names Carlos Kleiber). Ensembles keep their whole name, and so does a surname under three letters ("Yo-Yo Ma"). Changed on the way: a search step for such a person searches the surname alone.
+- **Optional 2 (#44)** `uninvertedName` (credits.js) reads "Beethoven, Ludwig van" as "Ludwig van Beethoven" for composer tags and work keys (one comma; lists, numbers and "Jr."/"arr." left alone), and a person an earlier scan named the inverted way is found under the normal spelling, so no second composer is made. Known limit: "Lennon, McCartney" reads as one name, "McCartney Lennon".
+- **Optional 3 (#45)** Kk. (before K.), Wq., and after a comma or with a dot H. and Z. are catalogue identities (`works.js`), classical evidence (`classify-evidence.js`) and catalogue fields. "Op. posth." is evidence and a catalogue field but no identity, since many pieces carry it: the work key leaves it out like a key phrase.
+- **Optional 1 (#46)** `readTags` reads MOVEMENTNAME and MOVEMENT (Picard), or iTunes' ©mvn and ©mvi; the scan keeps them as `movement`/`movementNumber` hints. With WORK set, they name the movement ("III. Allegro") whatever the title says (`taggedMovement`). Files already scanned are read again only when written to.
+- **Optional 4 (#49)** Key, catalogue number, form and the other title-derived fields are filled after the pass creates its works: in an album's match for that album's works, and in the library pass for every work (it used to run before creation, so new works waited a pass). Tests that assumed empty fields now expect them (composer page's form groups, the work page's facts, a piano filter, a tag plan's catalogue), as does the composer-page browser check.
+- **Optional 5 (#50)** `mergeDuplicateAutoWorks` merges through `recordChange`: Activity lists "Matching merged “…” into “…”", Undo brings both works back, and the undo records them as kept apart so the next scan doesn't merge them again. A merge whose movements don't line up records nothing and is reviewed as before.
+- **U3 (core #50)** Core: text fields in admin-pages-v2 forms take the row's full width like textareas (`PluginAdminPage.tsx`); see core HANDOFF.
+
+Found on the way: since core's #1969 sync the frontend reads `import.meta.env.VITE_HOSTED`, and every real-renderer browser check here failed against that core. Their esbuild `define` now sets it. CI's integration workflow pins an older core, so it wasn't affected yet.
+
+The Apple corpus baseline is saved with 5 improved album results, none worse. Bundle rebuilt.
+
+Verification: `V0_3_REPORT.md`.
+
 # Review fixes L17, L16, U2, L18, U4 (issues #35–#39)
 
 The next five open review issues, by number. Plugin only; no core or schema change; no settings added.

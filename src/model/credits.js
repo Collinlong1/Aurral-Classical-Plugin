@@ -116,3 +116,18 @@ export function composersOf(hints = {}, options) {
   const credit = artistCredits(hints, options);
   return credit?.confidence === "high" ? credit.composers : [];
 }
+
+// "Beethoven, Ludwig van" → "Ludwig van Beethoven", as composer tags from some
+// taggers and libraries write it. Only one comma between a short surname and
+// given names; lists, numbers and suffixes ("Strauss, Jr.", "Bach, arr.
+// Busoni") are left as they are.
+const NAME_SUFFIX = /^(?:jr|sr|ii|iii|iv|the elder|the younger|arr|arranged|orch|ed|trad|anon)\b/i;
+export function uninvertedName(name) {
+  const text = String(name ?? "").trim();
+  const parts = text.split(",");
+  if (parts.length !== 2 || /[\d;/&+]|\band\b/i.test(text)) return text;
+  const [surname, given] = parts.map((part) => part.trim().replace(/\s+/g, " "));
+  if (!surname || !given || NAME_SUFFIX.test(given)) return text;
+  if (surname.split(" ").length > 3 || given.split(" ").length > 4) return text;
+  return `${given} ${surname}`;
+}

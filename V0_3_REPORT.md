@@ -13,7 +13,32 @@ v0.3 adds the Classical Library, contributors, classical tag writing and MusicBr
 
 Settings added: **Write classical tags to files** (`enableTagWriting`, off by default). Schema: 5 (additive; rollback by restoring `before-v5-*.sqlite` offline, tested against the real schema 4 build). Paired core: `aurral-classical` with the Phase 3 hooks and 6.5's whole-track playlist labels (`9fec213`); the integration workflows pin it.
 
-Not part of v0.3: review and optional issues #28–#50. #28, #29, #31, #32, #34 and #35–#39 are fixed for review (November 18, below); the rest remain open. Not run in this environment: `pnpm eden test`, and the Compose workflow (no Docker); both integration workflows run in CI.
+Not part of v0.3: review and optional issues #28–#50. All of them are fixed for review (November 18, below), with core #50. Not run in this environment: `pnpm eden test`, and the Compose workflow (no Docker); both integration workflows run in CI.
+
+---
+
+# Review fixes U5, L14, E9, D1, optional 1–5 / issues #40–#46, #49, #50 (core #50)
+
+## Result
+
+- `src/model/editor-v2.js`: album track rows (U5); `reorderMovements` (E9). `src/model/history.js`: `reorder` in `CHANGE_KINDS`; undo records `keepApart` (optional 5).
+- `src/model/presentation.js`: `compareAlbumGroups` start tiebreak (L14).
+- `src/works.js`: `surname` fallback (D1); Kk., Wq., H., Z. (optional 3). `src/slskd-ranking.js`, `src/source.js`: ensembles keep their whole name.
+- `src/model/credits.js`: `uninvertedName`; `src/model/auto-match.js`: composer tags, work keys and the person index use it (optional 2); "Op. posth." left out of keys, in catalogue fields (optional 3); `taggedMovement` (optional 1); fields derived after creation (optional 4); `recordedMerge` (optional 5). `src/tags.js`, `src/model/runtime.js`: movement tags (optional 1). `src/model/classify-evidence.js`: new catalogue systems.
+- `dev/*-browser.mjs`: `import.meta.env.VITE_HOSTED` defined; `dev/classical-pages-browser.mjs` finds the Moonlight on whichever page holds it.
+- Core (Collinlong1/aurral `claude/fervent-cray-ajjtft`): `PluginAdminPage.tsx` stacks text fields (U3).
+
+## Verification
+
+On Node 22.23: full `npm test` 486/486. Each new test failed on the previous code first:
+
+- U5, L14 (twelve albums, so a lucky order can't pass), E9: `test/editor-v2.test.js`, `test/model.test.js`.
+- D1: `test/source.test.js` (Kleiber by surname; an orchestra and Yo-Yo Ma by whole name).
+- Optional 1–5: `test/messy-matching.test.js` (movement tags read from a real FLAC and used for titles across two albums; inverted names make one work and one person; two Scarlatti sonatas are two works and Op. posth. keys like no number; works from an album's match and from the library pass have key and catalogue; a scan merge undone stays undone after the next scan).
+- Existing tests changed because works now have derived fields at once: `test/entity-pages.test.js`, `test/search.test.js`, `test/tag-plan.test.js`, `test/editor-work-sections.test.js` (the reorder message), `test/source.test.js` (a conductor without a sort name searches by surname).
+- Browser, Chromium at 1280 and 390 px, against core `f32f035` (this session's core branch, on the #1969 sync): all ten local checks pass. Core U3 before/after captures at 1280 px: the whole title shows after, cut before; checked by eye. Core `pnpm run check` passes (1089 unsafe-any uses).
+
+Not run here: `dev/editor-browser.mjs` and the Compose restart (no Docker; CI runs them), `pnpm eden test`, remote CI.
 
 ---
 

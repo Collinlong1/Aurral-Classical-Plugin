@@ -17,9 +17,9 @@ export const REVIEW_SCORE = 45;
 // performer.
 export function searchLadder(info, { albumTitle = "" } = {}) {
   if (!info?.performer) return [];
-  const performer = surname(info.performer);
+  const performer = surname(info.performer, { group: info.performer === info.ensemble });
   const conductor = info.conductor && info.conductor !== info.performer ? surname(info.conductor) : "";
-  const ensemble = info.ensemble && info.ensemble !== info.performer ? surname(info.ensemble) : "";
+  const ensemble = info.ensemble && info.ensemble !== info.performer ? surname(info.ensemble, { group: true }) : "";
   const composer = surname(info.composer);
   const work = shortWorkTitle(info.workTitle);
   const catalogue = catalogueNumber(info.workTitle) || catalogueNumber(info.movementTitle);
@@ -60,9 +60,9 @@ export function scoreFolder(folder, info, { albumTitle = "", movements = [] } = 
   const haystack = haystackOf(folder);
   const reasons = [];
   let score = 0;
-  const performer = surname(info.performer);
+  const performer = surname(info.performer, { group: info.performer === info.ensemble });
   const conductor = info.conductor && info.conductor !== info.performer ? surname(info.conductor) : "";
-  const ensemble = info.ensemble && info.ensemble !== info.performer ? surname(info.ensemble) : "";
+  const ensemble = info.ensemble && info.ensemble !== info.performer ? surname(info.ensemble, { group: true }) : "";
   const hasPerformer = has(haystack, performer);
   const hasConductor = Boolean(conductor) && has(haystack, conductor);
   const hasEnsemble = Boolean(ensemble) && has(haystack, ensemble);

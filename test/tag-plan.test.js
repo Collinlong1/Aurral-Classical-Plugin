@@ -40,12 +40,14 @@ test("a movement proposes its composer, work, movement, performers, conductor, c
 
 test("the plan follows the catalogue: an admin's credit and values, and what is missing is left out", async (t) => {
   const { c } = await library(t);
-  // Levit is credited as soloist by hand; no sort name, catalogue or MusicBrainz work.
+  // Levit is credited as soloist by hand; no sort name or MusicBrainz work.
   const plan = proposedTags(c, linkOf(c, "levit-2")).fields;
   assert.deepEqual(plan.performers, ["Igor Levit (soloist)"]);
   assert.deepEqual(plan.movementName, ["III. Presto agitato"]);
   assert.deepEqual([plan.movementNumber, plan.movementTotal], [["3"], ["3"]]);
-  for (const field of ["composerSort", "conductor", "catalogue", "workId"]) assert.equal(plan[field], undefined, field);
+  for (const field of ["composerSort", "conductor", "workId"]) assert.equal(plan[field], undefined, field);
+  // The catalogue number comes from the work's title as soon as matching makes it (#49).
+  assert.deepEqual(plan.catalogue, ["Op. 27 No. 2"]);
   // An instrument on the credit names it, as Picard writes performers.
   c.db.prepare("UPDATE credit SET instrument='piano' WHERE role='soloist' AND target_id=(SELECT source_id FROM relation WHERE id=(SELECT performance_work_id FROM realization WHERE label='Album levit'))").run();
   assert.deepEqual(proposedTags(c, linkOf(c, "levit-2")).fields.performers, ["Igor Levit (piano)"]);

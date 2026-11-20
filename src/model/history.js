@@ -1,5 +1,5 @@
-// Undo for destructive metadata changes (merging and deleting works, and
-// merging and deleting people and ensembles).
+// Undo for destructive metadata changes (merging and deleting works,
+// merging and deleting people and ensembles) and movement reorders.
 //
 // Before the change, every row that names the works involved (their
 // movements, performances, recordings, realizations, segments, credits,
@@ -44,7 +44,7 @@ export function contributorClosure(c, ids) {
 // it with the state right after the change.
 const creditState = (c, ids) =>
   JSON.stringify(c.db.prepare(`SELECT id,target_id,contributor_id,role,instrument,state FROM credit WHERE contributor_id IN (${marks(ids)}) ORDER BY id`).all(...ids).map((row) => ({ ...row })));
-export const CHANGE_KINDS = ["merge", "delete", "merge-person", "delete-person"];
+export const CHANGE_KINDS = ["merge", "delete", "merge-person", "delete-person", "reorder"];
 
 // The rows to keep, table by table, with the predicate that finds them.
 function predicates(set) {
@@ -231,6 +231,9 @@ export function undoChange(c, id, actor) {
     reapplyListenerEdits(c, set, listeners);
     if (c.db.prepare("PRAGMA foreign_key_check").all().length) throw new Error("Undo would break the catalogue's links; nothing was changed");
     for (const key of data.suppressions || []) c.db.prepare("DELETE FROM match_suppression WHERE key=?").run(key);
+    // A merge matching made and an admin undid: the two stay apart.
+    for (const key of data.keepApart || [])
+      c.db.prepare("INSERT INTO match_suppression VALUES (?,?,?,?,?) ON CONFLICT(key) DO NOTHING").run(key, row.summary.slice(0, 200), "distinct", actor, Date.now());
     c.db.prepare("UPDATE change_set SET undone_at=? WHERE id=?").run(Date.now(), id);
     c.audit("change.undo", data.set.entities[0] || id, { change: id, kind: row.kind }, actor);
     return { kind: row.kind, summary: row.summary, works: data.works || [] };

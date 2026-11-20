@@ -43,7 +43,7 @@ Searching, no matches and lookup failures are separate states. **Try again** ret
 
 **Edit together.** Tick works in the list → **Edit together**: period, form, key, instrumentation, or add a composer to all of them (empty fields are left alone), or **Use provider values** to unpin what you set by hand.
 
-**Undo.** Merges and deletions appear in **Activity**; open one and **Undo**. Undo is refused when those entries changed afterwards, so it never discards a later edit. Favourites and picks listeners made since are kept: a pick goes back with its recording.
+**Undo.** Merges and deletions, new movement orders, and the merges matching makes itself appear in **Activity**; open one and **Undo**. Undo is refused when those entries changed afterwards, so it never discards a later edit. Favourites and picks listeners made since are kept: a pick goes back with its recording.
 
 **Duplicates.** On a work, composer or performer, **Merge with another …**: choose the other entry and **Continue**. The merge step names both ("the one you opened" and "the other", with their recordings or credits), shows what happens if either stays, and the two works side by side. Choose the **Entry that stays**, then **Merge**; **Cancel** goes back without merging. Recordings, credits, favourites, picks and MusicBrainz/tag identities move into the entry that stays; the other is removed. A user who liked either work keeps the like; where both works had a pick, the kept work's pick wins. Movements are matched by title (or number, where one is untitled); a movement the staying work doesn't have is added to it, at the end, with its tracks, and the work opens at its Movements so you can put it in order with **Reorder movements**. An unused entry can be deleted.
 
@@ -82,7 +82,7 @@ Scans run on their own when the plugin schedule and API access are on: after dow
 
 - **Maintenance** (pinned first): the model's state, **Scan the library** (or Continue / Cancel), and the lookups **Identify earlier albums**, **Work names from MusicBrainz** and **Details from MusicBrainz** (sort names, dates and other names for everyone and every work with a MusicBrainz ID; your own values stay). They run on the model worker in the background and continue on the plugin schedule; reload to see progress. These used to be album-menu actions.
 - **Tag requests** waiting for you (from the album and artist menus), first.
-- **Merges and deletions**, each with **Undo**.
+- **Merges, deletions and movement reorders** (yours or matching's), each with **Undo**. Undoing a merge matching made keeps the two works apart.
 - **slskd searches**: each step of the query ladder, the candidates with their scores and reasons, and the folders rejected with theirs.
 
 ## Search

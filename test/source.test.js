@@ -105,7 +105,8 @@ test("Liszt display credit does not replace Trifonov as acquisition performer", 
   assert.deepEqual(ladder.map((s) => s.step), [1, 2, 3, 4, 5]);
   assert.ok(ladder.filter((s) => [1, 2, 4].includes(s.step)).every((s) => s.query.startsWith("Trifonov ")), JSON.stringify(ladder));
   assert.ok(ladder.every((s) => s.step === 5 || !s.query.startsWith("Liszt")));
-  assert.equal(ladder[2].query, "Wrong priority conductor Transcendental");
+  // A person without a sort name is searched by the last word of the name (#43).
+  assert.equal(ladder[2].query, "conductor Transcendental");
   assert.equal(scoreFolder({ directory: "Liszt - Transcendental Etudes (Horowitz)", files: [] }, info).rejected, "names the composer but none of the performers");
   assert.equal((await acquisitionIdentity(ctx, { artist: "Franz Liszt", trackMbid: "liszt-recording" })).artist, "Daniil Trifonov");
   assert.equal(performerMatches({ directory: "Liszt Horowitz", files: [] }, info), false);
@@ -116,6 +117,25 @@ test("Liszt display credit does not replace Trifonov as acquisition performer", 
   assert.deepEqual(await acquisitionIdentity(ctx, { trackMbid: "liszt-recording" }), { blocked: true });
   ctx.resolver.resolve = async () => null;
   assert.equal(await acquisitionIdentity(ctx, { trackMbid: "rock" }), null);
+});
+
+// D1 (#43): a performer without a sort name is found by surname; an
+// ensemble still needs its whole name, and a two-letter surname the whole name.
+test("a performer without a sort name matches a folder by surname", async () => {
+  const conductor = { name: "Carlos Kleiber", sortName: "Carlos Kleiber" };
+  const orchestra = { name: "Wiener Philharmoniker", sortName: "Wiener Philharmoniker" };
+  const composer = { name: "Ludwig van Beethoven", sortName: "Beethoven, Ludwig van" };
+  const info = { performer: conductor, conductor, ensemble: orchestra, composer, workTitle: "Symphony No. 5 in C minor, Op. 67", movementTitle: "" };
+  const folder = { directory: "Kleiber - Beethoven 5", files: [] };
+  assert.equal(performerMatches(folder, info), true);
+  assert.ok(!scoreFolder(folder, info).rejected, JSON.stringify(scoreFolder(folder, info)));
+  assert.equal(searchLadder(info, { albumTitle: "Symphonies 5 & 7" })[0].query, "Kleiber Symphonies 5 7");
+  // The orchestra alone: its whole name, not "Philharmoniker".
+  const byOrchestra = { ...info, performer: orchestra, conductor: null };
+  assert.equal(performerMatches({ directory: "Berliner Philharmoniker - Beethoven 5", files: [] }, byOrchestra), false);
+  assert.equal(performerMatches({ directory: "Wiener Philharmoniker - Beethoven 5", files: [] }, byOrchestra), true);
+  const ma = { ...info, performer: { name: "Yo-Yo Ma", sortName: "Yo-Yo Ma" }, conductor: null, ensemble: null };
+  assert.equal(performerMatches({ directory: "Ma - Bach Suites", files: [] }, ma), false);
 });
 
 test("catalogue numbers and short work titles", () => {

@@ -1650,3 +1650,38 @@ test("#39 a new work has its catalogue number, key and form at once", async (t) 
   await s.ok("save-entity", { target: made, key: "C-sharp minor (Moonlight)" }, made);
   assert.equal(fields(made).key, "C-sharp minor (Moonlight)");
 });
+
+// #40 (U5): an album's track rows say which work and movement a track is,
+// without its title twice, and show a loose track's WORK tag and composer.
+test("#40 album track rows name the work and movement, or the WORK tag and composer", async (t) => {
+  const s = await setup(t);
+  setHints(s, s.trackIds("B")[0], { work: "Symphony No. 5" });
+  const work = (await s.ok("create-work-from-album", { albumId: "A", tracks: s.trackIds("A"), title: "Symphony No. 5 in C minor, Op. 67", composer: "", composerName: "Ludwig van Beethoven" }, "album:A")).selection;
+  const rows = section((await s.read({ selection: "album:A" })).view, "tracks").rows;
+  assert.ok(rows[0].label.startsWith("1. Symphony No. 5 in C minor, Op. 67: "), rows[0].label);
+  for (const row of rows) assert.ok(!row.detail.includes("Symphony No. 5"), `the title isn't repeated: ${row.detail}`);
+  assert.ok(live(s, work));
+  const loose = section((await s.read({ selection: "album:B" })).view, "tracks").rows[0];
+  assert.equal(loose.detail, "Not in a work · WORK “Symphony No. 5” · Ludwig van Beethoven · Orchestra B");
+});
+
+// #42 (E9): a movement reorder is listed in Activity and undoes exactly; a
+// later edit of the work blocks the undo.
+test("#42 a movement reorder is in Activity and can be undone", async (t) => {
+  const s = await setup(t);
+  const work = (await s.ok("create-work", { title: "Order suite", movements: ["A", "B", "C"] })).selection;
+  const order = () => s.c.db.prepare("SELECT target_id FROM relation WHERE kind='movement' AND source_id=? ORDER BY position").all(work).map((row) => row.target_id);
+  const before = order();
+  await s.ok("set-movement-order", { work, movements: before, order: [before[2], before[0], before[1]] }, `${work}!reorder`);
+  const change = (await s.read({ tab: "activity" })).list.items.find((item) => item.label === "Reordered the movements of “Order suite”");
+  assert.ok(change, "Activity lists the reorder");
+  assert.equal(section((await s.read({ selection: change.selection })).view, "change").items[0].value, "New movement order");
+  await s.ok("undo-change", { id: change.selection.slice(7) }, change.selection);
+  assert.deepEqual(order(), before);
+  // Moving one up is recorded too; a rename after it blocks the undo.
+  await s.ok("move-movement", { work, movement: before[1], direction: "up" }, `${work}!movements`);
+  const moved = (await s.read({ tab: "activity" })).list.items.find((item) => item.label === "Reordered the movements of “Order suite”" && !item.badge);
+  await s.ok("save-entity", { target: work, title: "Order suite (renamed)" }, work);
+  const refused = await s.mutate("undo-change", { id: moved.selection.slice(7) }, moved.selection);
+  assert.deepEqual([refused.ok, /changed after this/.test(refused.message)], [false, true]);
+});

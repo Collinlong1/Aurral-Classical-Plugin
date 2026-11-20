@@ -266,7 +266,7 @@ export function searchQueries(info, { albumTitle = "" } = {}) {
 }
 
 export function performerMatches(folder, info) {
-  const wanted = searchWords(surname(info.performer)).toLowerCase().split(/\s+/).filter(Boolean);
+  const wanted = searchWords(surname(info.performer, { group: info.performer === info.ensemble })).toLowerCase().split(/\s+/).filter(Boolean);
   if (!wanted.length) return false;
   const haystack = ` ${searchWords([folder.directory, ...folder.files.map((file) => file.filename)].join(" ")).toLowerCase()} `;
   return wanted.every((word) => haystack.includes(` ${word} `));
@@ -276,7 +276,7 @@ export async function acquisitionIdentity(ctx, track) {
   const info = await classicalInfo(ctx, track.trackMbid);
   if (!info) return null;
   if (!info.performer) return { blocked: true };
-  return { artist: [info.performer.name, info.performer !== info.ensemble && info.ensemble?.name].filter(Boolean).join(" "), aliases: [], requiredTerms: [surname(info.performer)] };
+  return { artist: [info.performer.name, info.performer !== info.ensemble && info.ensemble?.name].filter(Boolean).join(" "), aliases: [], requiredTerms: [surname(info.performer, { group: info.performer === info.ensemble })] };
 }
 
 // Runs the ladder one step at a time (slskd runs one search at a time) and

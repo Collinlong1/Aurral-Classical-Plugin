@@ -105,16 +105,18 @@ test("a composer page groups works by form, sorts them, and links to works and p
   assert.equal(fact(view, "Dates"), "1770–1827");
   assert.equal(fact(view, "Period"), "Classical");
   assert.equal(section(view, "about").items[0].value, "Bonn, then Vienna.");
-  // By form (the default): sonatas, then works with no form.
+  // By form (the default). The septet's form comes from its title as soon as
+  // matching makes it (#49).
   const works = section(view, "works");
   assert.equal(works.type, "groups");
   assert.deepEqual(works.groups.map((g) => [g.heading, g.rows.map((r) => r.id)]), [
+    ["Septet", [septet]],
     ["Sonata", [pathetique, moonlight]],
-    ["Other works", [septet]],
   ]);
   // Catalogue numbers only where the title lacks them; recording counts.
-  assert.equal(works.groups[0].rows[1].detail, "2 recordings");
-  assert.deepEqual(works.groups[0].rows[0].link, page(`work:${pathetique}`));
+  const sonatas = works.groups.find((g) => g.heading === "Sonata");
+  assert.equal(sonatas.rows[1].detail, "2 recordings");
+  assert.deepEqual(sonatas.rows[0].link, page(`work:${pathetique}`));
   // Other orders are one list.
   const sorted = (sort) => section(read(c, `composer:${beethoven}`, { sort }), "works");
   assert.equal(sorted("title").type, "rows");
@@ -140,8 +142,8 @@ test("a composer page pages 100 works at a time, and an unknown composer is not 
   const second = fitsCore(read(c, `composer:${beethoven}`, { sort: "title", page: 1 }));
   assert.equal(section(second, "works").rows.length, 31);
   assert.equal(section(second, "performers"), undefined, "performers on the first page only");
-  // By form, one group of 100 rows.
-  assert.equal(section(read(c, `composer:${beethoven}`), "works").groups[0].rows.length, 100);
+  // By form, 100 rows on the first page across the forms' groups.
+  assert.equal(section(read(c, `composer:${beethoven}`), "works").groups.reduce((n, group) => n + group.rows.length, 0), 100);
   assert.throws(() => read(c, "composer:nobody"), /Composer not found/);
 });
 
@@ -295,7 +297,7 @@ test("a work page has facts, movements, recordings by performance with completen
   assert.equal(fact(view, "Catalogue"), "Op. 27 No. 2");
   assert.equal(fact(view, "Key"), "C-sharp minor");
   assert.match(header(view).facts[0].link.resourceId, /^composer:/);
-  assert.deepEqual(Object.fromEntries(section(view, "about").items.map((i) => [i.label, i.value])), { Period: "Classical", Written: "1801", "Other names": "Sonata quasi una fantasia" });
+  assert.deepEqual(Object.fromEntries(section(view, "about").items.map((i) => [i.label, i.value])), { Form: "sonata", Instrumentation: "Piano", Period: "Classical", Written: "1801", "Other names": "Sonata quasi una fantasia" });
   assert.deepEqual(view.sections.find((s) => s.type === "tabs").tabs.map((tab) => [tab.id, tab.count]), [["recordings", 3], ["movements", 3]]);
   // Recordings: one per performance (Levit's two releases are one), badged.
   const recordings = section(view, "recordings").groups;

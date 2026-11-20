@@ -53,7 +53,7 @@ await build({
   },
   bundle: true, nodePaths: [path.join(core, "frontend/node_modules")], jsx: "automatic", format: "esm",
   outfile: path.join(output, "app.js"), loader: { ".woff2": "file", ".woff": "file", ".svg": "dataurl", ".png": "dataurl" },
-  define: { "import.meta.env.DEV": "true", "import.meta.env.VITE_API_URL": '""' },
+  define: { "import.meta.env.DEV": "true", "import.meta.env.VITE_API_URL": '""', "import.meta.env.VITE_HOSTED": "false" },
   // Vite asset URLs (the Wrapped intro video) are never shown here.
   plugins: [{ name: "vite-url", setup(b) {
     b.onResolve({ filter: /\?url$/ }, (args) => ({ path: args.path, namespace: "vite-url" }));
@@ -197,9 +197,12 @@ try {
     assert.equal(await page.locator("section[aria-label=Works] .plugin-view__row").count(), 100, name);
     await shot("composer", { fullPage: false });
     // The work page (6.1): recordings with completeness, then a movement.
-    // The Moonlight is on the second page (110 Bagatelles come first).
-    await page.getByRole("button", { name: "Next" }).first().click();
-    await page.getByRole("link", { name: /Piano Sonata No\. 14/ }).click();
+    // Grouped by form, the Moonlight's Sonata group comes before the 110
+    // Bagatelles; it used to be on the second page, before works had their
+    // form from the title at once (#49).
+    const moonlight = page.getByRole("link", { name: /Piano Sonata No\. 14/ });
+    if (!(await moonlight.count())) await page.getByRole("button", { name: "Next" }).first().click();
+    await moonlight.click();
     await page.getByRole("heading", { name: /Piano Sonata No\. 14/, level: 1 }).waitFor();
     await page.getByRole("heading", { name: "Recordings", level: 2 }).waitFor();
     assert.ok((await page.locator(".plugin-view__badge", { hasText: "Complete" }).count()) >= 2, name);
