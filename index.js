@@ -35208,54 +35208,236 @@ var require_dist = __commonJS({
 // src/index.js
 import path6 from "node:path";
 
-// src/aurral.js
-var Aurral = class {
-  constructor(api, fetchImpl = fetch) {
-    if (!api?.url || !api?.key) throw new Error("Aurral API access is off. Turn it on on the plugin's page.");
-    this.url = api.url.replace(/\/+$/, "");
-    this.key = api.key;
-    this.fetch = fetchImpl;
+// src/mb.js
+import path2 from "node:path";
+
+// src/store.js
+import { createHash, randomUUID } from "node:crypto";
+import fs from "node:fs/promises";
+import path from "node:path";
+var sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+async function readJson(file, fallback) {
+  try {
+    return JSON.parse(await fs.readFile(file, "utf8"));
+  } catch {
+    return fallback;
   }
-  async request(method, route, body) {
-    const response = await this.fetch(`${this.url}${route}`, {
-      method,
-      headers: { "X-Api-Key": this.key, ...body !== void 0 && { "Content-Type": "application/json" } },
-      body: body === void 0 ? void 0 : JSON.stringify(body),
-      signal: AbortSignal.timeout(3e4)
-    });
-    const data = await response.json().catch(() => null);
-    if (!response.ok) {
-      const detail = data?.message || data?.error || response.statusText;
-      throw new Error(`Aurral answered ${response.status} for ${route}: ${detail}`);
+}
+async function writeJson(file, value) {
+  await fs.mkdir(path.dirname(file), { recursive: true });
+  const temp = `${file}.${process.pid}.${randomUUID()}.tmp`;
+  await fs.writeFile(temp, JSON.stringify(value));
+  await fs.rename(temp, file);
+}
+async function tryLock(dir, staleMs) {
+  try {
+    await fs.mkdir(dir);
+  } catch (error) {
+    if (error.code !== "EEXIST") throw error;
+    const stat = await fs.stat(dir).catch(() => null);
+    if (stat && Date.now() - stat.mtimeMs < staleMs) return null;
+    await fs.rm(dir, { recursive: true, force: true });
+    try {
+      await fs.mkdir(dir);
+    } catch {
+      return null;
     }
-    return data;
   }
-  // Re-reads files whose tags changed, so the Library shows the new ones.
-  refreshLibrary() {
-    return this.request("POST", "/library/refresh", { mode: "quick" });
+  let released = false;
+  return {
+    async touch() {
+      if (released) return;
+      const now = /* @__PURE__ */ new Date();
+      await fs.utimes(dir, now, now).catch(() => {
+      });
+    },
+    async release() {
+      released = true;
+      await fs.rm(dir, { recursive: true, force: true }).catch(() => {
+      });
+    }
+  };
+}
+async function withLock(dir, staleMs, run, { waitMs = 3e4 } = {}) {
+  const until = Date.now() + waitMs;
+  for (; ; ) {
+    const lock = await tryLock(dir, staleMs);
+    if (lock) {
+      try {
+        return await run(lock);
+      } finally {
+        await lock.release();
+      }
+    }
+    if (Date.now() > until) throw new Error(`Timed out waiting for ${path.basename(dir)}`);
+    await sleep(50 + Math.random() * 100);
   }
-  users() {
-    return this.request("GET", "/users");
+}
+var Throttle = class {
+  constructor(folder, intervalMs) {
+    this.lockDir = path.join(folder, "mb-throttle.lock");
+    this.stateFile = path.join(folder, "mb-throttle.json");
+    this.intervalMs = intervalMs;
   }
-  async staticPlaylists() {
-    const status = await this.request("GET", "/playlists/status");
-    return status?.staticPlaylists ?? [];
-  }
-  createPlaylist(name, tracks) {
-    return this.request("POST", "/playlists/static-playlists", { name, tracks, downloadMissing: true });
-  }
-  updatePlaylist(id, name, tracks) {
-    return this.request("PUT", `/playlists/static-playlists/${encodeURIComponent(id)}`, { name, tracks });
+  async wait() {
+    if (!this.intervalMs) return;
+    const slot = await withLock(this.lockDir, 5e3, async () => {
+      const state = await readJson(this.stateFile, { next: 0 });
+      const at = Math.max(Date.now(), Number(state.next) || 0);
+      await writeJson(this.stateFile, { next: at + this.intervalMs });
+      return at;
+    });
+    const wait = slot - Date.now();
+    if (wait > 0) await sleep(wait);
   }
 };
-async function canRequest(aurral, user) {
-  if (!user) return false;
-  if (user.role === "admin") return true;
-  const users = await aurral.users();
-  const found = (Array.isArray(users) ? users : []).find((entry) => Number(entry.id) === Number(user.id));
-  if (!found || found.status && found.status !== "active") return false;
-  return found.role === "admin" || found.permissions?.addAlbum !== false;
+var FileCache = class {
+  constructor(folder) {
+    this.folder = folder;
+  }
+  file(key) {
+    const hash = createHash("sha1").update(key).digest("hex");
+    return path.join(this.folder, hash.slice(0, 2), `${hash}.json`);
+  }
+  async get(key, ttlMs) {
+    const entry = await readJson(this.file(key), null);
+    if (!entry || Date.now() - entry.time > ttlMs) return null;
+    return entry.value;
+  }
+  async set(key, value) {
+    await writeJson(this.file(key), { time: Date.now(), key, value }).catch(() => {
+    });
+  }
+};
+async function pruneCache(folder, maxAgeMs) {
+  const stamp = path.join(folder, ".pruned");
+  const last = (await fs.stat(stamp).catch(() => null))?.mtimeMs ?? 0;
+  if (Date.now() - last < 24 * 60 * 6e4) return 0;
+  await fs.mkdir(folder, { recursive: true });
+  await fs.writeFile(stamp, "");
+  let removed = 0;
+  for (const dir of await fs.readdir(folder).catch(() => [])) {
+    const sub = path.join(folder, dir);
+    for (const name of await fs.readdir(sub).catch(() => [])) {
+      const file = path.join(sub, name);
+      const stat = await fs.stat(file).catch(() => null);
+      if (stat && Date.now() - stat.mtimeMs > maxAgeMs) {
+        await fs.rm(file, { force: true });
+        removed++;
+      }
+    }
+  }
+  return removed;
 }
+
+// src/version.js
+var VERSION = true ? "1.0.4" : "dev";
+var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
+
+// src/mb.js
+var PUBLIC_MB = "https://musicbrainz.org";
+var DAY = 24 * 60 * 6e4;
+var TTL = { recording: DAY, default: 30 * DAY, search: 7 * DAY };
+var RETRY_STATUSES = /* @__PURE__ */ new Set([500, 502, 503, 504]);
+function mbBaseUrl(settings) {
+  const mirror = String(settings.mbMirror || "").trim().replace(/\/+$/, "");
+  if (!mirror) return PUBLIC_MB;
+  return /^https?:\/\//i.test(mirror) ? mirror.replace(/\/ws\/2$/, "") : `http://${mirror}`;
+}
+var MusicBrainz = class {
+  constructor({ settings, dataFolder, fetchImpl = fetch, log: log2 = () => {
+  }, intervalMs, maxRetries = 4, retryWaitMs = 3e3 }) {
+    this.base = mbBaseUrl(settings);
+    this.userAgent = `AurralClassical/${VERSION} ( ${REPOSITORY} )`;
+    this.fetch = fetchImpl;
+    this.log = log2;
+    this.cache = new FileCache(path2.join(dataFolder, "mb-cache"));
+    const isPublic = this.base === PUBLIC_MB;
+    this.throttle = new Throttle(dataFolder, intervalMs ?? (isPublic ? 1e3 : 0));
+    this.maxRetries = maxRetries;
+    this.retryWaitMs = retryWaitMs;
+    this.failures = 0;
+    this.disabled = false;
+    this.requests = 0;
+  }
+  // An entity lookup: get("recording", id, "artist-rels+work-rels").
+  get(entity, id, inc, { ttl } = {}) {
+    if (!id) return Promise.resolve(null);
+    const query = new URLSearchParams({ fmt: "json", ...inc && { inc } });
+    const ttlMs = ttl ?? (entity === "recording" ? TTL.recording : TTL.default);
+    return this.request(`${entity}/${id}?${query}`, ttlMs);
+  }
+  // A search or browse: query("release", { query: "..." }).
+  query(entity, params, { ttl = TTL.search } = {}) {
+    const query = new URLSearchParams({ fmt: "json", ...params });
+    return this.request(`${entity}?${query}`, ttl);
+  }
+  // True when MusicBrainz answers at all.
+  async ping() {
+    await this.throttle.wait();
+    try {
+      const response = await this.fetch(`${this.base}/ws/2/artist/1f9df192-a621-4f54-8850-2c5373b7eac9?fmt=json`, {
+        headers: { "User-Agent": this.userAgent, Accept: "application/json" },
+        signal: AbortSignal.timeout(15e3)
+      });
+      return response.status < 500 ? true : `it answered ${response.status}`;
+    } catch (error) {
+      return error.cause?.code || error.message;
+    }
+  }
+  async request(pathAndQuery, ttlMs) {
+    const key = `${this.base}|${pathAndQuery}`;
+    if (ttlMs > 0) {
+      const cached = await this.cache.get(key, ttlMs);
+      if (cached !== null) {
+        this.lastResult = cached.missing ? "missing" : "ok";
+        return cached.missing ? null : cached;
+      }
+    }
+    this.lastResult = "failed";
+    if (this.disabled) return null;
+    const url = `${this.base}/ws/2/${pathAndQuery}`;
+    let lastError = null;
+    for (let attempt = 0; attempt < this.maxRetries; attempt++) {
+      await this.throttle.wait();
+      this.requests++;
+      let response;
+      try {
+        response = await this.fetch(url, {
+          headers: { "User-Agent": this.userAgent, Accept: "application/json" },
+          signal: AbortSignal.timeout(2e4)
+        });
+      } catch (error) {
+        lastError = error;
+        if (attempt < this.maxRetries - 1) await sleep(this.retryWaitMs * (attempt + 1));
+        continue;
+      }
+      if (response.ok) {
+        const data = await response.json();
+        this.failures = 0;
+        this.lastResult = "ok";
+        if (ttlMs > 0) await this.cache.set(key, data);
+        return data;
+      }
+      if (response.status === 404) {
+        this.failures = 0;
+        this.lastResult = "missing";
+        if (ttlMs > 0) await this.cache.set(key, { missing: true });
+        return null;
+      }
+      lastError = new Error(`MusicBrainz answered ${response.status}`);
+      if (!RETRY_STATUSES.has(response.status) || attempt === this.maxRetries - 1) break;
+      const retryAfter = Number(response.headers.get("retry-after")) * 1e3 || 0;
+      await sleep(Math.max(retryAfter, this.retryWaitMs * (attempt + 1)));
+    }
+    this.log(`MusicBrainz request failed for ${pathAndQuery}: ${lastError?.message}`);
+    if (++this.failures >= 5) {
+      this.disabled = true;
+      this.log("5 MusicBrainz lookups failed in a row; skipping lookups for the rest of this run");
+    }
+    return null;
+  }
+};
 
 // src/resolver.js
 var DEFAULT_KNOWN_NAMES = {
@@ -35917,7 +36099,6 @@ var ClassicalResolver = class _ClassicalResolver {
 
 // src/settings.js
 var DEFAULT_SEPARATOR = " \u2014 ";
-var DEFAULT_COMPARE_COUNT = 10;
 var ROLE_ALIASES = {
   composer: "composers",
   composers: "composers",
@@ -35951,10 +36132,6 @@ function parseSeparator(value) {
   if (raw !== raw.trim()) return raw;
   return /^[,;]$/.test(raw) ? `${raw} ` : ` ${raw} `;
 }
-function compareCount(settings) {
-  const n = Math.round(Number(settings.compareCount));
-  return Number.isFinite(n) && n > 0 ? Math.min(n, 25) : DEFAULT_COMPARE_COUNT;
-}
 function slskdSettings(settings) {
   const url = String(settings.slskdUrl || "").trim().replace(/\/+$/, "");
   const apiKey = String(settings.slskdApiKey || "").trim();
@@ -35962,17 +36139,104 @@ function slskdSettings(settings) {
   return { url, apiKey, downloadFolder, configured: Boolean(url && apiKey) };
 }
 
-// src/tagger.js
-import { randomUUID as randomUUID3 } from "node:crypto";
+// src/slskd.js
+import { randomUUID as randomUUID2 } from "node:crypto";
+var Slskd = class {
+  constructor({ url, apiKey }, fetchImpl = fetch) {
+    if (!url || !apiKey) throw new Error("Set the slskd URL and API key on the plugin's page");
+    this.url = url.replace(/\/+$/, "");
+    this.apiKey = apiKey;
+    this.fetch = fetchImpl;
+  }
+  // slskd answers 429 while it's busy with another request; those wait and
+  // try again.
+  async request(method, route, body, options = {}) {
+    for (let attempt = 0; ; attempt++) {
+      try {
+        return await this.requestOnce(method, route, body, options);
+      } catch (error) {
+        if (!/answered 429/.test(error.message) || attempt >= 10) throw error;
+        await sleep(250 + attempt * 150);
+      }
+    }
+  }
+  async requestOnce(method, route, body, { timeoutMs = 15e3 } = {}) {
+    let response;
+    try {
+      response = await this.fetch(`${this.url}/api/v0${route}`, {
+        method,
+        headers: { "X-API-Key": this.apiKey, ...body !== void 0 && { "Content-Type": "application/json" } },
+        body: body === void 0 ? void 0 : JSON.stringify(body),
+        signal: AbortSignal.timeout(timeoutMs)
+      });
+    } catch (error) {
+      throw new Error(`Couldn't reach slskd: ${error.cause?.code || error.message}`);
+    }
+    if (response.status === 401 || response.status === 403) throw new Error("slskd refused the API key");
+    if (!response.ok) {
+      const detail = (await response.text().catch(() => "")).slice(0, 200);
+      throw new Error(`slskd answered ${response.status} for ${route}${detail ? `: ${detail}` : ""}`);
+    }
+    const textBody = await response.text();
+    return textBody ? JSON.parse(textBody) : null;
+  }
+  application() {
+    return this.request("GET", "/application");
+  }
+  // Starts a search and returns its id.
+  async startSearch(searchText, searchTimeoutMs) {
+    const id = randomUUID2();
+    const body = { id, searchText, searchTimeout: searchTimeoutMs, filterResponses: true, minimumResponseFileCount: 1, responseLimit: 200, fileLimit: 2e4 };
+    await this.request("POST", "/searches", body, { timeoutMs: searchTimeoutMs + 15e3 });
+    return id;
+  }
+  // Waits for a search to finish, never past `deadline`, and returns its
+  // responses.
+  async searchResults(id, deadline) {
+    try {
+      while (Date.now() < deadline) {
+        await sleep(1e3);
+        const state = await this.request("GET", `/searches/${id}`);
+        if (state?.isComplete || String(state?.state || "").startsWith("Completed")) break;
+      }
+      return await this.request("GET", `/searches/${id}/responses`) ?? [];
+    } finally {
+      this.request("DELETE", `/searches/${id}`).catch(() => {
+      });
+    }
+  }
+  async search(searchText, { searchTimeoutMs = 1e4, deadline = Date.now() + 2e4 } = {}) {
+    return this.searchResults(await this.startSearch(searchText, searchTimeoutMs), deadline);
+  }
+  enqueue(username, files) {
+    return this.request("POST", `/transfers/downloads/${encodeURIComponent(username)}`, files);
+  }
+  // Every download from one user, as a flat list of files.
+  async downloads(username) {
+    let data;
+    try {
+      data = await this.request("GET", `/transfers/downloads/${encodeURIComponent(username)}`);
+    } catch (error) {
+      if (/answered 404/.test(error.message)) return [];
+      throw error;
+    }
+    return (data?.directories ?? []).flatMap((dir) => dir.files ?? []);
+  }
+};
+var FAILED_STATES = /Errored|Rejected|Cancelled|TimedOut|Aborted|Failed/i;
+var isSucceeded = (state) => /Completed/i.test(state) && /Succeeded/i.test(state);
+
+// src/source.js
+import { randomUUID as randomUUID4 } from "node:crypto";
 import fs3 from "node:fs/promises";
-import path3 from "node:path";
+import path4 from "node:path";
 
 // src/tags.js
 var import_node_taglib_sharp = __toESM(require_dist(), 1);
-import { randomUUID } from "node:crypto";
+import { randomUUID as randomUUID3 } from "node:crypto";
 import { closeSync, fstatSync, openSync, readSync } from "node:fs";
-import fs from "node:fs/promises";
-import path from "node:path";
+import fs2 from "node:fs/promises";
+import path3 from "node:path";
 import_node_taglib_sharp.Id3v2Settings.useNumericGenres = false;
 var READ_STYLE = import_node_taglib_sharp.ReadStyle.None | import_node_taglib_sharp.ReadStyle.PictureLazy;
 var READ_WITH_PROPERTIES = import_node_taglib_sharp.ReadStyle.Average | import_node_taglib_sharp.ReadStyle.PictureLazy;
@@ -35980,7 +36244,7 @@ var ADDED_TAG_TYPES = import_node_taglib_sharp.TagTypes.Id3v1 | import_node_tagl
 var ITUNES_MEAN = "com.apple.iTunes";
 var MUSICBRAINZ_UFID_OWNER = "http://musicbrainz.org";
 var AUDIO_EXTENSIONS = /* @__PURE__ */ new Set([".flac", ".mp3", ".m4a", ".mp4", ".ogg", ".oga", ".opus"]);
-var isAudioPath = (file) => AUDIO_EXTENSIONS.has(path.extname(file).toLowerCase());
+var isAudioPath = (file) => AUDIO_EXTENSIONS.has(path3.extname(file).toLowerCase());
 var text = (value) => value == null ? "" : String(value).trim();
 var texts = (value) => (Array.isArray(value) ? value : [value]).map(text).filter(Boolean);
 var positive = (value) => {
@@ -36088,10 +36352,10 @@ function isFragmentedMp4(filePath) {
 var UnsupportedFormat = class extends Error {
 };
 function openFile(filePath, readStyle = READ_STYLE, asPath = filePath) {
-  if (!isAudioPath(asPath)) throw new UnsupportedFormat(`can't tag ${path.extname(asPath) || "this kind of"} files`);
+  if (!isAudioPath(asPath)) throw new UnsupportedFormat(`can't tag ${path3.extname(asPath) || "this kind of"} files`);
   if (isFragmentedMp4(filePath)) throw new UnsupportedFormat("can't tag fragmented MP4 files");
   try {
-    return import_node_taglib_sharp.File.createFromPath(filePath, `taglib/${path.extname(asPath).slice(1).toLowerCase()}`, readStyle);
+    return import_node_taglib_sharp.File.createFromPath(filePath, `taglib/${path3.extname(asPath).slice(1).toLowerCase()}`, readStyle);
   } catch (error) {
     if (/unsupported format/i.test(String(error?.message))) throw new UnsupportedFormat("can't tag this kind of file");
     throw error;
@@ -36134,7 +36398,7 @@ function readTags(filePath) {
 }
 var same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 async function writeTags(filePath, values) {
-  const source = path.resolve(filePath);
+  const source = path3.resolve(filePath);
   const preview = openFile(source);
   let changed;
   try {
@@ -36143,9 +36407,9 @@ async function writeTags(filePath, values) {
     preview.dispose();
   }
   if (!changed.length) return [];
-  const extension = path.extname(source);
-  const working = path.join(path.dirname(source), `.${path.basename(source, extension)}.${randomUUID()}.tagging`);
-  await fs.copyFile(source, working, fs.constants.COPYFILE_FICLONE);
+  const extension = path3.extname(source);
+  const working = path3.join(path3.dirname(source), `.${path3.basename(source, extension)}.${randomUUID3()}.tagging`);
+  await fs2.copyFile(source, working, fs2.constants.COPYFILE_FICLONE);
   try {
     const file = openFile(working, READ_STYLE, source);
     try {
@@ -36157,9 +36421,9 @@ async function writeTags(filePath, values) {
     } finally {
       file.dispose();
     }
-    await fs.rename(working, source);
+    await fs2.rename(working, source);
   } catch (error) {
-    await fs.rm(working, { force: true }).catch(() => {
+    await fs2.rm(working, { force: true }).catch(() => {
     });
     throw error;
   }
@@ -36225,994 +36489,7 @@ function releaseYear(date) {
   return Number.isInteger(year) && year > 0 ? year : null;
 }
 
-// src/store.js
-import { createHash, randomUUID as randomUUID2 } from "node:crypto";
-import fs2 from "node:fs/promises";
-import path2 from "node:path";
-var sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-async function readJson(file, fallback) {
-  try {
-    return JSON.parse(await fs2.readFile(file, "utf8"));
-  } catch {
-    return fallback;
-  }
-}
-async function writeJson(file, value) {
-  await fs2.mkdir(path2.dirname(file), { recursive: true });
-  const temp = `${file}.${process.pid}.${randomUUID2()}.tmp`;
-  await fs2.writeFile(temp, JSON.stringify(value));
-  await fs2.rename(temp, file);
-}
-async function tryLock(dir, staleMs) {
-  try {
-    await fs2.mkdir(dir);
-  } catch (error) {
-    if (error.code !== "EEXIST") throw error;
-    const stat = await fs2.stat(dir).catch(() => null);
-    if (stat && Date.now() - stat.mtimeMs < staleMs) return null;
-    await fs2.rm(dir, { recursive: true, force: true });
-    try {
-      await fs2.mkdir(dir);
-    } catch {
-      return null;
-    }
-  }
-  let released = false;
-  return {
-    async touch() {
-      if (released) return;
-      const now = /* @__PURE__ */ new Date();
-      await fs2.utimes(dir, now, now).catch(() => {
-      });
-    },
-    async release() {
-      released = true;
-      await fs2.rm(dir, { recursive: true, force: true }).catch(() => {
-      });
-    }
-  };
-}
-async function withLock(dir, staleMs, run, { waitMs = 3e4 } = {}) {
-  const until = Date.now() + waitMs;
-  for (; ; ) {
-    const lock = await tryLock(dir, staleMs);
-    if (lock) {
-      try {
-        return await run(lock);
-      } finally {
-        await lock.release();
-      }
-    }
-    if (Date.now() > until) throw new Error(`Timed out waiting for ${path2.basename(dir)}`);
-    await sleep(50 + Math.random() * 100);
-  }
-}
-var Throttle = class {
-  constructor(folder, intervalMs) {
-    this.lockDir = path2.join(folder, "mb-throttle.lock");
-    this.stateFile = path2.join(folder, "mb-throttle.json");
-    this.intervalMs = intervalMs;
-  }
-  async wait() {
-    if (!this.intervalMs) return;
-    const slot = await withLock(this.lockDir, 5e3, async () => {
-      const state = await readJson(this.stateFile, { next: 0 });
-      const at = Math.max(Date.now(), Number(state.next) || 0);
-      await writeJson(this.stateFile, { next: at + this.intervalMs });
-      return at;
-    });
-    const wait = slot - Date.now();
-    if (wait > 0) await sleep(wait);
-  }
-};
-var FileCache = class {
-  constructor(folder) {
-    this.folder = folder;
-  }
-  file(key) {
-    const hash = createHash("sha1").update(key).digest("hex");
-    return path2.join(this.folder, hash.slice(0, 2), `${hash}.json`);
-  }
-  async get(key, ttlMs) {
-    const entry = await readJson(this.file(key), null);
-    if (!entry || Date.now() - entry.time > ttlMs) return null;
-    return entry.value;
-  }
-  async set(key, value) {
-    await writeJson(this.file(key), { time: Date.now(), key, value }).catch(() => {
-    });
-  }
-};
-async function pruneCache(folder, maxAgeMs) {
-  const stamp = path2.join(folder, ".pruned");
-  const last = (await fs2.stat(stamp).catch(() => null))?.mtimeMs ?? 0;
-  if (Date.now() - last < 24 * 60 * 6e4) return 0;
-  await fs2.mkdir(folder, { recursive: true });
-  await fs2.writeFile(stamp, "");
-  let removed = 0;
-  for (const dir of await fs2.readdir(folder).catch(() => [])) {
-    const sub = path2.join(folder, dir);
-    for (const name of await fs2.readdir(sub).catch(() => [])) {
-      const file = path2.join(sub, name);
-      const stat = await fs2.stat(file).catch(() => null);
-      if (stat && Date.now() - stat.mtimeMs > maxAgeMs) {
-        await fs2.rm(file, { force: true });
-        removed++;
-      }
-    }
-  }
-  return removed;
-}
-
-// src/tagger.js
-var LOCK_STALE_MS = 2 * 6e4;
-var SAVE_EVERY_MS = 3e4;
-var queueDir = (ctx) => path3.join(ctx.dataFolder, "queue");
-var processedFile = (ctx) => path3.join(ctx.dataFolder, "processed.json");
-var indexFile = (ctx) => path3.join(ctx.dataFolder, "library-index.json");
-var originalsFile = (ctx) => path3.join(ctx.dataFolder, "originals.json");
-var excludedFile = (ctx) => path3.join(ctx.dataFolder, "excluded.json");
-var TAG_FIELDS = ["artist", "albumArtist", "composer", "work", "workId"];
-var TAGGING_VERSION = 2;
-var outdated = (record) => record && (record.status === "tagged" || record.status === "unchanged") && (record.v ?? 1) < TAGGING_VERSION;
-var lockDir = (ctx) => path3.join(ctx.dataFolder, "tagging.lock");
-var yieldFile = (ctx) => path3.join(ctx.dataFolder, "tagging.yield");
-var YIELD_FRESH_MS = 10 * 6e4;
-var PRIORITY_WAIT_MS = 5 * 6e4;
-var ACTION_CLAIM_MS = 2 * 6e4;
-async function enqueue(ctx, filePaths, { force = false, source = null } = {}) {
-  await fs3.mkdir(queueDir(ctx), { recursive: true });
-  const ids = [];
-  for (const filePath of filePaths) {
-    if (!filePath) continue;
-    const id = `${Date.now().toString().padStart(15, "0")}-${randomUUID3()}`;
-    await writeJson(path3.join(queueDir(ctx), `${id}.json`), { path: filePath, force, source, at: Date.now() });
-    ids.push(id);
-  }
-  return ids;
-}
-async function queuedEntries(ctx) {
-  const names = (await fs3.readdir(queueDir(ctx)).catch(() => [])).filter((n) => n.endsWith(".json")).sort();
-  return names.map((name) => ({ name, file: path3.join(queueDir(ctx), name) }));
-}
-var queueLength = async (ctx) => (await queuedEntries(ctx)).length;
-async function allowedPath(ctx, filePath) {
-  const real = await fs3.realpath(filePath).catch(() => null);
-  if (!real) return null;
-  for (const root of [ctx.libraryFolder, ctx.dataFolder]) {
-    if (!root) continue;
-    const base = await fs3.realpath(root).catch(() => null);
-    if (!base) continue;
-    const relative = path3.relative(base, real);
-    if (relative && !relative.startsWith("..") && !path3.isAbsolute(relative)) return real;
-  }
-  return null;
-}
-var statKey = (stat) => ({ mtimeMs: Math.round(stat.mtimeMs), size: stat.size });
-var sameStat = (record, stat) => record && record.mtimeMs === Math.round(stat.mtimeMs) && record.size === stat.size;
-function indexEntry(tags, stat) {
-  return {
-    ...statKey(stat),
-    title: tags.title,
-    artist: tags.artist,
-    album: tags.album,
-    albumArtist: tags.albumArtist,
-    recordingMbid: tags.recordingMbid,
-    releaseMbid: tags.releaseMbid,
-    releaseGroupMbid: tags.releaseGroupMbid,
-    albumArtistMbids: tags.albumArtistMbids,
-    trackNumber: tags.trackNumber,
-    discNumber: tags.discNumber,
-    durationMs: tags.durationMs,
-    workId: tags.workId
-  };
-}
-var State = class {
-  constructor(ctx, lock) {
-    this.ctx = ctx;
-    this.lock = lock;
-    this.dirty = 0;
-    this.savedAt = Date.now();
-    this.refs = 0;
-    this.admins = 0;
-    this.background = 0;
-    this.claimed = /* @__PURE__ */ new Set();
-    this.busyPaths = /* @__PURE__ */ new Map();
-  }
-  async load() {
-    this.processed = await readJson(processedFile(this.ctx), {});
-    this.index = await readJson(indexFile(this.ctx), {});
-    this.originals = await readJson(originalsFile(this.ctx), {});
-    this.excluded = await readJson(excludedFile(this.ctx), {});
-  }
-  // Saved every 30 seconds while working, and at the end: the index of a
-  // large Library is several megabytes.
-  async save(force = false) {
-    if (!this.dirty || !force && Date.now() - this.savedAt < SAVE_EVERY_MS) return;
-    this.savedAt = Date.now();
-    this.dirty = 0;
-    await writeJson(processedFile(this.ctx), this.processed);
-    await writeJson(indexFile(this.ctx), this.index);
-    await writeJson(originalsFile(this.ctx), this.originals);
-    await writeJson(excludedFile(this.ctx), this.excluded);
-    await this.lock.touch();
-  }
-  // One call at a time works on a file.
-  async exclusive(file, work) {
-    while (this.busyPaths.has(file)) await this.busyPaths.get(file).catch(() => {
-    });
-    const running = work();
-    this.busyPaths.set(file, running);
-    try {
-      return await running;
-    } finally {
-      this.busyPaths.delete(file);
-    }
-  }
-};
-var Session = class {
-  constructor(ctx, state, priority) {
-    this.ctx = ctx;
-    this.state = state;
-    this.priority = priority;
-    this.changedFiles = 0;
-    this.stats = { tagged: 0, unchanged: 0, skipped: {}, failed: 0, left: 0 };
-  }
-  get processed() {
-    return this.state.processed;
-  }
-  get index() {
-    return this.state.index;
-  }
-  get originals() {
-    return this.state.originals;
-  }
-  get excluded() {
-    return this.state.excluded;
-  }
-  get dirty() {
-    return this.state.dirty;
-  }
-  set dirty(value) {
-    this.state.dirty = value;
-  }
-  save(force = false) {
-    return this.state.save(force);
-  }
-  // True when an admin action wants the lock and this is background work:
-  // one in this process, or one waiting in another.
-  async shouldYield() {
-    if (this.priority) return false;
-    if (this.state.admins > 0) this.yielding = true;
-    else if (!this.yieldCheckedAt || Date.now() - this.yieldCheckedAt >= 500) {
-      this.yieldCheckedAt = Date.now();
-      const stat = await fs3.stat(yieldFile(this.ctx)).catch(() => null);
-      this.yielding = Boolean(stat && Date.now() - stat.mtimeMs < YIELD_FRESH_MS);
-    }
-    if (this.yielding && !this.yieldLogged) {
-      this.yieldLogged = true;
-      this.ctx.log("Pausing background tagging for an admin action");
-    }
-    return this.yielding;
-  }
-  record(filePath, stat, result) {
-    this.processed[filePath] = { ...statKey(stat), ...result, at: Date.now() };
-    this.dirty++;
-    if (result.status === "skipped") this.stats.skipped[result.reason] = (this.stats.skipped[result.reason] || 0) + 1;
-    else this.stats[result.status]++;
-  }
-  // Returns false when MusicBrainz can't be reached, so the caller stops.
-  async processFile(filePath, options = {}) {
-    const real = await allowedPath(this.ctx, filePath);
-    if (!real) {
-      this.ctx.log(`Not tagging ${filePath}: it isn't in the Library folder`);
-      this.stats.skipped["outside the Library"] = (this.stats.skipped["outside the Library"] || 0) + 1;
-      return true;
-    }
-    if (!isAudioPath(real)) return true;
-    return this.state.exclusive(real, () => this.processReal(real, options));
-  }
-  // `queuedAt`: when the request to tag was made. Classical tags an admin
-  // removed after that stay removed.
-  async processReal(real, { force = false, prefilter = false, upgrade = false, queuedAt = null } = {}) {
-    const { ctx } = this;
-    const stat = await fs3.stat(real);
-    if (!force && sameStat(this.processed[real], stat) && !(upgrade && outdated(this.processed[real]))) return true;
-    let tags;
-    try {
-      tags = readTags(real);
-    } catch (error) {
-      this.record(real, stat, { status: "skipped", reason: error instanceof UnsupportedFormat ? "unsupported format" : "unreadable" });
-      return true;
-    }
-    this.index[real] = indexEntry(tags, stat);
-    if (!tags.recordingMbid) {
-      this.record(real, stat, { status: "skipped", reason: "no recording ID" });
-      return true;
-    }
-    if (this.excluded[tags.recordingMbid]) {
-      if (!force || queuedAt && (this.excluded[tags.recordingMbid].at ?? 0) > queuedAt) {
-        this.record(real, stat, { status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
-        return true;
-      }
-      delete this.excluded[tags.recordingMbid];
-    }
-    if (prefilter && ctx.resolver.classifyGenres(new Set(tags.genres.map((g) => g.toLowerCase()))) === false) {
-      this.record(real, stat, { status: "skipped", reason: "non-classical", recording: tags.recordingMbid });
-      return true;
-    }
-    const fields = await ctx.resolver.resolve(tags.recordingMbid, {
-      trackArtistIds: tags.artistMbids,
-      albumArtistIds: tags.albumArtistMbids,
-      releaseGroupId: tags.releaseGroupMbid || null,
-      confirmed: force
-    });
-    if (!fields) {
-      const reason = ctx.resolver.skipReason;
-      if (reason === "unreachable") return false;
-      this.record(real, stat, { status: "skipped", reason, recording: tags.recordingMbid });
-      return true;
-    }
-    const values = { artist: [fields.artist], composer: fields.composers };
-    if (fields.workId) Object.assign(values, { work: [fields.work], workId: [fields.workId] });
-    const albumArtist = await this.englishAlbumArtist(tags);
-    if (albumArtist) values.albumArtist = [albumArtist];
-    let changed;
-    try {
-      if (!this.originals[real]) {
-        this.originals[real] = { ...readValues(real, TAG_FIELDS), recording: tags.recordingMbid };
-        this.dirty++;
-      }
-      changed = await writeTags(real, values);
-    } catch (error) {
-      ctx.log(`Couldn't tag ${real}: ${error.message}`);
-      this.record(real, stat, { status: "skipped", reason: "couldn't write tags", recording: tags.recordingMbid });
-      return true;
-    }
-    const after = await fs3.stat(real);
-    this.index[real] = { ...this.index[real], ...statKey(after), artist: fields.artist, workId: fields.workId || "" };
-    this.record(real, after, {
-      v: TAGGING_VERSION,
-      status: changed.length ? "tagged" : "unchanged",
-      recording: tags.recordingMbid,
-      artist: fields.artist,
-      workId: fields.workId
-    });
-    if (changed.length) {
-      this.changedFiles++;
-      ctx.log(`Tagged ${path3.basename(real)}: ${fields.artist}`);
-    }
-    return true;
-  }
-  // Puts back the tags a file had before the plugin changed them. Files
-  // tagged before the plugin kept backups get the artist MusicBrainz credits
-  // for that track on its release, which is what Aurral writes.
-  async untagFile(filePath) {
-    const real = await allowedPath(this.ctx, filePath);
-    if (!real || !isAudioPath(real)) return "skipped";
-    return this.state.exclusive(real, () => this.untagReal(real));
-  }
-  async untagReal(real) {
-    const { ctx } = this;
-    let tags;
-    try {
-      tags = readTags(real);
-    } catch {
-      return "skipped";
-    }
-    if (tags.recordingMbid) this.excluded[tags.recordingMbid] = { at: Date.now() };
-    const original = this.originals[real];
-    let values;
-    if (original) values = Object.fromEntries(TAG_FIELDS.map((field) => [field, original[field] ?? []]));
-    else {
-      const credit = await this.trackCredit(tags);
-      if (!credit) return "no backup";
-      values = { artist: [credit] };
-      if (tags.albumArtistMbids.length === 1) {
-        const name = (await ctx.mb.get("artist", tags.albumArtistMbids[0], "aliases+genres"))?.name;
-        if (name) values.albumArtist = [name];
-      }
-    }
-    const changed = await writeTags(real, values);
-    delete this.originals[real];
-    const after = await fs3.stat(real);
-    this.index[real] = { ...this.index[real] ?? {}, ...indexEntry(readTags(real), after) };
-    this.record(real, after, { status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
-    this.stats.skipped["classical tags removed"]--;
-    if (changed.length) {
-      this.changedFiles++;
-      ctx.log(`Removed classical tags from ${path3.basename(real)}`);
-    }
-    return changed.length ? "restored" : "unchanged";
-  }
-  async englishAlbumArtist(tags) {
-    if (tags.albumArtistMbids.length !== 1) return null;
-    const artist = await this.ctx.resolver.getArtist(tags.albumArtistMbids[0]);
-    if (!artist?.name) return null;
-    const [name] = await this.ctx.resolver.englishNames(artist);
-    return name || null;
-  }
-  // MusicBrainz's artist credit for this recording on the file's release,
-  // else on the recording itself.
-  async trackCredit(tags) {
-    const { mb } = this.ctx;
-    if (tags.releaseMbid) {
-      const release = await mb.get("release", tags.releaseMbid, RELEASE_INC);
-      for (const medium of release?.media || [])
-        for (const track of medium.tracks || [])
-          if (track.recording?.id === tags.recordingMbid) {
-            const credit = creditString(track["artist-credit"] || track.recording["artist-credit"]);
-            if (credit) return credit;
-          }
-    }
-    const recording = await mb.get("recording", tags.recordingMbid, "artist-credits");
-    return creditString(recording?.["artist-credit"]) || null;
-  }
-  async drainQueue(until, onlyIds = null) {
-    for (const entry of await queuedEntries(this.ctx)) {
-      if (Date.now() > until || await this.shouldYield()) return false;
-      if (onlyIds && !onlyIds.has(entry.name.replace(/\.json$/, ""))) continue;
-      if (this.state.claimed.has(entry.name)) continue;
-      this.state.claimed.add(entry.name);
-      try {
-        const job = await readJson(entry.file, null);
-        if (!this.priority && job?.source === "action" && Date.now() - (job.at || 0) < ACTION_CLAIM_MS) continue;
-        if (job?.path) {
-          const reachable = await this.processFile(job.path, { force: job.force, queuedAt: job.at });
-          if (!reachable) return false;
-        }
-        await fs3.rm(entry.file, { force: true });
-      } finally {
-        this.state.claimed.delete(entry.name);
-      }
-      await this.save();
-    }
-    return true;
-  }
-  // Walks the Library, refreshing the index, and returns files that have a
-  // recording ID and were never processed (or changed since). Stops at
-  // `until`; unchanged files cost only a stat, so the next run gets further.
-  async scan(until) {
-    const root = this.ctx.libraryFolder;
-    const pending = [];
-    const seen = /* @__PURE__ */ new Set();
-    let complete = true;
-    const walk = async (dir) => {
-      if (Date.now() > until || await this.shouldYield()) {
-        complete = false;
-        return;
-      }
-      const entries = await fs3.readdir(dir, { withFileTypes: true }).catch(() => []);
-      for (const entry of entries) {
-        if (Date.now() > until || await this.shouldYield()) {
-          complete = false;
-          return;
-        }
-        if (entry.name.startsWith(".")) continue;
-        const full = path3.join(dir, entry.name);
-        if (entry.isDirectory()) await walk(full);
-        else if (entry.isFile() && isAudioPath(full)) {
-          seen.add(full);
-          const stat = await fs3.stat(full).catch(() => null);
-          if (!stat) continue;
-          if (!sameStat(this.index[full], stat)) {
-            try {
-              this.index[full] = indexEntry(readTags(full), stat);
-            } catch {
-              delete this.index[full];
-              continue;
-            }
-            this.dirty++;
-            await this.save();
-          }
-          if (this.index[full].recordingMbid && (!sameStat(this.processed[full], stat) || outdated(this.processed[full]))) pending.push(full);
-        }
-      }
-    };
-    if (root) await walk(root);
-    if (complete) {
-      for (const file of Object.keys(this.index)) if (file.startsWith(root) && !seen.has(file)) delete this.index[file];
-    }
-    this.scanComplete = complete;
-    return pending;
-  }
-};
-var held = /* @__PURE__ */ new Map();
-async function openState(ctx, priority) {
-  let lock = await tryLock(lockDir(ctx), LOCK_STALE_MS);
-  if (!lock && priority) {
-    ctx.log("Waiting for background tagging in another process to pause");
-    const until = Date.now() + PRIORITY_WAIT_MS;
-    while (!lock && Date.now() < until) {
-      await writeJson(yieldFile(ctx), { at: Date.now() });
-      await sleep(500);
-      lock = await tryLock(lockDir(ctx), LOCK_STALE_MS);
-    }
-    await fs3.rm(yieldFile(ctx), { force: true });
-    if (!lock) ctx.log("Tagging in another process didn't pause within 5 minutes");
-  }
-  if (!lock) return null;
-  const state = new State(ctx, lock);
-  try {
-    await state.load();
-  } catch (error) {
-    await lock.release();
-    throw error;
-  }
-  state.heartbeat = setInterval(() => lock.touch(), 3e4);
-  return state;
-}
-async function withTagging(ctx, work, { priority = false } = {}) {
-  const key = path3.resolve(ctx.dataFolder);
-  let entry;
-  for (; ; ) {
-    entry = held.get(key);
-    if (!entry) {
-      entry = { opening: openState(ctx, priority), state: null };
-      held.set(key, entry);
-      try {
-        entry.state = await entry.opening;
-      } catch (error) {
-        held.delete(key);
-        throw error;
-      }
-      if (!entry.state) {
-        held.delete(key);
-        return null;
-      }
-      break;
-    }
-    if (!entry.state) {
-      if (!priority) return null;
-      await entry.opening.catch(() => {
-      });
-      if (held.get(key) === entry && entry.state) break;
-      continue;
-    }
-    if (!priority && entry.state.background > 0) return null;
-    break;
-  }
-  const { state } = entry;
-  const session = new Session(ctx, state, priority);
-  state.refs++;
-  if (priority) state.admins++;
-  else state.background++;
-  try {
-    await work(session);
-    return session.stats;
-  } finally {
-    if (priority) state.admins--;
-    else state.background--;
-    if (--state.refs === 0) {
-      held.delete(key);
-      clearInterval(state.heartbeat);
-      await state.save(true).catch((error) => ctx.log(`Couldn't save progress: ${error.message}`));
-      await state.lock.release();
-    } else {
-      await state.save().catch(() => {
-      });
-    }
-    if (session.changedFiles) await refreshLibrary(ctx);
-  }
-}
-async function refreshLibrary(ctx) {
-  if (!ctx.api?.url || !ctx.api?.key) return;
-  try {
-    await new Aurral(ctx.api, ctx.fetch).refreshLibrary();
-  } catch (error) {
-    ctx.log(`Couldn't ask Aurral to rescan the Library: ${error.message}`);
-  }
-}
-async function runQueue(ctx, budgetMs, onlyIds = null, { priority = false } = {}) {
-  const until = Date.now() + budgetMs;
-  return withTagging(
-    ctx,
-    async (session) => {
-      await session.drainQueue(until, onlyIds);
-      session.stats.left = onlyIds ? (await queuedEntries(ctx)).filter((e) => onlyIds.has(e.name.replace(/\.json$/, ""))).length : await queueLength(ctx);
-    },
-    { priority }
-  );
-}
-async function runScheduled(ctx, budgetMs) {
-  const until = Date.now() + budgetMs;
-  return withTagging(ctx, async (session) => {
-    if (!await session.drainQueue(until)) return;
-    const pending = await session.scan(until);
-    session.stats.found = pending.length;
-    for (const file of pending) {
-      if (Date.now() > until || await session.shouldYield()) break;
-      if (!await session.processFile(file, { prefilter: true, upgrade: true })) break;
-      await session.save();
-    }
-    session.stats.left = await queueLength(ctx) + pending.filter((f) => !session.processed[f]).length;
-  });
-}
-async function libraryIndex(ctx, budgetMs, { priority = false } = {}) {
-  let index = null;
-  await withTagging(
-    ctx,
-    async (session) => {
-      await session.scan(Date.now() + budgetMs);
-      index = session.index;
-    },
-    { priority }
-  );
-  return index ?? await readJson(indexFile(ctx), {});
-}
-async function untagFiles(ctx, paths, budgetMs, { priority = false } = {}) {
-  const until = Date.now() + budgetMs;
-  const counts = { restored: 0, unchanged: 0, "no backup": 0, skipped: 0, left: 0 };
-  const stats = await withTagging(ctx, async (session) => {
-    for (const file of paths) {
-      if (Date.now() > until) {
-        counts.left++;
-        continue;
-      }
-      try {
-        counts[await session.untagFile(file)]++;
-      } catch (error) {
-        ctx.log(`Couldn't remove classical tags from ${file}: ${error.message}`);
-        counts.skipped++;
-      }
-    }
-  }, { priority });
-  return stats ? counts : null;
-}
-function describeStats(stats) {
-  if (!stats) return "Another tagging run is in progress";
-  const parts = [`${stats.tagged} tagged`];
-  if (stats.unchanged) parts.push(`${stats.unchanged} already right`);
-  for (const [reason, count] of Object.entries(stats.skipped)) parts.push(`${count} skipped (${reason})`);
-  if (stats.failed) parts.push(`${stats.failed} failed`);
-  if (stats.left) parts.push(`${stats.left} left for the next run`);
-  return parts.join(", ");
-}
-
-// src/compare.js
-var MAX_PLAYLISTS = 10;
-var SKIPPED_PERFORMANCE = /* @__PURE__ */ new Set(["partial", "medley"]);
-var playlistName = (composer, work) => `Recordings: ${composer}: ${work}`.slice(0, 200);
-function recordingIdOf(track) {
-  if (track.mbid) return track.mbid;
-  if (!track.path) return null;
-  try {
-    return readTags(track.path).recordingMbid || null;
-  } catch {
-    return null;
-  }
-}
-function pickRelease(releases) {
-  const rank = (r) => [r.status === "Official" ? 0 : 1, r.date ? r.date : "9999"];
-  return [...releases || []].sort((a, b) => {
-    const [x, y] = [rank(a), rank(b)];
-    return x[0] - y[0] || x[1].localeCompare(y[1]);
-  })[0];
-}
-async function downloadTrack(ctx, recordingId) {
-  const data = await ctx.mb.get("recording", recordingId, "releases+release-groups+media+artist-credits");
-  const release = pickRelease(data?.releases);
-  if (!data || !release) return null;
-  let medium = null;
-  let track = null;
-  for (const m of release.media || []) {
-    track = (m.tracks || m.track || []).find((t) => t.id && t.position) || null;
-    if (track) {
-      medium = m;
-      break;
-    }
-  }
-  const credit = release["artist-credit"]?.length ? release["artist-credit"] : data["artist-credit"];
-  return {
-    artist: creditString(credit) || creditString(data["artist-credit"]),
-    artistMbid: credit?.[0]?.artist?.id ?? null,
-    title: track?.title || data.title,
-    album: release.title,
-    albumMbid: release["release-group"]?.id ?? null,
-    releaseMbid: release.id,
-    trackMbid: recordingId,
-    durationMs: track?.length ?? data.length ?? null,
-    trackNumber: track?.position ?? null,
-    discNumber: medium?.position ?? null,
-    releaseYear: releaseYear(release.date)
-  };
-}
-function libraryTrack(path7, entry) {
-  return {
-    artist: entry.albumArtist || entry.artist,
-    title: entry.title,
-    album: entry.album || null,
-    albumMbid: entry.releaseGroupMbid || null,
-    releaseMbid: entry.releaseMbid || null,
-    trackMbid: entry.recordingMbid,
-    durationMs: entry.durationMs || null,
-    trackNumber: entry.trackNumber || null,
-    discNumber: entry.discNumber || null,
-    path: path7
-  };
-}
-async function compareMovement(ctx, aurral, playlists, movement, index) {
-  const work = await ctx.mb.get("work", movement.workId, "recording-rels");
-  const recordings = [];
-  for (const rel of work?.relations || []) {
-    if (rel["target-type"] !== "recording" || rel.type !== "performance" || !rel.recording?.id) continue;
-    if ((rel.attributes || []).some((a) => SKIPPED_PERFORMANCE.has(String(a).toLowerCase()))) continue;
-    if (!recordings.includes(rel.recording.id)) recordings.push(rel.recording.id);
-  }
-  if (!recordings.includes(movement.recordingId)) recordings.unshift(movement.recordingId);
-  const n = compareCount(ctx.settings);
-  const inLibrary = /* @__PURE__ */ new Map();
-  for (const [file, entry] of Object.entries(index)) {
-    if (entry.recordingMbid && recordings.includes(entry.recordingMbid) && !inLibrary.has(entry.recordingMbid))
-      inLibrary.set(entry.recordingMbid, libraryTrack(file, entry));
-  }
-  const ordered = [
-    movement.recordingId,
-    ...recordings.filter((id) => inLibrary.has(id) && id !== movement.recordingId),
-    ...recordings.filter((id) => !inLibrary.has(id) && id !== movement.recordingId)
-  ];
-  const tracks = [];
-  let fromLibrary = 0;
-  for (const id of ordered) {
-    if (tracks.length >= n) break;
-    if (inLibrary.has(id)) {
-      tracks.push(inLibrary.get(id));
-      fromLibrary++;
-      continue;
-    }
-    const track = await downloadTrack(ctx, id);
-    if (track?.artist && track.title) tracks.push(track);
-  }
-  const name = playlistName(movement.composer, movement.work);
-  const existing = playlists.find((p) => p.name === name);
-  if (existing) await aurral.updatePlaylist(existing.id, name, tracks);
-  else await aurral.createPlaylist(name, tracks);
-  const queued = tracks.length - fromLibrary;
-  return `${existing ? "Updated" : "Created"} "${name}": ${tracks.length} recordings, ${fromLibrary} in the Library${queued ? `, ${queued} to download` : ""}`;
-}
-async function compareRecordings(ctx, user, tracks) {
-  const aurral = new Aurral(ctx.api, ctx.fetch);
-  if (!await canRequest(aurral, user)) throw new Error("Only admins and people who can request music can compare recordings");
-  const movements = [];
-  let notClassical = 0;
-  for (const track of tracks) {
-    const recordingId = recordingIdOf(track);
-    const fields = recordingId ? await ctx.resolver.resolve(recordingId) : null;
-    if (!fields?.workId) {
-      notClassical++;
-      continue;
-    }
-    if (movements.some((m) => m.workId === fields.workId)) continue;
-    movements.push({ recordingId, workId: fields.workId, work: fields.work, composer: fields.composers[0] });
-  }
-  if (!movements.length)
-    throw new Error(
-      notClassical === 1 ? "This track has no Work with a composer on MusicBrainz" : "None of these tracks has a Work with a composer on MusicBrainz"
-    );
-  const index = await libraryIndex(ctx, 6e4);
-  const playlists = await aurral.staticPlaylists();
-  const lines = [];
-  for (const movement of movements.slice(0, MAX_PLAYLISTS)) {
-    lines.push(await compareMovement(ctx, aurral, playlists, movement, index));
-  }
-  if (movements.length > MAX_PLAYLISTS) lines.push(`${movements.length - MAX_PLAYLISTS} more movements left out`);
-  return summarize(lines);
-}
-function summarize(lines) {
-  let message = lines[0];
-  for (const line of lines.slice(1)) {
-    if (`${message}. ${line}`.length > 480) {
-      message += `. And ${lines.length - lines.indexOf(line)} more`;
-      break;
-    }
-    message += `. ${line}`;
-  }
-  return message.length > 500 ? `${message.slice(0, 497)}...` : message;
-}
-
-// src/mb.js
-import path4 from "node:path";
-
-// src/version.js
-var VERSION = true ? "1.0.4" : "dev";
-var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
-
-// src/mb.js
-var PUBLIC_MB = "https://musicbrainz.org";
-var DAY = 24 * 60 * 6e4;
-var TTL = { recording: DAY, default: 30 * DAY, search: 7 * DAY };
-var RETRY_STATUSES = /* @__PURE__ */ new Set([500, 502, 503, 504]);
-function mbBaseUrl(settings) {
-  const mirror = String(settings.mbMirror || "").trim().replace(/\/+$/, "");
-  if (!mirror) return PUBLIC_MB;
-  return /^https?:\/\//i.test(mirror) ? mirror.replace(/\/ws\/2$/, "") : `http://${mirror}`;
-}
-var MusicBrainz = class {
-  constructor({ settings, dataFolder, fetchImpl = fetch, log: log2 = () => {
-  }, intervalMs, maxRetries = 4, retryWaitMs = 3e3 }) {
-    this.base = mbBaseUrl(settings);
-    this.userAgent = `AurralClassical/${VERSION} ( ${REPOSITORY} )`;
-    this.fetch = fetchImpl;
-    this.log = log2;
-    this.cache = new FileCache(path4.join(dataFolder, "mb-cache"));
-    const isPublic = this.base === PUBLIC_MB;
-    this.throttle = new Throttle(dataFolder, intervalMs ?? (isPublic ? 1e3 : 0));
-    this.maxRetries = maxRetries;
-    this.retryWaitMs = retryWaitMs;
-    this.failures = 0;
-    this.disabled = false;
-    this.requests = 0;
-  }
-  // An entity lookup: get("recording", id, "artist-rels+work-rels").
-  get(entity, id, inc, { ttl } = {}) {
-    if (!id) return Promise.resolve(null);
-    const query = new URLSearchParams({ fmt: "json", ...inc && { inc } });
-    const ttlMs = ttl ?? (entity === "recording" ? TTL.recording : TTL.default);
-    return this.request(`${entity}/${id}?${query}`, ttlMs);
-  }
-  // A search or browse: query("release", { query: "..." }).
-  query(entity, params, { ttl = TTL.search } = {}) {
-    const query = new URLSearchParams({ fmt: "json", ...params });
-    return this.request(`${entity}?${query}`, ttl);
-  }
-  // True when MusicBrainz answers at all.
-  async ping() {
-    await this.throttle.wait();
-    try {
-      const response = await this.fetch(`${this.base}/ws/2/artist/1f9df192-a621-4f54-8850-2c5373b7eac9?fmt=json`, {
-        headers: { "User-Agent": this.userAgent, Accept: "application/json" },
-        signal: AbortSignal.timeout(15e3)
-      });
-      return response.status < 500 ? true : `it answered ${response.status}`;
-    } catch (error) {
-      return error.cause?.code || error.message;
-    }
-  }
-  async request(pathAndQuery, ttlMs) {
-    const key = `${this.base}|${pathAndQuery}`;
-    if (ttlMs > 0) {
-      const cached = await this.cache.get(key, ttlMs);
-      if (cached !== null) {
-        this.lastResult = cached.missing ? "missing" : "ok";
-        return cached.missing ? null : cached;
-      }
-    }
-    this.lastResult = "failed";
-    if (this.disabled) return null;
-    const url = `${this.base}/ws/2/${pathAndQuery}`;
-    let lastError = null;
-    for (let attempt = 0; attempt < this.maxRetries; attempt++) {
-      await this.throttle.wait();
-      this.requests++;
-      let response;
-      try {
-        response = await this.fetch(url, {
-          headers: { "User-Agent": this.userAgent, Accept: "application/json" },
-          signal: AbortSignal.timeout(2e4)
-        });
-      } catch (error) {
-        lastError = error;
-        if (attempt < this.maxRetries - 1) await sleep(this.retryWaitMs * (attempt + 1));
-        continue;
-      }
-      if (response.ok) {
-        const data = await response.json();
-        this.failures = 0;
-        this.lastResult = "ok";
-        if (ttlMs > 0) await this.cache.set(key, data);
-        return data;
-      }
-      if (response.status === 404) {
-        this.failures = 0;
-        this.lastResult = "missing";
-        if (ttlMs > 0) await this.cache.set(key, { missing: true });
-        return null;
-      }
-      lastError = new Error(`MusicBrainz answered ${response.status}`);
-      if (!RETRY_STATUSES.has(response.status) || attempt === this.maxRetries - 1) break;
-      const retryAfter = Number(response.headers.get("retry-after")) * 1e3 || 0;
-      await sleep(Math.max(retryAfter, this.retryWaitMs * (attempt + 1)));
-    }
-    this.log(`MusicBrainz request failed for ${pathAndQuery}: ${lastError?.message}`);
-    if (++this.failures >= 5) {
-      this.disabled = true;
-      this.log("5 MusicBrainz lookups failed in a row; skipping lookups for the rest of this run");
-    }
-    return null;
-  }
-};
-
-// src/slskd.js
-import { randomUUID as randomUUID4 } from "node:crypto";
-var Slskd = class {
-  constructor({ url, apiKey }, fetchImpl = fetch) {
-    if (!url || !apiKey) throw new Error("Set the slskd URL and API key on the plugin's page");
-    this.url = url.replace(/\/+$/, "");
-    this.apiKey = apiKey;
-    this.fetch = fetchImpl;
-  }
-  // slskd answers 429 while it's busy with another request; those wait and
-  // try again.
-  async request(method, route, body, options = {}) {
-    for (let attempt = 0; ; attempt++) {
-      try {
-        return await this.requestOnce(method, route, body, options);
-      } catch (error) {
-        if (!/answered 429/.test(error.message) || attempt >= 10) throw error;
-        await sleep(250 + attempt * 150);
-      }
-    }
-  }
-  async requestOnce(method, route, body, { timeoutMs = 15e3 } = {}) {
-    let response;
-    try {
-      response = await this.fetch(`${this.url}/api/v0${route}`, {
-        method,
-        headers: { "X-API-Key": this.apiKey, ...body !== void 0 && { "Content-Type": "application/json" } },
-        body: body === void 0 ? void 0 : JSON.stringify(body),
-        signal: AbortSignal.timeout(timeoutMs)
-      });
-    } catch (error) {
-      throw new Error(`Couldn't reach slskd: ${error.cause?.code || error.message}`);
-    }
-    if (response.status === 401 || response.status === 403) throw new Error("slskd refused the API key");
-    if (!response.ok) {
-      const detail = (await response.text().catch(() => "")).slice(0, 200);
-      throw new Error(`slskd answered ${response.status} for ${route}${detail ? `: ${detail}` : ""}`);
-    }
-    const textBody = await response.text();
-    return textBody ? JSON.parse(textBody) : null;
-  }
-  application() {
-    return this.request("GET", "/application");
-  }
-  // Starts a search and returns its id.
-  async startSearch(searchText, searchTimeoutMs) {
-    const id = randomUUID4();
-    const body = { id, searchText, searchTimeout: searchTimeoutMs, filterResponses: true, minimumResponseFileCount: 1, responseLimit: 200, fileLimit: 2e4 };
-    await this.request("POST", "/searches", body, { timeoutMs: searchTimeoutMs + 15e3 });
-    return id;
-  }
-  // Waits for a search to finish, never past `deadline`, and returns its
-  // responses.
-  async searchResults(id, deadline) {
-    try {
-      while (Date.now() < deadline) {
-        await sleep(1e3);
-        const state = await this.request("GET", `/searches/${id}`);
-        if (state?.isComplete || String(state?.state || "").startsWith("Completed")) break;
-      }
-      return await this.request("GET", `/searches/${id}/responses`) ?? [];
-    } finally {
-      this.request("DELETE", `/searches/${id}`).catch(() => {
-      });
-    }
-  }
-  async search(searchText, { searchTimeoutMs = 1e4, deadline = Date.now() + 2e4 } = {}) {
-    return this.searchResults(await this.startSearch(searchText, searchTimeoutMs), deadline);
-  }
-  enqueue(username, files) {
-    return this.request("POST", `/transfers/downloads/${encodeURIComponent(username)}`, files);
-  }
-  // Every download from one user, as a flat list of files.
-  async downloads(username) {
-    let data;
-    try {
-      data = await this.request("GET", `/transfers/downloads/${encodeURIComponent(username)}`);
-    } catch (error) {
-      if (/answered 404/.test(error.message)) return [];
-      throw error;
-    }
-    return (data?.directories ?? []).flatMap((dir) => dir.files ?? []);
-  }
-};
-var FAILED_STATES = /Errored|Rejected|Cancelled|TimedOut|Aborted|Failed/i;
-var isSucceeded = (state) => /Completed/i.test(state) && /Succeeded/i.test(state);
-
 // src/source.js
-import { randomUUID as randomUUID5 } from "node:crypto";
-import fs4 from "node:fs/promises";
-import path5 from "node:path";
 var LENGTH_TOLERANCE_MS = 2e3;
 var SEARCH_BUDGET_MS = 5e4;
 var SEARCH_TIMEOUT_MS = 12e3;
@@ -37534,7 +36811,7 @@ async function searchAlbum(ctx, album) {
     }
   }));
 }
-var downloadsDir = (ctx) => path5.join(ctx.dataFolder, "downloads");
+var downloadsDir = (ctx) => path4.join(ctx.dataFolder, "downloads");
 async function startDownload(ctx, result, kind) {
   const data = result?.data;
   if (!data?.username || !Array.isArray(data.files) || !data.files.length) throw new Error("The result has no files to download");
@@ -37548,8 +36825,8 @@ async function startDownload(ctx, result, kind) {
   }
   const slskd = slskdFor(ctx);
   await slskd.enqueue(data.username, data.files.map((f) => ({ filename: f.filename, size: f.size })));
-  const id = randomUUID5();
-  await writeJson(path5.join(downloadsDir(ctx), `${id}.json`), { kind, key, username: data.username, files: data.files, startedAt: Date.now() });
+  const id = randomUUID4();
+  await writeJson(path4.join(downloadsDir(ctx), `${id}.json`), { kind, key, username: data.username, files: data.files, startedAt: Date.now() });
   return { pending: id };
 }
 var downloadKey = (username, files) => `${username}\0${files.map((f) => f.filename).sort().join("\0")}`;
@@ -37557,11 +36834,11 @@ var KEEP_DOWNLOADS_MS = 2 * 24 * 60 * 6e4;
 var MISSING_GRACE_MS = 2 * 6e4;
 async function findDownload(ctx, key) {
   const dir = downloadsDir(ctx);
-  for (const name of await fs4.readdir(dir).catch(() => [])) {
+  for (const name of await fs3.readdir(dir).catch(() => [])) {
     if (!name.endsWith(".json")) continue;
-    const record = await readJson(path5.join(dir, name), null);
+    const record = await readJson(path4.join(dir, name), null);
     if (!record || Date.now() - (record.startedAt || 0) > KEEP_DOWNLOADS_MS) {
-      await fs4.rm(path5.join(dir, name), { force: true });
+      await fs3.rm(path4.join(dir, name), { force: true });
       continue;
     }
     if (record.key === key && !record.failed) return name.replace(/\.json$/, "");
@@ -37570,20 +36847,20 @@ async function findDownload(ctx, key) {
 }
 async function locate(downloadFolder, file) {
   const base = remoteBase(file.filename);
-  const direct = path5.join(downloadFolder, remoteBase(remoteDir(file.filename)), base);
-  const stat = await fs4.stat(direct).catch(() => null);
+  const direct = path4.join(downloadFolder, remoteBase(remoteDir(file.filename)), base);
+  const stat = await fs3.stat(direct).catch(() => null);
   if (stat?.isFile()) return direct;
   let seen = 0;
   const walk = async (dir, depth) => {
     if (depth > 4) return null;
-    for (const entry of await fs4.readdir(dir, { withFileTypes: true }).catch(() => [])) {
+    for (const entry of await fs3.readdir(dir, { withFileTypes: true }).catch(() => [])) {
       if (++seen > 5e4) return null;
-      const full = path5.join(dir, entry.name);
+      const full = path4.join(dir, entry.name);
       if (entry.isDirectory()) {
         const found = await walk(full, depth + 1);
         if (found) return found;
       } else if (entry.isFile() && (entry.name === base || entry.name.replace(/_\d{15,}(?=\.[^.]+$)/, "") === base)) {
-        const s = await fs4.stat(full).catch(() => null);
+        const s = await fs3.stat(full).catch(() => null);
         if (s && (!file.size || s.size === file.size)) return full;
       }
     }
@@ -37592,7 +36869,7 @@ async function locate(downloadFolder, file) {
   return walk(downloadFolder, 0);
 }
 async function downloadStatus(ctx, id, directory) {
-  const record = await readJson(path5.join(downloadsDir(ctx), `${id}.json`), null);
+  const record = await readJson(path4.join(downloadsDir(ctx), `${id}.json`), null);
   if (!record) throw new Error("This download is unknown to the plugin");
   const slskd = slskdFor(ctx);
   const transfers = await slskd.downloads(record.username);
@@ -37611,7 +36888,7 @@ async function downloadStatus(ctx, id, directory) {
     }
   }
   const failed = states.find((state) => FAILED_STATES.test(state));
-  if (failed) await writeJson(path5.join(downloadsDir(ctx), `${id}.json`), { ...record, failed: true });
+  if (failed) await writeJson(path4.join(downloadsDir(ctx), `${id}.json`), { ...record, failed: true });
   if (failed) throw new Error(`slskd: ${remoteBase(record.files[states.indexOf(failed)].filename)} ${failed.replace(/^Completed,\s*/, "").toLowerCase()}`);
   if (!states.every(isSucceeded)) return { done: false };
   return finishDownload(ctx, id, record, directory);
@@ -37643,20 +36920,20 @@ async function finishDownload(ctx, id, record, directory) {
 var formatBytes = (bytes) => bytes >= 1024 ** 3 ? `${(bytes / 1024 ** 3).toFixed(1)} GB` : `${Math.max(1, Math.round(bytes / 1024 ** 2))} MB`;
 async function freeBytes(ctx, dir) {
   if (ctx.freeBytes) return ctx.freeBytes(dir);
-  for (let at = dir; ; at = path5.dirname(at)) {
-    const stats = await fs4.statfs(at).catch(() => null);
+  for (let at = dir; ; at = path4.dirname(at)) {
+    const stats = await fs3.statfs(at).catch(() => null);
     if (stats) return stats.bavail * stats.bsize;
-    if (path5.dirname(at) === at) return Infinity;
+    if (path4.dirname(at) === at) return Infinity;
   }
 }
-var link = (ctx, local, target) => (ctx.linkFile ?? fs4.link)(local, target);
+var link = (ctx, local, target) => (ctx.linkFile ?? fs3.link)(local, target);
 async function copyInto(local, target) {
-  const temp = `${target}.${randomUUID5()}.part`;
+  const temp = `${target}.${randomUUID4()}.part`;
   try {
-    await fs4.copyFile(local, temp);
-    await fs4.rename(temp, target);
+    await fs3.copyFile(local, temp);
+    await fs3.rename(temp, target);
   } catch (error) {
-    await fs4.rm(temp, { force: true }).catch(() => {
+    await fs3.rm(temp, { force: true }).catch(() => {
     });
     throw error;
   }
@@ -37668,15 +36945,15 @@ async function moveIntoPlace(ctx, id, record, directory) {
     const local = await locate(downloadFolder, file);
     if (!local) throw new Error(`Couldn't find ${remoteBase(file.filename)} in slskd's download folder`);
     const name = `${String(file.disc || 1).padStart(2, "0")}-${String(i + 1).padStart(3, "0")} ${remoteBase(file.filename)}`.replace(/[\\/]/g, "_");
-    const target = path5.join(directory, record.kind === "album" ? name : remoteBase(file.filename));
-    files.push({ local, target, file, size: (await fs4.stat(local)).size });
+    const target = path4.join(directory, record.kind === "album" ? name : remoteBase(file.filename));
+    files.push({ local, target, file, size: (await fs3.stat(local)).size });
   }
-  await fs4.mkdir(directory, { recursive: true });
+  await fs3.mkdir(directory, { recursive: true });
   const todo = [];
   for (const entry of files) {
-    const there = await fs4.stat(entry.target).catch(() => null);
+    const there = await fs3.stat(entry.target).catch(() => null);
     if (!there || there.size !== entry.size) {
-      await fs4.rm(entry.target, { force: true });
+      await fs3.rm(entry.target, { force: true });
       todo.push(entry);
     }
   }
@@ -37714,11 +36991,569 @@ async function moveIntoPlace(ctx, id, record, directory) {
       await writeTags(target, { title: [file.title], artist: [file.artist].filter(Boolean), recordingMbid: [file.recordingId] });
       tagged++;
     } catch (error) {
-      ctx.log(`Couldn't tag ${path5.basename(target)}: ${error.message}`);
+      ctx.log(`Couldn't tag ${path4.basename(target)}: ${error.message}`);
     }
   }
   ctx.log(`Download ${id}: ${files.length} file(s) ${linked ? "linked" : "copied"}, ${tagged} identified and tagged`);
-  return record.kind === "album" ? { done: true } : { done: true, path: path5.basename(files[0].target) };
+  return record.kind === "album" ? { done: true } : { done: true, path: path4.basename(files[0].target) };
+}
+
+// src/tagger.js
+import { randomUUID as randomUUID5 } from "node:crypto";
+import fs4 from "node:fs/promises";
+import path5 from "node:path";
+
+// src/aurral.js
+var Aurral = class {
+  constructor(api, fetchImpl = fetch) {
+    if (!api?.url || !api?.key) throw new Error("Aurral API access is off. Turn it on on the plugin's page.");
+    this.url = api.url.replace(/\/+$/, "");
+    this.key = api.key;
+    this.fetch = fetchImpl;
+  }
+  async request(method, route, body) {
+    const response = await this.fetch(`${this.url}${route}`, {
+      method,
+      headers: { "X-Api-Key": this.key, ...body !== void 0 && { "Content-Type": "application/json" } },
+      body: body === void 0 ? void 0 : JSON.stringify(body),
+      signal: AbortSignal.timeout(3e4)
+    });
+    const data = await response.json().catch(() => null);
+    if (!response.ok) {
+      const detail = data?.message || data?.error || response.statusText;
+      throw new Error(`Aurral answered ${response.status} for ${route}: ${detail}`);
+    }
+    return data;
+  }
+  // Re-reads files whose tags changed, so the Library shows the new ones.
+  refreshLibrary() {
+    return this.request("POST", "/library/refresh", { mode: "quick" });
+  }
+};
+
+// src/tagger.js
+var LOCK_STALE_MS = 2 * 6e4;
+var SAVE_EVERY_MS = 3e4;
+var queueDir = (ctx) => path5.join(ctx.dataFolder, "queue");
+var processedFile = (ctx) => path5.join(ctx.dataFolder, "processed.json");
+var indexFile = (ctx) => path5.join(ctx.dataFolder, "library-index.json");
+var originalsFile = (ctx) => path5.join(ctx.dataFolder, "originals.json");
+var excludedFile = (ctx) => path5.join(ctx.dataFolder, "excluded.json");
+var TAG_FIELDS = ["artist", "albumArtist", "composer", "work", "workId"];
+var TAGGING_VERSION = 2;
+var outdated = (record) => record && (record.status === "tagged" || record.status === "unchanged") && (record.v ?? 1) < TAGGING_VERSION;
+var lockDir = (ctx) => path5.join(ctx.dataFolder, "tagging.lock");
+var yieldFile = (ctx) => path5.join(ctx.dataFolder, "tagging.yield");
+var YIELD_FRESH_MS = 10 * 6e4;
+var PRIORITY_WAIT_MS = 5 * 6e4;
+var ACTION_CLAIM_MS = 2 * 6e4;
+async function enqueue(ctx, filePaths, { force = false, source = null } = {}) {
+  await fs4.mkdir(queueDir(ctx), { recursive: true });
+  const ids = [];
+  for (const filePath of filePaths) {
+    if (!filePath) continue;
+    const id = `${Date.now().toString().padStart(15, "0")}-${randomUUID5()}`;
+    await writeJson(path5.join(queueDir(ctx), `${id}.json`), { path: filePath, force, source, at: Date.now() });
+    ids.push(id);
+  }
+  return ids;
+}
+async function queuedEntries(ctx) {
+  const names = (await fs4.readdir(queueDir(ctx)).catch(() => [])).filter((n) => n.endsWith(".json")).sort();
+  return names.map((name) => ({ name, file: path5.join(queueDir(ctx), name) }));
+}
+var queueLength = async (ctx) => (await queuedEntries(ctx)).length;
+async function allowedPath(ctx, filePath) {
+  const real = await fs4.realpath(filePath).catch(() => null);
+  if (!real) return null;
+  for (const root of [ctx.libraryFolder, ctx.dataFolder]) {
+    if (!root) continue;
+    const base = await fs4.realpath(root).catch(() => null);
+    if (!base) continue;
+    const relative = path5.relative(base, real);
+    if (relative && !relative.startsWith("..") && !path5.isAbsolute(relative)) return real;
+  }
+  return null;
+}
+var statKey = (stat) => ({ mtimeMs: Math.round(stat.mtimeMs), size: stat.size });
+var sameStat = (record, stat) => record && record.mtimeMs === Math.round(stat.mtimeMs) && record.size === stat.size;
+function indexEntry(tags, stat) {
+  return {
+    ...statKey(stat),
+    title: tags.title,
+    artist: tags.artist,
+    album: tags.album,
+    albumArtist: tags.albumArtist,
+    recordingMbid: tags.recordingMbid,
+    releaseMbid: tags.releaseMbid,
+    releaseGroupMbid: tags.releaseGroupMbid,
+    albumArtistMbids: tags.albumArtistMbids,
+    trackNumber: tags.trackNumber,
+    discNumber: tags.discNumber,
+    durationMs: tags.durationMs,
+    workId: tags.workId
+  };
+}
+var State = class {
+  constructor(ctx, lock) {
+    this.ctx = ctx;
+    this.lock = lock;
+    this.dirty = 0;
+    this.savedAt = Date.now();
+    this.refs = 0;
+    this.admins = 0;
+    this.background = 0;
+    this.claimed = /* @__PURE__ */ new Set();
+    this.busyPaths = /* @__PURE__ */ new Map();
+  }
+  async load() {
+    this.processed = await readJson(processedFile(this.ctx), {});
+    this.index = await readJson(indexFile(this.ctx), {});
+    this.originals = await readJson(originalsFile(this.ctx), {});
+    this.excluded = await readJson(excludedFile(this.ctx), {});
+  }
+  // Saved every 30 seconds while working, and at the end: the index of a
+  // large Library is several megabytes.
+  async save(force = false) {
+    if (!this.dirty || !force && Date.now() - this.savedAt < SAVE_EVERY_MS) return;
+    this.savedAt = Date.now();
+    this.dirty = 0;
+    await writeJson(processedFile(this.ctx), this.processed);
+    await writeJson(indexFile(this.ctx), this.index);
+    await writeJson(originalsFile(this.ctx), this.originals);
+    await writeJson(excludedFile(this.ctx), this.excluded);
+    await this.lock.touch();
+  }
+  // One call at a time works on a file.
+  async exclusive(file, work) {
+    while (this.busyPaths.has(file)) await this.busyPaths.get(file).catch(() => {
+    });
+    const running = work();
+    this.busyPaths.set(file, running);
+    try {
+      return await running;
+    } finally {
+      this.busyPaths.delete(file);
+    }
+  }
+};
+var Session = class {
+  constructor(ctx, state, priority) {
+    this.ctx = ctx;
+    this.state = state;
+    this.priority = priority;
+    this.changedFiles = 0;
+    this.stats = { tagged: 0, unchanged: 0, skipped: {}, failed: 0, left: 0 };
+  }
+  get processed() {
+    return this.state.processed;
+  }
+  get index() {
+    return this.state.index;
+  }
+  get originals() {
+    return this.state.originals;
+  }
+  get excluded() {
+    return this.state.excluded;
+  }
+  get dirty() {
+    return this.state.dirty;
+  }
+  set dirty(value) {
+    this.state.dirty = value;
+  }
+  save(force = false) {
+    return this.state.save(force);
+  }
+  // True when an admin action wants the lock and this is background work:
+  // one in this process, or one waiting in another.
+  async shouldYield() {
+    if (this.priority) return false;
+    if (this.state.admins > 0) this.yielding = true;
+    else if (!this.yieldCheckedAt || Date.now() - this.yieldCheckedAt >= 500) {
+      this.yieldCheckedAt = Date.now();
+      const stat = await fs4.stat(yieldFile(this.ctx)).catch(() => null);
+      this.yielding = Boolean(stat && Date.now() - stat.mtimeMs < YIELD_FRESH_MS);
+    }
+    if (this.yielding && !this.yieldLogged) {
+      this.yieldLogged = true;
+      this.ctx.log("Pausing background tagging for an admin action");
+    }
+    return this.yielding;
+  }
+  record(filePath, stat, result) {
+    this.processed[filePath] = { ...statKey(stat), ...result, at: Date.now() };
+    this.dirty++;
+    if (result.status === "skipped") this.stats.skipped[result.reason] = (this.stats.skipped[result.reason] || 0) + 1;
+    else this.stats[result.status]++;
+  }
+  // Returns false when MusicBrainz can't be reached, so the caller stops.
+  async processFile(filePath, options = {}) {
+    const real = await allowedPath(this.ctx, filePath);
+    if (!real) {
+      this.ctx.log(`Not tagging ${filePath}: it isn't in the Library folder`);
+      this.stats.skipped["outside the Library"] = (this.stats.skipped["outside the Library"] || 0) + 1;
+      return true;
+    }
+    if (!isAudioPath(real)) return true;
+    return this.state.exclusive(real, () => this.processReal(real, options));
+  }
+  // `queuedAt`: when the request to tag was made. Classical tags an admin
+  // removed after that stay removed.
+  async processReal(real, { force = false, prefilter = false, upgrade = false, queuedAt = null } = {}) {
+    const { ctx } = this;
+    const stat = await fs4.stat(real);
+    if (!force && sameStat(this.processed[real], stat) && !(upgrade && outdated(this.processed[real]))) return true;
+    let tags;
+    try {
+      tags = readTags(real);
+    } catch (error) {
+      this.record(real, stat, { status: "skipped", reason: error instanceof UnsupportedFormat ? "unsupported format" : "unreadable" });
+      return true;
+    }
+    this.index[real] = indexEntry(tags, stat);
+    if (!tags.recordingMbid) {
+      this.record(real, stat, { status: "skipped", reason: "no recording ID" });
+      return true;
+    }
+    if (this.excluded[tags.recordingMbid]) {
+      if (!force || queuedAt && (this.excluded[tags.recordingMbid].at ?? 0) > queuedAt) {
+        this.record(real, stat, { status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
+        return true;
+      }
+      delete this.excluded[tags.recordingMbid];
+    }
+    if (prefilter && ctx.resolver.classifyGenres(new Set(tags.genres.map((g) => g.toLowerCase()))) === false) {
+      this.record(real, stat, { status: "skipped", reason: "non-classical", recording: tags.recordingMbid });
+      return true;
+    }
+    const fields = await ctx.resolver.resolve(tags.recordingMbid, {
+      trackArtistIds: tags.artistMbids,
+      albumArtistIds: tags.albumArtistMbids,
+      releaseGroupId: tags.releaseGroupMbid || null,
+      confirmed: force
+    });
+    if (!fields) {
+      const reason = ctx.resolver.skipReason;
+      if (reason === "unreachable") return false;
+      this.record(real, stat, { status: "skipped", reason, recording: tags.recordingMbid });
+      return true;
+    }
+    const values = { artist: [fields.artist], composer: fields.composers };
+    if (fields.workId) Object.assign(values, { work: [fields.work], workId: [fields.workId] });
+    const albumArtist = await this.englishAlbumArtist(tags);
+    if (albumArtist) values.albumArtist = [albumArtist];
+    let changed;
+    try {
+      if (!this.originals[real]) {
+        this.originals[real] = { ...readValues(real, TAG_FIELDS), recording: tags.recordingMbid };
+        this.dirty++;
+      }
+      changed = await writeTags(real, values);
+    } catch (error) {
+      ctx.log(`Couldn't tag ${real}: ${error.message}`);
+      this.record(real, stat, { status: "skipped", reason: "couldn't write tags", recording: tags.recordingMbid });
+      return true;
+    }
+    const after = await fs4.stat(real);
+    this.index[real] = { ...this.index[real], ...statKey(after), artist: fields.artist, workId: fields.workId || "" };
+    this.record(real, after, {
+      v: TAGGING_VERSION,
+      status: changed.length ? "tagged" : "unchanged",
+      recording: tags.recordingMbid,
+      artist: fields.artist,
+      workId: fields.workId
+    });
+    if (changed.length) {
+      this.changedFiles++;
+      ctx.log(`Tagged ${path5.basename(real)}: ${fields.artist}`);
+    }
+    return true;
+  }
+  // Puts back the tags a file had before the plugin changed them. Files
+  // tagged before the plugin kept backups get the artist MusicBrainz credits
+  // for that track on its release, which is what Aurral writes.
+  async untagFile(filePath) {
+    const real = await allowedPath(this.ctx, filePath);
+    if (!real || !isAudioPath(real)) return "skipped";
+    return this.state.exclusive(real, () => this.untagReal(real));
+  }
+  async untagReal(real) {
+    const { ctx } = this;
+    let tags;
+    try {
+      tags = readTags(real);
+    } catch {
+      return "skipped";
+    }
+    if (tags.recordingMbid) this.excluded[tags.recordingMbid] = { at: Date.now() };
+    const original = this.originals[real];
+    let values;
+    if (original) values = Object.fromEntries(TAG_FIELDS.map((field) => [field, original[field] ?? []]));
+    else {
+      const credit = await this.trackCredit(tags);
+      if (!credit) return "no backup";
+      values = { artist: [credit] };
+      if (tags.albumArtistMbids.length === 1) {
+        const name = (await ctx.mb.get("artist", tags.albumArtistMbids[0], "aliases+genres"))?.name;
+        if (name) values.albumArtist = [name];
+      }
+    }
+    const changed = await writeTags(real, values);
+    delete this.originals[real];
+    const after = await fs4.stat(real);
+    this.index[real] = { ...this.index[real] ?? {}, ...indexEntry(readTags(real), after) };
+    this.record(real, after, { status: "skipped", reason: "classical tags removed", recording: tags.recordingMbid });
+    this.stats.skipped["classical tags removed"]--;
+    if (changed.length) {
+      this.changedFiles++;
+      ctx.log(`Removed classical tags from ${path5.basename(real)}`);
+    }
+    return changed.length ? "restored" : "unchanged";
+  }
+  async englishAlbumArtist(tags) {
+    if (tags.albumArtistMbids.length !== 1) return null;
+    const artist = await this.ctx.resolver.getArtist(tags.albumArtistMbids[0]);
+    if (!artist?.name) return null;
+    const [name] = await this.ctx.resolver.englishNames(artist);
+    return name || null;
+  }
+  // MusicBrainz's artist credit for this recording on the file's release,
+  // else on the recording itself.
+  async trackCredit(tags) {
+    const { mb } = this.ctx;
+    if (tags.releaseMbid) {
+      const release = await mb.get("release", tags.releaseMbid, RELEASE_INC);
+      for (const medium of release?.media || [])
+        for (const track of medium.tracks || [])
+          if (track.recording?.id === tags.recordingMbid) {
+            const credit = creditString(track["artist-credit"] || track.recording["artist-credit"]);
+            if (credit) return credit;
+          }
+    }
+    const recording = await mb.get("recording", tags.recordingMbid, "artist-credits");
+    return creditString(recording?.["artist-credit"]) || null;
+  }
+  async drainQueue(until, onlyIds = null) {
+    for (const entry of await queuedEntries(this.ctx)) {
+      if (Date.now() > until || await this.shouldYield()) return false;
+      if (onlyIds && !onlyIds.has(entry.name.replace(/\.json$/, ""))) continue;
+      if (this.state.claimed.has(entry.name)) continue;
+      this.state.claimed.add(entry.name);
+      try {
+        const job = await readJson(entry.file, null);
+        if (!this.priority && job?.source === "action" && Date.now() - (job.at || 0) < ACTION_CLAIM_MS) continue;
+        if (job?.path) {
+          const reachable = await this.processFile(job.path, { force: job.force, queuedAt: job.at });
+          if (!reachable) return false;
+        }
+        await fs4.rm(entry.file, { force: true });
+      } finally {
+        this.state.claimed.delete(entry.name);
+      }
+      await this.save();
+    }
+    return true;
+  }
+  // Walks the Library, refreshing the index, and returns files that have a
+  // recording ID and were never processed (or changed since). Stops at
+  // `until`; unchanged files cost only a stat, so the next run gets further.
+  async scan(until) {
+    const root = this.ctx.libraryFolder;
+    const pending = [];
+    const seen = /* @__PURE__ */ new Set();
+    let complete = true;
+    const walk = async (dir) => {
+      if (Date.now() > until || await this.shouldYield()) {
+        complete = false;
+        return;
+      }
+      const entries = await fs4.readdir(dir, { withFileTypes: true }).catch(() => []);
+      for (const entry of entries) {
+        if (Date.now() > until || await this.shouldYield()) {
+          complete = false;
+          return;
+        }
+        if (entry.name.startsWith(".")) continue;
+        const full = path5.join(dir, entry.name);
+        if (entry.isDirectory()) await walk(full);
+        else if (entry.isFile() && isAudioPath(full)) {
+          seen.add(full);
+          const stat = await fs4.stat(full).catch(() => null);
+          if (!stat) continue;
+          if (!sameStat(this.index[full], stat)) {
+            try {
+              this.index[full] = indexEntry(readTags(full), stat);
+            } catch {
+              delete this.index[full];
+              continue;
+            }
+            this.dirty++;
+            await this.save();
+          }
+          if (this.index[full].recordingMbid && (!sameStat(this.processed[full], stat) || outdated(this.processed[full]))) pending.push(full);
+        }
+      }
+    };
+    if (root) await walk(root);
+    if (complete) {
+      for (const file of Object.keys(this.index)) if (file.startsWith(root) && !seen.has(file)) delete this.index[file];
+    }
+    this.scanComplete = complete;
+    return pending;
+  }
+};
+var held = /* @__PURE__ */ new Map();
+async function openState(ctx, priority) {
+  let lock = await tryLock(lockDir(ctx), LOCK_STALE_MS);
+  if (!lock && priority) {
+    ctx.log("Waiting for background tagging in another process to pause");
+    const until = Date.now() + PRIORITY_WAIT_MS;
+    while (!lock && Date.now() < until) {
+      await writeJson(yieldFile(ctx), { at: Date.now() });
+      await sleep(500);
+      lock = await tryLock(lockDir(ctx), LOCK_STALE_MS);
+    }
+    await fs4.rm(yieldFile(ctx), { force: true });
+    if (!lock) ctx.log("Tagging in another process didn't pause within 5 minutes");
+  }
+  if (!lock) return null;
+  const state = new State(ctx, lock);
+  try {
+    await state.load();
+  } catch (error) {
+    await lock.release();
+    throw error;
+  }
+  state.heartbeat = setInterval(() => lock.touch(), 3e4);
+  return state;
+}
+async function withTagging(ctx, work, { priority = false } = {}) {
+  const key = path5.resolve(ctx.dataFolder);
+  let entry;
+  for (; ; ) {
+    entry = held.get(key);
+    if (!entry) {
+      entry = { opening: openState(ctx, priority), state: null };
+      held.set(key, entry);
+      try {
+        entry.state = await entry.opening;
+      } catch (error) {
+        held.delete(key);
+        throw error;
+      }
+      if (!entry.state) {
+        held.delete(key);
+        return null;
+      }
+      break;
+    }
+    if (!entry.state) {
+      if (!priority) return null;
+      await entry.opening.catch(() => {
+      });
+      if (held.get(key) === entry && entry.state) break;
+      continue;
+    }
+    if (!priority && entry.state.background > 0) return null;
+    break;
+  }
+  const { state } = entry;
+  const session = new Session(ctx, state, priority);
+  state.refs++;
+  if (priority) state.admins++;
+  else state.background++;
+  try {
+    await work(session);
+    return session.stats;
+  } finally {
+    if (priority) state.admins--;
+    else state.background--;
+    if (--state.refs === 0) {
+      held.delete(key);
+      clearInterval(state.heartbeat);
+      await state.save(true).catch((error) => ctx.log(`Couldn't save progress: ${error.message}`));
+      await state.lock.release();
+    } else {
+      await state.save().catch(() => {
+      });
+    }
+    if (session.changedFiles) await refreshLibrary(ctx);
+  }
+}
+async function refreshLibrary(ctx) {
+  if (!ctx.api?.url || !ctx.api?.key) return;
+  try {
+    await new Aurral(ctx.api, ctx.fetch).refreshLibrary();
+  } catch (error) {
+    ctx.log(`Couldn't ask Aurral to rescan the Library: ${error.message}`);
+  }
+}
+async function runQueue(ctx, budgetMs, onlyIds = null, { priority = false } = {}) {
+  const until = Date.now() + budgetMs;
+  return withTagging(
+    ctx,
+    async (session) => {
+      await session.drainQueue(until, onlyIds);
+      session.stats.left = onlyIds ? (await queuedEntries(ctx)).filter((e) => onlyIds.has(e.name.replace(/\.json$/, ""))).length : await queueLength(ctx);
+    },
+    { priority }
+  );
+}
+async function runScheduled(ctx, budgetMs) {
+  const until = Date.now() + budgetMs;
+  return withTagging(ctx, async (session) => {
+    if (!await session.drainQueue(until)) return;
+    const pending = await session.scan(until);
+    session.stats.found = pending.length;
+    for (const file of pending) {
+      if (Date.now() > until || await session.shouldYield()) break;
+      if (!await session.processFile(file, { prefilter: true, upgrade: true })) break;
+      await session.save();
+    }
+    session.stats.left = await queueLength(ctx) + pending.filter((f) => !session.processed[f]).length;
+  });
+}
+async function libraryIndex(ctx, budgetMs, { priority = false } = {}) {
+  let index = null;
+  await withTagging(
+    ctx,
+    async (session) => {
+      await session.scan(Date.now() + budgetMs);
+      index = session.index;
+    },
+    { priority }
+  );
+  return index ?? await readJson(indexFile(ctx), {});
+}
+async function untagFiles(ctx, paths, budgetMs, { priority = false } = {}) {
+  const until = Date.now() + budgetMs;
+  const counts = { restored: 0, unchanged: 0, "no backup": 0, skipped: 0, left: 0 };
+  const stats = await withTagging(ctx, async (session) => {
+    for (const file of paths) {
+      if (Date.now() > until) {
+        counts.left++;
+        continue;
+      }
+      try {
+        counts[await session.untagFile(file)]++;
+      } catch (error) {
+        ctx.log(`Couldn't remove classical tags from ${file}: ${error.message}`);
+        counts.skipped++;
+      }
+    }
+  }, { priority });
+  return stats ? counts : null;
+}
+function describeStats(stats) {
+  if (!stats) return "Another tagging run is in progress";
+  const parts = [`${stats.tagged} tagged`];
+  if (stats.unchanged) parts.push(`${stats.unchanged} already right`);
+  for (const [reason, count] of Object.entries(stats.skipped)) parts.push(`${count} skipped (${reason})`);
+  if (stats.failed) parts.push(`${stats.failed} failed`);
+  if (stats.left) parts.push(`${stats.left} left for the next run`);
+  return parts.join(", ");
 }
 
 // src/index.js
@@ -37824,14 +37659,6 @@ var index_default = {
       const ctx = makeContext(input);
       const index = await libraryIndex(ctx, 10 * 6e4, { priority: true });
       return { message: await tagNow(ctx, artistFiles(index, input.artist), input.artist.name) };
-    },
-    async "compare-track"(input) {
-      const ctx = makeContext(input);
-      return { message: await compareRecordings(ctx, input.user, input.tracks) };
-    },
-    async "compare-album"(input) {
-      const ctx = makeContext(input);
-      return { message: await compareRecordings(ctx, input.user, input.album.tracks) };
     }
   },
   events: {

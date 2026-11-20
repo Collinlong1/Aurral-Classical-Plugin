@@ -10,8 +10,6 @@ using the same rules, so beets no longer needs to touch these files.
   `WORK` and `MUSICBRAINZ_WORKID`, all from MusicBrainz.
 * **Tag as classical.** An admin-only artist and album menu item, for files
   that were already in the Library.
-* **Compare recordings.** A track and album menu item that makes a playlist of
-  the same movement played by different performers.
 * **slskd download source.** Finds classical tracks and albums on Soulseek
   through your slskd, only in folders that line up with the exact release.
 
@@ -21,8 +19,8 @@ In Aurral, open **Settings > Plugins**, paste
 `https://github.com/Collinlong1/Aurral-Classical-Plugin`, and install
 **Aurral Classical**. Fill in the settings, press **Test**, then turn it on.
 
-The plugin asks for **Aurral API access** to create Compare recordings
-playlists and to check who may use that item.
+The plugin asks for **Aurral API access** to have Aurral re-read files after
+it tags them, so the Library shows the new tags.
 
 ## Settings
 
@@ -33,7 +31,6 @@ playlists and to check who may use that item.
 | slskd download folder | slskd's downloads folder, as Aurral's container sees it. Finished files are copied from here. |
 | Name order | The roles in the artist, in order. Default `composers, arrangers, soloists, ensembles, conductors`. People credited on the recording but in none of these roles come last. |
 | Separator | Goes between the names. Default `—`, with a space either side. |
-| Recordings to compare | How many recordings Compare recordings puts in a playlist. Default 10, at most 25. |
 
 ## Tagging
 
@@ -125,18 +122,6 @@ as classical again.
 Menu items appear only while the plugin is on. Aurral's web app remembers the
 list for a few minutes, so reload the page after turning the plugin on.
 
-## Compare recordings
-
-On a track (or an album, one playlist per movement, up to 10), this makes or
-updates a static playlist called `Recordings: <Composer>: <Work>` with the
-same movement from up to N recordings. The chosen recording comes first, then
-other recordings already in the Library, then others MusicBrainz lists for
-that Work (excerpts and medleys left out), each from its earliest official
-release. Aurral queues downloads for the tracks the Library doesn't have.
-
-Admins and users who may request music can use it. Aurral's API can only create
-a playlist as the plugin itself, so it has no owner: admins see it under
-Playlists, other users don't yet.
 
 ## slskd download source
 

@@ -3,13 +3,13 @@
   "name": "Aurral Classical",
   "version": "1.0.4",
   "api": 1,
-  "description": "Tags classical music as Composer — Soloist — Ensemble — Conductor from MusicBrainz, compares recordings of a movement, and downloads classical albums from slskd.",
+  "description": "Tags classical music as Composer — Soloist — Ensemble — Conductor from MusicBrainz, and downloads classical albums from slskd.",
   "repository": "https://github.com/Collinlong1/Aurral-Classical-Plugin",
   "uses": [
     "musicbrainz.org, or your mirror",
     "Your slskd",
     "Tags of classical files in your Library",
-    "Aurral's API, to make playlists"
+    "Aurral's API, to refresh the Library after tagging"
   ],
   "settings": [
     {
@@ -46,12 +46,6 @@
       "label": "Separator",
       "type": "text",
       "help": "Goes between the names in the artist tag. Default: —"
-    },
-    {
-      "key": "compareCount",
-      "label": "Recordings to compare",
-      "type": "number",
-      "help": "How many recordings Compare recordings puts in a playlist. Default 10, at most 25."
     }
   ],
   "test": true,
@@ -75,18 +69,6 @@
       "label": "Remove classical tags",
       "target": "album",
       "admin": true,
-      "background": true
-    },
-    {
-      "id": "compare-track",
-      "label": "Compare recordings",
-      "target": "track",
-      "background": true
-    },
-    {
-      "id": "compare-album",
-      "label": "Compare recordings",
-      "target": "album",
       "background": true
     }
   ],

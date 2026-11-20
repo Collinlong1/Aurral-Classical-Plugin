@@ -1,5 +1,4 @@
 import path from "node:path";
-import { compareRecordings } from "./compare.js";
 import { MusicBrainz, mbBaseUrl, TTL } from "./mb.js";
 import { ClassicalResolver } from "./resolver.js";
 import { parseOrder, parseSeparator, slskdSettings } from "./settings.js";
@@ -133,15 +132,6 @@ export default {
       return { message: await tagNow(ctx, artistFiles(index, input.artist), input.artist.name) };
     },
 
-    async "compare-track"(input) {
-      const ctx = makeContext(input);
-      return { message: await compareRecordings(ctx, input.user, input.tracks) };
-    },
-
-    async "compare-album"(input) {
-      const ctx = makeContext(input);
-      return { message: await compareRecordings(ctx, input.user, input.album.tracks) };
-    },
   },
 
   events: {
