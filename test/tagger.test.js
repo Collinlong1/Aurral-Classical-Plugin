@@ -654,3 +654,22 @@ test("headings find tracks by the path Aurral gives, through a symlinked folder"
   assert.deepEqual((await plugin.albumPresentation(input({ album }))).groups.map((group) => group.trackIds), [[1]]);
 });
 
+test("a work's tracks share one heading even when other tracks sit between them", async () => {
+  const admin = { id: 1, role: "admin" };
+  const entities = symphonyEntities();
+  const one = await copyFixture("sine.flac", path.join(folders.libraryFolder, "split", "01.flac"));
+  const two = await copyFixture("sine.mp3", path.join(folders.libraryFolder, "split", "02.mp3"));
+  const three = await copyFixture("sine.m4a", path.join(folders.libraryFolder, "split", "03.m4a"));
+  const album = { id: 15, title: "Split", tracks: [{ id: 1, path: one }, { id: 2, path: two }, { id: 3, path: three }] };
+  await plugin.actions["tag-album"](input({ user: admin, album }));
+  // The middle file belongs to another work.
+  const works = JSON.parse(await fs.readFile(path.join(folders.dataFolder, "works.json"), "utf8"));
+  works[two] = { ...works[two], work: { id: "other", title: "Violin Concerto" } };
+  await fs.writeFile(path.join(folders.dataFolder, "works.json"), JSON.stringify(works));
+  const { groups } = await plugin.albumPresentation(input({ album }));
+  assert.deepEqual(groups.map((group) => [group.title, group.trackIds]), [
+    ["Symphony No. 5 in C minor, op. 67", [1, 3]],
+    ["Violin Concerto", [2]],
+  ]);
+});
+

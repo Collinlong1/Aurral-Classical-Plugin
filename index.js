@@ -36318,8 +36318,8 @@ async function works(ctx) {
 }
 async function albumPresentation(ctx, album) {
   const known = await works(ctx);
-  const groups = [];
-  let current = null;
+  const byWork = /* @__PURE__ */ new Map();
+  let previous = null;
   let gap = [];
   const add = (group, track, entry) => {
     group.trackIds.push(track.id);
@@ -36327,41 +36327,39 @@ async function albumPresentation(ctx, album) {
   };
   for (const track of album?.tracks || []) {
     if (!track.path) {
-      if (current) gap.push(track);
+      if (previous) gap.push(track);
       continue;
     }
     const entry = known[track.path];
     if (!entry?.work?.id) {
-      current = null;
+      previous = null;
       gap = [];
       continue;
     }
-    if (current?.workId === entry.work.id) {
-      for (const missing of gap) add(current, missing, null);
-      add(current, track, entry);
-      gap = [];
-      continue;
+    let group = byWork.get(entry.work.id);
+    if (!group) {
+      group = {
+        title: entry.work.title || "Untitled work",
+        ...entry.composer && { subtitle: entry.composer },
+        trackIds: [],
+        titles: []
+      };
+      byWork.set(entry.work.id, group);
     }
+    if (previous === entry.work.id) for (const missing of gap) add(group, missing, null);
     gap = [];
-    current = {
-      workId: entry.work.id,
-      title: entry.work.title || "Untitled work",
-      ...entry.composer && { subtitle: entry.composer },
-      trackIds: [],
-      titles: []
-    };
-    add(current, track, entry);
-    groups.push(current);
+    add(group, track, entry);
+    previous = entry.work.id;
   }
-  if (!groups.length) return null;
-  return { label: "By work", groups: groups.map(({ workId, ...group }) => group) };
+  if (!byWork.size) return null;
+  return { label: "By work", groups: [...byWork.values()] };
 }
 
 // src/mb.js
 import path5 from "node:path";
 
 // src/version.js
-var VERSION = "1.1.5";
+var VERSION = "1.1.6";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js
