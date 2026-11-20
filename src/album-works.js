@@ -22,17 +22,27 @@ export async function albumPresentation(ctx, album) {
   const known = await works(ctx);
   const groups = [];
   let current = null;
+  // Tracks with no file yet (still downloading, or missing) between two
+  // tracks of one work stay under its heading.
+  let gap = [];
   for (const track of album?.tracks || []) {
-    const real = track.path ? await fs.realpath(track.path).catch(() => track.path) : null;
-    const entry = real ? known[real] : null;
+    if (!track.path) {
+      if (current) gap.push(track.id);
+      continue;
+    }
+    const real = await fs.realpath(track.path).catch(() => track.path);
+    const entry = known[real];
     if (!entry?.work?.id) {
       current = null;
+      gap = [];
       continue;
     }
     if (current?.workId === entry.work.id) {
-      current.trackIds.push(track.id);
+      current.trackIds.push(...gap, track.id);
+      gap = [];
       continue;
     }
+    gap = [];
     current = {
       workId: entry.work.id,
       title: entry.work.title || "Untitled work",

@@ -119,8 +119,10 @@ Each file is read again first: one that changed since the plan is left alone,
 and the rest get exactly the values the plan showed. A newer plan for the same
 album or artist replaces an older one, and plans are dropped after a week.
 
-Files in a read-only folder are planned like any other, and the message says
-they can't be written. Nothing is ever written to them.
+Files in a read-only folder, including Aurral's read-only folders outside the
+Library folder, are planned like any other (so their albums get work
+headings), and the message says they can't be written. Nothing is ever
+written to them.
 
 Admin actions never wait their turn behind other tagging. Several can run at
 once, and background tagging (the schedule, new downloads) pauses at its next

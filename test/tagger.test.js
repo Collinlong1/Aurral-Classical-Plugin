@@ -597,3 +597,28 @@ test("a read-only folder is previewed but never written", async (t) => {
   }
 });
 
+test("an album in one of Aurral's read-only folders is previewed and grouped, never written", async () => {
+  const admin = { id: 1, role: "admin" };
+  // Outside the Library folder, where Aurral's read-only folders live.
+  const file = await copyFixture("sine.flac", path.join(folders.root, "music", "ro", "01.flac"));
+  const before = await fs.readFile(file);
+  const album = { id: 11, title: "Elsewhere", tracks: [{ id: 5, path: file }] };
+  const planned = await plugin.actions["tag-album"](input({ user: admin, album }));
+  assert.ok(planned.message.includes(`Artist: ${EXPECTED_ARTIST}.`), planned.message);
+  assert.match(planned.message, /These files are read-only, so they can't be written\.$/);
+  assert.deepEqual((await plugin.albumPresentation(input({ album }))).groups.map((group) => group.trackIds), [[5]]);
+  const written = await plugin.actions["write-album"](input({ user: admin, album }));
+  assert.match(written.message, /1 skipped \(read-only folder\)/);
+  assert.deepEqual(await fs.readFile(file), before);
+});
+
+test("tracks with no file inside a work stay under its heading", async () => {
+  const admin = { id: 1, role: "admin" };
+  const one = await copyFixture("sine.flac", path.join(folders.libraryFolder, "gap", "01.flac"));
+  const three = await copyFixture("sine.mp3", path.join(folders.libraryFolder, "gap", "03.mp3"));
+  const album = { id: 12, title: "Gap", tracks: [{ id: 1, path: one }, { id: 2, path: null }, { id: 3, path: three }, { id: 4, path: null }] };
+  await plugin.actions["tag-album"](input({ user: admin, album }));
+  const { groups } = await plugin.albumPresentation(input({ album }));
+  assert.deepEqual(groups.map((group) => group.trackIds), [[1, 2, 3]]);
+});
+

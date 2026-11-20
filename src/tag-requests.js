@@ -94,16 +94,22 @@ export async function requestTags(ctx, paths, { mode, what, actor, target = null
   if (!MODES[mode]) throw new Error("Unknown tag request");
   if (!paths.length) return { message: mode === "tag" ? `No files to tag in ${what}` : `No files in ${what}` };
   const plan = [];
+  const outside = new Set();
   let unreachable = false;
   const stats = await withTagging(
     ctx,
     async (session) => {
       for (const file of paths) {
-        const real = await allowedPath(ctx, file);
+        // Files in Aurral's read-only folders (outside the Library folder)
+        // are planned from the paths Aurral gave, so they can be previewed
+        // and grouped by work; they are never written.
+        const inside = await allowedPath(ctx, file);
+        const real = inside || (await fsp.realpath(file).catch(() => null));
         if (!real || !isAudioPath(real)) {
-          plan.push({ file, status: "skipped", reason: real ? "not an audio file" : "outside the Library" });
+          plan.push({ file, status: "skipped", reason: real ? "not an audio file" : "file not found" });
           continue;
         }
+        if (!inside) outside.add(real);
         if (mode === "tag") {
           if (!(await session.processReal(real, { force: true, plan }))) {
             unreachable = true;
@@ -117,7 +123,7 @@ export async function requestTags(ctx, paths, { mode, what, actor, target = null
   if (!stats) return { message: "Tagging is busy. Try again in a few minutes." };
   const files = plan.map((entry) => (entry.status === "planned" ? { ...entry, status: same(entry.current, entry.values) ? "unchanged" : "change" } : entry));
   let readOnly = 0;
-  for (const entry of files) if (entry.status === "change" && !(await writable(entry.file))) readOnly++;
+  for (const entry of files) if (entry.status === "change" && (outside.has(entry.file) || !(await writable(entry.file)))) readOnly++;
   const count = (status) => files.filter((entry) => entry.status === status).length;
   const changing = count("change");
   // Skips by reason, as the tagger reports them: "1 skipped (non-classical)".
@@ -165,8 +171,9 @@ export async function applyRequest(ctx, id, actor) {
         if (entry.status !== "change") continue;
         const real = await allowedPath(ctx, entry.file);
         if (!real) {
-          entry.result = { status: "skipped", reason: "outside the Library" };
+          entry.result = { status: "skipped", reason: "read-only folder" };
           counts.skipped++;
+          session.stats.skipped["read-only folder"] = (session.stats.skipped["read-only folder"] || 0) + 1;
           continue;
         }
         entry.result = await session.state

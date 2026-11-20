@@ -36247,17 +36247,25 @@ async function albumPresentation(ctx, album) {
   const known = await works(ctx);
   const groups = [];
   let current = null;
+  let gap = [];
   for (const track of album?.tracks || []) {
-    const real = track.path ? await fs4.realpath(track.path).catch(() => track.path) : null;
-    const entry = real ? known[real] : null;
+    if (!track.path) {
+      if (current) gap.push(track.id);
+      continue;
+    }
+    const real = await fs4.realpath(track.path).catch(() => track.path);
+    const entry = known[real];
     if (!entry?.work?.id) {
       current = null;
+      gap = [];
       continue;
     }
     if (current?.workId === entry.work.id) {
-      current.trackIds.push(track.id);
+      current.trackIds.push(...gap, track.id);
+      gap = [];
       continue;
     }
+    gap = [];
     current = {
       workId: entry.work.id,
       title: entry.work.title || "Untitled work",
@@ -36275,7 +36283,7 @@ async function albumPresentation(ctx, album) {
 import path5 from "node:path";
 
 // src/version.js
-var VERSION = "1.1.0";
+var VERSION = "1.1.1";
 var REPOSITORY = "https://github.com/Collinlong1/Aurral-Classical-Plugin";
 
 // src/mb.js
@@ -37967,16 +37975,19 @@ async function requestTags(ctx, paths, { mode, what, actor, target = null }) {
   if (!MODES[mode]) throw new Error("Unknown tag request");
   if (!paths.length) return { message: mode === "tag" ? `No files to tag in ${what}` : `No files in ${what}` };
   const plan = [];
+  const outside = /* @__PURE__ */ new Set();
   let unreachable = false;
   const stats = await withTagging(
     ctx,
     async (session) => {
       for (const file of paths) {
-        const real = await allowedPath(ctx, file);
+        const inside = await allowedPath(ctx, file);
+        const real = inside || await fsp.realpath(file).catch(() => null);
         if (!real || !isAudioPath(real)) {
-          plan.push({ file, status: "skipped", reason: real ? "not an audio file" : "outside the Library" });
+          plan.push({ file, status: "skipped", reason: real ? "not an audio file" : "file not found" });
           continue;
         }
+        if (!inside) outside.add(real);
         if (mode === "tag") {
           if (!await session.processReal(real, { force: true, plan })) {
             unreachable = true;
@@ -37990,7 +38001,7 @@ async function requestTags(ctx, paths, { mode, what, actor, target = null }) {
   if (!stats) return { message: "Tagging is busy. Try again in a few minutes." };
   const files = plan.map((entry) => entry.status === "planned" ? { ...entry, status: same2(entry.current, entry.values) ? "unchanged" : "change" } : entry);
   let readOnly = 0;
-  for (const entry of files) if (entry.status === "change" && !await writable(entry.file)) readOnly++;
+  for (const entry of files) if (entry.status === "change" && (outside.has(entry.file) || !await writable(entry.file))) readOnly++;
   const count = (status) => files.filter((entry) => entry.status === status).length;
   const changing = count("change");
   const reasons = {};
@@ -38033,8 +38044,9 @@ async function applyRequest(ctx, id, actor) {
         if (entry.status !== "change") continue;
         const real = await allowedPath(ctx, entry.file);
         if (!real) {
-          entry.result = { status: "skipped", reason: "outside the Library" };
+          entry.result = { status: "skipped", reason: "read-only folder" };
           counts.skipped++;
+          session.stats.skipped["read-only folder"] = (session.stats.skipped["read-only folder"] || 0) + 1;
           continue;
         }
         entry.result = await session.state.exclusive(real, async () => {
